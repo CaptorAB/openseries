@@ -1,0 +1,62 @@
+{
+  "layout": {
+    "autosize": true,
+    "title": {
+      "text": null,
+      "y": 0.97,
+      "x": 0.5,
+      "xanchor": "center",
+      "yanchor": "top"
+    },
+    "titlefont": {
+      "size": 24
+    },
+    "font": {
+      "size": 14,
+      "color": "#01579B",
+      "family": "Proxima Nova-Light, Proxima Nova Light, Proxima Nova"
+    },
+    "xaxis": {
+      "tickformat": null,
+      "tickangle": -45,
+      "title": null,
+      "gridcolor": "#EEEEEE",
+      "zeroline": false
+    },
+    "yaxis": {
+      "tickformat": "%",
+      "title": null,
+      "gridcolor": "#EEEEEE",
+      "zeroline": false
+    },
+    "colorway": [
+      "#2186c5",
+      "#43a04c",
+      "#f44336",
+      "#f8a031",
+      "#ba46b8",
+      "#009688",
+      "#ff5722",
+      "#ec407a",
+      "#c0ca33",
+      "#795548",
+      "#e5878a",
+      "#9e9e9e"
+    ],
+    "showlegend": true,
+    "paper_bgcolor": "rgba(0, 0, 0, 0)",
+    "plot_bgcolor": "rgba(0, 0, 0, 0)",
+    "legend": {
+      "orientation": "h",
+      "valign": "bottom",
+      "y": -0.15
+    },
+    "margin": {
+      "l": 40,
+      "r": 18,
+      "t": 34,
+      "b": 40,
+      "pad": 4
+    }
+  }
+}
