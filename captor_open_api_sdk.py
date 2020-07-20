@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+import datetime as dt
 import pandas as pd
 import requests
 
 
 class CaptorOpenApiService(object):
 
-    def __init__(self, base_url: str = 'https://apiv2.captor.se/public/api/'):
+    def __init__(self, base_url: str = 'https://apiv2.captor.se/public/api'):
         """
         :param base_url:
         """
@@ -28,6 +29,24 @@ class CaptorOpenApiService(object):
         :return: dict
         """
         response = requests.get(url=self.base_url + f'{url}/{timeseries_id}', headers=self.headers)
+
+        if response.status_code // 100 != 2:
+            raise Exception(f'{response.status_code}, {response.text}')
+
+        return response.json()
+
+    def get_fundinfo(self, isins: list, report_date: dt.date = None, url: str = '/fundinfo') -> dict:
+        """
+
+        :param isins: list
+        :param report_date:
+        :param url: str
+        :return: dict
+        """
+        params = {'isins': isins}
+        if report_date:
+            params.update({'reportDate': report_date.strftime('%Y-%m-%d')})
+        response = requests.get(url=self.base_url + url, params=params, headers=self.headers)
 
         if response.status_code // 100 != 2:
             raise Exception(f'{response.status_code}, {response.text}')

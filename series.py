@@ -51,16 +51,15 @@ class OpenTimeSeries(object):
     def __init__(self, d):
 
         schema_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'openseries.json')
-        with open(schema_file, 'r') as f:
+        with open(file=schema_file, mode='r', encoding='utf-8') as f:
             series_schema = json.load(f)
 
         try:
-            jsonschema.validate(d, series_schema)
+            jsonschema.validate(instance=d, schema=series_schema)
         except ValidationError as e:
             raise Exception(d.get('_id', None), d.get('name', None), e)
 
-        for item in d:
-            self.__setattr__(item, d.get(item, ''))
+        self.__dict__ = d
 
         if self.name != '':
             self.label = self.name
@@ -139,26 +138,33 @@ class OpenTimeSeries(object):
         return cls(d=output)
 
     @classmethod
-    def dev_purpose_from_jsonfile(cls, filename: str = 'series.json'):
+    def from_open_fundinfo(cls, isin: str, report_date: dt.date = None, valuetype: str = 'Price(Close)',
+                           local_ccy: bool = True):
         """
-        Method to create a timeseries from a json file in the current working directory.
+        Method to create a timeseries from Captor open API.
 
-        :param filename: File from which to load dict (JSON).
+        :param isin:
+        :param report_date:
+        :param valuetype:
+        :param local_ccy:
         """
-        assert os.path.isfile(filename), 'The file passed does not exist in the current working directory.'
-        with open(filename, 'r') as ff:
-            output = json.load(ff)
+        captor = CaptorOpenApiService()
+        data = captor.get_fundinfo(isins=[isin], report_date=report_date)
 
-        return cls(d=output)
+        fundinfo = data[0]['classes'][0]
 
-    @classmethod
-    def from_dict(cls, output: dict):
-        """
-        Method to create a timeseries from a dictionary.
+        if isin != fundinfo['isin']:
+            raise Exception('Method OpenTimeSeries.from_open_fundinfo() returned the wrong isin.')
 
-        :param output: a dictionary that should have the structure of the Captor timeseries collection.
-        """
-        assert isinstance(output, dict), 'argument must be dict'
+        output = {'_id': '',
+                  'name': fundinfo['name'],
+                  'currency': fundinfo['navCurrency'],
+                  'instrumentId': '',
+                  'isin': fundinfo['isin'],
+                  'local_ccy': local_ccy,
+                  'valuetype': valuetype,
+                  'dates': fundinfo['returnTimeSeries']['dates'],
+                  'values': [float(val) for val in fundinfo['returnTimeSeries']['values']]}
 
         return cls(d=output)
 
@@ -205,7 +211,7 @@ class OpenTimeSeries(object):
     def from_frame(cls, frame, label: str, valuetype: str = 'Price(Close)',
                    baseccy: str = 'SEK', local_ccy: bool = True):
         """
-        Method to create a timeseries from a series sliced from a CaptorFrame.
+        Method to create a timeseries from a series sliced from an OpenFrame.
 
         :param frame:
         :param label:
@@ -1184,22 +1190,19 @@ class OpenTimeSeries(object):
             sizer = None
             text_array = None
 
-        data = [go.Scatter(
-            x=self.tsdf.index,
-            y=values,
-            hovertemplate='%{y}<br>%{x|%x}',
-            line=dict(
-                width=2.5,
-                color='rgb(33, 134, 197)',
-                dash='solid'),
-            marker=dict(
-                size=size_array,
-                sizemode='area',
-                sizeref=sizer,
-                sizemin=4),
-            text=text_array,
-            mode=mode,
-            name=self.label)]
+        data = [go.Scatter(x=self.tsdf.index,
+                           y=values,
+                           hovertemplate='%{y}<br>%{x|%Y-%m-%d}',
+                           line=dict(width=2.5,
+                                     color='rgb(33, 134, 197)',
+                                     dash='solid'),
+                           marker=dict(size=size_array,
+                                       sizemode='area',
+                                       sizeref=sizer,
+                                       sizemin=4),
+                           text=text_array,
+                           mode=mode,
+                           name=self.label)]
 
         layoutfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plotly_layouts.json')
         with open(layoutfile, 'r', encoding='utf-8') as ff:
@@ -1241,4 +1244,4 @@ def timeseries_chain(front, back, old_fee: float = 0.0):
     for item in cleaner_list:
         new_dict.pop(item)
     new_dict.update(dates=dates, values=values)
-    return type(back).from_dict(output=new_dict)
+    return type(back)(new_dict)

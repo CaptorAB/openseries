@@ -8,7 +8,6 @@ import numpy as np
 import os
 import random
 import string
-import webbrowser
 import pandas as pd
 from pandas.tseries.offsets import CDay
 from pathlib import Path
@@ -43,7 +42,7 @@ class OpenFrame(object):
         if constituents is not None and len(constituents) != 0:
             self.tsdf = pd.concat([x.tsdf for x in self.constituents], axis='columns')
         else:
-            logging.warning('CaptorFrame() was passed an empty list.')
+            logging.warning('OpenFrame() was passed an empty list.')
 
         if weights is not None:
             assert len(self.constituents) == len(self.weights), 'Number of TimeSeries must equal number of weights.'
@@ -936,7 +935,7 @@ class OpenFrame(object):
         :param name:
         """
         if self.weights is None:
-            raise Exception('CaptorFrame weights property must be provided to run the make_portfolio method.')
+            raise Exception('OpenFrame weights property must be provided to run the make_portfolio method.')
         df = self.tsdf.copy()
         if not any([True if x == 'Return(Total)' else False for x in self.tsdf.columns.get_level_values(1).values]):
             df = df.pct_change()
@@ -1047,16 +1046,6 @@ class OpenFrame(object):
             mddf = pd.concat([mddf, dd], axis='columns')
         return mddf.T
 
-    def show_public_series_url(self):
-        """
-        Method allows manuel setting the columns of the tsdf Pandas Dataframe associated with the timeseries
-
-        """
-        idlist = [getattr(x, '_id') for x in self.constituents]
-        idlist = ','.join(idlist)
-        url = f'https://portal.captor.se/publictimeseries/{idlist}?noLogin=true'
-        webbrowser.open_new_tab(url)
-
     def plot_series(self, mode: str = 'lines', tick_fmt: str = None, filename: str = None, directory: str = None,
                     labels: list = None, auto_open: bool = True) -> (go.Figure, str):
         """
@@ -1084,16 +1073,13 @@ class OpenFrame(object):
 
         data = []
         for item in range(self.item_count):
-            data.append(
-                go.Scatter(
-                    x=self.tsdf.index,
-                    y=self.tsdf.iloc[:, item],
-                    hovertemplate='%{y}<br>%{x|%x}',
-                    line=dict(
-                        width=2.5,
-                        dash='solid'),
-                    mode=mode,
-                    name=labels[item]))
+            data.append(go.Scatter(x=self.tsdf.index,
+                                   y=self.tsdf.iloc[:, item],
+                                   hovertemplate='%{y}<br>%{x|%Y-%m-%d}',
+                                   line=dict(width=2.5,
+                                             dash='solid'),
+                                   mode=mode,
+                                   name=labels[item]))
 
         layoutfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plotly_layouts.json')
         with open(layoutfile, 'r', encoding='utf-8') as f:

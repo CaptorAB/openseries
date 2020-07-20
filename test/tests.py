@@ -59,7 +59,9 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_opentimeseries_tsdf_not_empty(self):
 
         json_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'series.json')
-        timeseries = OpenTimeSeries.dev_purpose_from_jsonfile(json_file)
+        with open(json_file, 'r') as ff:
+            output = json.load(ff)
+        timeseries = OpenTimeSeries(output)
 
         self.assertFalse(timeseries.tsdf.empty)
 
@@ -77,19 +79,12 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertTrue(isinstance(timeseries, OpenTimeSeries))
 
-    def test_create_opentimeseries_from_dict(self):
+    def test_create_opentimeseries_from_open_fundinfo(self):
 
         fund = 'SE0009807308'
-        timeseries1 = OpenTimeSeries.from_open_nav(isin=fund)
+        timeseries = OpenTimeSeries.from_open_fundinfo(isin=fund)
 
-        new_dict = timeseries1.attributes
-        cleaner_list = ['label', 'tsdf']
-        for item in cleaner_list:
-            new_dict.pop(item)
-
-        timeseries2 = OpenTimeSeries.from_dict(new_dict)
-
-        self.assertTrue(isinstance(timeseries2, OpenTimeSeries))
+        self.assertTrue(isinstance(timeseries, OpenTimeSeries))
 
     def test_create_opentimeseries_from_pandas_df(self):
 
@@ -129,13 +124,6 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertFalse(os.path.exists(seriesfile))
 
-    def test_create_opentimeseries_from_jsonfile(self):
-
-        json_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'series.json')
-        timeseries = OpenTimeSeries.dev_purpose_from_jsonfile(json_file)
-
-        self.assertTrue(isinstance(timeseries, OpenTimeSeries))
-
     def test_create_opentimeseries_from_fixed_rate(self):
 
         fixseries = OpenTimeSeries.from_fixed_rate(rate=0.03, days=756, end_dt=dt.date(2019, 6, 30))
@@ -153,13 +141,13 @@ class TestOpenTimeSeries(unittest.TestCase):
             new_dict.pop(item)
 
         with self.assertRaises(Exception):
-            OpenTimeSeries.from_dict(new_dict)
+            OpenTimeSeries(new_dict)
 
         new_dict.pop('label')
         new_dict['dates'] = []  # Set dates attribute to empty array to trigger minItems ValidationError
 
         with self.assertRaises(Exception):
-            OpenTimeSeries.from_dict(new_dict)
+            OpenTimeSeries(new_dict)
 
     def test_opentimeseries_periods_in_a_year(self):
 
@@ -657,15 +645,14 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         common_methods = ['align_index_to_local_cdays', 'all_properties', 'calc_range', 'from_deepcopy', 'plot_series',
                           'resample', 'return_nan_handle', 'rolling_return', 'rolling_vol', 'rolling_cvar_down',
-                          'rolling_var_down', 'show_public_series_url', 'to_cumret', 'to_drawdown_series',
-                          'value_nan_handle', 'value_ret_calendar_period', 'value_to_diff', 'value_to_log',
-                          'value_to_ret']
+                          'rolling_var_down', 'to_cumret', 'to_drawdown_series', 'value_nan_handle',
+                          'value_ret_calendar_period', 'value_to_diff', 'value_to_log', 'value_to_ret']
 
-        series_createmethods = ['dev_purpose_from_jsonfile', 'from_open_api', 'from_open_nav', 'from_df', 'from_dict',
-                                'from_frame', 'from_fixed_rate', 'from_quandl']
+        series_createmethods = ['from_open_api', 'from_open_nav', 'from_open_fundinfo', 'from_df', 'from_frame',
+                                'from_fixed_rate', 'from_quandl']
 
         series_unique = ['pandas_df', 'running_adjustment', 'set_new_label', 'to_json', 'validate_vs_schema',
-                         'setup_class']
+                         'setup_class', 'show_public_series_url']
 
         frame_unique = ['add_timeseries', 'delete_timeseries', 'delete_tsdf_item', 'drawdown_details',
                         'ord_least_squares_fit', 'make_portfolio', 'relative', 'rolling_corr', 'trunc_frame',
