@@ -135,7 +135,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         fund = 'SE0009807308'
         timeseries1 = OpenTimeSeries.from_open_nav(isin=fund)
 
-        new_dict = timeseries1.attributes
+        new_dict = timeseries1.__dict__
         cleaner_list = ['local_ccy', 'tsdf']  # 'local_ccy' not removed to trigger ValidationError
         for item in cleaner_list:
             new_dict.pop(item)
@@ -177,31 +177,6 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertEqual(121, rs_series.length)
         self.assertEqual(before, rs_series.value_ret)
-
-    def test_opentimeseries_nan_nandf(self):
-
-        simnan = ReturnSimulation.from_merton_jump_gbm(n=1, d=2512, mu=0.05, vol=0.1,
-                                                       jumps_lamda=0.00125, jumps_sigma=0.001, jumps_mu=-0.2, seed=71)
-        nanseries = sim_to_opentimeseries(simnan, end=dt.date(2019, 6, 30)).to_cumret()
-
-        self.assertFalse(nanseries.nan)
-
-        nanseries.tsdf.iloc[1] = None
-
-        self.assertTrue(nanseries.nan)
-        self.assertEqual('2009-07-01', nanseries.nandf.index[0].strftime('%Y-%m-%d'))
-
-        nanseries.value_nan_handle()
-        self.assertFalse(nanseries.nan)
-
-        nanseries.value_to_ret()
-        nanseries.tsdf.iloc[1] = None
-
-        self.assertTrue(nanseries.nan)
-        self.assertEqual('2009-07-01', nanseries.nandf.index[0].strftime('%Y-%m-%d'))
-
-        nanseries.return_nan_handle()
-        self.assertFalse(nanseries.nan)
 
     def test_opentimeseries_calc_range(self):
 
@@ -441,26 +416,6 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertDictEqual(dict_toframe_0, dict_toframe_1)
 
-    def test_openframe_nan_nandf(self):
-
-        sim_nanframe = ReturnSimulation.from_normal(n=4, d=61, mu=0.05, vol=0.1, seed=71)
-        frame_nan = sim_to_openframe(sim_nanframe, end=dt.date(2019, 6, 30))
-
-        self.assertFalse(frame_nan.nan)
-
-        frame_nan.tsdf.iloc[1, 1] = None
-
-        self.assertTrue(frame_nan.nan)
-        self.assertEqual('2019-03-29', frame_nan.nandf.index[0].strftime('%Y-%m-%d'))
-
-        frame_nan.tsdf.iloc[1, 1] = 0.01
-        self.assertFalse(frame_nan.nan)
-
-        frame_nan.tsdf.iloc[1, 1] = np.nan
-
-        self.assertTrue(frame_nan.nan)
-        self.assertEqual('2019-03-29', frame_nan.nandf.index[0].strftime('%Y-%m-%d'))
-
     def test_openframe_keyvaluetable_with_relative_results(self):
 
         json_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'key_value_table_with_relative.json')
@@ -611,12 +566,12 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         common_props = ['periods_in_a_year', 'yearfrac', 'max_drawdown_date']
 
-        common_attributes = ['attributes', 'length', 'first_idx', 'last_idx', 'nan', 'nandf', 'tsdf', 'sweden']
+        common_attributes = ['length', 'first_idx', 'last_idx', 'tsdf', 'sweden']
 
         series_attributes = ['values', 'local_ccy', '_id', 'instrumentId', 'currency', 'isin', 'dates', 'name',
                              'valuetype', 'label', 'domestic']
 
-        frame_attributes = ['constituents', 'columns_lvl_zero', 'columns_lvl_one', 'item_count', 'labels', 'weights',
+        frame_attributes = ['constituents', 'columns_lvl_zero', 'columns_lvl_one', 'item_count', 'weights',
                             'first_indices', 'last_indices', 'lengths_of_items']
 
         frame_calc_props = ['correl_matrix']
@@ -655,8 +610,7 @@ class TestOpenTimeSeries(unittest.TestCase):
                          'setup_class', 'show_public_series_url']
 
         frame_unique = ['add_timeseries', 'delete_timeseries', 'delete_tsdf_item', 'drawdown_details',
-                        'ord_least_squares_fit', 'make_portfolio', 'relative', 'rolling_corr', 'trunc_frame',
-                        'warn_diff_nbr_datapoints', 'warn_nan_present']
+                        'ord_least_squares_fit', 'make_portfolio', 'relative', 'rolling_corr', 'trunc_frame']
 
         series_methods = [a for a in dir(sameseries) if not a.startswith('__') and callable(getattr(sameseries, a))]
         series_compared = set(series_methods).symmetric_difference(set(common_calc_methods + common_methods +

@@ -27,20 +27,20 @@ from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
 
 class OpenTimeSeries(object):
 
-    _id: str
-    instrumentId: str
-    currency: str
-    dates: List[str]
-    domestic: str
-    name: str
-    isin: str
-    label: str
-    schema: dict
-    sweden: CaptorHolidayCalendar
-    valuetype: str
-    values: List[float]
-    local_ccy: bool
-    tsdf: pd.DataFrame
+    _id: str  # Captor database identifier for the timeseries
+    instrumentId: str  # Captor database identifier for the instrument associated with the timeseries
+    currency: str  # Currency of the timeseries. Only used if conversion/hedging methods are added.
+    dates: List[str]  # Dates of the timeseries. Not edited by any method to allow reversion to original.
+    domestic: str  # Domestic currency of the user / investor. Only used if conversion/hedging methods are added.
+    name: str  # An identifier field.
+    isin: str  # ISIN code of the associated instrument. If any.
+    label: str  # Field used in outputs.
+    schema: dict  # Jsonschema to validate against in the __init__ method.
+    sweden: CaptorHolidayCalendar  # A calendar object used to generate business days.
+    valuetype: str  # "Price(Close)" if a series of values and "Return(Total)" if a series of returns.
+    values: List[float]  # Values of the timeseries. Not edited by any method to allow reversion to original.
+    local_ccy: bool  # Indicates if series should be in its local currency or the domestic currency of the user.
+    tsdf: pd.DataFrame  # The Pandas DataFrame which gets edited by the class methods.
 
     @classmethod
     def setup_class(cls):
@@ -90,14 +90,7 @@ class OpenTimeSeries(object):
 
     @classmethod
     def from_open_api(cls, timeseries_id: str, label: str = 'series', baseccy: str = 'SEK', local_ccy: bool = True):
-        """
-        Method to create a timeseries from Captor open API.
 
-        :param timeseries_id:
-        :param label: A label to be set by user.
-        :param baseccy:
-        :param local_ccy:
-        """
         captor = CaptorOpenApiService()
         data = captor.get_timeseries(timeseries_id)
 
@@ -115,13 +108,7 @@ class OpenTimeSeries(object):
 
     @classmethod
     def from_open_nav(cls, isin: str, valuetype: str = 'Price(Close)', local_ccy: bool = True):
-        """
-        Method to create a timeseries from Captor open API.
 
-        :param isin:
-        :param valuetype:
-        :param local_ccy:
-        """
         captor = CaptorOpenApiService()
         data = captor.get_nav(isin=isin)
 
@@ -140,14 +127,7 @@ class OpenTimeSeries(object):
     @classmethod
     def from_open_fundinfo(cls, isin: str, report_date: dt.date = None, valuetype: str = 'Price(Close)',
                            local_ccy: bool = True):
-        """
-        Method to create a timeseries from Captor open API.
 
-        :param isin:
-        :param report_date:
-        :param valuetype:
-        :param local_ccy:
-        """
         captor = CaptorOpenApiService()
         data = captor.get_fundinfo(isins=[isin], report_date=report_date)
 
@@ -171,15 +151,7 @@ class OpenTimeSeries(object):
     @classmethod
     def from_df(cls, df: Union[pd.DataFrame, pd.Series], column_nmbr: int = 0, valuetype: str = 'Price(Close)',
                 baseccy: str = 'SEK', local_ccy: bool = True):
-        """
-        Method to create a timeseries from a Pandas Dataframe.
 
-        :param df:
-        :param column_nmbr:
-        :param valuetype:
-        :param baseccy:
-        :param local_ccy:
-        """
         if isinstance(df, Series):
             if isinstance(df.name, tuple):
                 label, _ = df.name
@@ -210,15 +182,7 @@ class OpenTimeSeries(object):
     @classmethod
     def from_frame(cls, frame, label: str, valuetype: str = 'Price(Close)',
                    baseccy: str = 'SEK', local_ccy: bool = True):
-        """
-        Method to create a timeseries from a series sliced from an OpenFrame.
 
-        :param frame:
-        :param label:
-        :param valuetype:
-        :param baseccy:
-        :param local_ccy:
-        """
         df = frame.tsdf.loc[:, (label, valuetype)]
         dates = [date_fix(d).strftime('%Y-%m-%d') for d in df.index]
 
@@ -238,14 +202,7 @@ class OpenTimeSeries(object):
     @classmethod
     def from_quandl(cls, database_code: str, dataset_code: str, field: Union[int, str] = 1, baseccy: str = 'SEK',
                     local_ccy: bool = True):
-        """
 
-        :param database_code:
-        :param dataset_code:
-        :param field:
-        :param baseccy:
-        :param local_ccy:
-        """
         home_dir = str(Path.home())
         apikey_file = os.path.join(home_dir, '.quandl_apikey')
         with open(apikey_file, 'r') as ff:
@@ -321,12 +278,7 @@ class OpenTimeSeries(object):
         return cls(d=output)
 
     def to_json(self, filename: str, directory: str = None) -> dict:
-        """
-        This method will do a json dump to file.
 
-        :param directory: Provide something like this: directory = os.path.dirname(os.path.abspath(__file__))
-        :param filename: Provide filename including the extension .json
-        """
         if not directory:
             directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -342,9 +294,7 @@ class OpenTimeSeries(object):
         return data
 
     def pandas_df(self):
-        """
-        This method creates a Pandas DataFrame attribute, tsdf, from the given list of dates and values.
-        """
+
         df = pd.DataFrame(data=self.values, index=self.dates, dtype='float64')
         df.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         df.index = pd.DatetimeIndex(df.index)
@@ -355,9 +305,7 @@ class OpenTimeSeries(object):
         return self
 
     def validate_vs_schema(self):
-        """
-        This method validates the object __dict__ versus a jsonschema located here: Core/schemas/timeSeries.json
-        """
+
         cleaned_dict = self.__dict__
 
         extra_keys = ['api', 'tsdf', 'local_ccy']
@@ -427,11 +375,7 @@ class OpenTimeSeries(object):
         return self
 
     def all_properties(self, properties: list = None) -> pd.DataFrame:
-        """
-        Method to return all timeseries properties.
 
-        :param properties: A list to override the full list of properties.
-        """
         if not properties:
             properties = ['value_ret', 'geo_ret', 'arithmetic_ret', 'twr_ret', 'vol', 'ret_vol_ratio', 'z_score',
                           'skew', 'kurtosis', 'positive_share', 'var_down', 'cvar_down', 'vol_from_var', 'worst',
@@ -445,45 +389,18 @@ class OpenTimeSeries(object):
         return pdf
 
     @property
-    def attributes(self) -> dict:
-        """
-        Method returns object __dict__.
-        """
-        return self.__dict__
-
-    @property
     def length(self) -> int:
-        """
-        Number of row items (dates) in the associated Pandas Dataframe.
-        """
+
         return len(self.tsdf.index)
 
     @property
-    def nan(self) -> bool:
-        """
-        True if series contains NaN / null.
-        """
-        return self.tsdf.isnull().values.any()
-
-    @property
-    def nandf(self) -> pd.DataFrame:
-        """
-        Returns Pandas DataFrame with all rows that contain any NaN.
-        """
-        return self.tsdf[self.tsdf.isnull().T.any().T]
-
-    @property
     def first_idx(self) -> dt.date:
-        """
-        First valid index in the associated Pandas Dataframe.
-        """
+
         return self.tsdf.first_valid_index().date()
 
     @property
     def last_idx(self) -> dt.date:
-        """
-        Last valid index in the associated Pandas Dataframe.
-        """
+
         return self.tsdf.last_valid_index().date()
 
     @property
@@ -496,7 +413,7 @@ class OpenTimeSeries(object):
     @property
     def periods_in_a_year(self) -> float:
         """
-        The number of businessdays in an average year for all days in the data.
+        The number of observations in an average year for all days in the data.
         """
         return self.length / self.yearfrac
 
@@ -669,13 +586,13 @@ class OpenTimeSeries(object):
     @property
     def z_score(self) -> float:
         """
-        Z-score as (last return - mean return) / standard deviation of return
+        Z-score as (last return - mean return) / standard deviation of returns.
         """
         return float((self.tsdf.pct_change().iloc[-1] - self.tsdf.pct_change().mean()) / self.tsdf.pct_change().std())
 
     def z_score_func(self, months_from_last: int = None, from_date: dt.date = None, to_date: dt.date = None) -> float:
         """
-        Z-score as (last return - mean return) / standard deviation of return
+        Z-score as (last return - mean return) / standard deviation of returns.
         :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
@@ -694,7 +611,7 @@ class OpenTimeSeries(object):
     @property
     def max_drawdown_date(self) -> dt.date:
         """
-        Date when Max drawdown occurred.
+        Date when the maximum drawdown occurred.
         """
         mdd_date = (self.tsdf / self.tsdf.expanding(min_periods=1).max()).idxmin().values[0].astype(dt.datetime)
         return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
@@ -702,7 +619,7 @@ class OpenTimeSeries(object):
     def max_drawdown_func(self, months_from_last: int = None,
                           from_date: dt.date = None, to_date: dt.date = None) -> float:
         """
-        Max drawdown.
+        Maximum drawdown.
 
         :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
         :param from_date: Specific from date
@@ -715,7 +632,7 @@ class OpenTimeSeries(object):
     @property
     def max_drawdown_cal_year(self) -> float:
         """
-        Max drawdown in a single calendar year.
+        Maximum drawdown in a single calendar year.
         """
         return float(self.tsdf.groupby([self.tsdf.index.year]).apply(
             lambda x: (x / x.expanding(min_periods=1).max()).min() - 1).min())
@@ -808,7 +725,7 @@ class OpenTimeSeries(object):
     @property
     def cvar_down(self, level: float = 0.95) -> float:
         """
-        Downside CVaR.
+        Downside Conditional Value At Risk, "CVaR".
 
         :param level: The sought CVaR level as a float
         """
@@ -818,7 +735,7 @@ class OpenTimeSeries(object):
     def cvar_down_func(self, level: float = 0.95, months_from_last: int = None,
                        from_date: dt.date = None, to_date: dt.date = None) -> float:
         """
-        Downside CVaR.
+        Downside Conditional Value At Risk, "CVaR".
 
         :param level: The sought CVaR level as a float
         :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
@@ -833,7 +750,7 @@ class OpenTimeSeries(object):
     @property
     def var_down(self, level: float = 0.95, interpolation: str = 'lower') -> float:
         """
-        Downside VaR.
+        Downside Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
 
         :param level: The sought VaR level as a float
         :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
@@ -843,7 +760,7 @@ class OpenTimeSeries(object):
     def var_down_func(self, level: float = 0.95, months_from_last: int = None,
                       from_date: dt.date = None, to_date: dt.date = None, interpolation: str = 'lower') -> float:
         """
-        Downside VaR.
+        Downside Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
 
         :param level: The sought VaR level as a float
         :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
@@ -857,7 +774,7 @@ class OpenTimeSeries(object):
     @property
     def vol_from_var(self, level: float = 0.95, interpolation: str = 'lower') -> float:
         """
-        This method calculates an implied annualized volatility from the Downside VaR using the assumption that returns
+        Implied annualized volatility from the Downside VaR using the assumption that returns
         are normally distributed.
 
         :param level: The VaR level as a float
@@ -870,7 +787,7 @@ class OpenTimeSeries(object):
                           from_date: dt.date = None, to_date: dt.date = None, interpolation: str = 'lower',
                           drift_adjust: bool = False, periods_in_a_year_fixed: int = None) -> float:
         """
-        This method calculates an implied annualized volatility from the Downside VaR using the assumption that returns
+        Implied annualized volatility from the Downside VaR using the assumption that returns
         are normally distributed.
 
         :param level: The VaR level as a float
@@ -903,8 +820,7 @@ class OpenTimeSeries(object):
                                from_date: dt.date = None, to_date: dt.date = None, interpolation: str = 'lower',
                                drift_adjust: bool = False, periods_in_a_year_fixed: int = None) -> float:
         """
-        This method is used to calculate the Scilla strategy position target weight from the ratio between a
-        VaR implied volatility and a given target volatility.
+        A position target weight from the ratio between a VaR implied volatility and a given target volatility.
         :param target_vol:
         :param min_leverage_local:
         :param max_leverage_local:
@@ -929,7 +845,6 @@ class OpenTimeSeries(object):
     def value_to_ret(self, logret: bool = False):
         """
         Function converts a valueseries into a returnseries.
-        Percent return matches method applied by Bloomberg.
         Log return is the equivalent of LN(value[t] / value[t-1]) in MS excel.
 
         :param logret: Boolean set to True for log return and False for simple return.
@@ -1088,10 +1003,10 @@ class OpenTimeSeries(object):
 
     def running_adjustment(self, adjustment: float, days_in_year: int = 365):
         """
-        Method adds (+) or subtracts (-) a percentage fee from the timeseries return.
+        Method adds (+) or subtracts (-) a fee from the timeseries return.
 
-        :param adjustment: ...
-        :param days_in_year: ...
+        :param adjustment: Fee to add or subtract
+        :param days_in_year:
         """
         if any([True if x == 'Return(Total)' else False for x in self.tsdf.columns.get_level_values(1).values]):
             ra_df = self.tsdf.copy()
@@ -1116,9 +1031,9 @@ class OpenTimeSeries(object):
         """
         Method allows manuel setting the columns of the tsdf Pandas Dataframe associated with the timeseries
 
-        :param lvl_zero: ...
-        :param lvl_one: ...
-        :param delete_lvl_one: ...
+        :param lvl_zero: New level zero label
+        :param lvl_one: New level one label
+        :param delete_lvl_one: Boolean. If True the level one label is deleted.
         """
         if lvl_zero is None and lvl_one is None:
             self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
@@ -1128,7 +1043,7 @@ class OpenTimeSeries(object):
         elif lvl_zero is None and lvl_one is not None:
             self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [lvl_one]])
             self.valuetype = lvl_one
-        elif lvl_zero is not None and lvl_one is not None:
+        else:
             self.tsdf.columns = pd.MultiIndex.from_product([[lvl_zero], [lvl_one]])
             self.label, self.valuetype = lvl_zero, lvl_one
         if delete_lvl_one:
@@ -1224,9 +1139,9 @@ class OpenTimeSeries(object):
 def timeseries_chain(front, back, old_fee: float = 0.0):
     """
 
-    :param front:
-    :param back:
-    :param old_fee:
+    :param front: Earlier series to chain with.
+    :param back: Later series to chain with.
+    :param old_fee: Fee to apply to earlier series.
     """
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)
@@ -1239,7 +1154,7 @@ def timeseries_chain(front, back, old_fee: float = 0.0):
     dates.extend([x.strftime('%Y-%m-%d') for x in new.tsdf.index])
     values.extend([float(x) for x in new.tsdf.values])
 
-    new_dict = dict(new.attributes)
+    new_dict = dict(new.__dict__)
     cleaner_list = ['label', 'tsdf']
     for item in cleaner_list:
         new_dict.pop(item)

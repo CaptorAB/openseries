@@ -56,17 +56,11 @@ class OpenFrame(object):
         return '{}(constituents={}, weights={})'.format(self.__class__.__name__, self.constituents, self.weights)
 
     def from_deepcopy(self):
-        """
 
-        """
         return copy.deepcopy(self)
 
     def all_properties(self, properties: list = None) -> pd.DataFrame:
-        """
-        Method to return all timeseries properties.
 
-        :param properties: A list to override the default list of properties.
-        """
         if not properties:
             properties = ['value_ret', 'geo_ret', 'arithmetic_ret', 'twr_ret', 'vol', 'ret_vol_ratio', 'z_score',
                           'skew', 'kurtosis', 'positive_share', 'var_down', 'cvar_down', 'vol_from_var', 'worst',
@@ -122,108 +116,61 @@ class OpenFrame(object):
         return self
 
     @property
-    def attributes(self) -> dict:
-        """
-        Method returns object __dict__.
-        """
-        return self.__dict__
-
-    @property
-    def labels(self) -> list:
-        """
-        :return: List of labels for the TSframe constituents.
-        """
-        return [self.tsdf.iloc[:, x].name[0] for x in range(self.tsdf.shape[1])]
-
-    @property
     def length(self) -> int:
-        """
-        :return: Number of row items (dates) in the associated Pandas Dataframe.
-        """
+
         return len(self.tsdf.index)
 
     @property
     def lengths_of_items(self) -> pd.Series:
-        """
-        :return: Lengths of the constituent Dataframes.
-        """
+
         return pd.Series(data=[i.length for i in self.constituents], index=self.tsdf.columns, name='lengths of items')
 
     @property
     def item_count(self) -> int:
-        """
-        :return: Number of columns (individual timeseries) in the associated Pandas Dataframe.
-        """
+
         return self.tsdf.shape[1]
 
     @property
     def columns_lvl_zero(self) -> list:
-        """
-        :return: The names from level zero of the Dataframe columns.
-        """
+
         return self.tsdf.columns.get_level_values(0).tolist()
 
     @property
     def columns_lvl_one(self) -> list:
-        """
-        :return: The types from level one of the Dataframe columns.
-        """
+
         return self.tsdf.columns.get_level_values(1).tolist()
 
     @property
-    def nan(self) -> bool:
-        """
-        True if frame contains NaN / null.
-        """
-        return self.tsdf.isnull().values.any()
-
-    @property
-    def nandf(self) -> pd.DataFrame:
-        """
-        :return: Pandas DataFrame with all rows that contain any NaN.
-        Checking for NaN can be done by Boolean attribute nandf.empty. True means there are no NaN.
-        """
-        return self.tsdf[self.tsdf.isnull().T.any().T]
-
-    @property
     def first_idx(self) -> dt.date:
-        """
-        :return: First valid index in the associated Pandas Dataframe.
-        """
+
         return self.tsdf.first_valid_index().date()
 
     @property
     def first_indices(self) -> pd.Series:
-        """
-        :return: First valid indices of the constituent Dataframes.
-        """
+
         return pd.Series(data=[i.first_idx for i in self.constituents], index=self.tsdf.columns, name='first indices')
 
     @property
     def last_idx(self) -> dt.date:
-        """
-        :return: Last valid index in the associated Pandas Dataframe.
-        """
+
         return self.tsdf.last_valid_index().date()
 
     @property
     def last_indices(self) -> pd.Series:
-        """
-        :return: Last valid indices of the constituent Dataframes.
-        """
+
         return pd.Series(data=[i.last_idx for i in self.constituents], index=self.tsdf.columns, name='last indices')
 
     @property
     def yearfrac(self) -> float:
         """
-        :return: Length of timeseries expressed as fraction of a year with 365.25 days.
+        Length of timeseries expressed as fraction of a year with 365.25 days.
         """
         return (self.last_idx - self.first_idx).days / 365.25
 
     @property
     def periods_in_a_year(self) -> float:
         """
-        :return: The number of businessdays in an average year for all days in the data.
+        The number of businessdays in an average year for all days in the data.
         """
         return self.length / self.yearfrac
 
@@ -567,7 +514,7 @@ class OpenFrame(object):
     @property
     def cvar_down(self, level: float = 0.95) -> pd.Series:
         """
-        Downside CVaR.
+        Downside Conditional Value At Risk, "CVaR".
         :param level: The sought CVaR level as a float
         """
         cvar_df = self.tsdf.copy(deep=True)
@@ -578,7 +525,7 @@ class OpenFrame(object):
     def cvar_down_func(self, level: float = 0.95, months_from_last: int = None, from_date: dt.date = None,
                        to_date: dt.date = None) -> pd.Series:
         """
-        Downside CVaR.
+        Downside Conditional Value At Risk, "CVaR".
         :param level: The sought CVaR level as a float
         :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
         :param from_date: Specific from date
@@ -593,7 +540,7 @@ class OpenFrame(object):
     @property
     def var_down(self, level: float = 0.95, interpolation: str = 'lower') -> pd.Series:
         """
-        Downside VaR. The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
+        Downside Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
         :param level: The sought VaR level as a float
         :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
         """
@@ -603,7 +550,7 @@ class OpenFrame(object):
     def var_down_func(self, level: float = 0.95, months_from_last: int = None,
                       from_date: dt.date = None, to_date: dt.date = None, interpolation: str = 'lower') -> pd.Series:
         """
-        Downside VaR.
+        Downside Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
 
         :param level: The sought VaR level as a float
         :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
@@ -662,8 +609,7 @@ class OpenFrame(object):
                                from_date: dt.date = None, to_date: dt.date = None, interpolation: str = 'lower',
                                drift_adjust: bool = False, periods_in_a_year_fixed: int = None) -> pd.Series:
         """
-        This method is used to calculate the Scilla strategy position target weight from the ratio between a
-        VaR implied volatility and a given target volatility.
+        A position target weight from the ratio between a VaR implied volatility and a given target volatility.
         :param target_vol:
         :param min_leverage_local:
         :param max_leverage_local:
@@ -762,19 +708,6 @@ class OpenFrame(object):
         self.tsdf = self.tsdf.resample(freq).last()
         return self
 
-    def warn_diff_nbr_datapoints(self, tolerate: int = 10):
-        """
-        Function warns if there is a difference in number of datapoints
-        between constituents that exceeds a given tolerance.
-
-        :param tolerate: What difference to tolerate.
-        """
-        diff_nbr_observations = (self.lengths_of_items.max() - self.lengths_of_items.min())
-        if diff_nbr_observations > tolerate:
-            logging.warning(' Difference in constituent data points is {}. Exceeding tolerance of {}.'.
-                            format(diff_nbr_observations, tolerate))
-        return self
-
     def trunc_frame(self, start_cut: dt.date = None, end_cut: dt.date = None,
                     before: bool = True, after: bool = True):
         """
@@ -794,17 +727,6 @@ class OpenFrame(object):
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
         if len(set(self.first_indices)) != 1 or len(set(self.last_indices)) != 1:
             logging.warning('One or more constituents still not truncated to same start and/or end dates.')
-        return self
-
-    def warn_nan_present(self):
-        """
-        Function warns if there are null / nan present that are not explained by the difference in constituent lengths.
-        """
-        if not self.nandf.empty:
-            if all(self.first_indices.max() < x < self.last_indices.min() for x in self.nandf.index):
-                logging.warning(' Null/nan present not explained by difference in constituent lengths.')
-            else:
-                logging.warning(' Null/nan present due to the difference in constituent lengths.')
         return self
 
     def value_nan_handle(self, method: str = 'fill'):
