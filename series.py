@@ -205,8 +205,8 @@ class OpenTimeSeries(object):
 
         home_dir = str(Path.home())
         apikey_file = os.path.join(home_dir, '.quandl_apikey')
-        with open(apikey_file, 'r') as ff:
-            api_key = ff.read()
+        with open(apikey_file, 'r', encoding='utf-8') as ff:
+            api_key = ff.read().rstrip()
 
         url = f'https://www.quandl.com/api/v3/datasets/{database_code}/{dataset_code}/data.json?api_key={api_key}'
 
@@ -299,6 +299,12 @@ class OpenTimeSeries(object):
         df.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         df.index = pd.DatetimeIndex(df.index)
         df.sort_index(inplace=True)
+
+        if any(df.index.duplicated()):
+            duplicates = df.loc[df.loc[df.index.duplicated()].index]
+            logging.warning(f'\nData used to create {type(self).__name__} contains duplicate(s).\n {duplicates}'
+                            f'\nKeeping the last data point of each duplicate.')
+            df = df[~df.index.duplicated(keep='last')]
 
         self.tsdf = df
 
@@ -895,7 +901,7 @@ class OpenTimeSeries(object):
         """
         if not any([True if x == 'Return(Total)' else False for x in self.tsdf.columns.get_level_values(1).values]):
             self.value_to_ret(logret=logret)
-        self.tsdf = self.tsdf.apply(lambda x: x + 1.0)
+        self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.cumprod(axis=0)
         if div_by_first:
             self.tsdf = self.tsdf / self.tsdf.iloc[0]

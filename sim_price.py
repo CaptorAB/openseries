@@ -205,7 +205,7 @@ class ReturnSimulation(object):
 
     @property
     def results(self) -> pd.Series:
-        return self.df.apply(lambda x: x + 1.0).cumprod(axis='columns').iloc[:, -1]
+        return self.df.add(1.0).cumprod(axis='columns').iloc[:, -1]
 
     @property
     def realized_mean_return(self) -> float:
@@ -213,4 +213,4 @@ class ReturnSimulation(object):
 
     @property
     def realized_vol(self) -> float:
-        return self.results.apply(lambda x: x + 1.0).std() / np.sqrt(self.trading_days_in_year)
+        return self.results.add(1.0).std() / np.sqrt(self.trading_days_in_year)

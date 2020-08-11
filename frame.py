@@ -24,7 +24,6 @@ from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
 
 
 class OpenFrame(object):
-
     constituents: List[OpenTimeSeries]
     sweden: CaptorHolidayCalendar
     tsdf: pd.DataFrame
@@ -534,7 +533,7 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         cvar_df = self.tsdf.loc[earlier:later].copy(deep=True)
         var_list = [cvar_df.loc[:, x].pct_change().sort_values(
-            ).iloc[:int(math.ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))].mean() for x in self.tsdf]
+        ).iloc[:int(math.ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))].mean() for x in self.tsdf]
         return pd.Series(data=var_list, index=self.tsdf.columns, name=f'CVaR {level:.1%}')
 
     @property
@@ -966,7 +965,7 @@ class OpenFrame(object):
             dd = drawdown_details(i.tsdf)
             dd.name = i.label
             mddf = pd.concat([mddf, dd], axis='columns')
-        return mddf.T
+        return mddf
 
     def plot_series(self, mode: str = 'lines', tick_fmt: str = None, filename: str = None, directory: str = None,
                     labels: list = None, auto_open: bool = True) -> (go.Figure, str):
