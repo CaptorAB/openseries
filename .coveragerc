@@ -1,0 +1,11 @@
+[run]
+omit =
+    venv/*
+
+include =
+    App/*
+    Core/*
+    Jobs/*
+
+[report]
+show_missing = True

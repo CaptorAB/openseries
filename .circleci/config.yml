@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.1
+
+    working_directory: ~/repo
+    environment:
+        SETUPTOOLS_USE_DISTUTILS: stdlib #https://stackoverflow.com/questions/63663362/django-python3-on-install-i-get-parent-module-setuptools-not-loaded
+
+    steps:
+      - checkout
+      - run:
+          name: Switch timezone to Stockholm
+          command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
+      - run: python --version
+      #- run: sudo pip install --upgrade pip
+      - run: pip --version
+      - run: sudo pip3 install --upgrade -r requirements.txt
+      - run: PYTHONPATH=${PWD} python3.6 /usr/local/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
