@@ -13,7 +13,6 @@ Processes that can be simulated in this module are:
 - Ornstein Uhlenbeck
 
 """
-import json
 import math
 import numpy as np
 import numpy.random as nrand
@@ -23,6 +22,8 @@ import plotly.graph_objs as go
 from plotly.offline import plot
 import scipy.linalg
 from typing import Tuple
+
+from OpenSeries.load_plotly import load_plotly_dict
 
 
 class ModelParameters(object):
@@ -110,11 +111,9 @@ def plot_stochastic_processes(processes: list, title: str = None) -> (go.Figure,
     file_name = title.replace('/', '').replace('#', '').replace(' ', '').upper()
     plotfile = os.path.join(os.path.abspath(str(Path.home())), f'{file_name}.html')
 
-    layoutfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plotly_layouts.json')
-    with open(layoutfile, 'r', encoding='utf-8') as ff:
-        fig = json.load(ff)
-
+    fig, logo = load_plotly_dict()
     figure = go.Figure(fig)
+
     x_axis = np.arange(0, len(processes[0]), 1)
 
     for n in range(len(processes)):
@@ -123,6 +122,7 @@ def plot_stochastic_processes(processes: list, title: str = None) -> (go.Figure,
 
     figure.update_layout(title=dict(text=title), xaxis_title='Time, t', yaxis_title='simulated asset price',
                          showlegend=False, yaxis=dict(tickformat=None))
+    figure.add_layout_image(logo)
 
     plot(figure, filename=plotfile, auto_open=True, link_text='', include_plotlyjs='cdn')
 
