@@ -109,7 +109,7 @@ def plot_stochastic_processes(processes: list, title: str = None) -> (go.Figure,
     :param title:
     """
     file_name = title.replace('/', '').replace('#', '').replace(' ', '').upper()
-    plotfile = os.path.join(os.path.abspath(str(Path.home())), f'{file_name}.html')
+    plotfile = os.path.join(os.path.abspath(str(Path.home())), 'Documents', f'{file_name}.html')
 
     fig, logo = load_plotly_dict()
     figure = go.Figure(fig)
