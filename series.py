@@ -21,6 +21,7 @@ import webbrowser
 
 from OpenSeries.captor_open_api_sdk import CaptorOpenApiService
 from OpenSeries.datefixer import date_offset_foll, date_fix
+from OpenSeries.load_plotly import load_plotly_dict
 from OpenSeries.risk import cvar_down, var_down, drawdown_series
 from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
 
@@ -1079,7 +1080,7 @@ class OpenTimeSeries(object):
             return url
 
     def plot_series(self, mode: str = 'lines', tick_fmt: str = None, directory: str = None,
-                    size_array: list = None, auto_open: bool = True) -> (dict, str):
+                    size_array: list = None, auto_open: bool = True, add_logo: bool = True) -> (dict, str):
         """
         Function to draw a Plotly graph with lines in Captor style.
 
@@ -1088,6 +1089,7 @@ class OpenTimeSeries(object):
         :param directory: Directory where Plotly html file is saved.
         :param size_array: The values will set bubble sizes.
         :param auto_open: Determines whether or not to open a browser window with the plot.
+        :param add_logo: If True a Captor logo is added to the plot.
 
         To scale the bubble size, use the attribute sizeref.
         We recommend using the following formula to calculate a sizeref value:
@@ -1125,18 +1127,12 @@ class OpenTimeSeries(object):
                            mode=mode,
                            name=self.label)]
 
-        layoutfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plotly_layouts.json')
-        with open(layoutfile, 'r', encoding='utf-8') as ff:
-            fig = json.load(ff)
-
+        fig, logo = load_plotly_dict()
         fig['data'] = data
         figure = go.Figure(fig)
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
-        figure.add_layout_image(
-            dict(source='https://info.captor.se/hubfs/Logotyp/captor_logo_sv_1600_transparent_crop.png',
-                 xref='paper', yref='paper',
-                 x=0.01, y=0.95,
-                 sizex=0.15, sizey=0.15))
+        if add_logo:
+            figure.add_layout_image(logo)
         plot(figure, filename=plotfile, auto_open=auto_open, link_text='', include_plotlyjs='cdn')
 
         return fig, plotfile

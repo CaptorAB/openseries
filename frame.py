@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
 import datetime as dt
-import json
 import logging
 import math
 import numpy as np
@@ -19,6 +18,7 @@ from typing import List, Union, Tuple
 
 from OpenSeries.series import OpenTimeSeries
 from OpenSeries.datefixer import date_offset_foll
+from OpenSeries.load_plotly import load_plotly_dict
 from OpenSeries.risk import calc_max_drawdown, drawdown_series, drawdown_details, cvar_down, var_down
 from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
 
@@ -122,7 +122,8 @@ class OpenFrame(object):
     @property
     def lengths_of_items(self) -> pd.Series:
 
-        return pd.Series(data=[i.length for i in self.constituents], index=self.tsdf.columns, name='lengths of items')
+        return pd.Series(data=[self.tsdf.loc[:, d].count() for d in self.tsdf], index=self.tsdf.columns,
+                         name='lengths of items')
 
     @property
     def item_count(self) -> int:
@@ -968,7 +969,7 @@ class OpenFrame(object):
         return mddf
 
     def plot_series(self, mode: str = 'lines', tick_fmt: str = None, filename: str = None, directory: str = None,
-                    labels: list = None, auto_open: bool = True) -> (go.Figure, str):
+                    labels: list = None, auto_open: bool = True, add_logo: bool = True) -> (go.Figure, str):
         """
         Function to draw a Plotly graph with lines in Captor style.
 
@@ -978,6 +979,7 @@ class OpenFrame(object):
         :param directory: Directory where Plotly html file is saved.
         :param labels
         :param auto_open: Determines whether or not to open a browser window with the plot.
+        :param add_logo: If True a Captor logo is added to the plot.
         """
         if labels:
             assert len(labels) == self.item_count, 'Must provide same number of labels as items in frame.'
@@ -1002,18 +1004,12 @@ class OpenFrame(object):
                                    mode=mode,
                                    name=labels[item]))
 
-        layoutfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plotly_layouts.json')
-        with open(layoutfile, 'r', encoding='utf-8') as f:
-            fig = json.load(f)
-
+        fig, logo = load_plotly_dict()
         fig['data'] = data
         figure = go.Figure(fig)
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
-        figure.add_layout_image(
-            dict(source='https://info.captor.se/hubfs/Logotyp/captor_logo_sv_1600_transparent_crop.png',
-                 xref='paper', yref='paper',
-                 x=0.01, y=0.95,
-                 sizex=0.15, sizey=0.15))
+        if add_logo:
+            figure.add_layout_image(logo)
         plot(figure, filename=plotfile, auto_open=auto_open, link_text='', include_plotlyjs='cdn')
 
         return figure, plotfile
