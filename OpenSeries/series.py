@@ -1057,28 +1057,6 @@ class OpenTimeSeries(object):
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
         return self
 
-    def show_public_series_url(self, series_not_fundinfo: bool = True, open_browser: bool = True) -> Union[str, dict]:
-        """
-        Method displays timeseries in a webbrowser
-
-        :param series_not_fundinfo:
-        :param open_browser:
-        """
-        if series_not_fundinfo:
-            url = f'https://apiv2.captor.se/public/api/opentimeseries/{self._id}'
-            if open_browser:
-                webbrowser.open_new_tab(url)
-            else:
-                response = requests.get(url)
-                if response.status_code // 100 != 2:
-                    logging.error(response.text)
-                return response.json()
-        else:
-            url = f'https://apiv2.captor.se/public/api/fundinfo?isins={self.isin}'
-            if open_browser:
-                webbrowser.open_new_tab(url)
-            return url
-
     def plot_series(self, mode: str = 'lines', tick_fmt: str = None, directory: str = None,
                     size_array: list = None, auto_open: bool = True, add_logo: bool = True) -> (dict, str):
         """

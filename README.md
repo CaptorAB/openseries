@@ -8,8 +8,8 @@ To easily use all of the tools available in the [Pandas](https://pandas.pydata.o
 
 | Module | Description |
 | :--- | :--- |
-| [OpenTimeSeries, defined in series.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/series.py) | The *Class* for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
-| [OpenFrame, defined in frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/frame.py) | The *Class* for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries. |
+| [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/series.py) | Defines the class *OpenTimeSeries* for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
+| [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/frame.py) | Defines the class *OpenFrame* for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries. |
 | [main.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/main.py) | A module with usage examples. |
 | [CaptorOpenApiService, defined in captor_open_api_sdk.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/captor_open_api_sdk.py) | A Python SDK to interact with the Captor Open API. |
 | [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/datefixer.py) | A module with date utilities. |
@@ -86,7 +86,6 @@ To easily use all of the tools available in the [Pandas](https://pandas.pydata.o
 | `pandas_df` | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`. |
 | `set_new_label` | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex. |
 | `running_adjustment` | `OpenTimeSeries` | Adjusts the series performance with a `float` factor. |
-| `show_public_series_url` | `OpenTimeSeries` | Returns URL:s of the Captor open API for the series. |
 
 #### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/frame.py) class.
 
@@ -115,7 +114,7 @@ To easily use all of the tools available in the [Pandas](https://pandas.pydata.o
 | `value_to_diff` | `OpenTimeSeries`, `OpenFrame` | Converts a value series into a series of differences. |
 | `value_to_log` | `OpenTimeSeries`, `OpenFrame` | Converts a value series into a logarithmic return series. |
 | `value_ret_calendar_period` | `OpenTimeSeries`, `OpenFrame` | Returns the series simple return for a specific calendar period. |
-| `plot_series` | `OpenTimeSeries`, `OpenFrame` | Opens an HTML [Plotly](https://plotly.com/python/) plot of the series in a browser window. |
+| `plot_series` | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly](https://plotly.com/python/) plot of the series in a browser window. |
 | `to_drawdown_series` | `OpenTimeSeries`, `OpenFrame` | Converts the series into drawdown series. |
 | `rolling_return` | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling returns. |
 | `rolling_vol` | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling volatilities. |

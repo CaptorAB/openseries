@@ -607,7 +607,7 @@ class TestOpenTimeSeries(unittest.TestCase):
                                 'from_fixed_rate', 'from_quandl']
 
         series_unique = ['pandas_df', 'running_adjustment', 'set_new_label', 'to_json', 'validate_vs_schema',
-                         'setup_class', 'show_public_series_url']
+                         'setup_class']
 
         frame_unique = ['add_timeseries', 'delete_timeseries', 'delete_tsdf_item', 'drawdown_details',
                         'ord_least_squares_fit', 'make_portfolio', 'relative', 'rolling_corr', 'trunc_frame']
