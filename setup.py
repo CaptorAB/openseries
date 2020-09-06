@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="OpenSeries",
-    version="0.1.1",
+    version="0.1.2",
     packages=["OpenSeries"],
     package_data={"OpenSeries": ["*.json"]},
     install_requires=["holidays", "jsonschema", "numpy", "pandas<=1.0.4", "plotly",
