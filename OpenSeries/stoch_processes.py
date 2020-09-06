@@ -271,7 +271,7 @@ def get_correlated_geometric_brownian_motions(param: ModelParameters, correlatio
         extracted_paths.append([])
     for j in range(0, len(correlated_matrix)*n - n, n):
         for g in range(n):
-            extracted_paths[i].append(correlated_matrix.item(j + g))
+            extracted_paths[j].append(correlated_matrix.item(j + g))
     return extracted_paths
 
 
@@ -358,65 +358,3 @@ def ornstein_uhlenbeck_levels(param: ModelParameters) -> list:
         randomness = brownian_motion_returns[h - 1]
         ou_levels.append(ou_levels[h - 1] + drift + randomness)
     return ou_levels
-
-
-if __name__ == '__main__':
-
-    mp = ModelParameters(all_s0=1.0,
-                         all_r0=0.5,
-                         all_time=800,
-                         all_delta=0.003968253968253968,
-                         all_sigma=0.125,
-                         gbm_mu=0.058,
-                         jumps_lamda=0.00125,
-                         jumps_sigma=0.001,
-                         jumps_mu=-0.2,
-                         cir_a=3.0,
-                         cir_mu=0.5,
-                         cir_rho=0.5,
-                         ou_a=3.0,
-                         ou_mu=0.5,
-                         heston_a=0.25,
-                         heston_mu=0.35,
-                         heston_vol0=0.06125)
-
-    gbm_param = ModelParameters(all_s0=1, all_time=252, all_delta=1.0/252, all_sigma=0.15, gbm_mu=0.05)
-    
-    paths: int = 15
-
-    brownian_motion_examples = []
-    for i in range(paths):
-        brownian_motion_examples.append(brownian_motion_levels(mp))
-    plot_stochastic_processes(brownian_motion_examples, 'Brownian Motion')
-
-    geometric_brownian_motion_examples = []
-    for i in range(paths):
-        geometric_brownian_motion_examples.append(geometric_brownian_motion_levels(gbm_param))
-    plot_stochastic_processes(geometric_brownian_motion_examples, 'Geometric Brownian Motion')
-
-    jump_diffusion_examples = []
-    for i in range(paths):
-        jump_diffusion_examples.append(geometric_brownian_motion_jump_diffusion_levels(mp))
-    plot_stochastic_processes(jump_diffusion_examples, 'Jump Diffusion Geometric Brownian Motion (Merton)')
-
-    stochastic_volatility_examples = []
-    for i in range(paths):
-        stochastic_volatility_examples.append(heston_model_levels(mp)[0])
-    plot_stochastic_processes(stochastic_volatility_examples,
-                              'Stochastic Volatility Geometric Brownian Motion (Heston)')
-
-    stochastic_volatility_examples = []
-    for i in range(paths):
-        stochastic_volatility_examples.append(heston_model_levels(mp)[1])
-    plot_stochastic_processes(stochastic_volatility_examples,
-                              'Stochastic Volatility Geometric Brownian Motion (Heston vol)')
-
-    cir_examples = []
-    for i in range(paths):
-        cir_examples.append(cox_ingersoll_ross_levels(mp))
-    plot_stochastic_processes(cir_examples, 'Cox Ingersoll Ross')
-
-    ou_examples = []
-    for i in range(paths):
-        ou_examples.append(ornstein_uhlenbeck_levels(mp))
-    plot_stochastic_processes(ou_examples, 'Ornstein Uhlenbeck')

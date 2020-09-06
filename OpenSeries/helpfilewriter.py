@@ -2,8 +2,6 @@
 import os
 import sys
 
-from OpenSeries.series import OpenTimeSeries
-
 
 def write_helpfile(obj):
     """
@@ -22,10 +20,3 @@ def write_helpfile(obj):
         print('Error in helpfilewriter: ', e)
     else:
         print(f'Class {obj.__class__.__name__} help file {filename} saved to working directory.')
-
-
-if __name__ == '__main__':
-
-    fund = 'SE0009807308'
-    timeseries = OpenTimeSeries.from_open_nav(isin=fund)
-    write_helpfile(timeseries)
