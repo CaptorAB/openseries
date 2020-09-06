@@ -15,7 +15,7 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 * [OpenTimeSeries only methods](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-methods-that-apply-only-to-the-opentimeseries-class)
 * [OpenFrame only methods](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-methods-that-apply-only-to-the-openframe-class)
 * [Methods for both classes](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-methods-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
-* [Numeric methods for both classes](https://github.com/CaptorAB/OpenSeries#below-are-the-numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
+* [Numeric properties for both classes](https://github.com/CaptorAB/OpenSeries#below-are-the-numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
 * [Numeric methods with period arguments for both classes](https://github.com/CaptorAB/OpenSeries#the-methods-below-are-identical-to-the-numeric-properties-above)
 
 
