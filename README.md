@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master.svg?style=svg)](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master)
+
 # OpenSeries
 
 This is a project where we keep tools to perform timeseries analysis on a single asset or a group of assets.
