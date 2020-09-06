@@ -16,7 +16,7 @@ setup(
     license="BSD License",
     author="karrmagadgeteer2",
     author_email="martin.karrin@captor.se",
-    description="A module for analyzing financial time series",
+    description="A package for analyzing financial time series",
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
