@@ -10,6 +10,8 @@ setup(
     version="0.1.1",
     packages=["OpenSeries"],
     package_data={"OpenSeries": ["*.json"]},
+    install_requires=["holidays", "jsonschema", "numpy", "pandas<=1.0.4", "plotly",
+                      "python-dateutil", "requests", "scipy", "statsmodels"],
     url="https://github.com/CaptorAB/OpenSeries",
     license="BSD License",
     author="karrmagadgeteer2",
