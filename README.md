@@ -24,12 +24,12 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 | :--- | :--- |
 | [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/series.py) | Defines the class *OpenTimeSeries* for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
 | [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/frame.py) | Defines the class *OpenFrame* for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries. |
-| [main.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/main.py) | A module with usage examples. |
 | [captor_open_api_sdk.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/captor_open_api_sdk.py) | A Python SDK to interact with the Captor Open API. |
 | [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/datefixer.py) | A module with date utilities. |
 | [helpfilewriter.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/helpfilewriter.py) | A module that allows printing a description of a Python class. |
 | [openseries.json](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/openseries.json) | The jsonschema of the OpenTimeSeries class. |
 | [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/plotly_layouts.json) | A module setting [Plotly](https://plotly.com/python/) defaults used in the `plot_series` methods. |
+| [plotly_captor_logo.json](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/plotly_captor_logo.json) | A module with a link to the Captor logo used in the `plot_series` methods. |
 | [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/risk.py) | Module with methods used to calculate VaR, CVaR and drawdowns. |
 | [sim_price.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/sim_price.py) | Module to simulate OpenTimeSeries from different stochastic processes. |
 | [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/stoch_processes.py) | Module to generate stochastic processes used in the `sim_price.py` module. |

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from pandas.tseries.holiday import AbstractHolidayCalendar, DateOffset, Holiday, Day, FR, GoodFriday, \
     EasterMonday, Easter
-# from pandas.tseries.offsets import CDay
 
 holidays_sw = [
         Holiday('Nyårsdagen', month=1, day=1),
