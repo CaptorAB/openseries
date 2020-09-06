@@ -9,6 +9,8 @@ setup(
     name="OpenSeries",
     version="0.1.0",
     packages=["OpenSeries"],
+    data_files=[("OpenSeries", ["openseries.json", "plotly_captor_logo.json", "plotly_layouts.json"]),
+                ("tests", ["key_value_table_with_relative.json", "series.json"])],
     url="https://github.com/CaptorAB/OpenSeries",
     license="BSD License",
     author="karrmagadgeteer2",
