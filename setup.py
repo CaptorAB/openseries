@@ -7,9 +7,9 @@ with open("README.md", "r") as fh:
 
 setup(
     name="OpenSeries",
-    version="0.1.0",
+    version="0.1.1",
     packages=["OpenSeries"],
-    data_files=[("OpenSeries", ["openseries.json", "plotly_captor_logo.json", "plotly_layouts.json"]),
+    data_files=[("", ["openseries.json", "plotly_captor_logo.json", "plotly_layouts.json"]),
                 ("tests", ["key_value_table_with_relative.json", "series.json"])],
     url="https://github.com/CaptorAB/OpenSeries",
     license="BSD License",
