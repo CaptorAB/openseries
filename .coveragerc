@@ -3,9 +3,7 @@ omit =
     venv/*
 
 include =
-    App/*
-    Core/*
-    Jobs/*
+    OpenSeries/*
 
 [report]
 show_missing = True
