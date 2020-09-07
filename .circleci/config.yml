@@ -10,7 +10,6 @@ jobs:
 
     steps:
       - checkout
-      - run: python --version
-      - run: pip --version
-      - run: sudo pip3 install --upgrade -r requirements.txt
-      - run: PYTHONPATH=${PWD} python3.6 /usr/local/bin/nosetests -vv --nologcapture --nocapture --with-timer --with-coverage ./
+      - run: python3 -m venv ./venv
+      - run: PYTHONPATH=${PWD} ./venv/bin/pip3 install --upgrade -r requirements.txt      
+      - run: PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture --with-timer --with-coverage ./
