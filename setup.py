@@ -7,16 +7,16 @@ with open("README.md", "r") as fh:
 
 setup(
     name="openseries",
-    version="0.1.6",
+    version="0.1.8",
     packages=find_packages(),
     package_data={"OpenSeries": ["*.json"], ".": ["*.json"]},
-    install_requires=["holidays", "jsonschema", "numpy", "pandas<=1.0.4", "plotly",
-                      "python-dateutil", "requests", "scipy", "statsmodels"],
+    install_requires=["jsonschema", "numpy", "pandas<=1.0.4", "plotly", "python-dateutil",
+                      "requests", "scipy", "statsmodels"],
     url="https://github.com/CaptorAB/OpenSeries",
     license="BSD License",
     author="karrmagadgeteer2",
     author_email="martin.karrin@captor.se",
-    description="A module for analyzing financial time series",
+    description="A package for analyzing financial time series",
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[

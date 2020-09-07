@@ -17,7 +17,6 @@ import plotly.graph_objs as go
 import requests
 import scipy.stats as ss
 from typing import Union, Tuple, List
-import webbrowser
 
 from OpenSeries.captor_open_api_sdk import CaptorOpenApiService
 from OpenSeries.datefixer import date_offset_foll, date_fix

@@ -2,70 +2,12 @@
 import datetime as dt
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-import holidays
 import logging
-import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import CDay
 from typing import Union
 
 from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
-
-
-def np_biz_calendar(country: str = 'SE') -> np.busdaycalendar:
-
-    all_dates = np.arange('1970-12-30', '2070-12-30', dtype='datetime64[D]')
-
-    years = [y for y in range(1970, 2071)]
-    country_holidays = holidays.CountryHoliday(country=country, years=years)
-    hols = []
-    for date in sorted(country_holidays.keys()):
-        hols.append(np.datetime64(date))
-
-    hols = np.array(hols, dtype='datetime64[D]')
-
-    while hols[0] < all_dates[0]:
-        hols = hols[1:]
-    while hols[-1] > all_dates[-1]:
-        hols = hols[:-1]
-
-    return np.busdaycalendar(holidays=hols)
-
-
-def np_biz_date_range(start_dt: Union[np.datetime64, dt.date, str], end_dt: Union[np.datetime64, dt.date, str],
-                      bdays: np.busdaycalendar = None, country: str = 'SE') -> np.ndarray:
-
-    if isinstance(start_dt, np.datetime64):
-        start_dt = str(np.datetime_as_string(start_dt))
-    elif isinstance(start_dt, dt.date):
-        start_dt = start_dt.strftime('%Y-%m-%d')
-
-    if isinstance(end_dt, np.datetime64):
-        end_dt = str(np.datetime_as_string(end_dt))
-    elif isinstance(end_dt, dt.date):
-        end_dt = end_dt.strftime('%Y-%m-%d')
-
-    all_dates = np.arange(start_dt, end_dt, dtype='datetime64[D]')
-
-    if bdays is None:
-        first_year = int(str(all_dates[0]).split('-')[0])
-        last_year = int(str(all_dates[-1]).split('-')[0]) + 1
-        years = [y for y in range(first_year, last_year)]
-
-        country_holidays = holidays.CountryHoliday(country=country, years=years)
-        hols = []
-        for date in sorted(country_holidays.keys()):
-            hols.append(np.datetime64(date))
-
-        hols = np.array(hols, dtype='datetime64[D]')
-        while hols[0] < all_dates[0]:
-            hols = hols[1:]
-        while hols[-1] > all_dates[-1]:
-            hols = hols[:-1]
-
-        bdays = np.busdaycalendar(holidays=hols)
-
-    return all_dates[np.is_busday(all_dates, busdaycal=bdays)]
 
 
 def date_fix(d: Union[str, dt.date, dt.datetime]) -> dt.date:
