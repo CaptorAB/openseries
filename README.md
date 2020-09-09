@@ -1,4 +1,10 @@
+
 [![CircleCI](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master.svg?style=svg)](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Pypi](https://badge.fury.io/py/OpenSeries.svg)](https://badge.fury.io/py/OpenSeries.svg)
+
+
+
 
 # OpenSeries
 
