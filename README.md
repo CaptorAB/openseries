@@ -4,6 +4,44 @@
 
 This is a project where we keep tools to perform timeseries analysis on a single asset or a group of assets.
 
+To install:
+
+    pip install openseries
+
+To construct an OpenTimeSeries object from a "raw" dictionary:
+
+    data = {'_id': '',
+            'currency': 'SEK',
+            'dates': ['2020-09-03',
+                      '2020-09-04',
+                      '2020-09-07',
+                      '2020-09-08',
+                      '2020-09-09'],
+            'instrumentId': '',
+            'local_ccy': True,
+            'name': 'Timeseries',
+            'values': [114.9965,
+                       114.8355,
+                       114.8694,
+                       115.1131,
+                       114.8643],
+            'valuetype': 'Price(Close)'}
+    
+    series =  = OpenTimeSeries(data)
+   
+Or to construct using the class method designed to get a NAV timeseries for a Captor Fund:
+
+    capirisc = 'SE0009807308'
+    bonds = OpenTimeSeries.from_open_nav(isin=capirisc)
+
+And print its geometric annual return and volatility:
+
+    print(f'Return    : {bonds.geo_ret:.2%}\nVolatility: {bonds.vol:.2%}.')
+
+To compare timeseries an OpenFrame is constructed like this:
+
+    frame = OpenFrame([series, bonds])
+
 To make use of some of the tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
 ## Table of Contents
