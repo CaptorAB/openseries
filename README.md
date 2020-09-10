@@ -46,7 +46,22 @@ And print its geometric annual return and volatility:
 
 To compare timeseries an OpenFrame is constructed like this:
 
-    frame = OpenFrame([series, bonds])
+    basket = OpenFrame([series, bonds])
+
+The helper methods to work with the time series can be chained like this:
+
+    basket.trunc_frame().value_nan_handle().to_cumret()
+
+And a new portfolio timeseries can be constructed from an OpenFrame like this:
+
+    basket.weights = [0.6, 0.4]
+    portfolio = OpenTimeSeries.from_df(basket.make_portfolio('porfolio'))
+    basket.add_timeseries(portfolio)
+    
+Finally, plotting is simple. This will plot the timeseries in a browser window:
+
+    basket.plot_series(tick_fmt='.1%')
+
 
 To make use of some of the tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/OpenSeries/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
