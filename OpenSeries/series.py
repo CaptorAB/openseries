@@ -22,7 +22,7 @@ from OpenSeries.captor_open_api_sdk import CaptorOpenApiService
 from OpenSeries.datefixer import date_offset_foll, date_fix
 from OpenSeries.load_plotly import load_plotly_dict
 from OpenSeries.risk import cvar_down, var_down, drawdown_series
-from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
+from OpenSeries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class OpenTimeSeries(object):
@@ -36,7 +36,7 @@ class OpenTimeSeries(object):
     isin: str  # ISIN code of the associated instrument. If any.
     label: str  # Field used in outputs.
     schema: dict  # Jsonschema to validate against in the __init__ method.
-    sweden: CaptorHolidayCalendar  # A calendar object used to generate business days.
+    sweden: SwedenHolidayCalendar  # A calendar object used to generate business days.
     valuetype: str  # "Price(Close)" if a series of values and "Return(Total)" if a series of returns.
     values: List[float]  # Values of the timeseries. Not edited by any method to allow reversion to original.
     local_ccy: bool  # Indicates if series should be in its local currency or the domestic currency of the user.
@@ -46,7 +46,7 @@ class OpenTimeSeries(object):
     def setup_class(cls):
 
         cls.domestic = 'SEK'
-        cls.sweden = CaptorHolidayCalendar(holidays_sw)
+        cls.sweden = SwedenHolidayCalendar(holidays_sw)
 
     def __init__(self, d):
 

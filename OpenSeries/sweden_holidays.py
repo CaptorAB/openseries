@@ -19,10 +19,6 @@ holidays_sw = [
 
 
 class SwedenHolidayCalendar(AbstractHolidayCalendar):
-    rules = holidays_sw
-
-
-class CaptorHolidayCalendar(AbstractHolidayCalendar):
 
     def __init__(self, rules: list):
         super().__init__()

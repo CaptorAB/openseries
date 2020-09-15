@@ -144,7 +144,7 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 | `last_idx` | `datetime.date` | `OpenTimeSeries`, `OpenFrame` | Last date of the series. |
 | `length` | `int` | `OpenTimeSeries`, `OpenFrame` | Number of items in the series. |
 | `tsdf` | `pandas.DataFrame` | `OpenTimeSeries`, `OpenFrame` | The Pandas DataFrame which gets edited by the class methods. |
-| `sweden` | `CaptorHolidayCalendar` | `OpenTimeSeries`, `OpenFrame` | A calendar object used to generate business days. |
+| `sweden` | `SwedenHolidayCalendar` | `OpenTimeSeries`, `OpenFrame` | A calendar object used to generate business days. |
 | `max_drawdown_date` | `datetime.date`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | Date when the maximum drawdown occurred. |
 | `periods_in_a_year` | `float` | `OpenTimeSeries`, `OpenFrame` | The number of observations in an average year for all days in the data. |
 | `yearfrac` | `float` | `OpenTimeSeries`, `OpenFrame` | Length of timeseries expressed as np.float64 fraction of a year with 365.25 days. |

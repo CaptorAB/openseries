@@ -20,12 +20,12 @@ from OpenSeries.series import OpenTimeSeries
 from OpenSeries.datefixer import date_offset_foll
 from OpenSeries.load_plotly import load_plotly_dict
 from OpenSeries.risk import calc_max_drawdown, drawdown_series, drawdown_details, cvar_down, var_down
-from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
+from OpenSeries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class OpenFrame(object):
     constituents: List[OpenTimeSeries]
-    sweden: CaptorHolidayCalendar
+    sweden: SwedenHolidayCalendar
     tsdf: pd.DataFrame
     weights: List[float]
 
@@ -36,7 +36,7 @@ class OpenFrame(object):
         """
         self.weights = weights
         self.tsdf = pd.DataFrame()
-        self.sweden = CaptorHolidayCalendar(holidays_sw)
+        self.sweden = SwedenHolidayCalendar(holidays_sw)
         self.constituents = constituents
         if constituents is not None and len(constituents) != 0:
             self.tsdf = pd.concat([x.tsdf for x in self.constituents], axis='columns')

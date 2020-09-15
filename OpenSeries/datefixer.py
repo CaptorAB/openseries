@@ -7,7 +7,7 @@ import pandas as pd
 from pandas.tseries.offsets import CDay
 from typing import Union
 
-from OpenSeries.sweden_holidays import CaptorHolidayCalendar, holidays_sw
+from OpenSeries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 def date_fix(d: Union[str, dt.date, dt.datetime]) -> dt.date:
@@ -57,6 +57,6 @@ def date_offset_foll(raw_date: Union[str, dt.date, dt.datetime], calendar: CDay,
 
 
 def get_previous_sweden_business_day_before_today():
-    sweden = CaptorHolidayCalendar(rules=holidays_sw)
+    sweden = SwedenHolidayCalendar(rules=holidays_sw)
     return date_offset_foll(dt.date.today() - dt.timedelta(days=1), calendar=CDay(calendar=sweden),
                             months_offset=0, adjust=True, following=False)
