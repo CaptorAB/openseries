@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -12,4 +12,9 @@ jobs:
       - checkout
       - run: python3 -m venv ./venv
       - run: PYTHONPATH=${PWD} ./venv/bin/pip3 install --upgrade -r requirements.txt      
-      - run: PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture --with-timer --with-coverage ./
+      - run: PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture  ./
+      - slack/status:
+        webhook: webhook
+
+orbs:
+        slack: circleci/slack@3.4.2
