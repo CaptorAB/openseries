@@ -16,11 +16,11 @@ import scipy.stats as ss
 import statsmodels.api as sm
 from typing import List, Union, Tuple
 
-from OpenSeries.series import OpenTimeSeries
-from OpenSeries.datefixer import date_offset_foll
-from OpenSeries.load_plotly import load_plotly_dict
-from OpenSeries.risk import calc_max_drawdown, drawdown_series, drawdown_details, cvar_down, var_down
-from OpenSeries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+from openseries.series import OpenTimeSeries
+from openseries.datefixer import date_offset_foll
+from openseries.load_plotly import load_plotly_dict
+from openseries.risk import calc_max_drawdown, drawdown_series, drawdown_details, cvar_down, var_down
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class OpenFrame(object):

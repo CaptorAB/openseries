@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from typing import Union
 
-from OpenSeries.stoch_processes import ModelParameters, geometric_brownian_motion_log_returns, \
+from openseries.stoch_processes import ModelParameters, geometric_brownian_motion_log_returns, \
     heston_model_levels, geometric_brownian_motion_jump_diffusion_levels
 
 

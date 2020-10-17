@@ -14,15 +14,14 @@ from pandas.tseries.offsets import CDay
 from pathlib import Path
 from plotly.offline import plot
 import plotly.graph_objs as go
-import requests
 import scipy.stats as ss
 from typing import Union, Tuple, List
 
-from OpenSeries.captor_open_api_sdk import CaptorOpenApiService
-from OpenSeries.datefixer import date_offset_foll, date_fix
-from OpenSeries.load_plotly import load_plotly_dict
-from OpenSeries.risk import cvar_down, var_down, drawdown_series
-from OpenSeries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+from openseries.captor_open_api_sdk import CaptorOpenApiService
+from openseries.datefixer import date_offset_foll, date_fix
+from openseries.load_plotly import load_plotly_dict
+from openseries.risk import cvar_down, var_down, drawdown_series
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class OpenTimeSeries(object):
@@ -253,7 +252,6 @@ class OpenTimeSeries(object):
         df = pd.DataFrame(data=self.values, index=self.dates, dtype='float64')
         df.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         df.index = pd.DatetimeIndex(df.index)
-        df.sort_index(inplace=True)
 
         if any(df.index.duplicated()):
             duplicates = df.loc[df.loc[df.index.duplicated()].index]
@@ -261,6 +259,7 @@ class OpenTimeSeries(object):
                             f'\nKeeping the last data point of each duplicate.')
             df = df[~df.index.duplicated(keep='last')]
 
+        df.sort_index(inplace=True)
         self.tsdf = df
 
         return self
@@ -973,11 +972,11 @@ class OpenTimeSeries(object):
         else:
             ra_df = self.tsdf.pct_change().copy()
         ra_df.dropna(inplace=True)
-        prev = dt.datetime.strptime(str(self.first_idx), '%Y-%m-%d %H:%M:%S').date()
+        prev = date_fix(str(self.first_idx))
         dates: list = [prev]
         values: list = [float(self.tsdf.iloc[0])]
         for idx, row in ra_df.iterrows():
-            idx = dt.datetime.strptime(str(idx), '%Y-%m-%d %H:%M:%S').date()
+            idx = date_fix(str(idx))
             dates.append(idx)
             values.append(values[-1] * (1 + float(row) + adjustment * (idx - prev).days / days_in_year))
             prev = idx

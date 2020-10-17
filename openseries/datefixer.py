@@ -7,7 +7,7 @@ import pandas as pd
 from pandas.tseries.offsets import CDay
 from typing import Union
 
-from OpenSeries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 def date_fix(d: Union[str, dt.date, dt.datetime]) -> dt.date:

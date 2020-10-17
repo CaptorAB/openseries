@@ -7,9 +7,9 @@ with open("README.md", "r") as fh:
 
 setup(
     name="openseries",
-    version="0.1.12",
+    version="0.1.13",
     packages=find_packages(),
-    package_data={"OpenSeries": ["*.json"], ".": ["*.json"]},
+    package_data={"openseries": ["*.json"], ".": ["*.json"]},
     install_requires=["jsonschema", "numpy", "pandas", "plotly", "python-dateutil",
                       "requests", "scipy", "statsmodels"],
     url="https://github.com/CaptorAB/OpenSeries",

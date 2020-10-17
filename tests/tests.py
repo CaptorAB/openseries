@@ -8,11 +8,11 @@ from pandas.tseries.offsets import CDay
 import sys
 import unittest
 
-from OpenSeries.series import OpenTimeSeries, timeseries_chain
-from OpenSeries.frame import OpenFrame, key_value_table
-from OpenSeries.sim_price import ReturnSimulation
-from OpenSeries.risk import cvar_down, var_down
-from OpenSeries.datefixer import date_fix
+from openseries.series import OpenTimeSeries, timeseries_chain
+from openseries.frame import OpenFrame, key_value_table
+from openseries.sim_price import ReturnSimulation
+from openseries.risk import cvar_down, var_down
+from openseries.datefixer import date_fix
 
 repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 if repo_root not in sys.path:

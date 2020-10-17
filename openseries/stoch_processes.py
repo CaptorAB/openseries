@@ -23,7 +23,7 @@ from plotly.offline import plot
 import scipy.linalg
 from typing import Tuple
 
-from OpenSeries.load_plotly import load_plotly_dict
+from openseries.load_plotly import load_plotly_dict
 
 
 class ModelParameters(object):
