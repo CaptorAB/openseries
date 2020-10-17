@@ -983,6 +983,7 @@ class OpenTimeSeries(object):
         self.tsdf = pd.DataFrame(data=values, index=dates)
         self.valuetype = 'Price(Close)'
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
         return self
 
     def set_new_label(self, lvl_zero: str = None, lvl_one: str = None, delete_lvl_one: bool = False):
