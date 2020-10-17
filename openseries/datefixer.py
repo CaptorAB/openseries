@@ -51,7 +51,7 @@ def date_offset_foll(raw_date: Union[str, dt.date, dt.datetime], calendar: CDay,
         day_delta = relativedelta(days=-1)
     new_date = raw_date + month_delta
     if adjust:
-        while new_date not in local_bdays:
+        while pd.Timestamp(new_date) not in local_bdays:
             new_date += day_delta
     return new_date
 
