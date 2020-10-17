@@ -1078,11 +1078,10 @@ def timeseries_chain(front, back, old_fee: float = 0.0):
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)
     new = back.from_deepcopy()
-    new_first = dt.datetime.strptime(str(new.first_idx), '%Y-%m-%d %H:%M:%S').date()
 
-    dates = [x.strftime('%Y-%m-%d') for x in old.tsdf.index if x < new_first]
+    dates = [x.strftime('%Y-%m-%d') for x in old.tsdf.index if x < pd.Timestamp(new.first_idx)]
     values = np.array([float(x) for x in old.tsdf.values][:len(dates)])
-    values = list(values * float(new.tsdf.iloc[0]) / float(old.tsdf.loc[new_first]))
+    values = list(values * float(new.tsdf.iloc[0]) / float(old.tsdf.loc[pd.Timestamp(new.first_idx)]))
 
     dates.extend([x.strftime('%Y-%m-%d') for x in new.tsdf.index])
     values.extend([float(x) for x in new.tsdf.values])
