@@ -70,7 +70,7 @@ class OpenFrame(object):
         return results
 
     def calc_range(self, months_offset: int = None, from_dt: dt.date = None, to_dt: dt.date = None) \
-            -> Tuple[dt.date, dt.date]:
+            -> Tuple[pd.Timestamp, pd.Timestamp]:
         """
         Function to create user defined time frame.
 
@@ -103,7 +103,7 @@ class OpenFrame(object):
                 later += dt.timedelta(days=1)
         else:
             earlier, later = self.first_idx, self.last_idx
-        return earlier, later
+        return pd.Timestamp(earlier), pd.Timestamp(later)
 
     def align_index_to_local_cdays(self):
         """
@@ -141,9 +141,9 @@ class OpenFrame(object):
         return self.tsdf.columns.get_level_values(1).tolist()
 
     @property
-    def first_idx(self) -> dt.date:
+    def first_idx(self) -> pd.Timestamp:
 
-        return self.tsdf.first_valid_index().date()
+        return pd.Timestamp(self.tsdf.first_valid_index())
 
     @property
     def first_indices(self) -> pd.Series:
@@ -151,9 +151,9 @@ class OpenFrame(object):
         return pd.Series(data=[i.first_idx for i in self.constituents], index=self.tsdf.columns, name='first indices')
 
     @property
-    def last_idx(self) -> dt.date:
+    def last_idx(self) -> pd.Timestamp:
 
-        return self.tsdf.last_valid_index().date()
+        return pd.Timestamp(self.tsdf.last_valid_index())
 
     @property
     def last_indices(self) -> pd.Series:
@@ -482,7 +482,7 @@ class OpenFrame(object):
         """
         Max drawdown in a single calendar year.
         """
-        md = self.tsdf.groupby([self.tsdf.index.year]).apply(lambda x: calc_max_drawdown(x)).min()
+        md = self.tsdf.groupby([pd.DatetimeIndex(self.tsdf.index).year]).apply(lambda x: calc_max_drawdown(x)).min()
         md.name = 'Max drawdown in cal yr'
         return md
 

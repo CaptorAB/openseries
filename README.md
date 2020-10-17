@@ -104,7 +104,6 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 | `from_df` | `OpenTimeSeries` | Class method to create an OpenTimeSeries object from a pandas.DataFrame column. |
 | `from_frame` | `OpenTimeSeries` | Class method to create a new OpenTimeSeries object from a series within an OpenFrame. |
 | `from_fixed_rate` | `OpenTimeSeries` | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
-| `from_quandl` | `OpenTimeSeries` | Class method to create an OpenTimeSeries object from a Quandl API endpoint. |
 | `from_deepcopy` | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object. |
 
 

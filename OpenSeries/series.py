@@ -199,51 +199,6 @@ class OpenTimeSeries(object):
 
         return cls(d=output)
 
-    @classmethod
-    def from_quandl(cls, database_code: str, dataset_code: str, field: Union[int, str] = 1, baseccy: str = 'SEK',
-                    local_ccy: bool = True):
-
-        home_dir = str(Path.home())
-        apikey_file = os.path.join(home_dir, '.quandl_apikey')
-        with open(apikey_file, 'r', encoding='utf-8') as ff:
-            api_key = ff.read().rstrip()
-
-        url = f'https://www.quandl.com/api/v3/datasets/{database_code}/{dataset_code}/data.json?api_key={api_key}'
-
-        response = requests.get(url=url, headers={'accept': 'application/json'})
-
-        if response.status_code // 100 != 2:
-            raise Exception(f'{response.status_code}, {response.text}')
-
-        data = response.json()['dataset_data']
-
-        if isinstance(field, str):
-            idx = data['column_names'].index(field)
-        elif isinstance(field, int):
-            idx = field
-            field = data['column_names'][idx]
-        else:
-            raise Exception('field must be string or integer')
-
-        dates, values = [], []
-        for item in data['data']:
-            if item[idx]:
-                dates.append(item[0])
-                values.append(item[idx])
-
-        output = {
-            '_id': '',
-            'name': dataset_code,
-            'currency': baseccy,
-            'local_ccy': local_ccy,
-            'instrumentId': '',
-            'isin': '',
-            'valuetype': field,
-            'dates': dates,
-            'values': values}
-
-        return cls(d=output)
-
     def from_deepcopy(self):
         return copy.deepcopy(self)
 
@@ -325,7 +280,7 @@ class OpenTimeSeries(object):
         jsonschema.validate(cleaned_dict, self.schema)
 
     def calc_range(self, months_offset: int = None, from_dt: Union[dt.date, None] = None,
-                   to_dt: Union[dt.date, None] = None) -> Tuple[dt.date, dt.date]:
+                   to_dt: Union[dt.date, None] = None) -> Tuple[pd.Timestamp, pd.Timestamp]:
         """
         Function to create user defined time frame.
 
@@ -366,7 +321,7 @@ class OpenTimeSeries(object):
         else:
             earlier, later = self.first_idx, self.last_idx
 
-        return earlier, later
+        return pd.Timestamp(earlier), pd.Timestamp(later)
 
     def align_index_to_local_cdays(self):
         """
@@ -400,14 +355,14 @@ class OpenTimeSeries(object):
         return len(self.tsdf.index)
 
     @property
-    def first_idx(self) -> dt.date:
+    def first_idx(self) -> pd.Timestamp:
 
-        return self.tsdf.first_valid_index().date()
+        return pd.Timestamp(self.tsdf.first_valid_index())
 
     @property
-    def last_idx(self) -> dt.date:
+    def last_idx(self) -> pd.Timestamp:
 
-        return self.tsdf.last_valid_index().date()
+        return pd.Timestamp(self.tsdf.last_valid_index())
 
     @property
     def yearfrac(self) -> float:
@@ -640,7 +595,7 @@ class OpenTimeSeries(object):
         """
         Maximum drawdown in a single calendar year.
         """
-        return float(self.tsdf.groupby([self.tsdf.index.year]).apply(
+        return float(self.tsdf.groupby([pd.DatetimeIndex(self.tsdf.index).year]).apply(
             lambda x: (x / x.expanding(min_periods=1).max()).min() - 1).min())
 
     @property
@@ -923,7 +878,6 @@ class OpenTimeSeries(object):
         """
         self.tsdf = drawdown_series(self.tsdf)
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], ['Drawdowns']])
-        self.tsdf.index = pd.to_datetime(self.tsdf.index)
         return self
 
     def rolling_vol(self, observations: int = 21, periods_in_a_year_fixed: int = None) -> pd.Series:
@@ -1019,7 +973,7 @@ class OpenTimeSeries(object):
         else:
             ra_df = self.tsdf.pct_change().copy()
         ra_df.dropna(inplace=True)
-        prev = self.first_idx
+        prev = dt.datetime.strptime(str(self.first_idx), '%Y-%m-%d %H:%M:%S').date()
         dates: list = [prev]
         values: list = [float(self.tsdf.iloc[0])]
         for idx, row in ra_df.iterrows():
@@ -1030,7 +984,6 @@ class OpenTimeSeries(object):
         self.tsdf = pd.DataFrame(data=values, index=dates)
         self.valuetype = 'Price(Close)'
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
-        self.tsdf.index = pd.to_datetime(self.tsdf.index)
         return self
 
     def set_new_label(self, lvl_zero: str = None, lvl_one: str = None, delete_lvl_one: bool = False):
@@ -1125,10 +1078,11 @@ def timeseries_chain(front, back, old_fee: float = 0.0):
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)
     new = back.from_deepcopy()
+    new_first = dt.datetime.strptime(str(new.first_idx), '%Y-%m-%d %H:%M:%S').date()
 
-    dates = [x.strftime('%Y-%m-%d') for x in old.tsdf.index if x < new.first_idx]
+    dates = [x.strftime('%Y-%m-%d') for x in old.tsdf.index if x < new_first]
     values = np.array([float(x) for x in old.tsdf.values][:len(dates)])
-    values = list(values * float(new.tsdf.iloc[0]) / float(old.tsdf.loc[new.first_idx]))
+    values = list(values * float(new.tsdf.iloc[0]) / float(old.tsdf.loc[new_first]))
 
     dates.extend([x.strftime('%Y-%m-%d') for x in new.tsdf.index])
     values.extend([float(x) for x in new.tsdf.values])

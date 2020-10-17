@@ -604,7 +604,7 @@ class TestOpenTimeSeries(unittest.TestCase):
                           'value_ret_calendar_period', 'value_to_diff', 'value_to_log', 'value_to_ret']
 
         series_createmethods = ['from_open_api', 'from_open_nav', 'from_open_fundinfo', 'from_df', 'from_frame',
-                                'from_fixed_rate', 'from_quandl']
+                                'from_fixed_rate']
 
         series_unique = ['pandas_df', 'running_adjustment', 'set_new_label', 'to_json', 'validate_vs_schema',
                          'setup_class']
