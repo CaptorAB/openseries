@@ -685,7 +685,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         plotsim = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
         plotseries = sim_to_opentimeseries(plotsim, end=dt.date(2019, 6, 30))
-        fig, _ = plotseries.plot_series(auto_open=False)
+        fig, _ = plotseries.plot_series(auto_open=False, output_type='div')
         fig_json = json.loads(fig.to_json())
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ['data', 'layout'])
@@ -707,7 +707,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         plotsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         plotframe = sim_to_openframe(plotsims, dt.date(2019, 6, 30)).to_cumret()
-        fig, _ = plotframe.plot_series(auto_open=False)
+        fig, _ = plotframe.plot_series(auto_open=False, output_type='div')
         fig_json = json.loads(fig.to_json())
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ['data', 'layout'])
