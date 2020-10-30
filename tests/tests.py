@@ -680,3 +680,47 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertListEqual(full_series.dates, chained_series.dates)
         self.assertListEqual(full_values, chained_values)
+
+    def test_opentimeseries_plot_series(self):
+
+        plotsim = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
+        plotseries = sim_to_opentimeseries(plotsim, end=dt.date(2019, 6, 30))
+        fig, _ = plotseries.plot_series(auto_open=False)
+        fig_json = json.loads(fig.to_json())
+        fig_keys = list(fig_json.keys())
+        self.assertListEqual(fig_keys, ['data', 'layout'])
+
+    def test_opentimeseries_plot_series_write_imagefile(self):
+
+        plotsim = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
+        plotseries = sim_to_opentimeseries(plotsim, end=dt.date(2019, 6, 30))
+        directory = os.path.dirname(os.path.abspath(__file__))
+        fig, _ = plotseries.plot_series(auto_open=False, directory=directory, output_type='div')
+        image_file = os.path.join(directory, 'ASSET.svg')
+        fig.write_image(image_file)
+        try:
+            os.remove(image_file)
+        except AssertionError as e:
+            self.assertTrue(isinstance(e, AssertionError))
+
+    def test_openframe_plot_series(self):
+
+        plotsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
+        plotframe = sim_to_openframe(plotsims, dt.date(2019, 6, 30)).to_cumret()
+        fig, _ = plotframe.plot_series(auto_open=False)
+        fig_json = json.loads(fig.to_json())
+        fig_keys = list(fig_json.keys())
+        self.assertListEqual(fig_keys, ['data', 'layout'])
+
+    def test_openframe_plot_series_write_imagefile(self):
+
+        plotsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
+        plotframe = sim_to_openframe(plotsims, dt.date(2019, 6, 30)).to_cumret()
+        directory = os.path.dirname(os.path.abspath(__file__))
+        fig, _ = plotframe.plot_series(auto_open=False, filename='ASSETS.html', directory=directory, output_type='div')
+        image_file = os.path.join(directory, 'ASSETS.svg')
+        fig.write_image(image_file)
+        try:
+            os.remove(image_file)
+        except AssertionError as e:
+            self.assertTrue(isinstance(e, AssertionError))

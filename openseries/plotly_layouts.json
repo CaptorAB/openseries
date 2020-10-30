@@ -1,4 +1,13 @@
 {
+  "config": {
+    "toImageButtonOptions": {
+      "format": "svg",
+      "filename": "captor_plot_image",
+      "height": 480,
+      "width": 848,
+      "scale": 1
+    }
+  },
   "layout": {
     "autosize": true,
     "title": {

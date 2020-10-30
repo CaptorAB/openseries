@@ -67,7 +67,7 @@ class OpenTimeSeries(object):
 
     def __repr__(self):
 
-        return '{}(label={}, _id={}, valuetype={}, currency= {}, start={}, end={})' \
+        return '{}(label={}, _id={}, valuetype={}, currency={}, start={}, end={})' \
             .format(self.__class__.__name__,
                     self.label,
                     self._id,
@@ -1010,7 +1010,8 @@ class OpenTimeSeries(object):
         return self
 
     def plot_series(self, mode: str = 'lines', tick_fmt: str = None, directory: str = None,
-                    size_array: list = None, auto_open: bool = True, add_logo: bool = True) -> (dict, str):
+                    size_array: list = None, auto_open: bool = True, add_logo: bool = True,
+                    output_type: str = 'file') -> (go.Figure, str):
         """
         Function to draw a Plotly graph with lines in Captor style.
 
@@ -1020,6 +1021,7 @@ class OpenTimeSeries(object):
         :param size_array: The values will set bubble sizes.
         :param auto_open: Determines whether or not to open a browser window with the plot.
         :param add_logo: If True a Captor logo is added to the plot.
+        :param output_type: file or div.
 
         To scale the bubble size, use the attribute sizeref.
         We recommend using the following formula to calculate a sizeref value:
@@ -1063,9 +1065,10 @@ class OpenTimeSeries(object):
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
         if add_logo:
             figure.add_layout_image(logo)
-        plot(figure, filename=plotfile, auto_open=auto_open, link_text='', include_plotlyjs='cdn')
+        plot(figure, filename=plotfile, auto_open=auto_open, link_text='', include_plotlyjs='cdn', config=fig['config'],
+             output_type=output_type)
 
-        return fig, plotfile
+        return figure, plotfile
 
 
 def timeseries_chain(front, back, old_fee: float = 0.0):

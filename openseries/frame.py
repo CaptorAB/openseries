@@ -969,7 +969,8 @@ class OpenFrame(object):
         return mddf
 
     def plot_series(self, mode: str = 'lines', tick_fmt: str = None, filename: str = None, directory: str = None,
-                    labels: list = None, auto_open: bool = True, add_logo: bool = True) -> (go.Figure, str):
+                    labels: list = None, auto_open: bool = True, add_logo: bool = True,
+                    output_type: str = 'file') -> (go.Figure, str):
         """
         Function to draw a Plotly graph with lines in Captor style.
 
@@ -980,6 +981,7 @@ class OpenFrame(object):
         :param labels
         :param auto_open: Determines whether or not to open a browser window with the plot.
         :param add_logo: If True a Captor logo is added to the plot.
+        :param output_type: file or div.
         """
         if labels:
             assert len(labels) == self.item_count, 'Must provide same number of labels as items in frame.'
@@ -1010,7 +1012,8 @@ class OpenFrame(object):
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
         if add_logo:
             figure.add_layout_image(logo)
-        plot(figure, filename=plotfile, auto_open=auto_open, link_text='', include_plotlyjs='cdn')
+        plot(figure, filename=plotfile, auto_open=auto_open, link_text='', include_plotlyjs='cdn', config=fig['config'],
+             output_type=output_type)
 
         return figure, plotfile
 
