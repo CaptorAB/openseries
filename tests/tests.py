@@ -324,6 +324,33 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertListEqual([dt.date(2018, 8, 15), dt.date(2018, 7, 2), dt.date(2018, 8, 3), dt.date(2018, 10, 3),
                               dt.date(2018, 10, 17)], mddframe.max_drawdown_date.tolist())
 
+    def test_openframe_make_portfolio(self):
+
+        assets = 5
+        mpsim = ReturnSimulation.from_normal(n=assets, d=252, mu=0.05, vol=0.1, seed=71)
+        mpframe = sim_to_openframe(mpsim, dt.date(2019, 6, 30)).to_cumret()
+        mpframe.weights = [1.0 / assets] * assets
+
+        name = 'portfolio'
+        mptail = mpframe.make_portfolio(name=name).tail()
+        mptail = mptail.applymap(lambda nn: f'{nn:.6f}')
+
+        correct = ['1.037311', '1.039374', '1.039730', '1.044433', '1.045528']
+        wrong = ['1.037311', '1.039374', '1.039730', '1.044433', '1.045527']
+        true_tail = pd.DataFrame(columns=pd.MultiIndex.from_product([[name], ['Price(Close)']]),
+                                 index=pd.DatetimeIndex(['2019-06-24', '2019-06-25', '2019-06-26', '2019-06-27',
+                                                         '2019-06-28']), data=correct)
+        false_tail = pd.DataFrame(columns=pd.MultiIndex.from_product([[name], ['Price(Close)']]),
+                                  index=pd.DatetimeIndex(['2019-06-24', '2019-06-25', '2019-06-26', '2019-06-27',
+                                                          '2019-06-28']), data=wrong)
+
+        assert_frame_equal(true_tail, mptail, check_exact=True)
+
+        try:
+            assert_frame_equal(false_tail, mptail, check_exact=True)
+        except AssertionError as e:
+            self.assertTrue(isinstance(e, AssertionError))
+
     def test_opentimeseries_running_adjustment(self):
 
         simadj = ReturnSimulation.from_merton_jump_gbm(n=1, d=2512, mu=0.05, vol=0.1,
