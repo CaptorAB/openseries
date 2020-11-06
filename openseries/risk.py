@@ -22,10 +22,12 @@ def cvar_down(data: List[float], level: float = 0.95) -> float:
         clean = np.nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
     array = np.sort(ret)
-    return float(np.mean(array[:int(math.ceil(len(array) * (1 - level)))]))
+    return float(np.mean(array[: int(math.ceil(len(array) * (1 - level)))]))
 
 
-def var_down(data: List[float], level: float = 0.95, interpolation: str = 'lower') -> float:
+def var_down(
+    data: List[float], level: float = 0.95, interpolation: str = "lower"
+) -> float:
     """
 
     :param data:
@@ -38,7 +40,9 @@ def var_down(data: List[float], level: float = 0.95, interpolation: str = 'lower
     return result
 
 
-def drawdown_series(prices: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
+def drawdown_series(
+    prices: Union[pd.DataFrame, pd.Series]
+) -> Union[pd.DataFrame, pd.Series]:
     """
     Calculates the `drawdown <https://www.investopedia.com/terms/d/drawdown.asp>`_ series.
     This returns a series representing a drawdown.
@@ -54,18 +58,20 @@ def drawdown_series(prices: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFram
     drawdown = prices.copy()
 
     # Fill NaN's with previous values
-    drawdown = drawdown.fillna(method='ffill')
+    drawdown = drawdown.fillna(method="ffill")
 
     # Ignore problems with NaN's in the beginning
     drawdown[np.isnan(drawdown)] = -np.Inf
 
     # Rolling maximum
     roll_max = np.maximum.accumulate(drawdown)
-    drawdown = drawdown / roll_max - 1.
+    drawdown = drawdown / roll_max - 1.0
     return drawdown
 
 
-def calc_max_drawdown(prices: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
+def calc_max_drawdown(
+    prices: Union[pd.DataFrame, pd.Series]
+) -> Union[pd.DataFrame, pd.Series]:
     """
     Calculates the max drawdown of a price series. If you want the
     actual drawdown series, please use to_drawdown_series.
@@ -78,7 +84,12 @@ def max_drawdown_date(prices: Union[pd.DataFrame, pd.Series]) -> dt.date:
     """
     Date when Max drawdown occurred.
     """
-    mdd_date = (prices / prices.expanding(min_periods=1).max()).idxmin().values[0].astype(dt.datetime)
+    mdd_date = (
+        (prices / prices.expanding(min_periods=1).max())
+        .idxmin()
+        .values[0]
+        .astype(dt.datetime)
+    )
     return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
 
 
@@ -96,7 +107,15 @@ def drawdown_details(prices: Union[pd.DataFrame, pd.Series]) -> pd.Series:
     sdate = dt.datetime.fromtimestamp(sdate / 1e9).date()
     duration = (mdate - sdate).days
     ret_per_day = md / duration
-    df = pd.Series(data=[md, sdate, mdate, duration, ret_per_day],
-                   index=['Max Drawdown', 'Start of drawdown', 'Date of bottom', 'Days from start to bottom',
-                          'Average fall per day'], name='Drawdown details')
+    df = pd.Series(
+        data=[md, sdate, mdate, duration, ret_per_day],
+        index=[
+            "Max Drawdown",
+            "Start of drawdown",
+            "Date of bottom",
+            "Days from start to bottom",
+            "Average fall per day",
+        ],
+        name="Drawdown details",
+    )
     return df
