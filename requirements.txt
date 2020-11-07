@@ -1,6 +1,6 @@
 coverage==5.1
 jsonschema==3.2.0
-kaleido==0.1.0a2
+kaleido==0.0.3.post1
 nose-timer==1.0.0
 nose==1.3.7
 numpy==1.19.2
@@ -10,3 +10,4 @@ python-dateutil==2.8.1
 requests==2.24.0
 scipy==1.5.2
 statsmodels==0.12.0
+testfixtures==6.15.0

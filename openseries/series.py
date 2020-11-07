@@ -20,7 +20,7 @@ from typing import Union, Tuple, List
 from openseries.captor_open_api_sdk import CaptorOpenApiService
 from openseries.datefixer import date_offset_foll, date_fix
 from openseries.load_plotly import load_plotly_dict
-from openseries.risk import cvar_down, var_down, drawdown_series
+from openseries.risk import cvar_down, var_down, drawdown_series, drawdown_details
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
@@ -1162,6 +1162,13 @@ class OpenTimeSeries(object):
         self.tsdf = drawdown_series(self.tsdf)
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], ["Drawdowns"]])
         return self
+
+    def drawdown_details(self) -> pd.DataFrame:
+        """
+        Returns a DataFrame with: 'Max Drawdown', 'Start of drawdown', 'Date of bottom', 'Days from start to bottom', &
+            'Average fall per day' for each constituent.
+        """
+        return drawdown_details(self.tsdf).to_frame()
 
     def rolling_vol(
         self, observations: int = 21, periods_in_a_year_fixed: int = None
