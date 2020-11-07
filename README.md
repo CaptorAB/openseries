@@ -169,7 +169,6 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 | `delete_tsdf_item` | `OpenFrame` | Deletes a column from the OpenFrame pandas.DataFrame. |
 | `relative` | `OpenFrame` | Calculates a new series that is the relative performance of two others. |
 | `make_portfolio` | `OpenFrame` | Calculates a portfolio timeseries from series and weights. |
-| `drawdown_details` | `OpenFrame` | Returns detailed drawdown characteristics. |
 | `rolling_corr` | `OpenFrame` | Calculates and adds a series of rolling correlations between two other series. |
 | `ord_least_squares_fit` | `OpenFrame` | Calculates the *Beta* and a Ordinary Least Squares fitted series from two others. |
 
@@ -187,6 +186,7 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 | `value_to_log` | `OpenTimeSeries`, `OpenFrame` | Converts a value series into a logarithmic return series. |
 | `value_ret_calendar_period` | `OpenTimeSeries`, `OpenFrame` | Returns the series simple return for a specific calendar period. |
 | `plot_series` | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly](https://plotly.com/python/) plot of the series in a browser window. |
+| `drawdown_details` | `OpenTimeSeries`, `OpenFrame` | Returns detailed drawdown characteristics. |
 | `to_drawdown_series` | `OpenTimeSeries`, `OpenFrame` | Converts the series into drawdown series. |
 | `rolling_return` | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling returns. |
 | `rolling_vol` | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling volatilities. |
