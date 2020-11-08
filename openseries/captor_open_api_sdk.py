@@ -20,7 +20,9 @@ class CaptorOpenApiService(object):
 
         return "{}(base_url={})".format(self.__class__.__name__, self.base_url)
 
-    def get_timeseries(self, timeseries_id: str, url: str = "/opentimeseries") -> dict:
+    def get_timeseries(
+        self, timeseries_id: str, url: str = "/opentimeseries"
+    ) -> dict:
         """
 
         :param timeseries_id: str

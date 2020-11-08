@@ -36,7 +36,9 @@ class OpenFrame(object):
     tsdf: pd.DataFrame
     weights: List[float]
 
-    def __init__(self, constituents: List[OpenTimeSeries], weights: List[float] = None):
+    def __init__(
+        self, constituents: List[OpenTimeSeries], weights: List[float] = None
+    ):
         """
         :param constituents:  List of objects of Class OpenTimeSeries.
         :param weights:       List of weights in float64 format.
@@ -46,7 +48,9 @@ class OpenFrame(object):
         self.sweden = SwedenHolidayCalendar(holidays_sw)
         self.constituents = constituents
         if constituents is not None and len(constituents) != 0:
-            self.tsdf = pd.concat([x.tsdf for x in self.constituents], axis="columns")
+            self.tsdf = pd.concat(
+                [x.tsdf for x in self.constituents], axis="columns"
+            )
         else:
             logging.warning("OpenFrame() was passed an empty list.")
 
@@ -102,7 +106,10 @@ class OpenFrame(object):
         return results
 
     def calc_range(
-        self, months_offset: int = None, from_dt: dt.date = None, to_dt: dt.date = None
+        self,
+        months_offset: int = None,
+        from_dt: dt.date = None,
+        to_dt: dt.date = None,
     ) -> Tuple[pd.Timestamp, pd.Timestamp]:
         """
         Function to create user defined time frame.
@@ -111,7 +118,11 @@ class OpenFrame(object):
         :param from_dt: Specific from date
         :param to_dt: Specific to date
         """
-        if months_offset is not None or from_dt is not None or to_dt is not None:
+        if (
+            months_offset is not None
+            or from_dt is not None
+            or to_dt is not None
+        ):
             if months_offset is not None:
                 earlier = date_offset_foll(
                     self.last_idx,
@@ -242,7 +253,8 @@ class OpenFrame(object):
             )
         else:
             return pd.Series(
-                data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac)
+                data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0])
+                ** (1 / self.yearfrac)
                 - 1,
                 name="Geometric return",
             )
@@ -263,7 +275,9 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
         return pd.Series(
-            data=(self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1,
+            data=(self.tsdf.loc[later] / self.tsdf.loc[earlier])
+            ** (1 / fraction)
+            - 1,
             name="Subset Geometric return",
         )
 
@@ -300,7 +314,8 @@ class OpenFrame(object):
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
         return pd.Series(
-            data=np.log(self.tsdf.loc[earlier:later]).diff().mean() * time_factor,
+            data=np.log(self.tsdf.loc[earlier:later]).diff().mean()
+            * time_factor,
             name="Subset Arithmetic return",
         )
 
@@ -317,7 +332,8 @@ class OpenFrame(object):
             )
         else:
             return pd.Series(
-                data=self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1, name="Total return"
+                data=self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1,
+                name="Total return",
             )
 
     def value_ret_func(
@@ -347,7 +363,9 @@ class OpenFrame(object):
                 ret = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
             return pd.Series(data=ret, name="Subset Total return")
 
-    def value_ret_calendar_period(self, year: int, month: int = None) -> pd.Series:
+    def value_ret_calendar_period(
+        self, year: int, month: int = None
+    ) -> pd.Series:
         """
         Function to calculate simple return for a specific calendar period.
 
@@ -370,7 +388,10 @@ class OpenFrame(object):
         Annualized time weighted return.
         """
         return pd.Series(
-            data=((self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.length) - 1)
+            data=(
+                (self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.length)
+                - 1
+            )
             * self.periods_in_a_year,
             name="Time-weighted return",
         )
@@ -398,7 +419,11 @@ class OpenFrame(object):
             fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
         return pd.Series(
-            data=((self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / how_many) - 1)
+            data=(
+                (self.tsdf.loc[later] / self.tsdf.loc[earlier])
+                ** (1 / how_many)
+                - 1
+            )
             * time_factor,
             name="Subset Time-weighted return",
         )
@@ -440,7 +465,8 @@ class OpenFrame(object):
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
         return pd.Series(
-            data=self.tsdf.loc[earlier:later].pct_change().std() * np.sqrt(time_factor),
+            data=self.tsdf.loc[earlier:later].pct_change().std()
+            * np.sqrt(time_factor),
             name="Subset Volatility",
         )
 
@@ -455,7 +481,9 @@ class OpenFrame(object):
             zd.iloc[0] = 0.0
         else:
             zd = self.tsdf.pct_change()
-        return pd.Series(data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Z-score")
+        return pd.Series(
+            data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Z-score"
+        )
 
     def z_score_func(
         self,
@@ -591,9 +619,13 @@ class OpenFrame(object):
         :param to_date: Specific to date
         """
         ratio = self.geo_ret_func(
-            months_from_last=months_from_last, from_date=from_date, to_date=to_date
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         ) / self.vol_func(
-            months_from_last=months_from_last, from_date=from_date, to_date=to_date
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
         ratio.name = "Subset Return vol ratio"
         return ratio
@@ -603,7 +635,9 @@ class OpenFrame(object):
         """
         Max drawdown from peak to recovery.
         """
-        return pd.Series(data=calc_max_drawdown(self.tsdf), name="Max drawdown")
+        return pd.Series(
+            data=calc_max_drawdown(self.tsdf), name="Max drawdown"
+        )
 
     @property
     def max_drawdown_date(self) -> pd.Series:
@@ -669,7 +703,8 @@ class OpenFrame(object):
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return pd.Series(
-            data=self.tsdf.loc[earlier:later].pct_change().min(), name="Subset Worst"
+            data=self.tsdf.loc[earlier:later].pct_change().min(),
+            name="Subset Worst",
         )
 
     @property
@@ -678,7 +713,8 @@ class OpenFrame(object):
         Most negative month.
         """
         return pd.Series(
-            data=self.tsdf.resample("BM").last().pct_change().min(), name="Worst month"
+            data=self.tsdf.resample("BM").last().pct_change().min(),
+            name="Worst month",
         )
 
     @property
@@ -693,7 +729,11 @@ class OpenFrame(object):
             .pct_change()
             .sort_values()
             .iloc[
-                : int(math.ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))
+                : int(
+                    math.ceil(
+                        (1 - level) * cvar_df.loc[:, x].pct_change().count()
+                    )
+                )
             ]
             .mean()
             for x in self.tsdf
@@ -723,7 +763,11 @@ class OpenFrame(object):
             .pct_change()
             .sort_values()
             .iloc[
-                : int(math.ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))
+                : int(
+                    math.ceil(
+                        (1 - level) * cvar_df.loc[:, x].pct_change().count()
+                    )
+                )
             ]
             .mean()
             for x in self.tsdf
@@ -733,7 +777,9 @@ class OpenFrame(object):
         )
 
     @property
-    def var_down(self, level: float = 0.95, interpolation: str = "lower") -> pd.Series:
+    def var_down(
+        self, level: float = 0.95, interpolation: str = "lower"
+    ) -> pd.Series:
         """
         Downside Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
         :param level: The sought VaR level as a float
@@ -830,7 +876,9 @@ class OpenFrame(object):
                 .quantile(1 - level, interpolation=interpolation)
                 / ss.norm.ppf(level)
             )
-        return pd.Series(data=imp_vol, name=f"Subset Imp vol from VaR {level:.0%}")
+        return pd.Series(
+            data=imp_vol, name=f"Subset Imp vol from VaR {level:.0%}"
+        )
 
     def target_weight_from_var(
         self,
@@ -868,16 +916,22 @@ class OpenFrame(object):
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
         vfv = vfv.apply(
-            lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local))
+            lambda x: max(
+                min_leverage_local, min(target_vol / x, max_leverage_local)
+            )
         )
-        return pd.Series(data=vfv, name=f"Weight from target vol {target_vol:.1%}")
+        return pd.Series(
+            data=vfv, name=f"Weight from target vol {target_vol:.1%}"
+        )
 
     @property
     def positive_share(self) -> pd.Series:
         """
         The share of percentage changes that are positive.
         """
-        pos = self.tsdf.pct_change()[1:][self.tsdf.pct_change()[1:] > 0.0].count()
+        pos = self.tsdf.pct_change()[1:][
+            self.tsdf.pct_change()[1:] > 0.0
+        ].count()
         tot = self.tsdf.pct_change()[1:].count()
         answer = pos / tot
         answer.name = "Positive share"
@@ -899,7 +953,9 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         pos = (
             self.tsdf.loc[earlier:later]
-            .pct_change()[1:][self.tsdf.loc[earlier:later].pct_change()[1:] > 0.0]
+            .pct_change()[1:][
+                self.tsdf.loc[earlier:later].pct_change()[1:] > 0.0
+            ]
             .count()
         )
         tot = self.tsdf.loc[earlier:later].pct_change()[1:].count()
@@ -912,7 +968,9 @@ class OpenFrame(object):
         """
         Correlation matrix
         """
-        corr_matrix = self.tsdf.pct_change().corr(method="pearson", min_periods=1)
+        corr_matrix = self.tsdf.pct_change().corr(
+            method="pearson", min_periods=1
+        )
         corr_matrix.columns = corr_matrix.columns.droplevel(level=1)
         corr_matrix.index = corr_matrix.index.droplevel(level=1)
         corr_matrix.index.name = "Correlation"
@@ -982,10 +1040,17 @@ class OpenFrame(object):
             start_cut = self.first_indices.max()
         if not end_cut and after:
             end_cut = self.last_indices.min()
-        self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
+        self.tsdf = self.tsdf.truncate(
+            before=start_cut, after=end_cut, copy=False
+        )
         for x in self.constituents:
-            x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
-        if len(set(self.first_indices)) != 1 or len(set(self.last_indices)) != 1:
+            x.tsdf = x.tsdf.truncate(
+                before=start_cut, after=end_cut, copy=False
+            )
+        if (
+            len(set(self.first_indices)) != 1
+            or len(set(self.last_indices)) != 1
+        ):
             logging.warning(
                 "One or more constituents still not truncated to same start and/or end dates."
             )
@@ -1080,14 +1145,19 @@ class OpenFrame(object):
             self.tsdf = self.tsdf.pct_change()
             self.tsdf.iloc[0] = 0
         self.tsdf = self.tsdf.add(1.0)
-        self.tsdf = self.tsdf.apply(np.cumprod, axis="index") / self.tsdf.iloc[0]
+        self.tsdf = (
+            self.tsdf.apply(np.cumprod, axis="index") / self.tsdf.iloc[0]
+        )
         new_labels = ["Price(Close)"] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
         self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
         return self
 
     def relative(
-        self, long_column: int = 0, short_column: int = 1, base_zero: bool = True
+        self,
+        long_column: int = 0,
+        short_column: int = 1,
+        base_zero: bool = True,
     ):
         """
         Function calculates cumulative relative return between two series.
@@ -1111,11 +1181,14 @@ class OpenFrame(object):
         )
         if base_zero:
             self.tsdf[rel_label, "Relative return"] = (
-                self.tsdf.iloc[:, long_column] - self.tsdf.iloc[:, short_column]
+                self.tsdf.iloc[:, long_column]
+                - self.tsdf.iloc[:, short_column]
             )
         else:
             self.tsdf[rel_label, "Relative return"] = (
-                1.0 + self.tsdf.iloc[:, long_column] - self.tsdf.iloc[:, short_column]
+                1.0
+                + self.tsdf.iloc[:, long_column]
+                - self.tsdf.iloc[:, short_column]
             )
 
     def ord_least_squares_fit(
@@ -1156,11 +1229,16 @@ class OpenFrame(object):
             df.iloc[0] = 0
         portfolio = df.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
-        portfolio.columns = pd.MultiIndex.from_product([[name], ["Price(Close)"]])
+        portfolio.columns = pd.MultiIndex.from_product(
+            [[name], ["Price(Close)"]]
+        )
         return portfolio
 
     def rolling_corr(
-        self, first_column: int = 0, second_column: int = 1, observations: int = 21
+        self,
+        first_column: int = 0,
+        second_column: int = 1,
+        observations: int = 21,
     ):
         """
         Function calculates correlation between two series.
@@ -1189,7 +1267,10 @@ class OpenFrame(object):
         return self.tsdf.loc[:, (corr_label, "Rolling correlation")]
 
     def rolling_vol(
-        self, column: int, observations: int = 21, periods_in_a_year_fixed: int = None
+        self,
+        column: int,
+        observations: int = 21,
+        periods_in_a_year_fixed: int = None,
     ):
         """
         Calculates rolling annualised volatilities.
@@ -1204,16 +1285,18 @@ class OpenFrame(object):
             time_factor = self.periods_in_a_year
         vol_label = self.tsdf.iloc[:, column].name[0]
         df = self.tsdf.iloc[:, column].pct_change()
-        voldf = df.rolling(observations, min_periods=observations).std() * np.sqrt(
-            time_factor
-        )
+        voldf = df.rolling(
+            observations, min_periods=observations
+        ).std() * np.sqrt(time_factor)
         voldf = voldf.dropna().to_frame()
         voldf.columns = pd.MultiIndex.from_product(
             [[vol_label], ["Rolling volatility"]]
         )
         return voldf
 
-    def rolling_return(self, column: int, observations: int = 21) -> pd.DataFrame:
+    def rolling_return(
+        self, column: int, observations: int = 21
+    ) -> pd.DataFrame:
         """
         Calculates sum of the returns in a rolling window.
 
@@ -1228,7 +1311,9 @@ class OpenFrame(object):
             .sum()
         )
         retdf = retdf.dropna().to_frame()
-        retdf.columns = pd.MultiIndex.from_product([[ret_label], ["Rolling returns"]])
+        retdf.columns = pd.MultiIndex.from_product(
+            [[ret_label], ["Rolling returns"]]
+        )
         return retdf
 
     def rolling_cvar_down(
@@ -1248,7 +1333,9 @@ class OpenFrame(object):
             .apply(lambda x: cvar_down(x, level=level))
         )
         cvardf = cvardf.dropna().to_frame()
-        cvardf.columns = pd.MultiIndex.from_product([[cvar_label], ["Rolling CVaR"]])
+        cvardf.columns = pd.MultiIndex.from_product(
+            [[cvar_label], ["Rolling CVaR"]]
+        )
         return cvardf
 
     def rolling_var_down(
@@ -1270,10 +1357,14 @@ class OpenFrame(object):
         vardf = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
-            .apply(lambda x: var_down(x, level=level, interpolation=interpolation))
+            .apply(
+                lambda x: var_down(x, level=level, interpolation=interpolation)
+            )
         )
         vardf = vardf.dropna().to_frame()
-        vardf.columns = pd.MultiIndex.from_product([[var_label], ["Rolling VaR"]])
+        vardf.columns = pd.MultiIndex.from_product(
+            [[var_label], ["Rolling VaR"]]
+        )
         return vardf
 
     def to_drawdown_series(self):
@@ -1329,7 +1420,9 @@ class OpenFrame(object):
         if not directory:
             directory = os.path.join(str(Path.home()), "Documents")
         if not filename:
-            filename = "".join(random.choices(string.ascii_letters, k=6)) + ".html"
+            filename = (
+                "".join(random.choices(string.ascii_letters, k=6)) + ".html"
+            )
         plotfile = os.path.join(os.path.abspath(directory), filename)
         assert mode in [
             "lines",
@@ -1402,18 +1495,28 @@ def key_value_table(
         ), "Must pass the same number of attributes as column labels"
 
     if not attributes:
-        attributes = ["geo_ret", "vol", "worst_month", "var_down", "ret_vol_ratio"]
+        attributes = [
+            "geo_ret",
+            "vol",
+            "worst_month",
+            "var_down",
+            "ret_vol_ratio",
+        ]
         if basket.last_idx.year - 1 < basket.first_idx.year:
             first_ret = basket.value_ret_calendar_period(basket.last_idx.year)
             first_yr = basket.last_idx.year
         else:
-            first_ret = basket.value_ret_calendar_period(basket.last_idx.year - 1)
+            first_ret = basket.value_ret_calendar_period(
+                basket.last_idx.year - 1
+            )
             first_yr = basket.last_idx.year - 1
         if basket.last_idx.year == basket.first_idx.year:
             attributes = [
                 basket.value_ret_calendar_period(basket.last_idx.year),
                 pd.Series(
-                    data=[""] * basket.item_count, index=basket.vol.index, name=""
+                    data=[""] * basket.item_count,
+                    index=basket.vol.index,
+                    name="",
                 ),
             ] + [getattr(basket, x) for x in attributes]
             if swe_not_eng:
@@ -1468,11 +1571,11 @@ def key_value_table(
     if cols:
         keyvalues.columns = cols
     if swe_not_eng:
-        date_range = (
-            f"Från {basket.first_idx:%d %b, %Y} till {basket.last_idx:%d %b, %Y}"
-        )
+        date_range = f"Från {basket.first_idx:%d %b, %Y} till {basket.last_idx:%d %b, %Y}"
     else:
-        date_range = f"From {basket.first_idx:%d %b, %Y} to {basket.last_idx:%d %b, %Y}"
+        date_range = (
+            f"From {basket.first_idx:%d %b, %Y} to {basket.last_idx:%d %b, %Y}"
+        )
 
     if headers:
         if len(headers) == len(keyvalues.columns):

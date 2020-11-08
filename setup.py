@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="openseries",
-    version="0.1.19",
+    version="0.1.20",
     packages=find_packages(),
     package_data={"openseries": ["*.json"], ".": ["*.json"]},
     install_requires=[
@@ -20,7 +20,7 @@ setup(
         "requests",
         "scipy",
         "statsmodels",
-        "testfixtures"
+        "testfixtures",
     ],
     url="https://github.com/CaptorAB/OpenSeries",
     license="BSD License",
