@@ -2,7 +2,7 @@
 [![CircleCI](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master.svg?style=svg)](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![PyPI version](https://badge.fury.io/py/openseries.svg)](https://badge.fury.io/py/openseries)
-
+[![Coverage](https://img.shields.io/badge/coverage-86%25-green.svg)](https://img.shields.io/badge/coverage-86%25-green)
 
 
 
