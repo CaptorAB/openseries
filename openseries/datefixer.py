@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
+import logging
+from typing import Union
+
+import pandas as pd
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-import logging
-import pandas as pd
 from pandas.tseries.offsets import CDay
-from typing import Union
 
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
@@ -40,8 +41,10 @@ def date_offset_foll(
     :param raw_date: The date to offset from.
     :param calendar:
     :param months_offset: Number of months as integer
-    :param adjust: Boolean condition controlling if offset should adjust for business days.
-    :param following: Boolean condition controlling days should be offset forward (following=True) or backward.
+    :param adjust: Boolean condition controlling if offset should adjust for
+                   business days.
+    :param following: Boolean condition controlling days should be offset
+                      forward (following=True) or backward.
     :returns : datetime.date
     """
     start_dt = dt.date(1970, 12, 30)

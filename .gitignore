@@ -128,3 +128,4 @@ dmypy.json
 .idea/*
 /.inspectionProfiles/
 .xml
+/pyproject.toml

@@ -20,5 +20,6 @@ def write_helpfile(obj):
         print("Error in helpfilewriter: ", e)
     else:
         print(
-            f"Class {obj.__class__.__name__} help file {filename} saved to working directory."
+            f"Class {obj.__class__.__name__} help file {filename} "
+            f"saved to working directory."
         )

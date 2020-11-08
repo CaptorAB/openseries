@@ -5,9 +5,10 @@ https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
 import math
+from typing import List, Union
+
 import numpy as np
 import pandas as pd
-from typing import List, Union
 
 
 def cvar_down(data: List[float], level: float = 0.95) -> float:
@@ -44,7 +45,7 @@ def drawdown_series(
     prices: Union[pd.DataFrame, pd.Series]
 ) -> Union[pd.DataFrame, pd.Series]:
     """
-    Calculates the `drawdown <https://www.investopedia.com/terms/d/drawdown.asp>`_ series.
+    Calculates https://www.investopedia.com/terms/d/drawdown.asp
     This returns a series representing a drawdown.
     When the price is at all time highs, the drawdown
     is 0. However, when prices are below high water marks,

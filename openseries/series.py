@@ -2,20 +2,21 @@
 import copy
 import datetime as dt
 import json
-import jsonschema
-from jsonschema.exceptions import ValidationError
 import logging
 import math
-import numpy as np
 import os
-import pandas as pd
-from pandas.core.series import Series
-from pandas.tseries.offsets import CDay
 from pathlib import Path
-from plotly.offline import plot
+from typing import Union, Tuple, List
+
+import jsonschema
+import numpy as np
+import pandas as pd
 import plotly.graph_objs as go
 import scipy.stats as ss
-from typing import Union, Tuple, List
+from jsonschema.exceptions import ValidationError
+from pandas.core.series import Series
+from pandas.tseries.offsets import CDay
+from plotly.offline import plot
 
 from openseries.captor_open_api_sdk import CaptorOpenApiService
 from openseries.datefixer import date_offset_foll, date_fix
@@ -30,25 +31,24 @@ from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class OpenTimeSeries(object):
-
-    _id: str  # Captor database identifier for the timeseries
-    instrumentId: str  # Captor database identifier for the instrument associated with the timeseries
-    currency: str  # Currency of the timeseries. Only used if conversion/hedging methods are added.
+    _id: str
+    instrumentId: str
+    currency: str
     dates: List[
         str
-    ]  # Dates of the timeseries. Not edited by any method to allow reversion to original.
-    domestic: str  # Domestic currency of the user / investor. Only used if conversion/hedging methods are added.
-    name: str  # An identifier field.
-    isin: str  # ISIN code of the associated instrument. If any.
-    label: str  # Field used in outputs.
-    schema: dict  # Jsonschema to validate against in the __init__ method.
-    sweden: SwedenHolidayCalendar  # A calendar object used to generate business days.
-    valuetype: str  # "Price(Close)" if a series of values and "Return(Total)" if a series of returns.
+    ]
+    domestic: str
+    name: str
+    isin: str
+    label: str
+    schema: dict
+    sweden: SwedenHolidayCalendar
+    valuetype: str
     values: List[
         float
-    ]  # Values of the timeseries. Not edited by any method to allow reversion to original.
-    local_ccy: bool  # Indicates if series should be in its local currency or the domestic currency of the user.
-    tsdf: pd.DataFrame  # The Pandas DataFrame which gets edited by the class methods.
+    ]
+    local_ccy: bool
+    tsdf: pd.DataFrame
 
     @classmethod
     def setup_class(cls):
@@ -78,26 +78,32 @@ class OpenTimeSeries(object):
 
     def __repr__(self):
 
-        return "{}(label={}, _id={}, valuetype={}, currency={}, start={}, end={})".format(
-            self.__class__.__name__,
-            self.label,
-            self._id,
-            self.valuetype,
-            self.currency,
-            self.first_idx.strftime("%Y-%m-%d"),
-            self.last_idx.strftime("%Y-%m-%d"),
+        return (
+            "{}(label={}, _id={}, valuetype={}, currency={}, start={}, "
+            "end={})".format(
+                self.__class__.__name__,
+                self.label,
+                self._id,
+                self.valuetype,
+                self.currency,
+                self.first_idx.strftime("%Y-%m-%d"),
+                self.last_idx.strftime("%Y-%m-%d"),
+            )
         )
 
     def __str__(self):
 
-        return "{}(label={}, _id={}, valuetype={}, currency= {}, start={}, end={})".format(
-            self.__class__.__name__,
-            self.label,
-            self._id,
-            self.valuetype,
-            self.currency,
-            self.first_idx.strftime("%Y-%m-%d"),
-            self.last_idx.strftime("%Y-%m-%d"),
+        return (
+            "{}(label={}, _id={}, valuetype={}, currency= {}, start={}, "
+            "end={})".format(
+                self.__class__.__name__,
+                self.label,
+                self._id,
+                self.valuetype,
+                self.currency,
+                self.first_idx.strftime("%Y-%m-%d"),
+                self.last_idx.strftime("%Y-%m-%d"),
+            )
         )
 
     @classmethod
@@ -164,7 +170,8 @@ class OpenTimeSeries(object):
 
         if isin != fundinfo["isin"]:
             raise Exception(
-                "Method OpenTimeSeries.from_open_fundinfo() returned the wrong isin."
+                "Method OpenTimeSeries.from_open_fundinfo() returned "
+                "the wrong isin."
             )
 
         output = {
@@ -176,9 +183,8 @@ class OpenTimeSeries(object):
             "local_ccy": local_ccy,
             "valuetype": valuetype,
             "dates": fundinfo["returnTimeSeries"]["dates"],
-            "values": [
-                float(val) for val in fundinfo["returnTimeSeries"]["values"]
-            ],
+            "values": [float(val) for val in
+                       fundinfo["returnTimeSeries"]["values"]],
         }
 
         return cls(d=output)
@@ -310,15 +316,15 @@ class OpenTimeSeries(object):
     def pandas_df(self):
 
         df = pd.DataFrame(data=self.values, index=self.dates, dtype="float64")
-        df.columns = pd.MultiIndex.from_product(
-            [[self.label], [self.valuetype]]
-        )
+        df.columns = \
+            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         df.index = pd.DatetimeIndex(df.index)
 
         if any(df.index.duplicated()):
             duplicates = df.loc[df.loc[df.index.duplicated()].index]
             logging.warning(
-                f"\nData used to create {type(self).__name__} contains duplicate(s).\n {duplicates}"
+                f"\nData used to create {type(self).__name__}"
+                f" contains duplicate(s).\n {duplicates}"
                 f"\nKeeping the last data point of each duplicate."
             )
             df = df[~df.index.duplicated(keep="last")]
@@ -351,16 +357,14 @@ class OpenTimeSeries(object):
         """
         Function to create user defined time frame.
 
-        :param months_offset: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_offset: number of months offset as positive integer.
+                              Overrides use of from_date and to_date
         :param from_dt: Specific from date
         :param to_dt: Specific to date
         """
         self.setup_class()
-        if (
-            months_offset is not None
-            or from_dt is not None
-            or to_dt is not None
-        ):
+        if months_offset is not None or from_dt is not None or \
+                to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
                     self.last_idx,
@@ -368,14 +372,15 @@ class OpenTimeSeries(object):
                     months_offset=-months_offset,
                 )
                 assert (
-                    earlier >= self.first_idx
+                        earlier >= self.first_idx
                 ), "Function calc_range returned earlier date < series start"
                 later = self.last_idx
             else:
                 if from_dt is not None and to_dt is None:
                     assert (
-                        from_dt >= self.first_idx
-                    ), "Function calc_range returned earlier date < series start"
+                            from_dt >= self.first_idx
+                    ), "Function calc_range returned earlier date < " \
+                       "series start"
                     earlier, later = from_dt, self.last_idx
                 elif from_dt is None and to_dt is not None:
                     assert (
@@ -384,8 +389,9 @@ class OpenTimeSeries(object):
                     earlier, later = self.first_idx, to_dt
                 elif from_dt is not None and to_dt is not None:
                     assert (
-                        to_dt <= self.last_idx and from_dt >= self.first_idx
-                    ), "Function calc_range returned dates outside series range"
+                            to_dt <= self.last_idx and from_dt >= self.first_idx
+                    ), "Function calc_range returned dates outside " \
+                       "series range"
                     earlier, later = from_dt, to_dt
                 else:
                     earlier, later = from_dt, to_dt
@@ -406,7 +412,8 @@ class OpenTimeSeries(object):
 
     def align_index_to_local_cdays(self):
         """
-        Changes the index of the associated pd.DataFrame tsdf to align with local calendar business days.
+        Changes the index of the associated pd.DataFrame tsdf to align with
+        local calendar business days.
         """
         self.setup_class()
         date_range = pd.date_range(
@@ -474,7 +481,8 @@ class OpenTimeSeries(object):
     @property
     def yearfrac(self) -> float:
         """
-        Length of timeseries expressed as np.float64 fraction of a year with 365.25 days.
+        Length of timeseries expressed as np.float64 fraction of
+        a year with 365.25 days.
         """
         return (self.last_idx - self.first_idx).days / 365.25
 
@@ -507,7 +515,8 @@ class OpenTimeSeries(object):
         """
         Geometric annualized return.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -516,8 +525,8 @@ class OpenTimeSeries(object):
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception("First data point == 0.0")
         return float(
-            (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction)
-            - 1
+            (self.tsdf.loc[later] / self.tsdf.loc[earlier]) **
+            (1 / fraction) - 1
         )
 
     @property
@@ -537,7 +546,8 @@ class OpenTimeSeries(object):
         """
         Arithmetic annualized log return.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         :param periods_in_a_year_fixed:
@@ -549,9 +559,8 @@ class OpenTimeSeries(object):
             fraction = (later - earlier).days / 365.25
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
-        return float(
-            np.log(self.tsdf.loc[earlier:later]).diff().mean() * time_factor
-        )
+        return float(np.log(self.tsdf.loc[earlier:later]).diff().mean() *
+                     time_factor)
 
     @property
     def twr_ret(self) -> float:
@@ -575,7 +584,8 @@ class OpenTimeSeries(object):
         """
         Annualized time weighted return.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         :param periods_in_a_year_fixed:
@@ -590,11 +600,8 @@ class OpenTimeSeries(object):
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception("First data point == 0.0")
         return float(
-            (
-                (self.tsdf.loc[later] / self.tsdf.loc[earlier])
-                ** (1 / how_many)
-                - 1
-            )
+            ((self.tsdf.loc[later] / self.tsdf.loc[earlier]) **
+             (1 / how_many) - 1)
             * time_factor
         )
 
@@ -617,8 +624,9 @@ class OpenTimeSeries(object):
         """
         Simple return
 
-        :param logret: Boolean set to True for log return and False for simple return.
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param logret: True for log return and False for simple return.
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -649,11 +657,11 @@ class OpenTimeSeries(object):
     @property
     def vol(self) -> float:
         """
-        Annualized volatility. Pandas .std() is the equivalent of stdev.s([...]) in MS excel.
+        Annualized volatility. Pandas .std() is the equivalent of
+        stdev.s([...]) in MS excel.
         """
-        return float(
-            self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year)
-        )
+        return float(self.tsdf.pct_change().std() *
+                     np.sqrt(self.periods_in_a_year))
 
     def vol_func(
         self,
@@ -665,7 +673,8 @@ class OpenTimeSeries(object):
         """
         Annualized volatility.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         :param periods_in_a_year_fixed:
@@ -678,8 +687,8 @@ class OpenTimeSeries(object):
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
         return float(
-            self.tsdf.loc[earlier:later].pct_change().std()
-            * np.sqrt(time_factor)
+            self.tsdf.loc[earlier:later].pct_change().std() *
+            np.sqrt(time_factor)
         )
 
     @property
@@ -697,13 +706,15 @@ class OpenTimeSeries(object):
     ) -> float:
         """
         Ratio of geometric return and annualized volatility.
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
-        return self.geo_ret_func(
-            months_from_last, from_date, to_date
-        ) / self.vol_func(months_from_last, from_date, to_date)
+        return self.geo_ret_func(months_from_last, from_date, to_date) / \
+               self.vol_func(
+                   months_from_last, from_date, to_date
+               )
 
     @property
     def z_score(self) -> float:
@@ -722,8 +733,9 @@ class OpenTimeSeries(object):
         to_date: dt.date = None,
     ) -> float:
         """
-        Z-score as (last return - mean return) / standard deviation of returns.
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        Z-score as (last return - mean return) / standard deviation.
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -736,9 +748,9 @@ class OpenTimeSeries(object):
         """
         Max drawdown.
         """
-        return float(
-            (self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1
-        )
+        return float((self.tsdf / self.tsdf.expanding(
+            min_periods=1
+        ).max()).min() - 1)
 
     @property
     def max_drawdown_date(self) -> dt.date:
@@ -762,7 +774,8 @@ class OpenTimeSeries(object):
         """
         Maximum drawdown.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -809,7 +822,8 @@ class OpenTimeSeries(object):
         """
         Most negative percentage change.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -836,7 +850,8 @@ class OpenTimeSeries(object):
         """
         The share of percentage changes that are positive.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -853,9 +868,9 @@ class OpenTimeSeries(object):
         Skew of the return distribution.
         """
         return float(
-            ss.skew(
-                self.tsdf.pct_change().values, bias=True, nan_policy="omit"
-            )
+            ss.skew(self.tsdf.pct_change().values,
+                    bias=True,
+                    nan_policy="omit")
         )
 
     def skew_func(
@@ -867,7 +882,8 @@ class OpenTimeSeries(object):
         """
         Skew of the return distribution.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -903,7 +919,8 @@ class OpenTimeSeries(object):
         """
         Kurtosis of the return distribution.
 
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -944,7 +961,8 @@ class OpenTimeSeries(object):
         Downside Conditional Value At Risk, "CVaR".
 
         :param level: The sought CVaR level as a float
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
@@ -964,18 +982,21 @@ class OpenTimeSeries(object):
 
     @property
     def var_down(
-        self, level: float = 0.95, interpolation: str = "lower"
+            self,
+            level: float = 0.95,
+            interpolation: str = "lower"
     ) -> float:
         """
-        Downside Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
+        Downside Value At Risk, "VaR". The equivalent of
+        percentile.inc([...], 1-level) over returns in MS Excel.
 
         :param level: The sought VaR level as a float
-        :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
+        :param interpolation: type of interpolation in quantile function
+                              (default value in quantile is linear)
         """
         return float(
-            self.tsdf.pct_change().quantile(
-                1 - level, interpolation=interpolation
-            )
+            self.tsdf.pct_change().quantile(1 - level,
+                                            interpolation=interpolation)
         )
 
     def var_down_func(
@@ -987,13 +1008,16 @@ class OpenTimeSeries(object):
         interpolation: str = "lower",
     ) -> float:
         """
-        Downside Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
+        Downside Value At Risk, "VaR". The equivalent of
+        percentile.inc([...], 1-level) over returns in MS Excel.
 
         :param level: The sought VaR level as a float
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
-        :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
+        :param interpolation: type of interpolation in quantile function
+                              (default value in quantile is linear)
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return float(
@@ -1004,14 +1028,17 @@ class OpenTimeSeries(object):
 
     @property
     def vol_from_var(
-        self, level: float = 0.95, interpolation: str = "lower"
+            self,
+            level: float = 0.95,
+            interpolation: str = "lower"
     ) -> float:
         """
-        Implied annualized volatility from the Downside VaR using the assumption that returns
-        are normally distributed.
+        Implied annualized volatility from the Downside VaR using the
+        assumption that returns are normally distributed.
 
         :param level: The VaR level as a float
-        :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
+        :param interpolation: type of interpolation in quantile function
+                              (default value in quantile is linear)
         """
         return float(
             -np.sqrt(self.periods_in_a_year)
@@ -1030,14 +1057,16 @@ class OpenTimeSeries(object):
         periods_in_a_year_fixed: int = None,
     ) -> float:
         """
-        Implied annualized volatility from the Downside VaR using the assumption that returns
-        are normally distributed.
+        Implied annualized volatility from the Downside VaR using the
+        assumption that returns are normally distributed.
 
         :param level: The VaR level as a float
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
-        :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
+        :param interpolation: type of interpolation in quantile function
+                              (default value in quantile is linear)
         :param drift_adjust:
         :param periods_in_a_year_fixed:
         """
@@ -1086,15 +1115,18 @@ class OpenTimeSeries(object):
         periods_in_a_year_fixed: int = None,
     ) -> float:
         """
-        A position target weight from the ratio between a VaR implied volatility and a given target volatility.
+        A position target weight from the ratio between a VaR implied
+        volatility and a given target volatility.
         :param target_vol:
         :param min_leverage_local:
         :param max_leverage_local:
         :param level: The VaR level as a float
-        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
-        :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
+        :param interpolation: type of interpolation in quantile function
+                              (default value in quantile is linear)
         :param drift_adjust:
         :param periods_in_a_year_fixed:
         """
@@ -1120,7 +1152,7 @@ class OpenTimeSeries(object):
         Function converts a valueseries into a returnseries.
         Log return is the equivalent of LN(value[t] / value[t-1]) in MS excel.
 
-        :param logret: Boolean set to True for log return and False for simple return.
+        :param logret: True for log return and False for simple return.
         """
         if logret:
             self.tsdf = np.log(self.tsdf).diff()
@@ -1128,9 +1160,8 @@ class OpenTimeSeries(object):
             self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = "Return(Total)"
-        self.tsdf.columns = pd.MultiIndex.from_product(
-            [[self.label], [self.valuetype]]
-        )
+        self.tsdf.columns = \
+            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         return self
 
     def value_to_diff(self, periods: int = 1):
@@ -1142,14 +1173,14 @@ class OpenTimeSeries(object):
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
         self.valuetype = "Return(Total)"
-        self.tsdf.columns = pd.MultiIndex.from_product(
-            [[self.label], [self.valuetype]]
-        )
+        self.tsdf.columns = \
+            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         return self
 
     def value_to_log(self, reverse: bool = False):
         """
-        Function converts a valueseries into logarithmic returns equivalent to LN(value[t] / value[t=0]) in MS excel.
+        Function converts a valueseries into logarithmic returns equivalent
+        to LN(value[t] / value[t=0]) in MS excel.
 
         :param reverse:
         """
@@ -1172,7 +1203,7 @@ class OpenTimeSeries(object):
         Function converts a total return timeseries into a cumulative series.
 
         :param div_by_first:
-        :param logret: Boolean set to True for log return and False for simple return.
+        :param logret: True for log return and False for simple return.
         """
         if not any(
             [
@@ -1186,9 +1217,8 @@ class OpenTimeSeries(object):
         if div_by_first:
             self.tsdf = self.tsdf / self.tsdf.iloc[0]
         self.valuetype = "Price(Close)"
-        self.tsdf.columns = pd.MultiIndex.from_product(
-            [[self.label], [self.valuetype]]
-        )
+        self.tsdf.columns = \
+            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         return self
 
     def resample(self, freq: str = "BM"):
@@ -1204,14 +1234,14 @@ class OpenTimeSeries(object):
         Converts the series (self.tsdf) into a drawdown series
         """
         self.tsdf = drawdown_series(self.tsdf)
-        self.tsdf.columns = pd.MultiIndex.from_product(
-            [[self.label], ["Drawdowns"]]
-        )
+        self.tsdf.columns = \
+            pd.MultiIndex.from_product([[self.label], ["Drawdowns"]])
         return self
 
     def drawdown_details(self) -> pd.DataFrame:
         """
-        Returns a DataFrame with: 'Max Drawdown', 'Start of drawdown', 'Date of bottom', 'Days from start to bottom', &
+        Returns a DataFrame with: 'Max Drawdown', 'Start of drawdown',
+            'Date of bottom', 'Days from start to bottom', &
             'Average fall per day' for each constituent.
         """
         return drawdown_details(self.tsdf).to_frame()
@@ -1230,9 +1260,10 @@ class OpenTimeSeries(object):
         else:
             time_factor = self.periods_in_a_year
         df = self.tsdf.pct_change().copy()
-        voldf = df.rolling(
-            observations, min_periods=observations
-        ).std() * np.sqrt(time_factor)
+        voldf = df.rolling(observations,
+                           min_periods=observations).std() * np.sqrt(
+            time_factor
+        )
         voldf.dropna(inplace=True)
         voldf.columns = pd.MultiIndex.from_product(
             [[self.label], ["Rolling volatility"]]
@@ -1246,13 +1277,11 @@ class OpenTimeSeries(object):
         :param observations: Number of observations in the overlapping window.
         """
         retdf = (
-            self.tsdf.pct_change()
-            .rolling(observations, min_periods=observations)
-            .sum()
+            self.tsdf.pct_change().rolling(observations,
+                                           min_periods=observations).sum()
         )
-        retdf.columns = pd.MultiIndex.from_product(
-            [[self.label], ["Rolling returns"]]
-        )
+        retdf.columns = \
+            pd.MultiIndex.from_product([[self.label], ["Rolling returns"]])
         return retdf.dropna()
 
     def rolling_cvar_down(
@@ -1264,13 +1293,13 @@ class OpenTimeSeries(object):
         :param observations: Number of observations in the overlapping window.
         :param level: The sought CVaR level as a float
         """
-        cvardf = self.tsdf.rolling(
-            observations, min_periods=observations
-        ).apply(lambda x: cvar_down(x, level=level))
-        cvardf = cvardf.dropna()
-        cvardf.columns = pd.MultiIndex.from_product(
-            [[self.label], ["Rolling CVaR"]]
+        cvardf = self.tsdf.rolling(observations,
+                                   min_periods=observations).apply(
+            lambda x: cvar_down(x, level=level)
         )
+        cvardf = cvardf.dropna()
+        cvardf.columns = \
+            pd.MultiIndex.from_product([[self.label], ["Rolling CVaR"]])
         return cvardf
 
     def rolling_var_down(
@@ -1284,24 +1313,26 @@ class OpenTimeSeries(object):
 
         :param level: The sought VaR level as a float
         :param observations: Number of observations in the overlapping window.
-        :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
+        :param interpolation: type of interpolation in quantile function
+                              (default value in quantile is linear)
         """
-        vardf = self.tsdf.rolling(
-            observations, min_periods=observations
-        ).apply(
-            lambda x: var_down(x, level=level, interpolation=interpolation)
+        vardf = self.tsdf.rolling(observations,
+                                  min_periods=observations).apply(
+            lambda x: var_down(x,
+                               level=level,
+                               interpolation=interpolation)
         )
         vardf = vardf.dropna()
-        vardf.columns = pd.MultiIndex.from_product(
-            [[self.label], ["Rolling VaR"]]
-        )
+        vardf.columns = \
+            pd.MultiIndex.from_product([[self.label], ["Rolling VaR"]])
         return vardf
 
     def value_nan_handle(self, method: str = "fill"):
         """
         Method handles NaN in valueseries.
 
-        :param method: Method used to handle NaN. Either fill with last known (default) or drop.
+        :param method: Method used to handle NaN. Either fill with last known
+                       (default) or drop.
         """
         assert method in [
             "fill",
@@ -1317,7 +1348,8 @@ class OpenTimeSeries(object):
         """
         Method handles NaN in returnseries.
 
-        :param method: Method used to handle NaN. Either fill with last known (default) or drop.
+        :param method: Method used to handle NaN. Either fill with last known
+                       (default) or drop.
         """
         assert method in [
             "fill",
@@ -1354,18 +1386,14 @@ class OpenTimeSeries(object):
             dates.append(idx)
             values.append(
                 values[-1]
-                * (
-                    1
-                    + float(row)
-                    + adjustment * (idx - prev).days / days_in_year
-                )
+                * (1 + float(row) + adjustment *
+                   (idx - prev).days / days_in_year)
             )
             prev = idx
         self.tsdf = pd.DataFrame(data=values, index=dates)
         self.valuetype = "Price(Close)"
-        self.tsdf.columns = pd.MultiIndex.from_product(
-            [[self.label], [self.valuetype]]
-        )
+        self.tsdf.columns = \
+            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
         return self
 
@@ -1376,7 +1404,8 @@ class OpenTimeSeries(object):
         delete_lvl_one: bool = False,
     ):
         """
-        Method allows manuel setting the columns of the tsdf Pandas Dataframe associated with the timeseries
+        Method allows manuel setting the columns of the tsdf Pandas Dataframe
+            associated with the timeseries
 
         :param lvl_zero: New level zero label
         :param lvl_one: New level one label
@@ -1392,14 +1421,12 @@ class OpenTimeSeries(object):
             )
             self.label = lvl_zero
         elif lvl_zero is None and lvl_one is not None:
-            self.tsdf.columns = pd.MultiIndex.from_product(
-                [[self.label], [lvl_one]]
-            )
+            self.tsdf.columns = \
+                pd.MultiIndex.from_product([[self.label], [lvl_one]])
             self.valuetype = lvl_one
         else:
-            self.tsdf.columns = pd.MultiIndex.from_product(
-                [[lvl_zero], [lvl_one]]
-            )
+            self.tsdf.columns = \
+                pd.MultiIndex.from_product([[lvl_zero], [lvl_one]])
             self.label, self.valuetype = lvl_zero, lvl_one
         if delete_lvl_one:
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
@@ -1418,29 +1445,34 @@ class OpenTimeSeries(object):
         """
         Function to draw a Plotly graph with lines in Captor style.
 
-        :param mode: The type of scatter to use, lines, markers or lines+markers.
-        :param tick_fmt: None, '%', '.1%' depending on number of decimals to show.
+        :param mode: The type of scatter to use, lines, markers or
+                     lines+markers.
+        :param tick_fmt: None, '%', '.1%' depending on number of
+                         decimals to show.
         :param directory: Directory where Plotly html file is saved.
         :param size_array: The values will set bubble sizes.
-        :param auto_open: Determines whether or not to open a browser window with the plot.
+        :param auto_open: Determines whether or not to open a browser window
+                          with the plot.
         :param add_logo: If True a Captor logo is added to the plot.
         :param output_type: file or div.
 
         To scale the bubble size, use the attribute sizeref.
         We recommend using the following formula to calculate a sizeref value:
-        sizeref = 2. * max(array of size values) / (desired maximum marker size ** 2)
+        sizeref = 2. * max(array of size values) /
+                  (desired maximum marker size ** 2)
         """
         if not directory:
             directory = os.path.join(str(Path.home()), "Documents")
-        filename = (
-            self.label.replace("/", "")
-            .replace("#", "")
-            .replace(" ", "")
-            .upper()
-        )
-        plotfile = os.path.join(
-            os.path.abspath(directory), "{}.html".format(filename)
-        )
+        filename = self.label.replace(
+            "/", ""
+        ).replace(
+            "#", ""
+        ).replace(
+            " ", ""
+        ).upper()
+        plotfile = \
+            os.path.join(os.path.abspath(directory),
+                         "{}.html".format(filename))
 
         assert mode in [
             "lines",
@@ -1465,9 +1497,10 @@ class OpenTimeSeries(object):
                 y=values,
                 hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
                 line=dict(width=2.5, color="rgb(33, 134, 197)", dash="solid"),
-                marker=dict(
-                    size=size_array, sizemode="area", sizeref=sizer, sizemin=4
-                ),
+                marker=dict(size=size_array,
+                            sizemode="area",
+                            sizeref=sizer,
+                            sizemin=4),
                 text=text_array,
                 mode=mode,
                 name=self.label,

@@ -82,9 +82,9 @@ builtins =
 disable-noqa = False
 
 # Set the maximum length that any line (with some exceptions) may be.
-max-line-length = 100
+max-line-length = 88
 # Set the maximum allowed McCabe complexity value for a block of code.
-max-complexity = 10
+max-complexity = 18
 # Toggle whether pycodestyle should enforce matching the indentation of the opening bracket’s line.
 # incluences E131 and E133
 hang-closing = True
@@ -101,14 +101,11 @@ hang-closing = True
 # W503 - line break before binary operator
 
 # Specify a list of codes to ignore.
-ignore =
-    E501
+ignore = E203, E266, E501, W503, F403, F401
+
 # Specify the list of error codes you wish Flake8 to report.
-select =
-    E,
-    W,
-    F,
-    C
+select = B, C, E, F, W, T4, B9
+
 # Enable off-by-default extensions.
 enable-extensions =
 
