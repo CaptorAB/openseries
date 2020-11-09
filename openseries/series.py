@@ -91,21 +91,6 @@ class OpenTimeSeries(object):
             )
         )
 
-    def __str__(self):
-
-        return (
-            "{}(label={}, _id={}, valuetype={}, currency= {}, start={}, "
-            "end={})".format(
-                self.__class__.__name__,
-                self.label,
-                self._id,
-                self.valuetype,
-                self.currency,
-                self.first_idx.strftime("%Y-%m-%d"),
-                self.last_idx.strftime("%Y-%m-%d"),
-            )
-        )
-
     @classmethod
     def from_open_api(
         cls,

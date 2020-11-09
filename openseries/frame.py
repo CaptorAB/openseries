@@ -67,12 +67,6 @@ class OpenFrame(object):
             self.__class__.__name__, self.constituents, self.weights
         )
 
-    def __str__(self):
-
-        return "{}(constituents={}, weights={})".format(
-            self.__class__.__name__, self.constituents, self.weights
-        )
-
     def from_deepcopy(self):
 
         return copy.deepcopy(self)
@@ -1006,7 +1000,8 @@ class OpenFrame(object):
     def resample(self, freq="BM"):
         """
         Function resamples (changes) timeseries frequency.
-        :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
+        :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/
+                              user_guide/timeseries.html#dateoffset-objects
         """
         self.tsdf = self.tsdf.resample(freq).last()
         return self
