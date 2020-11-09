@@ -6,6 +6,7 @@
 [![Documentation Status](https://readthedocs.org/projects/flake8/badge/?version=latest)](https://flake8.pycqa.org/en/latest/?badge=latest)
 
 
+
 # OpenSeries
 
 This is a project where we keep tools to perform timeseries analysis on a single asset or a group of assets.
