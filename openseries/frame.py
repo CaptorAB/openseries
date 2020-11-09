@@ -987,16 +987,6 @@ class OpenFrame(object):
         self.tsdf.drop(lvl_zero_item, axis="columns", level=0, inplace=True)
         return self
 
-    def delete_tsdf_item(self, lvl_zero_item: str):
-        """
-        Function drops the selected item from the associated DataFrame.
-        Note that the item is not dropped from
-        the input constituents.
-        :param lvl_zero_item:
-        """
-        self.tsdf.drop(lvl_zero_item, axis="columns", level=0, inplace=True)
-        return self
-
     def resample(self, freq="BM"):
         """
         Function resamples (changes) timeseries frequency.

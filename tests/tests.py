@@ -1101,7 +1101,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         frame_unique = [
             "add_timeseries",
             "delete_timeseries",
-            "delete_tsdf_item",
             "ord_least_squares_fit",
             "make_portfolio",
             "relative",
@@ -1618,3 +1617,52 @@ class TestOpenTimeSeries(unittest.TestCase):
                                 "2017-06-02"]),
                            columns=["Captor Iris Bond, SE0009807308"])
         assert_frame_equal(df, ddf)
+
+    def test_openframe_all_properties(self):
+
+        prop_index = [
+            "Total return",
+            "Geometric return",
+            "Arithmetic return",
+            "Time-weighted return",
+            "Volatility",
+            "Return vol ratio",
+            "Z-score",
+            "Skew",
+            "Kurtosis",
+            "Positive share",
+            "VaR 95.0%",
+            "CVaR 95.0%",
+            "Imp vol from VaR 95%",
+            "Worst",
+            "Worst month",
+            "Max drawdown",
+            "Max drawdown dates",
+            "Max drawdown in cal yr",
+            "first indices",
+            "last indices",
+            "lengths of items",
+        ]
+        apsims = ReturnSimulation.from_normal(
+            n=5, d=252, mu=0.05, vol=0.1, seed=71
+        )
+        apframe = sim_to_openframe(apsims, dt.date(2019, 6, 30)).to_cumret()
+        result_index = apframe.all_properties().index.tolist()
+
+        self.assertListEqual(prop_index, result_index)
+
+    def test_align_index_to_local_cdays(self):
+
+        date_range = pd.date_range(start="2020-06-15", end="2020-06-25")
+        asim = [1.0] * len(date_range)
+        adf = pd.DataFrame(data=asim,
+                           index=date_range,
+                           columns=pd.MultiIndex.from_product(
+                               [["Asset"], ["Price(Close)"]]))
+        aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
+
+        midsummer = "2020-06-19"
+        self.assertTrue(midsummer in date_range)
+
+        aseries.align_index_to_local_cdays()
+        self.assertFalse(midsummer in aseries.tsdf.index)
