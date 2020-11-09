@@ -34,9 +34,7 @@ class OpenTimeSeries(object):
     _id: str
     instrumentId: str
     currency: str
-    dates: List[
-        str
-    ]
+    dates: List[str]
     domestic: str
     name: str
     isin: str
@@ -44,9 +42,7 @@ class OpenTimeSeries(object):
     schema: dict
     sweden: SwedenHolidayCalendar
     valuetype: str
-    values: List[
-        float
-    ]
+    values: List[float]
     local_ccy: bool
     tsdf: pd.DataFrame
 
@@ -183,8 +179,9 @@ class OpenTimeSeries(object):
             "local_ccy": local_ccy,
             "valuetype": valuetype,
             "dates": fundinfo["returnTimeSeries"]["dates"],
-            "values": [float(val) for val in
-                       fundinfo["returnTimeSeries"]["values"]],
+            "values": [
+                float(val) for val in fundinfo["returnTimeSeries"]["values"]
+            ],
         }
 
         return cls(d=output)
@@ -316,8 +313,9 @@ class OpenTimeSeries(object):
     def pandas_df(self):
 
         df = pd.DataFrame(data=self.values, index=self.dates, dtype="float64")
-        df.columns = \
-            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        df.columns = pd.MultiIndex.from_product(
+            [[self.label], [self.valuetype]]
+        )
         df.index = pd.DatetimeIndex(df.index)
 
         if any(df.index.duplicated()):
@@ -363,8 +361,11 @@ class OpenTimeSeries(object):
         :param to_dt: Specific to date
         """
         self.setup_class()
-        if months_offset is not None or from_dt is not None or \
-                to_dt is not None:
+        if (
+            months_offset is not None
+            or from_dt is not None
+            or to_dt is not None
+        ):
             if months_offset is not None:
                 earlier = date_offset_foll(
                     self.last_idx,
@@ -372,15 +373,15 @@ class OpenTimeSeries(object):
                     months_offset=-months_offset,
                 )
                 assert (
-                        earlier >= self.first_idx
+                    earlier >= self.first_idx
                 ), "Function calc_range returned earlier date < series start"
                 later = self.last_idx
             else:
                 if from_dt is not None and to_dt is None:
-                    assert (
-                            from_dt >= self.first_idx
-                    ), "Function calc_range returned earlier date < " \
-                       "series start"
+                    assert from_dt >= self.first_idx, (
+                        "Function calc_range returned earlier date < "
+                        "series start"
+                    )
                     earlier, later = from_dt, self.last_idx
                 elif from_dt is None and to_dt is not None:
                     assert (
@@ -389,9 +390,11 @@ class OpenTimeSeries(object):
                     earlier, later = self.first_idx, to_dt
                 elif from_dt is not None and to_dt is not None:
                     assert (
-                            to_dt <= self.last_idx and from_dt >= self.first_idx
-                    ), "Function calc_range returned dates outside " \
-                       "series range"
+                        to_dt <= self.last_idx and from_dt >= self.first_idx
+                    ), (
+                        "Function calc_range returned dates outside "
+                        "series range"
+                    )
                     earlier, later = from_dt, to_dt
                 else:
                     earlier, later = from_dt, to_dt
@@ -525,8 +528,8 @@ class OpenTimeSeries(object):
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception("First data point == 0.0")
         return float(
-            (self.tsdf.loc[later] / self.tsdf.loc[earlier]) **
-            (1 / fraction) - 1
+            (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction)
+            - 1
         )
 
     @property
@@ -559,8 +562,9 @@ class OpenTimeSeries(object):
             fraction = (later - earlier).days / 365.25
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
-        return float(np.log(self.tsdf.loc[earlier:later]).diff().mean() *
-                     time_factor)
+        return float(
+            np.log(self.tsdf.loc[earlier:later]).diff().mean() * time_factor
+        )
 
     @property
     def twr_ret(self) -> float:
@@ -600,8 +604,11 @@ class OpenTimeSeries(object):
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception("First data point == 0.0")
         return float(
-            ((self.tsdf.loc[later] / self.tsdf.loc[earlier]) **
-             (1 / how_many) - 1)
+            (
+                (self.tsdf.loc[later] / self.tsdf.loc[earlier])
+                ** (1 / how_many)
+                - 1
+            )
             * time_factor
         )
 
@@ -660,8 +667,9 @@ class OpenTimeSeries(object):
         Annualized volatility. Pandas .std() is the equivalent of
         stdev.s([...]) in MS excel.
         """
-        return float(self.tsdf.pct_change().std() *
-                     np.sqrt(self.periods_in_a_year))
+        return float(
+            self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year)
+        )
 
     def vol_func(
         self,
@@ -687,8 +695,8 @@ class OpenTimeSeries(object):
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
         return float(
-            self.tsdf.loc[earlier:later].pct_change().std() *
-            np.sqrt(time_factor)
+            self.tsdf.loc[earlier:later].pct_change().std()
+            * np.sqrt(time_factor)
         )
 
     @property
@@ -711,10 +719,9 @@ class OpenTimeSeries(object):
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
-        return self.geo_ret_func(months_from_last, from_date, to_date) / \
-               self.vol_func(
-                   months_from_last, from_date, to_date
-               )
+        return self.geo_ret_func(
+            months_from_last, from_date, to_date
+        ) / self.vol_func(months_from_last, from_date, to_date)
 
     @property
     def z_score(self) -> float:
@@ -748,9 +755,9 @@ class OpenTimeSeries(object):
         """
         Max drawdown.
         """
-        return float((self.tsdf / self.tsdf.expanding(
-            min_periods=1
-        ).max()).min() - 1)
+        return float(
+            (self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1
+        )
 
     @property
     def max_drawdown_date(self) -> dt.date:
@@ -868,9 +875,9 @@ class OpenTimeSeries(object):
         Skew of the return distribution.
         """
         return float(
-            ss.skew(self.tsdf.pct_change().values,
-                    bias=True,
-                    nan_policy="omit")
+            ss.skew(
+                self.tsdf.pct_change().values, bias=True, nan_policy="omit"
+            )
         )
 
     def skew_func(
@@ -982,9 +989,7 @@ class OpenTimeSeries(object):
 
     @property
     def var_down(
-            self,
-            level: float = 0.95,
-            interpolation: str = "lower"
+        self, level: float = 0.95, interpolation: str = "lower"
     ) -> float:
         """
         Downside Value At Risk, "VaR". The equivalent of
@@ -995,8 +1000,9 @@ class OpenTimeSeries(object):
                               (default value in quantile is linear)
         """
         return float(
-            self.tsdf.pct_change().quantile(1 - level,
-                                            interpolation=interpolation)
+            self.tsdf.pct_change().quantile(
+                1 - level, interpolation=interpolation
+            )
         )
 
     def var_down_func(
@@ -1028,9 +1034,7 @@ class OpenTimeSeries(object):
 
     @property
     def vol_from_var(
-            self,
-            level: float = 0.95,
-            interpolation: str = "lower"
+        self, level: float = 0.95, interpolation: str = "lower"
     ) -> float:
         """
         Implied annualized volatility from the Downside VaR using the
@@ -1160,8 +1164,9 @@ class OpenTimeSeries(object):
             self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = "Return(Total)"
-        self.tsdf.columns = \
-            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = pd.MultiIndex.from_product(
+            [[self.label], [self.valuetype]]
+        )
         return self
 
     def value_to_diff(self, periods: int = 1):
@@ -1173,8 +1178,9 @@ class OpenTimeSeries(object):
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
         self.valuetype = "Return(Total)"
-        self.tsdf.columns = \
-            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = pd.MultiIndex.from_product(
+            [[self.label], [self.valuetype]]
+        )
         return self
 
     def value_to_log(self, reverse: bool = False):
@@ -1217,8 +1223,9 @@ class OpenTimeSeries(object):
         if div_by_first:
             self.tsdf = self.tsdf / self.tsdf.iloc[0]
         self.valuetype = "Price(Close)"
-        self.tsdf.columns = \
-            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = pd.MultiIndex.from_product(
+            [[self.label], [self.valuetype]]
+        )
         return self
 
     def resample(self, freq: str = "BM"):
@@ -1234,8 +1241,9 @@ class OpenTimeSeries(object):
         Converts the series (self.tsdf) into a drawdown series
         """
         self.tsdf = drawdown_series(self.tsdf)
-        self.tsdf.columns = \
-            pd.MultiIndex.from_product([[self.label], ["Drawdowns"]])
+        self.tsdf.columns = pd.MultiIndex.from_product(
+            [[self.label], ["Drawdowns"]]
+        )
         return self
 
     def drawdown_details(self) -> pd.DataFrame:
@@ -1260,10 +1268,9 @@ class OpenTimeSeries(object):
         else:
             time_factor = self.periods_in_a_year
         df = self.tsdf.pct_change().copy()
-        voldf = df.rolling(observations,
-                           min_periods=observations).std() * np.sqrt(
-            time_factor
-        )
+        voldf = df.rolling(
+            observations, min_periods=observations
+        ).std() * np.sqrt(time_factor)
         voldf.dropna(inplace=True)
         voldf.columns = pd.MultiIndex.from_product(
             [[self.label], ["Rolling volatility"]]
@@ -1277,11 +1284,13 @@ class OpenTimeSeries(object):
         :param observations: Number of observations in the overlapping window.
         """
         retdf = (
-            self.tsdf.pct_change().rolling(observations,
-                                           min_periods=observations).sum()
+            self.tsdf.pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
         )
-        retdf.columns = \
-            pd.MultiIndex.from_product([[self.label], ["Rolling returns"]])
+        retdf.columns = pd.MultiIndex.from_product(
+            [[self.label], ["Rolling returns"]]
+        )
         return retdf.dropna()
 
     def rolling_cvar_down(
@@ -1293,13 +1302,13 @@ class OpenTimeSeries(object):
         :param observations: Number of observations in the overlapping window.
         :param level: The sought CVaR level as a float
         """
-        cvardf = self.tsdf.rolling(observations,
-                                   min_periods=observations).apply(
-            lambda x: cvar_down(x, level=level)
-        )
+        cvardf = self.tsdf.rolling(
+            observations, min_periods=observations
+        ).apply(lambda x: cvar_down(x, level=level))
         cvardf = cvardf.dropna()
-        cvardf.columns = \
-            pd.MultiIndex.from_product([[self.label], ["Rolling CVaR"]])
+        cvardf.columns = pd.MultiIndex.from_product(
+            [[self.label], ["Rolling CVaR"]]
+        )
         return cvardf
 
     def rolling_var_down(
@@ -1316,15 +1325,15 @@ class OpenTimeSeries(object):
         :param interpolation: type of interpolation in quantile function
                               (default value in quantile is linear)
         """
-        vardf = self.tsdf.rolling(observations,
-                                  min_periods=observations).apply(
-            lambda x: var_down(x,
-                               level=level,
-                               interpolation=interpolation)
+        vardf = self.tsdf.rolling(
+            observations, min_periods=observations
+        ).apply(
+            lambda x: var_down(x, level=level, interpolation=interpolation)
         )
         vardf = vardf.dropna()
-        vardf.columns = \
-            pd.MultiIndex.from_product([[self.label], ["Rolling VaR"]])
+        vardf.columns = pd.MultiIndex.from_product(
+            [[self.label], ["Rolling VaR"]]
+        )
         return vardf
 
     def value_nan_handle(self, method: str = "fill"):
@@ -1386,14 +1395,18 @@ class OpenTimeSeries(object):
             dates.append(idx)
             values.append(
                 values[-1]
-                * (1 + float(row) + adjustment *
-                   (idx - prev).days / days_in_year)
+                * (
+                    1
+                    + float(row)
+                    + adjustment * (idx - prev).days / days_in_year
+                )
             )
             prev = idx
         self.tsdf = pd.DataFrame(data=values, index=dates)
         self.valuetype = "Price(Close)"
-        self.tsdf.columns = \
-            pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = pd.MultiIndex.from_product(
+            [[self.label], [self.valuetype]]
+        )
         self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
         return self
 
@@ -1421,12 +1434,14 @@ class OpenTimeSeries(object):
             )
             self.label = lvl_zero
         elif lvl_zero is None and lvl_one is not None:
-            self.tsdf.columns = \
-                pd.MultiIndex.from_product([[self.label], [lvl_one]])
+            self.tsdf.columns = pd.MultiIndex.from_product(
+                [[self.label], [lvl_one]]
+            )
             self.valuetype = lvl_one
         else:
-            self.tsdf.columns = \
-                pd.MultiIndex.from_product([[lvl_zero], [lvl_one]])
+            self.tsdf.columns = pd.MultiIndex.from_product(
+                [[lvl_zero], [lvl_one]]
+            )
             self.label, self.valuetype = lvl_zero, lvl_one
         if delete_lvl_one:
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
@@ -1463,16 +1478,15 @@ class OpenTimeSeries(object):
         """
         if not directory:
             directory = os.path.join(str(Path.home()), "Documents")
-        filename = self.label.replace(
-            "/", ""
-        ).replace(
-            "#", ""
-        ).replace(
-            " ", ""
-        ).upper()
-        plotfile = \
-            os.path.join(os.path.abspath(directory),
-                         "{}.html".format(filename))
+        filename = (
+            self.label.replace("/", "")
+            .replace("#", "")
+            .replace(" ", "")
+            .upper()
+        )
+        plotfile = os.path.join(
+            os.path.abspath(directory), "{}.html".format(filename)
+        )
 
         assert mode in [
             "lines",
@@ -1497,10 +1511,9 @@ class OpenTimeSeries(object):
                 y=values,
                 hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
                 line=dict(width=2.5, color="rgb(33, 134, 197)", dash="solid"),
-                marker=dict(size=size_array,
-                            sizemode="area",
-                            sizeref=sizer,
-                            sizemin=4),
+                marker=dict(
+                    size=size_array, sizemode="area", sizeref=sizer, sizemin=4
+                ),
                 text=text_array,
                 mode=mode,
                 name=self.label,
