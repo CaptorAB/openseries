@@ -3,7 +3,7 @@ omit =
     venv/*
 
 include =
-    OpenSeries/*
+    openseries/*
 
 [report]
 show_missing = True
