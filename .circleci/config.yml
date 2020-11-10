@@ -13,7 +13,6 @@ jobs:
       - run: python3 -m venv ./venv
       - run: PYTHONPATH=${PWD} ./venv/bin/pip3 install --upgrade -r requirements.txt      
       - run: PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture  ./
-      - run: PYTHONPATH=${PWD} ./venv/bin/coverage report openseries/*.py
       - run:
           name: Run Tests
           command: |
