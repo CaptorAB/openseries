@@ -21,7 +21,6 @@ from typing import Tuple
 import numpy as np
 import numpy.random as nrand
 import plotly.graph_objs as go
-import scipy.linalg
 from plotly.offline import plot
 
 from openseries.load_plotly import load_plotly_dict
@@ -366,48 +365,6 @@ def heston_construct_correlated_path(
         )
         brownian_motion_two.append(term_one + term_two)
     return np.array(brownian_motion_one), np.array(brownian_motion_two)
-
-
-# noinspection PyArgumentList
-def get_correlated_geometric_brownian_motions(
-    param: ModelParameters, correlation_matrix, n: int, seed: int = None
-) -> list:
-    """
-    This method can construct a basket of correlated asset paths using the
-    Cholesky decomposition method
-    :param param: model parameters object
-    :param correlation_matrix: nxn correlation matrix
-    :param n: the number of assets i.e. the number of paths to return
-    :param seed:
-    :return: n correlated log return geometric brownian motion processes
-    """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
-    if seed is not None:
-        nrand.seed(seed)
-    decomposition = scipy.linalg.cholesky(correlation_matrix, lower=False)
-    uncorrelated_paths = []
-    sqrt_delta_sigma = math.sqrt(param.all_delta) * param.all_sigma
-    # Construct uncorrelated paths to convert into correlated paths
-    for h in range(param.all_time):
-        uncorrelated_random_numbers = []
-        for j in range(n):
-            uncorrelated_random_numbers.append(
-                nrand.normal(0, sqrt_delta_sigma)
-            )
-        uncorrelated_paths.append(np.array(uncorrelated_random_numbers))
-    uncorrelated_matrix = np.ndarray(uncorrelated_paths)
-    correlated_matrix = uncorrelated_matrix * decomposition
-    assert isinstance(correlated_matrix, np.matrix)
-    # The rest of this method just extracts paths from the matrix
-    extracted_paths = []
-    for f in range(1, n + 1):
-        extracted_paths.append([])
-    for j in range(0, len(correlated_matrix) * n - n, n):
-        for g in range(n):
-            extracted_paths[j].append(correlated_matrix.item(j + g))
-    return extracted_paths
 
 
 def cox_ingersoll_ross_heston(

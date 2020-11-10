@@ -1,4 +1,5 @@
 import datetime as dt
+import io
 import json
 import os
 import numpy as np
@@ -12,6 +13,7 @@ import unittest
 from openseries.series import OpenTimeSeries, timeseries_chain
 from openseries.frame import OpenFrame, key_value_table
 from openseries.sim_price import ReturnSimulation
+from openseries.captor_open_api_sdk import CaptorOpenApiService
 from openseries.stoch_processes import (
     ModelParameters,
     cox_ingersoll_ross_levels,
@@ -216,7 +218,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "dates"
         ] = (
             []
-        )  # Set dates attribute to empty array to trigger minItems ValidationError
+        )  # Set dates to empty array to trigger minItems ValidationError
 
         with self.assertRaises(Exception):
             OpenTimeSeries(new_dict)
@@ -508,9 +510,10 @@ class TestOpenTimeSeries(unittest.TestCase):
                 msg=f"Difference in {c}",
             )
 
+        func = "value_ret_calendar_period"
         self.assertEqual(
             f"{0.076502833914:.12f}",
-            f'{getattr(self.randomseries, "value_ret_calendar_period")(year=2019):.12f}',
+            f'{getattr(self.randomseries, func)(year=2019):.12f}',
         )
 
     def test_opentimeseries_max_drawdown_date(self):
@@ -695,7 +698,8 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame_1 = sim_to_openframe(sim_1, end=dt.date(2019, 6, 30))
 
-        # The below adjustment is not ideal but I believe I implemented it to mimic behaviour of Bbg return series.
+        # The below adjustment is not ideal but I believe I implemented it
+        # to mimic behaviour of Bbg return series.
         frame_1.tsdf.iloc[0] = 0
 
         frame_1.tsdf = frame_1.tsdf.applymap(lambda x: fmt.format(x))
@@ -826,11 +830,11 @@ class TestOpenTimeSeries(unittest.TestCase):
             n=2, d=504, mu=0.05, vol=0.175, seed=71
         )
 
-        sameseries = sim_to_opentimeseries(
+        sames = sim_to_opentimeseries(
             same, end=dt.date(2019, 6, 30)
         ).to_cumret()
-        sameseries.set_new_label(lvl_zero="Asset_0")
-        sameframe = sim_to_openframe(
+        sames.set_new_label(lvl_zero="Asset_0")
+        samef = sim_to_openframe(
             same, end=dt.date(2019, 6, 30)
         ).to_cumret()
 
@@ -854,8 +858,8 @@ class TestOpenTimeSeries(unittest.TestCase):
         ]
         for m in methods_to_compare:
             self.assertEqual(
-                f"{getattr(sameseries, m)(months_from_last=12):.11f}",
-                f"{float(getattr(sameframe, m)(months_from_last=12).iloc[0]):.11f}",
+                f"{getattr(sames, m)(months_from_last=12):.11f}",
+                f"{float(getattr(samef, m)(months_from_last=12).iloc[0]):.11f}",
             )
 
     def test_opentimeseries_measures_same_as_openframe_measures(self):
@@ -1097,7 +1101,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         frame_unique = [
             "add_timeseries",
             "delete_timeseries",
-            "delete_tsdf_item",
             "ord_least_squares_fit",
             "make_portfolio",
             "relative",
@@ -1225,7 +1228,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         front_series = OpenTimeSeries.from_df(full_series.tsdf.iloc[:126])
 
         back_series = OpenTimeSeries.from_df(
-            full_series.tsdf.loc[front_series.last_idx :]
+            full_series.tsdf.loc[front_series.last_idx:]
         )
 
         chained_series = timeseries_chain(front_series, back_series)
@@ -1582,3 +1585,84 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertListEqual(target_means, means)
         self.assertListEqual(target_deviations, deviations)
+
+    def test_captoropenapiservice_repr(self):
+
+        old_stdout = sys.stdout
+        new_stdout = io.StringIO()
+        sys.stdout = new_stdout
+        service = CaptorOpenApiService()
+        r = "CaptorOpenApiService(" \
+            "base_url=https://apiv2.captor.se/public/api)\n"
+        print(service)
+        output = new_stdout.getvalue()
+        sys.stdout = old_stdout
+        self.assertEqual(r, output)
+
+    def test_captoropenapiservice_get_nav_to_dataframe(self):
+
+        sevice = CaptorOpenApiService()
+        isin_code = "SE0009807308"
+        df = sevice.get_nav_to_dataframe(isin=isin_code).head()
+        ddf = pd.DataFrame(data=[100.0000,
+                                 100.0978,
+                                 100.2821,
+                                 100.1741,
+                                 100.4561],
+                           index=pd.DatetimeIndex(
+                               ["2017-05-29",
+                                "2017-05-30",
+                                "2017-05-31",
+                                "2017-06-01",
+                                "2017-06-02"]),
+                           columns=["Captor Iris Bond, SE0009807308"])
+        assert_frame_equal(df, ddf)
+
+    def test_openframe_all_properties(self):
+
+        prop_index = [
+            "Total return",
+            "Geometric return",
+            "Arithmetic return",
+            "Time-weighted return",
+            "Volatility",
+            "Return vol ratio",
+            "Z-score",
+            "Skew",
+            "Kurtosis",
+            "Positive share",
+            "VaR 95.0%",
+            "CVaR 95.0%",
+            "Imp vol from VaR 95%",
+            "Worst",
+            "Worst month",
+            "Max drawdown",
+            "Max drawdown dates",
+            "Max drawdown in cal yr",
+            "first indices",
+            "last indices",
+            "lengths of items",
+        ]
+        apsims = ReturnSimulation.from_normal(
+            n=5, d=252, mu=0.05, vol=0.1, seed=71
+        )
+        apframe = sim_to_openframe(apsims, dt.date(2019, 6, 30)).to_cumret()
+        result_index = apframe.all_properties().index.tolist()
+
+        self.assertListEqual(prop_index, result_index)
+
+    def test_align_index_to_local_cdays(self):
+
+        date_range = pd.date_range(start="2020-06-15", end="2020-06-25")
+        asim = [1.0] * len(date_range)
+        adf = pd.DataFrame(data=asim,
+                           index=date_range,
+                           columns=pd.MultiIndex.from_product(
+                               [["Asset"], ["Price(Close)"]]))
+        aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
+
+        midsummer = "2020-06-19"
+        self.assertTrue(midsummer in date_range)
+
+        aseries.align_index_to_local_cdays()
+        self.assertFalse(midsummer in aseries.tsdf.index)

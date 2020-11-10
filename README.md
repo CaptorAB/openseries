@@ -2,7 +2,7 @@
 [![CircleCI](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master.svg?style=svg)](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![PyPI version](https://badge.fury.io/py/openseries.svg)](https://badge.fury.io/py/openseries)
-[![Coverage](https://img.shields.io/badge/coverage-91%25-green.svg)](https://img.shields.io/badge/coverage-91%25-green)
+[![Coverage](https://img.shields.io/badge/coverage-95%25-green.svg)](https://img.shields.io/badge/coverage-95%25-green)
 [![Documentation Status](https://readthedocs.org/projects/flake8/badge/?version=latest)](https://flake8.pycqa.org/en/latest/?badge=latest)
 
 
@@ -167,7 +167,6 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 | `trunc_frame` | `OpenFrame` | Truncates the OpenFrame to a common period. |
 | `add_timeseries` | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame. |
 | `delete_timeseries` | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame. |
-| `delete_tsdf_item` | `OpenFrame` | Deletes a column from the OpenFrame pandas.DataFrame. |
 | `relative` | `OpenFrame` | Calculates a new series that is the relative performance of two others. |
 | `make_portfolio` | `OpenFrame` | Calculates a portfolio timeseries from series and weights. |
 | `rolling_corr` | `OpenFrame` | Calculates and adds a series of rolling correlations between two other series. |

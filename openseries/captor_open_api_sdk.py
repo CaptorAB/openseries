@@ -16,10 +16,6 @@ class CaptorOpenApiService(object):
 
         return "{}(base_url={})".format(self.__class__.__name__, self.base_url)
 
-    def __str__(self):
-
-        return "{}(base_url={})".format(self.__class__.__name__, self.base_url)
-
     def get_timeseries(
         self, timeseries_id: str, url: str = "/opentimeseries"
     ) -> dict:
@@ -89,6 +85,6 @@ class CaptorOpenApiService(object):
         data = self.get_nav(isin=isin)
         return pd.DataFrame(
             data=data["navPerUnit"],
-            index=data["dates"],
+            index=pd.DatetimeIndex(data["dates"]),
             columns=[f'{data["longName"]}, {data["isin"]}'],
         )
