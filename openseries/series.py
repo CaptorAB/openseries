@@ -1216,7 +1216,8 @@ class OpenTimeSeries(object):
     def resample(self, freq: str = "BM"):
         """
         Function resamples timeseries frequency.
-        :param freq: https://pandas.pydata.org/pandas-docs/version/0.22.0/timeseries.html#offset-aliases
+        :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/
+                              user_guide/timeseries.html#dateoffset-objects
         """
         self.tsdf = self.tsdf.resample(freq).last()
         return self
