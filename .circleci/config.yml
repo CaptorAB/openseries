@@ -14,6 +14,14 @@ jobs:
       - run: PYTHONPATH=${PWD} ./venv/bin/pip3 install --upgrade -r requirements.txt      
       - run: PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture  ./
       - run: PYTHONPATH=${PWD} ./venv/bin/coverage report openseries/*.py
+      - run:
+          name: Run Tests
+          command: |
+            PYTHONPATH=${PWD} ./venv/bin/coverage run -m openseries/*.py
+            PYTHONPATH=${PWD} ./venv/bin/coverage report
+            PYTHONPATH=${PWD} ./venv/bin/coverage html  # open htmlcov/index.html in a browser
+      - store_artifacts:
+          path: htmlcov
       - slack/status:
         webhook: webhook
 
