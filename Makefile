@@ -11,6 +11,7 @@ test:
 coverage:
 	PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer --with-coverage ./
 	PYTHONPATH=${PWD} venv/bin/coverage html -d coverage_html
+	PYTHONPATH=${PWD} venv/bin/coverage-badge -o coverage.svg
 
 clean:
 	rm -rf venv
