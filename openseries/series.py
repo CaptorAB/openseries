@@ -1525,7 +1525,7 @@ class OpenTimeSeries(object):
         return figure, plotfile
 
 
-def timeseries_chain(front, back, old_fee: float = 0.0):
+def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
     """
 
     :param front: Earlier series to chain with.
