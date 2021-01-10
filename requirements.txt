@@ -1,7 +1,7 @@
 # This is an implicit value, here for clarity
 --index-url https://pypi.org/project/openseries/
 
-coverage==5.3.1
+coverage==5.1
 coverage-badge==1.0.1
 jsonschema==3.2.0
 kaleido==0.1.0.post1
