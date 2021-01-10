@@ -28,19 +28,7 @@ share/python-wheels/
 MANIFEST
 
 # Unit tests / coverage reports
-htmlcov/
-coverage_html/
-.tox/
-.nox/
 .coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
 
 # Environments
 .env
@@ -58,3 +46,4 @@ venv.bak/
 .xml
 /pyproject.toml
 .noseids
+.DS_Store

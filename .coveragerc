@@ -8,5 +8,11 @@ include =
 [report]
 show_missing = True
 
+exclude_lines =
+    # Don't complain if non-runnable code isn't run:
+    if __name__ == .__main__.:
+
 [html]
 directory = coverage_html
+
+title = openseries Coverage report
