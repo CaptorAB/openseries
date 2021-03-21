@@ -1,6 +1,7 @@
 import datetime as dt
 import io
 import json
+from jsonschema.exceptions import ValidationError
 import os
 import numpy as np
 import pandas as pd
@@ -86,6 +87,42 @@ class TestOpenTimeSeries(unittest.TestCase):
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
             ("Asset", "Price(Close)")
         ]
+
+    def test_opentimeseries_duplicate_dates_invalidates(self):
+
+        invalid = False
+        try:
+            data_with_duplicate_date = {
+                "_id": "",
+                "currency": "SEK",
+                "dates": [
+                    "2020-09-03",
+                    "2020-09-04",
+                    "2020-09-07",
+                    "2020-09-08",
+                    "2020-09-08",
+                    "2020-09-09",
+                ],
+                "instrumentId": "",
+                "local_ccy": True,
+                "name": "Timeseries",
+                "values": [
+                    114.9965,
+                    114.8355,
+                    114.8694,
+                    115.1131,
+                    115.5555,
+                    114.8643,
+                ],
+                "valuetype": "Price(Close)",
+            }
+
+            OpenTimeSeries(data_with_duplicate_date)
+
+        except Exception as waste:
+            invalid = isinstance(waste.args[2], ValidationError)
+
+        self.assertTrue(invalid)
 
     def test_opentimeseries_tsdf_not_empty(self):
 
@@ -216,9 +253,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         new_dict.pop("label")
         new_dict[
             "dates"
-        ] = (
-            []
-        )  # Set dates to empty array to trigger minItems ValidationError
+        ] = []  # Set dates to empty array to trigger minItems ValidationError
 
         with self.assertRaises(Exception):
             OpenTimeSeries(new_dict)
@@ -513,7 +548,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         func = "value_ret_calendar_period"
         self.assertEqual(
             f"{0.076502833914:.12f}",
-            f'{getattr(self.randomseries, func)(year=2019):.12f}',
+            f"{getattr(self.randomseries, func)(year=2019):.12f}",
         )
 
     def test_opentimeseries_max_drawdown_date(self):
@@ -834,9 +869,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             same, end=dt.date(2019, 6, 30)
         ).to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
-        samef = sim_to_openframe(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        samef = sim_to_openframe(same, end=dt.date(2019, 6, 30)).to_cumret()
 
         methods_to_compare = [
             "arithmetic_ret_func",
@@ -1228,7 +1261,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         front_series = OpenTimeSeries.from_df(full_series.tsdf.iloc[:126])
 
         back_series = OpenTimeSeries.from_df(
-            full_series.tsdf.loc[front_series.last_idx:]
+            full_series.tsdf.loc[front_series.last_idx :]
         )
 
         chained_series = timeseries_chain(front_series, back_series)
@@ -1592,8 +1625,10 @@ class TestOpenTimeSeries(unittest.TestCase):
         new_stdout = io.StringIO()
         sys.stdout = new_stdout
         service = CaptorOpenApiService()
-        r = "CaptorOpenApiService(" \
+        r = (
+            "CaptorOpenApiService("
             "base_url=https://apiv2.captor.se/public/api)\n"
+        )
         print(service)
         output = new_stdout.getvalue()
         sys.stdout = old_stdout
@@ -1604,18 +1639,19 @@ class TestOpenTimeSeries(unittest.TestCase):
         sevice = CaptorOpenApiService()
         isin_code = "SE0009807308"
         df = sevice.get_nav_to_dataframe(isin=isin_code).head()
-        ddf = pd.DataFrame(data=[100.0000,
-                                 100.0978,
-                                 100.2821,
-                                 100.1741,
-                                 100.4561],
-                           index=pd.DatetimeIndex(
-                               ["2017-05-29",
-                                "2017-05-30",
-                                "2017-05-31",
-                                "2017-06-01",
-                                "2017-06-02"]),
-                           columns=["Captor Iris Bond, SE0009807308"])
+        ddf = pd.DataFrame(
+            data=[100.0000, 100.0978, 100.2821, 100.1741, 100.4561],
+            index=pd.DatetimeIndex(
+                [
+                    "2017-05-29",
+                    "2017-05-30",
+                    "2017-05-31",
+                    "2017-06-01",
+                    "2017-06-02",
+                ]
+            ),
+            columns=["Captor Iris Bond, SE0009807308"],
+        )
         assert_frame_equal(df, ddf)
 
     def test_openframe_all_properties(self):
@@ -1655,10 +1691,11 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         date_range = pd.date_range(start="2020-06-15", end="2020-06-25")
         asim = [1.0] * len(date_range)
-        adf = pd.DataFrame(data=asim,
-                           index=date_range,
-                           columns=pd.MultiIndex.from_product(
-                               [["Asset"], ["Price(Close)"]]))
+        adf = pd.DataFrame(
+            data=asim,
+            index=date_range,
+            columns=pd.MultiIndex.from_product([["Asset"], ["Price(Close)"]]),
+        )
         aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
 
         midsummer = "2020-06-19"
