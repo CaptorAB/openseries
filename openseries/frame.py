@@ -1238,6 +1238,7 @@ class OpenFrame(object):
                                  Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
+        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1328,6 +1329,12 @@ class OpenFrame(object):
         The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
         difference between the fund and the index returns.
+
+        :param long_column: Column of timeseries that is the numerator in the ratio.
+        :param short_column: Column of timeseries that is the denominator in the ratio.
+        :param observations: The length of the rolling window to use is set as
+                             number of observations.
+        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
         """
         ratio_label = (
             f"{self.tsdf.iloc[:, long_column].name[0]}"
