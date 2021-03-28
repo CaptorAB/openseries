@@ -1134,6 +1134,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         frame_unique = [
             "add_timeseries",
             "delete_timeseries",
+            "information_ratio",
             "ord_least_squares_fit",
             "make_portfolio",
             "relative",
@@ -1703,3 +1704,165 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         aseries.align_index_to_local_cdays()
         self.assertFalse(midsummer in aseries.tsdf.index)
+
+    def test_openframe_information_ratio(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=5,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.information_ratio(long_column=0, short_column=1).head()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [0.220296, 0.163429, 0.199549, 0.195792, 0.203463]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_openframe_rolling_corr(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=5,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.rolling_corr(first_column=0, second_column=1).head()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [-0.061702, -0.086124, -0.064623, -0.054879, -0.106349]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_openframe_rolling_vol(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=1,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.rolling_vol(column=0, observations=21).head()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [0.08745, 0.088091, 0.088323, 0.086713, 0.08301]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_openframe_rolling_return(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=1,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.rolling_return(column=0, observations=21).head()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [-0.014776, -0.016623, -0.017359, -0.021387, -0.035925]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_openframe_rolling_cvar_down(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=1,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.rolling_cvar_down(column=0, observations=21).tail()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [-0.013375, -0.013375, -0.013375, -0.012702, -0.012702]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_openframe_rolling_var_down(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=1,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.rolling_var_down(column=0, observations=21).tail()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [-0.013422, -0.013422, -0.013422, -0.013422, -0.013422]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_opentimeseries_rolling_vol(self):
+
+        simdata = self.randomseries.rolling_vol(observations=21).head()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [0.08745, 0.088091, 0.088323, 0.086713, 0.08301]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_opentimeseries_rolling_return(self):
+
+        simdata = self.randomseries.rolling_return(observations=21).head()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [-0.014776, -0.016623, -0.017359, -0.021387, -0.035925]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_opentimeseries_rolling_cvar_down(self):
+
+        simdata = self.randomseries.rolling_cvar_down(observations=21).tail()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [-0.013375, -0.013375, -0.013375, -0.012702, -0.012702]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_opentimeseries_rolling_var_down(self):
+
+        simdata = self.randomseries.rolling_var_down(observations=21).tail()
+
+        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
+        checkdata = [-0.013422, -0.013422, -0.013422, -0.013422, -0.013422]
+
+        self.assertListEqual(values, checkdata)

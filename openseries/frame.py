@@ -1264,12 +1264,57 @@ class OpenFrame(object):
         )
         return portfolio
 
+    def information_ratio(
+        self,
+        long_column: int = 0,
+        short_column: int = 1,
+        observations: int = 21,
+        periods_in_a_year_fixed: int = None,
+    ) -> pd.DataFrame:
+        """
+        The Information Ratio equals ( fund return less index return ) divided by the
+        Tracking Error. And the Tracking Error is the standard deviation of the
+        difference between the fund and the index returns.
+        """
+        ratio_label = (
+            f"{self.tsdf.iloc[:, long_column].name[0]}"
+            f" / {self.tsdf.iloc[:, short_column].name[0]}"
+        )
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            time_factor = self.periods_in_a_year
+
+        relative = (
+            1.0
+            + self.tsdf.iloc[:, long_column]
+            - self.tsdf.iloc[:, short_column]
+        )
+
+        retdf = (
+            relative.pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
+        )
+        retdf = retdf.dropna().to_frame()
+
+        voldf = relative.pct_change().rolling(
+            observations, min_periods=observations
+        ).std() * np.sqrt(time_factor)
+        voldf = voldf.dropna().to_frame()
+
+        ratiodf = (retdf.iloc[:, 0] / voldf.iloc[:, 0]).to_frame()
+        ratiodf.columns = pd.MultiIndex.from_product(
+            [[ratio_label], ["Information Ratio"]]
+        )
+        return ratiodf
+
     def rolling_corr(
         self,
         first_column: int = 0,
         second_column: int = 1,
         observations: int = 21,
-    ):
+    ) -> pd.DataFrame:
         """
         Function calculates correlation between two series.
         The period with at least the given number of observations is the first
@@ -1286,7 +1331,7 @@ class OpenFrame(object):
             + "_VS_"
             + self.tsdf.iloc[:, second_column].name[0]
         )
-        self.tsdf[corr_label, "Rolling correlation"] = (
+        corrdf = (
             self.tsdf.iloc[:, first_column]
             .pct_change()
             .rolling(observations, min_periods=observations)
@@ -1296,14 +1341,18 @@ class OpenFrame(object):
                 .rolling(observations, min_periods=observations)
             )
         )
-        return self.tsdf.loc[:, (corr_label, "Rolling correlation")]
+        corrdf = corrdf.dropna().to_frame()
+        corrdf.columns = pd.MultiIndex.from_product(
+            [[corr_label], ["Rolling correlation"]]
+        )
+        return corrdf
 
     def rolling_vol(
         self,
         column: int,
         observations: int = 21,
         periods_in_a_year_fixed: int = None,
-    ):
+    ) -> pd.DataFrame:
         """
         Calculates rolling annualised volatilities.
 

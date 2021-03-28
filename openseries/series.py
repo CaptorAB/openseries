@@ -303,15 +303,6 @@ class OpenTimeSeries(object):
         )
         df.index = pd.DatetimeIndex(df.index)
 
-        if any(df.index.duplicated()):
-            duplicates = df.loc[df.loc[df.index.duplicated()].index]
-            logging.warning(
-                f"\nData used to create {type(self).__name__}"
-                f" contains duplicate(s).\n {duplicates}"
-                f"\nKeeping the last data point of each duplicate."
-            )
-            df = df[~df.index.duplicated(keep="last")]
-
         df.sort_index(inplace=True)
         self.tsdf = df
 
