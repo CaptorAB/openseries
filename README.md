@@ -158,15 +158,17 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 
 #### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
-| Method                  | Applies to  | Description                                                                       |
-| :---------------------- | :---------- | :-------------------------------------------------------------------------------- |
-| `trunc_frame`           | `OpenFrame` | Truncates the OpenFrame to a common period.                                       |
-| `add_timeseries`        | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                     |
-| `delete_timeseries`     | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                     |
-| `relative`              | `OpenFrame` | Calculates a new series that is the relative performance of two others.           |
-| `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                        |
-| `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling correlations between two other series.    |
-| `ord_least_squares_fit` | `OpenFrame` | Calculates the _Beta_ and a Ordinary Least Squares fitted series from two others. |
+| Method                  | Applies to  | Description                                                                        |
+| :---------------------- | :---------- | :--------------------------------------------------------------------------------- |
+| `trunc_frame`           | `OpenFrame` | Truncates the OpenFrame to a common period.                                        |
+| `add_timeseries`        | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                      |
+| `delete_timeseries`     | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                      |
+| `relative`              | `OpenFrame` | Calculates a new series that is the relative performance of two others.            |
+| `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                         |
+| `info_ratio_func`       | `OpenFrame` | Calculates the information ratios relative to a selected series in the OpenFrame.  |
+| `rolling_info_ratio`    | `OpenFrame` | Returns a pandas.DataFrame with the rolling information ratio between two series.  |
+| `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling correlations between two other series.     |
+| `ord_least_squares_fit` | `OpenFrame` | Calculates the _Beta_ and an Ordinary Least Squares fitted series from two others. |
 
 #### In this table are the methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 

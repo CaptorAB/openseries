@@ -1134,7 +1134,8 @@ class TestOpenTimeSeries(unittest.TestCase):
         frame_unique = [
             "add_timeseries",
             "delete_timeseries",
-            "information_ratio",
+            "rolling_info_ratio",
+            "info_ratio_func",
             "ord_least_squares_fit",
             "make_portfolio",
             "relative",
@@ -1705,7 +1706,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         aseries.align_index_to_local_cdays()
         self.assertFalse(midsummer in aseries.tsdf.index)
 
-    def test_openframe_information_ratio(self):
+    def test_openframe_rolling_info_ratio(self):
 
         sims = ReturnSimulation.from_merton_jump_gbm(
             n=5,
@@ -1719,12 +1720,32 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.information_ratio(long_column=0, short_column=1).head()
+        simdata = frame.rolling_info_ratio(
+            long_column=0, short_column=1
+        ).head()
 
         values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
         checkdata = [0.220296, 0.163429, 0.199549, 0.195792, 0.203463]
 
         self.assertListEqual(values, checkdata)
+
+    def test_openframe_info_ratio_func(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=5,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.info_ratio_func(base_column=1)
+
+        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.3286500542)
 
     def test_openframe_rolling_corr(self):
 

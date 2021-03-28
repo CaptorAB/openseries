@@ -1220,6 +1220,59 @@ class OpenFrame(object):
                 - self.tsdf.iloc[:, short_column]
             )
 
+    def info_ratio_func(
+        self,
+        base_column: Union[tuple, int] = -1,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+        periods_in_a_year_fixed: int = None,
+    ) -> pd.Series:
+        """
+        The Information Ratio equals ( fund return less index return ) divided by the
+        Tracking Error. And the Tracking Error is the standard deviation of the
+        difference between the fund and the index returns.
+
+        :param base_column: Column of timeseries that is the denominator in the ratio.
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
+        :param from_date: Specific from date
+        :param to_date: Specific to date
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        if isinstance(base_column, tuple):
+            shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
+            short_label = self.tsdf.loc[:, base_column].name[0]
+        elif isinstance(base_column, int):
+            shortdf = self.tsdf.loc[earlier:later].iloc[:, base_column]
+            short_label = self.tsdf.iloc[:, base_column].name[0]
+        else:
+            raise Exception("base_column should be a tuple or an integer.")
+
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            fraction = (later - earlier).days / 365.25
+            time_factor = shortdf.count() / fraction
+
+        ratios = []
+        for item in self.tsdf:
+            longdf = self.tsdf.loc[earlier:later].loc[:, item]
+            relative = 1.0 + longdf - shortdf
+            georet = float(
+                (relative.iloc[-1] / relative.iloc[0]) ** (1 / self.yearfrac)
+                - 1
+            )
+            vol = float(relative.pct_change().std() * np.sqrt(time_factor))
+            ratios.append(georet / vol)
+
+        return pd.Series(
+            data=ratios,
+            index=self.tsdf.columns,
+            name=f"Info Ratios / {short_label}",
+        )
+
     def ord_least_squares_fit(
         self, endo_column: tuple, exo_column: tuple, fitted_series: bool = True
     ) -> float:
@@ -1264,7 +1317,7 @@ class OpenFrame(object):
         )
         return portfolio
 
-    def information_ratio(
+    def rolling_info_ratio(
         self,
         long_column: int = 0,
         short_column: int = 1,
