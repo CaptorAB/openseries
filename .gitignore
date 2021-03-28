@@ -47,3 +47,6 @@ venv.bak/
 /pyproject.toml
 .noseids
 .DS_Store
+coverage_html/
+/coverage_html
+coverage_html

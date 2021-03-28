@@ -1244,13 +1244,14 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
+            short_item = base_column
             short_label = self.tsdf.loc[:, base_column].name[0]
         elif isinstance(base_column, int):
             shortdf = self.tsdf.loc[earlier:later].iloc[:, base_column]
+            short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
             raise Exception("base_column should be a tuple or an integer.")
-
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
         else:
@@ -1259,19 +1260,23 @@ class OpenFrame(object):
 
         ratios = []
         for item in self.tsdf:
-            longdf = self.tsdf.loc[earlier:later].loc[:, item]
-            relative = 1.0 + longdf - shortdf
-            georet = float(
-                (relative.iloc[-1] / relative.iloc[0]) ** (1 / self.yearfrac)
-                - 1
-            )
-            vol = float(relative.pct_change().std() * np.sqrt(time_factor))
-            ratios.append(georet / vol)
+            if item == short_item:
+                ratios.append(0.0)
+            else:
+                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                relative = 1.0 + longdf - shortdf
+                georet = float(
+                    (relative.iloc[-1] / relative.iloc[0])
+                    ** (1 / self.yearfrac)
+                    - 1
+                )
+                vol = float(relative.pct_change().std() * np.sqrt(time_factor))
+                ratios.append(georet / vol)
 
         return pd.Series(
             data=ratios,
             index=self.tsdf.columns,
-            name=f"Info Ratios / {short_label}",
+            name=f"Info Ratios vs {short_label}",
         )
 
     def ord_least_squares_fit(
