@@ -5,6 +5,8 @@
     "modeBarButtonsToRemove": [
       "zoom2d",
       "pan2d",
+      "select2d",
+      "resetViews",
       "toggleSpikelines",
       "hoverClosestCartesian",
       "hoverCompareCartesian",
@@ -14,15 +16,13 @@
       "hoverClosestPie"
     ],
     "toImageButtonOptions": {
-      "format": "svg",
-      "filename": "captor_plot_image",
-      "height": 480,
-      "width": 848,
-      "scale": 1
+      "format": "png",
+      "filename": "captor_plot_image"
     }
   },
   "layout": {
     "autosize": true,
+    "dragmode": false,
     "title": {
       "y": 0.95,
       "x": 0.5,
@@ -66,16 +66,7 @@
     "legend": {
       "bgcolor": "rgba(0, 0, 0, 0)",
       "x": 0.02,
-      "xanchor": "auto",
-      "y": 0.02,
-      "yanchor": "auto"
-    },
-    "margin": {
-      "l": 50,
-      "r": 25,
-      "t": 25,
-      "b": 60,
-      "pad": 5
+      "y": 0.02
     }
   }
 }
