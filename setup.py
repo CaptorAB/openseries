@@ -7,12 +7,11 @@ with open("README.md", "r") as fh:
 
 setup(
     name="openseries",
-    version="0.2.3",
+    version="0.2.4",
     packages=find_packages(),
     package_data={"openseries": ["*.json"], ".": ["*.json", "coverage.svg"]},
     install_requires=[
         "jsonschema",
-        "kaleido",
         "numpy",
         "pandas",
         "plotly",

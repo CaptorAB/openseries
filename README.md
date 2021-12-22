@@ -41,11 +41,11 @@ And print its geometric annual return and volatility:
 
     print(f'Return    : {bonds.geo_ret:.2%}\nVolatility: {bonds.vol:.2%}.')
 
-To compare timeseries an OpenFrame is constructed like this:
+To compare timeseries an OpenFrame is constructed as below. The names of the timeseries must be unique.
 
     basket = OpenFrame([series, bonds])
 
-The helper methods to work with the time series can be chained like this:
+The helper methods to work with the timeseries can be chained like this:
 
     basket.trunc_frame().value_nan_handle().to_cumret()
 
@@ -166,6 +166,7 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 | `relative`              | `OpenFrame` | Calculates a new series that is the relative performance of two others.            |
 | `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                         |
 | `info_ratio_func`       | `OpenFrame` | Calculates the information ratios relative to a selected series in the OpenFrame.  |
+| `capture_ratio_func`    | `OpenFrame` | Calculates up, down and up/down capture ratios relative to a selected series.      |
 | `rolling_info_ratio`    | `OpenFrame` | Returns a pandas.DataFrame with the rolling information ratio between two series.  |
 | `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling correlations between two other series.     |
 | `ord_least_squares_fit` | `OpenFrame` | Calculates the _Beta_ and an Ordinary Least Squares fitted series from two others. |

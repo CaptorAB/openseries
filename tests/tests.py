@@ -25,17 +25,13 @@ from openseries.datefixer import date_fix, date_offset_foll
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 repo_root = os.path.dirname(
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    )
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 if repo_root not in sys.path:
     sys.path.append(repo_root)
 
 
-def sim_to_opentimeseries(
-    sim: ReturnSimulation, end: dt.date
-) -> OpenTimeSeries:
+def sim_to_opentimeseries(sim: ReturnSimulation, end: dt.date) -> OpenTimeSeries:
     date_range = pd.date_range(
         periods=sim.trading_days,
         end=end,
@@ -57,14 +53,15 @@ def sim_to_openframe(sim: ReturnSimulation, end: dt.date) -> OpenFrame:
     for item in range(sim.number_of_sims):
         sdf = sim.df.iloc[item].T.to_frame()
         sdf.index = date_range
-        sdf.columns = pd.MultiIndex.from_product(
-            [[f"Asset_{item}"], ["Return(Total)"]]
-        )
+        sdf.columns = pd.MultiIndex.from_product([[f"Asset_{item}"], ["Return(Total)"]])
         tslist.append(OpenTimeSeries.from_df(sdf, valuetype="Return(Total)"))
     return OpenFrame(tslist)
 
 
 class TestOpenTimeSeries(unittest.TestCase):
+    randomseries: OpenTimeSeries
+    sim: ReturnSimulation
+
     @classmethod
     def setUpClass(cls):
 
@@ -284,9 +281,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             f"{9.9931553730322:.13f}", f"{self.randomseries.yearfrac:.13f}"
         )
         all_prop = self.random_properties["yearfrac"]
-        self.assertEqual(
-            f"{all_prop:.13f}", f"{self.randomseries.yearfrac:.13f}"
-        )
+        self.assertEqual(f"{all_prop:.13f}", f"{self.randomseries.yearfrac:.13f}")
 
     def test_opentimeseries_resample(self):
 
@@ -300,9 +295,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             jumps_mu=-0.2,
             seed=71,
         )
-        rs_series = sim_to_opentimeseries(
-            rs_sim, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        rs_series = sim_to_opentimeseries(rs_sim, end=dt.date(2019, 6, 30)).to_cumret()
 
         before = rs_series.value_ret
 
@@ -313,12 +306,8 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_calc_range(self):
 
-        csim = ReturnSimulation.from_normal(
-            n=1, d=1200, mu=0.05, vol=0.1, seed=71
-        )
-        cseries = sim_to_opentimeseries(
-            csim, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        csim = ReturnSimulation.from_normal(n=1, d=1200, mu=0.05, vol=0.1, seed=71)
+        cseries = sim_to_opentimeseries(csim, end=dt.date(2019, 6, 30)).to_cumret()
 
         dates = cseries.calc_range(months_offset=48)
 
@@ -347,9 +336,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_value_to_diff(self):
 
-        diffsim = ReturnSimulation.from_normal(
-            n=1, d=15, mu=0.05, vol=0.1, seed=71
-        )
+        diffsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
         diffseries = sim_to_opentimeseries(
             diffsim, end=dt.date(2019, 6, 30)
         ).to_cumret()
@@ -377,12 +364,8 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_value_to_ret(self):
 
-        retsim = ReturnSimulation.from_normal(
-            n=1, d=15, mu=0.05, vol=0.1, seed=71
-        )
-        retseries = sim_to_opentimeseries(
-            retsim, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        retsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
+        retseries = sim_to_opentimeseries(retsim, end=dt.date(2019, 6, 30)).to_cumret()
 
         retseries.value_to_ret(logret=False)
         are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.values]
@@ -432,12 +415,8 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_log_and_exp(self):
 
-        logsim = ReturnSimulation.from_normal(
-            n=1, d=15, mu=0.05, vol=0.1, seed=71
-        )
-        logseries = sim_to_opentimeseries(
-            logsim, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        logsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
+        logseries = sim_to_opentimeseries(logsim, end=dt.date(2019, 6, 30)).to_cumret()
         b4_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values]
 
         logseries.value_to_log()
@@ -553,17 +532,13 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_max_drawdown_date(self):
 
-        self.assertEqual(
-            dt.date(2018, 11, 8), self.randomseries.max_drawdown_date
-        )
+        self.assertEqual(dt.date(2018, 11, 8), self.randomseries.max_drawdown_date)
         all_prop = self.random_properties["max_drawdown_date"]
         self.assertEqual(all_prop, self.randomseries.max_drawdown_date)
 
     def test_openframe_max_drawdown_date(self):
 
-        mddsim = ReturnSimulation.from_normal(
-            n=5, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        mddsim = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         mddframe = sim_to_openframe(mddsim, dt.date(2019, 6, 30)).to_cumret()
         self.assertListEqual(
             [
@@ -579,9 +554,7 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_openframe_make_portfolio(self):
 
         assets = 5
-        mpsim = ReturnSimulation.from_normal(
-            n=assets, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        mpsim = ReturnSimulation.from_normal(n=assets, d=252, mu=0.05, vol=0.1, seed=71)
         mpframe = sim_to_openframe(mpsim, dt.date(2019, 6, 30)).to_cumret()
         mpframe.weights = [1.0 / assets] * assets
 
@@ -667,9 +640,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         frame_0 = OpenFrame(self.create_list_randomseries(n)).to_cumret()
         dict_toseries = frame_0.tsdf.to_dict()
 
-        sim_1 = ReturnSimulation.from_normal(
-            n=n, d=100, mu=0.05, vol=0.1, seed=71
-        )
+        sim_1 = ReturnSimulation.from_normal(n=n, d=100, mu=0.05, vol=0.1, seed=71)
         frame_1 = sim_to_openframe(sim_1, end=dt.date(2019, 6, 30))
         frame_1.to_cumret()
         dict_toframe = frame_1.tsdf.to_dict()
@@ -686,9 +657,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         dict_toseries = frame_0.tsdf.to_dict()
 
-        sim_1 = ReturnSimulation.from_normal(
-            n=4, d=100, mu=0.05, vol=0.1, seed=71
-        )
+        sim_1 = ReturnSimulation.from_normal(n=4, d=100, mu=0.05, vol=0.1, seed=71)
         frame_1 = sim_to_openframe(sim_1, end=dt.date(2019, 6, 30))
 
         dict_toframe = frame_1.tsdf.to_dict()
@@ -697,9 +666,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_delete_timeseries(self):
 
-        dsim = ReturnSimulation.from_normal(
-            n=4, d=100, mu=0.05, vol=0.1, seed=71
-        )
+        dsim = ReturnSimulation.from_normal(n=4, d=100, mu=0.05, vol=0.1, seed=71)
 
         frame = sim_to_openframe(dsim, end=dt.date(2019, 6, 30))
         frame.weights = [0.4, 0.1, 0.2, 0.3]
@@ -715,9 +682,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         fmt = "{:.12f}"
 
-        sim_0 = ReturnSimulation.from_normal(
-            n=4, d=61, mu=0.05, vol=0.1, seed=71
-        )
+        sim_0 = ReturnSimulation.from_normal(n=4, d=61, mu=0.05, vol=0.1, seed=71)
         frame_0 = sim_to_openframe(sim_0, end=dt.date(2019, 6, 30))
 
         frame_0.to_cumret()
@@ -728,9 +693,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         dict_toframe_0 = frame_0.tsdf.to_dict()
 
-        sim_1 = ReturnSimulation.from_normal(
-            n=4, d=61, mu=0.05, vol=0.1, seed=71
-        )
+        sim_1 = ReturnSimulation.from_normal(n=4, d=61, mu=0.05, vol=0.1, seed=71)
         frame_1 = sim_to_openframe(sim_1, end=dt.date(2019, 6, 30))
 
         # The below adjustment is not ideal but I believe I implemented it
@@ -752,12 +715,8 @@ class TestOpenTimeSeries(unittest.TestCase):
         with open(json_file, "r", encoding="utf-8") as ff:
             output = json.load(ff)
 
-        sim_rel = ReturnSimulation.from_normal(
-            n=4, d=2512, mu=0.05, vol=0.1, seed=71
-        )
-        frame_rel = sim_to_openframe(
-            sim_rel, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        sim_rel = ReturnSimulation.from_normal(n=4, d=2512, mu=0.05, vol=0.1, seed=71)
+        frame_rel = sim_to_openframe(sim_rel, end=dt.date(2019, 6, 30)).to_cumret()
         frame_rel.relative(base_zero=False)
 
         kv = key_value_table(frame_rel)
@@ -770,9 +729,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_risk_functions_same_as_series_and_frame_methods(self):
 
-        riskdata = ReturnSimulation.from_normal(
-            n=1, d=504, mu=0.05, vol=0.175, seed=71
-        )
+        riskdata = ReturnSimulation.from_normal(n=1, d=504, mu=0.05, vol=0.175, seed=71)
 
         riskseries = sim_to_opentimeseries(riskdata, end=dt.date(2019, 6, 30))
         riskseries.set_new_label(lvl_zero="Asset_0")
@@ -804,9 +761,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_methods_same_as_opentimeseries(self):
 
-        same = ReturnSimulation.from_normal(
-            n=1, d=504, mu=0.05, vol=0.175, seed=71
-        )
+        same = ReturnSimulation.from_normal(n=1, d=504, mu=0.05, vol=0.175, seed=71)
 
         sameseries = sim_to_opentimeseries(same, end=dt.date(2019, 6, 30))
         sameseries.set_new_label(lvl_zero="Asset_0")
@@ -861,13 +816,9 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_calc_methods_same_as_opentimeseries(self):
 
-        same = ReturnSimulation.from_normal(
-            n=2, d=504, mu=0.05, vol=0.175, seed=71
-        )
+        same = ReturnSimulation.from_normal(n=2, d=504, mu=0.05, vol=0.175, seed=71)
 
-        sames = sim_to_opentimeseries(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        sames = sim_to_opentimeseries(same, end=dt.date(2019, 6, 30)).to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
         samef = sim_to_openframe(same, end=dt.date(2019, 6, 30)).to_cumret()
 
@@ -940,16 +891,10 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_properties_same_as_opentimeseries(self):
 
-        same = ReturnSimulation.from_normal(
-            n=1, d=504, mu=0.05, vol=0.175, seed=71
-        )
-        sameseries = sim_to_opentimeseries(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        same = ReturnSimulation.from_normal(n=1, d=504, mu=0.05, vol=0.175, seed=71)
+        sameseries = sim_to_opentimeseries(same, end=dt.date(2019, 6, 30)).to_cumret()
         sameseries.set_new_label(lvl_zero="Asset_0")
-        sameframe = sim_to_openframe(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        sameframe = sim_to_openframe(same, end=dt.date(2019, 6, 30)).to_cumret()
 
         common_props_to_compare = ["periods_in_a_year", "yearfrac"]
         for c in common_props_to_compare:
@@ -957,16 +902,10 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_keeping_attributes_aligned_openframe_vs_opentimeseries(self):
 
-        same = ReturnSimulation.from_normal(
-            n=1, d=255, mu=0.05, vol=0.175, seed=71
-        )
-        sameseries = sim_to_opentimeseries(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        same = ReturnSimulation.from_normal(n=1, d=255, mu=0.05, vol=0.175, seed=71)
+        sameseries = sim_to_opentimeseries(same, end=dt.date(2019, 6, 30)).to_cumret()
         sameseries.set_new_label(lvl_zero="Asset_0")
-        sameframe = sim_to_openframe(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        sameframe = sim_to_openframe(same, end=dt.date(2019, 6, 30)).to_cumret()
 
         common_calc_props = [
             "arithmetic_ret",
@@ -1032,10 +971,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         ]
         series_compared = set(series_props).symmetric_difference(
             set(
-                common_calc_props
-                + common_props
-                + common_attributes
-                + series_attributes
+                common_calc_props + common_props + common_attributes + series_attributes
             )
         )
         self.assertTrue(
@@ -1061,16 +997,10 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_keeping_methods_aligned_openframe_vs_opentimeseries(self):
 
-        same = ReturnSimulation.from_normal(
-            n=1, d=255, mu=0.05, vol=0.175, seed=71
-        )
-        sameseries = sim_to_opentimeseries(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        same = ReturnSimulation.from_normal(n=1, d=255, mu=0.05, vol=0.175, seed=71)
+        sameseries = sim_to_opentimeseries(same, end=dt.date(2019, 6, 30)).to_cumret()
         sameseries.set_new_label(lvl_zero="Asset_0")
-        sameframe = sim_to_openframe(
-            same, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        sameframe = sim_to_openframe(same, end=dt.date(2019, 6, 30)).to_cumret()
 
         common_calc_methods = [
             "arithmetic_ret_func",
@@ -1136,6 +1066,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "delete_timeseries",
             "rolling_info_ratio",
             "info_ratio_func",
+            "capture_ratio_func",
             "ord_least_squares_fit",
             "make_portfolio",
             "relative",
@@ -1174,9 +1105,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_log_and_exp(self):
 
-        logsim = ReturnSimulation.from_normal(
-            n=5, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        logsim = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         logframe = sim_to_openframe(logsim, dt.date(2019, 6, 30)).to_cumret()
 
         aa = logframe.tsdf.applymap(lambda nn: f"{nn:.12f}")
@@ -1201,13 +1130,9 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_correl_matrix(self):
 
-        corrsim = ReturnSimulation.from_normal(
-            n=5, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        corrsim = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         corrframe = sim_to_openframe(corrsim, dt.date(2019, 6, 30)).to_cumret()
-        dict1 = corrframe.correl_matrix.applymap(
-            lambda nn: f"{nn:.12f}"
-        ).to_dict()
+        dict1 = corrframe.correl_matrix.applymap(lambda nn: f"{nn:.12f}").to_dict()
         dict2 = {
             "Asset_0": {
                 "Asset_0": "1.000000000000",
@@ -1250,15 +1175,11 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_timeseries_chain(self):
 
-        full_sim = ReturnSimulation.from_normal(
-            n=1, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        full_sim = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
         full_series = sim_to_opentimeseries(
             full_sim, end=dt.date(2019, 6, 30)
         ).to_cumret()
-        full_values = [
-            f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0].tolist()
-        ]
+        full_values = [f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0].tolist()]
 
         front_series = OpenTimeSeries.from_df(full_series.tsdf.iloc[:126])
 
@@ -1274,64 +1195,21 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_plot_series(self):
 
-        plotsim = ReturnSimulation.from_normal(
-            n=1, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        plotsim = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
         plotseries = sim_to_opentimeseries(plotsim, end=dt.date(2019, 6, 30))
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
         fig_json = json.loads(fig.to_json())
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ["data", "layout"])
 
-    def test_opentimeseries_plot_series_write_imagefile(self):
-
-        plotsim = ReturnSimulation.from_normal(
-            n=1, d=252, mu=0.05, vol=0.1, seed=71
-        )
-        plotseries = sim_to_opentimeseries(plotsim, end=dt.date(2019, 6, 30))
-        directory = os.path.dirname(os.path.abspath(__file__))
-        fig, _ = plotseries.plot_series(
-            auto_open=False, directory=directory, output_type="div"
-        )
-        image_file = os.path.join(directory, "ASSET.svg")
-        fig.write_image(image_file)
-        self.assertTrue(os.path.exists(image_file))
-        os.remove(image_file)
-        self.assertFalse(os.path.exists(image_file))
-
     def test_openframe_plot_series(self):
 
-        plotsims = ReturnSimulation.from_normal(
-            n=5, d=252, mu=0.05, vol=0.1, seed=71
-        )
-        plotframe = sim_to_openframe(
-            plotsims, dt.date(2019, 6, 30)
-        ).to_cumret()
+        plotsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
+        plotframe = sim_to_openframe(plotsims, dt.date(2019, 6, 30)).to_cumret()
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
         fig_json = json.loads(fig.to_json())
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ["data", "layout"])
-
-    def test_openframe_plot_series_write_imagefile(self):
-
-        plotsims = ReturnSimulation.from_normal(
-            n=5, d=252, mu=0.05, vol=0.1, seed=71
-        )
-        plotframe = sim_to_openframe(
-            plotsims, dt.date(2019, 6, 30)
-        ).to_cumret()
-        directory = os.path.dirname(os.path.abspath(__file__))
-        fig, _ = plotframe.plot_series(
-            auto_open=False,
-            filename="ASSETS.html",
-            directory=directory,
-            output_type="div",
-        )
-        image_file = os.path.join(directory, "ASSETS.svg")
-        fig.write_image(image_file)
-        self.assertTrue(os.path.exists(image_file))
-        os.remove(image_file)
-        self.assertFalse(os.path.exists(image_file))
 
     def test_date_fix(self):
 
@@ -1418,9 +1296,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         n = 5
         wghts = [1.0 / n] * (n + 1)
-        wrongsims = ReturnSimulation.from_normal(
-            n=n, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        wrongsims = ReturnSimulation.from_normal(n=n, d=252, mu=0.05, vol=0.1, seed=71)
         date_range = pd.date_range(
             periods=wrongsims.trading_days,
             end=dt.date(2019, 6, 30),
@@ -1433,12 +1309,8 @@ class TestOpenTimeSeries(unittest.TestCase):
             sdf.columns = pd.MultiIndex.from_product(
                 [[f"Asset_{item}"], ["Return(Total)"]]
             )
-            tslist.append(
-                OpenTimeSeries.from_df(sdf, valuetype="Return(Total)")
-            )
-        with ShouldAssert(
-            "Number of TimeSeries must equal number of weights."
-        ):
+            tslist.append(OpenTimeSeries.from_df(sdf, valuetype="Return(Total)"))
+        with ShouldAssert("Number of TimeSeries must equal number of weights."):
             OpenFrame(tslist, weights=wghts)
 
     def test_opentimeseries_drawdown_details(self):
@@ -1462,38 +1334,24 @@ class TestOpenTimeSeries(unittest.TestCase):
             details.loc["Days from start to bottom", "Drawdown details"], 136
         )
         self.assertEqual(
-            "{:.9}".format(
-                details.loc["Average fall per day", "Drawdown details"]
-            ),
+            "{:.9}".format(details.loc["Average fall per day", "Drawdown details"]),
             "-0.000433858919",
         )
 
     def test_openframe_drawdown_details(self):
 
-        ddsims = ReturnSimulation.from_normal(
-            n=5, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        ddsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         ddframe = sim_to_openframe(ddsims, dt.date(2019, 6, 30)).to_cumret()
-        dds = (
-            ddframe.drawdown_details()
-            .loc["Days from start to bottom"]
-            .tolist()
-        )
+        dds = ddframe.drawdown_details().loc["Days from start to bottom"].tolist()
         self.assertListEqual([1, 5, 36, 89, 79], dds)
 
     def test_openframe_trunc_frame(self):
 
-        sim_long = ReturnSimulation.from_normal(
-            n=1, d=756, mu=0.05, vol=0.1, seed=71
-        )
+        sim_long = ReturnSimulation.from_normal(n=1, d=756, mu=0.05, vol=0.1, seed=71)
         series_long = sim_to_opentimeseries(sim_long, end=dt.date(2020, 6, 30))
         series_long.set_new_label("Long")
-        sim_short = ReturnSimulation.from_normal(
-            n=1, d=252, mu=0.05, vol=0.1, seed=71
-        )
-        series_short = sim_to_opentimeseries(
-            sim_short, end=dt.date(2019, 6, 30)
-        )
+        sim_short = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
+        series_short = sim_to_opentimeseries(sim_short, end=dt.date(2019, 6, 30))
         series_short.set_new_label("Short")
         frame = OpenFrame([series_long, series_short])
 
@@ -1556,9 +1414,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         for m, a in zip(methods, added):
             arguments = {**args, **a}
             onesim = getattr(ReturnSimulation, m)(**arguments)
-            serie = sim_to_opentimeseries(
-                onesim, end=dt.date(2019, 6, 30)
-            ).to_cumret()
+            serie = sim_to_opentimeseries(onesim, end=dt.date(2019, 6, 30)).to_cumret()
             serie.set_new_label(f"Asset_{m}")
             series.append(serie)
 
@@ -1600,9 +1456,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         for process in processes:
             onesim = process(mp, seed=71)
             name = process.__name__
-            date_range = pd.date_range(
-                periods=days, end=dt.date(2019, 6, 30), freq="D"
-            )
+            date_range = pd.date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
             sdf = pd.DataFrame(
                 data=onesim,
                 index=date_range,
@@ -1610,9 +1464,7 @@ class TestOpenTimeSeries(unittest.TestCase):
                     [[f"Asset_{name[:-7]}"], ["Price(Close)"]]
                 ),
             )
-            series.append(
-                OpenTimeSeries.from_df(sdf, valuetype="Price(Close)")
-            )
+            series.append(OpenTimeSeries.from_df(sdf, valuetype="Price(Close)"))
 
         frame = OpenFrame(series)
         means = [f"{r:.9f}" for r in frame.tsdf.mean()]
@@ -1627,10 +1479,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         new_stdout = io.StringIO()
         sys.stdout = new_stdout
         service = CaptorOpenApiService()
-        r = (
-            "CaptorOpenApiService("
-            "base_url=https://apiv2.captor.se/public/api)\n"
-        )
+        r = "CaptorOpenApiService(" "base_url=https://apiv2.captor.se/public/api)\n"
         print(service)
         output = new_stdout.getvalue()
         sys.stdout = old_stdout
@@ -1681,9 +1530,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "last indices",
             "lengths of items",
         ]
-        apsims = ReturnSimulation.from_normal(
-            n=5, d=252, mu=0.05, vol=0.1, seed=71
-        )
+        apsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         apframe = sim_to_openframe(apsims, dt.date(2019, 6, 30)).to_cumret()
         result_index = apframe.all_properties().index.tolist()
 
@@ -1720,9 +1567,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.rolling_info_ratio(
-            long_column=0, short_column=1
-        ).head()
+        simdata = frame.rolling_info_ratio(long_column=0, short_column=1).head()
 
         values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
         checkdata = [0.220296, 0.163429, 0.199549, 0.195792, 0.203463]
@@ -1887,3 +1732,163 @@ class TestOpenTimeSeries(unittest.TestCase):
         checkdata = [-0.013422, -0.013422, -0.013422, -0.013422, -0.013422]
 
         self.assertListEqual(values, checkdata)
+
+    def test_openframe_label_uniqueness(self):
+
+        usim = ReturnSimulation.from_normal(n=1, d=1200, mu=0.05, vol=0.1, seed=71)
+        aseries = sim_to_opentimeseries(usim, end=dt.date(2019, 6, 30))
+        bseries = sim_to_opentimeseries(usim, end=dt.date(2019, 6, 30))
+        with self.assertRaises(Exception):
+            OpenFrame([aseries, bseries])
+
+        bseries.set_new_label("other_name")
+        uframe = OpenFrame([aseries, bseries])
+
+        self.assertEqual(len(set(uframe.columns_lvl_zero)), 2)
+
+    def test_openframe_capture_ratio(self):
+
+        """
+        Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
+        in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and
+        Finance Education (Vol 2 Winter 2013).
+        https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf
+        """
+
+        asset = OpenTimeSeries(
+            {
+                "_id": "",
+                "currency": "USD",
+                "dates": [
+                    "2007-12-31",
+                    "2008-01-31",
+                    "2008-02-29",
+                    "2008-03-31",
+                    "2008-04-30",
+                    "2008-05-31",
+                    "2008-06-30",
+                    "2008-07-31",
+                    "2008-08-31",
+                    "2008-09-30",
+                    "2008-10-31",
+                    "2008-11-30",
+                    "2008-12-31",
+                    "2009-01-31",
+                    "2009-02-28",
+                    "2009-03-31",
+                    "2009-04-30",
+                    "2009-05-31",
+                    "2009-06-30",
+                    "2009-07-31",
+                    "2009-08-31",
+                    "2009-09-30",
+                    "2009-10-31",
+                    "2009-11-30",
+                    "2009-12-31",
+                ],
+                "instrumentId": "",
+                "local_ccy": True,
+                "name": "asset",
+                "values": [
+                    0.0,
+                    -0.0436,
+                    -0.0217,
+                    -0.0036,
+                    0.0623,
+                    0.0255,
+                    -0.0555,
+                    -0.0124,
+                    -0.0088,
+                    -0.0643,
+                    -0.1897,
+                    -0.0781,
+                    0.0248,
+                    -0.0666,
+                    -0.0993,
+                    0.0853,
+                    0.1028,
+                    0.0634,
+                    -0.0125,
+                    0.0762,
+                    0.0398,
+                    0.048,
+                    -0.0052,
+                    0.0592,
+                    0.0195,
+                ],
+                "valuetype": "Return(Total)",
+            }
+        )
+        indxx = OpenTimeSeries(
+            {
+                "_id": "",
+                "currency": "USD",
+                "dates": [
+                    "2007-12-31",
+                    "2008-01-31",
+                    "2008-02-29",
+                    "2008-03-31",
+                    "2008-04-30",
+                    "2008-05-31",
+                    "2008-06-30",
+                    "2008-07-31",
+                    "2008-08-31",
+                    "2008-09-30",
+                    "2008-10-31",
+                    "2008-11-30",
+                    "2008-12-31",
+                    "2009-01-31",
+                    "2009-02-28",
+                    "2009-03-31",
+                    "2009-04-30",
+                    "2009-05-31",
+                    "2009-06-30",
+                    "2009-07-31",
+                    "2009-08-31",
+                    "2009-09-30",
+                    "2009-10-31",
+                    "2009-11-30",
+                    "2009-12-31",
+                ],
+                "instrumentId": "",
+                "local_ccy": True,
+                "name": "indxx",
+                "values": [
+                    0.0,
+                    -0.06,
+                    -0.0325,
+                    -0.0043,
+                    0.0487,
+                    0.013,
+                    -0.0843,
+                    -0.0084,
+                    0.0145,
+                    -0.0891,
+                    -0.168,
+                    -0.0718,
+                    0.0106,
+                    -0.0843,
+                    -0.1065,
+                    0.0876,
+                    0.0957,
+                    0.0559,
+                    0.002,
+                    0.0756,
+                    0.0361,
+                    0.0373,
+                    -0.0186,
+                    0.06,
+                    0.0193,
+                ],
+                "valuetype": "Return(Total)",
+            }
+        )
+        cframe = OpenFrame([asset, indxx]).to_cumret()
+
+        up = cframe.capture_ratio_func(ratio="up")
+        down = cframe.capture_ratio_func(ratio="down")
+        both = cframe.capture_ratio_func(ratio="both")
+
+        self.assertEqual(f"{up.iloc[0]:.12f}", "1.063842457805")
+        self.assertEqual(f"{down.iloc[0]:.12f}", "0.922188852957")
+        self.assertEqual(f"{both.iloc[0]:.12f}", "1.153605852417")
