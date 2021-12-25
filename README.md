@@ -268,8 +268,6 @@ I have run the test suite with Python version 3.10.0 using [nose2](https://docs.
     coverage-badge     1.1.0
     idna               3.3
     jsonschema         4.3.2
-    nose               1.3.7
-    nose-timer         1.0.1
     nose2              0.10.0
     numpy              1.21.5
     openseries         0.2.4
