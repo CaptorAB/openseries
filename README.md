@@ -254,7 +254,7 @@ And then the packaging steps from [here](https://packaging.python.org/en/latest/
     py -m pip install --upgrade twine
     py -m twine upload --repository pypi dist/*
 
-###Future proofing
+### Future proofing
 
 I have run the test suite with Python version 3.10.0 using [nose2](https://docs.nose2.io/en/latest/index.html) and the module versions below. Everything works except the warnings and test failure outlined below.
 
@@ -290,9 +290,8 @@ I have run the test suite with Python version 3.10.0 using [nose2](https://docs.
     urllib3            1.26.7
     wheel              0.37.1
 
-A warning is generated from pandas:
+Pandas==1.3.5 causes the test test_openframe_rolling_corr to fail and it warns as below on the other relevant tests:
 
     FutureWarning: Comparison of Timestamp with datetime.date is deprecated in order to match the standard library behavior.
     In a future version these will be considered non-comparable.Use 'ts == pd.Timestamp(date)' or 'ts.date() == date' instead.
 
-And the test test_openframe_rolling_corr fails. Also due to pandas==1.3.5
