@@ -33,4 +33,4 @@ jobs:
       - run:
           name: Run tests
           command: |
-            PYTHONPATH=${PWD} venv/bin/nose2 -vv ./
+            PYTHONPATH=${PWD} venv/bin/nose2 -vv
