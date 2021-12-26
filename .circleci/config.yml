@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Run tests
           command: |
-            PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
+            PYTHONPATH=${PWD} py -m /usr/local/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
       - slack/status:
         webhook: webhook
 
