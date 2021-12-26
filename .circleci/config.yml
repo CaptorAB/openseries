@@ -12,7 +12,7 @@ jobs:
           command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
       - run: python3 --version
       - run: python3 -m venv ./venv
-      - run: sudo venv/bin/activate
+      - run: sudo ./venv/bin/activate
       - run: venv/bin/pip install --upgrade "pip==21.3.1"
       - run: venv/bin/pip --version
       - run:
@@ -23,7 +23,7 @@ jobs:
           name: Run tests
           command: |
             PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
-      - run: sudo venv/bin/deactivate
+      - run: sudo ./venv/bin/deactivate
       - slack/status:
         webhook: webhook
 
