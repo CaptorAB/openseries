@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/python:3.9.9
+      - image: circleci/python:3.6.1
 
     working_directory: ~/repo
     steps:
@@ -33,4 +33,4 @@ jobs:
       - run:
           name: Run tests
           command: |
-            PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
+            PYTHONPATH=${PWD} venv/bin/nosetests -v --nologcapture --nocapture --with-timer ./
