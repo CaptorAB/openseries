@@ -10,15 +10,14 @@ jobs:
       - run:
           name: Switch timezone to Stockholm
           command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
-      - run: python3 --version
       - run: python3 -m venv ./venv
-      - run: ls ./venv/bin
-      - run: venv/bin/pip install --upgrade "pip==21.3.1"
-      - run: venv/bin/pip --version
+      - run: PYTHONPATH=${PWD} venv/bin/python3 --version
+      - run: PYTHONPATH=${PWD} venv/bin/pip3 install --upgrade "pip==21.3.1"
+      - run: PYTHONPATH=${PWD} venv/bin/pip3 --version
       - run:
           name: Install dependencies
           command: |
-            venv/bin/pip install --upgrade -r requirements.txt
+            PYTHONPATH=${PWD} venv/bin/pip3 install --upgrade -r requirements.txt
       - run:
           name: Run tests
           command: |
