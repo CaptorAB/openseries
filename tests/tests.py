@@ -1356,12 +1356,12 @@ class TestOpenTimeSeries(unittest.TestCase):
         frame = OpenFrame([series_long, series_short])
 
         firsts = [
-            pd.Timestamp.fromisoformat("2018-06-27"),
-            pd.Timestamp.fromisoformat("2018-06-27"),
+            pd.Timestamp(dt.date(2018, 6, 27)),
+            pd.Timestamp(dt.date(2018, 6, 27)),
         ]
         lasts = [
-            pd.Timestamp.fromisoformat("2019-06-28"),
-            pd.Timestamp.fromisoformat("2019-06-28"),
+            pd.Timestamp(dt.date(2019, 6, 28)),
+            pd.Timestamp(dt.date(2019, 6, 28)),
         ]
 
         self.assertNotEqual(firsts, frame.first_indices.tolist())

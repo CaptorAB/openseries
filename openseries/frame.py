@@ -121,8 +121,7 @@ class OpenFrame(object):
                     months_offset=-months_offset,
                 )
                 assert (
-                    pd.Timestamp.fromisoformat(earlier.strftime("%Y-%m-%d"))
-                    >= self.first_idx
+                    earlier >= self.first_idx
                 ), "Function calc_range returned earlier date < series start"
                 later = self.last_idx
             else:
@@ -150,10 +149,7 @@ class OpenFrame(object):
         else:
             earlier, later = self.first_idx, self.last_idx
 
-        return (
-            pd.Timestamp.fromisoformat(earlier.strftime("%Y-%m-%d")),
-            pd.Timestamp.fromisoformat(later.strftime("%Y-%m-%d")),
-        )
+        return pd.Timestamp(earlier), pd.Timestamp(later)
 
     def align_index_to_local_cdays(self):
         """
@@ -1409,7 +1405,7 @@ class OpenFrame(object):
         ):
             df = df.pct_change()
             df.iloc[0] = 0
-        portfolio = df.dot(np.ndarray(self.weights))
+        portfolio = df.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
         portfolio.columns = pd.MultiIndex.from_product([[name], ["Price(Close)"]])
         return portfolio

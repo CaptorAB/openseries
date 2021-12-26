@@ -339,16 +339,14 @@ class OpenTimeSeries(object):
                     months_offset=-months_offset,
                 )
                 assert (
-                    pd.Timestamp.fromisoformat(earlier.strftime("%Y-%m-%d"))
-                    >= self.first_idx
+                    earlier >= self.first_idx
                 ), "Function calc_range returned earlier date < series start"
                 later = self.last_idx
             else:
                 if from_dt is not None and to_dt is None:
-                    assert (
-                        pd.Timestamp.fromisoformat(from_dt.strftime("%Y-%m-%d"))
-                        >= self.first_idx
-                    ), "Function calc_range returned earlier date < " "series start"
+                    assert from_dt >= self.first_idx, (
+                        "Function calc_range returned earlier date < " "series start"
+                    )
                     earlier, later = from_dt, self.last_idx
                 elif from_dt is None and to_dt is not None:
                     assert (
@@ -375,10 +373,7 @@ class OpenTimeSeries(object):
         else:
             earlier, later = self.first_idx, self.last_idx
 
-        return (
-            pd.Timestamp.fromisoformat(earlier.strftime("%Y-%m-%d")),
-            pd.Timestamp.fromisoformat(later.strftime("%Y-%m-%d")),
-        )
+        return pd.Timestamp(earlier), pd.Timestamp(later)
 
     def align_index_to_local_cdays(self):
         """
