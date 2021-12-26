@@ -7,13 +7,14 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: python3 -m venv ./venv
       - run:
           name: Switch timezone to Stockholm
           command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
       - run: python3 --version
+      - run: python3 -m venv ./venv
+      - run: venv/bin/activate
       - run: venv/bin/pip install --upgrade "pip==21.3.1"
-      - run: pip --version
+      - run: venv/bin/pip --version
       - run:
           name: Install dependencies
           command: |
@@ -22,6 +23,7 @@ jobs:
           name: Run tests
           command: |
             PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
+      - run: venv/bin/deactivate
       - slack/status:
         webhook: webhook
 
