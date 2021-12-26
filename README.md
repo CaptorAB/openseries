@@ -242,7 +242,7 @@ _They are simply methods that take different date or length inputs to return the
 
 Below are the steps used to publish the package on pypi. First update the version in [setup.py](https://github.com/CaptorAB/OpenSeries/blob/master/setup.py) and do git commands.
 
-    git add -all
+    git add --all
     git commit -m "changes made"
     git push
 
