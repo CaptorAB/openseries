@@ -24,8 +24,3 @@ jobs:
           command: |
             PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
       - run: sudo ./venv/bin/deactivate
-      - slack/status:
-        webhook: webhook
-
-orbs:
-        slack: circleci/slack@3.4.2
