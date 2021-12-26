@@ -38,6 +38,10 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+/Pipfile
+/Pipfile.lock
+/venvten/
+venvten/
 
 # My own additions
 .idea/*

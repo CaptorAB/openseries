@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+        slack: circleci/slack@3.4.2
 jobs:
   build:
     docker:
@@ -18,12 +20,10 @@ jobs:
       - run:
           name: Run tests
           command: |
-            PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture --with-timer --with-coverage ./
-            PYTHONPATH=${PWD} ./venv/bin/coverage html
-      - store_artifacts:
-          path: htmlcov
-      - slack/status:
-        webhook: webhook
-
-orbs:
-        slack: circleci/slack@3.4.2
+            PYTHONPATH=${PWD} ./venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+      - slack/notify:
+          event: pass
+          template: basic_success_1
