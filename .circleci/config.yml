@@ -14,8 +14,8 @@ jobs:
           name: Create Python venv environment
           command: |
             python3 -m venv ./venv
-      - run: ls ./venv/lib/python3.6
-      - run: ls ./venv/lib64/python3.6
+      - run: ls ./venv/lib/python3.6/site-packages
+      - run: ls ./venv/lib64/python3.6/site-packages
       - run:
           name: Check Python version
           command: |
