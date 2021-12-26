@@ -3,7 +3,7 @@
 
 jsonschema<=3.2.0
 nose2<=0.10.0
-numpy<=1.19.5
+numpy<=1.21.0
 pandas<=1.1.5
 plotly<=4.14.1
 python-dateutil<=2.8.1
