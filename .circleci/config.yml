@@ -10,10 +10,22 @@ jobs:
       - run:
           name: Switch timezone to Stockholm
           command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
-      - run: python3 -m venv ./venv
-      - run: PYTHONPATH=${PWD} venv/bin/python3 --version
-      - run: PYTHONPATH=${PWD} venv/bin/pip3 install --upgrade "pip==21.3.1"
-      - run: PYTHONPATH=${PWD} venv/bin/pip3 --version
+      - run:
+          name: Create Python venv environment
+          command: |
+            python3 -m venv ./venv
+      - run:
+          name: Check Python version
+          command: |
+            PYTHONPATH=${PWD} venv/bin/python3 --version
+      - run:
+          name: Update pip
+          command: |
+            PYTHONPATH=${PWD} venv/bin/pip3 install --upgrade "pip==21.3.1"
+      - run:
+          name: Check Pip version
+          command: |
+            PYTHONPATH=${PWD} venv/bin/pip3 --version
       - run:
           name: Install dependencies
           command: |
@@ -22,3 +34,8 @@ jobs:
           name: Run tests
           command: |
             PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
+      - slack/status:
+        webhook: webhook
+
+orbs:
+        slack: circleci/slack@3.4.2
