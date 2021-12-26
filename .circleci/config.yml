@@ -33,4 +33,4 @@ jobs:
       - run:
           name: Run tests
           command: |
-            PYTHONPATH=${PWD} venv/bin/nose2 -v
+            PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
