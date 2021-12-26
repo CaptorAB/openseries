@@ -14,6 +14,7 @@ jobs:
           name: Create Python venv environment
           command: |
             python3 -m venv ./venv
+      - run: ls ./venv
       - run:
           name: Check Python version
           command: |
@@ -34,8 +35,3 @@ jobs:
           name: Run tests
           command: |
             PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
-      - slack/status:
-        webhook: webhook
-
-orbs:
-        slack: circleci/slack@3.4.2
