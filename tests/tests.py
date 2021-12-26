@@ -1598,7 +1598,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertEqual(float(f"{simdata[0]:.10f}"), 0.3286500542)
 
-    @unittest.skip("This test fails with Pandas 1.3.5")
+    # @unittest.skip("This test fails with Pandas 1.3.5")
     def test_openframe_rolling_corr(self):
 
         sims = ReturnSimulation.from_merton_jump_gbm(
