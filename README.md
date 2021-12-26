@@ -250,8 +250,8 @@ And then the packaging steps from [here](https://packaging.python.org/en/latest/
 
     pip install --upgrade pip
     pip install --upgrade build
+    pip install --upgrade twine
     py -m build
-    py -m pip install --upgrade twine
     py -m twine upload --repository pypi dist/*
 
 ### Future proofing
