@@ -5,16 +5,19 @@ jobs:
       - image: circleci/python:3.6.1
 
     working_directory: ~/repo
-    environment:
-        SETUPTOOLS_USE_DISTUTILS: stdlib #https://stackoverflow.com/questions/63663362/django-python3-on-install-i-get-parent-module-setuptools-not-loaded
-
     steps:
       - checkout
       - run: python3 -m venv ./venv
       - run:
+          name: Switch timezone to Stockholm
+          command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
+      - run: python3 --version
+      - run: sudo pip install --upgrade "pip==21.3.1"
+      - run: pip --version
+      - run:
           name: Install dependencies
           command: |
-            PYTHONPATH=${PWD} ./venv/bin/pip3 install --upgrade -r requirements.txt
+            sudo pip3 install --upgrade -r requirements.txt
       - run:
           name: Run tests
           command: |
