@@ -12,16 +12,16 @@ jobs:
           name: Switch timezone to Stockholm
           command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
       - run: python3 --version
-      - run: sudo pip install --upgrade "pip==21.3.1"
+      - run: venv/bin/pip install --upgrade "pip==21.3.1"
       - run: pip --version
       - run:
           name: Install dependencies
           command: |
-            sudo pip3 install --upgrade -r requirements.txt
+            venv/bin/pip install --upgrade -r requirements.txt
       - run:
           name: Run tests
           command: |
-            PYTHONPATH=${PWD} py -m /usr/local/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
+            PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer ./
       - slack/status:
         webhook: webhook
 
