@@ -34,3 +34,8 @@ jobs:
           name: Run tests
           command: |
             PYTHONPATH=${PWD} venv/bin/nosetests -v --nologcapture --nocapture --with-timer ./
+      - slack/status:
+        webhook: webhook
+
+orbs:
+        slack: circleci/slack@3.4.2
