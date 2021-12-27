@@ -264,25 +264,24 @@ I have run the test suite with Python version 3.10.0 using [nose2](https://docs.
     attrs              21.2.0
     certifi            2021.10.8
     charset-normalizer 2.0.9
-    coverage           6.2
-    coverage-badge     1.1.0
+    coverage           6.2     # updated
+    coverage-badge     1.1.0   # updated
     idna               3.3
-    jsonschema         4.3.2
+    jsonschema         4.3.2   # updated
     nose2              0.10.0
-    numpy              1.21.5
-    openseries         0.2.4
-    pandas             1.3.5
+    numpy              1.21.5  # updated
+    pandas             1.3.5   # updated
     patsy              0.5.2
     pip                21.3.1
-    plotly             5.5.0
+    plotly             5.5.0   # updated
     pyrsistent         0.18.0
     python-dateutil    2.8.2
     pytz               2021.3
-    requests           2.26.0
-    scipy              1.7.3
+    requests           2.26.0  # updated
+    scipy              1.7.3   # updated
     setuptools         60.1.0
     six                1.16.0
-    statsmodels        0.13.1
+    statsmodels        0.13.1  # updated
     tenacity           8.0.1
     testfixtures       6.18.3
     urllib3            1.26.7
