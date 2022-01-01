@@ -1,8 +1,8 @@
 {
-  "_id": "5b72a10c23d27735104e0576",
+  "_id": "",
   "name": "Captor Iris Bond",
   "currency": "SEK",
-  "instrumentId": "58ecf5fd23d2771520e3bf42",
+  "instrumentId": "",
   "isin": "SE0009807308",
   "local_ccy": true,
   "valuetype": "Price(Close)",

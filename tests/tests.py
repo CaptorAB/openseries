@@ -85,42 +85,6 @@ class TestOpenTimeSeries(unittest.TestCase):
             ("Asset", "Price(Close)")
         ]
 
-    def test_opentimeseries_duplicate_dates_invalidates(self):
-
-        invalid = False
-        try:
-            data_with_duplicate_date = {
-                "_id": "",
-                "currency": "SEK",
-                "dates": [
-                    "2020-09-03",
-                    "2020-09-04",
-                    "2020-09-07",
-                    "2020-09-08",
-                    "2020-09-08",
-                    "2020-09-09",
-                ],
-                "instrumentId": "",
-                "local_ccy": True,
-                "name": "Timeseries",
-                "values": [
-                    114.9965,
-                    114.8355,
-                    114.8694,
-                    115.1131,
-                    115.5555,
-                    114.8643,
-                ],
-                "valuetype": "Price(Close)",
-            }
-
-            OpenTimeSeries(data_with_duplicate_date)
-
-        except Exception as waste:
-            invalid = isinstance(waste.args[2], ValidationError)
-
-        self.assertTrue(invalid)
-
     def test_opentimeseries_tsdf_not_empty(self):
 
         json_file = os.path.join(
@@ -131,6 +95,73 @@ class TestOpenTimeSeries(unittest.TestCase):
         timeseries = OpenTimeSeries(output)
 
         self.assertFalse(timeseries.tsdf.empty)
+
+    def test_opentimeseries_duplicates_handling(self):
+
+        class CaptorTimeSeries(OpenTimeSeries):
+
+            def __init__(self, d):
+
+                super().__init__(d)
+
+            @classmethod
+            def from_file(cls, remove_duplicates: bool = False):
+
+                json_file = os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)), "series.json"
+                )
+                with open(json_file, "r") as ff:
+                    output = json.load(ff)
+
+                dates = (
+                    output["dates"][:63]
+                    + [output["dates"][63]]
+                    + output["dates"][63:128]
+                    + [output["dates"][128]] * 2
+                    + output["dates"][128:]
+                )
+                values = (
+                    output["values"][:63]
+                    + [output["values"][63]]
+                    + output["values"][63:128]
+                    + [output["values"][128]] * 2
+                    + output["values"][128:]
+                )
+                output.update({"dates": dates, "values": values})
+
+                if remove_duplicates:
+                    udf = pd.DataFrame(
+                        index=output["dates"],
+                        columns=[output["name"]],
+                        data=output["values"],
+                    )
+                    udf.sort_index(inplace=True)
+                    removed = udf.loc[udf.index.duplicated(keep="first")]
+                    if not removed.empty:
+                        udf = udf.loc[~udf.index.duplicated(keep="first")]
+                        output.update({"dates": udf.index.tolist()})
+                        output.update({"values": udf.iloc[:, 0].values.tolist()})
+
+                        self.assertListEqual(
+                            removed.index.tolist(),
+                            ["2017-08-28", "2017-11-27", "2017-11-27"],
+                        )
+                        self.assertListEqual(
+                            removed.iloc[:, 0].values.tolist(),
+                            [99.4062, 100.8974, 100.8974],
+                        )
+
+                return cls(d=output)
+
+        invalid = False
+        try:
+            CaptorTimeSeries.from_file(remove_duplicates=False)
+        except Exception as waste:
+            invalid = isinstance(waste.args[2], ValidationError)
+        self.assertTrue(invalid)
+
+        ts = CaptorTimeSeries.from_file(remove_duplicates=True)
+        self.assertIsInstance(ts, OpenTimeSeries)
 
     def test_create_opentimeseries_from_open_api(self):
 
