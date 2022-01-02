@@ -4,6 +4,8 @@
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![PyPI version](https://badge.fury.io/py/openseries.svg)](https://badge.fury.io/py/openseries)
 [![Coverage](coverage.svg)](coverage.svg)
+[![Downloads](https://pepy.tech/badge/openseries)](https://pepy.tech/project/openseries)
+[![Downloads](https://pepy.tech/badge/openseries/month)](https://pepy.tech/project/openseries)
 
 This is a project where we keep tools to perform timeseries analysis on a single asset or a group of assets.
 
