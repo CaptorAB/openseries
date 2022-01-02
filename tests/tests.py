@@ -7,8 +7,9 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CDay
+from stdnum.exceptions import InvalidChecksum
 import sys
-from testfixtures import LogCapture, ShouldAssert
+from testfixtures import LogCapture
 import unittest
 
 from openseries.series import OpenTimeSeries, timeseries_chain
@@ -97,9 +98,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertFalse(timeseries.tsdf.empty)
 
     def test_opentimeseries_duplicates_handling(self):
-
         class CaptorTimeSeries(OpenTimeSeries):
-
             def __init__(self, d):
 
                 super().__init__(d)
@@ -153,12 +152,10 @@ class TestOpenTimeSeries(unittest.TestCase):
 
                 return cls(d=output)
 
-        invalid = False
-        try:
+        with self.assertRaises(Exception) as e_dup:
             CaptorTimeSeries.from_file(remove_duplicates=False)
-        except Exception as waste:
-            invalid = isinstance(waste.args[2], ValidationError)
-        self.assertTrue(invalid)
+
+        self.assertIsInstance(e_dup.exception.args[2], ValidationError)
 
         ts = CaptorTimeSeries.from_file(remove_duplicates=True)
         self.assertIsInstance(ts, OpenTimeSeries)
@@ -261,30 +258,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
 
         self.assertTrue(isinstance(fixseries, OpenTimeSeries))
-
-    def test_warn_on_jsonschema_when_create_opentimeseries_from_dict(self):
-
-        fund = "SE0009807308"
-        timeseries1 = OpenTimeSeries.from_open_nav(isin=fund)
-
-        new_dict = timeseries1.__dict__
-        cleaner_list = [
-            "local_ccy",
-            "tsdf",
-        ]  # 'local_ccy' not removed to trigger ValidationError
-        for item in cleaner_list:
-            new_dict.pop(item)
-
-        with self.assertRaises(Exception):
-            OpenTimeSeries(new_dict)
-
-        new_dict.pop("label")
-        new_dict[
-            "dates"
-        ] = []  # Set dates to empty array to trigger minItems ValidationError
-
-        with self.assertRaises(Exception):
-            OpenTimeSeries(new_dict)
 
     def test_opentimeseries_periods_in_a_year(self):
 
@@ -1341,8 +1314,14 @@ class TestOpenTimeSeries(unittest.TestCase):
                 [[f"Asset_{item}"], ["Return(Total)"]]
             )
             tslist.append(OpenTimeSeries.from_df(sdf, valuetype="Return(Total)"))
-        with ShouldAssert("Number of TimeSeries must equal number of weights."):
+
+        with self.assertRaises(Exception) as e_weights:
             OpenFrame(tslist, weights=wghts)
+
+        self.assertEqual(
+            "Number of TimeSeries must equal number of weights.",
+            e_weights.exception.args[0],
+        )
 
     def test_opentimeseries_drawdown_details(self):
 
@@ -1776,8 +1755,13 @@ class TestOpenTimeSeries(unittest.TestCase):
         usim = ReturnSimulation.from_normal(n=1, d=1200, mu=0.05, vol=0.1, seed=71)
         aseries = sim_to_opentimeseries(usim, end=dt.date(2019, 6, 30))
         bseries = sim_to_opentimeseries(usim, end=dt.date(2019, 6, 30))
-        with self.assertRaises(Exception):
+
+        with self.assertRaises(Exception) as e_unique:
             OpenFrame([aseries, bseries])
+
+        self.assertEqual(
+            "TimeSeries names/labels must be unique.", e_unique.exception.args[0]
+        )
 
         bseries.set_new_label("other_name")
         uframe = OpenFrame([aseries, bseries])
@@ -1930,3 +1914,101 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertEqual(f"{up.iloc[0]:.12f}", "1.063842457805")
         self.assertEqual(f"{down.iloc[0]:.12f}", "0.922188852957")
         self.assertEqual(f"{both.iloc[0]:.12f}", "1.153605852417")
+
+    def test_opentimeseries_validations(self):
+
+        valid_isin = "SE0009807308"
+        invalid_isin_one = "SE0009807307"
+        invalid_isin_two = "SE000980730B"
+
+        timeseries_with_valid_isin = OpenTimeSeries(
+            {
+                "_id": "",
+                "currency": "SEK",
+                "dates": [
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                "instrumentId": "",
+                "isin": valid_isin,
+                "local_ccy": True,
+                "name": "asset",
+                "values": [
+                    100.0,
+                    100.0978,
+                ],
+                "valuetype": "Price(Close)",
+            }
+        )
+        self.assertIsInstance(timeseries_with_valid_isin, OpenTimeSeries)
+
+        new_dict = dict(timeseries_with_valid_isin.__dict__)
+        cleaner_list = [
+            "local_ccy",
+            "tsdf",
+        ]  # 'local_ccy' removed to trigger ValidationError
+        for item in cleaner_list:
+            new_dict.pop(item)
+
+        with self.assertRaises(Exception) as e_ccy:
+            OpenTimeSeries(new_dict)
+
+        self.assertIn(member="local_ccy", container=e_ccy.exception.args[2].message)
+
+        new_dict.pop("label")
+        new_dict.update(
+            {"local_ccy": True, "dates": []}
+        )  # Set dates to empty array to trigger minItems ValidationError
+
+        with self.assertRaises(Exception) as e_min_items:
+            OpenTimeSeries(new_dict)
+
+        self.assertIn(
+            member="is too short", container=e_min_items.exception.args[2].message
+        )
+
+        with self.assertRaises(Exception) as e_one:
+            OpenTimeSeries(
+                {
+                    "_id": "",
+                    "currency": "SEK",
+                    "dates": [
+                        "2017-05-29",
+                        "2017-05-30",
+                    ],
+                    "instrumentId": "",
+                    "isin": invalid_isin_one,
+                    "local_ccy": True,
+                    "name": "asset",
+                    "values": [
+                        100.0,
+                        100.0978,
+                    ],
+                    "valuetype": "Price(Close)",
+                }
+            )
+        self.assertIsInstance(e_one.exception.args[1], InvalidChecksum)
+
+        with self.assertRaises(Exception) as e_two:
+            OpenTimeSeries(
+                {
+                    "_id": "",
+                    "currency": "SEK",
+                    "dates": [
+                        "2017-05-29",
+                        "2017-05-30",
+                    ],
+                    "instrumentId": "",
+                    "isin": invalid_isin_two,
+                    "local_ccy": True,
+                    "name": "asset",
+                    "values": [
+                        100.0,
+                        100.0978,
+                    ],
+                    "valuetype": "Price(Close)",
+                }
+            )
+        self.assertIn(
+            member="does not match", container=e_two.exception.args[2].message
+        )

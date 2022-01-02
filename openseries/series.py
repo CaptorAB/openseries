@@ -11,6 +11,8 @@ import jsonschema
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
+from stdnum import isin as isincode
+from stdnum.exceptions import ValidationError as StdnumValidationError
 import scipy.stats as ss
 from jsonschema.exceptions import ValidationError
 from pandas.core.series import Series
@@ -63,6 +65,12 @@ class OpenTimeSeries(object):
             jsonschema.validate(instance=d, schema=series_schema)
         except ValidationError as e:
             raise Exception(d.get("_id", None), d.get("name", None), e)
+
+        if d.get("isin", None):
+            try:
+                isincode.validate(d["isin"])
+            except StdnumValidationError as ee:
+                raise Exception("Provided ISIN code is invalid.", ee)
 
         self.__dict__ = d
 
