@@ -32,8 +32,7 @@ jobs:
       - run:
           name: Check Python version
           command: |
-            pipenv shell
-            python --version
+            pipenv run python --version
       - run:
           name: ls
           command: |
