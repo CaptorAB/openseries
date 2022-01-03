@@ -25,7 +25,6 @@ setup(
     extras_require={
         "dev": [
             "black",
-            "codecov",
             "coverage",
             "flake8",
             "flake8-black",

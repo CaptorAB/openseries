@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: [3.6]
 
     steps:
@@ -34,7 +34,7 @@ jobs:
 
     - name: Test
       run: |
-        python -m nose --with-coverage ./
+        python -m nose -v --nologcapture --nocapture --with-timer --with-coverage ./
 
     - name: Package and check
       run: |
