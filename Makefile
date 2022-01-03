@@ -8,16 +8,16 @@ test:
 	PYTHONPATH=${PWD} venv/bin/nosetests -v --nologcapture --nocapture --with-timer ./
 
 lint:
-	python -m flake8 openseries setup.py
+	PYTHONPATH=${PWD} venv/bin/flake8 ./
 
 fix:
-	python -m black openseries setup.py
+	PYTHONPATH=${PWD} venv/bin/black ./
 
 dist:
-	python setup.py sdist
+	PYTHONPATH=${PWD} venv/bin/python setup.py sdist
 
 upload: clean dist
-	twine upload dist/*
+	PYTHONPATH=${PWD} venv/bin/twine upload dist/*
 
 coverage:
 	PYTHONPATH=${PWD} venv/bin/nosetests -vv --nologcapture --nocapture --with-timer --with-coverage ./
