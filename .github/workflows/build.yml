@@ -42,7 +42,7 @@ jobs:
 
     - name: Code Coverage
       run: |
-        python -m coverage -m report
+        python -m coverage report
 
     - name: Package and check
       run: |
