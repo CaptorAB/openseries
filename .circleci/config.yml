@@ -20,19 +20,19 @@ jobs:
       - run:
           name: Check Pip version
           command: |
-            pip --version
+            pip3 --version
       - run:
           name: Create Python pipenv environment
           command: |
             sudo pip install pipenv
       - run:
-          name: Check Python version
-          command: |
-            pipenv --py
-      - run:
           name: Install dependencies
           command: |
             pipenv install
+      - run:
+          name: Check Python version
+          command: |
+            pipenv --py
       - run:
           name: Run tests
           command: |
