@@ -16,15 +16,15 @@ jobs:
       - run:
           name: Update pip
           command: |
-            pip3 install --user --upgrade "pip==21.3.1"
+            pip3 install --upgrade "pip==21.3.1"
       - run:
           name: Check Pip version
           command: |
-            pip --version
+            pip3 --version
       - run:
           name: Create Python pipenv environment
           command: |
-            pip install --user --upgrade pipenv
+            pip3 install --upgrade pipenv
       - run:
           name: Install dependencies
           command: |
