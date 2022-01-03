@@ -34,7 +34,7 @@ jobs:
 
     - name: Tests
       run: |
-        python -m nosetests -v --nologcapture --nocapture --with-timer ./
+        python -m nose -v --nologcapture --nocapture --with-timer ./
 
     - name: Package and check
       run: |
