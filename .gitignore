@@ -48,7 +48,6 @@ venvten/
 .vscode/*
 /.inspectionProfiles/
 .xml
-/pyproject.toml
 .noseids
 .DS_Store
 coverage_html/

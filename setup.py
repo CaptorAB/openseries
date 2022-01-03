@@ -22,6 +22,17 @@ setup(
         "statsmodels",
         "testfixtures",
     ],
+    extras_require={
+        "dev": [
+            "black",
+            "codecov",
+            "coverage",
+            "flake8",
+            "flake8-black",
+            "nose",
+            "nose-timer",
+        ],
+    },
     url="https://github.com/CaptorAB/OpenSeries",
     license="BSD License",
     author="karrmagadgeteer2",
