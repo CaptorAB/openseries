@@ -108,9 +108,7 @@ def convert_to_returns(log_returns: np.ndarray) -> np.ndarray:
     return np.exp(log_returns)
 
 
-def convert_to_prices(
-    param: ModelParameters, log_returns: np.ndarray
-) -> np.ndarray:
+def convert_to_prices(param: ModelParameters, log_returns: np.ndarray) -> np.ndarray:
     """
     This method converts a sequence of log returns into normal returns
     (exponentiation) and then computes a price
@@ -131,17 +129,13 @@ def convert_to_prices(
     return np.array(price_sequence)
 
 
-def plot_stochastic_processes(
-    processes: list, title: str = None
-) -> (go.Figure, str):
+def plot_stochastic_processes(processes: list, title: str = None) -> (go.Figure, str):
     """
     This method plots a list of stochastic processes with a specified title
     :param processes:
     :param title:
     """
-    file_name = (
-        title.replace("/", "").replace("#", "").replace(" ", "").upper()
-    )
+    file_name = title.replace("/", "").replace("#", "").replace(" ", "").upper()
     plotfile = os.path.join(
         os.path.abspath(str(Path.home())), "Documents", f"{file_name}.html"
     )
@@ -182,9 +176,7 @@ def plot_stochastic_processes(
     return figure, plotfile
 
 
-def brownian_motion_log_returns(
-    param: ModelParameters, seed: int = None
-) -> np.ndarray:
+def brownian_motion_log_returns(param: ModelParameters, seed: int = None) -> np.ndarray:
     """
     This method returns a Wiener process. The Wiener process is also called
     Brownian motion. For more information about the Wiener process check out
@@ -202,9 +194,7 @@ def brownian_motion_log_returns(
     return nrand.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time)
 
 
-def brownian_motion_levels(
-    param: ModelParameters, seed: int = None
-) -> np.ndarray:
+def brownian_motion_levels(param: ModelParameters, seed: int = None) -> np.ndarray:
     """
     Returns a price sequence whose returns evolve according to
     a brownian motion
@@ -215,9 +205,7 @@ def brownian_motion_levels(
     assert isinstance(
         param, ModelParameters
     ), "param must be an object of Class ModelParameters"
-    return convert_to_prices(
-        param, brownian_motion_log_returns(param, seed=seed)
-    )
+    return convert_to_prices(param, brownian_motion_log_returns(param, seed=seed))
 
 
 def geometric_brownian_motion_log_returns(
@@ -288,9 +276,7 @@ def jump_diffusion_process(param: ModelParameters, seed: int = None) -> list:
                 <= s_n * param.all_delta
                 <= (j + 1) * param.all_delta
             ):
-                jump_sizes[j] += nrand.normal(
-                    param.jumps_mu, param.jumps_sigma
-                )
+                jump_sizes[j] += nrand.normal(param.jumps_mu, param.jumps_sigma)
                 break
         time += 1
     return jump_sizes
@@ -311,9 +297,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
         param, ModelParameters
     ), "param must be an object of Class ModelParameters"
     jump_diffusion = jump_diffusion_process(param, seed=seed)
-    geometric_brownian_motion = geometric_brownian_motion_log_returns(
-        param, seed=seed
-    )
+    geometric_brownian_motion = geometric_brownian_motion_log_returns(param, seed=seed)
     return np.add(jump_diffusion, geometric_brownian_motion)
 
 
@@ -432,9 +416,7 @@ def heston_model_levels(
 
     heston_market_price_levels = [param.all_s0]
     for h in range(1, param.all_time):
-        drift = (
-            param.gbm_mu * heston_market_price_levels[h - 1] * param.all_delta
-        )
+        drift = param.gbm_mu * heston_market_price_levels[h - 1] * param.all_delta
         vol = (
             cir_process[h - 1]
             * heston_market_price_levels[h - 1]
@@ -446,9 +428,7 @@ def heston_model_levels(
     return np.array(heston_market_price_levels), np.array(cir_process)
 
 
-def cox_ingersoll_ross_levels(
-    param: ModelParameters, seed: int = None
-) -> np.ndarray:
+def cox_ingersoll_ross_levels(param: ModelParameters, seed: int = None) -> np.ndarray:
     """
     This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
@@ -479,9 +459,7 @@ def cox_ingersoll_ross_levels(
     return np.array(levels)
 
 
-def ornstein_uhlenbeck_levels(
-    param: ModelParameters, seed: int = None
-) -> list:
+def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int = None) -> list:
     """
     This method returns the rate levels of a mean-reverting
     Ornstein Uhlenbeck process.

@@ -91,10 +91,7 @@ class ReturnSimulation(object):
         if seed:
             np.random.seed(seed)
         daily_returns = (
-            np.random.lognormal(
-                mean=mu / t, sigma=vol / np.sqrt(t), size=(n, d)
-            )
-            - 1
+            np.random.lognormal(mean=mu / t, sigma=vol / np.sqrt(t), size=(n, d)) - 1
         )
         output = {
             "number_of_sims": n,
@@ -319,11 +316,7 @@ class ReturnSimulation(object):
 
     @property
     def realized_mean_return(self) -> float:
-        return (
-            (self.results.mean() - 1)
-            * self.trading_days_in_year
-            / self.trading_days
-        )
+        return (self.results.mean() - 1) * self.trading_days_in_year / self.trading_days
 
     @property
     def realized_vol(self) -> float:
