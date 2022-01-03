@@ -1,44 +1,38 @@
 version: 2.1
-executors:
-  py36-executor:
+jobs:
+  build:
     working_directory: ~/repo
     docker:
       - image: circleci/python:3.6.1
-        environment:
-          PIPENV_VENV_IN_PROJECT: true
-
-jobs:
-  build:
-    executor: py36-executor
     steps:
       - checkout
       - run:
           name: Switch timezone to Stockholm
           command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
       - run:
-          name: Update pip
+          name: Create Python venv environment
           command: |
-            pip3 install --user --upgrade "pip==21.3.1"
-      - run:
-          name: Check Pip version
-          command: |
-            pip3 --version
-      - run:
-          name: Create Python pipenv environment
-          command: |
-            sudo pip install pipenv
-      - run:
-          name: Install dependencies
-          command: |
-            pipenv install
+            python3 -m venv ./venv
       - run:
           name: Check Python version
           command: |
-            pipenv run python --version
+            venv/bin/python3 --version
+      - run:
+          name: Update pip
+          command: |
+            venv/bin/pip3 install --upgrade "pip==21.3.1"
+      - run:
+          name: Check Pip version
+          command: |
+            venv/bin/pip3 --version
+      - run:
+          name: Install dependencies
+          command: |
+            venv/bin/pip3 install --upgrade -r requirements.txt
       - run:
           name: Run tests
           command: |
-            pipenv run nosetests -v --nologcapture --nocapture --with-timer ./
+            venv/bin/nosetests -v --nologcapture --nocapture --with-timer ./
       - slack/status:
         webhook: webhook
 
