@@ -2,12 +2,8 @@ version: 2.1
 executors:
   py36-executor:
     working_directory: ~/repo
-    machine:
-      image: ubuntu-2004:202111-02
     docker:
       - image: circleci/python:3.6.1
-        environment:
-          PIPENV_VENV_IN_PROJECT: true
 
 jobs:
   build:
