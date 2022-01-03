@@ -36,10 +36,11 @@ jobs:
           command: |
             pipenv run python --version
       - run:
-          name: ls
-          command: |
-            ls
-      - run:
           name: Run tests
           command: |
             pipenv run nosetests -v --nologcapture --nocapture --with-timer ./
+      - slack/status:
+        webhook: webhook
+
+orbs:
+        slack: circleci/slack@3.4.2
