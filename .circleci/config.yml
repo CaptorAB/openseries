@@ -24,7 +24,7 @@ jobs:
       - run:
           name: Create Python pipenv environment
           command: |
-            sudo pip install pipenv
+            pip3 install pipenv
       - run:
           name: Install dependencies
           command: |
@@ -40,4 +40,4 @@ jobs:
       - run:
           name: Run tests
           command: |
-            pipenv run .bin/nosetests -v --nologcapture --nocapture --with-timer ./
+            pipenv run nosetests -v --nologcapture --nocapture --with-timer ./
