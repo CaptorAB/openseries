@@ -28,17 +28,21 @@ jobs:
         python -m pip install -e .[dev]
         python -m pip install -U wheel twine setuptools
 
+    - name: Fix
+      run: |
+        python -m black ./
+
     - name: Lint
       run: |
         python -m flake8 ./
 
-    - name: Test
+    - name: Tests
       run: |
-        python -m nose -v --nologcapture --nocapture --with-timer ./
+        python -m nosetests -v --nologcapture --nocapture --with-timer --with-coverage ./
 
-    - name: Coverage
+    - name: Code Coverage
       run: |
-        python -m nose -v --nologcapture --nocapture --with-timer --with-coverage ./
+        python -m coverage -m report
 
     - name: Package and check
       run: |
