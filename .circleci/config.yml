@@ -20,11 +20,11 @@ jobs:
       - run:
           name: Check Pip version
           command: |
-            pip3 --version
+            pip --version
       - run:
           name: Create Python pipenv environment
           command: |
-            pip3 install pipenv
+            pip install pipenv
       - run:
           name: Install dependencies
           command: |
