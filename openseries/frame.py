@@ -489,8 +489,9 @@ class OpenFrame(object):
         """
         dddf = self.tsdf.pct_change()
 
+        # noinspection PyTypeChecker
         return pd.Series(
-            data=np.sqrt((dddf[dddf.values < 0.0] ** 2).sum() / self.length)
+            data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / self.length)
             * np.sqrt(self.periods_in_a_year),
             name="Downside Deviation",
         )
