@@ -247,16 +247,20 @@ class OpenTimeSeries(object):
     def from_fixed_rate(
         cls,
         rate: float,
-        days: int,
-        end_dt: dt.date,
+        date_range: pd.DatetimeIndex = None,
+        days: int = None,
+        end_dt: dt.date = None,
         label: str = "Series",
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
         """
+        Providing a date_range of type Pandas.DatetimeIndex takes priority over
+        providing a combination of days and an end date.
 
         :param rate:
+        :param date_range:
         :param days:
         :param end_dt:
         :param label:
@@ -264,7 +268,8 @@ class OpenTimeSeries(object):
         :param baseccy:
         :param local_ccy:
         """
-        date_range = pd.date_range(periods=days, end=end_dt, freq="D")
+        if date_range is None:
+            date_range = pd.date_range(periods=days, end=end_dt, freq="D")
         deltas = np.array([i.days for i in date_range[1:] - date_range[:-1]])
         array = np.cumprod(np.insert(1 + deltas * rate / 365, 0, 1.0)).tolist()
         date_range = [d.strftime("%Y-%m-%d") for d in date_range]
@@ -424,6 +429,7 @@ class OpenTimeSeries(object):
                 "first_idx",
                 "last_idx",
                 "length",
+                "span_of_days",
                 "yearfrac",
                 "periods_in_a_year",
             ]
@@ -438,7 +444,9 @@ class OpenTimeSeries(object):
 
     @property
     def length(self) -> int:
-
+        """
+        The number of observations.
+        """
         return len(self.tsdf.index)
 
     @property
@@ -454,12 +462,19 @@ class OpenTimeSeries(object):
         return self.tsdf.last_valid_index()
 
     @property
+    def span_of_days(self) -> int:
+        """
+        Number of days from the first date to the last.
+        """
+        return (self.last_idx - self.first_idx).days
+
+    @property
     def yearfrac(self) -> float:
         """
         Length of timeseries expressed as np.float64 fraction of
         a year with 365.25 days.
         """
-        return (self.last_idx - self.first_idx).days / 365.25
+        return self.span_of_days / 365.25
 
     @property
     def periods_in_a_year(self) -> float:
@@ -497,8 +512,10 @@ class OpenTimeSeries(object):
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
+
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception("First data point == 0.0")
+
         return float(
             (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
         )
@@ -657,8 +674,64 @@ class OpenTimeSeries(object):
             fraction = (later - earlier).days / 365.25
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
+
         return float(
             self.tsdf.loc[earlier:later].pct_change().std() * np.sqrt(time_factor)
+        )
+
+    @property
+    def downside_deviation(self) -> float:
+        """
+        Downside Deviation is here the standard deviation of returns that are
+        below a Minimum Accepted Return of zero. It is used to calculate the
+        Sortino Ratio.
+        """
+        dddf = self.tsdf.pct_change()
+
+        return float(
+            math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / self.length)
+            * np.sqrt(self.periods_in_a_year)
+        )
+
+    def downside_deviation_func(
+        self,
+        min_accepted_return: float = 0.0,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+        periods_in_a_year_fixed: int = None,
+    ) -> float:
+        """
+        Downside Deviation is the standard deviation of returns that are below
+        a given Minimum Accepted Return (MAR). It is used to calculate the
+        Sortino Ratio.
+
+        :param min_accepted_return: The annualized Minimum Accepted Return (MAR)
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
+        :param from_date: Specific from date
+        :param to_date: Specific to date
+        :param periods_in_a_year_fixed:
+        """
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        how_many = float(
+            self.tsdf.loc[earlier:later].pct_change().count(numeric_only=True)
+        )
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            fraction = (later - earlier).days / 365.25
+            time_factor = how_many / fraction
+
+        dddf = (
+            self.tsdf.loc[earlier:later]
+            .pct_change()
+            .sub(min_accepted_return / time_factor)
+        )
+
+        return float(
+            math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
+            * np.sqrt(time_factor)
         )
 
     @property
@@ -673,16 +746,57 @@ class OpenTimeSeries(object):
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
+        riskfree_rate: float = 0.0,
     ) -> float:
         """
-        Ratio of geometric return and annualized volatility.
+        The ratio of geometric return and annualized volatility or, if risk free return
+        provided, Sharpe ratio calculated as ( geometric return - risk free return )
+        / volatility. The latter ratio implies that the riskfree asset has
+        zero volatility.
+
         :param months_from_last: number of months offset as positive integer.
                                  Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
+        :param riskfree_rate:
         """
-        return self.geo_ret_func(months_from_last, from_date, to_date) / self.vol_func(
-            months_from_last, from_date, to_date
+        return (
+            self.geo_ret_func(months_from_last, from_date, to_date) - riskfree_rate
+        ) / self.vol_func(months_from_last, from_date, to_date)
+
+    @property
+    def sortino_ratio(self) -> float:
+        """
+        Ratio of geometric return and downside deviation with a riskfree rate
+        of zero.
+        """
+        return self.geo_ret / self.downside_deviation
+
+    def sortino_ratio_func(
+        self,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+        riskfree_rate: float = 0.0,
+    ) -> float:
+        """
+        The Sortino ratio calculated as ( geometric return - risk free return )
+        / downside deviation. The ratio implies that the riskfree asset has
+        zero volatility, and a minimum acceptable return of zero.
+
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
+        :param from_date: Specific from date
+        :param to_date: Specific to date
+        :param riskfree_rate:
+        """
+        return (
+            self.geo_ret_func(months_from_last, from_date, to_date) - riskfree_rate
+        ) / self.downside_deviation_func(
+            min_accepted_return=0.0,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property

@@ -94,6 +94,7 @@ class OpenFrame(object):
                 "first_indices",
                 "last_indices",
                 "lengths_of_items",
+                "span_of_days_all",
             ]
         prop_list = [getattr(self, x) for x in properties]
         results = pd.concat(prop_list, axis="columns").T
@@ -175,7 +176,7 @@ class OpenFrame(object):
         return pd.Series(
             data=[self.tsdf.loc[:, d].count() for d in self.tsdf],
             index=self.tsdf.columns,
-            name="lengths of items",
+            name="observations",
         )
 
     @property
@@ -224,16 +225,37 @@ class OpenFrame(object):
         )
 
     @property
+    def span_of_days(self) -> int:
+        """
+        Number of days from the first date to the last.
+        Be aware that this is not the same for all constituents.
+        """
+        return (self.last_idx - self.first_idx).days
+
+    @property
+    def span_of_days_all(self) -> pd.Series:
+        """
+        Number of days from the first date to the last for all items in the frame.
+        """
+        return pd.Series(
+            data=[c.span_of_days for c in self.constituents],
+            index=self.tsdf.columns,
+            name="span of days",
+        )
+
+    @property
     def yearfrac(self) -> float:
         """
         Length of timeseries expressed as fraction of a year with 365.25 days.
+        Be aware that this is not the same for all constituents.
         """
-        return (self.last_idx - self.first_idx).days / 365.25
+        return self.span_of_days / 365.25
 
     @property
     def periods_in_a_year(self) -> float:
         """
         The number of businessdays in an average year for all days in the data.
+        Be aware that this is not the same for all constituents.
         """
         return self.length / self.yearfrac
 
@@ -459,6 +481,61 @@ class OpenFrame(object):
         )
 
     @property
+    def downside_deviation(self) -> pd.Series:
+        """
+        Downside Deviation is here the standard deviation of returns that are
+        below a Minimum Accepted Return of zero. It is used to calculate the
+        Sortino Ratio.
+        """
+        dddf = self.tsdf.pct_change()
+
+        return pd.Series(
+            data=np.sqrt((dddf[dddf.values < 0.0] ** 2).sum() / self.length)
+            * np.sqrt(self.periods_in_a_year),
+            name="Downside Deviation",
+        )
+
+    def downside_deviation_func(
+        self,
+        min_accepted_return: float = 0.0,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+        periods_in_a_year_fixed: int = None,
+    ) -> pd.Series:
+        """
+        Downside Deviation is the standard deviation of returns that are below
+        a given Minimum Accepted Return (MAR). It is used to calculate the
+        Sortino Ratio.
+
+        :param min_accepted_return: The annualized Minimum Accepted Return (MAR)
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
+        :param from_date: Specific from date
+        :param to_date: Specific to date
+        :param periods_in_a_year_fixed:
+        """
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        how_many = self.tsdf.loc[earlier:later].pct_change().count(numeric_only=True)
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            fraction = (later - earlier).days / 365.25
+            time_factor = how_many / fraction
+
+        dddf = (
+            self.tsdf.loc[earlier:later]
+            .pct_change()
+            .sub(min_accepted_return / time_factor)
+        )
+
+        return pd.Series(
+            data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / how_many)
+            * np.sqrt(time_factor),
+            name="Subset Downside Deviation",
+        )
+
+    @property
     def z_score(self, logret: bool = False) -> pd.Series:
         """
         Z-score as (last return - mean return) / standard deviation of return
@@ -596,29 +673,177 @@ class OpenFrame(object):
 
     def ret_vol_ratio_func(
         self,
+        riskfree_rate: float = None,
+        riskfree_column: Union[tuple, int] = -1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
+        periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
         """
-        Ratio of geometric return and annualized volatility.
+        The Sharpe Ratio equals geometric return of an asset minus a risk free return
+        divided by the volatility of the asset. It implies that the riskfree asset has
+        zero volatility.
 
+        :param riskfree_rate: A risk free rate provided as a float.
+        :param riskfree_column: Column of timeseries that is the denominator in the ratio.
         :param months_from_last: number of months offset as positive integer.
                                  Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
+        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
         """
-        ratio = self.geo_ret_func(
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        ) / self.vol_func(
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
-        ratio.name = "Subset Return vol ratio"
-        return ratio
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        how_many = self.tsdf.loc[earlier:later].iloc[:, 0].count()
+        fraction = (later - earlier).days / 365.25
+
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            time_factor = how_many / fraction
+
+        ratios = []
+        if riskfree_rate is None:
+            if isinstance(riskfree_column, tuple):
+                riskfree = self.tsdf.loc[earlier:later].loc[:, riskfree_column]
+                riskfree_item = riskfree_column
+                riskfree_label = self.tsdf.loc[:, riskfree_column].name[0]
+            elif isinstance(riskfree_column, int):
+                riskfree = self.tsdf.loc[earlier:later].iloc[:, riskfree_column]
+                riskfree_item = self.tsdf.iloc[:, riskfree_column].name
+                riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
+            else:
+                raise Exception("base_column should be a tuple or an integer.")
+
+            for item in self.tsdf:
+                if item == riskfree_item:
+                    ratios.append(0.0)
+                else:
+                    longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                    georet = float(
+                        (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
+                    )
+                    riskfree_ret = float(
+                        (riskfree.iloc[-1] / riskfree.iloc[0]) ** (1 / fraction) - 1
+                    )
+                    vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
+                    ratios.append((georet - riskfree_ret) / vol)
+
+            return pd.Series(
+                data=ratios,
+                index=self.tsdf.columns,
+                name=f"Sharpe Ratios vs {riskfree_label}",
+            )
+        else:
+            for item in self.tsdf:
+                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
+                vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
+                ratios.append((georet - riskfree_rate) / vol)
+
+            return pd.Series(
+                data=ratios,
+                index=self.tsdf.columns,
+                name=f"Sharpe Ratios (rf={riskfree_rate:.2%})",
+            )
+
+    @property
+    def sortino_ratio(self) -> pd.Series:
+        """
+        Ratio of geometric return and downside deviation with a riskfree rate
+        of zero.
+        """
+        sortino = self.geo_ret / self.downside_deviation
+        sortino.name = "Sortino ratio"
+        return sortino
+
+    def sortino_ratio_func(
+        self,
+        riskfree_rate: float = None,
+        riskfree_column: Union[tuple, int] = -1,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+        periods_in_a_year_fixed: int = None,
+    ) -> pd.Series:
+        """
+        The Sortino ratio calculated as ( geometric return - risk free return )
+        / downside deviation. The ratio implies that the riskfree asset has
+        zero volatility, and a minimum acceptable return of zero.
+
+        :param riskfree_rate: A risk free rate provided as a float.
+        :param riskfree_column: Column of timeseries that is the denominator in the ratio.
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
+        :param from_date: Specific from date
+        :param to_date: Specific to date
+        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        how_many = self.tsdf.loc[earlier:later].iloc[:, 0].count()
+        fraction = (later - earlier).days / 365.25
+
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            time_factor = how_many / fraction
+
+        ratios = []
+        if riskfree_rate is None:
+            if isinstance(riskfree_column, tuple):
+                riskfree = self.tsdf.loc[earlier:later].loc[:, riskfree_column]
+                riskfree_item = riskfree_column
+                riskfree_label = self.tsdf.loc[:, riskfree_column].name[0]
+            elif isinstance(riskfree_column, int):
+                riskfree = self.tsdf.loc[earlier:later].iloc[:, riskfree_column]
+                riskfree_item = self.tsdf.iloc[:, riskfree_column].name
+                riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
+            else:
+                raise Exception("base_column should be a tuple or an integer.")
+
+            for item in self.tsdf:
+                if item == riskfree_item:
+                    ratios.append(0.0)
+                else:
+                    longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                    georet = float(
+                        (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
+                    )
+                    riskfree_ret = float(
+                        (riskfree.iloc[-1] / riskfree.iloc[0]) ** (1 / fraction) - 1
+                    )
+                    dddf = longdf.pct_change()
+                    downdev = float(
+                        math.sqrt(
+                            (dddf[dddf.values < 0.0].values ** 2).sum() / how_many
+                        )
+                        * np.sqrt(time_factor)
+                    )
+                    ratios.append((georet - riskfree_ret) / downdev)
+
+            return pd.Series(
+                data=ratios,
+                index=self.tsdf.columns,
+                name=f"Sortino Ratios vs {riskfree_label}",
+            )
+        else:
+            for item in self.tsdf:
+                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
+                dddf = longdf.pct_change()
+                downdev = float(
+                    math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
+                    * np.sqrt(time_factor)
+                )
+                ratios.append((georet - riskfree_rate) / downdev)
+
+            return pd.Series(
+                data=ratios,
+                index=self.tsdf.columns,
+                name=f"Sortino Ratios (rf={riskfree_rate:.2%},mar=0.0%)",
+            )
 
     @property
     def max_drawdown(self) -> pd.Series:
@@ -1182,6 +1407,8 @@ class OpenFrame(object):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        fraction = (later - earlier).days / 365.25
+
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
             short_item = base_column
@@ -1192,10 +1419,10 @@ class OpenFrame(object):
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
             raise Exception("base_column should be a tuple or an integer.")
+
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
         else:
-            fraction = (later - earlier).days / 365.25
             time_factor = shortdf.count() / fraction
 
         ratios = []
@@ -1206,7 +1433,7 @@ class OpenFrame(object):
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 relative = 1.0 + longdf - shortdf
                 georet = float(
-                    (relative.iloc[-1] / relative.iloc[0]) ** (1 / self.yearfrac) - 1
+                    (relative.iloc[-1] / relative.iloc[0]) ** (1 / fraction) - 1
                 )
                 vol = float(relative.pct_change().std() * np.sqrt(time_factor))
                 ratios.append(georet / vol)
@@ -1224,6 +1451,7 @@ class OpenFrame(object):
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
+        periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
         """
         The Up (Down) Capture Ratio is calculated by dividing the annualized returns
@@ -1241,6 +1469,7 @@ class OpenFrame(object):
                                  Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
+        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
         """
         assert ratio in [
             "up",
@@ -1249,6 +1478,8 @@ class OpenFrame(object):
         ], "Ratio must be one of 'up', 'down' or 'both'."
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        fraction = (later - earlier).days / 365.25
+
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
             short_item = base_column
@@ -1259,6 +1490,11 @@ class OpenFrame(object):
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
             raise Exception("base_column should be a tuple or an integer.")
+
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            time_factor = shortdf.count() / fraction
 
         ratios = []
         for item in self.tsdf:
@@ -1272,19 +1508,14 @@ class OpenFrame(object):
                         .add(1)
                         .values
                     )
-                    up_return = (
-                        uparray.prod() ** (1 / (len(uparray) / self.periods_in_a_year))
-                        - 1
-                    )
+                    up_return = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
                         shortdf.pct_change()[shortdf.pct_change().values > 0.0]
                         .add(1)
                         .values
                     )
                     up_idx_return = (
-                        upidxarray.prod()
-                        ** (1 / (len(upidxarray) / self.periods_in_a_year))
-                        - 1
+                        upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     ratios.append(up_return / up_idx_return)
                 elif ratio == "down":
@@ -1294,9 +1525,7 @@ class OpenFrame(object):
                         .values
                     )
                     down_return = (
-                        downarray.prod()
-                        ** (1 / (len(downarray) / self.periods_in_a_year))
-                        - 1
+                        downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
                         shortdf.pct_change()[shortdf.pct_change().values < 0.0]
@@ -1304,8 +1533,7 @@ class OpenFrame(object):
                         .values
                     )
                     down_idx_return = (
-                        downidxarray.prod()
-                        ** (1 / (len(downidxarray) / self.periods_in_a_year))
+                        downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
                         - 1
                     )
                     ratios.append(down_return / down_idx_return)
@@ -1315,19 +1543,14 @@ class OpenFrame(object):
                         .add(1)
                         .values
                     )
-                    up_return = (
-                        uparray.prod() ** (1 / (len(uparray) / self.periods_in_a_year))
-                        - 1
-                    )
+                    up_return = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
                         shortdf.pct_change()[shortdf.pct_change().values > 0.0]
                         .add(1)
                         .values
                     )
                     up_idx_return = (
-                        upidxarray.prod()
-                        ** (1 / (len(upidxarray) / self.periods_in_a_year))
-                        - 1
+                        upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     downarray = (
                         longdf.pct_change()[shortdf.pct_change().values < 0.0]
@@ -1335,9 +1558,7 @@ class OpenFrame(object):
                         .values
                     )
                     down_return = (
-                        downarray.prod()
-                        ** (1 / (len(downarray) / self.periods_in_a_year))
-                        - 1
+                        downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
                         shortdf.pct_change()[shortdf.pct_change().values < 0.0]
@@ -1345,8 +1566,7 @@ class OpenFrame(object):
                         .values
                     )
                     down_idx_return = (
-                        downidxarray.prod()
-                        ** (1 / (len(downidxarray) / self.periods_in_a_year))
+                        downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
                         - 1
                     )
                     ratios.append(

@@ -829,11 +829,11 @@ class TestOpenTimeSeries(unittest.TestCase):
         methods_to_compare = [
             "arithmetic_ret_func",
             "cvar_down_func",
+            "downside_deviation_func",
             "geo_ret_func",
             "kurtosis_func",
             "max_drawdown_func",
             "positive_share_func",
-            "ret_vol_ratio_func",
             "skew_func",
             "target_weight_from_var",
             "twr_ret_func",
@@ -849,6 +849,24 @@ class TestOpenTimeSeries(unittest.TestCase):
                 f"{getattr(sames, m)(months_from_last=12):.11f}",
                 f"{float(getattr(samef, m)(months_from_last=12).iloc[0]):.11f}",
             )
+
+    def test_openframe_ratio_methods_same_as_opentimeseries(self):
+
+        same = ReturnSimulation.from_normal(n=2, d=504, mu=0.05, vol=0.175, seed=71)
+
+        sames = sim_to_opentimeseries(same, end=dt.date(2019, 6, 30)).to_cumret()
+        sames.set_new_label(lvl_zero="Asset_0")
+        samef = sim_to_openframe(same, end=dt.date(2019, 6, 30)).to_cumret()
+
+        self.assertEqual(
+            f"{sames.ret_vol_ratio_func(months_from_last=12):.11f}",
+            f"{float(samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]):.11f}",
+        )
+
+        self.assertEqual(
+            f"{sames.sortino_ratio_func(months_from_last=12):.11f}",
+            f"{float(samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]):.11f}",
+        )
 
     def test_opentimeseries_measures_same_as_openframe_measures(self):
 
@@ -914,6 +932,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         common_calc_props = [
             "arithmetic_ret",
             "cvar_down",
+            "downside_deviation",
             "geo_ret",
             "kurtosis",
             "max_drawdown",
@@ -921,6 +940,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "positive_share",
             "ret_vol_ratio",
             "skew",
+            "sortino_ratio",
             "twr_ret",
             "value_ret",
             "var_down",
@@ -935,6 +955,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         common_attributes = [
             "length",
+            "span_of_days",
             "first_idx",
             "last_idx",
             "tsdf",
@@ -964,6 +985,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "first_indices",
             "last_indices",
             "lengths_of_items",
+            "span_of_days_all",
         ]
 
         frame_calc_props = ["correl_matrix"]
@@ -1009,12 +1031,14 @@ class TestOpenTimeSeries(unittest.TestCase):
         common_calc_methods = [
             "arithmetic_ret_func",
             "cvar_down_func",
+            "downside_deviation_func",
             "geo_ret_func",
             "kurtosis_func",
             "max_drawdown_func",
             "positive_share_func",
             "ret_vol_ratio_func",
             "skew_func",
+            "sortino_ratio_func",
             "target_weight_from_var",
             "twr_ret_func",
             "value_ret_func",
@@ -1544,7 +1568,8 @@ class TestOpenTimeSeries(unittest.TestCase):
             "Max drawdown in cal yr",
             "first indices",
             "last indices",
-            "lengths of items",
+            "observations",
+            "span of days",
         ]
         apsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         apframe = sim_to_openframe(apsims, dt.date(2019, 6, 30)).to_cumret()
@@ -1914,6 +1939,55 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertEqual(f"{up.iloc[0]:.12f}", "1.063842457805")
         self.assertEqual(f"{down.iloc[0]:.12f}", "0.922188852957")
         self.assertEqual(f"{both.iloc[0]:.12f}", "1.153605852417")
+
+    def test_opentimeseries_downside_deviation(self):
+
+        """
+        Source:
+        https://www.investopedia.com/terms/d/downside-deviation.asp
+        """
+
+        dd_asset = OpenTimeSeries(
+            {
+                "_id": "",
+                "currency": "USD",
+                "dates": [
+                    "2010-12-31",
+                    "2011-12-31",
+                    "2012-12-31",
+                    "2013-12-31",
+                    "2014-12-31",
+                    "2015-12-31",
+                    "2016-12-31",
+                    "2017-12-31",
+                    "2018-12-31",
+                    "2019-12-31",
+                ],
+                "instrumentId": "",
+                "local_ccy": True,
+                "name": "asset",
+                "values": [
+                    0.0,
+                    -0.02,
+                    0.16,
+                    0.31,
+                    0.17,
+                    -0.11,
+                    0.21,
+                    0.26,
+                    -0.03,
+                    0.38,
+                ],
+                "valuetype": "Return(Total)",
+            }
+        ).to_cumret()
+
+        mar = 0.01
+        downdev = dd_asset.downside_deviation_func(
+            min_accepted_return=mar, periods_in_a_year_fixed=1
+        )
+
+        self.assertEqual(f"{downdev:.12f}", "0.043333333333")
 
     def test_opentimeseries_validations(self):
 
