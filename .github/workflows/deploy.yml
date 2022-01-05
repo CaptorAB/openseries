@@ -1,9 +1,6 @@
 name: Deploy
 
-on:  
-  push:
-    tags:
-      - 'v*'
+on: workflow_dispatch
 
 jobs:
   build:
@@ -27,6 +24,10 @@ jobs:
       run: |
         python -m pip install -e .[dev]
         python -m pip install -U wheel twine setuptools
+
+    - name: Fix
+      run: |
+        python -m black ./
 
     - name: Lint
       run: |
