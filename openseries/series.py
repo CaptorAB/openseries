@@ -411,9 +411,10 @@ class OpenTimeSeries(object):
                 "value_ret",
                 "geo_ret",
                 "arithmetic_ret",
-                "twr_ret",
                 "vol",
+                "downside_deviation",
                 "ret_vol_ratio",
+                "sortino_ratio",
                 "z_score",
                 "skew",
                 "kurtosis",
@@ -551,48 +552,6 @@ class OpenTimeSeries(object):
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
         return float(np.log(self.tsdf.loc[earlier:later]).diff().mean() * time_factor)
-
-    @property
-    def twr_ret(self) -> float:
-        """
-        Annualized time weighted return.
-        """
-        if float(self.tsdf.iloc[0]) == 0.0:
-            raise Exception("First data point == 0.0")
-        return float(
-            ((self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.length) - 1)
-            * self.periods_in_a_year
-        )
-
-    def twr_ret_func(
-        self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
-    ) -> float:
-        """
-        Annualized time weighted return.
-
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
-        """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
-        if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
-        else:
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
-        if float(self.tsdf.loc[earlier]) == 0.0:
-            raise Exception("First data point == 0.0")
-        return float(
-            ((self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / how_many) - 1)
-            * time_factor
-        )
 
     @property
     def value_ret(self) -> float:

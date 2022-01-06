@@ -76,9 +76,10 @@ class OpenFrame(object):
                 "value_ret",
                 "geo_ret",
                 "arithmetic_ret",
-                "twr_ret",
                 "vol",
+                "downside_deviation",
                 "ret_vol_ratio",
+                "sortino_ratio",
                 "z_score",
                 "skew",
                 "kurtosis",
@@ -397,46 +398,6 @@ class OpenFrame(object):
         return rtn
 
     @property
-    def twr_ret(self) -> pd.Series:
-        """
-        Annualized time weighted return.
-        """
-        return pd.Series(
-            data=((self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.length) - 1)
-            * self.periods_in_a_year,
-            name="Time-weighted return",
-        )
-
-    def twr_ret_func(
-        self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
-    ) -> pd.Series:
-        """
-        Annualized time weighted return.
-
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
-        """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
-        if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
-        else:
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
-        return pd.Series(
-            data=((self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / how_many) - 1)
-            * time_factor,
-            name="Subset Time-weighted return",
-        )
-
-    @property
     def vol(self, logret: bool = False) -> pd.Series:
         """
         Annualized volatility. Pandas .std() is the equivalent of
@@ -493,7 +454,7 @@ class OpenFrame(object):
         return pd.Series(
             data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / self.length)
             * np.sqrt(self.periods_in_a_year),
-            name="Downside Deviation",
+            name="Downside deviation",
         )
 
     def downside_deviation_func(
@@ -533,7 +494,7 @@ class OpenFrame(object):
         return pd.Series(
             data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / how_many)
             * np.sqrt(time_factor),
-            name="Subset Downside Deviation",
+            name="Subset Downside deviation",
         )
 
     @property
