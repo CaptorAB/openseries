@@ -855,6 +855,7 @@ class OpenTimeSeries(object):
 
     def worst_func(
         self,
+        observations: int = 1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
@@ -862,13 +863,14 @@ class OpenTimeSeries(object):
         """
         Most negative percentage change.
 
+        :param observations:
         :param months_from_last: number of months offset as positive integer.
                                  Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return float(self.tsdf.loc[earlier:later].pct_change().min())
+        return float(self.tsdf.loc[earlier:later].pct_change().rolling(observations, min_periods=observations).sum().min())
 
     @property
     def positive_share(self) -> float:

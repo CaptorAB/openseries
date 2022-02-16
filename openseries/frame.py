@@ -866,6 +866,7 @@ class OpenFrame(object):
 
     def worst_func(
         self,
+        observations: int = 1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
@@ -873,6 +874,7 @@ class OpenFrame(object):
         """
         Most negative percentage change.
 
+        :param observations:
         :param months_from_last: number of months offset as positive integer.
                                  Overrides use of from_date and to_date
         :param from_date: Specific from date
@@ -880,8 +882,8 @@ class OpenFrame(object):
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return pd.Series(
-            data=self.tsdf.loc[earlier:later].pct_change().min(),
-            name="Subset Worst",
+            data=self.tsdf.loc[earlier:later].pct_change().rolling(observations, min_periods=observations).sum().min(),
+            name=f"Subset Worst {observations}day period",
         )
 
     @property
