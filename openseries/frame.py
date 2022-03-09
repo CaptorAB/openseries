@@ -1349,6 +1349,61 @@ class OpenFrame(object):
                 1.0 + self.tsdf.iloc[:, long_column] - self.tsdf.iloc[:, short_column]
             )
 
+    def tracking_error_func(
+        self,
+        base_column: Union[tuple, int] = -1,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+        periods_in_a_year_fixed: int = None,
+    ) -> pd.Series:
+        """
+        The Tracking Error is the standard deviation of the
+        difference between the fund and the index returns.
+
+        :param base_column: Column of timeseries that is the denominator in the ratio.
+        :param months_from_last: number of months offset as positive integer.
+                                 Overrides use of from_date and to_date
+        :param from_date: Specific from date
+        :param to_date: Specific to date
+        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        fraction = (later - earlier).days / 365.25
+
+        if isinstance(base_column, tuple):
+            shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
+            short_item = base_column
+            short_label = self.tsdf.loc[:, base_column].name[0]
+        elif isinstance(base_column, int):
+            shortdf = self.tsdf.loc[earlier:later].iloc[:, base_column]
+            short_item = self.tsdf.iloc[:, base_column].name
+            short_label = self.tsdf.iloc[:, base_column].name[0]
+        else:
+            raise Exception("base_column should be a tuple or an integer.")
+
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            time_factor = shortdf.count() / fraction
+
+        terrors = []
+        for item in self.tsdf:
+            if item == short_item:
+                terrors.append(0.0)
+            else:
+                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                relative = 1.0 + longdf - shortdf
+                vol = float(relative.pct_change().std() * np.sqrt(time_factor))
+                terrors.append(vol)
+
+        return pd.Series(
+            data=terrors,
+            index=self.tsdf.columns,
+            name=f"Tracking Errors vs {short_label}",
+        )
+
     def info_ratio_func(
         self,
         base_column: Union[tuple, int] = -1,

@@ -1094,6 +1094,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "delete_timeseries",
             "rolling_info_ratio",
             "info_ratio_func",
+            "tracking_error_func",
             "capture_ratio_func",
             "ord_least_squares_fit",
             "make_portfolio",
@@ -1651,6 +1652,24 @@ class TestOpenTimeSeries(unittest.TestCase):
         simdata = frame.sortino_ratio_func(riskfree_column=-1)
 
         self.assertEqual(float(f"{simdata[0]:.10f}"), 0.2959333819)
+
+    def test_openframe_tracking_error_func(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=5,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+
+        simdata = frame.tracking_error_func(base_column=1)
+
+        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.1554104519)
 
     def test_openframe_info_ratio_func(self):
 
