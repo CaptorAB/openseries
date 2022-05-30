@@ -1562,7 +1562,9 @@ def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
 
     dates = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < new.first_idx]
     values = np.array([float(x) for x in old.tsdf.values][: len(dates)])
-    values = list(values * float(new.tsdf.iloc[0]) / float(old.tsdf.loc[pd.Timestamp(new.first_idx)]))
+    olddf = old.tsdf.copy()
+    olddf.index = [d.date() for d in olddf.index]
+    values = list(values * float(new.tsdf.iloc[0]) / float(olddf.loc[new.first_idx]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
     values.extend([float(x) for x in new.tsdf.values])

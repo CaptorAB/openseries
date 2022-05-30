@@ -37,7 +37,7 @@ def var_down(
     """
     clean = np.nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
-    result = np.quantile(ret, 1 - level, interpolation=interpolation)
+    result = np.quantile(ret, 1 - level, method=interpolation)
     return result
 
 
