@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.6]
+        python-version: ["3.10"]
 
     steps:
     - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
 
     - name: Tests
       run: |
-        python -m nose -v --nologcapture --nocapture --with-timer ./
+        pytest --verbose
 
     - name: Package and check
       run: |

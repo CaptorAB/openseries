@@ -28,8 +28,7 @@ setup(
             "coverage",
             "flake8",
             "flake8-black",
-            "nose",
-            "nose-timer",
+            "pytest"
         ],
     },
     url="https://github.com/CaptorAB/OpenSeries",

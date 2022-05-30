@@ -262,37 +262,6 @@ And then the packaging steps from [here](https://packaging.python.org/en/latest/
 
 ### Future proofing
 
-I have run the test suite with Python version 3.10.0 using [nose2](https://docs.nose2.io/en/latest/index.html) and the module versions below. Everything works except the warnings and test failure outlined below.
-
-    C:\Python310> py -3.10 -m pip list
-    Package            Version
-    ------------------ ---------
-    attrs              21.2.0
-    certifi            2021.10.8
-    charset-normalizer 2.0.9
-    coverage           6.2     # updated
-    coverage-badge     1.1.0   # updated
-    idna               3.3
-    jsonschema         4.3.2   # updated
-    nose2              0.10.0
-    numpy              1.21.5  # updated
-    pandas             1.3.5   # updated
-    patsy              0.5.2
-    pip                21.3.1
-    plotly             5.5.0   # updated
-    pyrsistent         0.18.0
-    python-dateutil    2.8.2
-    pytz               2021.3
-    requests           2.26.0  # updated
-    scipy              1.7.3   # updated
-    setuptools         60.1.0
-    six                1.16.0
-    statsmodels        0.13.1  # updated
-    tenacity           8.0.1
-    testfixtures       6.18.3
-    urllib3            1.26.7
-    wheel              0.37.1
-
 Pandas==1.3.5 causes the test test_openframe_rolling_corr to fail and it warns as below on the other relevant tests:
 
     FutureWarning: Comparison of Timestamp with datetime.date is deprecated in order to match the standard library behavior.
