@@ -106,7 +106,7 @@ class OpenFrame(object):
         months_offset: int = None,
         from_dt: dt.date = None,
         to_dt: dt.date = None,
-    ) -> Tuple[pd.Timestamp, pd.Timestamp]:
+    ) -> Tuple[dt.date, dt.date]:
         """
         Function to create user defined time frame.
 
@@ -151,18 +151,21 @@ class OpenFrame(object):
         else:
             earlier, later = self.first_idx, self.last_idx
 
-        return pd.Timestamp(earlier), pd.Timestamp(later)
+        return earlier, later
 
     def align_index_to_local_cdays(self):
         """
         Changes the index of the associated pd.DataFrame tsdf to align with
         local calendar business days.
         """
-        date_range = pd.date_range(
-            start=self.tsdf.first_valid_index(),
-            end=self.tsdf.last_valid_index(),
-            freq=CDay(calendar=self.sweden),
-        )
+        date_range = [
+            d.date()
+            for d in pd.date_range(
+                start=self.tsdf.first_valid_index(),
+                end=self.tsdf.last_valid_index(),
+                freq=CDay(calendar=self.sweden),
+            )
+        ]
         self.tsdf = self.tsdf.reindex(date_range, method="pad", copy=False)
         return self
 
@@ -196,10 +199,9 @@ class OpenFrame(object):
         return self.tsdf.columns.get_level_values(1).tolist()
 
     @property
-    def first_idx(self) -> pd.Timestamp:
+    def first_idx(self) -> dt.date:
 
-        # noinspection PyTypeChecker
-        return self.tsdf.first_valid_index()
+        return self.tsdf.index[0]
 
     @property
     def first_indices(self) -> pd.Series:
@@ -211,10 +213,9 @@ class OpenFrame(object):
         )
 
     @property
-    def last_idx(self) -> pd.Timestamp:
+    def last_idx(self) -> dt.date:
 
-        # noinspection PyTypeChecker
-        return self.tsdf.last_valid_index()
+        return self.tsdf.index[-1]
 
     @property
     def last_indices(self) -> pd.Series:
@@ -391,7 +392,9 @@ class OpenFrame(object):
             period = str(year)
         else:
             period = "-".join([str(year), str(month).zfill(2)])
-        rtn = self.tsdf.pct_change().copy()
+        vrdf = self.tsdf.copy()
+        vrdf.index = pd.DatetimeIndex(vrdf.index)
+        rtn = vrdf.pct_change().copy()
         rtn = rtn.loc[period] + 1
         rtn = rtn.apply(np.cumprod, axis="index").iloc[-1] - 1
         rtn.name = period
@@ -450,7 +453,6 @@ class OpenFrame(object):
         """
         dddf = self.tsdf.pct_change()
 
-        # noinspection PyTypeChecker
         return pd.Series(
             data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / self.length)
             * np.sqrt(self.periods_in_a_year),
@@ -882,7 +884,11 @@ class OpenFrame(object):
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return pd.Series(
-            data=self.tsdf.loc[earlier:later].pct_change().rolling(observations, min_periods=observations).sum().min(),
+            data=self.tsdf.loc[earlier:later]
+            .pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
+            .min(),
             name=f"Subset Worst {observations}day period",
         )
 
@@ -891,8 +897,10 @@ class OpenFrame(object):
         """
         Most negative month.
         """
+        wdf = self.tsdf.copy()
+        wdf.index = pd.DatetimeIndex(wdf.index)
         return pd.Series(
-            data=self.tsdf.resample("BM").last().pct_change().min(),
+            data=wdf.resample("BM").last().pct_change().min(),
             name="Worst month",
         )
 
@@ -1178,7 +1186,9 @@ class OpenFrame(object):
         :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/
                               user_guide/timeseries.html#dateoffset-objects
         """
+        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
+        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
         return self
 
     def trunc_frame(
@@ -1718,16 +1728,18 @@ class OpenFrame(object):
             + "_VS_"
             + self.tsdf.iloc[:, second_column].name[0]
         )
-        corrdf = (
+        first = pd.DataFrame(
             self.tsdf.iloc[:, first_column]
-            .pct_change()
+            .pct_change()[1:]
             .rolling(observations, min_periods=observations)
-            .corr(
-                self.tsdf.iloc[:, second_column]
-                .pct_change()
-                .rolling(observations, min_periods=observations)
-            )
         )
+        second = pd.DataFrame(
+            self.tsdf.iloc[:, second_column]
+            .pct_change()[1:]
+            .rolling(observations, min_periods=observations)
+        )
+        # noinspection PyTypeChecker
+        corrdf = first.corr(second)
         corrdf = corrdf.dropna().to_frame()
         corrdf.columns = pd.MultiIndex.from_product(
             [[corr_label], ["Rolling correlation"]]
@@ -1845,7 +1857,9 @@ class OpenFrame(object):
         """
         mddf = pd.DataFrame()
         for i in self.constituents:
-            dd = drawdown_details(i.tsdf)
+            tmpdf = i.tsdf.copy()
+            tmpdf.index = pd.DatetimeIndex(tmpdf.index)
+            dd = drawdown_details(tmpdf)
             dd.name = i.label
             mddf = pd.concat([mddf, dd], axis="columns")
         return mddf

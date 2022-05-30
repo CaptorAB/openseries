@@ -33,11 +33,14 @@ if repo_root not in sys.path:
 
 
 def sim_to_opentimeseries(sim: ReturnSimulation, end: dt.date) -> OpenTimeSeries:
-    date_range = pd.date_range(
-        periods=sim.trading_days,
-        end=end,
-        freq=CDay(calendar=OpenTimeSeries.sweden),
-    )
+    date_range = [
+        d.date()
+        for d in pd.date_range(
+            periods=sim.trading_days,
+            end=end,
+            freq=CDay(calendar=OpenTimeSeries.sweden),
+        )
+    ]
     sdf = sim.df.iloc[0].T.to_frame()
     sdf.index = date_range
     sdf.columns = pd.MultiIndex.from_product([["Asset"], ["Return(Total)"]])
@@ -45,11 +48,14 @@ def sim_to_opentimeseries(sim: ReturnSimulation, end: dt.date) -> OpenTimeSeries
 
 
 def sim_to_openframe(sim: ReturnSimulation, end: dt.date) -> OpenFrame:
-    date_range = pd.date_range(
-        periods=sim.trading_days,
-        end=end,
-        freq=CDay(calendar=OpenTimeSeries.sweden),
-    )
+    date_range = [
+        d.date()
+        for d in pd.date_range(
+            periods=sim.trading_days,
+            end=end,
+            freq=CDay(calendar=OpenTimeSeries.sweden),
+        )
+    ]
     tslist = []
     for item in range(sim.number_of_sims):
         sdf = sim.df.iloc[item].T.to_frame()
@@ -572,28 +578,24 @@ class TestOpenTimeSeries(unittest.TestCase):
         wrong = ["1.037311", "1.039374", "1.039730", "1.044433", "1.045527"]
         true_tail = pd.DataFrame(
             columns=pd.MultiIndex.from_product([[name], ["Price(Close)"]]),
-            index=pd.DatetimeIndex(
-                [
-                    "2019-06-24",
-                    "2019-06-25",
-                    "2019-06-26",
-                    "2019-06-27",
-                    "2019-06-28",
-                ]
-            ),
+            index=[
+                    dt.date(2019, 6, 24),
+                    dt.date(2019, 6, 25),
+                    dt.date(2019, 6, 26),
+                    dt.date(2019, 6, 27),
+                    dt.date(2019, 6, 28),
+                ],
             data=correct,
         )
         false_tail = pd.DataFrame(
             columns=pd.MultiIndex.from_product([[name], ["Price(Close)"]]),
-            index=pd.DatetimeIndex(
-                [
-                    "2019-06-24",
-                    "2019-06-25",
-                    "2019-06-26",
-                    "2019-06-27",
-                    "2019-06-28",
-                ]
-            ),
+            index=[
+                dt.date(2019, 6, 24),
+                dt.date(2019, 6, 25),
+                dt.date(2019, 6, 26),
+                dt.date(2019, 6, 27),
+                dt.date(2019, 6, 28),
+            ],
             data=wrong,
         )
 
@@ -1326,11 +1328,14 @@ class TestOpenTimeSeries(unittest.TestCase):
         n = 5
         wghts = [1.0 / n] * (n + 1)
         wrongsims = ReturnSimulation.from_normal(n=n, d=252, mu=0.05, vol=0.1, seed=71)
-        date_range = pd.date_range(
-            periods=wrongsims.trading_days,
-            end=dt.date(2019, 6, 30),
-            freq=CDay(calendar=OpenTimeSeries.sweden),
-        )
+        date_range = [
+            d.date()
+            for d in pd.date_range(
+                periods=wrongsims.trading_days,
+                end=dt.date(2019, 6, 30),
+                freq=CDay(calendar=OpenTimeSeries.sweden),
+            )
+        ]
         tslist = []
         for item in range(wrongsims.number_of_sims):
             sdf = wrongsims.df.iloc[item].T.to_frame()
@@ -1391,12 +1396,12 @@ class TestOpenTimeSeries(unittest.TestCase):
         frame = OpenFrame([series_long, series_short])
 
         firsts = [
-            pd.Timestamp(dt.date(2018, 6, 27)),
-            pd.Timestamp(dt.date(2018, 6, 27)),
+            dt.date(2018, 6, 27),
+            dt.date(2018, 6, 27),
         ]
         lasts = [
-            pd.Timestamp(dt.date(2019, 6, 28)),
-            pd.Timestamp(dt.date(2019, 6, 28)),
+            dt.date(2019, 6, 28),
+            dt.date(2019, 6, 28),
         ]
 
         self.assertNotEqual(firsts, frame.first_indices.tolist())
@@ -1497,7 +1502,10 @@ class TestOpenTimeSeries(unittest.TestCase):
         for process in processes:
             onesim = process(mp, seed=71)
             name = process.__name__
-            date_range = pd.date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
+            date_range = [
+                d.date()
+                for d in pd.date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
+            ]
             sdf = pd.DataFrame(
                 data=onesim,
                 index=date_range,
@@ -1581,7 +1589,9 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_align_index_to_local_cdays(self):
 
-        date_range = pd.date_range(start="2020-06-15", end="2020-06-25")
+        date_range = [
+            d.date() for d in pd.date_range(start="2020-06-15", end="2020-06-25")
+        ]
         asim = [1.0] * len(date_range)
         adf = pd.DataFrame(
             data=asim,
@@ -1590,7 +1600,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
 
-        midsummer = "2020-06-19"
+        midsummer = dt.date(2020, 6, 19)
         self.assertTrue(midsummer in date_range)
 
         aseries.align_index_to_local_cdays()
@@ -1703,7 +1713,6 @@ class TestOpenTimeSeries(unittest.TestCase):
             seed=71,
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
-        #print(frame.tsdf.index)
         simdata = frame.rolling_corr(first_column=0, second_column=1).head()
 
         values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]

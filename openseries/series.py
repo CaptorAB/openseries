@@ -269,7 +269,9 @@ class OpenTimeSeries(object):
         :param local_ccy:
         """
         if date_range is None:
-            date_range = pd.date_range(periods=days, end=end_dt, freq="D")
+            date_range = pd.DatetimeIndex(
+                [d.date() for d in pd.date_range(periods=days, end=end_dt, freq="D")]
+            )
         deltas = np.array([i.days for i in date_range[1:] - date_range[:-1]])
         array = np.cumprod(np.insert(1 + deltas * rate / 365, 0, 1.0)).tolist()
         date_range = [d.strftime("%Y-%m-%d") for d in date_range]
@@ -308,7 +310,7 @@ class OpenTimeSeries(object):
 
         df = pd.DataFrame(data=self.values, index=self.dates, dtype="float64")
         df.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
-        df.index = pd.DatetimeIndex(df.index)
+        df.index = [d.date() for d in pd.DatetimeIndex(df.index)]
 
         df.sort_index(inplace=True)
         self.tsdf = df
@@ -334,7 +336,7 @@ class OpenTimeSeries(object):
         months_offset: int = None,
         from_dt: Union[dt.date, None] = None,
         to_dt: Union[dt.date, None] = None,
-    ) -> (pd.Timestamp, pd.Timestamp):
+    ) -> (dt.date, dt.date):
         """
         Function to create user defined time frame.
 
@@ -386,7 +388,7 @@ class OpenTimeSeries(object):
         else:
             earlier, later = self.first_idx, self.last_idx
 
-        return pd.Timestamp(earlier), pd.Timestamp(later)
+        return earlier, later
 
     def align_index_to_local_cdays(self):
         """
@@ -394,11 +396,14 @@ class OpenTimeSeries(object):
         local calendar business days.
         """
         self.setup_class()
-        date_range = pd.date_range(
-            start=self.tsdf.first_valid_index(),
-            end=self.tsdf.last_valid_index(),
-            freq=CDay(calendar=self.sweden),
-        )
+        date_range = [
+            d.date()
+            for d in pd.date_range(
+                start=self.tsdf.first_valid_index(),
+                end=self.tsdf.last_valid_index(),
+                freq=CDay(calendar=self.sweden),
+            )
+        ]
 
         self.tsdf = self.tsdf.reindex(date_range, method="pad", copy=False)
 
@@ -451,16 +456,14 @@ class OpenTimeSeries(object):
         return len(self.tsdf.index)
 
     @property
-    def first_idx(self) -> pd.Timestamp:
+    def first_idx(self) -> dt.date:
 
-        # noinspection PyTypeChecker
-        return self.tsdf.first_valid_index()
+        return self.tsdf.index[0]
 
     @property
-    def last_idx(self) -> pd.Timestamp:
+    def last_idx(self) -> dt.date:
 
-        # noinspection PyTypeChecker
-        return self.tsdf.last_valid_index()
+        return self.tsdf.index[-1]
 
     @property
     def span_of_days(self) -> int:
@@ -594,11 +597,13 @@ class OpenTimeSeries(object):
         :param year: Year of the period to calculate.
         :param month: Optional month of the period to calculate.
         """
+        caldf = self.tsdf.copy()
+        caldf.index = pd.DatetimeIndex(caldf.index)
         if month is None:
             period = str(year)
         else:
             period = "-".join([str(year), str(month).zfill(2)])
-        rtn = self.tsdf.copy().pct_change()
+        rtn = caldf.copy().pct_change()
         rtn = rtn.loc[period] + 1
         return float(rtn.apply(np.cumprod, axis="index").iloc[-1] - 1)
 
@@ -797,8 +802,10 @@ class OpenTimeSeries(object):
         """
         Date when the maximum drawdown occurred.
         """
+        mdddf = self.tsdf.copy()
+        mdddf.index = pd.DatetimeIndex(mdddf.index)
         mdd_date = (
-            (self.tsdf / self.tsdf.expanding(min_periods=1).max())
+            (mdddf / mdddf.expanding(min_periods=1).max())
             .idxmin()
             .values[0]
             .astype(dt.datetime)
@@ -851,7 +858,9 @@ class OpenTimeSeries(object):
         """
         Most negative month.
         """
-        return float(self.tsdf.resample("BM").last().pct_change().min())
+        resdf = self.tsdf.copy()
+        resdf.index = pd.DatetimeIndex(resdf.index)
+        return float(resdf.resample("BM").last().pct_change().min())
 
     def worst_func(
         self,
@@ -870,7 +879,13 @@ class OpenTimeSeries(object):
         :param to_date: Specific to date
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return float(self.tsdf.loc[earlier:later].pct_change().rolling(observations, min_periods=observations).sum().min())
+        return float(
+            self.tsdf.loc[earlier:later]
+            .pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
+            .min()
+        )
 
     @property
     def positive_share(self) -> float:
@@ -1255,7 +1270,9 @@ class OpenTimeSeries(object):
         :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/
                               user_guide/timeseries.html#dateoffset-objects
         """
+        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
+        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
         return self
 
     def to_drawdown_series(self):
@@ -1272,7 +1289,9 @@ class OpenTimeSeries(object):
             'Date of bottom', 'Days from start to bottom', &
             'Average fall per day' for each constituent.
         """
-        return drawdown_details(self.tsdf).to_frame()
+        dddf = self.tsdf.copy()
+        dddf.index = pd.DatetimeIndex(dddf.index)
+        return drawdown_details(dddf).to_frame()
 
     def rolling_vol(
         self, observations: int = 21, periods_in_a_year_fixed: int = None
@@ -1492,7 +1511,7 @@ class OpenTimeSeries(object):
         values = [float(x) for x in self.tsdf.iloc[:, 0].tolist()]
 
         if size_array:
-            sizer = 2.0 * max(size_array) / (90.0 ** 2)
+            sizer = 2.0 * max(size_array) / (90.0**2)
             text_array = [f"{x:.2%}" for x in size_array]
         else:
             sizer = None
@@ -1541,17 +1560,9 @@ def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
     old.running_adjustment(old_fee)
     new = back.from_deepcopy()
 
-    dates = [
-        x.strftime("%Y-%m-%d")
-        for x in old.tsdf.index
-        if x < pd.Timestamp(new.first_idx)
-    ]
+    dates = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < new.first_idx]
     values = np.array([float(x) for x in old.tsdf.values][: len(dates)])
-    values = list(
-        values
-        * float(new.tsdf.iloc[0])
-        / float(old.tsdf.loc[pd.Timestamp(new.first_idx)])
-    )
+    values = list(values * float(new.tsdf.iloc[0]) / float(old.tsdf.loc[pd.Timestamp(new.first_idx)]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
     values.extend([float(x) for x in new.tsdf.values])
