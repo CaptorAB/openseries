@@ -1560,10 +1560,10 @@ def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
     old.running_adjustment(old_fee)
     new = back.from_deepcopy()
 
-    dates = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < new.first_idx]
-    values = np.array([float(x) for x in old.tsdf.values][: len(dates)])
     olddf = old.tsdf.copy()
     olddf.index = [d.date() for d in olddf.index]
+    dates = [x.strftime("%Y-%m-%d") for x in olddf.index if x < new.first_idx]
+    values = np.array([float(x) for x in old.tsdf.values][: len(dates)])
     values = list(values * float(new.tsdf.iloc[0]) / float(olddf.loc[new.first_idx]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
