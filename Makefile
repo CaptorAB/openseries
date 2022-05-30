@@ -5,7 +5,7 @@ venv: requirements.txt
 	venv/bin/pip install --upgrade -r requirements.txt
 
 test:
-	PYTHONPATH=${PWD} venv/bin/nosetests -v --nologcapture --nocapture --with-timer ./
+	PYTHONPATH=${PWD} venv/bin/pytest --verbose
 
 lint:
 	PYTHONPATH=${PWD} venv/bin/flake8 ./
