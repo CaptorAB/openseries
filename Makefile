@@ -27,4 +27,4 @@ coverage:
 clean:
 	rm -rf dist
 	rm -rf openseries.egg-info
-    rm -rf venv
+	rm -rf venv
