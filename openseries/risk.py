@@ -9,6 +9,7 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
+import sys
 
 
 def cvar_down(data: List[float], level: float = 0.95) -> float:
@@ -37,7 +38,11 @@ def var_down(
     """
     clean = np.nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
-    result = np.quantile(ret, 1 - level, method=interpolation)
+    if (sys.version_info[0] == 3) and (sys.version_info[1] > 6):
+        kwargs = {"method": interpolation}
+    else:
+        kwargs = {"interpolation": interpolation}
+    result = np.quantile(ret, 1 - level, **kwargs)
     return result
 
 
