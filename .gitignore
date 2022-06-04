@@ -53,3 +53,4 @@ venvten/
 coverage_html/
 /coverage_html
 coverage_html
+/.pytest_cache/

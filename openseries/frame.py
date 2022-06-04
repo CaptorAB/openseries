@@ -1212,6 +1212,7 @@ class OpenFrame(object):
             start_cut = self.first_indices.max()
         if not end_cut and after:
             end_cut = self.last_indices.min()
+        self.tsdf.sort_index(inplace=True)
         self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
@@ -1715,31 +1716,25 @@ class OpenFrame(object):
         """
         Function calculates correlation between two series.
         The period with at least the given number of observations is the first
-        period calculated. Result is given in a new column.
+        period calculated.
         :param first_column: The position as integer of the first timeseries
-                             to compare.
+                             to compare
         :param second_column: The position as integer of the second timeseries
-                              to compare.
+                              to compare
         :param observations: The length of the rolling window to use is set as
-                             number of observations.
+                             number of observations
         """
         corr_label = (
             self.tsdf.iloc[:, first_column].name[0]
             + "_VS_"
             + self.tsdf.iloc[:, second_column].name[0]
         )
-        first = pd.DataFrame(
-            self.tsdf.iloc[:, first_column]
-            .pct_change()[1:]
-            .rolling(observations, min_periods=observations)
+        corrdf = (
+            self.tsdf.iloc[:, 0]
+                .pct_change()[1:]
+                .rolling(observations, min_periods=observations)
+                .corr(self.tsdf.iloc[:, 1].pct_change()[1:])
         )
-        second = pd.DataFrame(
-            self.tsdf.iloc[:, second_column]
-            .pct_change()[1:]
-            .rolling(observations, min_periods=observations)
-        )
-        # noinspection PyTypeChecker
-        corrdf = first.corr(second)
         corrdf = corrdf.dropna().to_frame()
         corrdf.columns = pd.MultiIndex.from_product(
             [[corr_label], ["Rolling correlation"]]
