@@ -166,7 +166,7 @@ class OpenFrame(object):
                 freq=CDay(calendar=self.sweden),
             )
         ]
-        self.tsdf = self.tsdf.reindex(date_range, method="pad", copy=False)
+        self.tsdf = self.tsdf.reindex(date_range, method=None, copy=False)
         return self
 
     @property

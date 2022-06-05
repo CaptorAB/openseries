@@ -405,7 +405,7 @@ class OpenTimeSeries(object):
             )
         ]
 
-        self.tsdf = self.tsdf.reindex(date_range, method="pad", copy=False)
+        self.tsdf = self.tsdf.reindex(date_range, method=None, copy=False)
 
         return self
 
@@ -1430,7 +1430,7 @@ class OpenTimeSeries(object):
         self.tsdf = pd.DataFrame(data=values, index=dates)
         self.valuetype = "Price(Close)"
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
-        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
+        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
         return self
 
     def set_new_label(
@@ -1561,7 +1561,6 @@ def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
     new = back.from_deepcopy()
 
     olddf = old.tsdf.copy()
-    olddf.index = [d.date() for d in olddf.index]
     dates = [x.strftime("%Y-%m-%d") for x in olddf.index if x < new.first_idx]
     values = np.array([float(x) for x in old.tsdf.values][: len(dates)])
     values = list(values * float(new.tsdf.iloc[0]) / float(olddf.loc[new.first_idx]))
