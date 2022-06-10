@@ -579,12 +579,12 @@ class TestOpenTimeSeries(unittest.TestCase):
         true_tail = pd.DataFrame(
             columns=pd.MultiIndex.from_product([[name], ["Price(Close)"]]),
             index=[
-                    dt.date(2019, 6, 24),
-                    dt.date(2019, 6, 25),
-                    dt.date(2019, 6, 26),
-                    dt.date(2019, 6, 27),
-                    dt.date(2019, 6, 28),
-                ],
+                dt.date(2019, 6, 24),
+                dt.date(2019, 6, 25),
+                dt.date(2019, 6, 26),
+                dt.date(2019, 6, 27),
+                dt.date(2019, 6, 28),
+            ],
             data=correct,
         )
         false_tail = pd.DataFrame(

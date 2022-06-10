@@ -49,7 +49,9 @@ def date_offset_foll(
     """
     start_dt = dt.date(1970, 12, 30)
     end_dt = dt.date(start_dt.year + 90, 12, 30)
-    local_bdays = [d.date() for d in pd.date_range(start=start_dt, end=end_dt, freq=calendar)]
+    local_bdays = [
+        d.date() for d in pd.date_range(start=start_dt, end=end_dt, freq=calendar)
+    ]
     raw_date = date_fix(raw_date)
     assert isinstance(raw_date, dt.date), "Error when parsing raw_date."
     month_delta = relativedelta(months=months_offset)

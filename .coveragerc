@@ -13,6 +13,6 @@ exclude_lines =
     if __name__ == .__main__.:
 
 [html]
-directory = coverage_html
+directory = htmlcov
 
 title = openseries Coverage report
