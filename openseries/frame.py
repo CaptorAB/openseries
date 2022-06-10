@@ -30,24 +30,31 @@ from openseries.series import OpenTimeSeries
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
-# noinspection DuplicatedCode
 class OpenFrame(object):
     constituents: List[OpenTimeSeries]
     sweden: SwedenHolidayCalendar
     tsdf: pd.DataFrame
     weights: List[float]
 
-    def __init__(self, constituents: List[OpenTimeSeries], weights: List[float] = None):
+    def __init__(
+        self,
+        constituents: List[OpenTimeSeries],
+        weights: List[float] = None,
+        sort: bool = True,
+    ):
         """
         :param constituents:  List of objects of Class OpenTimeSeries.
         :param weights:       List of weights in float64 format.
+        :param sort:          argument in Pandas df.concat added to fix issue when upgrading py and pd
         """
         self.weights = weights
         self.tsdf = pd.DataFrame()
         self.sweden = SwedenHolidayCalendar(holidays_sw)
         self.constituents = constituents
         if constituents is not None and len(constituents) != 0:
-            self.tsdf = pd.concat([x.tsdf for x in self.constituents], axis="columns")
+            self.tsdf = pd.concat(
+                [x.tsdf for x in self.constituents], axis="columns", sort=sort
+            )
         else:
             logging.warning("OpenFrame() was passed an empty list.")
 
@@ -1731,9 +1738,9 @@ class OpenFrame(object):
         )
         corrdf = (
             self.tsdf.iloc[:, 0]
-                .pct_change()[1:]
-                .rolling(observations, min_periods=observations)
-                .corr(self.tsdf.iloc[:, 1].pct_change()[1:])
+            .pct_change()[1:]
+            .rolling(observations, min_periods=observations)
+            .corr(self.tsdf.iloc[:, 1].pct_change()[1:])
         )
         corrdf = corrdf.dropna().to_frame()
         corrdf.columns = pd.MultiIndex.from_product(
