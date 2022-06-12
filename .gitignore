@@ -27,9 +27,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Unit tests / coverage reports
-.coverage
-
 # Environments
 .env
 .venv

@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="openseries",
-    version="0.3.15",
+    version="0.3.16",
     packages=find_packages(),
     package_data={"openseries": ["*.json"], ".": ["*.json", "coverage.svg"]},
     install_requires=[
@@ -23,7 +23,14 @@ setup(
         "testfixtures",
     ],
     extras_require={
-        "dev": ["black", "coverage", "flake8", "flake8-black", "pytest"],
+        "dev": [
+            "black",
+            "coverage",
+            "coverage-badge",
+            "flake8",
+            "flake8-black",
+            "pytest",
+        ],
     },
     url="https://github.com/CaptorAB/OpenSeries",
     license="BSD License",
