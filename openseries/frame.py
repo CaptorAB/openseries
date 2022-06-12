@@ -105,7 +105,7 @@ class OpenFrame(object):
                 "span_of_days_all",
             ]
         prop_list = [getattr(self, x) for x in properties]
-        results = pd.concat(prop_list, axis="columns").T
+        results = pd.concat(prop_list, axis="columns", sort=True).T
         return results
 
     def calc_range(
@@ -1164,7 +1164,7 @@ class OpenFrame(object):
         :param new_series:
         """
         self.constituents += [new_series]
-        self.tsdf = pd.concat([self.tsdf, new_series.tsdf], axis="columns")
+        self.tsdf = pd.concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
     def delete_timeseries(self, lvl_zero_item: str):
@@ -1863,7 +1863,7 @@ class OpenFrame(object):
             tmpdf.index = pd.DatetimeIndex(tmpdf.index)
             dd = drawdown_details(tmpdf)
             dd.name = i.label
-            mddf = pd.concat([mddf, dd], axis="columns")
+            mddf = pd.concat([mddf, dd], axis="columns", sort=True)
         return mddf
 
     def plot_series(
@@ -2045,7 +2045,7 @@ def key_value_table(
     else:
         attributes = [getattr(basket, x) for x in attributes]
 
-    keyvalues = pd.concat(attributes, axis="columns")
+    keyvalues = pd.concat(attributes, axis="columns", sort=True)
     if cols:
         keyvalues.columns = cols
     if swe_not_eng:
