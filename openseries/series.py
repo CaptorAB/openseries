@@ -317,20 +317,6 @@ class OpenTimeSeries(object):
 
         return self
 
-    def validate_vs_schema(self):
-
-        cleaned_dict = self.__dict__
-
-        extra_keys = ["api", "tsdf", "local_ccy"]
-
-        for kay in extra_keys:
-            try:
-                del cleaned_dict[kay]
-            except KeyError:
-                raise Exception(f"Key {kay} not present in self.__dict__")
-
-        jsonschema.validate(cleaned_dict, self.schema)
-
     def calc_range(
         self,
         months_offset: int = None,

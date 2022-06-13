@@ -151,14 +151,13 @@ To make use of some of the tools available in the [Pandas](https://pandas.pydata
 
 #### In this table are the methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Method               | Applies to       | Description   |
-| :------------------- | :--------------- | :------------ |
-| `setup_class`        | `OpenTimeSeries` | Class method that defines the `domestic` attribute and a `sweden` business day calendar. |
-| `validate_vs_schema` | `OpenTimeSeries` | Method to validate the OpenTimeSeries input against the [openseries.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/openseries.json) jsonschema. |
-| `to_json`            | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.  |
-| `pandas_df`          | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.  |
-| `set_new_label`      | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.  |
-| `running_adjustment` | `OpenTimeSeries` | Adjusts the series performance with a `float` factor. |
+| Method               | Applies to       | Description                                                                                                                                                          |
+| :------------------- | :--------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `setup_class`        | `OpenTimeSeries` | Class method that defines the `domestic` attribute and a `sweden` business day calendar.                                                                             |
+| `to_json`            | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                                                                                                       |
+| `pandas_df`          | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.                                                                                          |
+| `set_new_label`      | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                                                                                             |
+| `running_adjustment` | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                                                |
 
 #### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 

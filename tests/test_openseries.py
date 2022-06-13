@@ -1087,7 +1087,6 @@ class TestOpenTimeSeries(unittest.TestCase):
             "running_adjustment",
             "set_new_label",
             "to_json",
-            "validate_vs_schema",
             "setup_class",
         ]
 
