@@ -244,25 +244,3 @@ _They are simply methods that take different date or length inputs to return the
 | `kurtosis_func`           | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Kurtosis](https://www.investopedia.com/terms/k/kurtosis.asp) of the return distribution.                                                                                                                                                                |
 | `z_score_func`            | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Z-score](https://www.investopedia.com/terms/z/zscore.asp) as (last return - mean return) / standard deviation of returns.                                                                                                                               |
 | `target_weight_from_var`  | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | A position target weight from the ratio between a VaR implied volatility and a given target volatility.                                                                                                                                                  |
-
-Below are the steps used to publish the package on pypi. First update the version in [setup.py](https://github.com/CaptorAB/OpenSeries/blob/master/setup.py) and do git commands.
-
-    git add --all
-    git commit -m "changes made"
-    git push
-
-And then the packaging steps from [here](https://packaging.python.org/en/latest/tutorials/packaging-projects/): 
-
-    pip install --upgrade pip
-    pip install --upgrade build
-    pip install --upgrade twine
-    py -m build
-    py -m twine upload --repository pypi dist/*
-
-### Future proofing
-
-Pandas==1.3.5 causes the test test_openframe_rolling_corr to fail and it warns as below on the other relevant tests:
-
-    FutureWarning: Comparison of Timestamp with datetime.date is deprecated in order to match the standard library behavior.
-    In a future version these will be considered non-comparable.Use 'ts == pd.Timestamp(date)' or 'ts.date() == date' instead.
-
