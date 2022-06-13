@@ -37,8 +37,7 @@ jobs:
       run: |
         coverage run -m pytest --verbose
         coverage report
-        rm -f coverage.svg
-        coverage-badge -o coverage.svg
+        coverage-badge -o -f coverage.svg
 
     - name: Package and check
       run: |
