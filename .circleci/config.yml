@@ -1,17 +1,29 @@
 version: 2
+
 jobs:
-  build:
-    docker:
+
+build:
+
+docker:
       - image: cimg/python:3.10
 
     working_directory: ~/repo
 
-    steps:
+steps:
       - checkout
+      - run: cat /proc/version
+      - run: sudo apt-get install -y gnupg
+      - run: gpg --version
       - run:
           name: Switch timezone to Stockholm
           command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
       - run: python --version
       - run: pip --version
-      - run: pip install --upgrade -r requirements.txt
-      - run: PYTHONPATH=${PWD} pytest --verbose
+      - run:
+          name: Install dependencies from requirements.txt
+          command: pip install -r requirements.txt
+      - run:
+          name: Tests with Code Coverage
+          command: |
+            PYTHONPATH=${PWD} coverage run -m pytest --verbose ./
+            PYTHONPATH=${PWD} coverage report
