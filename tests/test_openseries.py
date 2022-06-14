@@ -1527,7 +1527,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         new_stdout = io.StringIO()
         sys.stdout = new_stdout
         service = CaptorOpenApiService()
-        r = "CaptorOpenApiService(" "base_url=https://apiv2.captor.se/public/api)\n"
+        r = "CaptorOpenApiService(" "base_url=https://api.frenkla.com/public/api/)\n"
         print(service)
         output = new_stdout.getvalue()
         sys.stdout = old_stdout
