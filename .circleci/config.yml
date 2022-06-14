@@ -1,15 +1,11 @@
 version: 2
-
 jobs:
-
-build:
-
-docker:
+  build:
+    docker:
       - image: cimg/python:3.10
 
     working_directory: ~/repo
-
-steps:
+    steps:
       - checkout
       - run: cat /proc/version
       - run: sudo apt-get install -y gnupg
