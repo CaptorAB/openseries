@@ -1460,6 +1460,7 @@ class OpenTimeSeries(object):
         size_array: list = None,
         auto_open: bool = True,
         add_logo: bool = True,
+        show_last: bool = False,
         output_type: str = "file",
     ) -> (go.Figure, str):
         """
@@ -1474,6 +1475,8 @@ class OpenTimeSeries(object):
         :param auto_open: Determines whether or not to open a browser window
                           with the plot.
         :param add_logo: If True a Captor logo is added to the plot.
+        :param show_last: If True the last data point is highlighted as red dot
+                          with a label.
         :param output_type: file or div.
 
         To scale the bubble size, use the attribute sizeref.
@@ -1520,8 +1523,29 @@ class OpenTimeSeries(object):
         fig["data"] = data
         figure = go.Figure(fig)
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
+
         if add_logo:
             figure.add_layout_image(logo)
+
+        if show_last is True:
+            if tick_fmt:
+                txt = (
+                        "Last " + "{:" + "{}".format(tick_fmt) + "}"
+                )
+            else:
+                txt = "Last {}"
+
+            figure.add_scatter(
+                x=[self.last_idx],
+                y=[self.tsdf.iloc[-1, 0]],
+                mode="markers + text",
+                marker={"color": "red", "size": 12},
+                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+                showlegend=False,
+                text=[txt.format(self.tsdf.iloc[-1, 0])],
+                textposition="top center",
+            )
+
         plot(
             figure,
             filename=plotfile,
