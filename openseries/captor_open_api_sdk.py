@@ -5,7 +5,7 @@ import requests
 
 
 class CaptorOpenApiService(object):
-    def __init__(self, base_url: str = "https://apiv2.captor.se/public/api"):
+    def __init__(self, base_url: str = "https://api.frenkla.com/public/api/"):
         """
         :param base_url:
         """
