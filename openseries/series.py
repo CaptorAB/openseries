@@ -1529,9 +1529,7 @@ class OpenTimeSeries(object):
 
         if show_last is True:
             if tick_fmt:
-                txt = (
-                        "Last " + "{:" + "{}".format(tick_fmt) + "}"
-                )
+                txt = "Last " + "{:" + "{}".format(tick_fmt) + "}"
             else:
                 txt = "Last {}"
 

@@ -26,7 +26,6 @@ setup(
         "dev": [
             "black",
             "coverage",
-            "coverage-badge",
             "flake8",
             "flake8-black",
             "pytest",
