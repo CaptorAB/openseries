@@ -72,6 +72,11 @@ class CaptorOpenApiService(object):
             if res["isin"] == isin:
                 output.update(res)
 
+        if len(output) == 0:
+            raise Exception(
+                f"Request for NAV series using ISIN {isin} returned no data."
+            )
+
         return output
 
     def get_nav_to_dataframe(self, isin: str) -> pd.DataFrame:
@@ -81,6 +86,12 @@ class CaptorOpenApiService(object):
         :return: pd.DataFrame
         """
         data = self.get_nav(isin=isin)
+        try:
+            _ = data["navPerUnit"]
+        except KeyError:
+            raise Exception(
+                f"Request for NAV series using ISIN {isin} returned no data."
+            )
         return pd.DataFrame(
             data=data["navPerUnit"],
             index=pd.DatetimeIndex(data["dates"]),

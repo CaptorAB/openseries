@@ -158,7 +158,9 @@ class OpenTimeSeries(object):
 
         if isin != fundinfo["isin"]:
             raise Exception(
-                "Method OpenTimeSeries.from_open_fundinfo() returned " "the wrong isin."
+                "Method OpenTimeSeries.from_open_fundinfo() returned {} instead of intended {}".format(
+                    fundinfo["isin"], isin
+                )
             )
 
         output = {

@@ -180,12 +180,33 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertTrue(isinstance(timeseries, OpenTimeSeries))
 
+        with self.assertRaises(Exception) as e_unique:
+            fnd = ""
+            _ = OpenTimeSeries.from_open_nav(isin=fnd)
+
+        self.assertEqual(
+            f"Request for NAV series using ISIN {fnd} returned no data.",
+            e_unique.exception.args[0],
+        )
+
     def test_create_opentimeseries_from_open_fundinfo(self):
 
         fund = "SE0009807308"
         timeseries = OpenTimeSeries.from_open_fundinfo(isin=fund)
 
         self.assertTrue(isinstance(timeseries, OpenTimeSeries))
+
+        with self.assertRaises(Exception) as e_unique:
+            fnd = ""
+            _ = OpenTimeSeries.from_open_fundinfo(isin=fnd)
+
+        self.assertEqual(int(e_unique.exception.args[0].split(",")[0]), 400)
+
+        with self.assertRaises(Exception) as e_unique:
+            fundd = "SE000"
+            _ = OpenTimeSeries.from_open_fundinfo(isin=fundd)
+
+        self.assertTrue(f"{fundd} is not a valid ISIN" in e_unique.exception.args[0])
 
     def test_create_opentimeseries_from_pandas_df(self):
 
@@ -1533,6 +1554,23 @@ class TestOpenTimeSeries(unittest.TestCase):
         sys.stdout = old_stdout
         self.assertEqual(r, output)
 
+    def test_captoropenapiservice_get_nav(self):
+
+        sevice = CaptorOpenApiService()
+        isin_code = "SE0009807308"
+        series = sevice.get_nav(isin=isin_code)
+
+        self.assertEqual(isin_code, series["isin"])
+
+        with self.assertRaises(Exception) as e_unique:
+            isin_cde = ""
+            sevice.get_nav(isin=isin_cde)
+
+        self.assertEqual(
+            f"Request for NAV series using ISIN {isin_cde} returned no data.",
+            e_unique.exception.args[0],
+        )
+
     def test_captoropenapiservice_get_nav_to_dataframe(self):
 
         sevice = CaptorOpenApiService()
@@ -1552,6 +1590,15 @@ class TestOpenTimeSeries(unittest.TestCase):
             columns=["Captor Iris Bond, SE0009807308"],
         )
         assert_frame_equal(df, ddf)
+
+        with self.assertRaises(Exception) as e_unique:
+            isin_cde = ""
+            sevice.get_nav_to_dataframe(isin=isin_cde).head()
+
+        self.assertEqual(
+            f"Request for NAV series using ISIN {isin_cde} returned no data.",
+            e_unique.exception.args[0],
+        )
 
     def test_openframe_all_properties(self):
 
