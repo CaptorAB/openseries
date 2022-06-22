@@ -533,27 +533,27 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_all_calc_functions(self):
 
         checks = {
-            "arithmetic_ret_func": f"{0.003481792158:.12f}",
-            "cvar_down_func": f"{-0.013318898358:.12f}",
-            "downside_deviation_func": f"{0.073351258562:.12f}",
-            "geo_ret_func": f"{0.003484394437:.12f}",
-            "kurtosis_func": f"{-0.161645660276:.12f}",
-            "max_drawdown_func": f"{-0.205657752819:.12f}",
-            "positive_share_func": f"{0.506454816286:.12f}",
-            "ret_vol_ratio_func": f"{0.033606022349:.12f}",
-            "skew_func": f"{-0.036159475308:.12f}",
-            "sortino_ratio_func": f"{0.047502858236:.12f}",
-            "value_ret_func": f"{0.014029906514:.12f}",
-            "var_down_func": f"{-0.010958301720:.12f}",
-            "vol_func": f"{0.103683631486:.12f}",
-            "vol_from_var_func": f"{0.105686426193:.12f}",
-            "worst_func": f"{-0.020634872447:.12f}",
-            "z_score_func": f"{1.368253357728:.12f}",
+            "arithmetic_ret_func": f"{0.00348179216:.11f}",
+            "cvar_down_func": f"{-0.01331889836:.11f}",
+            "downside_deviation_func": f"{0.07335125856:.11f}",
+            "geo_ret_func": f"{0.00348439444:.11f}",
+            "kurtosis_func": f"{-0.16164566028:.11f}",
+            "max_drawdown_func": f"{-0.20565775282:.11f}",
+            "positive_share_func": f"{0.50645481629:.11f}",
+            "ret_vol_ratio_func": f"{0.03360602235:.11f}",
+            "skew_func": f"{-0.03615947531:.11f}",
+            "sortino_ratio_func": f"{0.04750285824:.11f}",
+            "value_ret_func": f"{0.01402990651:.11f}",
+            "var_down_func": f"{-0.01095830172:.11f}",
+            "vol_func": f"{0.10368363149:.11f}",
+            "vol_from_var_func": f"{0.10568642619:.11f}",
+            "worst_func": f"{-0.02063487245:.11f}",
+            "z_score_func": f"{1.36825335773:.11f}",
         }
         for c in checks:
             self.assertEqual(
                 checks[c],
-                f"{getattr(self.randomseries, c)(months_from_last=48):.12f}",
+                f"{getattr(self.randomseries, c)(months_from_last=48):.11f}",
                 msg=f"Difference in {c}",
             )
 
