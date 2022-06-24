@@ -2,24 +2,35 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/python:3.10
-
-    working_directory: ~/repo
+      - image: cimg/python:3.10.4
     steps:
       - checkout
-      - run: cat /proc/version
-      - run: sudo apt-get install -y gnupg
-      - run: gpg --version
       - run:
-          name: Switch timezone to Stockholm
-          command: sudo cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
-      - run: python --version
-      - run: pip --version
+          name: Install python in a virtual environment and activate it
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+      - run:
+          name: Upgrade pip
+          command: |
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip --version
       - run:
           name: Install dependencies from requirements.txt
-          command: pip install -r requirements.txt
-      - run:
-          name: Tests with Code Coverage
           command: |
-            PYTHONPATH=${PWD} coverage run -m pytest --verbose ./
-            PYTHONPATH=${PWD} coverage report
+            . venv/bin/activate
+            pip install -r requirements.txt
+            python --version
+      - run:
+          name: Tests with pytest and coverage
+          command: |
+            . venv/bin/activate
+            coverage run -m pytest --verbose ./
+            coverage report
+
+workflows:
+  version: 2
+  build-master:
+    jobs:
+      - build
