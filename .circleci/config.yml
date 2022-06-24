@@ -6,10 +6,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install python in a virtual environment and activate it
+          name: Install Python in a virtual environment and activate it
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            python --version
       - run:
           name: Upgrade pip
           command: |
@@ -21,12 +22,15 @@ jobs:
           command: |
             . venv/bin/activate
             pip install -r requirements.txt
-            python --version
       - run:
-          name: Tests with pytest and coverage
+          name: Tests with pytest
           command: |
             . venv/bin/activate
             coverage run -m pytest --verbose ./
+      - run:
+          name: Report coverage
+          command: |
+            . venv/bin/activate
             coverage report
 
 workflows:
