@@ -6,9 +6,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Python in a virtual environment and activate it
+          name: Linux kernel version
+          command: cat /proc/version
+      - run:
+          name: Install Python in a virtual environment
+          command: python3 -m venv venv
+      - run:
+          name: Python version
           command: |
-            python3 -m venv venv
             . venv/bin/activate
             python --version
       - run:
