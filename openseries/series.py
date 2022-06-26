@@ -769,10 +769,10 @@ class OpenTimeSeries(object):
     ) -> float:
         """
         Z-score as (last return - mean return) / standard deviation.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
+
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         part = self.tsdf.loc[earlier:later].pct_change().copy()
@@ -1002,12 +1002,11 @@ class OpenTimeSeries(object):
     ) -> float:
         """
         Downside Conditional Value At Risk, "CVaR".
-
         :param level: The sought CVaR level as a float
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
+
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         how_many = (
@@ -1155,12 +1154,10 @@ class OpenTimeSeries(object):
         :param min_leverage_local:
         :param max_leverage_local:
         :param level: The VaR level as a float
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
+        :param months_from_last: number of months offset as positive integer. Overrides use of from_date and to_date
         :param from_date: Specific from date
         :param to_date: Specific to date
-        :param interpolation: type of interpolation in quantile function
-                              (default value in quantile is linear)
+        :param interpolation: type of interpolation in quantile function (default value in quantile is linear)
         :param drift_adjust:
         :param periods_in_a_year_fixed:
         """
@@ -1255,8 +1252,7 @@ class OpenTimeSeries(object):
     def resample(self, freq: str = "BM"):
         """
         Function resamples timeseries frequency.
-        :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/
-                              user_guide/timeseries.html#dateoffset-objects
+        :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
         """
         self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
@@ -1468,23 +1464,19 @@ class OpenTimeSeries(object):
         """
         Function to draw a Plotly graph with lines in Captor style.
 
-        :param mode: The type of scatter to use, lines, markers or
-                     lines+markers.
-        :param tick_fmt: None, '%', '.1%' depending on number of
-                         decimals to show.
-        :param directory: Directory where Plotly html file is saved.
-        :param size_array: The values will set bubble sizes.
-        :param auto_open: Determines whether or not to open a browser window
-                          with the plot.
-        :param add_logo: If True a Captor logo is added to the plot.
-        :param show_last: If True the last data point is highlighted as red dot
-                          with a label.
-        :param output_type: file or div.
-
         To scale the bubble size, use the attribute sizeref.
         We recommend using the following formula to calculate a sizeref value:
-        sizeref = 2. * max(array of size values) /
-                  (desired maximum marker size ** 2)
+        sizeref = 2. * max(array of size values) / (desired maximum marker size ** 2)
+
+        :param mode: The type of scatter to use, lines, markers or lines+markers.
+        :param tick_fmt: None, '%', '.1%' depending on number of decimals to show.
+        :param directory: Directory where Plotly html file is saved.
+        :param size_array: The values will set bubble sizes.
+        :param auto_open: Determines whether or not to open a browser window with the plot.
+        :param add_logo: If True a Captor logo is added to the plot.
+        :param show_last: If True the last data point is highlighted as red dot with a label.
+        :param output_type: file or div.
+
         """
         if not directory:
             directory = os.path.join(str(Path.home()), "Documents")
