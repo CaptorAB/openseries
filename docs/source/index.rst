@@ -9,6 +9,10 @@ Welcome to the documentation for OpenSeries
 asset or a group of assets. It is solely made for daily or less frequent data.
 
 .. automodule:: openseries.series
+.. autoclass:: TimeSerie
+   :members:
+
+.. automodule:: openseries.series
 .. autoclass:: OpenTimeSeries
    :members:
 
