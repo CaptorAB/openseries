@@ -31,7 +31,7 @@ setup(
             "pytest",
         ],
     },
-    url="https://github.com/CaptorAB/OpenSeries",
+    url="https://captorab.github.io/OpenSeries/",
     license="BSD License",
     author="karrmagadgeteer2",
     author_email="martin.karrin@captor.se",
