@@ -2,22 +2,22 @@
 import copy
 import datetime as dt
 import json
-import math
-import os
-from pathlib import Path
-from typing import Union, List
-
 import jsonschema
+from jsonschema.exceptions import ValidationError
+import math
 import numpy as np
+import os
 import pandas as pd
+from pandas.core.series import Series
+from pandas.tseries.offsets import CDay
+from pathlib import Path
 import plotly.graph_objs as go
+from plotly.offline import plot
 from stdnum import isin as isincode
 from stdnum.exceptions import ValidationError as StdnumValidationError
 import scipy.stats as ss
-from jsonschema.exceptions import ValidationError
-from pandas.core.series import Series
-from pandas.tseries.offsets import CDay
-from plotly.offline import plot
+from typing import Union, List, TypedDict
+
 
 from openseries.captor_open_api_sdk import CaptorOpenApiService
 from openseries.datefixer import date_offset_foll, date_fix
@@ -31,7 +31,31 @@ from openseries.risk import (
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
+class TimeSerie(TypedDict, total=False):
+    """A class to hold the type of input data for the OpenTimeSeries class."""
+
+    _id: str
+    instrumentId: str
+    currency: str
+    dates: List[str]
+    domestic: str
+    name: str
+    isin: str
+    label: str
+    schema: dict
+    sweden: SwedenHolidayCalendar
+    valuetype: str
+    values: List[float]
+    local_ccy: bool
+    tsdf: pd.DataFrame
+
+
 class OpenTimeSeries(object):
+    """A class to hold a single timeseries.
+
+    The data can have daily frequency, but not more frequent.
+    """
+
     _id: str
     instrumentId: str
     currency: str
@@ -49,11 +73,16 @@ class OpenTimeSeries(object):
 
     @classmethod
     def setup_class(cls):
+        """This methods sets the domestic currency and calendar of the user.
+
+        The values default to SEK and a calendar for Sweden designed by Captor Fund Management.
+        We have no plans to support other calendars within this project.
+        """
 
         cls.domestic = "SEK"
         cls.sweden = SwedenHolidayCalendar(holidays_sw)
 
-    def __init__(self, d):
+    def __init__(self, d: TimeSerie):
 
         schema_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "openseries.json"
@@ -102,21 +131,23 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
+        """This method is used to fetch timeseries data from the Captor API /opentimeseries endpoint.
 
+        """
         captor = CaptorOpenApiService()
         data = captor.get_timeseries(timeseries_id)
 
-        output = {
-            "_id": data["id"],
-            "name": label,
-            "currency": baseccy,
-            "instrumentId": "",
-            "isin": "",
-            "local_ccy": local_ccy,
-            "valuetype": data["type"],
-            "dates": data["dates"],
-            "values": [float(val) for val in data["values"]],
-        }
+        output = TimeSerie(
+            _id=data["id"],
+            name=label,
+            currency=baseccy,
+            instrumentId="",
+            isin="",
+            local_ccy=local_ccy,
+            valuetype=data["type"],
+            dates=data["dates"],
+            values=[float(val) for val in data["values"]],
+        )
 
         return cls(d=output)
 
@@ -128,17 +159,17 @@ class OpenTimeSeries(object):
         captor = CaptorOpenApiService()
         data = captor.get_nav(isin=isin)
 
-        output = {
-            "_id": data["_id"],
-            "name": data["longName"],
-            "currency": data["currency"],
-            "instrumentId": "",
-            "isin": isin,
-            "local_ccy": local_ccy,
-            "valuetype": valuetype,
-            "dates": data["dates"],
-            "values": [float(val) for val in data["navPerUnit"]],
-        }
+        output = TimeSerie(
+            _id=data["_id"],
+            name=data["longName"],
+            currency=data["currency"],
+            instrumentId="",
+            isin=isin,
+            local_ccy=local_ccy,
+            valuetype=valuetype,
+            dates=data["dates"],
+            values=[float(val) for val in data["navPerUnit"]],
+        )
 
         return cls(d=output)
 
@@ -163,17 +194,17 @@ class OpenTimeSeries(object):
                 )
             )
 
-        output = {
-            "_id": "",
-            "name": fundinfo["name"],
-            "currency": fundinfo["navCurrency"],
-            "instrumentId": "",
-            "isin": fundinfo["isin"],
-            "local_ccy": local_ccy,
-            "valuetype": valuetype,
-            "dates": fundinfo["returnTimeSeries"]["dates"],
-            "values": [float(val) for val in fundinfo["returnTimeSeries"]["values"]],
-        }
+        output = TimeSerie(
+            _id="",
+            name=fundinfo["name"],
+            currency=fundinfo["navCurrency"],
+            instrumentId="",
+            isin=fundinfo["isin"],
+            local_ccy=local_ccy,
+            valuetype=valuetype,
+            dates=fundinfo["returnTimeSeries"]["dates"],
+            values=[float(val) for val in fundinfo["returnTimeSeries"]["values"]],
+        )
 
         return cls(d=output)
 
@@ -201,17 +232,17 @@ class OpenTimeSeries(object):
             else:
                 label = df.columns.values[column_nmbr]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
-        output = {
-            "_id": "",
-            "currency": baseccy,
-            "instrumentId": "",
-            "isin": "",
-            "local_ccy": local_ccy,
-            "name": label,
-            "valuetype": valuetype,
-            "dates": dates,
-            "values": values,
-        }
+        output = TimeSerie(
+            _id="",
+            currency=baseccy,
+            instrumentId="",
+            isin="",
+            local_ccy=local_ccy,
+            name=label,
+            valuetype=valuetype,
+            dates=dates,
+            values=values,
+        )
 
         return cls(d=output)
 
@@ -228,17 +259,17 @@ class OpenTimeSeries(object):
         df = frame.tsdf.loc[:, (label, valuetype)]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
 
-        output = {
-            "_id": "",
-            "currency": baseccy,
-            "instrumentId": "",
-            "isin": "",
-            "local_ccy": local_ccy,
-            "name": df.name[0],
-            "valuetype": df.name[1],
-            "dates": dates,
-            "values": df.values.tolist(),
-        }
+        output = TimeSerie(
+            _id="",
+            currency=baseccy,
+            instrumentId="",
+            isin="",
+            local_ccy=local_ccy,
+            name=df.name[0],
+            valuetype=df.name[1],
+            dates=dates,
+            values=df.values.tolist(),
+        )
 
         return cls(d=output)
 
@@ -275,20 +306,20 @@ class OpenTimeSeries(object):
                 [d.date() for d in pd.date_range(periods=days, end=end_dt, freq="D")]
             )
         deltas = np.array([i.days for i in date_range[1:] - date_range[:-1]])
-        array = np.cumprod(np.insert(1 + deltas * rate / 365, 0, 1.0)).tolist()
+        array = list(np.cumprod(np.insert(1 + deltas * rate / 365, 0, 1.0)))
         date_range = [d.strftime("%Y-%m-%d") for d in date_range]
 
-        output = {
-            "_id": "",
-            "name": label,
-            "currency": baseccy,
-            "instrumentId": "",
-            "isin": "",
-            "local_ccy": local_ccy,
-            "valuetype": valuetype,
-            "dates": date_range,
-            "values": array,
-        }
+        output = TimeSerie(
+            _id="",
+            name=label,
+            currency=baseccy,
+            instrumentId="",
+            isin="",
+            local_ccy=local_ccy,
+            valuetype=valuetype,
+            dates=date_range,
+            values=array,
+        )
 
         return cls(d=output)
 
