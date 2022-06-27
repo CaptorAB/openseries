@@ -1375,27 +1375,25 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_drawdown_details(self):
 
-        iris = OpenTimeSeries.from_open_nav(isin="SE0009807308")
-        iris.tsdf = iris.tsdf.truncate(after=dt.date(2020, 11, 6), copy=False)
-        details = iris.drawdown_details()
+        details = self.randomseries.drawdown_details()
         self.assertEqual(
             "{:7f}".format(details.loc["Max Drawdown", "Drawdown details"]),
-            "-0.059005",
+            "-0.400116",
         )
         self.assertEqual(
             details.loc["Start of drawdown", "Drawdown details"],
-            dt.date(2019, 8, 16),
+            dt.date(2012, 7, 5),
         )
         self.assertEqual(
             details.loc["Date of bottom", "Drawdown details"],
-            dt.date(2019, 12, 30),
+            dt.date(2018, 11, 8),
         )
         self.assertEqual(
-            details.loc["Days from start to bottom", "Drawdown details"], 136
+            details.loc["Days from start to bottom", "Drawdown details"], 2317
         )
         self.assertEqual(
-            "{:.9}".format(details.loc["Average fall per day", "Drawdown details"]),
-            "-0.000433858919",
+            "{:.9f}".format(details.loc["Average fall per day", "Drawdown details"]),
+            "-0.000172687",
         )
 
     def test_openframe_drawdown_details(self):
