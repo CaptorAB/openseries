@@ -131,7 +131,19 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
-        """This method is used to fetch timeseries data from the Captor API /opentimeseries endpoint."""
+        """This method is used to fetch timeseries data from the Captor API /opentimeseries endpoint
+
+        Parameters
+        ----------
+        timeseries_id: str
+            Captor database timeseries id
+        label : str, optional
+            Manually set name to appear on the timeseries
+        baseccy : str, default: "SEK"
+            The currency of the timeseries
+        local_ccy: bool, default: True
+            True if timeseries has not been converted into baseccy and False otherwise
+        """
         captor = CaptorOpenApiService()
         data = captor.get_timeseries(timeseries_id)
 
