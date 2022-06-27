@@ -131,9 +131,7 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
-        """This method is used to fetch timeseries data from the Captor API /opentimeseries endpoint.
-
-        """
+        """This method is used to fetch timeseries data from the Captor API /opentimeseries endpoint."""
         captor = CaptorOpenApiService()
         data = captor.get_timeseries(timeseries_id)
 
@@ -470,7 +468,10 @@ class OpenTimeSeries(object):
     @property
     def length(self) -> int:
         """
-        The number of observations.
+        Returns
+        -------
+        int
+            Number of observations
         """
         return len(self.tsdf.index)
 
@@ -481,36 +482,55 @@ class OpenTimeSeries(object):
 
     @property
     def last_idx(self) -> dt.date:
+        """
+        Returns
+        -------
+        datetime.date
+            Number of days from the first date to the last
+        """
 
         return self.tsdf.index[-1]
 
     @property
     def span_of_days(self) -> int:
         """
-        Number of days from the first date to the last.
+        Returns
+        -------
+        float
+            Number of days from the first date to the last
         """
         return (self.last_idx - self.first_idx).days
 
     @property
     def yearfrac(self) -> float:
         """
-        Length of timeseries expressed as np.float64 fraction of
-        a year with 365.25 days.
+        Returns
+        -------
+        float
+            Length of timeseries expressed in years assuming all years have 365.25 days
         """
         return self.span_of_days / 365.25
 
     @property
     def periods_in_a_year(self) -> float:
         """
-        The number of observations in an average year for all days in the data.
+        Returns
+        -------
+        float
+            The number of observations in an average year for all days in the data
         """
+
         return self.length / self.yearfrac
 
     @property
     def geo_ret(self) -> float:
         """
-        Geometric annualized return.
+        Returns
+        -------
+        float
+            Geometric annualized return
         """
+
         if float(self.tsdf.loc[self.first_idx]) == 0.0:
             raise Exception("First data point == 0.0")
         return float(
@@ -526,13 +546,21 @@ class OpenTimeSeries(object):
         to_date: dt.date = None,
     ) -> float:
         """
-        Geometric annualized return.
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
+        Returns
+        -------
+        float
+            Geometric annualized return
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
 
@@ -546,8 +574,12 @@ class OpenTimeSeries(object):
     @property
     def arithmetic_ret(self) -> float:
         """
-        Arithmetic annualized log return.
+        Returns
+        -------
+        float
+            Arithmetic annualized log return
         """
+
         return float(np.log(self.tsdf).diff().mean() * self.periods_in_a_year)
 
     def arithmetic_ret_func(
@@ -558,14 +590,23 @@ class OpenTimeSeries(object):
         periods_in_a_year_fixed: int = None,
     ) -> float:
         """
-        Arithmetic annualized log return.
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
+        Returns
+        -------
+        float
+            Arithmetic annualized log return
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -578,8 +619,12 @@ class OpenTimeSeries(object):
     @property
     def value_ret(self) -> float:
         """
-        Simple return from first to last observation.
+        Returns
+        -------
+        float
+            Simple return
         """
+
         if float(self.tsdf.iloc[0]) == 0.0:
             raise Exception("First data point == 0.0")
         return float(self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1)
@@ -592,14 +637,23 @@ class OpenTimeSeries(object):
         to_date: dt.date = None,
     ) -> float:
         """
-        Simple return
+        Parameters
+        ----------
+        logret : bool, optional
+            True for log return and False for simple return
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
 
-        :param logret: True for log return and False for simple return.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
+        Returns
+        -------
+        float
+            Simple return
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception("First data point == 0.0")
@@ -611,11 +665,19 @@ class OpenTimeSeries(object):
 
     def value_ret_calendar_period(self, year: int, month: int = None) -> float:
         """
-        Function to calculate simple return for a specific calendar period.
+        Parameters
+        ----------
+        year : int
+            Calendar year of the period to calculate.
+        month : int, optional
+            Calendar month of the period to calculate.
 
-        :param year: Year of the period to calculate.
-        :param month: Optional month of the period to calculate.
+        Returns
+        -------
+        float
+            Simple return for a specific calendar period
         """
+
         caldf = self.tsdf.copy()
         caldf.index = pd.DatetimeIndex(caldf.index)
         if month is None:
@@ -628,10 +690,14 @@ class OpenTimeSeries(object):
 
     @property
     def vol(self) -> float:
+        """Pandas .std() is the equivalent of stdev.s([...]) in MS excel.
+
+        Returns
+        -------
+        float
+            Annualized volatility
         """
-        Annualized volatility. Pandas .std() is the equivalent of
-        stdev.s([...]) in MS excel.
-        """
+
         return float(self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year))
 
     def vol_func(
@@ -642,14 +708,23 @@ class OpenTimeSeries(object):
         periods_in_a_year_fixed: int = None,
     ) -> float:
         """
-        Annualized volatility.
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
+        Returns
+        -------
+        float
+            Annualized volatility
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -664,11 +739,15 @@ class OpenTimeSeries(object):
 
     @property
     def downside_deviation(self) -> float:
+        """The standard deviation of returns that are below a Minimum Accepted Return of zero.
+        It is used to calculate the Sortino Ratio.
+
+        Returns
+        -------
+        float
+            Downside deviation
         """
-        Downside Deviation is here the standard deviation of returns that are
-        below a Minimum Accepted Return of zero. It is used to calculate the
-        Sortino Ratio.
-        """
+
         dddf = self.tsdf.pct_change()
 
         return float(
@@ -684,18 +763,28 @@ class OpenTimeSeries(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> float:
-        """
-        Downside Deviation is the standard deviation of returns that are below
-        a given Minimum Accepted Return (MAR). It is used to calculate the
-        Sortino Ratio.
+        """The standard deviation of returns that are below a given Minimum Accepted Return (MAR).
+        It is used to calculate the Sortino Ratio.
 
-        :param min_accepted_return: The annualized Minimum Accepted Return (MAR)
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
+        Parameters
+        ----------
+        min_accepted_return : float, optional
+            The annualized Minimum Accepted Return (MAR)
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        float
+            Downside deviation
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         how_many = float(
             self.tsdf.loc[earlier:later].pct_change().count(numeric_only=True)
@@ -720,8 +809,12 @@ class OpenTimeSeries(object):
     @property
     def ret_vol_ratio(self) -> float:
         """
-        Ratio of geometric return and annualized volatility.
+        Returns
+        -------
+        float
+            Ratio of geometric return and annualized volatility
         """
+
         return self.geo_ret / self.vol
 
     def ret_vol_ratio_func(
