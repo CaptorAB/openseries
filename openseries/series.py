@@ -32,7 +32,7 @@ from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class TimeSerie(TypedDict, total=False):
-    """A class to hold the type of input data for the OpenTimeSeries class."""
+    """Class to hold the type of input data for the OpenTimeSeries class."""
 
     _id: str
     instrumentId: str
@@ -51,10 +51,6 @@ class TimeSerie(TypedDict, total=False):
 
 
 class OpenTimeSeries(object):
-    """A class to hold a single timeseries.
-
-    The data can have daily frequency, but not more frequent.
-    """
 
     _id: str
     instrumentId: str
@@ -73,7 +69,7 @@ class OpenTimeSeries(object):
 
     @classmethod
     def setup_class(cls):
-        """This methods sets the domestic currency and calendar of the user.
+        """Method to set the domestic currency and calendar of the user.
 
         The values default to SEK and a calendar for Sweden designed by Captor Fund Management.
         We have no plans to support other calendars within this project.
@@ -83,6 +79,15 @@ class OpenTimeSeries(object):
         cls.sweden = SwedenHolidayCalendar(holidays_sw)
 
     def __init__(self, d: TimeSerie):
+        """Class to hold a single timeseries.
+
+        The data can have daily frequency, but not more frequent.
+
+        Parameters
+        ----------
+        d: TimeSerie
+            A subclass of TypedDict with the required and optional parameters
+        """
 
         schema_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "openseries.json"
@@ -108,7 +113,13 @@ class OpenTimeSeries(object):
 
         self.pandas_df()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        Returns
+        -------
+        str
+            A representation of an OpenTimeSeries object
+        """
 
         return (
             "{}(label={}, _id={}, valuetype={}, currency={}, start={}, "
@@ -131,18 +142,23 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
-        """This method is used to fetch timeseries data from the Captor API /opentimeseries endpoint
+        """TMethod to fetch timeseries data from the Captor API /opentimeseries endpoint
 
         Parameters
         ----------
         timeseries_id: str
             Captor database timeseries id
-        label : str, optional
-            Manually set name to appear on the timeseries
+        label : str, default: "series"
+            Name for the timeseries
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
             True if timeseries has not been converted into baseccy and False otherwise
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
         """
         captor = CaptorOpenApiService()
         data = captor.get_timeseries(timeseries_id)
@@ -165,6 +181,22 @@ class OpenTimeSeries(object):
     def from_open_nav(
         cls, isin: str, valuetype: str = "Price(Close)", local_ccy: bool = True
     ):
+        """Method to fetch timeseries data from the Captor API /nav endpoint
+
+        Parameters
+        ----------
+        isin: str
+            Captor database timeseries id
+        valuetype : str, default: "Price(Close)"
+            Type of timeseries
+        local_ccy: bool, default: True
+            True if timeseries has not been converted into baseccy and False otherwise
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
 
         captor = CaptorOpenApiService()
         data = captor.get_nav(isin=isin)
@@ -191,6 +223,24 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         local_ccy: bool = True,
     ):
+        """Method to fetch timeseries data from the Captor API /fundinfo endpoint
+
+        Parameters
+        ----------
+        isin: str
+            Captor database timeseries id
+        report_date : datetime.date, optional
+            reportDate parameter. Defaults to today if not set
+        valuetype : str, default: "Price(Close)"
+            Type of timeseries
+        local_ccy: bool, default: True
+            True if timeseries has not been converted into baseccy and False otherwise
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
 
         captor = CaptorOpenApiService()
         data = captor.get_fundinfo(isins=[isin], report_date=report_date)
@@ -227,6 +277,26 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
+        """Method to create a timeseries from a Pandas DataFrame or Series
+
+        Parameters
+        ----------
+        df: Union[pd.DataFrame, pd.Series]
+            Pandas DataFrame or Series
+        column_nmbr : int, default: 0
+            Using iloc[:, column_nmbr] to pick column
+        valuetype : str, default: "Price(Close)"
+            Name for the timeseries
+        baseccy : str, default: "SEK"
+            The currency of the timeseries
+        local_ccy: bool, default: True
+            True if timeseries has not been converted into baseccy and False otherwise
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
 
         if isinstance(df, Series):
             if isinstance(df.name, tuple):
@@ -265,6 +335,26 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
+        """Method to create a timeseries from an openseries.frame.OpenFrame
+
+        Parameters
+        ----------
+        frame: OpenFrame
+            openseries.frame.OpenFrame
+        label : str
+            Name for the timeseries
+        valuetype : str, default: "Price(Close)"
+            Name for the timeseries
+        baseccy : str, default: "SEK"
+            The currency of the timeseries
+        local_ccy: bool, default: True
+            True if timeseries has not been converted into baseccy and False otherwise
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
 
         df = frame.tsdf.loc[:, (label, valuetype)]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
@@ -284,6 +374,14 @@ class OpenTimeSeries(object):
         return cls(d=output)
 
     def from_deepcopy(self):
+        """Method to create a copy of an OpenTimeSeries object
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
+
         return copy.deepcopy(self)
 
     @classmethod
@@ -298,18 +396,34 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
-        """
+        """Method to create a timeseries from a series of values accruing with a given fixed rate
+
         Providing a date_range of type Pandas.DatetimeIndex takes priority over
         providing a combination of days and an end date.
 
-        :param rate:
-        :param date_range:
-        :param days:
-        :param end_dt:
-        :param label:
-        :param valuetype:
-        :param baseccy:
-        :param local_ccy:
+        Parameters
+        ----------
+        rate: float
+            The accrual rate
+        date_range: pd.DatetimeIndex, optional
+            A given range of dates
+        days: int, optional
+            Number of days to generate when date_range not provided. Must be combined with end_dt
+        end_dt: datetime.date, optional
+            End date of date range to generate when date_range not provided. Must be combined with days
+        label : str
+            Name for the timeseries
+        valuetype : str, default: "Price(Close)"
+            Name for the timeseries
+        baseccy : str, default: "SEK"
+            The currency of the timeseries
+        local_ccy: bool, default: True
+            True if timeseries has not been converted into baseccy and False otherwise
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
         """
         if date_range is None:
             date_range = pd.DatetimeIndex(
@@ -334,7 +448,21 @@ class OpenTimeSeries(object):
         return cls(d=output)
 
     def to_json(self, filename: str, directory: str = None) -> dict:
+        """ Method to dump timeseries data into a json file
 
+        The label and tsdf parameters are deleted before the json file is saved.
+
+        Parameters
+        ----------
+        filename: str
+            Filename including filetype
+        directory: str, optional
+            File folder location
+        Returns
+        -------
+        dict
+            A dictionary
+        """
         if not directory:
             directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -350,7 +478,13 @@ class OpenTimeSeries(object):
         return data
 
     def pandas_df(self):
+        """Sets the .tsdf parameter as a Pandas DataFrame from the .dates and .values lists
 
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
         df = pd.DataFrame(data=self.values, index=self.dates, dtype="float64")
         df.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         df.index = [d.date() for d in pd.DatetimeIndex(df.index)]
