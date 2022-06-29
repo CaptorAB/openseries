@@ -2,7 +2,10 @@
 
 venv: requirements.txt
 	python3 -m venv ./venv
-	venv/bin/pip install --upgrade -r requirements.txt
+	export PYTHONPATH=$PYTHONPATH:${PWD}
+	source venv/bin/activate
+	pip install --upgrade pip
+	pip install -r requirements.txt
 
 test:
 	PYTHONPATH=${PWD} venv/bin/coverage run -m pytest --verbose ./
