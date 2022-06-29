@@ -142,7 +142,7 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
-        """TMethod to fetch timeseries data from the Captor API /opentimeseries endpoint
+        """Method to fetch timeseries data from the Captor API /opentimeseries endpoint
 
         Parameters
         ----------
