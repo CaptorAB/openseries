@@ -7,7 +7,7 @@ import os
 import random
 import string
 from pathlib import Path
-from typing import List, Union, Tuple
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -31,6 +31,7 @@ from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class OpenFrame(object):
+
     constituents: List[OpenTimeSeries]
     sweden: SwedenHolidayCalendar
     tsdf: pd.DataFrame
@@ -42,10 +43,21 @@ class OpenFrame(object):
         weights: List[float] = None,
         sort: bool = True,
     ):
-        """
-        :param constituents:  List of objects of Class OpenTimeSeries.
-        :param weights:       List of weights in float64 format.
-        :param sort:          argument in Pandas df.concat added to fix issue when upgrading py and pd
+        """Instantiates an object of the class OpenFrame
+
+        Parameters
+        ----------
+        constituents: List[OpenTimeSeries]
+            List of objects of Class OpenTimeSeries
+        weights: List[float], optional
+            List of weights in float64 format.
+        sort: bool, default: True
+            argument in Pandas df.concat added to fix issue when upgrading Python & Pandas
+
+        Returns
+        -------
+        OpenFrame
+            Object of the class OpenFrame
         """
         self.weights = weights
         self.tsdf = pd.DataFrame()
@@ -67,16 +79,41 @@ class OpenFrame(object):
             raise Exception("TimeSeries names/labels must be unique.")
 
     def __repr__(self):
+        """
+        Returns
+        -------
+        str
+            A representation of an OpenFrame object
+        """
 
         return "{}(constituents={}, weights={})".format(
             self.__class__.__name__, self.constituents, self.weights
         )
 
     def from_deepcopy(self):
+        """Creates a copy of an OpenFrame object
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
 
         return copy.deepcopy(self)
 
     def all_properties(self, properties: list = None) -> pd.DataFrame:
+        """Calculates the chosen timeseries properties
+
+        Parameters
+        ----------
+        properties: list, optional
+            The properties to calculate. Defaults to calculating all available.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Pandas DataFrame
+        """
 
         if not properties:
             properties = [
@@ -113,15 +150,24 @@ class OpenFrame(object):
         months_offset: int = None,
         from_dt: dt.date = None,
         to_dt: dt.date = None,
-    ) -> Tuple[dt.date, dt.date]:
-        """
-        Function to create user defined time frame.
+    ) -> (dt.date, dt.date):
+        """Creates user defined date range
 
-        :param months_offset: number of months offset as positive integer.
-                              Overrides use of from_date and to_date
-        :param from_dt: Specific from date
-        :param to_dt: Specific to date
+        Parameters
+        ----------
+        months_offset: int, optional
+            Number of months offset as positive integer. Overrides use of from_date and to_date
+        from_dt: datetime.date, optional
+            Specific from date
+        to_dt: datetime.date, optional
+            Specific from date
+
+        Returns
+        -------
+        (datetime.date, datetime.date)
+            Start and end date of the chosen date range
         """
+
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
@@ -161,10 +207,15 @@ class OpenFrame(object):
         return earlier, later
 
     def align_index_to_local_cdays(self):
+        """Changes the index of the associated Pandas DataFrame .tsdf to align with
+        local calendar business days
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
         """
-        Changes the index of the associated pd.DataFrame tsdf to align with
-        local calendar business days.
-        """
+
         date_range = [
             d.date()
             for d in pd.date_range(
@@ -178,11 +229,23 @@ class OpenFrame(object):
 
     @property
     def length(self) -> int:
+        """
+        Returns
+        -------
+        int
+            Number of observations
+        """
 
         return len(self.tsdf.index)
 
     @property
     def lengths_of_items(self) -> pd.Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            Number of observations of all constituents
+        """
 
         return pd.Series(
             data=[self.tsdf.loc[:, d].count() for d in self.tsdf],
@@ -192,26 +255,55 @@ class OpenFrame(object):
 
     @property
     def item_count(self) -> int:
+        """
+        Returns
+        -------
+        int
+            Number of constituents
+        """
 
-        return self.tsdf.shape[1]
+        return len(self.constituents)
 
     @property
     def columns_lvl_zero(self) -> list:
+        """
+        Returns
+        -------
+        list
+            Level 0 values of the Pandas.MultiIndex columns in the .tsdf Pandas.DataFrame
+        """
 
         return self.tsdf.columns.get_level_values(0).tolist()
 
     @property
     def columns_lvl_one(self) -> list:
+        """
+        Returns
+        -------
+        list
+            Level 1 values of the Pandas.MultiIndex columns in the .tsdf Pandas.DataFrame
+        """
 
         return self.tsdf.columns.get_level_values(1).tolist()
 
     @property
     def first_idx(self) -> dt.date:
-
+        """
+        Returns
+        -------
+        datetime.date
+            The first date in the index of the .tsdf Pandas.DataFrame
+        """
         return self.tsdf.index[0]
 
     @property
     def first_indices(self) -> pd.Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            The first dates in the timeseries of all constituents
+        """
 
         return pd.Series(
             data=[i.first_idx for i in self.constituents],
@@ -221,11 +313,22 @@ class OpenFrame(object):
 
     @property
     def last_idx(self) -> dt.date:
-
+        """
+        Returns
+        -------
+        datetime.date
+            The last date in the index of the .tsdf Pandas.DataFrame
+        """
         return self.tsdf.index[-1]
 
     @property
     def last_indices(self) -> pd.Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            The last dates in the timeseries of all constituents
+        """
 
         return pd.Series(
             data=[i.last_idx for i in self.constituents],
@@ -236,9 +339,13 @@ class OpenFrame(object):
     @property
     def span_of_days(self) -> int:
         """
-        Number of days from the first date to the last.
-        Be aware that this is not the same for all constituents.
+        Returns
+        -------
+        int
+            Number of days from the first date to the last
+            in the index of the .tsdf Pandas.DataFrame
         """
+
         return (self.last_idx - self.first_idx).days
 
     @property
@@ -255,9 +362,13 @@ class OpenFrame(object):
     @property
     def yearfrac(self) -> float:
         """
-        Length of timeseries expressed as fraction of a year with 365.25 days.
-        Be aware that this is not the same for all constituents.
+        Returns
+        -------
+        float
+            Length of the index of the .tsdf Pandas.DataFrame expressed in years
+            assuming all years have 365.25 days
         """
+
         return self.span_of_days / 365.25
 
     @property
@@ -270,9 +381,14 @@ class OpenFrame(object):
 
     @property
     def geo_ret(self) -> pd.Series:
+        """https://www.investopedia.com/terms/c/cagr.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Geometric annualized return
         """
-        Geometric annualized return.
-        """
+
         if self.tsdf.iloc[0].isin([0.0]).any():
             raise Exception(
                 "Error in function geo_ret due to an initial value being zero."
@@ -290,14 +406,23 @@ class OpenFrame(object):
         from_date: dt.date = None,
         to_date: dt.date = None,
     ) -> pd.Series:
-        """
-        Geometric annualized return.
+        """https://www.investopedia.com/terms/c/cagr.asp
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Pandas.Series
+            Geometric annualized return
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
         return pd.Series(
@@ -307,9 +432,14 @@ class OpenFrame(object):
 
     @property
     def arithmetic_ret(self) -> pd.Series:
+        """https://www.investopedia.com/terms/a/arithmeticmean.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Arithmetic annualized log return
         """
-        Arithmetic annualized return.
-        """
+
         return pd.Series(
             data=np.log(self.tsdf).diff().mean() * self.periods_in_a_year,
             name="Arithmetic return",
@@ -322,15 +452,25 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        Arithmetic annualized return.
+        """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Arithmetic annualized log return
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -346,8 +486,12 @@ class OpenFrame(object):
     @property
     def value_ret(self) -> pd.Series:
         """
-        Simple return from first to last observation.
+        Returns
+        -------
+        Pandas.Series
+            Simple return
         """
+
         if self.tsdf.iloc[0].isin([0.0]).any():
             raise Exception(
                 f"Error in function value_ret due to an initial value "
@@ -367,14 +511,23 @@ class OpenFrame(object):
         to_date: dt.date = None,
     ) -> pd.Series:
         """
-        Simple or log return from the first to the last observation.
+        Parameters
+        ----------
+        logret : bool, optional
+            True for log return and False for simple return
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
 
-        :param logret: True for log return and False for simple return.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
+        Returns
+        -------
+        Pandas.Series
+            Simple return
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if self.tsdf.iloc[0].isin([0.0]).any():
             raise Exception(
@@ -390,11 +543,19 @@ class OpenFrame(object):
 
     def value_ret_calendar_period(self, year: int, month: int = None) -> pd.Series:
         """
-        Function to calculate simple return for a specific calendar period.
+        Parameters
+        ----------
+        year : int
+            Calendar year of the period to calculate.
+        month : int, optional
+            Calendar month of the period to calculate.
 
-        :param year: Year of the period to calculate.
-        :param month: Optional month of the period to calculate.
+        Returns
+        -------
+        Pandas.Series
+            Simple return for a specific calendar period
         """
+
         if month is None:
             period = str(year)
         else:
@@ -409,10 +570,15 @@ class OpenFrame(object):
 
     @property
     def vol(self, logret: bool = False) -> pd.Series:
+        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
+        https://www.investopedia.com/terms/v/volatility.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Annualized volatility
         """
-        Annualized volatility. Pandas .std() is the equivalent of
-        stdev.s([...]) in MS excel.
-        """
+
         if logret:
             vld = np.log(self.tsdf).diff()
             vld.iloc[0] = 0.0
@@ -429,16 +595,26 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        Annualized volatility. Pandas .std() is the equivalent of
-        stdev.s([...]) in MS excel.
+        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
+        https://www.investopedia.com/terms/v/volatility.asp
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Annualized volatility
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -453,11 +629,16 @@ class OpenFrame(object):
 
     @property
     def downside_deviation(self) -> pd.Series:
+        """The standard deviation of returns that are below a Minimum Accepted Return of zero.
+        It is used to calculate the Sortino Ratio \n
+        https://www.investopedia.com/terms/d/downside-deviation.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Downside deviation
         """
-        Downside Deviation is here the standard deviation of returns that are
-        below a Minimum Accepted Return of zero. It is used to calculate the
-        Sortino Ratio.
-        """
+
         dddf = self.tsdf.pct_change()
 
         return pd.Series(
@@ -474,18 +655,29 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        Downside Deviation is the standard deviation of returns that are below
-        a given Minimum Accepted Return (MAR). It is used to calculate the
-        Sortino Ratio.
+        """The standard deviation of returns that are below a Minimum Accepted Return of zero.
+        It is used to calculate the Sortino Ratio \n
+        https://www.investopedia.com/terms/d/downside-deviation.asp
 
-        :param min_accepted_return: The annualized Minimum Accepted Return (MAR)
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed:
+        Parameters
+        ----------
+        min_accepted_return : float, optional
+            The annualized Minimum Accepted Return (MAR)
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Downside deviation
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         how_many = self.tsdf.loc[earlier:later].pct_change().count(numeric_only=True)
         if periods_in_a_year_fixed:
@@ -507,137 +699,14 @@ class OpenFrame(object):
         )
 
     @property
-    def z_score(self, logret: bool = False) -> pd.Series:
-        """
-        Z-score as (last return - mean return) / standard deviation of return
-        :param logret:
-        """
-        if logret:
-            zd = np.log(self.tsdf).diff()
-            zd.iloc[0] = 0.0
-        else:
-            zd = self.tsdf.pct_change()
-        return pd.Series(data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Z-score")
-
-    def z_score_func(
-        self,
-        logret: bool = False,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-    ) -> pd.Series:
-        """
-        Z-score as (last return - mean return) / standard deviation of return
-
-        :param logret:
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if logret:
-            zd = np.log(self.tsdf.loc[earlier:later]).diff()
-            zd.iloc[0] = 0.0
-        else:
-            zd = self.tsdf.loc[earlier:later].pct_change()
-        return pd.Series(
-            data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Subset Z-score"
-        )
-
-    @property
-    def skew(self, logret: bool = False) -> pd.Series:
-        """
-        Skew of the return distribution.
-        """
-        if logret:
-            vld = np.log(self.tsdf).diff()
-            vld.iloc[0] = 0.0
-        else:
-            vld = self.tsdf.pct_change()
-        return pd.Series(
-            data=ss.skew(vld, bias=True, nan_policy="omit"),
-            index=self.tsdf.columns,
-            name="Skew",
-        )
-
-    def skew_func(
-        self,
-        logret: bool = False,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-    ) -> pd.Series:
-        """
-        Skew of the return distribution.
-
-        :param logret:
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if logret:
-            vld = np.log(self.tsdf.loc[earlier:later]).diff()
-            vld.iloc[0] = 0.0
-        else:
-            vld = self.tsdf.loc[earlier:later].pct_change()
-        return pd.Series(
-            data=ss.skew(vld, bias=True, nan_policy="omit"),
-            index=self.tsdf.columns,
-            name="Subset Skew",
-        )
-
-    @property
-    def kurtosis(self, logret: bool = False) -> pd.Series:
-        """
-        Kurtosis of the return distribution.
-        """
-        if logret:
-            vld = np.log(self.tsdf).diff()
-            vld.iloc[0] = 0.0
-        else:
-            vld = self.tsdf.pct_change()
-        return pd.Series(
-            data=ss.kurtosis(vld, fisher=True, bias=True, nan_policy="omit"),
-            index=self.tsdf.columns,
-            name="Kurtosis",
-        )
-
-    def kurtosis_func(
-        self,
-        logret: bool = False,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-    ) -> pd.Series:
-        """
-        Kurtosis of the return distribution.
-
-        :param logret:
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if logret:
-            vld = np.log(self.tsdf.loc[earlier:later]).diff()
-            vld.iloc[0] = 0.0
-        else:
-            vld = self.tsdf.loc[earlier:later].pct_change()
-        return pd.Series(
-            data=ss.kurtosis(vld, fisher=True, bias=True, nan_policy="omit"),
-            index=self.tsdf.columns,
-            name="Subset Kurtosis",
-        )
-
-    @property
     def ret_vol_ratio(self) -> pd.Series:
         """
-        Ratio of geometric return and annualized volatility.
+        Returns
+        -------
+        Pandas.Series
+            Ratio of geometric return and annualized volatility
         """
+
         ratio = self.geo_ret / self.vol
         ratio.name = "Return vol ratio"
         return ratio
@@ -651,18 +720,32 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        The Sharpe Ratio equals geometric return of an asset minus a risk free return
-        divided by the volatility of the asset. It implies that the riskfree asset has
-        zero volatility.
+        """The ratio of geometric return and annualized volatility or, if risk free return
+        provided, Sharpe ratio calculated as ( geometric return - risk free return )
+        / volatility. The latter ratio implies that the riskfree asset has
+        zero volatility \n
+        https://www.investopedia.com/terms/s/sharperatio.asp
 
-        :param riskfree_rate: A risk free rate provided as a float.
-        :param riskfree_column: Column of timeseries that is the denominator in the ratio.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        Parameters
+        ----------
+        riskfree_rate : float, optional
+            The return of the zero volatility asset used to calculate Sharpe ratio
+        riskfree_column : Union[tuple, int], default: -1
+            The return of the zero volatility asset used to calculate Sharpe ratio
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Ratio of geometric return and annualized volatility or,
+            if risk free return provided, Sharpe ratio
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -721,10 +804,14 @@ class OpenFrame(object):
 
     @property
     def sortino_ratio(self) -> pd.Series:
+        """https://www.investopedia.com/terms/s/sortinoratio.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Ratio of geometric return and downside deviation with a riskfree rate of zero
         """
-        Ratio of geometric return and downside deviation with a riskfree rate
-        of zero.
-        """
+
         sortino = self.geo_ret / self.downside_deviation
         sortino.name = "Sortino ratio"
         return sortino
@@ -738,18 +825,30 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        The Sortino ratio calculated as ( geometric return - risk free return )
+        """The Sortino ratio calculated as ( geometric return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has
-        zero volatility, and a minimum acceptable return of zero.
+        zero volatility, and a minimum acceptable return of zero \n
+        https://www.investopedia.com/terms/s/sortinoratio.asp
 
-        :param riskfree_rate: A risk free rate provided as a float.
-        :param riskfree_column: Column of timeseries that is the denominator in the ratio.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        Parameters
+        ----------
+        riskfree_rate : float, optional
+            The return of the zero volatility asset
+        riskfree_column : Union[tuple, int], default: -1
+            The return of the zero volatility asset used to calculate Sharpe ratio
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            The Sortino ratio calculated as ( geometric return - risk free return ) / downside deviation
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -817,17 +916,73 @@ class OpenFrame(object):
             )
 
     @property
+    def z_score(self, logret: bool = False) -> pd.Series:
+        """https://www.investopedia.com/terms/z/zscore.asp
+
+        Returns
+        -------
+        float
+            Z-score as (last return - mean return) / standard deviation of returns.
+        """
+
+        if logret:
+            zd = np.log(self.tsdf).diff()
+            zd.iloc[0] = 0.0
+        else:
+            zd = self.tsdf.pct_change()
+        return pd.Series(data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Z-score")
+
+    def z_score_func(
+        self,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+    ) -> pd.Series:
+        """https://www.investopedia.com/terms/z/zscore.asp
+
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Pandas.Series
+            Z-score as (last return - mean return) / standard deviation of returns
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        zd = self.tsdf.loc[earlier:later].pct_change()
+        return pd.Series(
+            data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Subset Z-score"
+        )
+
+    @property
     def max_drawdown(self) -> pd.Series:
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Maximum drawdown without any limit on date range
         """
-        Max drawdown from peak to recovery.
-        """
+
         return pd.Series(data=calc_max_drawdown(self.tsdf), name="Max drawdown")
 
     @property
     def max_drawdown_date(self) -> pd.Series:
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Date when the maximum drawdown occurred
         """
-        Date when Max drawdown occurred.
-        """
+
         md_dates = [c.max_drawdown_date for c in self.constituents]
         return pd.Series(
             data=md_dates, index=self.tsdf.columns, name="Max drawdown dates"
@@ -839,14 +994,23 @@ class OpenFrame(object):
         from_date: dt.date = None,
         to_date: dt.date = None,
     ) -> pd.Series:
-        """
-        Max drawdown from peak to recovery.
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Pandas.Series
+            Maximum drawdown without any limit on date range
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return pd.Series(
             data=calc_max_drawdown(self.tsdf.loc[earlier:later]),
@@ -855,9 +1019,14 @@ class OpenFrame(object):
 
     @property
     def max_drawdown_cal_year(self) -> pd.Series:
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Maximum drawdown in a single calendar year.
         """
-        Max drawdown in a single calendar year.
-        """
+
         md = (
             self.tsdf.groupby([pd.DatetimeIndex(self.tsdf.index).year])
             .apply(lambda x: calc_max_drawdown(x))
@@ -869,9 +1038,29 @@ class OpenFrame(object):
     @property
     def worst(self) -> pd.Series:
         """
-        Most negative percentage change.
+        Returns
+        -------
+        Pandas.Series
+            Most negative percentage change
         """
+
         return pd.Series(data=self.tsdf.pct_change().min(), name="Worst")
+
+    @property
+    def worst_month(self) -> pd.Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            Most negative month
+        """
+
+        wdf = self.tsdf.copy()
+        wdf.index = pd.DatetimeIndex(wdf.index)
+        return pd.Series(
+            data=wdf.resample("BM").last().pct_change().min(),
+            name="Worst month",
+        )
 
     def worst_func(
         self,
@@ -881,14 +1070,23 @@ class OpenFrame(object):
         to_date: dt.date = None,
     ) -> pd.Series:
         """
-        Most negative percentage change.
+        Parameters
+        ----------
+        observations: int, default: 1
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
 
-        :param observations:
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
+        Returns
+        -------
+        Pandas.Series
+            Most negative percentage change over a rolling number of observations within
+            a chosen date range
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return pd.Series(
             data=self.tsdf.loc[earlier:later]
@@ -900,23 +1098,170 @@ class OpenFrame(object):
         )
 
     @property
-    def worst_month(self) -> pd.Series:
+    def positive_share(self) -> pd.Series:
         """
-        Most negative month.
+        Returns
+        -------
+        Pandas.Series
+            The share of percentage changes that are greater than zero
         """
-        wdf = self.tsdf.copy()
-        wdf.index = pd.DatetimeIndex(wdf.index)
+        pos = self.tsdf.pct_change()[1:][self.tsdf.pct_change()[1:] > 0.0].count()
+        tot = self.tsdf.pct_change()[1:].count()
+        answer = pos / tot
+        answer.name = "Positive share"
+        return answer
+
+    def positive_share_func(
+        self,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+    ) -> pd.Series:
+        """
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Pandas.Series
+            The share of percentage changes that are greater than zero
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        pos = (
+            self.tsdf.loc[earlier:later]
+            .pct_change()[1:][self.tsdf.loc[earlier:later].pct_change()[1:] > 0.0]
+            .count()
+        )
+        tot = self.tsdf.loc[earlier:later].pct_change()[1:].count()
+        answer = pos / tot
+        answer.name = "Positive share"
+        return answer
+
+    @property
+    def skew(self) -> pd.Series:
+        """https://www.investopedia.com/terms/s/skewness.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Skew of the return distribution
+        """
+
         return pd.Series(
-            data=wdf.resample("BM").last().pct_change().min(),
-            name="Worst month",
+            data=ss.skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit"),
+            index=self.tsdf.columns,
+            name="Skew",
+        )
+
+    def skew_func(
+        self,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+    ) -> pd.Series:
+        """https://www.investopedia.com/terms/s/skewness.asp
+
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Pandas.Series
+            Skew of the return distribution
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+
+        return pd.Series(
+            data=ss.skew(
+                self.tsdf.loc[earlier:later].pct_change(), bias=True, nan_policy="omit"
+            ),
+            index=self.tsdf.columns,
+            name="Subset Skew",
+        )
+
+    @property
+    def kurtosis(self) -> pd.Series:
+        """https://www.investopedia.com/terms/k/kurtosis.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Kurtosis of the return distribution
+        """
+
+        return pd.Series(
+            data=ss.kurtosis(
+                self.tsdf.pct_change(), fisher=True, bias=True, nan_policy="omit"
+            ),
+            index=self.tsdf.columns,
+            name="Kurtosis",
+        )
+
+    def kurtosis_func(
+        self,
+        months_from_last: int = None,
+        from_date: dt.date = None,
+        to_date: dt.date = None,
+    ) -> pd.Series:
+        """https://www.investopedia.com/terms/k/kurtosis.asp
+
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Pandas.Series
+            Kurtosis of the return distribution
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+
+        return pd.Series(
+            data=ss.kurtosis(
+                self.tsdf.loc[earlier:later].pct_change(),
+                fisher=True,
+                bias=True,
+                nan_policy="omit",
+            ),
+            index=self.tsdf.columns,
+            name="Subset Kurtosis",
         )
 
     @property
     def cvar_down(self, level: float = 0.95) -> pd.Series:
+        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
+
+        Parameters
+        ----------
+        level: float, default: 0.95
+            The sought CVaR level
+
+        Returns
+        -------
+        Pandas.Series
+            Downside Conditional Value At Risk "CVaR"
         """
-        Downside Conditional Value At Risk, "CVaR".
-        :param level: The sought CVaR level as a float
-        """
+
         cvar_df = self.tsdf.copy(deep=True)
         var_list = [
             cvar_df.loc[:, x]
@@ -939,14 +1284,25 @@ class OpenFrame(object):
         from_date: dt.date = None,
         to_date: dt.date = None,
     ) -> pd.Series:
+        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
+
+        Parameters
+        ----------
+        level: float, default: 0.95
+            The sought CVaR level
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Pandas.Series
+            Downside Conditional Value At Risk "CVaR"
         """
-        Downside Conditional Value At Risk, "CVaR".
-        :param level: The sought CVaR level as a float
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         cvar_df = self.tsdf.loc[earlier:later].copy(deep=True)
         var_list = [
@@ -965,13 +1321,25 @@ class OpenFrame(object):
 
     @property
     def var_down(self, level: float = 0.95, interpolation: str = "lower") -> pd.Series:
+        """Downside Value At Risk, "VaR". The equivalent of
+        percentile.inc([...], 1-level) over returns in MS Excel \n
+        https://www.investopedia.com/terms/v/var.asp
+
+        Parameters
+        ----------
+
+        level: float, default: 0.95
+            The sought VaR level
+        interpolation: str, default: "lower"
+            type of interpolation in Pandas.DataFrame.quantile() function.
+            Default value is linear
+
+        Returns
+        -------
+        Pandas.Series
+            Downside Value At Risk
         """
-        Downside Value At Risk, "VaR". The equivalent of
-        percentile.inc([...], 1-level) over returns in MS Excel.
-        :param level: The sought VaR level as a float
-        :param interpolation: type of interpolation in quantile function
-                              (default value in quantile is linear)
-        """
+
         return pd.Series(
             data=self.tsdf.pct_change().quantile(
                 1 - level, interpolation=interpolation
@@ -987,17 +1355,31 @@ class OpenFrame(object):
         to_date: dt.date = None,
         interpolation: str = "lower",
     ) -> pd.Series:
-        """
+        """https://www.investopedia.com/terms/v/var.asp
         Downside Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel.
-        :param level: The sought VaR level as a float
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param interpolation: type of interpolation in quantile function
-                              (default value in quantile is linear)
+
+        Parameters
+        ----------
+
+        level: float, default: 0.95
+            The sought VaR level
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        interpolation: str, default: "lower"
+            type of interpolation in Pandas.DataFrame.quantile() function.
+            Default value is linear
+
+        Returns
+        -------
+        Pandas.Series
+            Downside Value At Risk
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return pd.Series(
             data=self.tsdf.loc[earlier:later]
@@ -1011,11 +1393,22 @@ class OpenFrame(object):
         self, level: float = 0.95, interpolation: str = "lower"
     ) -> pd.Series:
         """
-        Volatility implied from downside VaR assuming a normal distribution.
-        :param level: The sought VaR level as a float
-        :param interpolation: type of interpolation in quantile function
-                              (default value in quantile is linear)
+        Parameters
+        ----------
+
+        level: float, default: 0.95
+            The sought VaR level
+        interpolation: str, default: "lower"
+            type of interpolation in Pandas.DataFrame.quantile() function.
+            Default value is linear
+
+        Returns
+        -------
+        Pandas.Series
+            Implied annualized volatility from the Downside VaR using the
+            assumption that returns are normally distributed.
         """
+
         imp_vol = (
             -np.sqrt(self.periods_in_a_year)
             * self.var_down_func(interpolation=interpolation)
@@ -1034,16 +1427,32 @@ class OpenFrame(object):
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
         """
-        Volatility implied from downside VaR assuming a normal distribution.
-        :param level: The sought VaR level as a float
-        :param months_from_last:
-        :param from_date:
-        :param to_date:
-        :param interpolation: type of interpolation in quantile function
-                              (default value in quantile is linear)
-        :param drift_adjust:
-        :param periods_in_a_year_fixed:
+        Parameters
+        ----------
+
+        level: float, default: 0.95
+            The sought VaR level
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        interpolation: str, default: "lower"
+            type of interpolation in Pandas.DataFrame.quantile() function.
+            Default value is linear
+        drift_adjust: bool, default: False
+            An adjustment to remove the bias implied by the average return
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Implied annualized volatility from the Downside VaR using the
+            assumption that returns are normally distributed.
         """
+
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -1082,22 +1491,40 @@ class OpenFrame(object):
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
+        """A position weight multiplier from the ratio between a VaR implied
+        volatility and a given target volatility. Multiplier = 1.0 -> target met
+
+        Parameters
+        ----------
+        target_vol: float, default: 0.175
+            Target Volatility
+        min_leverage_local: float, default: 0.0
+            A minimum adjustment factor
+        max_leverage_local: float, default: 99999.0
+            A maximum adjustment factor
+        level: float, default: 0.95
+            The sought VaR level
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        interpolation: str, default: "lower"
+            type of interpolation in Pandas.DataFrame.quantile() function.
+            Default value is linear
+        drift_adjust: bool, default: False
+            An adjustment to remove the bias implied by the average return
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            A position weight multiplier from the ratio between a VaR implied
+            volatility and a given target volatility. Multiplier = 1.0 -> target met
         """
-        A position target weight from the ratio between a VaR implied
-        volatility and a given target volatility.
-        :param target_vol:
-        :param min_leverage_local:
-        :param max_leverage_local:
-        :param level: The VaR level as a float
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param interpolation: type of interpolation in quantile function
-                              (default value in quantile is linear)
-        :param drift_adjust:
-        :param periods_in_a_year_fixed:
-        """
+
         vfv = self.vol_from_var_func(
             level=level,
             months_from_last=months_from_last,
@@ -1112,46 +1539,336 @@ class OpenFrame(object):
         )
         return pd.Series(data=vfv, name=f"Weight from target vol {target_vol:.1%}")
 
-    @property
-    def positive_share(self) -> pd.Series:
-        """
-        The share of percentage changes that are positive.
-        """
-        pos = self.tsdf.pct_change()[1:][self.tsdf.pct_change()[1:] > 0.0].count()
-        tot = self.tsdf.pct_change()[1:].count()
-        answer = pos / tot
-        answer.name = "Positive share"
-        return answer
+    def value_to_ret(self, logret=False):
+        """Converts valueseries into returnseries.
 
-    def positive_share_func(
+        Parameters
+        ----------
+        logret: bool, default: False
+            True for log return and False for simple return.
+            Log return is the equivalent of LN(value[t] / value[t-1]) in MS excel.
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        if logret:
+            self.tsdf = np.log(self.tsdf).diff()
+        else:
+            self.tsdf = self.tsdf.pct_change()
+        self.tsdf.iloc[0] = 0
+        new_labels = ["Return(Total)"] * self.item_count
+        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        return self
+
+    def value_to_diff(self, periods: int = 1):
+        """Converts valueseries to series of their period differences
+
+        Parameters
+        ----------
+        periods: int, default: 1
+            The number of periods between observations over which difference is calculated
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        self.tsdf = self.tsdf.diff(periods=periods)
+        self.tsdf.iloc[0] = 0
+        new_labels = ["Return(Total)"] * self.item_count
+        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        return self
+
+    def value_to_log(self, reverse: bool = False):
+        """Converts a valueseries into logarithmic return series \n
+        Equivalent to LN(value[t] / value[t=0]) in MS Excel
+
+        Parameters
+        ----------
+        reverse: bool, default: False
+            Allows for a reversal of the conversion.
+            I.e. converting a logarithmic return series into a valueseries
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        if reverse:
+            self.tsdf = np.exp(self.tsdf)
+            new_labels = ["Price(Close)"] * self.item_count
+            arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+            self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        else:
+            self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
+            new_labels = ["Return(Total)"] * self.item_count
+            arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+            self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        return self
+
+    def to_cumret(self):
+        """Converts returnseries into cumulative valueseries
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        if not any(
+            [
+                True if x == "Return(Total)" else False
+                for x in self.tsdf.columns.get_level_values(1).values
+            ]
+        ):
+            self.value_to_ret()
+        self.tsdf = self.tsdf.add(1.0)
+        self.tsdf = self.tsdf.apply(np.cumprod, axis="index") / self.tsdf.iloc[0]
+        new_labels = ["Price(Close)"] * self.item_count
+        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        return self
+
+    def resample(self, freq="BM"):
+        """Resamples the timeseries frequency
+
+        Parameters
+        ----------
+        freq: str, default "BM"
+            Valid values https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
+        self.tsdf = self.tsdf.resample(freq).last()
+        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
+        return self
+
+    def to_drawdown_series(self):
+        """Converts the timeseries into a drawdown series
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        for t in self.tsdf:
+            self.tsdf.loc[:, t] = drawdown_series(self.tsdf.loc[:, t])
+        return self
+
+    def drawdown_details(self) -> pd.DataFrame:
+        """
+        Returns
+        -------
+        Pandas.DataFrame
+            Calculates 'Max Drawdown', 'Start of drawdown', 'Date of bottom',
+            'Days from start to bottom', & 'Average fall per day'
+        """
+
+        mddf = pd.DataFrame()
+        for i in self.constituents:
+            tmpdf = i.tsdf.copy()
+            tmpdf.index = pd.DatetimeIndex(tmpdf.index)
+            dd = drawdown_details(tmpdf)
+            dd.name = i.label
+            mddf = pd.concat([mddf, dd], axis="columns")
+        return mddf
+
+    def rolling_vol(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-    ) -> pd.Series:
+        column: int,
+        observations: int = 21,
+        periods_in_a_year_fixed: int = None,
+    ) -> pd.DataFrame:
         """
-        The share of percentage changes that are positive.
+        Parameters
+        ----------
+        column: int
+            Position as integer of column to calculate
+        observations: int, default: 21
+            Number of observations in the overlapping window.
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
 
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling annualised volatilities
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        pos = (
-            self.tsdf.loc[earlier:later]
-            .pct_change()[1:][self.tsdf.loc[earlier:later].pct_change()[1:] > 0.0]
-            .count()
+
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+        else:
+            time_factor = self.periods_in_a_year
+        vol_label = self.tsdf.iloc[:, column].name[0]
+        df = self.tsdf.iloc[:, column].pct_change()
+        voldf = df.rolling(observations, min_periods=observations).std() * np.sqrt(
+            time_factor
         )
-        tot = self.tsdf.loc[earlier:later].pct_change()[1:].count()
-        answer = pos / tot
-        answer.name = "Positive share"
-        return answer
+        voldf = voldf.dropna().to_frame()
+        voldf.columns = pd.MultiIndex.from_product(
+            [[vol_label], ["Rolling volatility"]]
+        )
+        return voldf
+
+    def rolling_return(self, column: int, observations: int = 21) -> pd.DataFrame:
+        """
+        Parameters
+        ----------
+        column: int
+            Position as integer of column to calculate
+        observations: int, default: 21
+            Number of observations in the overlapping window.
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling returns
+        """
+
+        ret_label = self.tsdf.iloc[:, column].name[0]
+        retdf = (
+            self.tsdf.iloc[:, column]
+            .pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
+        )
+        retdf = retdf.dropna().to_frame()
+        retdf.columns = pd.MultiIndex.from_product([[ret_label], ["Rolling returns"]])
+        return retdf
+
+    def rolling_cvar_down(
+        self, column: int, level: float = 0.95, observations: int = 252
+    ) -> pd.DataFrame:
+        """
+        Parameters
+        ----------
+        column: int
+            Position as integer of column to calculate
+        level: float, default: 0.95
+            The sought Conditional Value At Risk level
+        observations: int, default: 252
+            Number of observations in the overlapping window.
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling annualized downside CVaR
+        """
+
+        cvar_label = self.tsdf.iloc[:, column].name[0]
+        cvardf = (
+            self.tsdf.iloc[:, column]
+            .rolling(observations, min_periods=observations)
+            .apply(lambda x: cvar_down(x, level=level))
+        )
+        cvardf = cvardf.dropna().to_frame()
+        cvardf.columns = pd.MultiIndex.from_product([[cvar_label], ["Rolling CVaR"]])
+        return cvardf
+
+    def rolling_var_down(
+        self,
+        column: int,
+        level: float = 0.95,
+        interpolation: str = "lower",
+        observations: int = 252,
+    ) -> pd.DataFrame:
+        """
+        Parameters
+        ----------
+        column: int
+            Position as integer of column to calculate
+        level: float, default: 0.95
+            The sought Value At Risk level
+        observations: int, default: 252
+            Number of observations in the overlapping window.
+        interpolation: str, default: "lower"
+            type of interpolation in Pandas.DataFrame.quantile() function.
+            Default value is linear
+
+        Returns
+        -------
+        Pandas.DataFrame
+           Rolling annualized downside Value At Risk "VaR"
+        """
+
+        var_label = self.tsdf.iloc[:, column].name[0]
+        vardf = (
+            self.tsdf.iloc[:, column]
+            .rolling(observations, min_periods=observations)
+            .apply(lambda x: var_down(x, level=level, interpolation=interpolation))
+        )
+        vardf = vardf.dropna().to_frame()
+        vardf.columns = pd.MultiIndex.from_product([[var_label], ["Rolling VaR"]])
+        return vardf
+
+    def value_nan_handle(self, method: str = "fill"):
+        """Handling of missing values in a valueseries
+
+        Parameters
+        ----------
+        method: str, default: "fill"
+            Method used to handle NaN. Either fill with last known or drop
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        assert method in [
+            "fill",
+            "drop",
+        ], "Method must be either fill or drop passed as string."
+        if method == "fill":
+            self.tsdf.fillna(method="pad", inplace=True)
+        else:
+            self.tsdf.dropna(inplace=True)
+        return self
+
+    def return_nan_handle(self, method: str = "fill"):
+        """Handling of missing values in a returnseries
+
+        Parameters
+        ----------
+        method: str, default: "fill"
+            Method used to handle NaN. Either fill with zero or drop
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        assert method in [
+            "fill",
+            "drop",
+        ], "Method must be either fill or drop passed as string."
+        if method == "fill":
+            self.tsdf.fillna(value=0.0, inplace=True)
+        else:
+            self.tsdf.dropna(inplace=True)
+        return self
 
     @property
     def correl_matrix(self) -> pd.DataFrame:
         """
-        Correlation matrix
+        Returns
+        -------
+        Pandas.DataFrame
+            Correlation matrix
         """
         corr_matrix = self.tsdf.pct_change().corr(method="pearson", min_periods=1)
         corr_matrix.columns = corr_matrix.columns.droplevel(level=1)
@@ -1161,17 +1878,34 @@ class OpenFrame(object):
 
     def add_timeseries(self, new_series: OpenTimeSeries):
         """
-        :param new_series:
+        Parameters
+        ----------
+        new_series: OpenTimeSeries
+            The timeseries to add
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
         """
+
         self.constituents += [new_series]
         self.tsdf = pd.concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
     def delete_timeseries(self, lvl_zero_item: str):
         """
-        Function drops the selected item.
-        :param lvl_zero_item:
+        Parameters
+        ----------
+        lvl_zero_item: str
+            The .tsdf column level 0 value of the timeseries to delete
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
         """
+
         if self.weights:
             new_c, new_w = [], []
             for cc, ww in zip(self.constituents, self.weights):
@@ -1187,17 +1921,6 @@ class OpenFrame(object):
         self.tsdf.drop(lvl_zero_item, axis="columns", level=0, inplace=True)
         return self
 
-    def resample(self, freq="BM"):
-        """
-        Function resamples (changes) timeseries frequency.
-        :param freq: Freq str https://pandas.pydata.org/pandas-docs/stable/
-                              user_guide/timeseries.html#dateoffset-objects
-        """
-        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
-        self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
-        return self
-
     def trunc_frame(
         self,
         start_cut: dt.date = None,
@@ -1205,16 +1928,25 @@ class OpenFrame(object):
         before: bool = True,
         after: bool = True,
     ):
+        """Truncates DataFrame such that all timeseries have the same length
+
+        Parameters
+        ----------
+        start_cut: datetime.date, optional
+            Optional manually entered date
+        end_cut: datetime.date, optional
+            Optional manually entered date
+        before: bool, default: True
+            If True method will truncate to the common earliest start date also when start_cut = None.
+        after: bool, default: True
+            If True method will truncate to the common latest end date also when end_cut = None.
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
         """
-        Function truncates DataFrame such that all timeseries
-        have the same length.
-        :param start_cut: Optional manually entered date
-        :param end_cut: Optional manually entered date
-        :param before: If True method will truncate to the common earliest
-                       start date also when start_cut = None.
-        :param after: If True method will truncate to the common latest
-                      end date also when end_cut = None.
-        """
+
         if not start_cut and before:
             start_cut = self.first_indices.max()
         if not end_cut and after:
@@ -1230,119 +1962,26 @@ class OpenFrame(object):
             )
         return self
 
-    def value_nan_handle(self, method: str = "fill"):
-        """
-        Function handles NaN in valueseries.
-        """
-        assert method in [
-            "fill",
-            "drop",
-        ], "Method must be either fill or drop passed as string."
-        if method == "fill":
-            self.tsdf.fillna(method="pad", inplace=True)
-        else:
-            self.tsdf.dropna(inplace=True)
-        return self
-
-    def return_nan_handle(self, method: str = "fill"):
-        """
-        Function handles NaN in returnseries.
-        """
-        assert method in [
-            "fill",
-            "drop",
-        ], "Method must be either fill or drop passed as string."
-        if method == "fill":
-            self.tsdf.fillna(value=0.0, inplace=True)
-        else:
-            self.tsdf.dropna(inplace=True)
-        return self
-
-    def value_to_ret(self, logret=False):
-        """
-        Function converts a valueseries into a returnseries.
-        Simple return matches method applied by Bloomberg.
-        Log return would be: self.tsdf = np.log(self.tsdf).diff() + 1.0
-
-        :param logret: True for log return and False for simple return.
-        """
-        if logret:
-            self.tsdf = np.log(self.tsdf).diff()
-        else:
-            self.tsdf = self.tsdf.pct_change()
-        self.tsdf.iloc[0] = 0
-        new_labels = ["Return(Total)"] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
-        return self
-
-    def value_to_diff(self, periods: int = 1):
-        """
-        Function converts a valueseries to a series of its 1 period differences
-
-        :param periods:
-        """
-        self.tsdf = self.tsdf.diff(periods=periods)
-        self.tsdf.iloc[0] = 0
-        new_labels = ["Return(Total)"] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
-        return self
-
-    def value_to_log(self, reverse: bool = False):
-        """
-        Function converts valueseries into logarithmic returns equivalent to
-        LN(value[t] / value[t=0]) in MS excel.
-        :param reverse: If True the function applies the equivalent of
-                        EXP[...] on the entire series.
-        """
-        if reverse:
-            self.tsdf = np.exp(self.tsdf)
-            new_labels = ["Price(Close)"] * self.item_count
-            arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-            self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
-        else:
-            self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
-            new_labels = ["Return(Total)"] * self.item_count
-            arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-            self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
-        return self
-
-    def to_cumret(self):
-        """
-        Function does a rebase of all time series by first calling
-        value_to_ret() and then calculating the cumulative.
-        """
-        if not any(
-            [
-                True if x == "Return(Total)" else False
-                for x in self.tsdf.columns.get_level_values(1).values
-            ]
-        ):
-            self.tsdf = self.tsdf.pct_change()
-            self.tsdf.iloc[0] = 0
-        self.tsdf = self.tsdf.add(1.0)
-        self.tsdf = self.tsdf.apply(np.cumprod, axis="index") / self.tsdf.iloc[0]
-        new_labels = ["Price(Close)"] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
-        return self
-
     def relative(
         self,
         long_column: int = 0,
         short_column: int = 1,
         base_zero: bool = True,
     ):
-        """
-        Function calculates cumulative relative return between two series.
+        """Calculates cumulative relative return between two series.
         A new series is added to the frame.
 
-        :param long_column: Column # of timeseries bought
-        :param short_column: Column # of timeseries sold
-        :param base_zero: If set to False 1.0 is added to allow for a capital
-                          base and to apply e.g. a volatility calculation
+        Parameters
+        ----------
+        long_column: int, default: 0
+            Column # of timeseries bought
+        short_column: int, default: 1
+            Column # of timeseries sold
+        base_zero: bool, default: True
+            If set to False 1.0 is added to allow for a capital base and
+            to allow a volatility calculation
         """
+
         assert self.tsdf.shape[1] > long_column >= 0 and isinstance(long_column, int), (
             "Both arguments must be integers and within a range no larger or "
             "smaller than the number of columns."
@@ -1375,16 +2014,27 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        The Tracking Error is the standard deviation of the
-        difference between the fund and the index returns.
+        """Calculates the Tracking Error which is the standard deviation of the
+        difference between the fund and its index returns. \n
+        https://www.investopedia.com/terms/t/trackingerror.asp
 
-        :param base_column: Column of timeseries that is the denominator in the ratio.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        Parameters
+        ----------
+        base_column: Union[tuple, int], default: -1
+            Column of timeseries that is the denominator in the ratio.
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Tracking Errors
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1430,17 +2080,27 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        The Information Ratio equals ( fund return less index return ) divided by the
+        """The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
-        difference between the fund and the index returns.
+        difference between the fund and its index returns.
 
-        :param base_column: Column of timeseries that is the denominator in the ratio.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        Parameters
+        ----------
+        base_column: Union[tuple, int], default: -1
+            Column of timeseries that is the denominator in the ratio.
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Information Ratios
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1490,8 +2150,7 @@ class OpenFrame(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> pd.Series:
-        """
-        The Up (Down) Capture Ratio is calculated by dividing the annualized returns
+        """The Up (Down) Capture Ratio is calculated by dividing the annualized returns
         of the asset during periods that the benchmark returns are positive (negative)
         by the annualized returns of the benchmark during the same periods.
         CaptureRatio.BOTH is the Up ratio divided by the Down ratio.
@@ -1500,14 +2159,27 @@ class OpenFrame(object):
         Finance Education (Vol 2 Winter 2013).
         https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf
 
-        :param ratio: A string as either 'up', 'down' or 'both'.
-        :param base_column: Column of timeseries that is the denominator in the ratio.
-        :param months_from_last: number of months offset as positive integer.
-                                 Overrides use of from_date and to_date
-        :param from_date: Specific from date
-        :param to_date: Specific to date
-        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        Parameters
+        ----------
+        ratio: str
+            Either 'up', 'down' or 'both'
+        base_column: Union[tuple, int], default: -1
+            Column of timeseries that is the denominator in the ratio.
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.Series
+            Capture Ratios
         """
+
         assert ratio in [
             "up",
             "down",
@@ -1628,13 +2300,23 @@ class OpenFrame(object):
     def ord_least_squares_fit(
         self, endo_column: tuple, exo_column: tuple, fitted_series: bool = True
     ) -> float:
+        """Adds a new column with a fitted line using Ordinary Least Squares
+
+        Parameters
+        ----------
+        endo_column:
+            The column level values of the dependent variable
+        exo_column:
+            The column level values of the exogenous variable.
+        fitted_series:
+            If True the fit is added as a new column in the .tsdf Pandas.DataFrame
+
+        Returns
+        -------
+        float
+            The Beta between two timeseries estimated using an Ordinary Least Squares fit
         """
-        Function adds a new column with a fitted line using
-        Ordinary Least Squares.
-        :param endo_column: The column of the dependent variable
-        :param exo_column: The column of the exogenous variable.
-        :param fitted_series: If True the fit is added to the Dataframe
-        """
+
         y = self.tsdf.loc[:, endo_column]
         x = self.tsdf.loc[:, exo_column]
         model = sm.OLS(y, x).fit()
@@ -1644,9 +2326,17 @@ class OpenFrame(object):
         return float(model.params)
 
     def make_portfolio(self, name: str) -> pd.DataFrame:
-        """
+        """Calculates a basket timeseries based on the supplied weights
 
-        :param name:
+        Parameters
+        ----------
+        name: str
+            Name of the basket timeseries
+
+        Returns
+        -------
+        Pandas.DataFrame
+            A basket timeseries
         """
         if self.weights is None:
             raise Exception(
@@ -1674,17 +2364,27 @@ class OpenFrame(object):
         observations: int = 21,
         periods_in_a_year_fixed: int = None,
     ) -> pd.DataFrame:
-        """
-        The Information Ratio equals ( fund return less index return ) divided by the
+        """The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
-        difference between the fund and the index returns.
+        difference between the fund and its index returns.
 
-        :param long_column: Column of timeseries that is the numerator in the ratio.
-        :param short_column: Column of timeseries that is the denominator in the ratio.
-        :param observations: The length of the rolling window to use is set as
-                             number of observations.
-        :param periods_in_a_year_fixed: Fixing the parameter to simplify testing.
+        Parameters
+        ----------
+        long_column: int, default: 0
+            Column of timeseries that is the numerator in the ratio.
+        short_column: int, default: 1
+            Column of timeseries that is the denominator in the ratio.
+        observations: int, default: 21
+            The length of the rolling window to use is set as number of observations.
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling Information Ratios
         """
+
         ratio_label = (
             f"{self.tsdf.iloc[:, long_column].name[0]}"
             f" / {self.tsdf.iloc[:, short_column].name[0]}"
@@ -1720,17 +2420,24 @@ class OpenFrame(object):
         second_column: int = 1,
         observations: int = 21,
     ) -> pd.DataFrame:
+        """Calculates correlation between two series. The period with
+        at least the given number of observations is the first period calculated.
+
+        Parameters
+        ----------
+        first_column: int, default: 0
+            The position as integer of the first timeseries to compare
+        second_column: int, default: 1
+            The position as integer of the second timeseries to compare
+        observations: int, default: 21
+            The length of the rolling window to use is set as number of observations
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling Correlations
         """
-        Function calculates correlation between two series.
-        The period with at least the given number of observations is the first
-        period calculated.
-        :param first_column: The position as integer of the first timeseries
-                             to compare
-        :param second_column: The position as integer of the second timeseries
-                              to compare
-        :param observations: The length of the rolling window to use is set as
-                             number of observations
-        """
+
         corr_label = (
             self.tsdf.iloc[:, first_column].name[0]
             + "_VS_"
@@ -1748,124 +2455,6 @@ class OpenFrame(object):
         )
         return corrdf
 
-    def rolling_vol(
-        self,
-        column: int,
-        observations: int = 21,
-        periods_in_a_year_fixed: int = None,
-    ) -> pd.DataFrame:
-        """
-        Calculates rolling annualised volatilities.
-
-        :param column: Position as integer of column of returns over which
-                       to calculate.
-        :param observations: Number of observations in the overlapping window.
-        :param periods_in_a_year_fixed:
-        """
-        if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
-        else:
-            time_factor = self.periods_in_a_year
-        vol_label = self.tsdf.iloc[:, column].name[0]
-        df = self.tsdf.iloc[:, column].pct_change()
-        voldf = df.rolling(observations, min_periods=observations).std() * np.sqrt(
-            time_factor
-        )
-        voldf = voldf.dropna().to_frame()
-        voldf.columns = pd.MultiIndex.from_product(
-            [[vol_label], ["Rolling volatility"]]
-        )
-        return voldf
-
-    def rolling_return(self, column: int, observations: int = 21) -> pd.DataFrame:
-        """
-        Calculates sum of the returns in a rolling window.
-
-        :param column: Position as integer of column of returns over which
-                       to calculate.
-        :param observations: Number of observations in the overlapping window.
-        """
-        ret_label = self.tsdf.iloc[:, column].name[0]
-        retdf = (
-            self.tsdf.iloc[:, column]
-            .pct_change()
-            .rolling(observations, min_periods=observations)
-            .sum()
-        )
-        retdf = retdf.dropna().to_frame()
-        retdf.columns = pd.MultiIndex.from_product([[ret_label], ["Rolling returns"]])
-        return retdf
-
-    def rolling_cvar_down(
-        self, column: int, level: float = 0.95, observations: int = 252
-    ) -> pd.DataFrame:
-        """
-        Calculates rolling annualized downside CVaR.
-
-        :param column: Position as integer of column over which to calculate.
-        :param observations: Number of observations in the overlapping window.
-        :param level: The sought CVaR level as a float
-        """
-        cvar_label = self.tsdf.iloc[:, column].name[0]
-        cvardf = (
-            self.tsdf.iloc[:, column]
-            .rolling(observations, min_periods=observations)
-            .apply(lambda x: cvar_down(x, level=level))
-        )
-        cvardf = cvardf.dropna().to_frame()
-        cvardf.columns = pd.MultiIndex.from_product([[cvar_label], ["Rolling CVaR"]])
-        return cvardf
-
-    def rolling_var_down(
-        self,
-        column: int,
-        level: float = 0.95,
-        interpolation: str = "lower",
-        observations: int = 252,
-    ) -> pd.DataFrame:
-        """
-        Calculates rolling annualized downside VaR.
-
-        :param column: Position as integer of column over which to calculate.
-        :param level: The sought VaR level as a float
-        :param interpolation: type of interpolation in quantile function
-                              (default value in quantile is linear)
-        :param observations: Number of observations in the overlapping window.
-        """
-        var_label = self.tsdf.iloc[:, column].name[0]
-        vardf = (
-            self.tsdf.iloc[:, column]
-            .rolling(observations, min_periods=observations)
-            .apply(lambda x: var_down(x, level=level, interpolation=interpolation))
-        )
-        vardf = vardf.dropna().to_frame()
-        vardf.columns = pd.MultiIndex.from_product([[var_label], ["Rolling VaR"]])
-        return vardf
-
-    def to_drawdown_series(self):
-        """
-        Converts all series to drawdown series.
-
-        """
-        for t in self.tsdf:
-            self.tsdf.loc[:, t] = drawdown_series(self.tsdf.loc[:, t])
-        return self
-
-    def drawdown_details(self) -> pd.DataFrame:
-        """
-        Returns a DataFrame with: 'Max Drawdown', 'Start of drawdown',
-            'Date of bottom', 'Days from start to bottom', &
-            'Average fall per day' for each constituent.
-        """
-        mddf = pd.DataFrame()
-        for i in self.constituents:
-            tmpdf = i.tsdf.copy()
-            tmpdf.index = pd.DatetimeIndex(tmpdf.index)
-            dd = drawdown_details(tmpdf)
-            dd.name = i.label
-            mddf = pd.concat([mddf, dd], axis="columns")
-        return mddf
-
     def plot_series(
         self,
         mode: str = "lines",
@@ -1878,23 +2467,39 @@ class OpenFrame(object):
         show_last: bool = False,
         output_type: str = "file",
     ) -> (go.Figure, str):
-        """
-        Function to draw a Plotly graph with lines in Captor style.
+        """Creates a Plotly Figure
 
-        :param mode: The type of scatter to use, lines, markers or
-                     lines+markers.
-        :param tick_fmt: None, '%', '.1%' depending on number of decimals
-                         to show.
-        :param filename: Name of Plotly file. Include .html
-        :param directory: Directory where Plotly html file is saved.
-        :param labels
-        :param auto_open: Determines whether or not to open a browser window
-                          with the plot.
-        :param add_logo: If True a Captor logo is added to the plot.
-        :param show_last: If True the last data point is highlighted as red dot
-                          with a label.
-        :param output_type: file or div.
+        To scale the bubble size, use the attribute sizeref.
+        We recommend using the following formula to calculate a sizeref value:
+        sizeref = 2. * max(array of size values) / (desired maximum marker size ** 2)
+
+        Parameters
+        ----------
+        mode: str, default: "lines"
+            The type of scatter to use. lines, markers or lines+markers
+        tick_fmt: str, optional
+            None, '%', '.1%' depending on number of decimals to show
+        filename: str, optional
+            Name of the Plotly html file
+        directory: str, optional
+            Directory where Plotly html file is saved
+        labels: list, optional
+            A list of labels to manually override using the names of the input data
+        auto_open: bool, default: True
+            Determines whether or not to open a browser window with the plot
+        add_logo: bool, default: True
+            If True a Captor logo is added to the plot
+        show_last: bool, default: False
+            If True the last data point is highlighted as red dot with a label
+        output_type: str, default: "file"
+            file or div
+
+        Returns
+        -------
+        (plotly.go.Figure, str)
+            Plotly Figure and html filename with location
         """
+
         if labels:
             assert (
                 len(labels) == self.item_count
@@ -1975,18 +2580,32 @@ def key_value_table(
     pct_fmt: bool = False,
     transpose: bool = False,
 ) -> pd.DataFrame:
-    """
-    Method creates a table with some key statistics.
+    """Creates a standardized table of properties
 
-    :param series: The data for which key values will be calculated.
-    :param headers: New names for the items.
-    :param attributes: A list of strings corresponding to the attribute names
-                       of the key values to present.
-    :param cols: The labels corresponding to the key values.
-    :param swe_not_eng: True for Swedish and False for English.
-    :param pct_fmt: Converts values from float to percent formatted str.
-    :param transpose: Gives the option to transpose the DataFrame returned.
+    Parameters
+    ----------
+    series: Union[OpenFrame, List[OpenTimeSeries]]
+        The data for which key values will be calculated.
+    headers: list, optional
+        New names for the items.
+    attributes: list, optional
+        A list of strings corresponding to the attribute names
+        of the key values to present.
+    cols: list, optional
+        The labels corresponding to the key values.
+    swe_not_eng: bool, default: True
+        True for Swedish and False for English.
+    pct_fmt: bool, default: False
+        Converts values from float to percent formatted str.
+    transpose: bool, default: False
+        Gives the option to transpose the DataFrame returned.
+
+    Returns
+    -------
+    Pandas.DataFrame
+       A standardized table of properties
     """
+
     if isinstance(series, OpenFrame):
         basket = series.from_deepcopy()
     else:

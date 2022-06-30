@@ -4,10 +4,9 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-
 setup(
     name="openseries",
-    version="0.3.18",
+    version="0.4.0",
     packages=find_packages(),
     package_data={"openseries": ["*.json"], ".": ["*.json", "coverage.svg"]},
     install_requires=[

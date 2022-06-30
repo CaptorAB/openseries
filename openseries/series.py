@@ -79,7 +79,7 @@ class OpenTimeSeries(object):
         cls.sweden = SwedenHolidayCalendar(holidays_sw)
 
     def __init__(self, d: TimeSerie):
-        """Instantiates an object of the class OpenTimeSeries
+        """Instantiates an object of the class OpenTimeSeries \n
 
         The data can have daily frequency, but not more frequent.
 
@@ -87,6 +87,11 @@ class OpenTimeSeries(object):
         ----------
         d: TimeSerie
             A subclass of TypedDict with the required and optional parameters
+
+        Returns
+        -------
+        OpenTimeSeries
+            Object of the class OpenTimeSeries
         """
 
         schema_file = os.path.join(
@@ -516,6 +521,7 @@ class OpenTimeSeries(object):
         (datetime.date, datetime.date)
             Start and end date of the chosen date range
         """
+
         self.setup_class()
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
@@ -570,6 +576,7 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
+
         self.setup_class()
         date_range = [
             d.date()
@@ -873,7 +880,7 @@ class OpenTimeSeries(object):
 
     @property
     def vol(self) -> float:
-        """Pandas .std() is the equivalent of stdev.s([...]) in MS Excel \n
+        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
 
         Returns
@@ -891,7 +898,7 @@ class OpenTimeSeries(object):
         to_date: dt.date = None,
         periods_in_a_year_fixed: int = None,
     ) -> float:
-        """Pandas .std() is the equivalent of stdev.s([...]) in MS Excel \n
+        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
 
         Parameters
@@ -1032,7 +1039,8 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of geometric return and annualized volatility or, if risk free return provided, Sharpe ratio
+            Ratio of geometric return and annualized volatility or,
+            if risk free return provided, Sharpe ratio
         """
 
         return (
@@ -1098,6 +1106,7 @@ class OpenTimeSeries(object):
         float
             Z-score as (last return - mean return) / standard deviation of returns.
         """
+
         return float(
             (self.tsdf.pct_change().iloc[-1] - self.tsdf.pct_change().mean())
             / self.tsdf.pct_change().std()
@@ -1109,8 +1118,7 @@ class OpenTimeSeries(object):
         from_date: dt.date = None,
         to_date: dt.date = None,
     ) -> float:
-        """Z-score as (last return - mean return) / standard deviation \n
-        https://www.investopedia.com/terms/z/zscore.asp
+        """https://www.investopedia.com/terms/z/zscore.asp
 
         Parameters
         ----------
@@ -1321,6 +1329,7 @@ class OpenTimeSeries(object):
         float
             Skew of the return distribution
         """
+
         return float(
             ss.skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit")
         )
@@ -1359,7 +1368,7 @@ class OpenTimeSeries(object):
 
     @property
     def kurtosis(self) -> float:
-        """
+        """https://www.investopedia.com/terms/k/kurtosis.asp
 
         Returns
         -------
@@ -1381,7 +1390,7 @@ class OpenTimeSeries(object):
         from_date: dt.date = None,
         to_date: dt.date = None,
     ) -> float:
-        """
+        """https://www.investopedia.com/terms/k/kurtosis.asp
 
         Parameters
         ----------
@@ -1399,6 +1408,7 @@ class OpenTimeSeries(object):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
+
         return float(
             ss.kurtosis(
                 self.tsdf.loc[earlier:later].pct_change(),
@@ -1422,6 +1432,7 @@ class OpenTimeSeries(object):
         float
             Downside Conditional Value At Risk "CVaR"
         """
+
         items = self.tsdf.iloc[:, 0].pct_change().count()
         return (
             self.tsdf.iloc[:, 0]
@@ -1491,6 +1502,7 @@ class OpenTimeSeries(object):
         float
             Downside Value At Risk
         """
+
         return float(
             self.tsdf.pct_change().quantile(1 - level, interpolation=interpolation)
         )
@@ -1717,7 +1729,7 @@ class OpenTimeSeries(object):
         return self
 
     def value_to_diff(self, periods: int = 1):
-        """Converts a valueseries to a series of its 1 period differences
+        """Converts a valueseries to a series of its period differences
 
         Parameters
         ----------
@@ -1766,16 +1778,8 @@ class OpenTimeSeries(object):
             )
         return self
 
-    def to_cumret(self, div_by_first: bool = True, logret: bool = False):
+    def to_cumret(self):
         """Converts a returnseries into a cumulative valueseries
-
-        Parameters
-        ----------
-        div_by_first: bool, default: True
-            When set to True the all values in the series is dived by its initial value
-        logret: bool, default: False
-            True for log return and False for simple return.
-            Log return is the equivalent of LN(value[t] / value[t-1]) in MS excel.
 
         Returns
         -------
@@ -1789,12 +1793,9 @@ class OpenTimeSeries(object):
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):
-            self.value_to_ret(logret=logret)
+            self.value_to_ret()
         self.tsdf = self.tsdf.add(1.0)
-        self.tsdf = self.tsdf.cumprod(axis=0)
-        # TODO below needs to be checked if necessary
-        if div_by_first:
-            self.tsdf = self.tsdf / self.tsdf.iloc[0]
+        self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
         self.valuetype = "Price(Close)"
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         return self
@@ -1940,6 +1941,7 @@ class OpenTimeSeries(object):
         Pandas.DataFrame
            Rolling annualized downside Value At Risk "VaR"
         """
+
         vardf = self.tsdf.rolling(observations, min_periods=observations).apply(
             lambda x: var_down(x, level=level, interpolation=interpolation)
         )
@@ -2123,6 +2125,7 @@ class OpenTimeSeries(object):
         (plotly.go.Figure, str)
             Plotly Figure and html filename with location
         """
+
         if not directory:
             directory = os.path.join(str(Path.home()), "Documents")
         filename = self.label.replace("/", "").replace("#", "").replace(" ", "").upper()
