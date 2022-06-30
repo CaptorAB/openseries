@@ -28,17 +28,11 @@ MANIFEST
 
 # Unit test / coverage reports
 htmlcov/
-/htmlcov
-htmlcov
 coverage_html/
-/coverage_html
-coverage_html
-.tox/
-.coverage
-.coverage.*
-.cache
-*,cover
 /.pytest_cache/
+.coverage
+.coveragerc
+.cache
 
 # Environments
 .env
