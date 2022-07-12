@@ -31,7 +31,7 @@ jobs:
           name: Check formatting with black
           command: |
             . venv/bin/activate
-            black ./
+            python -m black ./
       - run:
           name: Tests with pytest
           command: |
