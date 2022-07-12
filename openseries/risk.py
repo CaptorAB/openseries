@@ -5,7 +5,7 @@ https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
 import math
-from typing import List, Union
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -46,9 +46,7 @@ def var_down(
     return result
 
 
-def drawdown_series(
-    prices: Union[pd.DataFrame, pd.Series]
-) -> Union[pd.DataFrame, pd.Series]:
+def drawdown_series(prices: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Series:
     """
     Calculates https://www.investopedia.com/terms/d/drawdown.asp
     This returns a series representing a drawdown.
@@ -75,9 +73,7 @@ def drawdown_series(
     return drawdown
 
 
-def calc_max_drawdown(
-    prices: Union[pd.DataFrame, pd.Series]
-) -> Union[pd.DataFrame, pd.Series]:
+def calc_max_drawdown(prices: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Series:
     """
     Calculates the max drawdown of a price series. If you want the
     actual drawdown series, please use to_drawdown_series.
@@ -86,7 +82,7 @@ def calc_max_drawdown(
     return (prices / prices.expanding(min_periods=1).max()).min() - 1
 
 
-def max_drawdown_date(prices: Union[pd.DataFrame, pd.Series]) -> dt.date:
+def max_drawdown_date(prices: pd.DataFrame | pd.Series) -> dt.date:
     """
     Date when Max drawdown occurred.
     """
@@ -99,7 +95,7 @@ def max_drawdown_date(prices: Union[pd.DataFrame, pd.Series]) -> dt.date:
     return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
 
 
-def drawdown_details(prices: Union[pd.DataFrame, pd.Series]) -> pd.Series:
+def drawdown_details(prices: pd.DataFrame | pd.Series) -> pd.Series:
     """
 
     :param prices:

@@ -7,7 +7,7 @@ import os
 import random
 import string
 from pathlib import Path
-from typing import List, Union
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -714,7 +714,7 @@ class OpenFrame(object):
     def ret_vol_ratio_func(
         self,
         riskfree_rate: float = None,
-        riskfree_column: Union[tuple, int] = -1,
+        riskfree_column: tuple | int = -1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
@@ -730,7 +730,7 @@ class OpenFrame(object):
         ----------
         riskfree_rate : float, optional
             The return of the zero volatility asset used to calculate Sharpe ratio
-        riskfree_column : Union[tuple, int], default: -1
+        riskfree_column : int | None, default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date and to_date
@@ -819,7 +819,7 @@ class OpenFrame(object):
     def sortino_ratio_func(
         self,
         riskfree_rate: float = None,
-        riskfree_column: Union[tuple, int] = -1,
+        riskfree_column: tuple | int = -1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
@@ -834,7 +834,7 @@ class OpenFrame(object):
         ----------
         riskfree_rate : float, optional
             The return of the zero volatility asset
-        riskfree_column : Union[tuple, int], default: -1
+        riskfree_column : int | None, default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date and to_date
@@ -2008,7 +2008,7 @@ class OpenFrame(object):
 
     def tracking_error_func(
         self,
-        base_column: Union[tuple, int] = -1,
+        base_column: tuple | int = -1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
@@ -2020,7 +2020,7 @@ class OpenFrame(object):
 
         Parameters
         ----------
-        base_column: Union[tuple, int], default: -1
+        base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date and to_date
@@ -2074,7 +2074,7 @@ class OpenFrame(object):
 
     def info_ratio_func(
         self,
-        base_column: Union[tuple, int] = -1,
+        base_column: tuple | int = -1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
@@ -2086,7 +2086,7 @@ class OpenFrame(object):
 
         Parameters
         ----------
-        base_column: Union[tuple, int], default: -1
+        base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date and to_date
@@ -2144,7 +2144,7 @@ class OpenFrame(object):
     def capture_ratio_func(
         self,
         ratio: str,
-        base_column: Union[tuple, int] = -1,
+        base_column: tuple | int = -1,
         months_from_last: int = None,
         from_date: dt.date = None,
         to_date: dt.date = None,
@@ -2163,7 +2163,7 @@ class OpenFrame(object):
         ----------
         ratio: str
             Either 'up', 'down' or 'both'
-        base_column: Union[tuple, int], default: -1
+        base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date and to_date
@@ -2458,9 +2458,9 @@ class OpenFrame(object):
     def plot_series(
         self,
         mode: str = "lines",
-        tick_fmt: str = None,
-        filename: str = None,
-        directory: str = None,
+        tick_fmt: str | None = None,
+        filename: str | None = None,
+        directory: str | None = None,
         labels: list = None,
         auto_open: bool = True,
         add_logo: bool = True,
@@ -2572,7 +2572,7 @@ class OpenFrame(object):
 
 
 def key_value_table(
-    series: Union[OpenFrame, List[OpenTimeSeries]],
+    series: OpenFrame | List[OpenTimeSeries],
     headers: list = None,
     attributes: list = None,
     cols: list = None,
@@ -2584,7 +2584,7 @@ def key_value_table(
 
     Parameters
     ----------
-    series: Union[OpenFrame, List[OpenTimeSeries]]
+    series: OpenFrame | List[OpenTimeSeries]
         The data for which key values will be calculated.
     headers: list, optional
         New names for the items.

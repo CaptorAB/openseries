@@ -2,7 +2,7 @@
 import copy
 import datetime as dt
 import json
-import jsonschema
+from jsonschema import Draft7Validator
 from jsonschema.exceptions import ValidationError
 import math
 import numpy as np
@@ -16,7 +16,7 @@ from plotly.offline import plot
 from stdnum import isin as isincode
 from stdnum.exceptions import ValidationError as StdnumValidationError
 import scipy.stats as ss
-from typing import Union, List, TypedDict
+from typing import List, TypedDict
 
 
 from openseries.captor_open_api_sdk import CaptorOpenApiService
@@ -100,8 +100,10 @@ class OpenTimeSeries(object):
         with open(file=schema_file, mode="r", encoding="utf-8") as f:
             series_schema = json.load(f)
 
+        Draft7Validator.check_schema(schema=series_schema)
+        validator = Draft7Validator(series_schema)
         try:
-            jsonschema.validate(instance=d, schema=series_schema)
+            validator.validate(d)
         except ValidationError as e:
             raise Exception(d.get("_id", None), d.get("name", None), e)
 
@@ -276,7 +278,7 @@ class OpenTimeSeries(object):
     @classmethod
     def from_df(
         cls,
-        df: Union[pd.DataFrame, pd.Series],
+        df: pd.DataFrame | pd.Series,
         column_nmbr: int = 0,
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
@@ -286,7 +288,7 @@ class OpenTimeSeries(object):
 
         Parameters
         ----------
-        df: Union[pd.DataFrame, pd.Series]
+        df: pd.DataFrame | pd.Series
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
@@ -452,7 +454,7 @@ class OpenTimeSeries(object):
 
         return cls(d=output)
 
-    def to_json(self, filename: str, directory: str = None) -> dict:
+    def to_json(self, filename: str, directory: str | None = None) -> dict:
         """Dumps timeseries data into a json file
 
         The label and tsdf parameters are deleted before the json file is saved
@@ -502,8 +504,8 @@ class OpenTimeSeries(object):
     def calc_range(
         self,
         months_offset: int = None,
-        from_dt: Union[dt.date, None] = None,
-        to_dt: Union[dt.date, None] = None,
+        from_dt: dt.date | None = None,
+        to_dt: dt.date | None = None,
     ) -> (dt.date, dt.date):
         """Creates user defined date range
 
@@ -2043,8 +2045,8 @@ class OpenTimeSeries(object):
 
     def set_new_label(
         self,
-        lvl_zero: str = None,
-        lvl_one: str = None,
+        lvl_zero: str | None = None,
+        lvl_one: str | None = None,
         delete_lvl_one: bool = False,
     ):
         """Sets the column labels of the .tsdf Pandas Dataframe associated
@@ -2087,8 +2089,8 @@ class OpenTimeSeries(object):
     def plot_series(
         self,
         mode: str = "lines",
-        tick_fmt: str = None,
-        directory: str = None,
+        tick_fmt: str | None = None,
+        directory: str | None = None,
         size_array: list = None,
         auto_open: bool = True,
         add_logo: bool = True,

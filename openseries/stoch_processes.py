@@ -129,7 +129,9 @@ def convert_to_prices(param: ModelParameters, log_returns: np.ndarray) -> np.nda
     return np.array(price_sequence)
 
 
-def plot_stochastic_processes(processes: list, title: str = None) -> (go.Figure, str):
+def plot_stochastic_processes(
+    processes: list, title: str | None = None
+) -> (go.Figure, str):
     """
     This method plots a list of stochastic processes with a specified title
     :param processes:

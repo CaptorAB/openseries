@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
 import logging
-from typing import Union
 
 import pandas as pd
 from dateutil.parser import parse
@@ -11,7 +10,7 @@ from pandas.tseries.offsets import CDay
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
-def date_fix(d: Union[str, dt.date, dt.datetime]) -> dt.date:
+def date_fix(d: str | dt.date | dt.datetime) -> dt.date:
     """
     Function to parse date or timestamp string into datetime.date
     :param d: A string containing a date/time stamp.
@@ -30,7 +29,7 @@ def date_fix(d: Union[str, dt.date, dt.datetime]) -> dt.date:
 
 
 def date_offset_foll(
-    raw_date: Union[str, dt.date, dt.datetime],
+    raw_date: str | dt.date | dt.datetime,
     calendar: CDay,
     months_offset: int = 12,
     adjust: bool = False,

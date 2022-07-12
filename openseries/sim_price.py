@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from typing import Union
-
 import numpy as np
 import pandas as pd
 
@@ -39,7 +37,7 @@ class ReturnSimulation(object):
         mu: float,
         vol: float,
         t: int = 252,
-        seed: Union[int, None] = 71,
+        seed: int | None = 71,
     ):
         """
         This  function generates n number of random prices over
@@ -75,7 +73,7 @@ class ReturnSimulation(object):
         mu: float,
         vol: float,
         t: int = 252,
-        seed: Union[int, None] = 71,
+        seed: int | None = 71,
     ):
         """
         This  function generates n number of random prices over
@@ -111,7 +109,7 @@ class ReturnSimulation(object):
         mu: float,
         vol: float,
         t: int = 252,
-        seed: Union[int, None] = 71,
+        seed: int | None = 71,
     ):
         """
         This method constructs a sequence of log returns which, when
@@ -152,7 +150,7 @@ class ReturnSimulation(object):
         heston_mu: float,
         heston_a: float,
         t: int = 252,
-        seed: Union[int, None] = 71,
+        seed: int | None = 71,
     ):
         """
         NOTE - this method is dodgy! Need to debug!
@@ -209,7 +207,7 @@ class ReturnSimulation(object):
         heston_mu: float,
         heston_a: float,
         t: int = 252,
-        seed: Union[int, None] = 71,
+        seed: int | None = 71,
     ):
         """
 
@@ -265,7 +263,7 @@ class ReturnSimulation(object):
         jumps_sigma: float,
         jumps_mu: float,
         t: int = 252,
-        seed: Union[int, None] = 71,
+        seed: int | None = 71,
     ):
         """
 
