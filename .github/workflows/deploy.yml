@@ -24,18 +24,17 @@ jobs:
         python -m pip install -e .[dev]
         python -m pip install -U wheel twine setuptools
 
-    - name: Fix
-      run: |
-        python -m black ./
+    - name: Format with Black
+      run: python -m black ./
 
-    - name: Lint
-      run: |
-        python -m flake8 ./
+    - name: Lint check with Flake8
+      run: python -m flake8 ./
 
-    - name: Tests with Code Coverage
-      run: |
-        coverage run -m pytest --verbose
-        coverage report
+    - name: Tests with Pytest
+      run: coverage run -m pytest --verbose
+
+    - name: Report coverage
+      run: coverage report
 
     - name: Package and check
       run: |
