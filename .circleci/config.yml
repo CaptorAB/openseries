@@ -28,6 +28,11 @@ jobs:
             . venv/bin/activate
             pip install -r requirements.txt
       - run:
+          name: Check formatting with black
+          command: |
+            . venv/bin/activate
+            black ./
+      - run:
           name: Tests with pytest
           command: |
             . venv/bin/activate
