@@ -393,12 +393,11 @@ class OpenFrame(object):
             raise Exception(
                 "Error in function geo_ret due to an initial value being zero."
             )
-        else:
-            return pd.Series(
-                data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac)
-                - 1,
-                name="Geometric return",
-            )
+        return pd.Series(
+            data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac)
+            - 1,
+            name="Geometric return",
+        )
 
     def geo_ret_func(
         self,
@@ -424,7 +423,12 @@ class OpenFrame(object):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
+
+        if self.tsdf.loc[earlier].isin([0.0]).any():
+            raise Exception("First data point == 0.0")
+
         fraction = (later - earlier).days / 365.25
+
         return pd.Series(
             data=(self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1,
             name="Subset Geometric return",
@@ -777,6 +781,8 @@ class OpenFrame(object):
                     ratios.append(0.0)
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                    if float(longdf.iloc[0]) == 0.0 or float(riskfree.iloc[0]) == 0.0:
+                        raise Exception("Error in ret_vol_ratio_func due to an initial value being zero.")
                     georet = float(
                         (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
                     )
@@ -794,6 +800,8 @@ class OpenFrame(object):
         else:
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                if float(longdf.iloc[0]) == 0.0:
+                    raise Exception("Error in ret_vol_ratio_func due to an initial value being zero.")
                 georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
                 vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
                 ratios.append((georet - riskfree_rate) / vol)
@@ -880,6 +888,8 @@ class OpenFrame(object):
                     ratios.append(0.0)
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                    if float(longdf.iloc[0]) == 0.0 or float(riskfree.iloc[0]) == 0.0:
+                        raise Exception("Error in sortino_ratio_func due to an initial value being zero.")
                     georet = float(
                         (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
                     )
@@ -903,6 +913,8 @@ class OpenFrame(object):
         else:
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                if float(longdf.iloc[0]) == 0.0:
+                    raise Exception("Error in sortino_ratio_func due to an initial value being zero.")
                 georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
                 dddf = longdf.pct_change()
                 downdev = float(
@@ -2131,6 +2143,8 @@ class OpenFrame(object):
             else:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 relative = 1.0 + longdf - shortdf
+                if float(relative.iloc[0]) == 0.0:
+                    raise Exception("Error in info_ratio_func due to an initial value being zero.")
                 georet = float(
                     (relative.iloc[-1] / relative.iloc[0]) ** (1 / fraction) - 1
                 )
