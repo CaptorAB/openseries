@@ -1215,9 +1215,9 @@ class OpenFrame(object):
 
     def kurtosis_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
@@ -1282,9 +1282,9 @@ class OpenFrame(object):
     def cvar_down_func(
         self,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
@@ -1352,9 +1352,9 @@ class OpenFrame(object):
     def var_down_func(
         self,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: str = "lower",
     ) -> pd.Series:
         """https://www.investopedia.com/terms/v/var.asp
@@ -1421,12 +1421,12 @@ class OpenFrame(object):
     def vol_from_var_func(
         self,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: str = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """
         Parameters
@@ -1486,12 +1486,12 @@ class OpenFrame(object):
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: str = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """A position weight multiplier from the ratio between a VaR implied
         volatility and a given target volatility. Multiplier = 1.0 -> target met
@@ -1692,7 +1692,7 @@ class OpenFrame(object):
         self,
         column: int,
         observations: int = 21,
-        periods_in_a_year_fixed: int = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.DataFrame:
         """
         Parameters
@@ -1925,8 +1925,8 @@ class OpenFrame(object):
 
     def trunc_frame(
         self,
-        start_cut: dt.date = None,
-        end_cut: dt.date = None,
+        start_cut: dt.date | None = None,
+        end_cut: dt.date | None = None,
         before: bool = True,
         after: bool = True,
     ):
@@ -2011,10 +2011,10 @@ class OpenFrame(object):
     def tracking_error_func(
         self,
         base_column: tuple | int = -1,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """Calculates the Tracking Error which is the standard deviation of the
         difference between the fund and its index returns. \n
@@ -2077,10 +2077,10 @@ class OpenFrame(object):
     def info_ratio_func(
         self,
         base_column: tuple | int = -1,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
@@ -2147,10 +2147,10 @@ class OpenFrame(object):
         self,
         ratio: str,
         base_column: tuple | int = -1,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """The Up (Down) Capture Ratio is calculated by dividing the annualized returns
         of the asset during periods that the benchmark returns are positive (negative)
@@ -2364,7 +2364,7 @@ class OpenFrame(object):
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
-        periods_in_a_year_fixed: int = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.DataFrame:
         """The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
@@ -2463,7 +2463,7 @@ class OpenFrame(object):
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: str | None = None,
-        labels: list = None,
+        labels: list | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
@@ -2575,9 +2575,9 @@ class OpenFrame(object):
 
 def key_value_table(
     series: OpenFrame | List[OpenTimeSeries],
-    headers: list = None,
-    attributes: list = None,
-    cols: list = None,
+    headers: list | None = None,
+    attributes: list | None = None,
+    cols: list | None = None,
     swe_not_eng: bool = True,
     pct_fmt: bool = False,
     transpose: bool = False,

@@ -127,19 +127,24 @@ class OpenTimeSeries(object):
         str
             A representation of an OpenTimeSeries object
         """
+        info = f"{self.__class__.__name__}("
+        if self.name is not None and self.name != "":
+            info += f"name={self.name}, "
+        if self._id is not None and self._id != "":
+            info += f"_id={self._id}, "
+        if self.instrumentId is not None and self.instrumentId != "":
+            info += f"instrumentId={self.instrumentId}, "
+        if self.isin is not None and self.isin != "":
+            info += f"isin={self.isin}, "
+        if self.valuetype is not None and self.valuetype != "":
+            info += f"valuetype={self.valuetype}, "
+        if self.currency is not None and self.currency != "":
+            info += f"currency={self.currency}, "
+        info += "start={}, ".format(self.first_idx.strftime("%Y-%m-%d"))
+        info += "end={}, ".format(self.last_idx.strftime("%Y-%m-%d"))
+        info += f"local_ccy={str(self.local_ccy)})"
 
-        return (
-            "{}(label={}, _id={}, valuetype={}, currency={}, start={}, "
-            "end={})".format(
-                self.__class__.__name__,
-                self.label,
-                self._id,
-                self.valuetype,
-                self.currency,
-                self.first_idx.strftime("%Y-%m-%d"),
-                self.last_idx.strftime("%Y-%m-%d"),
-            )
-        )
+        return info
 
     @classmethod
     def from_open_api(
@@ -1175,9 +1180,9 @@ class OpenTimeSeries(object):
 
     def max_drawdown_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1248,9 +1253,9 @@ class OpenTimeSeries(object):
     def worst_func(
         self,
         observations: int = 1,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """
         Parameters
@@ -1295,9 +1300,9 @@ class OpenTimeSeries(object):
 
     def positive_share_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """
         Parameters
@@ -1338,9 +1343,9 @@ class OpenTimeSeries(object):
 
     def skew_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/s/skewness.asp
 
@@ -1388,9 +1393,9 @@ class OpenTimeSeries(object):
 
     def kurtosis_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
@@ -1447,9 +1452,9 @@ class OpenTimeSeries(object):
     def cvar_down_func(
         self,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
@@ -1512,9 +1517,9 @@ class OpenTimeSeries(object):
     def var_down_func(
         self,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: str = "lower",
     ) -> float:
         """https://www.investopedia.com/terms/v/var.asp
@@ -1577,12 +1582,12 @@ class OpenTimeSeries(object):
     def vol_from_var_func(
         self,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: str = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """
         Parameters
@@ -1648,12 +1653,12 @@ class OpenTimeSeries(object):
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: str = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """A position weight multiplier from the ratio between a VaR implied
         volatility and a given target volatility. Multiplier = 1.0 -> target met
@@ -1848,7 +1853,7 @@ class OpenTimeSeries(object):
         return drawdown_details(dddf).to_frame()
 
     def rolling_vol(
-        self, observations: int = 21, periods_in_a_year_fixed: int = None
+        self, observations: int = 21, periods_in_a_year_fixed: int | None = None
     ) -> pd.DataFrame:
         """
         Parameters
@@ -2091,7 +2096,7 @@ class OpenTimeSeries(object):
         mode: str = "lines",
         tick_fmt: str | None = None,
         directory: str | None = None,
-        size_array: list = None,
+        size_array: list | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
