@@ -10,6 +10,8 @@
 **OpenSeries** is a project with tools to perform timeseries analysis on a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
+<span style="font-size:3em;">[Changelog](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
+
 To install:
 
     pip install openseries
@@ -63,8 +65,6 @@ Finally, plotting is simple. This will plot the timeseries in a browser window:
     basket.plot_series(tick_fmt='.1%')
 
 To make use of some of the tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
-
-<span style="font-size:2em;">[Change Log](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
 
 ## Table of Contents
 
