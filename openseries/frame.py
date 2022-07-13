@@ -394,8 +394,7 @@ class OpenFrame(object):
                 "Error in function geo_ret due to an initial value being zero."
             )
         return pd.Series(
-            data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac)
-            - 1,
+            data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac) - 1,
             name="Geometric return",
         )
 
@@ -782,7 +781,9 @@ class OpenFrame(object):
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
                     if float(longdf.iloc[0]) == 0.0 or float(riskfree.iloc[0]) == 0.0:
-                        raise Exception("Error in ret_vol_ratio_func due to an initial value being zero.")
+                        raise Exception(
+                            "Error in ret_vol_ratio_func due to an initial value being zero."
+                        )
                     georet = float(
                         (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
                     )
@@ -801,7 +802,9 @@ class OpenFrame(object):
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 if float(longdf.iloc[0]) == 0.0:
-                    raise Exception("Error in ret_vol_ratio_func due to an initial value being zero.")
+                    raise Exception(
+                        "Error in ret_vol_ratio_func due to an initial value being zero."
+                    )
                 georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
                 vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
                 ratios.append((georet - riskfree_rate) / vol)
@@ -889,7 +892,9 @@ class OpenFrame(object):
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
                     if float(longdf.iloc[0]) == 0.0 or float(riskfree.iloc[0]) == 0.0:
-                        raise Exception("Error in sortino_ratio_func due to an initial value being zero.")
+                        raise Exception(
+                            "Error in sortino_ratio_func due to an initial value being zero."
+                        )
                     georet = float(
                         (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
                     )
@@ -914,7 +919,9 @@ class OpenFrame(object):
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 if float(longdf.iloc[0]) == 0.0:
-                    raise Exception("Error in sortino_ratio_func due to an initial value being zero.")
+                    raise Exception(
+                        "Error in sortino_ratio_func due to an initial value being zero."
+                    )
                 georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
                 dddf = longdf.pct_change()
                 downdev = float(
@@ -2144,7 +2151,9 @@ class OpenFrame(object):
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 relative = 1.0 + longdf - shortdf
                 if float(relative.iloc[0]) == 0.0:
-                    raise Exception("Error in info_ratio_func due to an initial value being zero.")
+                    raise Exception(
+                        "Error in info_ratio_func due to an initial value being zero."
+                    )
                 georet = float(
                     (relative.iloc[-1] / relative.iloc[0]) ** (1 / fraction) - 1
                 )
