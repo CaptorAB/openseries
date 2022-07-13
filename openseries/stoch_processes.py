@@ -178,7 +178,9 @@ def plot_stochastic_processes(
     return figure, plotfile
 
 
-def brownian_motion_log_returns(param: ModelParameters, seed: int = None) -> np.ndarray:
+def brownian_motion_log_returns(
+    param: ModelParameters, seed: int | None = None
+) -> np.ndarray:
     """
     This method returns a Wiener process. The Wiener process is also called
     Brownian motion. For more information about the Wiener process check out
@@ -196,7 +198,9 @@ def brownian_motion_log_returns(param: ModelParameters, seed: int = None) -> np.
     return nrand.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time)
 
 
-def brownian_motion_levels(param: ModelParameters, seed: int = None) -> np.ndarray:
+def brownian_motion_levels(
+    param: ModelParameters, seed: int | None = None
+) -> np.ndarray:
     """
     Returns a price sequence whose returns evolve according to
     a brownian motion
@@ -211,7 +215,7 @@ def brownian_motion_levels(param: ModelParameters, seed: int = None) -> np.ndarr
 
 
 def geometric_brownian_motion_log_returns(
-    param: ModelParameters, seed: int = None
+    param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
     """
     This method constructs a sequence of log returns which, when
@@ -233,7 +237,7 @@ def geometric_brownian_motion_log_returns(
 
 
 def geometric_brownian_motion_levels(
-    param: ModelParameters, seed: int = None
+    param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
     """
     Returns a sequence of price levels for an asset which evolves according
@@ -250,7 +254,7 @@ def geometric_brownian_motion_levels(
     )
 
 
-def jump_diffusion_process(param: ModelParameters, seed: int = None) -> list:
+def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> list:
     """
     This method produces a sequence of Jump Sizes which represent a jump
     diffusion process. These jumps are combined with a geometric brownian
@@ -285,7 +289,7 @@ def jump_diffusion_process(param: ModelParameters, seed: int = None) -> list:
 
 
 def geometric_brownian_motion_jump_diffusion_log_returns(
-    param: ModelParameters, seed: int = None
+    param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
     """
     This method constructs combines a geometric brownian motion process
@@ -304,7 +308,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 
 
 def geometric_brownian_motion_jump_diffusion_levels(
-    param: ModelParameters, seed: int = None
+    param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
     """
     This method converts a sequence of gbm jmp returns into a price sequence
@@ -324,7 +328,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
 
 def heston_construct_correlated_path(
-    param: ModelParameters, brownian_motion_one: np.ndarray, seed: int = None
+    param: ModelParameters, brownian_motion_one: np.ndarray, seed: int | None = None
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     This method is a simplified version of the Cholesky decomposition method
@@ -354,7 +358,7 @@ def heston_construct_correlated_path(
 
 
 def cox_ingersoll_ross_heston(
-    param: ModelParameters, seed: int = None
+    param: ModelParameters, seed: int | None = None
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
@@ -390,7 +394,7 @@ def cox_ingersoll_ross_heston(
 
 
 def heston_model_levels(
-    param: ModelParameters, seed: int = None
+    param: ModelParameters, seed: int | None = None
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     NOTE - this method is dodgy! Need to debug!
@@ -430,7 +434,9 @@ def heston_model_levels(
     return np.array(heston_market_price_levels), np.array(cir_process)
 
 
-def cox_ingersoll_ross_levels(param: ModelParameters, seed: int = None) -> np.ndarray:
+def cox_ingersoll_ross_levels(
+    param: ModelParameters, seed: int | None = None
+) -> np.ndarray:
     """
     This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
@@ -461,7 +467,7 @@ def cox_ingersoll_ross_levels(param: ModelParameters, seed: int = None) -> np.nd
     return np.array(levels)
 
 
-def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int = None) -> list:
+def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -> list:
     """
     This method returns the rate levels of a mean-reverting
     Ornstein Uhlenbeck process.

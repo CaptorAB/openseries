@@ -40,7 +40,7 @@ class OpenFrame(object):
     def __init__(
         self,
         constituents: List[OpenTimeSeries],
-        weights: List[float] = None,
+        weights: List[float] | None = None,
         sort: bool = True,
     ):
         """Instantiates an object of the class OpenFrame
@@ -101,7 +101,7 @@ class OpenFrame(object):
 
         return copy.deepcopy(self)
 
-    def all_properties(self, properties: list = None) -> pd.DataFrame:
+    def all_properties(self, properties: list | None = None) -> pd.DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
@@ -147,9 +147,9 @@ class OpenFrame(object):
 
     def calc_range(
         self,
-        months_offset: int = None,
-        from_dt: dt.date = None,
-        to_dt: dt.date = None,
+        months_offset: int | None = None,
+        from_dt: dt.date | None = None,
+        to_dt: dt.date | None = None,
     ) -> (dt.date, dt.date):
         """Creates user defined date range
 
@@ -402,9 +402,9 @@ class OpenFrame(object):
 
     def geo_ret_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """https://www.investopedia.com/terms/c/cagr.asp
 
@@ -447,10 +447,10 @@ class OpenFrame(object):
 
     def arithmetic_ret_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
@@ -506,9 +506,9 @@ class OpenFrame(object):
     def value_ret_func(
         self,
         logret: bool = False,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """
         Parameters
@@ -541,7 +541,9 @@ class OpenFrame(object):
                 ret = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
             return pd.Series(data=ret, name="Subset Total return")
 
-    def value_ret_calendar_period(self, year: int, month: int = None) -> pd.Series:
+    def value_ret_calendar_period(
+        self, year: int, month: int | None = None
+    ) -> pd.Series:
         """
         Parameters
         ----------
@@ -590,10 +592,10 @@ class OpenFrame(object):
 
     def vol_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
@@ -650,10 +652,10 @@ class OpenFrame(object):
     def downside_deviation_func(
         self,
         min_accepted_return: float = 0.0,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """The standard deviation of returns that are below a Minimum Accepted Return of zero.
         It is used to calculate the Sortino Ratio \n
@@ -713,12 +715,12 @@ class OpenFrame(object):
 
     def ret_vol_ratio_func(
         self,
-        riskfree_rate: float = None,
+        riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """The ratio of geometric return and annualized volatility or, if risk free return
         provided, Sharpe ratio calculated as ( geometric return - risk free return )
@@ -818,12 +820,12 @@ class OpenFrame(object):
 
     def sortino_ratio_func(
         self,
-        riskfree_rate: float = None,
+        riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """The Sortino ratio calculated as ( geometric return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has
@@ -934,9 +936,9 @@ class OpenFrame(object):
 
     def z_score_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
@@ -990,9 +992,9 @@ class OpenFrame(object):
 
     def max_drawdown_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1065,9 +1067,9 @@ class OpenFrame(object):
     def worst_func(
         self,
         observations: int = 1,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """
         Parameters
@@ -1113,9 +1115,9 @@ class OpenFrame(object):
 
     def positive_share_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """
         Parameters
@@ -1162,9 +1164,9 @@ class OpenFrame(object):
 
     def skew_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> pd.Series:
         """https://www.investopedia.com/terms/s/skewness.asp
 

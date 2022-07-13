@@ -64,6 +64,8 @@ Finally, plotting is simple. This will plot the timeseries in a browser window:
 
 To make use of some of the tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
+## [Change log](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)
+
 ## Table of Contents
 
 - [Modules described](https://github.com/CaptorAB/OpenSeries#these-are-the-files--modules-described)

@@ -33,7 +33,7 @@ class CaptorOpenApiService(object):
         return response.json()
 
     def get_fundinfo(
-        self, isins: list, report_date: dt.date = None, url: str = "/fundinfo"
+        self, isins: list, report_date: dt.date | None = None, url: str = "/fundinfo"
     ) -> dict:
         """
 

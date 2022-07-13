@@ -226,7 +226,7 @@ class OpenTimeSeries(object):
     def from_open_fundinfo(
         cls,
         isin: str,
-        report_date: dt.date = None,
+        report_date: dt.date | None = None,
         valuetype: str = "Price(Close)",
         local_ccy: bool = True,
     ):
@@ -395,9 +395,9 @@ class OpenTimeSeries(object):
     def from_fixed_rate(
         cls,
         rate: float,
-        date_range: pd.DatetimeIndex = None,
-        days: int = None,
-        end_dt: dt.date = None,
+        date_range: pd.DatetimeIndex | None = None,
+        days: int | None = None,
+        end_dt: dt.date | None = None,
         label: str = "Series",
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
@@ -503,7 +503,7 @@ class OpenTimeSeries(object):
 
     def calc_range(
         self,
-        months_offset: int = None,
+        months_offset: int | None = None,
         from_dt: dt.date | None = None,
         to_dt: dt.date | None = None,
     ) -> (dt.date, dt.date):
@@ -593,7 +593,7 @@ class OpenTimeSeries(object):
 
         return self
 
-    def all_properties(self, properties: list = None) -> pd.DataFrame:
+    def all_properties(self, properties: list | None = None) -> pd.DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
@@ -730,9 +730,9 @@ class OpenTimeSeries(object):
 
     def geo_ret_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/cagr.asp
 
@@ -775,10 +775,10 @@ class OpenTimeSeries(object):
 
     def arithmetic_ret_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
@@ -824,9 +824,9 @@ class OpenTimeSeries(object):
     def value_ret_func(
         self,
         logret: bool = False,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """
         Parameters
@@ -855,7 +855,7 @@ class OpenTimeSeries(object):
             ret = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
         return float(ret)
 
-    def value_ret_calendar_period(self, year: int, month: int = None) -> float:
+    def value_ret_calendar_period(self, year: int, month: int | None = None) -> float:
         """
         Parameters
         ----------
@@ -895,10 +895,10 @@ class OpenTimeSeries(object):
 
     def vol_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
@@ -954,10 +954,10 @@ class OpenTimeSeries(object):
     def downside_deviation_func(
         self,
         min_accepted_return: float = 0.0,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
-        periods_in_a_year_fixed: int = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """The standard deviation of returns that are below a Minimum Accepted Return of zero.
         It is used to calculate the Sortino Ratio \n
@@ -1016,9 +1016,9 @@ class OpenTimeSeries(object):
 
     def ret_vol_ratio_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The ratio of geometric return and annualized volatility or, if risk free return
@@ -1063,9 +1063,9 @@ class OpenTimeSeries(object):
 
     def sortino_ratio_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Sortino ratio calculated as ( geometric return - risk free return )
@@ -1116,9 +1116,9 @@ class OpenTimeSeries(object):
 
     def z_score_func(
         self,
-        months_from_last: int = None,
-        from_date: dt.date = None,
-        to_date: dt.date = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/z/zscore.asp
 
