@@ -386,12 +386,12 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Geometric annualized return
+            Compounded Annual Growth Rate (CAGR)
         """
 
-        if self.tsdf.iloc[0].isin([0.0]).any():
+        if self.tsdf.iloc[0].isin([0.0]).any() or self.tsdf.lt(0.0).any().any():
             raise Exception(
-                "Error in function geo_ret due to an initial value being zero."
+                "Geometric return cannot be calculated due to an initial value being zero or a negative value."
             )
         return pd.Series(
             data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac) - 1,
@@ -418,13 +418,18 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Geometric annualized return
+            Compounded Annual Growth Rate (CAGR)
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
-        if self.tsdf.loc[earlier].isin([0.0]).any():
-            raise Exception("First data point == 0.0")
+        if (
+            self.tsdf.loc[earlier].isin([0.0]).any()
+            or self.tsdf.loc[[earlier, later]].lt(0.0).any().any()
+        ):
+            raise Exception(
+                "Geometric return cannot be calculated due to an initial value being zero or a negative value."
+            )
 
         fraction = (later - earlier).days / 365.25
 
@@ -440,7 +445,7 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Arithmetic annualized log return
+            Annualized arithmetic mean of log returns
         """
 
         return pd.Series(
@@ -471,7 +476,7 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Arithmetic annualized log return
+            Annualized arithmetic mean of log returns
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -709,10 +714,10 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Ratio of geometric return and annualized volatility
+            Ratio of the annualized arithmetic mean of log returns and annualized volatility.
         """
 
-        ratio = self.geo_ret / self.vol
+        ratio = self.arithmetic_ret / self.vol
         ratio.name = "Return vol ratio"
         return ratio
 
@@ -725,10 +730,9 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """The ratio of geometric return and annualized volatility or, if risk free return
-        provided, Sharpe ratio calculated as ( geometric return - risk free return )
-        / volatility. The latter ratio implies that the riskfree asset has
-        zero volatility \n
+        """The ratio of annualized arithmetic mean of log returns and annualized volatility or,
+        if riskfree return provided, Sharpe ratio calculated as ( geometric return - risk free return )
+        / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
 
         Parameters
@@ -749,8 +753,8 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Ratio of geometric return and annualized volatility or,
-            if risk free return provided, Sharpe ratio
+            Ratio of the annualized arithmetic mean of log returns and annualized volatility or,
+            if risk-free return provided, Sharpe ratio
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -780,18 +784,10 @@ class OpenFrame(object):
                     ratios.append(0.0)
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
-                    if float(longdf.iloc[0]) == 0.0 or float(riskfree.iloc[0]) == 0.0:
-                        raise Exception(
-                            "Error in ret_vol_ratio_func due to an initial value being zero."
-                        )
-                    georet = float(
-                        (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
-                    )
-                    riskfree_ret = float(
-                        (riskfree.iloc[-1] / riskfree.iloc[0]) ** (1 / fraction) - 1
-                    )
+                    ret = float(np.log(longdf).diff().mean() * time_factor)
+                    riskfree_ret = float(riskfree.diff().mean() * time_factor)
                     vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
-                    ratios.append((georet - riskfree_ret) / vol)
+                    ratios.append((ret - riskfree_ret) / vol)
 
             return pd.Series(
                 data=ratios,
@@ -801,13 +797,9 @@ class OpenFrame(object):
         else:
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
-                if float(longdf.iloc[0]) == 0.0:
-                    raise Exception(
-                        "Error in ret_vol_ratio_func due to an initial value being zero."
-                    )
-                georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
+                ret = float(np.log(longdf).diff().mean() * time_factor)
                 vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
-                ratios.append((georet - riskfree_rate) / vol)
+                ratios.append((ret - riskfree_rate) / vol)
 
             return pd.Series(
                 data=ratios,
@@ -822,10 +814,12 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Ratio of geometric return and downside deviation with a riskfree rate of zero
+            Sortino ratio calculated as the annualized arithmetic mean of log returns
+            / downside deviation. The ratio implies that the riskfree asset has zero
+            volatility, and a minimum acceptable return of zero.
         """
 
-        sortino = self.geo_ret / self.downside_deviation
+        sortino = self.arithmetic_ret / self.downside_deviation
         sortino.name = "Sortino ratio"
         return sortino
 
@@ -838,9 +832,10 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """The Sortino ratio calculated as ( geometric return - risk free return )
-        / downside deviation. The ratio implies that the riskfree asset has
-        zero volatility, and a minimum acceptable return of zero \n
+        """The Sortino ratio calculated as ( return - risk free return )
+        / downside deviation. The ratio implies that the riskfree asset has zero
+        volatility, and a minimum acceptable return of zero. The ratio is
+        calculated using the annualized arithmetic mean of log returns. \n
         https://www.investopedia.com/terms/s/sortinoratio.asp
 
         Parameters
@@ -861,7 +856,7 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            The Sortino ratio calculated as ( geometric return - risk free return ) / downside deviation
+            Sortino ratio calculated as ( return - riskfree return ) / downside deviation
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -891,16 +886,8 @@ class OpenFrame(object):
                     ratios.append(0.0)
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
-                    if float(longdf.iloc[0]) == 0.0 or float(riskfree.iloc[0]) == 0.0:
-                        raise Exception(
-                            "Error in sortino_ratio_func due to an initial value being zero."
-                        )
-                    georet = float(
-                        (longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1
-                    )
-                    riskfree_ret = float(
-                        (riskfree.iloc[-1] / riskfree.iloc[0]) ** (1 / fraction) - 1
-                    )
+                    ret = float(np.log(longdf).diff().mean() * time_factor)
+                    riskfree_ret = float(np.log(riskfree).diff().mean() * time_factor)
                     dddf = longdf.pct_change()
                     downdev = float(
                         math.sqrt(
@@ -908,7 +895,7 @@ class OpenFrame(object):
                         )
                         * np.sqrt(time_factor)
                     )
-                    ratios.append((georet - riskfree_ret) / downdev)
+                    ratios.append((ret - riskfree_ret) / downdev)
 
             return pd.Series(
                 data=ratios,
@@ -922,13 +909,13 @@ class OpenFrame(object):
                     raise Exception(
                         "Error in sortino_ratio_func due to an initial value being zero."
                     )
-                georet = float((longdf.iloc[-1] / longdf.iloc[0]) ** (1 / fraction) - 1)
+                ret = float(np.log(longdf).diff().mean() * time_factor)
                 dddf = longdf.pct_change()
                 downdev = float(
                     math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
                     * np.sqrt(time_factor)
                 )
-                ratios.append((georet - riskfree_rate) / downdev)
+                ratios.append((ret - riskfree_rate) / downdev)
 
             return pd.Series(
                 data=ratios,
@@ -2104,6 +2091,7 @@ class OpenFrame(object):
         """The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
         difference between the fund and its index returns.
+        The ratio is calculated using the annualized arithmetic mean of log returns.
 
         Parameters
         ----------
@@ -2150,15 +2138,9 @@ class OpenFrame(object):
             else:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 relative = 1.0 + longdf - shortdf
-                if float(relative.iloc[0]) == 0.0:
-                    raise Exception(
-                        "Error in info_ratio_func due to an initial value being zero."
-                    )
-                georet = float(
-                    (relative.iloc[-1] / relative.iloc[0]) ** (1 / fraction) - 1
-                )
+                ret = float(np.log(relative).diff().mean() * time_factor)
                 vol = float(relative.pct_change().std() * np.sqrt(time_factor))
-                ratios.append(georet / vol)
+                ratios.append(ret / vol)
 
         return pd.Series(
             data=ratios,
@@ -2175,9 +2157,9 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """The Up (Down) Capture Ratio is calculated by dividing the annualized returns
+        """The Up (Down) Capture Ratio is calculated by dividing the CAGR
         of the asset during periods that the benchmark returns are positive (negative)
-        by the annualized returns of the benchmark during the same periods.
+        by the CAGR of the benchmark during the same periods.
         CaptureRatio.BOTH is the Up ratio divided by the Down ratio.
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and

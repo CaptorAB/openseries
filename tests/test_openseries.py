@@ -12,7 +12,7 @@ import sys
 from testfixtures import LogCapture
 import unittest
 
-from openseries.series import OpenTimeSeries, timeseries_chain
+from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
 from openseries.frame import OpenFrame, key_value_table
 from openseries.sim_price import ReturnSimulation
 from openseries.captor_open_api_sdk import CaptorOpenApiService
@@ -92,6 +92,68 @@ class TestOpenTimeSeries(unittest.TestCase):
             ("Asset", "Price(Close)")
         ]
 
+    def test_opentimeseries_repr(self):
+
+        old_stdout = sys.stdout
+        new_stdout = io.StringIO()
+        sys.stdout = new_stdout
+        repseries = self.randomseries
+        r = (
+            f"OpenTimeSeries(name=Asset, valuetype=Price(Close), currency=SEK, "
+            f"start=2009-06-30, end=2019-06-28, local_ccy=True)\n"
+        )
+        print(repseries)
+        output = new_stdout.getvalue()
+        sys.stdout = old_stdout
+        self.assertEqual(r, output)
+
+    def test_openframe_repr(self):
+
+        old_stdout = sys.stdout
+        new_stdout = io.StringIO()
+        sys.stdout = new_stdout
+        reprframe = OpenFrame(
+            [
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="reprseries1",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=["2022-07-01", "2023-07-01"],
+                        values=[1.0, 1.1],
+                    )
+                ),
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="reprseries2",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=["2022-07-01", "2023-07-01"],
+                        values=[1.0, 1.2],
+                    )
+                ),
+            ],
+            weights=[0.5, 0.5],
+        )
+        r = (
+            "OpenFrame(constituents=[OpenTimeSeries(name=reprseries1, valuetype=Price(Close), currency=SEK, "
+            "start=2022-07-01, end=2023-07-01, local_ccy=True), "
+            "OpenTimeSeries(name=reprseries2, valuetype=Price(Close), currency=SEK, "
+            "start=2022-07-01, end=2023-07-01, local_ccy=True)], "
+            "weights=[0.5, 0.5])"
+        )
+        r = r.rstrip() + "\n"
+        print(reprframe)
+        output = new_stdout.getvalue()
+        sys.stdout = old_stdout
+        self.assertEqual(r, output)
+
     def test_opentimeseries_tsdf_not_empty(self):
 
         json_file = os.path.join(
@@ -104,7 +166,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertFalse(timeseries.tsdf.empty)
 
     def test_opentimeseries_duplicates_handling(self):
-        class CaptorTimeSeries(OpenTimeSeries):
+        class NewTimeSeries(OpenTimeSeries):
             def __init__(self, d):
 
                 super().__init__(d)
@@ -159,11 +221,11 @@ class TestOpenTimeSeries(unittest.TestCase):
                 return cls(d=output)
 
         with self.assertRaises(Exception) as e_dup:
-            CaptorTimeSeries.from_file(remove_duplicates=False)
+            NewTimeSeries.from_file(remove_duplicates=False)
 
         self.assertIsInstance(e_dup.exception.args[2], ValidationError)
 
-        ts = CaptorTimeSeries.from_file(remove_duplicates=True)
+        ts = NewTimeSeries.from_file(remove_duplicates=True)
         self.assertIsInstance(ts, OpenTimeSeries)
 
     def test_create_opentimeseries_from_open_api(self):
@@ -337,6 +399,108 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_calc_range(self):
 
+        cseries = self.randomseries.from_deepcopy()
+        st, en = cseries.first_idx.strftime("%Y-%m-%d"), cseries.last_idx.strftime(
+            "%Y-%m-%d"
+        )
+
+        rst, ren = cseries.calc_range()
+
+        self.assertListEqual(
+            [st, en], [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]
+        )
+
+        with self.assertRaises(AssertionError) as too_far:
+            _, _ = cseries.calc_range(months_offset=125)
+        self.assertIsInstance(too_far.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as too_early:
+            _, _ = cseries.calc_range(from_dt=dt.date(2009, 5, 31))
+        self.assertIsInstance(too_early.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as too_late:
+            _, _ = cseries.calc_range(to_dt=dt.date(2019, 7, 31))
+        self.assertIsInstance(too_late.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as outside:
+            _, _ = cseries.calc_range(
+                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 7, 31)
+            )
+        self.assertIsInstance(outside.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as outside_end:
+            _, _ = cseries.calc_range(
+                from_dt=dt.date(2009, 7, 31), to_dt=dt.date(2019, 7, 31)
+            )
+        self.assertIsInstance(outside_end.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as outside_start:
+            _, _ = cseries.calc_range(
+                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 5, 31)
+            )
+        self.assertIsInstance(outside_start.exception, AssertionError)
+
+        cseries.resample()
+
+        earlier_moved, _ = cseries.calc_range(from_dt=dt.date(2009, 8, 10))
+        self.assertEqual(earlier_moved, dt.date(2009, 7, 31))
+
+        _, later_moved = cseries.calc_range(to_dt=dt.date(2009, 8, 20))
+        self.assertEqual(later_moved, dt.date(2009, 8, 31))
+
+    def test_opentimeframe_calc_range(self):
+
+        crsims = ReturnSimulation.from_normal(n=5, d=2512, mu=0.05, vol=0.1, seed=71)
+        crframe = sim_to_openframe(crsims, dt.date(2019, 6, 30))
+        st, en = crframe.first_idx.strftime("%Y-%m-%d"), crframe.last_idx.strftime(
+            "%Y-%m-%d"
+        )
+        rst, ren = crframe.calc_range()
+
+        self.assertListEqual(
+            [st, en], [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]
+        )
+
+        with self.assertRaises(AssertionError) as too_far:
+            _, _ = crframe.calc_range(months_offset=125)
+        self.assertIsInstance(too_far.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as too_early:
+            _, _ = crframe.calc_range(from_dt=dt.date(2009, 5, 31))
+        self.assertIsInstance(too_early.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as too_late:
+            _, _ = crframe.calc_range(to_dt=dt.date(2019, 7, 31))
+        self.assertIsInstance(too_late.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as outside:
+            _, _ = crframe.calc_range(
+                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 7, 31)
+            )
+        self.assertIsInstance(outside.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as outside_end:
+            _, _ = crframe.calc_range(
+                from_dt=dt.date(2009, 7, 31), to_dt=dt.date(2019, 7, 31)
+            )
+        self.assertIsInstance(outside_end.exception, AssertionError)
+
+        with self.assertRaises(AssertionError) as outside_start:
+            _, _ = crframe.calc_range(
+                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 5, 31)
+            )
+        self.assertIsInstance(outside_start.exception, AssertionError)
+
+        crframe.resample()
+
+        earlier_moved, _ = crframe.calc_range(from_dt=dt.date(2009, 8, 10))
+        self.assertEqual(earlier_moved, dt.date(2009, 7, 31))
+
+        _, later_moved = crframe.calc_range(to_dt=dt.date(2009, 8, 20))
+        self.assertEqual(later_moved, dt.date(2009, 8, 31))
+
+    def test_opentimeseries_calc_range_ouput(self):
+
         csim = ReturnSimulation.from_normal(n=1, d=1200, mu=0.05, vol=0.1, seed=71)
         cseries = sim_to_opentimeseries(csim, end=dt.date(2019, 6, 30)).to_cumret()
 
@@ -507,9 +671,9 @@ class TestOpenTimeSeries(unittest.TestCase):
             "max_drawdown": f"{-0.40011625413:.11f}",
             "max_drawdown_cal_year": f"{-0.23811167802:.11f}",
             "positive_share": f"{0.49940262843:.11f}",
-            "ret_vol_ratio": f"{0.02071179512:.11f}",
+            "ret_vol_ratio": f"{0.02069498874:.11f}",
             "skew": f"{-6.94679906059:.11f}",
-            "sortino_ratio": f"{0.02634175780:.11f}",
+            "sortino_ratio": f"{0.02632038304:.11f}",
             "value_ret": f"{0.02447195802:.11f}",
             "var_down": f"{-0.01059129607:.11f}",
             "vol": f"{0.11695349153:.11f}",
@@ -540,9 +704,9 @@ class TestOpenTimeSeries(unittest.TestCase):
             "kurtosis_func": f"{-0.16164566028:.11f}",
             "max_drawdown_func": f"{-0.20565775282:.11f}",
             "positive_share_func": f"{0.50645481629:.11f}",
-            "ret_vol_ratio_func": f"{0.03360602235:.11f}",
+            "ret_vol_ratio_func": f"{0.03358092409:.11f}",
             "skew_func": f"{-0.03615947531:.11f}",
-            "sortino_ratio_func": f"{0.04750285824:.11f}",
+            "sortino_ratio_func": f"{0.04746738129:.11f}",
             "value_ret_func": f"{0.01402990651:.11f}",
             "var_down_func": f"{-0.01095830172:.11f}",
             "vol_func": f"{0.10368363149:.11f}",
@@ -737,6 +901,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_keyvaluetable_with_relative_results(self):
 
+        self.maxDiff = None
         json_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "key_value_table_with_relative.json",
@@ -1552,6 +1717,39 @@ class TestOpenTimeSeries(unittest.TestCase):
         sys.stdout = old_stdout
         self.assertEqual(r, output)
 
+    def test_captoropenapiservice_get_timeseries(self):
+
+        sevice = CaptorOpenApiService()
+        ts_id = "62d06f9d753964781e81f185"
+        series = sevice.get_timeseries(timeseries_id=ts_id)
+
+        self.assertEqual(ts_id, series["id"])
+
+        with self.assertRaises(Exception) as e_unique:
+            sevice.get_timeseries(timeseries_id="")
+
+        self.assertEqual(int(str(e_unique.exception)[:3]), 404)
+
+    def test_captoropenapiservice_get_fundinfo(self):
+
+        sevice = CaptorOpenApiService()
+        isin_code = "SE0009807308"
+        fundinfo = sevice.get_fundinfo(isins=[isin_code])
+
+        self.assertEqual(isin_code, fundinfo[0]["classes"][0]["isin"])
+
+        fundinfo_date = sevice.get_fundinfo(
+            isins=[isin_code], report_date=dt.date(2022, 6, 30)
+        )
+
+        self.assertEqual(isin_code, fundinfo_date[0]["classes"][0]["isin"])
+
+        with self.assertRaises(Exception) as e_unique:
+            isin_cde = ""
+            _ = sevice.get_fundinfo(isins=[isin_cde])
+
+        self.assertEqual(int(str(e_unique.exception)[:3]), 400)
+
     def test_captoropenapiservice_get_nav(self):
 
         sevice = CaptorOpenApiService()
@@ -1562,7 +1760,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         with self.assertRaises(Exception) as e_unique:
             isin_cde = ""
-            sevice.get_nav(isin=isin_cde)
+            _ = sevice.get_nav(isin=isin_cde)
 
         self.assertEqual(
             f"Request for NAV series using ISIN {isin_cde} returned no data.",
@@ -1591,7 +1789,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         with self.assertRaises(Exception) as e_unique:
             isin_cde = ""
-            sevice.get_nav_to_dataframe(isin=isin_cde).head()
+            _ = sevice.get_nav_to_dataframe(isin=isin_cde).head()
 
         self.assertEqual(
             f"Request for NAV series using ISIN {isin_cde} returned no data.",
@@ -1687,7 +1885,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.ret_vol_ratio_func(riskfree_column=-1)
 
-        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.2326842279)
+        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.2106086588)
 
     def test_openframe_sortino_ratio_func(self):
 
@@ -1705,7 +1903,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.sortino_ratio_func(riskfree_column=-1)
 
-        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.2959333819)
+        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.2994187134)
 
     def test_openframe_tracking_error_func(self):
 
@@ -1741,7 +1939,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.info_ratio_func(base_column=1)
 
-        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.3286500542)
+        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.3206599645)
 
     def test_openframe_rolling_corr(self):
 
@@ -2193,4 +2391,181 @@ class TestOpenTimeSeries(unittest.TestCase):
             )
         self.assertIn(
             member="does not match", container=e_two.exception.args[2].message
+        )
+
+    def test_opentimeseries_georet_exceptions(self):
+
+        geoseries = OpenTimeSeries(
+            TimeSerie(
+                _id="",
+                name="geoseries",
+                currency="SEK",
+                instrumentId="",
+                local_ccy=True,
+                valuetype="Price(Close)",
+                dates=["2022-07-01", "2023-07-01"],
+                values=[1.0, 1.1],
+            )
+        )
+        self.assertEqual(f"{geoseries.geo_ret:.7f}", "0.1000718")
+        self.assertEqual(f"{geoseries.geo_ret_func():.7f}", "0.1000718")
+
+        zeroseries = OpenTimeSeries(
+            TimeSerie(
+                _id="",
+                name="zeroseries",
+                currency="SEK",
+                instrumentId="",
+                local_ccy=True,
+                valuetype="Price(Close)",
+                dates=["2022-07-01", "2023-07-01"],
+                values=[0.0, 1.1],
+            )
+        )
+        with self.assertRaises(Exception) as e_gr_zero:
+            _ = zeroseries.geo_ret
+
+        self.assertEqual(
+            e_gr_zero.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+
+        with self.assertRaises(Exception) as e_grf_zero:
+            _ = zeroseries.geo_ret_func()
+
+        self.assertEqual(
+            e_grf_zero.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+        negseries = OpenTimeSeries(
+            TimeSerie(
+                _id="",
+                name="negseries",
+                currency="SEK",
+                instrumentId="",
+                local_ccy=True,
+                valuetype="Price(Close)",
+                dates=["2022-07-01", "2023-07-01"],
+                values=[1.0, -0.1],
+            )
+        )
+
+        with self.assertRaises(Exception) as e_gr_neg:
+            _ = negseries.geo_ret
+
+        self.assertEqual(
+            e_gr_neg.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+
+        with self.assertRaises(Exception) as e_grf_neg:
+            _ = negseries.geo_ret_func()
+
+        self.assertEqual(
+            e_grf_neg.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+
+    def test_openframe_georet_exceptions(self):
+
+        geoframe = OpenFrame(
+            [
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="geoseries1",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=["2022-07-01", "2023-07-01"],
+                        values=[1.0, 1.1],
+                    )
+                ),
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="geoseries2",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=["2022-07-01", "2023-07-01"],
+                        values=[1.0, 1.2],
+                    )
+                ),
+            ]
+        )
+        self.assertListEqual(
+            [f"{gr:.5f}" for gr in geoframe.geo_ret], ["0.10007", "0.20015"]
+        )
+
+        self.assertListEqual(
+            [f"{gr:.5f}" for gr in geoframe.geo_ret_func()], ["0.10007", "0.20015"]
+        )
+
+        geoframe.add_timeseries(
+            OpenTimeSeries(
+                TimeSerie(
+                    _id="",
+                    name="geoseries3",
+                    currency="SEK",
+                    instrumentId="",
+                    local_ccy=True,
+                    valuetype="Price(Close)",
+                    dates=["2022-07-01", "2023-07-01"],
+                    values=[0.0, 1.1],
+                )
+            )
+        )
+        with self.assertRaises(Exception) as e_gr_zero:
+            _ = geoframe.geo_ret
+
+        self.assertEqual(
+            e_gr_zero.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+
+        with self.assertRaises(Exception) as e_grf_zero:
+            _ = geoframe.geo_ret_func()
+
+        self.assertEqual(
+            e_grf_zero.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+
+        geoframe.delete_timeseries(lvl_zero_item="geoseries3")
+
+        self.assertListEqual(
+            [f"{gr:.5f}" for gr in geoframe.geo_ret], ["0.10007", "0.20015"]
+        )
+
+        geoframe.add_timeseries(
+            OpenTimeSeries(
+                TimeSerie(
+                    _id="",
+                    name="geoseries4",
+                    currency="SEK",
+                    instrumentId="",
+                    local_ccy=True,
+                    valuetype="Price(Close)",
+                    dates=["2022-07-01", "2023-07-01"],
+                    values=[1.0, -1.1],
+                )
+            )
+        )
+        with self.assertRaises(Exception) as e_gr_neg:
+            _ = geoframe.geo_ret
+
+        self.assertEqual(
+            e_gr_neg.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+
+        with self.assertRaises(Exception) as e_grf_neg:
+            _ = geoframe.geo_ret_func()
+
+        self.assertEqual(
+            e_grf_neg.exception.args[0],
+            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
         )

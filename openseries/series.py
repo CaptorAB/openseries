@@ -134,8 +134,6 @@ class OpenTimeSeries(object):
             info += f"_id={self._id}, "
         if self.instrumentId is not None and self.instrumentId != "":
             info += f"instrumentId={self.instrumentId}, "
-        if self.isin is not None and self.isin != "":
-            info += f"isin={self.isin}, "
         if self.valuetype is not None and self.valuetype != "":
             info += f"valuetype={self.valuetype}, "
         if self.currency is not None and self.currency != "":
@@ -722,11 +720,17 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Geometric annualized return
+            Compounded Annual Growth Rate (CAGR)
         """
 
-        if float(self.tsdf.loc[self.first_idx]) == 0.0:
-            raise Exception("First data point == 0.0")
+        if (
+            float(self.tsdf.loc[self.first_idx]) == 0.0
+            or self.tsdf.lt(0.0).values.any()
+        ):
+            raise Exception(
+                f"Geometric return cannot be calculated due to an initial "
+                f"value being zero or a negative value."
+            )
         return float(
             (self.tsdf.loc[self.last_idx] / self.tsdf.loc[self.first_idx])
             ** (1 / self.yearfrac)
@@ -753,14 +757,20 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Geometric annualized return
+            Compounded Annual Growth Rate (CAGR)
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
 
-        if float(self.tsdf.loc[earlier]) == 0.0:
-            raise Exception("First data point == 0.0")
+        if (
+            float(self.tsdf.loc[earlier]) == 0.0
+            or self.tsdf.loc[earlier:later].lt(0.0).values.any()
+        ):
+            raise Exception(
+                f"Geometric return cannot be calculated due to an initial "
+                f"value being zero or a negative value."
+            )
 
         return float(
             (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
@@ -773,7 +783,7 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Arithmetic annualized log return
+            Annualized arithmetic mean of log returns
         """
 
         return float(np.log(self.tsdf).diff().mean() * self.periods_in_a_year)
@@ -801,7 +811,7 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Arithmetic annualized log return
+            Annualized arithmetic mean of log returns
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1014,10 +1024,9 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of geometric return and annualized volatility
+            Ratio of the annualized arithmetic mean of log returns and annualized volatility.
         """
-
-        return self.geo_ret / self.vol
+        return self.arithmetic_ret / self.vol
 
     def ret_vol_ratio_func(
         self,
@@ -1026,10 +1035,9 @@ class OpenTimeSeries(object):
         to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
-        """The ratio of geometric return and annualized volatility or, if risk free return
-        provided, Sharpe ratio calculated as ( geometric return - risk free return )
-        / volatility. The latter ratio implies that the riskfree asset has
-        zero volatility \n
+        """The ratio of annualized arithmetic mean of log returns and annualized volatility or,
+        if risk free return provided, Sharpe ratio calculated as ( geometric return - risk free return )
+        / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
 
         Parameters
@@ -1046,12 +1054,13 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of geometric return and annualized volatility or,
-            if risk free return provided, Sharpe ratio
+            Ratio of the annualized arithmetic mean of log returns and annualized volatility or,
+            if risk-free return provided, Sharpe ratio
         """
 
         return (
-            self.geo_ret_func(months_from_last, from_date, to_date) - riskfree_rate
+            self.arithmetic_ret_func(months_from_last, from_date, to_date)
+            - riskfree_rate
         ) / self.vol_func(months_from_last, from_date, to_date)
 
     @property
@@ -1061,10 +1070,13 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of geometric return and downside deviation with a riskfree rate of zero
+        Pandas.Series
+            Sortino ratio calculated as the annualized arithmetic mean of log returns
+            / downside deviation. The ratio implies that the riskfree asset has zero
+            volatility, and a minimum acceptable return of zero.
         """
 
-        return self.geo_ret / self.downside_deviation
+        return self.arithmetic_ret / self.downside_deviation
 
     def sortino_ratio_func(
         self,
@@ -1073,9 +1085,9 @@ class OpenTimeSeries(object):
         to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
-        """The Sortino ratio calculated as ( geometric return - risk free return )
+        """The Sortino ratio calculated as ( asset return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has
-        zero volatility, and a minimum acceptable return of zero \n
+        zero volatility. \n
         https://www.investopedia.com/terms/s/sortinoratio.asp
 
         Parameters
@@ -1092,11 +1104,14 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            The Sortino ratio calculated as ( geometric return - risk free return ) / downside deviation
+        Pandas.Series
+            Sortino ratio calculated as the annualized arithmetic mean of log returns
+            / downside deviation.
         """
 
         return (
-            self.geo_ret_func(months_from_last, from_date, to_date) - riskfree_rate
+            self.arithmetic_ret_func(months_from_last, from_date, to_date)
+            - riskfree_rate
         ) / self.downside_deviation_func(
             min_accepted_return=0.0,
             months_from_last=months_from_last,
