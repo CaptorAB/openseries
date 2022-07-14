@@ -2,9 +2,9 @@
 
 For a long time I have not kept a log of the changes implemented in the different versions of the openseries package. In this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
-## Version [0.5.1] - 2022-07-14
+## Version [0.5.2] - 2022-07-15
 
-Fixed so that ratios based on geometric returns will throw an exception if the initial value in the underlying series is zero. Also added missing PEP604 type hints.
+Fixed so that ratios based on geometric returns will use arithmetic return instead to avoid some failures. The geo_ret functions will now raise and exception on initial zeroes and on negative values. Improved test coverage and also added missing PEP604 type hints.
 
 ## Version [0.5.0] - 2022-07-12
 
