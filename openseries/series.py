@@ -728,8 +728,8 @@ class OpenTimeSeries(object):
             or self.tsdf.lt(0.0).values.any()
         ):
             raise Exception(
-                f"Geometric return cannot be calculated due to an initial "
-                f"value being zero or a negative value."
+                "Geometric return cannot be calculated due to an initial "
+                "value being zero or a negative value."
             )
         return float(
             (self.tsdf.loc[self.last_idx] / self.tsdf.loc[self.first_idx])
@@ -768,8 +768,8 @@ class OpenTimeSeries(object):
             or self.tsdf.loc[earlier:later].lt(0.0).values.any()
         ):
             raise Exception(
-                f"Geometric return cannot be calculated due to an initial "
-                f"value being zero or a negative value."
+                "Geometric return cannot be calculated due to an initial "
+                "value being zero or a negative value."
             )
 
         return float(

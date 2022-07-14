@@ -8,7 +8,6 @@ requests = Mock()
 
 
 class TestCaptorOpenApiService(unittest.TestCase):
-
     @patch("openseries.captor_open_api_sdk.requests")
     def test_captor_open_api_sdk_timeout(self, mock_requests):
 

@@ -99,8 +99,8 @@ class TestOpenTimeSeries(unittest.TestCase):
         sys.stdout = new_stdout
         repseries = self.randomseries
         r = (
-            f"OpenTimeSeries(name=Asset, valuetype=Price(Close), currency=SEK, "
-            f"start=2009-06-30, end=2019-06-28, local_ccy=True)\n"
+            "OpenTimeSeries(name=Asset, valuetype=Price(Close), currency=SEK, "
+            "start=2009-06-30, end=2019-06-28, local_ccy=True)\n"
         )
         print(repseries)
         output = new_stdout.getvalue()
