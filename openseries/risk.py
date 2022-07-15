@@ -9,15 +9,26 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-import sys
 
 
-def cvar_down(data: List[float], level: float = 0.95) -> float:
+def cvar_down(
+    data: pd.DataFrame | pd.Series | List[float], level: float = 0.95
+) -> float:
+    """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
+
+    Parameters
+    ----------
+    data: pd.DataFrame | List[float]
+        The data to perform the calculation over
+    level: float, default: 0.95
+        The sought CVaR level
+
+    Returns
+    -------
+    float
+        Downside Conditional Value At Risk "CVaR"
     """
 
-    :param data:
-    :param level:
-    """
     if isinstance(data, pd.DataFrame):
         clean = np.nan_to_num(data.iloc[:, 0])
     else:
@@ -28,21 +39,36 @@ def cvar_down(data: List[float], level: float = 0.95) -> float:
 
 
 def var_down(
-    data: List[float], level: float = 0.95, interpolation: str = "lower"
+    data: pd.DataFrame | pd.Series | List[float],
+    level: float = 0.95,
+    interpolation: str = "lower",
 ) -> float:
+    """Downside Value At Risk, "VaR". The equivalent of
+    percentile.inc([...], 1-level) over returns in MS Excel \n
+    https://www.investopedia.com/terms/v/var.asp
+
+    Parameters
+    ----------
+    data: pd.DataFrame | List[float]
+        The data to perform the calculation over
+    level: float, default: 0.95
+        The sought VaR level
+    interpolation: str, default: "lower"
+        type of interpolation in Pandas.DataFrame.quantile() function.
+        Default value is linear
+
+    Returns
+    -------
+    float
+        Downside Value At Risk
     """
 
-    :param data:
-    :param level:
-    :param interpolation:
-    """
-    clean = np.nan_to_num(data)
-    ret = clean[1:] / clean[:-1] - 1
-    if (sys.version_info[0] == 3) and (sys.version_info[1] > 6):
-        kwargs = {"method": interpolation}
+    if isinstance(data, pd.DataFrame):
+        clean = np.nan_to_num(data.iloc[:, 0])
     else:
-        kwargs = {"interpolation": interpolation}
-    result = np.quantile(ret, 1 - level, **kwargs)
+        clean = np.nan_to_num(data)
+    ret = clean[1:] / clean[:-1] - 1
+    result = np.quantile(ret, 1 - level, method=interpolation)
     return result
 
 
@@ -50,8 +76,8 @@ def drawdown_series(prices: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Serie
     """
     Calculates https://www.investopedia.com/terms/d/drawdown.asp
     This returns a series representing a drawdown.
-    When the price is at all time highs, the drawdown
-    is 0. However, when prices are below high water marks,
+    When the price is at all-time highs, the drawdown
+    is 0. However, when prices are below high watermarks,
     the drawdown series = current / hwm - 1
     The max drawdown can be obtained by simply calling .min()
     on the result (since the drawdown series is negative)

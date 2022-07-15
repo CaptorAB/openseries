@@ -14,16 +14,9 @@ Processes that can be simulated in this module are:
 
 """
 import math
-import os
-from pathlib import Path
-from typing import Tuple
-
 import numpy as np
 import numpy.random as nrand
-import plotly.graph_objs as go
-from plotly.offline import plot
-
-from openseries.load_plotly import load_plotly_dict
+from typing import Tuple
 
 
 class ModelParameters(object):
@@ -101,7 +94,7 @@ class ModelParameters(object):
 
 def convert_to_returns(log_returns: np.ndarray) -> np.ndarray:
     """
-    This method exponentiates a sequence of log returns to get daily returns.
+    This method exponentiates a sequence of log returns to get daily returns
     :param log_returns: the log returns to exponentiated
     :return: the exponentiated returns
     """
@@ -129,55 +122,6 @@ def convert_to_prices(param: ModelParameters, log_returns: np.ndarray) -> np.nda
     return np.array(price_sequence)
 
 
-def plot_stochastic_processes(
-    processes: list, title: str | None = None
-) -> (go.Figure, str):
-    """
-    This method plots a list of stochastic processes with a specified title
-    :param processes:
-    :param title:
-    """
-    file_name = title.replace("/", "").replace("#", "").replace(" ", "").upper()
-    plotfile = os.path.join(
-        os.path.abspath(str(Path.home())), "Documents", f"{file_name}.html"
-    )
-
-    fig, logo = load_plotly_dict()
-    figure = go.Figure(fig)
-
-    x_axis = np.arange(0, len(processes[0]), 1)
-
-    for n in range(len(processes)):
-        figure.add_trace(
-            go.Scatter(
-                x=x_axis,
-                y=processes[n],
-                mode="lines",
-                hovertemplate="%{y}<br>%{x}",
-                line=dict(width=2.5, dash="solid"),
-            )
-        )
-
-    figure.update_layout(
-        title=dict(text=title),
-        xaxis_title="Time, t",
-        yaxis_title="simulated asset price",
-        showlegend=False,
-        yaxis=dict(tickformat=None),
-    )
-    figure.add_layout_image(logo)
-
-    plot(
-        figure,
-        filename=plotfile,
-        auto_open=True,
-        link_text="",
-        include_plotlyjs="cdn",
-    )
-
-    return figure, plotfile
-
-
 def brownian_motion_log_returns(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
@@ -202,8 +146,7 @@ def brownian_motion_levels(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
     """
-    Returns a price sequence whose returns evolve according to
-    a brownian motion
+    Delivers a price sequence whose returns evolve according to a brownian motion
     :param param: model parameters object
     :param seed:
     :return: returns a price sequence which follows a brownian motion
@@ -221,7 +164,7 @@ def geometric_brownian_motion_log_returns(
     This method constructs a sequence of log returns which, when
     exponentiated, produce a random Geometric Brownian Motion (GBM).
     GBM is the stochastic process underlying the Black Scholes
-    options pricing formula.
+    options pricing formula
     :param param: model parameters object
     :param seed:
     :return: returns the log returns of a geometric brownian motion process
@@ -258,7 +201,7 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
     """
     This method produces a sequence of Jump Sizes which represent a jump
     diffusion process. These jumps are combined with a geometric brownian
-    motion (log returns) to produce the Merton model.
+    motion (log returns) to produce the Merton model
     :param param: the model parameters object
     :param seed:
     :return: jump sizes for each point in time
@@ -294,7 +237,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
     """
     This method constructs combines a geometric brownian motion process
     (log returns) with a jump diffusion process (log returns) to produce a
-    sequence of gbm jump returns.
+    sequence of gbm jump returns
     :param param: model parameters object
     :param seed:
     :return: returns a GBM process with jumps in it
@@ -313,7 +256,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
     """
     This method converts a sequence of gbm jmp returns into a price sequence
     which evolves according to a geometric brownian motion but can contain
-    jumps at any point in time.
+    jumps at any point in time
     :param param: model parameters object
     :param seed:
     :return: the price levels
@@ -333,7 +276,7 @@ def heston_construct_correlated_path(
     """
     This method is a simplified version of the Cholesky decomposition method
     for just two assets. It does not make use of matrix algebra and is
-    therefore quite easy to implement.
+    therefore quite easy to implement
     :param param: model parameters object
     :param brownian_motion_one: A first path to correlate against
     :param seed:
@@ -382,7 +325,7 @@ def cox_ingersoll_ross_heston(
         loc=0, scale=sqrt_delta_sigma, size=param.all_time
     )
     a, mu, zero = param.heston_a, param.heston_mu, param.heston_vol0
-    volatilities = [zero]
+    volatilities: list = [zero]
     for h in range(1, param.all_time):
         drift = a * (mu - volatilities[-1]) * param.all_delta
         randomness = (
@@ -420,7 +363,7 @@ def heston_model_levels(
         param, brownian, seed=seed
     )
 
-    heston_market_price_levels = [param.all_s0]
+    heston_market_price_levels: list = [param.all_s0]
     for h in range(1, param.all_time):
         drift = param.gbm_mu * heston_market_price_levels[h - 1] * param.all_delta
         vol = (
@@ -455,7 +398,7 @@ def cox_ingersoll_ross_levels(
     # Setup the parameters for interest rates
     a, mu, zero = param.cir_a, param.cir_mu, param.all_r0
     # Assumes output is in levels
-    levels = [zero]
+    levels: list = [zero]
     for h in range(1, param.all_time):
         drift = a * (mu - levels[h - 1]) * param.all_delta
         """ The main difference between this and the Ornstein Uhlenbeck model 
@@ -470,7 +413,7 @@ def cox_ingersoll_ross_levels(
 def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -> list:
     """
     This method returns the rate levels of a mean-reverting
-    Ornstein Uhlenbeck process.
+    Ornstein Uhlenbeck process
     :param param: the model parameters object
     :param seed:
     :return: the interest rate levels for the Ornstein Uhlenbeck process
@@ -478,7 +421,7 @@ def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -
     assert isinstance(
         param, ModelParameters
     ), "param must be an object of Class ModelParameters"
-    ou_levels = [param.all_r0]
+    ou_levels: list = [param.all_r0]
     brownian_motion_returns = brownian_motion_log_returns(param, seed=seed)
     for h in range(1, param.all_time):
         drift = param.ou_a * (param.ou_mu - ou_levels[h - 1]) * param.all_delta

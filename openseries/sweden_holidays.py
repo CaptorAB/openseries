@@ -10,6 +10,7 @@ from pandas.tseries.holiday import (
     Easter,
 )
 
+# noinspection PyArgumentList
 holidays_sw = [
     Holiday("Nyårsdagen", month=1, day=1),
     Holiday("Trettondag jul", month=1, day=6),

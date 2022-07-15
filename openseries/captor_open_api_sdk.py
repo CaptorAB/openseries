@@ -86,12 +86,6 @@ class CaptorOpenApiService(object):
         :return: pd.DataFrame
         """
         data = self.get_nav(isin=isin)
-        try:
-            _ = data["navPerUnit"]
-        except KeyError:
-            raise Exception(
-                f"Request for NAV series using ISIN {isin} returned no data."
-            )
         return pd.DataFrame(
             data=data["navPerUnit"],
             index=pd.DatetimeIndex(data["dates"]),

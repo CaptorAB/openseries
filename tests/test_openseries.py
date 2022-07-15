@@ -12,18 +12,20 @@ import sys
 from testfixtures import LogCapture
 import unittest
 
-from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
-from openseries.frame import OpenFrame, key_value_table
-from openseries.sim_price import ReturnSimulation
 from openseries.captor_open_api_sdk import CaptorOpenApiService
+from openseries.frame import OpenFrame, key_value_table
+from openseries.risk import cvar_down, var_down
+from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
+from openseries.sim_price import ReturnSimulation
 from openseries.stoch_processes import (
     ModelParameters,
     cox_ingersoll_ross_levels,
     ornstein_uhlenbeck_levels,
+    brownian_motion_levels,
+    geometric_brownian_motion_levels,
+    geometric_brownian_motion_jump_diffusion_levels,
+    heston_model_levels,
 )
-from openseries.risk import cvar_down, var_down
-from openseries.datefixer import date_fix, date_offset_foll
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 repo_root = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -351,11 +353,7 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_opentimeseries_periods_in_a_year(self):
 
         calc = len(self.randomseries.dates) / (
-            (
-                date_fix(self.randomseries.dates[-1])
-                - date_fix(self.randomseries.dates[0])
-            ).days
-            / 365.25
+            (self.randomseries.last_idx - self.randomseries.first_idx).days / 365.25
         )
 
         self.assertEqual(calc, self.randomseries.periods_in_a_year)
@@ -953,6 +951,17 @@ class TestOpenTimeSeries(unittest.TestCase):
             msg="VaR for OpenFrame not equal",
         )
 
+        self.assertEqual(
+            riskframe.cvar_down.iloc[0],
+            cvar_down(riskframe.tsdf),
+            msg="CVaR for OpenFrame not equal",
+        )
+        self.assertEqual(
+            riskframe.var_down.iloc[0],
+            var_down(riskframe.tsdf),
+            msg="VaR for OpenFrame not equal",
+        )
+
     def test_openframe_methods_same_as_opentimeseries(self):
 
         same = ReturnSimulation.from_normal(n=1, d=504, mu=0.05, vol=0.175, seed=71)
@@ -1427,77 +1436,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ["data", "layout"])
 
-    def test_date_fix(self):
-
-        d = "2020-11-07"
-        result = date_fix(d)
-        self.assertTrue(type(result) == dt.date)
-        self.assertEqual(result.strftime("%Y-%m-%d"), d)
-
-        with LogCapture() as log:
-            d = "2020-11-0b"
-            date_fix(d)
-            ll = log.actual()
-            self.assertEqual(
-                ll, [("root", "ERROR", "Unknown string format: 2020-11-0b")]
-            )
-
-    def test_date_offset_foll(self):
-
-        sweden = SwedenHolidayCalendar(rules=holidays_sw)
-
-        d = "2020-06-19"
-        follow = date_offset_foll(
-            d,
-            calendar=CDay(calendar=sweden),
-            months_offset=0,
-            adjust=True,
-            following=True,
-        )
-        preced = date_offset_foll(
-            d,
-            calendar=CDay(calendar=sweden),
-            months_offset=0,
-            adjust=True,
-            following=False,
-        )
-        unadj = date_offset_foll(
-            d,
-            calendar=CDay(calendar=sweden),
-            months_offset=0,
-            adjust=False,
-            following=False,
-        )
-        self.assertEqual(dt.date(2020, 6, 22), follow)
-        self.assertEqual(dt.date(2020, 6, 18), preced)
-        self.assertEqual(dt.date(2020, 6, 19), unadj)
-
-        d2 = "2020-06-25"
-        follow2 = date_offset_foll(
-            d2,
-            calendar=CDay(calendar=sweden),
-            months_offset=12,
-            adjust=True,
-            following=True,
-        )
-        preced2 = date_offset_foll(
-            d2,
-            calendar=CDay(calendar=sweden),
-            months_offset=12,
-            adjust=True,
-            following=False,
-        )
-        unadj2 = date_offset_foll(
-            d2,
-            calendar=CDay(calendar=sweden),
-            months_offset=12,
-            adjust=False,
-            following=False,
-        )
-        self.assertEqual(dt.date(2021, 6, 28), follow2)
-        self.assertEqual(dt.date(2021, 6, 24), preced2)
-        self.assertEqual(dt.date(2021, 6, 25), unadj2)
-
     def test_openframe_passed_empty_list(self):
 
         with LogCapture() as log:
@@ -1599,9 +1537,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         frame.trunc_frame(start_cut=trunced[0], end_cut=trunced[1])
 
-        self.assertListEqual(
-            trunced, [date_fix(frame.first_idx), date_fix(frame.last_idx)]
-        )
+        self.assertListEqual(trunced, [frame.first_idx, frame.last_idx])
 
     def test_return_simulation_processes(self):
 
@@ -1623,38 +1559,101 @@ class TestOpenTimeSeries(unittest.TestCase):
             {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
         ]
         target_returns = [
-            "-0.011125873",
-            "0.008891874",
-            "-0.031071807",
-            "0.032353969",
-            "0.004562270",
-            "-0.029728241",
+            "-0.011157857",
+            "0.008917436",
+            "-0.031161130",
+            "0.032446979",
+            "0.004575385",
+            "-0.029813702",
         ]
         target_volatilities = [
-            "0.200141943",
-            "0.200217060",
-            "0.200141943",
-            "0.263077460",
-            "0.439888381",
-            "0.209996552",
+            "0.200429415",
+            "0.200504640",
+            "0.200429415",
+            "0.263455329",
+            "0.440520211",
+            "0.210298179",
         ]
 
-        series = []
+        returns = []
+        volatilities = []
         for m, a in zip(methods, added):
             arguments = {**args, **a}
             onesim = getattr(ReturnSimulation, m)(**arguments)
-            serie = sim_to_opentimeseries(onesim, end=dt.date(2019, 6, 30)).to_cumret()
-            serie.set_new_label(f"Asset_{m}")
-            series.append(serie)
-
-        frame = OpenFrame(series)
-        returns = [f"{r:.9f}" for r in frame.arithmetic_ret]
-        volatilities = [f"{v:.9f}" for v in frame.vol]
+            returns.append(f"{onesim.realized_mean_return:.9f}")
+            volatilities.append(f"{onesim.realized_vol:.9f}")
 
         self.assertListEqual(target_returns, returns)
         self.assertListEqual(target_volatilities, volatilities)
 
-    def test_cir_and_ou_stoch_processes(self):
+    def test_stoch_processes_assets(self):
+
+        days = 2520
+        target_returns = [
+            "-0.060945915",
+            "0.055052497",
+            "0.026204853",
+            "0.006932099",
+            "0.173730952",
+        ]
+        target_volatilities = [
+            "0.241393324",
+            "0.241469969",
+            "0.252469189",
+            "0.236601983",
+            "0.600404476",
+        ]
+
+        mp = ModelParameters(
+            all_s0=1.0,
+            all_r0=0.05,
+            all_time=days,
+            all_delta=1.0 / 252,
+            all_sigma=0.2,
+            gbm_mu=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            heston_a=0.25,
+            heston_mu=0.35,
+            heston_vol0=0.06125,
+        )
+
+        processes = [
+            brownian_motion_levels,
+            geometric_brownian_motion_levels,
+            geometric_brownian_motion_jump_diffusion_levels,
+            heston_model_levels,
+            heston_model_levels,
+        ]
+        res_indices = [None, None, None, 0, 1]
+
+        series = []
+        for i, process, residx in zip(range(len(processes)), processes, res_indices):
+            modelresult = process(param=mp, seed=71)
+            if isinstance(modelresult, tuple):
+                modelresult = modelresult[residx]
+            date_range = [
+                d.date()
+                for d in pd.date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
+            ]
+            sdf = pd.DataFrame(
+                data=modelresult,
+                index=date_range,
+                columns=[f"Simulation_{i}"],
+            )
+            series.append(
+                OpenTimeSeries.from_df(sdf, valuetype="Price(Close)").to_cumret()
+            )
+
+        frame = OpenFrame(series)
+        means = [f"{r:.9f}" for r in frame.arithmetic_ret]
+        deviations = [f"{v:.9f}" for v in frame.vol]
+
+        self.assertListEqual(target_returns, means)
+        self.assertListEqual(target_volatilities, deviations)
+
+    def test_stoch_processes_cir_and_ou(self):
 
         series = []
         days = 2520
@@ -2568,4 +2567,122 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertEqual(
             e_grf_neg.exception.args[0],
             "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+        )
+
+    def test_returnsimulation_properties(self):
+
+        days = 1200
+        psim = ReturnSimulation.from_normal(n=1, d=days, mu=0.05, vol=0.1, seed=71)
+
+        self.assertIsInstance(psim.results, pd.DataFrame)
+
+        self.assertEqual(psim.results.shape[0], days)
+
+        self.assertEqual(f"{psim.realized_mean_return:.9f}", "0.028832246")
+
+        self.assertEqual(f"{psim.realized_vol:.9f}", "0.096596353")
+
+    def test_opentimeseries_value_nan_handle(self):
+
+        nanseries = OpenTimeSeries(
+            TimeSerie(
+                _id="",
+                name="nanseries",
+                currency="SEK",
+                instrumentId="",
+                local_ccy=True,
+                valuetype="Price(Close)",
+                dates=[
+                    "2022-07-11",
+                    "2022-07-12",
+                    "2022-07-13",
+                    "2022-07-14",
+                    "2022-07-15",
+                ],
+                values=[1.1, 1.0, 0.8, 1.1, 1.0],
+            )
+        )
+        nanseries.tsdf.iloc[2, 0] = None
+        dropseries = nanseries.from_deepcopy()
+        dropseries.value_nan_handle(method="drop")
+        self.assertListEqual([1.1, 1.0, 1.1, 1.0], dropseries.tsdf.iloc[:, 0].tolist())
+
+        fillseries = nanseries.from_deepcopy()
+        fillseries.value_nan_handle(method="fill")
+        self.assertListEqual(
+            [1.1, 1.0, 1.0, 1.1, 1.0], fillseries.tsdf.iloc[:, 0].tolist()
+        )
+
+        with self.assertRaises(AssertionError) as e_method:
+            _ = nanseries.value_nan_handle(method="other")
+
+        self.assertEqual(
+            e_method.exception.args[0],
+            "Method must be either fill or drop passed as string.",
+        )
+
+    def test_openframe_value_nan_handle(self):
+
+        nanframe = OpenFrame(
+            [
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="nanseries1",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ],
+                        values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    )
+                ),
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="nanseries2",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ],
+                        values=[2.1, 2.0, 1.8, 2.1, 2.0],
+                    )
+                ),
+            ]
+        )
+        nanframe.tsdf.iloc[2, 0] = None
+        nanframe.tsdf.iloc[3, 1] = None
+        dropframe = nanframe.from_deepcopy()
+        dropframe.value_nan_handle(method="drop")
+        self.assertListEqual([1.1, 1.0, 1.0], dropframe.tsdf.iloc[:, 0].tolist())
+        self.assertListEqual([2.1, 2.0, 2.0], dropframe.tsdf.iloc[:, 1].tolist())
+
+        fillframe = nanframe.from_deepcopy()
+        fillframe.value_nan_handle(method="fill")
+        self.assertListEqual(
+            [1.1, 1.0, 1.0, 1.1, 1.0], fillframe.tsdf.iloc[:, 0].tolist()
+        )
+        self.assertListEqual(
+            [2.1, 2.0, 1.8, 1.8, 2.0], fillframe.tsdf.iloc[:, 1].tolist()
+        )
+
+        with self.assertRaises(AssertionError) as e_methd:
+            _ = nanframe.value_nan_handle(method="other")
+
+        self.assertEqual(
+            e_methd.exception.args[0],
+            "Method must be either fill or drop passed as string.",
         )

@@ -1,13 +1,25 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
+from typing import TypedDict
 
 from openseries.stoch_processes import (
     ModelParameters,
     geometric_brownian_motion_log_returns,
-    heston_model_levels,
     geometric_brownian_motion_jump_diffusion_levels,
+    heston_model_levels,
 )
+
+
+class Simulation(TypedDict, total=False):
+    """Class to hold the type of input data for the OpenTimeSeries class."""
+
+    number_of_sims: int
+    trading_days: int
+    trading_days_in_year: int
+    mean_annual_return: float
+    mean_annual_vol: float
+    df: pd.DataFrame
 
 
 class ReturnSimulation(object):
@@ -22,12 +34,29 @@ class ReturnSimulation(object):
     mean_annual_vol: float
     df: pd.DataFrame
 
-    def __init__(self, d: dict):
+    def __init__(self, d: Simulation):
         """
         :param d: Dictionary containing class attributes set by class method.
         """
 
         self.__dict__ = d
+
+    @property
+    def results(self) -> pd.DataFrame:
+        """Data output as Pandas.DataFrame"""
+        return self.df.add(1.0).cumprod(axis="columns").T
+
+    @property
+    def realized_mean_return(self) -> float:
+        """Annualized arithmetic mean of log returns"""
+        return float(np.log(self.results).diff().mean() * self.trading_days_in_year)
+
+    @property
+    def realized_vol(self) -> float:
+        """Annualized volatility"""
+        return float(
+            self.results.pct_change().std() * np.sqrt(self.trading_days_in_year)
+        )
 
     @classmethod
     def from_normal(
@@ -55,14 +84,14 @@ class ReturnSimulation(object):
         daily_returns = np.random.normal(
             loc=mu / t, scale=vol / np.sqrt(t), size=(n, d)
         )
-        output = {
-            "number_of_sims": n,
-            "trading_days": d,
-            "trading_days_in_year": t,
-            "mean_annual_return": mu,
-            "mean_annual_vol": vol,
-            "df": pd.DataFrame(data=daily_returns),
-        }
+        output = Simulation(
+            number_of_sims=n,
+            trading_days=d,
+            trading_days_in_year=t,
+            mean_annual_return=mu,
+            mean_annual_vol=vol,
+            df=pd.DataFrame(data=daily_returns),
+        )
         return cls(d=output)
 
     @classmethod
@@ -91,14 +120,14 @@ class ReturnSimulation(object):
         daily_returns = (
             np.random.lognormal(mean=mu / t, sigma=vol / np.sqrt(t), size=(n, d)) - 1
         )
-        output = {
-            "number_of_sims": n,
-            "trading_days": d,
-            "trading_days_in_year": t,
-            "mean_annual_return": mu,
-            "mean_annual_vol": vol,
-            "df": pd.DataFrame(data=daily_returns),
-        }
+        output = Simulation(
+            number_of_sims=n,
+            trading_days=d,
+            trading_days_in_year=t,
+            mean_annual_return=mu,
+            mean_annual_vol=vol,
+            df=pd.DataFrame(data=daily_returns),
+        )
         return cls(d=output)
 
     @classmethod
@@ -130,14 +159,14 @@ class ReturnSimulation(object):
         daily_returns = []
         for i in range(n):
             daily_returns.append(geometric_brownian_motion_log_returns(mp))
-        output = {
-            "number_of_sims": n,
-            "trading_days": d,
-            "trading_days_in_year": t,
-            "mean_annual_return": mu,
-            "mean_annual_vol": vol,
-            "df": pd.DataFrame(data=daily_returns),
-        }
+        output = Simulation(
+            number_of_sims=n,
+            trading_days=d,
+            trading_days_in_year=t,
+            mean_annual_return=mu,
+            mean_annual_vol=vol,
+            df=pd.DataFrame(data=daily_returns),
+        )
         return cls(d=output)
 
     @classmethod
@@ -187,14 +216,14 @@ class ReturnSimulation(object):
             r = aray[1:] / aray[:-1] - 1
             r = np.insert(r, 0, 0.0)
             daily_returns.append(r)
-        output = {
-            "number_of_sims": n,
-            "trading_days": d,
-            "trading_days_in_year": t,
-            "mean_annual_return": mu,
-            "mean_annual_vol": vol,
-            "df": pd.DataFrame(data=daily_returns),
-        }
+        output = Simulation(
+            number_of_sims=n,
+            trading_days=d,
+            trading_days_in_year=t,
+            mean_annual_return=mu,
+            mean_annual_vol=vol,
+            df=pd.DataFrame(data=daily_returns),
+        )
         return cls(d=output)
 
     @classmethod
@@ -242,14 +271,14 @@ class ReturnSimulation(object):
             r = aray[1:] / aray[:-1] - 1
             r = np.insert(r, 0, 0.0)
             daily_returns.append(r)
-        output = {
-            "number_of_sims": n,
-            "trading_days": d,
-            "trading_days_in_year": t,
-            "mean_annual_return": mu,
-            "mean_annual_vol": vol,
-            "df": pd.DataFrame(data=daily_returns),
-        }
+        output = Simulation(
+            number_of_sims=n,
+            trading_days=d,
+            trading_days_in_year=t,
+            mean_annual_return=mu,
+            mean_annual_vol=vol,
+            df=pd.DataFrame(data=daily_returns),
+        )
         return cls(d=output)
 
     @classmethod
@@ -298,24 +327,12 @@ class ReturnSimulation(object):
             r = aray[1:] / aray[:-1] - 1
             r = np.insert(r, 0, 0.0)
             daily_returns.append(r)
-        output = {
-            "number_of_sims": n,
-            "trading_days": d,
-            "trading_days_in_year": t,
-            "mean_annual_return": mu,
-            "mean_annual_vol": vol,
-            "df": pd.DataFrame(data=daily_returns),
-        }
+        output = Simulation(
+            number_of_sims=n,
+            trading_days=d,
+            trading_days_in_year=t,
+            mean_annual_return=mu,
+            mean_annual_vol=vol,
+            df=pd.DataFrame(data=daily_returns),
+        )
         return cls(d=output)
-
-    @property
-    def results(self) -> pd.Series:
-        return self.df.add(1.0).cumprod(axis="columns").iloc[:, -1]
-
-    @property
-    def realized_mean_return(self) -> float:
-        return (self.results.mean() - 1) * self.trading_days_in_year / self.trading_days
-
-    @property
-    def realized_vol(self) -> float:
-        return self.results.add(1.0).std() / np.sqrt(self.trading_days_in_year)
