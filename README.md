@@ -16,53 +16,58 @@ To install:
 
     pip install openseries
 
-To construct an OpenTimeSeries object from a "raw" dictionary:
+Import statements
 
-    data = {'_id': '',
-            'currency': 'SEK',
-            'dates': ['2020-09-03',
-                      '2020-09-04',
-                      '2020-09-07',
-                      '2020-09-08',
-                      '2020-09-09'],
-            'instrumentId': '',
-            'local_ccy': True,
-            'name': 'Timeseries',
-            'values': [114.9965,
-                       114.8355,
-                       114.8694,
-                       115.1131,
-                       114.8643],
-            'valuetype': 'Price(Close)'}
+    from openseries.frame import OpenFrame
+    from openseries.series import OpenTimeSeries, TimeSerie
 
-    series =  = OpenTimeSeries(data)
+To construct an OpenTimeSeries object from raw data in a TypedDict:
 
-Or to construct using the class method designed to get a NAV timeseries for a Captor Fund:
+    data = TimeSerie(
+        _id="",
+        currency="SEK",
+        dates=["2020-09-03", "2020-09-04", "2020-09-07", "2020-09-08", "2020-09-09"],
+        instrumentId="",
+        local_ccy=True,
+        name="Timeseries",
+        values=[114.9965, 114.8355, 114.8694, 115.1131, 114.8643],
+        valuetype="Price(Close)",
+    )
 
-    capirisc = 'SE0009807308'
+Instantiate OpenTimeSeries object:
+
+    series = OpenTimeSeries(data)
+
+To construct using the class method designed to get a NAV timeseries for a Captor Fund:
+
+    capirisc = "SE0009807308"
+    scillagc = "SE0011670843"
     bonds = OpenTimeSeries.from_open_nav(isin=capirisc)
+    equities = OpenTimeSeries.from_open_nav(isin=scillagc)
 
-And print its geometric annual return and volatility:
+To compare assets an OpenFrame is constructed as below.
 
-    print(f'Return    : {bonds.geo_ret:.2%}\nVolatility: {bonds.vol:.2%}.')
+    basket = OpenFrame([bonds, equities])
 
-To compare timeseries an OpenFrame is constructed as below. The names of the timeseries must be unique.
-
-    basket = OpenFrame([series, bonds])
-
-The helper methods to work with the timeseries can be chained like this:
+The data cleaning helper methods can be chained like this:
 
     basket.trunc_frame().value_nan_handle().to_cumret()
 
-And a new portfolio timeseries can be constructed from an OpenFrame like this:
+A new portfolio timeseries can be constructed from an OpenFrame like this:
 
     basket.weights = [0.6, 0.4]
     portfolio = OpenTimeSeries.from_df(basket.make_portfolio('porfolio'))
     basket.add_timeseries(portfolio)
 
+To print return and volatility:
+
+    data = basket.all_properties(properties=["arithmetic_ret", "vol"]).T
+    data = data.applymap(lambda x: f"{x:.2%}")
+    print(data)
+
 Finally, plotting is simple. This will plot the timeseries in a browser window:
 
-    basket.plot_series(tick_fmt='.1%')
+    basket.plot_series(tick_fmt=".2%")
 
 To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
