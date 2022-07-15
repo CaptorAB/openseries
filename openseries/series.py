@@ -526,8 +526,7 @@ class OpenTimeSeries(object):
         (datetime.date, datetime.date)
             Start and end date of the chosen date range
         """
-
-        self.setup_class()
+        earlier, later = None, None
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
@@ -542,7 +541,7 @@ class OpenTimeSeries(object):
             else:
                 if from_dt is not None and to_dt is None:
                     assert from_dt >= self.first_idx, (
-                        "Function calc_range returned earlier date < " "series start"
+                        "Function calc_range returned earlier date < series start"
                     )
                     earlier, later = from_dt, self.last_idx
                 elif from_dt is None and to_dt is not None:
@@ -550,23 +549,17 @@ class OpenTimeSeries(object):
                         to_dt <= self.last_idx
                     ), "Function calc_range returned later date > series end"
                     earlier, later = self.first_idx, to_dt
-                elif from_dt is not None and to_dt is not None:
+                elif from_dt is not None or to_dt is not None:
                     assert to_dt <= self.last_idx and from_dt >= self.first_idx, (
-                        "Function calc_range returned dates outside " "series range"
+                        "Function calc_range returned dates outside series range"
                     )
                     earlier, later = from_dt, to_dt
-                else:
-                    earlier, later = from_dt, to_dt
-
-            earlier = date_fix(earlier)
-            later = date_fix(later)
-
-            while not self.tsdf.index.isin([earlier]).any():
-                earlier -= dt.timedelta(days=1)
-
-            while not self.tsdf.index.isin([later]).any():
-                later += dt.timedelta(days=1)
-
+            if earlier is not None:
+                while not self.tsdf.index.isin([earlier]).any():
+                    earlier -= dt.timedelta(days=1)
+            if later is not None:
+                while not self.tsdf.index.isin([later]).any():
+                    later += dt.timedelta(days=1)
         else:
             earlier, later = self.first_idx, self.last_idx
 

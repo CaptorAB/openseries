@@ -13,7 +13,7 @@ from testfixtures import LogCapture
 import unittest
 
 from openseries.captor_open_api_sdk import CaptorOpenApiService
-from openseries.frame import OpenFrame, key_value_table
+from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
 from openseries.sim_price import ReturnSimulation
@@ -438,6 +438,12 @@ class TestOpenTimeSeries(unittest.TestCase):
             )
         self.assertIsInstance(outside_start.exception, AssertionError)
 
+        nst, nen = cseries.calc_range(
+            from_dt=dt.date(2009, 7, 3), to_dt=dt.date(2019, 6, 25)
+        )
+        self.assertEqual(nst, dt.date(2009, 7, 3))
+        self.assertEqual(nen, dt.date(2019, 6, 25))
+
         cseries.resample()
 
         earlier_moved, _ = cseries.calc_range(from_dt=dt.date(2009, 8, 10))
@@ -446,7 +452,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         _, later_moved = cseries.calc_range(to_dt=dt.date(2009, 8, 20))
         self.assertEqual(later_moved, dt.date(2009, 8, 31))
 
-    def test_opentimeframe_calc_range(self):
+    def test_openframe_calc_range(self):
 
         crsims = ReturnSimulation.from_normal(n=5, d=2512, mu=0.05, vol=0.1, seed=71)
         crframe = sim_to_openframe(crsims, dt.date(2019, 6, 30))
@@ -488,6 +494,12 @@ class TestOpenTimeSeries(unittest.TestCase):
                 from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 5, 31)
             )
         self.assertIsInstance(outside_start.exception, AssertionError)
+
+        nst, nen = crframe.calc_range(
+            from_dt=dt.date(2009, 7, 3), to_dt=dt.date(2019, 6, 25)
+        )
+        self.assertEqual(nst, dt.date(2009, 7, 3))
+        self.assertEqual(nen, dt.date(2019, 6, 25))
 
         crframe.resample()
 
@@ -896,28 +908,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         dict_toframe_1 = frame_1.tsdf.to_dict()
 
         self.assertDictEqual(dict_toframe_0, dict_toframe_1)
-
-    def test_openframe_keyvaluetable_with_relative_results(self):
-
-        self.maxDiff = None
-        json_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "key_value_table_with_relative.json",
-        )
-        with open(json_file, "r", encoding="utf-8") as ff:
-            output = json.load(ff)
-
-        sim_rel = ReturnSimulation.from_normal(n=4, d=2512, mu=0.05, vol=0.1, seed=71)
-        frame_rel = sim_to_openframe(sim_rel, end=dt.date(2019, 6, 30)).to_cumret()
-        frame_rel.relative(base_zero=False)
-
-        kv = key_value_table(frame_rel)
-        fmt = "{:.11f}"
-        kv = kv.applymap(lambda x: fmt.format(x))
-        dd = kv.to_dict(orient="index")
-        new_dd = {str(k): dd[k] for k in dd}
-
-        self.assertDictEqual(new_dd, output)
 
     def test_risk_functions_same_as_series_and_frame_methods(self):
 
@@ -1828,7 +1818,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertListEqual(prop_index, result_index)
 
-    def test_align_index_to_local_cdays(self):
+    def test_opentimeseries_align_index_to_local_cdays(self):
 
         date_range = [
             d.date() for d in pd.date_range(start="2020-06-15", end="2020-06-25")
@@ -1846,6 +1836,28 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         aseries.align_index_to_local_cdays()
         self.assertFalse(midsummer in aseries.tsdf.index)
+
+    def test_openframe_align_index_to_local_cdays(self):
+
+        date_range = [
+            d.date() for d in pd.date_range(start="2022-06-01", end="2022-06-15")
+        ]
+        asim = [1.0] * len(date_range)
+        adf = pd.DataFrame(
+            data=asim,
+            index=date_range,
+            columns=pd.MultiIndex.from_product([["Asset_a"], ["Price(Close)"]]),
+        )
+        aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
+        bseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
+        bseries.set_new_label("Asset_b")
+        aframe = OpenFrame([aseries, bseries])
+
+        midsummer = dt.date(2022, 6, 6)
+        self.assertTrue(midsummer in date_range)
+
+        aframe.align_index_to_local_cdays()
+        self.assertFalse(midsummer in aframe.tsdf.index)
 
     def test_openframe_rolling_info_ratio(self):
 
@@ -2686,3 +2698,59 @@ class TestOpenTimeSeries(unittest.TestCase):
             e_methd.exception.args[0],
             "Method must be either fill or drop passed as string.",
         )
+
+    def test_openframe_miscellaneous(self):
+
+        msims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
+        mframe = sim_to_openframe(msims, dt.date(2019, 6, 30)).to_cumret()
+
+        no_fixed = mframe.arithmetic_ret_func()
+        fixed = mframe.arithmetic_ret_func(periods_in_a_year_fixed=252)
+        for nf, f in zip(no_fixed, fixed):
+            self.assertAlmostEqual(nf, f, places=3)
+            self.assertNotAlmostEqual(nf, f, places=7)
+
+        ret = [f"{rr:.9f}" for rr in mframe.value_ret_func()]
+        logret = [f"{lr:.9f}" for lr in mframe.value_ret_func(logret=True)]
+        self.assertListEqual(
+            [
+                "0.275697802",
+                "-0.033533800",
+                "0.001519387",
+                "0.061395949",
+                "-0.040958695",
+            ],
+            ret,
+        )
+        self.assertListEqual(
+            [
+                "0.243493324",
+                "-0.034108953",
+                "0.001518234",
+                "0.059584975",
+                "-0.041821134",
+            ],
+            logret,
+        )
+
+        mframe.tsdf.iloc[0, 2] = 0.0
+
+        r = (
+            "Error in function value_ret due to an initial value being zero. "
+            "(                Asset_0      Asset_1      Asset_2      Asset_3      "
+            "Asset_4\n"
+            "           Price(Close) Price(Close) Price(Close) Price(Close) Price(Close)\n"
+            "2017-06-27     1.000000     1.000000     0.000000     1.000000     1.000000\n"
+            "2017-06-28     0.992677     1.013048     1.006154     0.998712     0.999713\n"
+            "2017-06-29     0.990096     1.005543     1.013704     0.998940     1.004026)"
+        )
+
+        with self.assertRaises(Exception) as e_vr:
+            _ = mframe.value_ret
+
+        self.assertEqual(e_vr.exception.args[0], r)
+
+        with self.assertRaises(Exception) as e_vrf:
+            _ = mframe.value_ret_func()
+
+        self.assertEqual(e_vrf.exception.args[0], r)

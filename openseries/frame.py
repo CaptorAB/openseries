@@ -167,7 +167,7 @@ class OpenFrame(object):
         (datetime.date, datetime.date)
             Start and end date of the chosen date range
         """
-
+        earlier, later = None, None
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
@@ -182,7 +182,7 @@ class OpenFrame(object):
             else:
                 if from_dt is not None and to_dt is None:
                     assert from_dt >= self.first_idx, (
-                        "Function calc_range returned " "earlier date < series start"
+                        "Function calc_range returned earlier date < series start"
                     )
                     earlier, later = from_dt, self.last_idx
                 elif from_dt is None and to_dt is not None:
@@ -192,15 +192,15 @@ class OpenFrame(object):
                     earlier, later = self.first_idx, to_dt
                 elif from_dt is not None or to_dt is not None:
                     assert to_dt <= self.last_idx and from_dt >= self.first_idx, (
-                        "Function calc_range returned " "dates outside series range"
+                        "Function calc_range returned dates outside series range"
                     )
                     earlier, later = from_dt, to_dt
-                else:
-                    earlier, later = self.first_idx, self.last_idx
-            while not self.tsdf.index.isin([earlier]).any():
-                earlier -= dt.timedelta(days=1)
-            while not self.tsdf.index.isin([later]).any():
-                later += dt.timedelta(days=1)
+            if earlier is not None:
+                while not self.tsdf.index.isin([earlier]).any():
+                    earlier -= dt.timedelta(days=1)
+            if later is not None:
+                while not self.tsdf.index.isin([later]).any():
+                    later += dt.timedelta(days=1)
         else:
             earlier, later = self.first_idx, self.last_idx
 
@@ -539,8 +539,8 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if self.tsdf.iloc[0].isin([0.0]).any():
             raise Exception(
-                "Error in function value_ret_func() due to an "
-                "initial value being zero."
+                f"Error in function value_ret due to an initial value "
+                f"being zero. ({self.tsdf.head(3)})"
             )
         else:
             if logret:
@@ -2576,149 +2576,3 @@ class OpenFrame(object):
         )
 
         return figure, plotfile
-
-
-def key_value_table(
-    series: OpenFrame | List[OpenTimeSeries],
-    headers: list | None = None,
-    attributes: list | None = None,
-    cols: list | None = None,
-    swe_not_eng: bool = True,
-    pct_fmt: bool = False,
-    transpose: bool = False,
-) -> pd.DataFrame:
-    """Creates a standardized table of properties
-
-    Parameters
-    ----------
-    series: OpenFrame | List[OpenTimeSeries]
-        The data for which key values will be calculated.
-    headers: list, optional
-        New names for the items.
-    attributes: list, optional
-        A list of strings corresponding to the attribute names
-        of the key values to present.
-    cols: list, optional
-        The labels corresponding to the key values.
-    swe_not_eng: bool, default: True
-        True for Swedish and False for English.
-    pct_fmt: bool, default: False
-        Converts values from float to percent formatted str.
-    transpose: bool, default: False
-        Gives the option to transpose the DataFrame returned.
-
-    Returns
-    -------
-    Pandas.DataFrame
-       A standardized table of properties
-    """
-
-    if isinstance(series, OpenFrame):
-        basket = series.from_deepcopy()
-    else:
-        basket = OpenFrame(series)
-
-    if attributes and cols:
-        assert len(attributes) == len(
-            cols
-        ), "Must pass the same number of attributes as column labels"
-
-    if not attributes:
-        attributes = [
-            "geo_ret",
-            "vol",
-            "worst_month",
-            "var_down",
-            "ret_vol_ratio",
-        ]
-        if basket.last_idx.year - 1 < basket.first_idx.year:
-            first_ret = basket.value_ret_calendar_period(basket.last_idx.year)
-            first_yr = basket.last_idx.year
-        else:
-            first_ret = basket.value_ret_calendar_period(basket.last_idx.year - 1)
-            first_yr = basket.last_idx.year - 1
-        if basket.last_idx.year == basket.first_idx.year:
-            attributes = [
-                basket.value_ret_calendar_period(basket.last_idx.year),
-                pd.Series(
-                    data=[""] * basket.item_count,
-                    index=basket.vol.index,
-                    name="",
-                ),
-            ] + [getattr(basket, x) for x in attributes]
-            if swe_not_eng:
-                cols = [
-                    f"Avkastning ({basket.last_idx.year})",
-                    "",
-                    "Årsavkastning från start",
-                    "Volatilitet",
-                    "Värsta månad",
-                    "VaR 95% (daglig)",
-                    "Ratio (avk/vol)",
-                ]
-            else:
-                cols = [
-                    f"Return ({basket.last_idx.year})",
-                    "",
-                    "Annual return from start",
-                    "Volatility",
-                    "Worst month",
-                    "VaR 95% (daily)",
-                    "Ratio (ret/vol)",
-                ]
-        else:
-            attributes = [
-                basket.value_ret_calendar_period(basket.last_idx.year),
-                first_ret,
-            ] + [getattr(basket, x) for x in attributes]
-            if swe_not_eng:
-                cols = [
-                    f"Avkastning ({basket.last_idx.year})",
-                    f"Avkastning ({first_yr})",
-                    "Årsavkastning från start",
-                    "Volatilitet",
-                    "Värsta månad",
-                    "VaR 95% (daglig)",
-                    "Ratio (avk/vol)",
-                ]
-            else:
-                cols = [
-                    f"Return ({basket.last_idx.year})",
-                    f"Return ({first_yr})",
-                    "Annual return from start",
-                    "Volatility",
-                    "Worst month",
-                    "VaR 95% (daily)",
-                    "Ratio (ret/vol)",
-                ]
-    else:
-        attributes = [getattr(basket, x) for x in attributes]
-
-    keyvalues = pd.concat(attributes, axis="columns")
-    if cols:
-        keyvalues.columns = cols
-    if swe_not_eng:
-        date_range = (
-            f"Från {basket.first_idx:%d %b, %Y} " f"till {basket.last_idx:%d %b, %Y}"
-        )
-    else:
-        date_range = (
-            f"From {basket.first_idx:%d %b, %Y} " f"to {basket.last_idx:%d %b, %Y}"
-        )
-
-    if headers:
-        if len(headers) == len(keyvalues.columns):
-            keyvalues.columns = headers
-        else:
-            keyvalues.index = headers
-    if isinstance(keyvalues.index, pd.MultiIndex):
-        keyvalues.index = keyvalues.index.droplevel(level=1)
-    keyvalues.index.name = date_range
-
-    if pct_fmt:
-        keyvalues = keyvalues.applymap(lambda x: "{:.2%}".format(x))
-
-    if transpose:
-        keyvalues = keyvalues.T
-
-    return keyvalues
