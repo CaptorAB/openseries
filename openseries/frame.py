@@ -181,9 +181,9 @@ class OpenFrame(object):
                 later = self.last_idx
             else:
                 if from_dt is not None and to_dt is None:
-                    assert from_dt >= self.first_idx, (
-                        "Function calc_range returned earlier date < series start"
-                    )
+                    assert (
+                        from_dt >= self.first_idx
+                    ), "Function calc_range returned earlier date < series start"
                     earlier, later = from_dt, self.last_idx
                 elif from_dt is None and to_dt is not None:
                     assert (
@@ -191,9 +191,9 @@ class OpenFrame(object):
                     ), "Function calc_range returned later date > series end"
                     earlier, later = self.first_idx, to_dt
                 elif from_dt is not None or to_dt is not None:
-                    assert to_dt <= self.last_idx and from_dt >= self.first_idx, (
-                        "Function calc_range returned dates outside series range"
-                    )
+                    assert (
+                        to_dt <= self.last_idx and from_dt >= self.first_idx
+                    ), "Function calc_range returned dates outside series range"
                     earlier, later = from_dt, to_dt
             if earlier is not None:
                 while not self.tsdf.index.isin([earlier]).any():
@@ -590,7 +590,8 @@ class OpenFrame(object):
         """
 
         return pd.Series(
-            data=self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year), name="Volatility"
+            data=self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year),
+            name="Volatility",
         )
 
     def vol_func(

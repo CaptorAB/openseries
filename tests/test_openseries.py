@@ -2721,7 +2721,13 @@ class TestOpenTimeSeries(unittest.TestCase):
         msims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
         mframe = sim_to_openframe(msims, dt.date(2019, 6, 30)).to_cumret()
 
-        methods = ["arithmetic_ret_func", "vol_func", "vol_from_var_func", "downside_deviation_func", "target_weight_from_var"]
+        methods = [
+            "arithmetic_ret_func",
+            "vol_func",
+            "vol_from_var_func",
+            "downside_deviation_func",
+            "target_weight_from_var",
+        ]
         for methd in methods:
             no_fixed = getattr(mframe, methd)()
             fixed = getattr(mframe, methd)(periods_in_a_year_fixed=252)
@@ -2779,14 +2785,22 @@ class TestOpenTimeSeries(unittest.TestCase):
         msims = ReturnSimulation.from_normal(n=1, d=504, mu=0.05, vol=0.1, seed=71)
         mseries = sim_to_opentimeseries(msims, dt.date(2019, 6, 30)).to_cumret()
 
-        methods = ["arithmetic_ret_func", "vol_func", "vol_from_var_func", "downside_deviation_func", "target_weight_from_var"]
+        methods = [
+            "arithmetic_ret_func",
+            "vol_func",
+            "vol_from_var_func",
+            "downside_deviation_func",
+            "target_weight_from_var",
+        ]
         for methd in methods:
             no_fixed = getattr(mseries, methd)()
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
             self.assertAlmostEqual(no_fixed, fixed, places=2)
             self.assertNotAlmostEqual(no_fixed, fixed, places=6)
 
-        value_ret_diff_simple_vs_log = mseries.value_ret_func() - mseries.value_ret_func(logret=True)
+        value_ret_diff_simple_vs_log = (
+            mseries.value_ret_func() - mseries.value_ret_func(logret=True)
+        )
         self.assertEqual(f"{value_ret_diff_simple_vs_log:.11f}", "0.03220447733")
 
     def test_value_ret_calendar_period(self):

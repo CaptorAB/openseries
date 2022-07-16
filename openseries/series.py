@@ -361,7 +361,7 @@ class OpenTimeSeries(object):
         """
 
         df = frame.tsdf.loc[:, (label, valuetype)]
-        dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
+        dates = [d.strftime("%Y-%m-%d") for d in df.index]
 
         output = TimeSerie(
             _id="",
@@ -2037,11 +2037,13 @@ class OpenTimeSeries(object):
         else:
             ra_df = self.tsdf.pct_change().copy()
         ra_df.dropna(inplace=True)
-        prev = date_fix(str(self.first_idx))
+
+        prev = self.first_idx
+        idx: dt.date
         dates: list = [prev]
         values: list = [float(self.tsdf.iloc[0])]
+
         for idx, row in ra_df.iterrows():
-            idx = date_fix(str(idx))
             dates.append(idx)
             values.append(
                 values[-1]
