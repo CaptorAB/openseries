@@ -4,10 +4,6 @@ For a long time I have not kept a log of the changes implemented in the differen
 
 ## Version [0.5.4] - 2022-07-16
 
-Grr. Found a bug through an external use case. Fixed it.
-
-## Version [0.5.3] - 2022-07-16
-
 Removed keyvaluetable and reduced use of date_fix function. Improved test coverage further and will leave at this level for now.
 
 ## Version [0.5.2] - 2022-07-15
