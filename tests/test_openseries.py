@@ -2405,7 +2405,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             member="does not match", container=e_two.exception.args[2].message
         )
 
-    def test_opentimeseries_georet_exceptions(self):
+    def test_opentimeseries_geo_ret_value_ret_exceptions(self):
 
         geoseries = OpenTimeSeries(
             TimeSerie(
@@ -2449,6 +2449,22 @@ class TestOpenTimeSeries(unittest.TestCase):
             e_grf_zero.exception.args[0],
             "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
         )
+        with self.assertRaises(Exception) as e_vr_zero:
+            _ = zeroseries.value_ret
+
+        self.assertEqual(
+            e_vr_zero.exception.args[0],
+            "Simple Return cannot be calculated due to an initial value being zero.",
+        )
+
+        with self.assertRaises(Exception) as e_vrf_zero:
+            _ = zeroseries.value_ret_func()
+
+        self.assertEqual(
+            e_vrf_zero.exception.args[0],
+            "Simple Return cannot be calculated due to an initial value being zero.",
+        )
+
         negseries = OpenTimeSeries(
             TimeSerie(
                 _id="",
@@ -2705,11 +2721,13 @@ class TestOpenTimeSeries(unittest.TestCase):
         msims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
         mframe = sim_to_openframe(msims, dt.date(2019, 6, 30)).to_cumret()
 
-        no_fixed = mframe.arithmetic_ret_func()
-        fixed = mframe.arithmetic_ret_func(periods_in_a_year_fixed=252)
-        for nf, f in zip(no_fixed, fixed):
-            self.assertAlmostEqual(nf, f, places=3)
-            self.assertNotAlmostEqual(nf, f, places=7)
+        methods = ["arithmetic_ret_func", "vol_func", "vol_from_var_func", "downside_deviation_func", "target_weight_from_var"]
+        for methd in methods:
+            no_fixed = getattr(mframe, methd)()
+            fixed = getattr(mframe, methd)(periods_in_a_year_fixed=252)
+            for nf, f in zip(no_fixed, fixed):
+                self.assertAlmostEqual(nf, f, places=2)
+                self.assertNotAlmostEqual(nf, f, places=6)
 
         ret = [f"{rr:.9f}" for rr in mframe.value_ret_func()]
         logret = [f"{lr:.9f}" for lr in mframe.value_ret_func(logret=True)]
@@ -2756,14 +2774,33 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertEqual(e_vrf.exception.args[0], r)
 
+    def test_opentimeseries_miscellaneous(self):
+
+        msims = ReturnSimulation.from_normal(n=1, d=504, mu=0.05, vol=0.1, seed=71)
+        mseries = sim_to_opentimeseries(msims, dt.date(2019, 6, 30)).to_cumret()
+
+        methods = ["arithmetic_ret_func", "vol_func", "vol_from_var_func", "downside_deviation_func", "target_weight_from_var"]
+        for methd in methods:
+            no_fixed = getattr(mseries, methd)()
+            fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
+            self.assertAlmostEqual(no_fixed, fixed, places=2)
+            self.assertNotAlmostEqual(no_fixed, fixed, places=6)
+
+        value_ret_diff_simple_vs_log = mseries.value_ret_func() - mseries.value_ret_func(logret=True)
+        self.assertEqual(f"{value_ret_diff_simple_vs_log:.11f}", "0.03220447733")
+
     def test_value_ret_calendar_period(self):
 
         vrcsims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
         vrcseries = sim_to_opentimeseries(vrcsims, dt.date(2019, 6, 30)).to_cumret()
         vrcframe = sim_to_openframe(vrcsims, dt.date(2019, 6, 30)).to_cumret()
 
-        vrfs_y = vrcseries.value_ret_func(from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28))
-        vrff_y = vrcframe.value_ret_func(from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28))
+        vrfs_y = vrcseries.value_ret_func(
+            from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28)
+        )
+        vrff_y = vrcframe.value_ret_func(
+            from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28)
+        )
         vrffl_y = [f"{rr:.11f}" for rr in vrff_y]
 
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
@@ -2773,8 +2810,12 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertEqual(f"{vrfs_y:.11f}", f"{vrvrcs_y:.11f}")
         self.assertListEqual(vrffl_y, vrvrcfl_y)
 
-        vrfs_ym = vrcseries.value_ret_func(from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31))
-        vrff_ym = vrcframe.value_ret_func(from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31))
+        vrfs_ym = vrcseries.value_ret_func(
+            from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31)
+        )
+        vrff_ym = vrcframe.value_ret_func(
+            from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31)
+        )
         vrffl_ym = [f"{rr:.11f}" for rr in vrff_ym]
 
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
@@ -2783,3 +2824,21 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")
         self.assertListEqual(vrffl_ym, vrvrcfl_ym)
+
+    def test_opentimeseries_to_drawdown_series(self):
+
+        msims = ReturnSimulation.from_normal(n=1, d=2520, mu=0.05, vol=0.1, seed=71)
+        mseries = sim_to_opentimeseries(msims, dt.date(2019, 6, 30)).to_cumret()
+        dd = mseries.max_drawdown
+        mseries.to_drawdown_series()
+        dds = float(mseries.tsdf.min())
+        self.assertEqual(f"{dd:.11f}", f"{dds:.11f}")
+
+    def test_openframe_to_drawdown_series(self):
+
+        msims = ReturnSimulation.from_normal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
+        mseries = sim_to_openframe(msims, dt.date(2019, 6, 30)).to_cumret()
+        dd = [f"{dmax:.11f}" for dmax in mseries.max_drawdown]
+        mseries.to_drawdown_series()
+        dds = [f"{dmax:.11f}" for dmax in mseries.tsdf.min()]
+        self.assertListEqual(dd, dds)

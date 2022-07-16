@@ -253,14 +253,10 @@ class OpenTimeSeries(object):
         captor = CaptorOpenApiService()
         data = captor.get_fundinfo(isins=[isin], report_date=report_date)
 
-        fundinfo = data[0]["classes"][0]
-
-        if isin != fundinfo["isin"]:
-            raise Exception(
-                "Method OpenTimeSeries.from_open_fundinfo() returned {} instead of intended {}".format(
-                    fundinfo["isin"], isin
-                )
-            )
+        fundinfo = None
+        for klass in data[0]["classes"]:
+            if klass.get("isin", None) == isin:
+                fundinfo = dict(klass)
 
         output = TimeSerie(
             _id="",
@@ -824,7 +820,9 @@ class OpenTimeSeries(object):
         """
 
         if float(self.tsdf.iloc[0]) == 0.0:
-            raise Exception("First data point == 0.0")
+            raise Exception(
+                "Simple Return cannot be calculated due to an initial value being zero."
+            )
         return float(self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1)
 
     def value_ret_func(
@@ -854,7 +852,9 @@ class OpenTimeSeries(object):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if float(self.tsdf.loc[earlier]) == 0.0:
-            raise Exception("First data point == 0.0")
+            raise Exception(
+                "Simple Return cannot be calculated due to an initial value being zero."
+            )
         if logret:
             ret = np.log(self.tsdf.loc[later] / self.tsdf.loc[earlier])
         else:

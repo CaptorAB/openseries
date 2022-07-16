@@ -9,7 +9,7 @@ venv:
 
 test:
 	PYTHONPATH=${PWD} venv/bin/coverage run -m pytest --verbose ./
-	PYTHONPATH=${PWD} venv/bin/coverage report
+	PYTHONPATH=${PWD} venv/bin/coverage report -m --skip-covered --skip-empty
 
 lint:
 	PYTHONPATH=${PWD} venv/bin/flake8 ./
