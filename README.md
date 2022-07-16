@@ -115,19 +115,20 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 
 #### In this table are the non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Attribute      | type          | Applies to       | Description                                                                                                                                  |
-|:---------------|:--------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
-| `_id`          | `str`         | `OpenTimeSeries` | Captor database identifier for the timeseries.                                                                                               |
-| `instrumentId` | `str`         | `OpenTimeSeries` | Captor database identifier for the instrument associated with the timeseries.                                                                |
-| `dates`        | `List[str]`   | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
-| `values`       | `List[float]` | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
-| `currency`     | `str`         | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                               |
-| `domestic`     | `str`         | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                 |
-| `local_ccy`    | `bool`        | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added. |
-| `name`         | `str`         | `OpenTimeSeries` | An identifier field.                                                                                                                         |
-| `isin`         | `str`         | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
-| `label`        | `str`         | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
-| `valuetype`    | `str`         | `OpenTimeSeries` | Field identifies a series of values, "Price(Close)", or a series of returns, "Return(Total)".                                                |
+| Attribute      | type                    | Applies to       | Description                                                                                                                                  |
+|:---------------|:------------------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
+| `_id`          | `str`                   | `OpenTimeSeries` | Captor database identifier for the timeseries.                                                                                               |
+| `instrumentId` | `str`                   | `OpenTimeSeries` | Captor database identifier for the instrument associated with the timeseries.                                                                |
+| `dates`        | `List[str]`             | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
+| `values`       | `List[float]`           | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
+| `currency`     | `str`                   | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                               |
+| `domestic`     | `str`                   | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                 |
+| `local_ccy`    | `bool`                  | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added. |
+| `name`         | `str`                   | `OpenTimeSeries` | An identifier field.                                                                                                                         |
+| `isin`         | `str`                   | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
+| `label`        | `str`                   | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
+| `sweden`       | `SwedenHolidayCalendar` | `OpenTimeSeries` | A calendar object used to generate business days.                                                                                            |
+| `valuetype`    | `str`                   | `OpenTimeSeries` | Field identifies a series of values, "Price(Close)", or a series of returns, "Return(Total)".                                                |
 
 #### In this table are the non-numeric or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
@@ -152,7 +153,6 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `length`            | `int`                            | `OpenTimeSeries`, `OpenFrame` | Number of items in the series.                                                    |
 | `span_of_days`      | `int`                            | `OpenTimeSeries`, `OpenFrame` | Number of days from the first to the last date in the series.                     |
 | `tsdf`              | `pandas.DataFrame`               | `OpenTimeSeries`, `OpenFrame` | The Pandas DataFrame which gets edited by the class methods.                      |
-| `sweden`            | `SwedenHolidayCalendar`          | `OpenTimeSeries`, `OpenFrame` | A calendar object used to generate business days.                                 |
 | `max_drawdown_date` | `datetime.date`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | Date when the maximum drawdown occurred.                                          |
 | `periods_in_a_year` | `float`                          | `OpenTimeSeries`, `OpenFrame` | The number of observations in an average year for all days in the data.           |
 | `yearfrac`          | `float`                          | `OpenTimeSeries`, `OpenFrame` | Length of timeseries expressed as np.float64 fraction of a year with 365.25 days. |
