@@ -2,6 +2,10 @@
 
 For a long time I have not kept a log of the changes implemented in the different versions of the openseries package. In this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
+## Version [0.5.4] - 2022-07-16
+
+Grr. Found a bug through an external use case. Fixed it.
+
 ## Version [0.5.3] - 2022-07-16
 
 Removed keyvaluetable and reduced use of date_fix function. Improved test coverage further and will leave at this level for now.

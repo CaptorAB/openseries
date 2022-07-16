@@ -1148,7 +1148,6 @@ class TestOpenTimeSeries(unittest.TestCase):
             "first_idx",
             "last_idx",
             "tsdf",
-            "sweden",
         ]
 
         series_attributes = [
@@ -1163,6 +1162,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "valuetype",
             "label",
             "domestic",
+            "sweden",
         ]
 
         frame_attributes = [

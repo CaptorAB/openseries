@@ -61,7 +61,6 @@ class OpenFrame(object):
         """
         self.weights = weights
         self.tsdf = pd.DataFrame()
-        self.sweden = SwedenHolidayCalendar(holidays_sw)
         self.constituents = constituents
         if constituents is not None and len(constituents) != 0:
             self.tsdf = pd.concat(
@@ -172,7 +171,7 @@ class OpenFrame(object):
             if months_offset is not None:
                 earlier = date_offset_foll(
                     self.last_idx,
-                    calendar=CDay(calendar=self.sweden),
+                    calendar=CDay(calendar=SwedenHolidayCalendar(holidays_sw)),
                     months_offset=-months_offset,
                 )
                 assert (
@@ -221,7 +220,7 @@ class OpenFrame(object):
             for d in pd.date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
-                freq=CDay(calendar=self.sweden),
+                freq=CDay(calendar=SwedenHolidayCalendar(holidays_sw)),
             )
         ]
         self.tsdf = self.tsdf.reindex(date_range, method=None, copy=False)

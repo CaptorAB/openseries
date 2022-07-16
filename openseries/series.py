@@ -523,6 +523,7 @@ class OpenTimeSeries(object):
         earlier, later = None, None
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
+                self.setup_class()
                 earlier = date_offset_foll(
                     self.last_idx,
                     calendar=CDay(calendar=self.sweden),
