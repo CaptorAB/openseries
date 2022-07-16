@@ -127,22 +127,20 @@ class OpenTimeSeries(object):
         str
             A representation of an OpenTimeSeries object
         """
-        info = f"{self.__class__.__name__}("
-        if self.name is not None and self.name != "":
-            info += f"name={self.name}, "
-        if self._id is not None and self._id != "":
-            info += f"_id={self._id}, "
-        if self.instrumentId is not None and self.instrumentId != "":
-            info += f"instrumentId={self.instrumentId}, "
-        if self.valuetype is not None and self.valuetype != "":
-            info += f"valuetype={self.valuetype}, "
-        if self.currency is not None and self.currency != "":
-            info += f"currency={self.currency}, "
-        info += "start={}, ".format(self.first_idx.strftime("%Y-%m-%d"))
-        info += "end={}, ".format(self.last_idx.strftime("%Y-%m-%d"))
-        info += f"local_ccy={str(self.local_ccy)})"
-
-        return info
+        return (
+            "{}(name={}, _id={}, instrumentId={}, valuetype={}, "
+            "currency={}, start={}, end={}, local_ccy={})"
+        ).format(
+            self.__class__.__name__,
+            self.name,
+            self._id,
+            self.instrumentId,
+            self.valuetype,
+            self.currency,
+            self.first_idx.strftime("%Y-%m-%d"),
+            self.last_idx.strftime("%Y-%m-%d"),
+            self.local_ccy,
+        )
 
     @classmethod
     def from_open_api(
@@ -540,9 +538,9 @@ class OpenTimeSeries(object):
                 later = self.last_idx
             else:
                 if from_dt is not None and to_dt is None:
-                    assert from_dt >= self.first_idx, (
-                        "Function calc_range returned earlier date < series start"
-                    )
+                    assert (
+                        from_dt >= self.first_idx
+                    ), "Function calc_range returned earlier date < series start"
                     earlier, later = from_dt, self.last_idx
                 elif from_dt is None and to_dt is not None:
                     assert (
@@ -550,9 +548,9 @@ class OpenTimeSeries(object):
                     ), "Function calc_range returned later date > series end"
                     earlier, later = self.first_idx, to_dt
                 elif from_dt is not None or to_dt is not None:
-                    assert to_dt <= self.last_idx and from_dt >= self.first_idx, (
-                        "Function calc_range returned dates outside series range"
-                    )
+                    assert (
+                        to_dt <= self.last_idx and from_dt >= self.first_idx
+                    ), "Function calc_range returned dates outside series range"
                     earlier, later = from_dt, to_dt
             if earlier is not None:
                 while not self.tsdf.index.isin([earlier]).any():

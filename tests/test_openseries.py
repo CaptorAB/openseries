@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime as dt
 import io
 import json
@@ -101,7 +102,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         sys.stdout = new_stdout
         repseries = self.randomseries
         r = (
-            "OpenTimeSeries(name=Asset, valuetype=Price(Close), currency=SEK, "
+            "OpenTimeSeries(name=Asset, _id=, instrumentId=, valuetype=Price(Close), currency=SEK, "
             "start=2009-06-30, end=2019-06-28, local_ccy=True)\n"
         )
         print(repseries)
@@ -144,9 +145,9 @@ class TestOpenTimeSeries(unittest.TestCase):
             weights=[0.5, 0.5],
         )
         r = (
-            "OpenFrame(constituents=[OpenTimeSeries(name=reprseries1, valuetype=Price(Close), currency=SEK, "
-            "start=2022-07-01, end=2023-07-01, local_ccy=True), "
-            "OpenTimeSeries(name=reprseries2, valuetype=Price(Close), currency=SEK, "
+            "OpenFrame(constituents=[OpenTimeSeries(name=reprseries1, _id=, instrumentId=, "
+            "valuetype=Price(Close), currency=SEK, start=2022-07-01, end=2023-07-01, local_ccy=True), "
+            "OpenTimeSeries(name=reprseries2, _id=, instrumentId=, valuetype=Price(Close), currency=SEK, "
             "start=2022-07-01, end=2023-07-01, local_ccy=True)], "
             "weights=[0.5, 0.5])"
         )
@@ -2754,3 +2755,31 @@ class TestOpenTimeSeries(unittest.TestCase):
             _ = mframe.value_ret_func()
 
         self.assertEqual(e_vrf.exception.args[0], r)
+
+    def test_value_ret_calendar_period(self):
+
+        vrcsims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
+        vrcseries = sim_to_opentimeseries(vrcsims, dt.date(2019, 6, 30)).to_cumret()
+        vrcframe = sim_to_openframe(vrcsims, dt.date(2019, 6, 30)).to_cumret()
+
+        vrfs_y = vrcseries.value_ret_func(from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28))
+        vrff_y = vrcframe.value_ret_func(from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28))
+        vrffl_y = [f"{rr:.11f}" for rr in vrff_y]
+
+        vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
+        vrvrcf_y = vrcframe.value_ret_calendar_period(year=2018)
+        vrvrcfl_y = [f"{rr:.11f}" for rr in vrvrcf_y]
+
+        self.assertEqual(f"{vrfs_y:.11f}", f"{vrvrcs_y:.11f}")
+        self.assertListEqual(vrffl_y, vrvrcfl_y)
+
+        vrfs_ym = vrcseries.value_ret_func(from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31))
+        vrff_ym = vrcframe.value_ret_func(from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31))
+        vrffl_ym = [f"{rr:.11f}" for rr in vrff_ym]
+
+        vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
+        vrvrcf_ym = vrcframe.value_ret_calendar_period(year=2018, month=5)
+        vrvrcfl_ym = [f"{rr:.11f}" for rr in vrvrcf_ym]
+
+        self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")
+        self.assertListEqual(vrffl_ym, vrvrcfl_ym)

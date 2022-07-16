@@ -579,7 +579,7 @@ class OpenFrame(object):
         return rtn
 
     @property
-    def vol(self, logret: bool = False) -> pd.Series:
+    def vol(self) -> pd.Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
 
@@ -589,13 +589,8 @@ class OpenFrame(object):
             Annualized volatility
         """
 
-        if logret:
-            vld = np.log(self.tsdf).diff()
-            vld.iloc[0] = 0.0
-        else:
-            vld = self.tsdf.pct_change()
         return pd.Series(
-            data=vld.std() * np.sqrt(self.periods_in_a_year), name="Volatility"
+            data=self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year), name="Volatility"
         )
 
     def vol_func(
