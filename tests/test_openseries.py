@@ -226,7 +226,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         with self.assertRaises(Exception) as e_dup:
             NewTimeSeries.from_file(remove_duplicates=False)
 
-        self.assertIsInstance(e_dup.exception.args[2], ValidationError)
+        self.assertIsInstance(e_dup.exception, ValidationError)
 
         ts = NewTimeSeries.from_file(remove_duplicates=True)
         self.assertIsInstance(ts, OpenTimeSeries)
@@ -2345,7 +2345,8 @@ class TestOpenTimeSeries(unittest.TestCase):
         with self.assertRaises(Exception) as e_ccy:
             OpenTimeSeries(new_dict)
 
-        self.assertIn(member="local_ccy", container=e_ccy.exception.args[2].message)
+        # noinspection PyUnresolvedReferences
+        self.assertIn(member="local_ccy", container=e_ccy.exception.message)
 
         new_dict.pop("label")
         new_dict.update(
@@ -2355,8 +2356,9 @@ class TestOpenTimeSeries(unittest.TestCase):
         with self.assertRaises(Exception) as e_min_items:
             OpenTimeSeries(new_dict)
 
+        # noinspection PyUnresolvedReferences
         self.assertIn(
-            member="is too short", container=e_min_items.exception.args[2].message
+            member="is too short", container=e_min_items.exception.message
         )
 
         with self.assertRaises(Exception) as e_one:
@@ -2379,7 +2381,7 @@ class TestOpenTimeSeries(unittest.TestCase):
                     "valuetype": "Price(Close)",
                 }
             )
-        self.assertIsInstance(e_one.exception.args[1], InvalidChecksum)
+        self.assertIsInstance(e_one.exception, InvalidChecksum)
 
         with self.assertRaises(Exception) as e_two:
             OpenTimeSeries(
@@ -2401,8 +2403,9 @@ class TestOpenTimeSeries(unittest.TestCase):
                     "valuetype": "Price(Close)",
                 }
             )
+        # noinspection PyUnresolvedReferences
         self.assertIn(
-            member="does not match", container=e_two.exception.args[2].message
+            member="does not match", container=e_two.exception.message
         )
 
     def test_opentimeseries_geo_ret_value_ret_exceptions(self):

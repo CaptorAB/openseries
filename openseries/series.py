@@ -3,7 +3,6 @@ import copy
 import datetime as dt
 import json
 from jsonschema import Draft7Validator
-from jsonschema.exceptions import ValidationError
 import math
 import numpy as np
 import os
@@ -14,7 +13,6 @@ from pathlib import Path
 import plotly.graph_objs as go
 from plotly.offline import plot
 from stdnum import isin as isincode
-from stdnum.exceptions import ValidationError as StdnumValidationError
 import scipy.stats as ss
 from typing import List, TypedDict
 
@@ -102,16 +100,10 @@ class OpenTimeSeries(object):
 
         Draft7Validator.check_schema(schema=series_schema)
         validator = Draft7Validator(series_schema)
-        try:
-            validator.validate(d)
-        except ValidationError as e:
-            raise Exception(d.get("_id", None), d.get("name", None), e)
+        validator.validate(d)
 
         if d.get("isin", None):
-            try:
-                isincode.validate(d["isin"])
-            except StdnumValidationError as ee:
-                raise Exception("Provided ISIN code is invalid.", ee)
+            isincode.validate(d["isin"])
 
         self.__dict__ = d
 
