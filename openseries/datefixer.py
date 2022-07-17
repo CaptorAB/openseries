@@ -1,39 +1,42 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
-from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
+import numpy as np
 import pandas as pd
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from pandas.tseries.offsets import CDay
 
 
-def date_fix(d: str | dt.date | dt.datetime) -> dt.date:
-    """
-    Function to parse date or timestamp string into datetime.date
-    :param d: A string containing a date/time stamp.
+def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> dt.date:
+    """Function to parse from different date formats into datetime.date
+    :param d: the data item to parse
     :returns : datetime.date
     """
-    if isinstance(d, str):
-        temp_dt = parse(d)
-        return dt.date(temp_dt.year, temp_dt.month, temp_dt.day)
-    elif isinstance(d, dt.datetime) or isinstance(d, dt.date):
-        temp_dt = parse(d.strftime("%Y-%m-%d"))
-        return dt.date(temp_dt.year, temp_dt.month, temp_dt.day)
+
+    if isinstance(d, dt.datetime) or isinstance(d, pd.Timestamp):
+        return d.date()
+    elif isinstance(d, dt.date):
+        return d
+    elif isinstance(d, np.datetime64):
+        return pd.to_datetime(str(d)).date()
+    elif isinstance(d, str):
+        return dt.datetime.strptime(d, "%Y-%m-%d").date()
     else:
-        raise ValueError("Argument passed to date_fix must be string or datetime")
+        raise Exception(
+            f"Unknown date format {str(d)} of type {str(type(d))} encountered"
+        )
 
 
 def date_offset_foll(
-    raw_date: str | dt.date | dt.datetime,
+    raw_date: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp,
     calendar: CDay,
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
 ) -> dt.date:
-    """
-    Function to offset dates according to a given calendar
+    """Function to offset dates according to a given calendar
     :param raw_date: The date to offset from
-    :param calendar:
+    :param calendar: Pandas date offset business calendar
     :param months_offset: Number of months as integer
     :param adjust: Boolean condition controlling if offset should adjust for
                    business days
@@ -41,6 +44,7 @@ def date_offset_foll(
                       forward (following=True) or backward
     :returns : datetime.date
     """
+
     start_dt = dt.date(1970, 12, 30)
     end_dt = dt.date(start_dt.year + 90, 12, 30)
     local_bdays = [
@@ -64,6 +68,10 @@ def date_offset_foll(
 
 
 def get_previous_sweden_business_day_before_today(today: dt.date | None = None):
+    """Function to bump backwards to find the previous Swedish business day before today
+    :param today: the data item to parse
+    :returns : datetime.date
+    """
 
     sweden = SwedenHolidayCalendar(rules=holidays_sw)
 
