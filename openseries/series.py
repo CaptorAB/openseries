@@ -16,7 +16,7 @@ from stdnum import isin as isincode
 import scipy.stats as ss
 from typing import List, TypedDict
 
-
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
 from openseries.datefixer import date_offset_foll, date_fix
 from openseries.load_plotly import load_plotly_dict
@@ -26,7 +26,6 @@ from openseries.risk import (
     drawdown_series,
     drawdown_details,
 )
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class TimeSerie(TypedDict, total=False):

@@ -2357,9 +2357,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             OpenTimeSeries(new_dict)
 
         # noinspection PyUnresolvedReferences
-        self.assertIn(
-            member="is too short", container=e_min_items.exception.message
-        )
+        self.assertIn(member="is too short", container=e_min_items.exception.message)
 
         with self.assertRaises(Exception) as e_one:
             OpenTimeSeries(
@@ -2404,9 +2402,7 @@ class TestOpenTimeSeries(unittest.TestCase):
                 }
             )
         # noinspection PyUnresolvedReferences
-        self.assertIn(
-            member="does not match", container=e_two.exception.message
-        )
+        self.assertIn(member="does not match", container=e_two.exception.message)
 
     def test_opentimeseries_geo_ret_value_ret_exceptions(self):
 
