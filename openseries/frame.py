@@ -443,11 +443,11 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Annualized arithmetic mean of log returns
+            Annualized arithmetic mean of returns
         """
 
         return pd.Series(
-            data=np.log(self.tsdf).diff().mean() * self.periods_in_a_year,
+            data=self.tsdf.pct_change().mean() * self.periods_in_a_year,
             name="Arithmetic return",
         )
 
@@ -474,7 +474,7 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Annualized arithmetic mean of log returns
+            Annualized arithmetic mean of returns
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -485,7 +485,7 @@ class OpenFrame(object):
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
         return pd.Series(
-            data=np.log(self.tsdf.loc[earlier:later]).diff().mean() * time_factor,
+            data=self.tsdf.loc[earlier:later].pct_change().mean() * time_factor,
             name="Subset Arithmetic return",
         )
 
@@ -511,7 +511,6 @@ class OpenFrame(object):
 
     def value_ret_func(
         self,
-        logret: bool = False,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -519,8 +518,6 @@ class OpenFrame(object):
         """
         Parameters
         ----------
-        logret : bool, optional
-            True for log return and False for simple return
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date and to_date
         from_date : datetime.date, optional
@@ -540,12 +537,10 @@ class OpenFrame(object):
                 f"Error in function value_ret due to an initial value "
                 f"being zero. ({self.tsdf.head(3)})"
             )
-        else:
-            if logret:
-                ret = np.log(self.tsdf.loc[later] / self.tsdf.loc[earlier])
-            else:
-                ret = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
-            return pd.Series(data=ret, name="Subset Total return")
+        return pd.Series(
+            data=self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1,
+            name="Subset Total return",
+        )
 
     def value_ret_calendar_period(
         self, year: int, month: int | None = None
@@ -708,7 +703,7 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Ratio of the annualized arithmetic mean of log returns and annualized volatility.
+            Ratio of the annualized arithmetic mean of returns and annualized volatility.
         """
 
         ratio = self.arithmetic_ret / self.vol
@@ -724,7 +719,7 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """The ratio of annualized arithmetic mean of log returns and annualized volatility or,
+        """The ratio of annualized arithmetic mean of returns and annualized volatility or,
         if riskfree return provided, Sharpe ratio calculated as ( geometric return - risk free return )
         / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
@@ -747,7 +742,7 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Ratio of the annualized arithmetic mean of log returns and annualized volatility or,
+            Ratio of the annualized arithmetic mean of returns and annualized volatility or,
             if risk-free return provided, Sharpe ratio
         """
 
@@ -778,8 +773,8 @@ class OpenFrame(object):
                     ratios.append(0.0)
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
-                    ret = float(np.log(longdf).diff().mean() * time_factor)
-                    riskfree_ret = float(riskfree.diff().mean() * time_factor)
+                    ret = float(longdf.pct_change().mean() * time_factor)
+                    riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
                     vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
                     ratios.append((ret - riskfree_ret) / vol)
 
@@ -791,7 +786,7 @@ class OpenFrame(object):
         else:
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
-                ret = float(np.log(longdf).diff().mean() * time_factor)
+                ret = float(longdf.pct_change().mean() * time_factor)
                 vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
                 ratios.append((ret - riskfree_rate) / vol)
 
@@ -808,7 +803,7 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Sortino ratio calculated as the annualized arithmetic mean of log returns
+            Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
         """
@@ -829,7 +824,7 @@ class OpenFrame(object):
         """The Sortino ratio calculated as ( return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has zero
         volatility, and a minimum acceptable return of zero. The ratio is
-        calculated using the annualized arithmetic mean of log returns. \n
+        calculated using the annualized arithmetic mean of returns. \n
         https://www.investopedia.com/terms/s/sortinoratio.asp
 
         Parameters
@@ -880,8 +875,8 @@ class OpenFrame(object):
                     ratios.append(0.0)
                 else:
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
-                    ret = float(np.log(longdf).diff().mean() * time_factor)
-                    riskfree_ret = float(np.log(riskfree).diff().mean() * time_factor)
+                    ret = float(longdf.pct_change().mean() * time_factor)
+                    riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
                     dddf = longdf.pct_change()
                     downdev = float(
                         math.sqrt(
@@ -903,7 +898,7 @@ class OpenFrame(object):
                     raise Exception(
                         "Error in sortino_ratio_func due to an initial value being zero."
                     )
-                ret = float(np.log(longdf).diff().mean() * time_factor)
+                ret = float(longdf.pct_change().mean() * time_factor)
                 dddf = longdf.pct_change()
                 downdev = float(
                     math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
@@ -918,7 +913,7 @@ class OpenFrame(object):
             )
 
     @property
-    def z_score(self, logret: bool = False) -> pd.Series:
+    def z_score(self) -> pd.Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
         Returns
@@ -927,11 +922,7 @@ class OpenFrame(object):
             Z-score as (last return - mean return) / standard deviation of returns.
         """
 
-        if logret:
-            zd = np.log(self.tsdf).diff()
-            zd.iloc[0] = 0.0
-        else:
-            zd = self.tsdf.pct_change()
+        zd = self.tsdf.pct_change()
         return pd.Series(data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Z-score")
 
     def z_score_func(
@@ -1541,25 +1532,15 @@ class OpenFrame(object):
         )
         return pd.Series(data=vfv, name=f"Weight from target vol {target_vol:.1%}")
 
-    def value_to_ret(self, logret=False):
-        """Converts valueseries into returnseries.
-
-        Parameters
-        ----------
-        logret: bool, default: False
-            True for log return and False for simple return.
-            Log return is the equivalent of LN(value[t] / value[t-1]) in MS excel.
-
+    def value_to_ret(self):
+        """
         Returns
         -------
         OpenFrame
-            An OpenFrame object
+            The returns of the values in the series
         """
 
-        if logret:
-            self.tsdf = np.log(self.tsdf).diff()
-        else:
-            self.tsdf = self.tsdf.pct_change()
+        self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
         new_labels = ["Return(Total)"] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
@@ -2085,7 +2066,7 @@ class OpenFrame(object):
         """The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
         difference between the fund and its index returns.
-        The ratio is calculated using the annualized arithmetic mean of log returns.
+        The ratio is calculated using the annualized arithmetic mean of returns.
 
         Parameters
         ----------
@@ -2132,7 +2113,7 @@ class OpenFrame(object):
             else:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 relative = 1.0 + longdf - shortdf
-                ret = float(np.log(relative).diff().mean() * time_factor)
+                ret = float(relative.pct_change().mean() * time_factor)
                 vol = float(relative.pct_change().std() * np.sqrt(time_factor))
                 ratios.append(ret / vol)
 

@@ -762,10 +762,10 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Annualized arithmetic mean of log returns
+            Annualized arithmetic mean of returns
         """
 
-        return float(np.log(self.tsdf).diff().mean() * self.periods_in_a_year)
+        return float(self.tsdf.pct_change().mean() * self.periods_in_a_year)
 
     def arithmetic_ret_func(
         self,
@@ -790,7 +790,7 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Annualized arithmetic mean of log returns
+            Annualized arithmetic mean of returns
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -800,7 +800,7 @@ class OpenTimeSeries(object):
             fraction = (later - earlier).days / 365.25
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
-        return float(np.log(self.tsdf.loc[earlier:later]).diff().mean() * time_factor)
+        return float(self.tsdf.loc[earlier:later].pct_change().mean() * time_factor)
 
     @property
     def value_ret(self) -> float:
@@ -819,7 +819,6 @@ class OpenTimeSeries(object):
 
     def value_ret_func(
         self,
-        logret: bool = False,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -827,8 +826,6 @@ class OpenTimeSeries(object):
         """
         Parameters
         ----------
-        logret : bool, optional
-            True for log return and False for simple return
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date and to_date
         from_date : datetime.date, optional
@@ -847,11 +844,7 @@ class OpenTimeSeries(object):
             raise Exception(
                 "Simple Return cannot be calculated due to an initial value being zero."
             )
-        if logret:
-            ret = np.log(self.tsdf.loc[later] / self.tsdf.loc[earlier])
-        else:
-            ret = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
-        return float(ret)
+        return float(self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1)
 
     def value_ret_calendar_period(self, year: int, month: int | None = None) -> float:
         """
@@ -1007,7 +1000,7 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of the annualized arithmetic mean of log returns and annualized volatility.
+            Ratio of the annualized arithmetic mean of returns and annualized volatility.
         """
         return self.arithmetic_ret / self.vol
 
@@ -1018,7 +1011,7 @@ class OpenTimeSeries(object):
         to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
-        """The ratio of annualized arithmetic mean of log returns and annualized volatility or,
+        """The ratio of annualized arithmetic mean of returns and annualized volatility or,
         if risk free return provided, Sharpe ratio calculated as ( geometric return - risk free return )
         / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
@@ -1037,7 +1030,7 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of the annualized arithmetic mean of log returns and annualized volatility or,
+            Ratio of the annualized arithmetic mean of returns and annualized volatility or,
             if risk-free return provided, Sharpe ratio
         """
 
@@ -1054,7 +1047,7 @@ class OpenTimeSeries(object):
         -------
         float
         Pandas.Series
-            Sortino ratio calculated as the annualized arithmetic mean of log returns
+            Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
         """
@@ -1088,7 +1081,7 @@ class OpenTimeSeries(object):
         -------
         float
         Pandas.Series
-            Sortino ratio calculated as the annualized arithmetic mean of log returns
+            Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation.
         """
 
@@ -1709,25 +1702,15 @@ class OpenTimeSeries(object):
             ),
         )
 
-    def value_to_ret(self, logret: bool = False):
-        """Converts a valueseries into a returnseries.
-
-        Parameters
-        ----------
-        logret: bool, default: False
-            True for log return and False for simple return.
-            Log return is the equivalent of LN(value[t] / value[t-1]) in MS excel.
-
+    def value_to_ret(self):
+        """
         Returns
         -------
         OpenTimeSeries
-            An OpenTimeSeries object
+            The returns of the values in the series
         """
 
-        if logret:
-            self.tsdf = np.log(self.tsdf).diff()
-        else:
-            self.tsdf = self.tsdf.pct_change()
+        self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = "Return(Total)"
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])

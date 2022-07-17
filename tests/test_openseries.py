@@ -573,7 +573,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         retsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
         retseries = sim_to_opentimeseries(retsim, end=dt.date(2019, 6, 30)).to_cumret()
 
-        retseries.value_to_ret(logret=False)
+        retseries.value_to_ret()
         are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.values]
         should_bes = [
             "0.000000000000",
@@ -596,28 +596,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertListEqual(are_bes, should_bes)
 
         retseries.to_cumret()
-
-        retseries.value_to_ret(logret=True)
-        are_log = [f"{nn[0]:.12f}" for nn in retseries.tsdf.values]
-        should_log = [
-            "0.000000000000",
-            "-0.007349569336",
-            "-0.002603794818",
-            "0.003276047717",
-            "-0.002649637160",
-            "0.003880411897",
-            "0.007585983975",
-            "-0.005897931610",
-            "0.001572197706",
-            "-0.005271650396",
-            "-0.001838019010",
-            "0.009057820522",
-            "-0.004300098140",
-            "-0.008417916189",
-            "-0.010604186218",
-        ]
-
-        self.assertListEqual(are_log, should_log)
 
     def test_opentimeseries_log_and_exp(self):
 
@@ -674,7 +652,7 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_all_calc_properties(self):
 
         checks = {
-            "arithmetic_ret": f"{0.00242035119:.11f}",
+            "arithmetic_ret": f"{0.00953014509:.11f}",
             "cvar_down": f"{-0.01402077271:.11f}",
             "downside_deviation": f"{0.09195729357:.11f}",
             "geo_ret": f"{0.00242231676:.11f}",
@@ -682,9 +660,9 @@ class TestOpenTimeSeries(unittest.TestCase):
             "max_drawdown": f"{-0.40011625413:.11f}",
             "max_drawdown_cal_year": f"{-0.23811167802:.11f}",
             "positive_share": f"{0.49940262843:.11f}",
-            "ret_vol_ratio": f"{0.02069498874:.11f}",
+            "ret_vol_ratio": f"{0.08148662314:.11f}",
             "skew": f"{-6.94679906059:.11f}",
-            "sortino_ratio": f"{0.02632038304:.11f}",
+            "sortino_ratio": f"{0.10363664173:.11f}",
             "value_ret": f"{0.02447195802:.11f}",
             "var_down": f"{-0.01059129607:.11f}",
             "vol": f"{0.11695349153:.11f}",
@@ -708,16 +686,16 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_all_calc_functions(self):
 
         checks = {
-            "arithmetic_ret_func": f"{0.00348179216:.11f}",
+            "arithmetic_ret_func": f"{0.00885255100:.11f}",
             "cvar_down_func": f"{-0.01331889836:.11f}",
             "downside_deviation_func": f"{0.07335125856:.11f}",
             "geo_ret_func": f"{0.00348439444:.11f}",
             "kurtosis_func": f"{-0.16164566028:.11f}",
             "max_drawdown_func": f"{-0.20565775282:.11f}",
             "positive_share_func": f"{0.50645481629:.11f}",
-            "ret_vol_ratio_func": f"{0.03358092409:.11f}",
+            "ret_vol_ratio_func": f"{0.08538041030:.11f}",
             "skew_func": f"{-0.03615947531:.11f}",
-            "sortino_ratio_func": f"{0.04746738129:.11f}",
+            "sortino_ratio_func": f"{0.12068710437:.11f}",
             "value_ret_func": f"{0.01402990651:.11f}",
             "var_down_func": f"{-0.01095830172:.11f}",
             "vol_func": f"{0.10368363149:.11f}",
@@ -1581,11 +1559,11 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         days = 2520
         target_returns = [
-            "-0.060945915",
-            "0.055052497",
-            "0.026204853",
-            "0.006932099",
-            "0.173730952",
+            "-0.031826675",
+            "0.084180046",
+            "0.058456697",
+            "0.034909498",
+            "0.353642948",
         ]
         target_volatilities = [
             "0.241393324",
@@ -1897,7 +1875,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.ret_vol_ratio_func(riskfree_column=-1)
 
-        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.2106086588)
+        self.assertEqual(f"{simdata[0]:.10f}", "0.1580040085")
 
     def test_openframe_sortino_ratio_func(self):
 
@@ -1915,7 +1893,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.sortino_ratio_func(riskfree_column=-1)
 
-        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.2994187134)
+        self.assertEqual(f"{simdata[0]:.10f}", "0.2009532877")
 
     def test_openframe_tracking_error_func(self):
 
@@ -1951,7 +1929,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.info_ratio_func(base_column=1)
 
-        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.3206599645)
+        self.assertEqual(f"{simdata[0]:.10f}", "0.3972681809")
 
     def test_openframe_rolling_corr(self):
 
@@ -2735,7 +2713,6 @@ class TestOpenTimeSeries(unittest.TestCase):
                 self.assertNotAlmostEqual(nf, f, places=6)
 
         ret = [f"{rr:.9f}" for rr in mframe.value_ret_func()]
-        logret = [f"{lr:.9f}" for lr in mframe.value_ret_func(logret=True)]
         self.assertListEqual(
             [
                 "0.275697802",
@@ -2745,16 +2722,6 @@ class TestOpenTimeSeries(unittest.TestCase):
                 "-0.040958695",
             ],
             ret,
-        )
-        self.assertListEqual(
-            [
-                "0.243493324",
-                "-0.034108953",
-                "0.001518234",
-                "0.059584975",
-                "-0.041821134",
-            ],
-            logret,
         )
 
         mframe.tsdf.iloc[0, 2] = 0.0
@@ -2796,11 +2763,6 @@ class TestOpenTimeSeries(unittest.TestCase):
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
             self.assertAlmostEqual(no_fixed, fixed, places=2)
             self.assertNotAlmostEqual(no_fixed, fixed, places=6)
-
-        value_ret_diff_simple_vs_log = (
-            mseries.value_ret_func() - mseries.value_ret_func(logret=True)
-        )
-        self.assertEqual(f"{value_ret_diff_simple_vs_log:.11f}", "0.03220447733")
 
     def test_value_ret_calendar_period(self):
 
