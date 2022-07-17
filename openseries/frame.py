@@ -33,7 +33,6 @@ from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 class OpenFrame(object):
 
     constituents: List[OpenTimeSeries]
-    sweden: SwedenHolidayCalendar
     tsdf: pd.DataFrame
     weights: List[float]
 

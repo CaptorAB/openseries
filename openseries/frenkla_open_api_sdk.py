@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 
 
-class CaptorOpenApiService(object):
+class FrenklaOpenApiService(object):
     def __init__(self, base_url: str = "https://api.frenkla.com/public/api/"):
         """
         :param base_url:

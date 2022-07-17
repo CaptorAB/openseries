@@ -13,7 +13,7 @@ import sys
 from testfixtures import LogCapture
 import unittest
 
-from openseries.captor_open_api_sdk import CaptorOpenApiService
+from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
@@ -1695,21 +1695,21 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertListEqual(target_means, means)
         self.assertListEqual(target_deviations, deviations)
 
-    def test_captoropenapiservice_repr(self):
+    def test_frenklaopenapiservice_repr(self):
 
         old_stdout = sys.stdout
         new_stdout = io.StringIO()
         sys.stdout = new_stdout
-        service = CaptorOpenApiService()
-        r = "CaptorOpenApiService(" "base_url=https://api.frenkla.com/public/api/)\n"
+        service = FrenklaOpenApiService()
+        r = "FrenklaOpenApiService(" "base_url=https://api.frenkla.com/public/api/)\n"
         print(service)
         output = new_stdout.getvalue()
         sys.stdout = old_stdout
         self.assertEqual(r, output)
 
-    def test_captoropenapiservice_get_timeseries(self):
+    def test_frenklaopenapiservice_get_timeseries(self):
 
-        sevice = CaptorOpenApiService()
+        sevice = FrenklaOpenApiService()
         ts_id = "62d06f9d753964781e81f185"
         series = sevice.get_timeseries(timeseries_id=ts_id)
 
@@ -1720,9 +1720,9 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertEqual(int(str(e_unique.exception)[:3]), 404)
 
-    def test_captoropenapiservice_get_fundinfo(self):
+    def test_frenklaopenapiservice_get_fundinfo(self):
 
-        sevice = CaptorOpenApiService()
+        sevice = FrenklaOpenApiService()
         isin_code = "SE0009807308"
         fundinfo = sevice.get_fundinfo(isins=[isin_code])
 
@@ -1740,9 +1740,9 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertEqual(int(str(e_unique.exception)[:3]), 400)
 
-    def test_captoropenapiservice_get_nav(self):
+    def test_frenklaopenapiservice_get_nav(self):
 
-        sevice = CaptorOpenApiService()
+        sevice = FrenklaOpenApiService()
         isin_code = "SE0009807308"
         series = sevice.get_nav(isin=isin_code)
 
@@ -1757,9 +1757,9 @@ class TestOpenTimeSeries(unittest.TestCase):
             e_unique.exception.args[0],
         )
 
-    def test_captoropenapiservice_get_nav_to_dataframe(self):
+    def test_frenklaopenapiservice_get_nav_to_dataframe(self):
 
-        sevice = CaptorOpenApiService()
+        sevice = FrenklaOpenApiService()
         isin_code = "SE0009807308"
         df = sevice.get_nav_to_dataframe(isin=isin_code).head()
         ddf = pd.DataFrame(

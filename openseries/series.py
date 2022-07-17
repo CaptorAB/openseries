@@ -19,7 +19,7 @@ import scipy.stats as ss
 from typing import List, TypedDict
 
 
-from openseries.captor_open_api_sdk import CaptorOpenApiService
+from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
 from openseries.datefixer import date_offset_foll, date_fix
 from openseries.load_plotly import load_plotly_dict
 from openseries.risk import (
@@ -150,12 +150,12 @@ class OpenTimeSeries(object):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ):
-        """Fetches timeseries data from the Captor API /opentimeseries endpoint
+        """Fetches timeseries data from the Frenkla API /opentimeseries endpoint
 
         Parameters
         ----------
         timeseries_id: str
-            Captor database timeseries id
+            Frenkla database timeseries id
         label : str, default: "series"
             Name for the timeseries
         baseccy : str, default: "SEK"
@@ -168,7 +168,7 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        captor = CaptorOpenApiService()
+        captor = FrenklaOpenApiService()
         data = captor.get_timeseries(timeseries_id)
 
         output = TimeSerie(
@@ -189,12 +189,12 @@ class OpenTimeSeries(object):
     def from_open_nav(
         cls, isin: str, valuetype: str = "Price(Close)", local_ccy: bool = True
     ):
-        """Fetches timeseries data from the Captor API /nav endpoint
+        """Fetches timeseries data from the Frenkla API /nav endpoint
 
         Parameters
         ----------
         isin: str
-            Captor database timeseries id
+            Frenkla database timeseries id
         valuetype : str, default: "Price(Close)"
             Type of timeseries
         local_ccy: bool, default: True
@@ -206,7 +206,7 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        captor = CaptorOpenApiService()
+        captor = FrenklaOpenApiService()
         data = captor.get_nav(isin=isin)
 
         output = TimeSerie(
@@ -231,12 +231,12 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         local_ccy: bool = True,
     ):
-        """Fetches timeseries data from the Captor API /fundinfo endpoint
+        """Fetches timeseries data from the Frenkla API /fundinfo endpoint
 
         Parameters
         ----------
         isin: str
-            Captor database timeseries id
+            Frenkla database timeseries id
         report_date : datetime.date, optional
             reportDate parameter. Defaults to today if not set
         valuetype : str, default: "Price(Close)"
@@ -250,7 +250,7 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        captor = CaptorOpenApiService()
+        captor = FrenklaOpenApiService()
         data = captor.get_fundinfo(isins=[isin], report_date=report_date)
 
         fundinfo = None
