@@ -1256,6 +1256,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         frame_unique = [
             "add_timeseries",
+            "beta",
             "delete_timeseries",
             "rolling_info_ratio",
             "info_ratio_func",
@@ -2812,8 +2813,92 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_openframe_to_drawdown_series(self):
 
         msims = ReturnSimulation.from_normal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
-        mseries = sim_to_openframe(msims, dt.date(2019, 6, 30)).to_cumret()
-        dd = [f"{dmax:.11f}" for dmax in mseries.max_drawdown]
-        mseries.to_drawdown_series()
-        dds = [f"{dmax:.11f}" for dmax in mseries.tsdf.min()]
+        mframe = sim_to_openframe(msims, dt.date(2019, 6, 30)).to_cumret()
+        dd = [f"{dmax:.11f}" for dmax in mframe.max_drawdown]
+        mframe.to_drawdown_series()
+        dds = [f"{dmax:.11f}" for dmax in mframe.tsdf.min()]
         self.assertListEqual(dd, dds)
+
+    def test_ord_least_squares_fit(self):
+
+        osims = ReturnSimulation.from_lognormal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
+        oframe = sim_to_openframe(osims, dt.date(2019, 6, 30)).to_cumret()
+        oframe.value_to_log()
+        results = []
+        for i in range(oframe.item_count):
+            for j in range(oframe.item_count):
+                results.append(
+                    f"{oframe.ord_least_squares_fit(y_column=i, x_column=j, fitted_series=False):.11f}"
+                )
+
+        self.assertListEqual(
+            results,
+            [
+                "1.00000000000",
+                "0.55040796387",
+                "0.60822717148",
+                "0.37824573835",
+                "0.32062039005",
+                "1.37777232698",
+                "1.00000000000",
+                "1.03552512853",
+                "0.68035802592",
+                "0.57966252870",
+                "1.34414305664",
+                "0.91421337148",
+                "1.00000000000",
+                "0.63878222178",
+                "0.53719279113",
+                "1.94917298315",
+                "1.40062251534",
+                "1.48953078947",
+                "1.00000000000",
+                "0.82328905407",
+                "2.30702559932",
+                "1.66626378001",
+                "1.74908846662",
+                "1.14957491185",
+                "1.00000000000",
+            ],
+        )
+
+    def test_beta(self):
+
+        bsims = ReturnSimulation.from_lognormal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
+        bframe = sim_to_openframe(bsims, dt.date(2019, 6, 30)).to_cumret()
+        bframe.value_to_log()
+        results = []
+        for i in range(bframe.item_count):
+            for j in range(bframe.item_count):
+                results.append(f"{bframe.beta(asset=i, market=j):.11f}")
+
+        self.assertListEqual(
+            results,
+            [
+                "1.00000000000",
+                "0.14859048744",
+                "0.22185318925",
+                "0.08349587036",
+                "0.06726506358",
+                "0.83313606318",
+                "1.00000000000",
+                "1.03770059983",
+                "0.63135889225",
+                "0.55992433269",
+                "0.91666296841",
+                "0.76470010892",
+                "1.00000000000",
+                "0.53828336682",
+                "0.44904330677",
+                "0.96819254850",
+                "1.30571416296",
+                "1.51064942313",
+                "1.00000000000",
+                "0.77162909557",
+                "1.04568410329",
+                "1.55244192772",
+                "1.68948821030",
+                "1.03448168040",
+                "1.00000000000",
+            ],
+        )

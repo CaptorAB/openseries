@@ -180,7 +180,8 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `capture_ratio_func`    | `OpenFrame` | Calculates up, down and up/down [capture ratios](https://www.investopedia.com/terms/d/down-market-capture-ratio.asp) relative to a selected series. |
 | `rolling_info_ratio`    | `OpenFrame` | Returns a pandas.DataFrame with the rolling [information ratio](https://www.investopedia.com/terms/i/informationratio.asp) between two series.      |
 | `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.              |
-| `ord_least_squares_fit` | `OpenFrame` | Calculates the _Beta_ and an [Ordinary Least Squares](https://www.investopedia.com/terms/l/least-squares-method.asp) fitted series from two others. |
+| `ord_least_squares_fit` | `OpenFrame` | Calculates an [Ordinary Least Squares](https://www.investopedia.com/terms/l/least-squares-method.asp) fitted parameter and series.                  |
+| `beta`                  | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                     |
 
 #### In this table are the methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 

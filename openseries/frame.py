@@ -1706,6 +1706,32 @@ class OpenFrame(object):
         )
         return voldf
 
+    #
+    # def rolling_beta(
+    #     self, y_column: int, x_column: int, observations: int = 21
+    # ) -> pd.DataFrame:
+    #     """Rolling Beta between two series using Ordinary Least Squares Fit
+    #
+    #     Parameters
+    #     ----------
+    #     y_column:
+    #         The column level values of the dependent variable y
+    #     x_column:
+    #         The column level values of the exogenous variable x
+    #
+    #     Returns
+    #     -------
+    #     float
+    #         The Beta between two timeseries estimated using an Ordinary Least Squares fit
+    #     """
+    #
+    #     betadf = self.tsdf.rolling(observations, min_periods=observations)
+    #     y = self.tsdf.loc[:, endo_column]
+    #     x = self.tsdf.loc[:, exo_column]
+    #     model = sm.OLS(y, x).fit()
+    #
+    #     return float(model.params)
+
     def rolling_return(self, column: int, observations: int = 21) -> pd.DataFrame:
         """
         Parameters
@@ -2279,18 +2305,54 @@ class OpenFrame(object):
             name=resultname,
         )
 
-    def ord_least_squares_fit(
-        self, endo_column: tuple, exo_column: tuple, fitted_series: bool = True
-    ) -> float:
-        """Adds a new column with a fitted line using Ordinary Least Squares
+    def beta(self, asset: tuple | int, market: tuple | int) -> float:
+        """https://www.investopedia.com/terms/b/beta.asp
+        Calculates Beta as Co-variance of x & y divided by Variance of x
 
         Parameters
         ----------
-        endo_column:
-            The column level values of the dependent variable
-        exo_column:
-            The column level values of the exogenous variable.
-        fitted_series:
+        asset: tuple | int
+            The column of the asset
+        market: tuple | int
+            The column of the market against which Beta is measured
+
+        Returns
+        -------
+        float
+            Beta as Co-variance of x & y divided by Variance of x
+        """
+
+        if isinstance(asset, tuple):
+            y = self.tsdf.loc[:, asset]
+        elif isinstance(asset, int):
+            y = self.tsdf.iloc[:, asset]
+        else:
+            raise Exception("asset should be a tuple or an integer.")
+
+        if isinstance(market, tuple):
+            x = self.tsdf.loc[:, market]
+        elif isinstance(market, int):
+            x = self.tsdf.iloc[:, market]
+        else:
+            raise Exception("market should be a tuple or an integer.")
+
+        covariance = np.cov(y, x, ddof=1)
+        beta = covariance[0, 1] / covariance[1, 1]
+
+        return beta
+
+    def ord_least_squares_fit(
+        self, y_column: tuple | int, x_column: tuple | int, fitted_series: bool = True
+    ) -> float:
+        """Calculates Beta and adds a new column with a fitted line using Ordinary Least Squares fit
+
+        Parameters
+        ----------
+        y_column: tuple | int
+            The column level values of the dependent variable y
+        x_column: tuple | int
+            The column level values of the exogenous variable x
+        fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
 
         Returns
@@ -2299,11 +2361,27 @@ class OpenFrame(object):
             The Beta between two timeseries estimated using an Ordinary Least Squares fit
         """
 
-        y = self.tsdf.loc[:, endo_column]
-        x = self.tsdf.loc[:, exo_column]
+        if isinstance(y_column, tuple):
+            y = self.tsdf.loc[:, y_column]
+            y_label = self.tsdf.loc[:, y_column].name[0]
+        elif isinstance(y_column, int):
+            y = self.tsdf.iloc[:, y_column]
+            y_label = self.tsdf.iloc[:, y_column].name[0]
+        else:
+            raise Exception("y_column should be a tuple or an integer.")
+
+        if isinstance(x_column, tuple):
+            x = self.tsdf.loc[:, x_column]
+            x_label = self.tsdf.loc[:, x_column].name[0]
+        elif isinstance(x_column, int):
+            x = self.tsdf.iloc[:, x_column]
+            x_label = self.tsdf.iloc[:, x_column].name[0]
+        else:
+            raise Exception("x_column should be a tuple or an integer.")
+
         model = sm.OLS(y, x).fit()
         if fitted_series:
-            self.tsdf[endo_column[0], exo_column[0]] = model.predict(x)
+            self.tsdf[y_label, x_label] = model.predict(x)
 
         return float(model.params)
 
