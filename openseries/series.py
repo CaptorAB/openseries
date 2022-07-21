@@ -159,8 +159,8 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        captor = FrenklaOpenApiService()
-        data = captor.get_timeseries(timeseries_id)
+        frenkla = FrenklaOpenApiService()
+        data = frenkla.get_timeseries(timeseries_id)
 
         output = TimeSerie(
             _id=data["id"],
@@ -197,8 +197,8 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        captor = FrenklaOpenApiService()
-        data = captor.get_nav(isin=isin)
+        frenkla = FrenklaOpenApiService()
+        data = frenkla.get_nav(isin=isin)
 
         output = TimeSerie(
             _id=data["_id"],
@@ -241,8 +241,8 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        captor = FrenklaOpenApiService()
-        data = captor.get_fundinfo(isins=[isin], report_date=report_date)
+        frenkla = FrenklaOpenApiService()
+        data = frenkla.get_fundinfo(isins=[isin], report_date=report_date)
 
         fundinfo = None
         for klass in data[0]["classes"]:
