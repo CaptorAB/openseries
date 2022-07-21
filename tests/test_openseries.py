@@ -328,7 +328,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertTrue(isinstance(fseries, OpenTimeSeries))
 
-    def test_save_opentimeseries_to_json(self):
+    def test_opentimeseries_save_to_json(self):
 
         seriesfile = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "irisc.json"
@@ -2819,7 +2819,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         dds = [f"{dmax:.11f}" for dmax in mframe.tsdf.min()]
         self.assertListEqual(dd, dds)
 
-    def test_ord_least_squares_fit(self):
+    def test_openframe_ord_least_squares_fit(self):
 
         osims = ReturnSimulation.from_lognormal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
         oframe = sim_to_openframe(osims, dt.date(2019, 6, 30)).to_cumret()
@@ -2862,7 +2862,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             ],
         )
 
-    def test_beta(self):
+    def test_openframe_beta(self):
 
         bsims = ReturnSimulation.from_lognormal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
         bframe = sim_to_openframe(bsims, dt.date(2019, 6, 30)).to_cumret()
