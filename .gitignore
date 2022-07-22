@@ -31,7 +31,6 @@ htmlcov/
 coverage_html/
 /.pytest_cache/
 .coverage
-.coveragerc
 .cache
 
 # Environments
