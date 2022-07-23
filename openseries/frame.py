@@ -1568,15 +1568,9 @@ class OpenFrame(object):
         self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_log(self, reverse: bool = False):
+    def value_to_log(self):
         """Converts a valueseries into logarithmic return series \n
         Equivalent to LN(value[t] / value[t=0]) in MS Excel
-
-        Parameters
-        ----------
-        reverse: bool, default: False
-            Allows for a reversal of the conversion.
-            I.e. converting a logarithmic return series into a valueseries
 
         Returns
         -------
@@ -1584,16 +1578,7 @@ class OpenFrame(object):
             An OpenFrame object
         """
 
-        if reverse:
-            self.tsdf = np.exp(self.tsdf)
-            new_labels = ["Price(Close)"] * self.item_count
-            arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-            self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
-        else:
-            self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
-            new_labels = ["Return(Total)"] * self.item_count
-            arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-            self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
         return self
 
     def to_cumret(self):
@@ -1705,32 +1690,6 @@ class OpenFrame(object):
             [[vol_label], ["Rolling volatility"]]
         )
         return voldf
-
-    #
-    # def rolling_beta(
-    #     self, y_column: int, x_column: int, observations: int = 21
-    # ) -> pd.DataFrame:
-    #     """Rolling Beta between two series using Ordinary Least Squares Fit
-    #
-    #     Parameters
-    #     ----------
-    #     y_column:
-    #         The column level values of the dependent variable y
-    #     x_column:
-    #         The column level values of the exogenous variable x
-    #
-    #     Returns
-    #     -------
-    #     float
-    #         The Beta between two timeseries estimated using an Ordinary Least Squares fit
-    #     """
-    #
-    #     betadf = self.tsdf.rolling(observations, min_periods=observations)
-    #     y = self.tsdf.loc[:, endo_column]
-    #     x = self.tsdf.loc[:, exo_column]
-    #     model = sm.OLS(y, x).fit()
-    #
-    #     return float(model.params)
 
     def rolling_return(self, column: int, observations: int = 21) -> pd.DataFrame:
         """
@@ -2307,7 +2266,7 @@ class OpenFrame(object):
 
     def beta(self, asset: tuple | int, market: tuple | int) -> float:
         """https://www.investopedia.com/terms/b/beta.asp
-        Calculates Beta as Co-variance of x & y divided by Variance of x
+        Calculates Beta as Co-variance of asset & market divided by Variance of market
 
         Parameters
         ----------
@@ -2321,20 +2280,37 @@ class OpenFrame(object):
         float
             Beta as Co-variance of x & y divided by Variance of x
         """
-
-        if isinstance(asset, tuple):
-            y = self.tsdf.loc[:, asset]
-        elif isinstance(asset, int):
-            y = self.tsdf.iloc[:, asset]
+        if all(
+            [
+                True if x == "Return(Total)" else False
+                for x in self.tsdf.columns.get_level_values(1).values
+            ]
+        ):
+            if isinstance(asset, tuple):
+                y = self.tsdf.loc[:, asset]
+            elif isinstance(asset, int):
+                y = self.tsdf.iloc[:, asset]
+            else:
+                raise Exception("asset should be a tuple or an integer.")
+            if isinstance(market, tuple):
+                x = self.tsdf.loc[:, market]
+            elif isinstance(market, int):
+                x = self.tsdf.iloc[:, market]
+            else:
+                raise Exception("market should be a tuple or an integer.")
         else:
-            raise Exception("asset should be a tuple or an integer.")
-
-        if isinstance(market, tuple):
-            x = self.tsdf.loc[:, market]
-        elif isinstance(market, int):
-            x = self.tsdf.iloc[:, market]
-        else:
-            raise Exception("market should be a tuple or an integer.")
+            if isinstance(asset, tuple):
+                y = np.log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
+            elif isinstance(asset, int):
+                y = np.log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+            else:
+                raise Exception("asset should be a tuple or an integer.")
+            if isinstance(market, tuple):
+                x = np.log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
+            elif isinstance(market, int):
+                x = np.log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+            else:
+                raise Exception("market should be a tuple or an integer.")
 
         covariance = np.cov(y, x, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -2474,6 +2450,46 @@ class OpenFrame(object):
         )
         return ratiodf
 
+    def rolling_beta(
+        self,
+        asset_column: int = 0,
+        market_column: int = 1,
+        observations: int = 21,
+    ) -> pd.DataFrame:
+        """https://www.investopedia.com/terms/b/beta.asp
+        Calculates Beta as Co-variance of asset & market divided by Variance of market
+
+        Parameters
+        ----------
+        asset_column: int, default: 0
+            Column of timeseries that is the asset.
+        market_column: int, default: 1
+            Column of timeseries that is the market.
+        observations: int, default: 21
+            The length of the rolling window to use is set as number of observations.
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling Betas
+        """
+        market_label = self.tsdf.iloc[:, market_column].name[0]
+        beta_label = f"{self.tsdf.iloc[:, asset_column].name[0]}" f" / {market_label}"
+
+        rolling = self.tsdf.copy()
+        rolling = rolling.pct_change().rolling(observations, min_periods=observations)
+
+        cov = rolling.cov()
+        cov.dropna(inplace=True)
+
+        rollbeta = cov.iloc[:, asset_column].xs(market_label, level=1) / cov.iloc[
+            :, market_column
+        ].xs(market_label, level=1)
+        rollbeta = rollbeta.to_frame()
+        rollbeta.columns = pd.MultiIndex.from_product([[beta_label], ["Beta"]])
+
+        return rollbeta
+
     def rolling_corr(
         self,
         first_column: int = 0,
@@ -2504,10 +2520,10 @@ class OpenFrame(object):
             + self.tsdf.iloc[:, second_column].name[0]
         )
         corrdf = (
-            self.tsdf.iloc[:, 0]
+            self.tsdf.iloc[:, first_column]
             .pct_change()[1:]
             .rolling(observations, min_periods=observations)
-            .corr(self.tsdf.iloc[:, 1].pct_change()[1:])
+            .corr(self.tsdf.iloc[:, second_column].pct_change()[1:])
         )
         corrdf = corrdf.dropna().to_frame()
         corrdf.columns = pd.MultiIndex.from_product(

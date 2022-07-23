@@ -597,17 +597,13 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         retseries.to_cumret()
 
-    def test_opentimeseries_log_and_exp(self):
+    def test_opentimeseries_valute_to_log(self):
 
         logsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
         logseries = sim_to_opentimeseries(logsim, end=dt.date(2019, 6, 30)).to_cumret()
-        b4_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values]
 
         logseries.value_to_log()
         are_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values]
-
-        logseries.value_to_log(reverse=True)
-        are_exp = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values]
 
         should_log = [
             "0.000000000000",
@@ -627,27 +623,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "-0.023560341062",
         ]
 
-        should_exp = [
-            "1.000000000000",
-            "0.992677372704",
-            "0.990096006637",
-            "0.993344927303",
-            "0.990716407521",
-            "0.994568263817",
-            "1.002141732515",
-            "0.996248564946",
-            "0.997816096566",
-            "0.992569799417",
-            "0.990747112836",
-            "0.999761887839",
-            "0.995472043590",
-            "0.987127414827",
-            "0.976715036868",
-        ]
-
         self.assertListEqual(are_log, should_log)
-        self.assertListEqual(are_exp, should_exp)
-        self.assertListEqual(b4_log, are_exp)
 
     def test_all_calc_properties(self):
 
@@ -959,16 +935,9 @@ class TestOpenTimeSeries(unittest.TestCase):
         cumseries = sameseries.from_deepcopy()
         cumframe = sameframe.from_deepcopy()
 
-        sameseries.value_to_log()
-        sameframe.value_to_log()
+        cumseries.value_to_log()
+        cumframe.value_to_log()
         assert_frame_equal(sameseries.tsdf, sameframe.tsdf)
-
-        sameseries.value_to_log(reverse=True)
-        sameframe.value_to_log(reverse=True)
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf)
-
-        assert_frame_equal(sameseries.tsdf, cumseries.tsdf)
-        assert_frame_equal(cumframe.tsdf, sameframe.tsdf)
 
         sameseries.value_to_ret()
         sameframe.value_to_ret()
@@ -1266,6 +1235,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             "make_portfolio",
             "relative",
             "rolling_corr",
+            "rolling_beta",
             "trunc_frame",
         ]
 
@@ -1298,7 +1268,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             len(frame_compared) == 0, msg=f"Difference is: {frame_compared}"
         )
 
-    def test_openframe_log_and_exp(self):
+    def test_openframe_value_to_log(self):
 
         logsim = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
         logframe = sim_to_openframe(logsim, dt.date(2019, 6, 30)).to_cumret()
@@ -1314,14 +1284,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         middle_log = [bb[k] for k in bb]
 
         self.assertNotEqual(b4_log, middle_log)
-
-        logframe.value_to_log(reverse=True)
-
-        aa = logframe.tsdf.applymap(lambda nn: f"{nn:.12f}")
-        bb = aa.to_dict(orient="list")
-        after_log = [bb[k] for k in bb]
-
-        self.assertListEqual(b4_log, after_log)
 
     def test_openframe_correl_matrix(self):
 
@@ -1841,6 +1803,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_rolling_info_ratio(self):
 
+        self.maxDiff = None
         sims = ReturnSimulation.from_merton_jump_gbm(
             n=5,
             d=2512,
@@ -1855,8 +1818,40 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.rolling_info_ratio(long_column=0, short_column=1).head()
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [0.220296, 0.163429, 0.199549, 0.195792, 0.203463]
+        values = [f"{v:.11f}" for v in simdata.iloc[:, 0]]
+        checkdata = [
+            "0.22029628522",
+            "0.16342938866",
+            "0.19954924433",
+            "0.19579197546",
+            "0.20346268143",
+        ]
+
+        self.assertListEqual(values, checkdata)
+
+    def test_openframe_rolling_beta(self):
+
+        sims = ReturnSimulation.from_merton_jump_gbm(
+            n=5,
+            d=2512,
+            mu=0.05,
+            vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            seed=71,
+        )
+        frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
+        simdata = frame.rolling_beta(asset_column=0, market_column=1).head()
+
+        values = [f"{v:.11f}" for v in simdata.iloc[:, 0]]
+        checkdata = [
+            "-0.05129437067",
+            "-0.07071418405",
+            "-0.05236923352",
+            "-0.04282093703",
+            "-0.08012220038",
+        ]
 
         self.assertListEqual(values, checkdata)
 
@@ -2866,7 +2861,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         bsims = ReturnSimulation.from_lognormal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
         bframe = sim_to_openframe(bsims, dt.date(2019, 6, 30)).to_cumret()
-        bframe.value_to_log()
+        bframe.resample("7D")
         results = []
         for i in range(bframe.item_count):
             for j in range(bframe.item_count):
@@ -2876,29 +2871,29 @@ class TestOpenTimeSeries(unittest.TestCase):
             results,
             [
                 "1.00000000000",
-                "0.14859048744",
-                "0.22185318925",
-                "0.08349587036",
-                "0.06726506358",
-                "0.83313606318",
+                "0.14789008484",
+                "0.22081056673",
+                "0.08289437576",
+                "0.06643502183",
+                "0.83394218499",
                 "1.00000000000",
-                "1.03770059983",
-                "0.63135889225",
-                "0.55992433269",
-                "0.91666296841",
-                "0.76470010892",
+                "1.03301969320",
+                "0.62455936849",
+                "0.55871763920",
+                "0.92277039702",
+                "0.76557107601",
                 "1.00000000000",
-                "0.53828336682",
-                "0.44904330677",
-                "0.96819254850",
-                "1.30571416296",
-                "1.51064942313",
+                "0.53556526892",
+                "0.44931511667",
+                "0.98059414709",
+                "1.31021049367",
+                "1.51601268628",
                 "1.00000000000",
-                "0.77162909557",
-                "1.04568410329",
-                "1.55244192772",
-                "1.68948821030",
-                "1.03448168040",
+                "0.77504650499",
+                "1.04160776510",
+                "1.55346911864",
+                "1.68571579339",
+                "1.02723700914",
                 "1.00000000000",
             ],
         )

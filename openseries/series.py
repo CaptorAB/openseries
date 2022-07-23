@@ -1736,15 +1736,9 @@ class OpenTimeSeries(object):
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         return self
 
-    def value_to_log(self, reverse: bool = False):
+    def value_to_log(self):
         """Converts a valueseries into logarithmic return series \n
         Equivalent to LN(value[t] / value[t=0]) in MS Excel
-
-        Parameters
-        ----------
-        reverse: bool, default: False
-            Allows for a reversal of the conversion.
-            I.e. converting a logarithmic return series into a valueseries
 
         Returns
         -------
@@ -1752,18 +1746,7 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        if reverse:
-            self.tsdf = np.exp(self.tsdf)
-            self.valuetype = "Price(Close)"
-            self.tsdf.columns = pd.MultiIndex.from_product(
-                [[self.label], [self.valuetype]]
-            )
-        else:
-            self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
-            self.valuetype = "Return(Total)"
-            self.tsdf.columns = pd.MultiIndex.from_product(
-                [[self.label], [self.valuetype]]
-            )
+        self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
         return self
 
     def to_cumret(self):
