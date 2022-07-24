@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="openseries",
-    version="0.5.5",
+    version="0.5.6",
     packages=find_packages(),
     package_data={"openseries": ["*.json"], ".": ["*.json", "coverage.svg"]},
     install_requires=[
