@@ -13,7 +13,7 @@ jobs:
           command: python3 -m venv venv
       - run:
           name: Activate environment
-          command: ./venv/bin/activate
+          command: . venv/bin/activate
       - run:
           name: Check Python version
           command: |
