@@ -2486,6 +2486,7 @@ class OpenFrame(object):
             :, market_column
         ].xs(market_label, level=1)
         rollbeta = rollbeta.to_frame()
+        rollbeta.index = rollbeta.index.droplevel(level=1)
         rollbeta.columns = pd.MultiIndex.from_product([[beta_label], ["Beta"]])
 
         return rollbeta

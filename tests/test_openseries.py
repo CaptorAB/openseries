@@ -1803,7 +1803,6 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_openframe_rolling_info_ratio(self):
 
-        self.maxDiff = None
         sims = ReturnSimulation.from_merton_jump_gbm(
             n=5,
             d=2512,
@@ -1816,9 +1815,10 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.rolling_info_ratio(long_column=0, short_column=1).head()
+        simdata = frame.rolling_info_ratio(long_column=0, short_column=1)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [f"{v:.11f}" for v in simdata.iloc[:, 0]]
+        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
             "0.22029628522",
             "0.16342938866",
@@ -1828,6 +1828,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_beta(self):
 
@@ -1842,9 +1843,10 @@ class TestOpenTimeSeries(unittest.TestCase):
             seed=71,
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
-        simdata = frame.rolling_beta(asset_column=0, market_column=1).head()
+        simdata = frame.rolling_beta(asset_column=0, market_column=1)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [f"{v:.11f}" for v in simdata.iloc[:, 0]]
+        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
             "-0.05129437067",
             "-0.07071418405",
@@ -1854,6 +1856,7 @@ class TestOpenTimeSeries(unittest.TestCase):
         ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_ret_vol_ratio_func(self):
 
@@ -1907,7 +1910,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         simdata = frame.tracking_error_func(base_column=1)
 
-        self.assertEqual(float(f"{simdata[0]:.10f}"), 0.1554104519)
+        self.assertEqual(f"{simdata[0]:.10f}", "0.1554104519")
 
     def test_openframe_info_ratio_func(self):
 
@@ -1940,12 +1943,20 @@ class TestOpenTimeSeries(unittest.TestCase):
             seed=71,
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
-        simdata = frame.rolling_corr(first_column=0, second_column=1).head()
+        simdata = frame.rolling_corr(first_column=0, second_column=1)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [-0.061702, -0.086124, -0.064623, -0.054879, -0.106349]
+        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
+        checkdata = [
+            "-0.06170179015",
+            "-0.08612430578",
+            "-0.06462318798",
+            "-0.05487880293",
+            "-0.10634855725",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_vol(self):
 
@@ -1961,12 +1972,20 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.rolling_vol(column=0, observations=21).head()
+        simdata = frame.rolling_vol(column=0, observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [0.08745, 0.088091, 0.088323, 0.086713, 0.08301]
+        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
+        checkdata = [
+            "0.08745000502",
+            "0.08809050608",
+            "0.08832329638",
+            "0.08671269840",
+            "0.08300985872",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_return(self):
 
@@ -1982,12 +2001,20 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.rolling_return(column=0, observations=21).head()
+        simdata = frame.rolling_return(column=0, observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [-0.014776, -0.016623, -0.017359, -0.021387, -0.035925]
+        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
+        checkdata = [
+            "-0.01477558639",
+            "-0.01662326401",
+            "-0.01735881460",
+            "-0.02138743793",
+            "-0.03592486809",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_cvar_down(self):
 
@@ -2003,12 +2030,20 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.rolling_cvar_down(column=0, observations=21).tail()
+        simdata = frame.rolling_cvar_down(column=0, observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [-0.013375, -0.013375, -0.013375, -0.012702, -0.012702]
+        values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
+        checkdata = [
+            "-0.01337460746",
+            "-0.01337460746",
+            "-0.01337460746",
+            "-0.01270193467",
+            "-0.01270193467",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_var_down(self):
 
@@ -2024,48 +2059,88 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.rolling_var_down(column=0, observations=21).tail()
+        simdata = frame.rolling_var_down(column=0, observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [-0.013422, -0.013422, -0.013422, -0.013422, -0.013422]
+        values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
+        checkdata = [
+            "-0.01342248045",
+            "-0.01342248045",
+            "-0.01342248045",
+            "-0.01342248045",
+            "-0.01342248045",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_opentimeseries_rolling_vol(self):
 
-        simdata = self.randomseries.rolling_vol(observations=21).head()
+        simdata = self.randomseries.rolling_vol(observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [0.08745, 0.088091, 0.088323, 0.086713, 0.08301]
+        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
+        checkdata = [
+            "0.08745000502",
+            "0.08809050608",
+            "0.08832329638",
+            "0.08671269840",
+            "0.08300985872",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_opentimeseries_rolling_return(self):
 
-        simdata = self.randomseries.rolling_return(observations=21).head()
+        simdata = self.randomseries.rolling_return(observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [-0.014776, -0.016623, -0.017359, -0.021387, -0.035925]
+        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
+        checkdata = [
+            "-0.01477558639",
+            "-0.01662326401",
+            "-0.01735881460",
+            "-0.02138743793",
+            "-0.03592486809",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_opentimeseries_rolling_cvar_down(self):
 
-        simdata = self.randomseries.rolling_cvar_down(observations=21).tail()
+        simdata = self.randomseries.rolling_cvar_down(observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [-0.013375, -0.013375, -0.013375, -0.012702, -0.012702]
+        values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
+        checkdata = [
+            "-0.01337460746",
+            "-0.01337460746",
+            "-0.01337460746",
+            "-0.01270193467",
+            "-0.01270193467",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_opentimeseries_rolling_var_down(self):
 
-        simdata = self.randomseries.rolling_var_down(observations=21).tail()
+        simdata = self.randomseries.rolling_var_down(observations=21)
+        simseries = OpenTimeSeries.from_df(simdata)
 
-        values = [float(f"{v:.6f}") for v in simdata.iloc[:, 0].values]
-        checkdata = [-0.013422, -0.013422, -0.013422, -0.013422, -0.013422]
+        values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
+        checkdata = [
+            "-0.01342248045",
+            "-0.01342248045",
+            "-0.01342248045",
+            "-0.01342248045",
+            "-0.01342248045",
+        ]
 
         self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_label_uniqueness(self):
 

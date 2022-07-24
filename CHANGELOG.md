@@ -2,7 +2,7 @@
 
 For a long time I have not kept a log of the changes implemented in the different versions of the openseries package. In this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
-## Version [0.5.6] - 2022-07-24
+## Version [0.5.7] - 2022-07-24
 
 Fixed rolling correlation, added beta attribute and rolling beta for OpenFrame and associated tests.
 
