@@ -12,30 +12,37 @@ jobs:
           name: Install Python in a virtual environment
           command: python3 -m venv venv
       - run:
-          name: Activate environment
-          command: . venv/bin/activate
-      - run:
           name: Check Python version
           command: |
+            . venv/bin/activate
             python --version
-            whereis python
+            which python
       - run:
           name: Upgrade pip and check version
           command: |
+            . venv/bin/activate
             pip install --upgrade pip
             pip --version
       - run:
           name: Install dependencies from requirements.txt
-          command: pip install -r requirements.txt
+          command: |
+            . venv/bin/activate
+            pip install -r requirements.txt
       - run:
           name: Check formatting with black
-          command: black ./
+          command: |
+            . venv/bin/activate
+            black ./
       - run:
           name: Tests with pytest
-          command: coverage run -m pytest --verbose ./
+          command: |
+            . venv/bin/activate
+            coverage run -m pytest --verbose ./
       - run:
           name: Report coverage
-          command: coverage report
+          command: |
+            . venv/bin/activate
+            coverage report
 
 workflows:
   version: 2
