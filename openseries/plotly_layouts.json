@@ -35,7 +35,7 @@
     "font": {
       "size": 14,
       "color": "#01579B",
-      "family": "Montserrat, sans-serif"
+      "family": "Open Sans"
     },
     "xaxis": {
       "tickangle": -45,

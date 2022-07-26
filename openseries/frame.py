@@ -894,10 +894,6 @@ class OpenFrame(object):
         else:
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
-                if float(longdf.iloc[0]) == 0.0:
-                    raise Exception(
-                        "Error in sortino_ratio_func due to an initial value being zero."
-                    )
                 ret = float(longdf.pct_change().mean() * time_factor)
                 dddf = longdf.pct_change()
                 downdev = float(
@@ -1950,16 +1946,6 @@ class OpenFrame(object):
             to allow a volatility calculation
         """
 
-        assert self.tsdf.shape[1] > long_column >= 0 and isinstance(long_column, int), (
-            "Both arguments must be integers and within a range no larger or "
-            "smaller than the number of columns."
-        )
-        assert self.tsdf.shape[1] > short_column >= 0 and isinstance(
-            short_column, int
-        ), (
-            "Both arguments must be integers and within a range no larger or "
-            "smaller than the number of columns."
-        )
         rel_label = (
             self.tsdf.iloc[:, long_column].name[0]
             + "_over_"
@@ -2253,10 +2239,8 @@ class OpenFrame(object):
             resultname = f"Up Capture Ratios vs {short_label}"
         elif ratio == "down":
             resultname = f"Down Capture Ratios vs {short_label}"
-        elif ratio == "both":
-            resultname = f"Up-Down Capture Ratios vs {short_label}"
         else:
-            resultname = ""
+            resultname = f"Up-Down Capture Ratios vs {short_label}"
 
         return pd.Series(
             data=ratios,
@@ -2588,13 +2572,6 @@ class OpenFrame(object):
         if not filename:
             filename = "".join(random.choices(string.ascii_letters, k=6)) + ".html"
         plotfile = os.path.join(os.path.abspath(directory), filename)
-        assert mode in [
-            "lines",
-            "markers",
-            "both",
-        ], "Style must be specified as lines, markers or both."
-        if mode == "both":
-            mode = "lines+markers"
 
         data = []
         for item in range(self.item_count):

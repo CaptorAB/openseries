@@ -1992,14 +1992,17 @@ class OpenTimeSeries(object):
             ]
         ):
             ra_df = self.tsdf.copy()
+            values: list = [1.0]
+            returns_input = True
         else:
+            values: list = [float(self.tsdf.iloc[0])]
             ra_df = self.tsdf.pct_change().copy()
+            returns_input = False
         ra_df.dropna(inplace=True)
 
         prev = self.first_idx
         idx: dt.date
         dates: list = [prev]
-        values: list = [float(self.tsdf.iloc[0])]
 
         for idx, row in ra_df.iterrows():
             dates.append(idx)
@@ -2012,6 +2015,8 @@ class OpenTimeSeries(object):
         self.valuetype = "Price(Close)"
         self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
         self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
+        if returns_input:
+            self.value_to_ret()
         return self
 
     def set_new_label(
@@ -2062,17 +2067,12 @@ class OpenTimeSeries(object):
         mode: str = "lines",
         tick_fmt: str | None = None,
         directory: str | None = None,
-        size_array: list | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
         output_type: str = "file",
     ) -> (go.Figure, str):
         """Creates a Plotly Figure
-
-        To scale the bubble size, use the attribute sizeref.
-        We recommend using the following formula to calculate a sizeref value:
-        sizeref = 2. * max(array of size values) / (desired maximum marker size ** 2)
 
         Parameters
         ----------
@@ -2082,8 +2082,6 @@ class OpenTimeSeries(object):
             None, '%', '.1%' depending on number of decimals to show
         directory: str, optional
             Directory where Plotly html file is saved
-        size_array: list, optional
-            List of values that will set bubble sizes if mode is markers
         auto_open: bool, default: True
             Determines whether or not to open a browser window with the plot
         add_logo: bool, default: True
@@ -2104,31 +2102,14 @@ class OpenTimeSeries(object):
         filename = self.label.replace("/", "").replace("#", "").replace(" ", "").upper()
         plotfile = os.path.join(os.path.abspath(directory), "{}.html".format(filename))
 
-        assert mode in [
-            "lines",
-            "markers",
-            "both",
-        ], "Style must be specified as lines, markers or both."
-        if mode == "both":
-            mode = "lines+markers"
-
         values = [float(x) for x in self.tsdf.iloc[:, 0].tolist()]
-
-        if size_array:
-            sizer = 2.0 * max(size_array) / (90.0**2)
-            text_array = [f"{x:.2%}" for x in size_array]
-        else:
-            sizer = None
-            text_array = None
 
         data = [
             go.Scatter(
                 x=self.tsdf.index,
                 y=values,
                 hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-                line=dict(width=2.5, color="rgb(33, 134, 197)", dash="solid"),
-                marker=dict(size=size_array, sizemode="area", sizeref=sizer, sizemin=4),
-                text=text_array,
+                line=dict(width=2.5, dash="solid"),
                 mode=mode,
                 name=self.label,
             )

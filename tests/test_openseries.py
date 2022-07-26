@@ -286,6 +286,17 @@ class TestOpenTimeSeries(unittest.TestCase):
             ],
             name="Asset_0",
         )
+        sen = pd.Series(
+            data=[1.0, 1.01, 0.99, 1.015, 1.003],
+            index=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            name=("Asset_0", "Price(Close)"),
+        )
         df = pd.DataFrame(
             data=[
                 [1.0, 1.0],
@@ -305,10 +316,13 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
 
         seseries = OpenTimeSeries.from_df(df=se)
+        senseries = OpenTimeSeries.from_df(df=sen)
         dfseries = OpenTimeSeries.from_df(df=df, column_nmbr=1)
 
         self.assertTrue(isinstance(seseries, OpenTimeSeries))
+        self.assertTrue(isinstance(senseries, OpenTimeSeries))
         self.assertTrue(isinstance(dfseries, OpenTimeSeries))
+        self.assertEqual(seseries.label, senseries.label)
 
     def test_create_opentimeseries_from_frame(self):
 
@@ -756,6 +770,18 @@ class TestOpenTimeSeries(unittest.TestCase):
         except AssertionError as e:
             self.assertTrue(isinstance(e, AssertionError))
 
+        mpframe.weights = None
+        with self.assertRaises(Exception) as e_make:
+            _ = mpframe.make_portfolio(name=name)
+
+        self.assertEqual(
+            e_make.exception.args[0],
+            (
+                "OpenFrame weights property must be provided to run the "
+                "make_portfolio method."
+            ),
+        )
+
     def test_opentimeseries_running_adjustment(self):
 
         simadj = ReturnSimulation.from_merton_jump_gbm(
@@ -776,6 +802,21 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertEqual(
             f"{1.689055852583:.12f}",
             f"{float(adjustedseries.tsdf.iloc[-1]):.12f}",
+        )
+        adjustedseries_returns = sim_to_opentimeseries(
+            simadj, end=dt.date(2019, 6, 30)
+        )
+        adjustedseries_returns.running_adjustment(0.05)
+
+        self.assertEqual(
+            f"{0.009114963334:.12f}",
+            f"{float(adjustedseries_returns.tsdf.iloc[-1]):.12f}",
+        )
+
+        adjustedseries_returns.to_cumret()
+        self.assertEqual(
+            f"{float(adjustedseries.tsdf.iloc[-1]):.12f}",
+            f"{float(adjustedseries_returns.tsdf.iloc[-1]):.12f}",
         )
 
     @staticmethod
@@ -1359,6 +1400,20 @@ class TestOpenTimeSeries(unittest.TestCase):
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ["data", "layout"])
 
+        fig_last, _ = plotseries.plot_series(
+            auto_open=False, output_type="div", show_last=True
+        )
+        fig_last_json = json.loads(fig_last.to_json())
+        last = fig_last_json["data"][-1]["y"][0]
+        self.assertEqual(f"{last:.12f}", "0.001319755187")
+
+        fig_last_fmt, _ = plotseries.plot_series(
+            auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
+        )
+        fig_last_fmt_json = json.loads(fig_last_fmt.to_json())
+        last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
+        self.assertEqual(last_fmt, "Last 0.132%")
+
     def test_openframe_plot_series(self):
 
         plotsims = ReturnSimulation.from_normal(n=5, d=252, mu=0.05, vol=0.1, seed=71)
@@ -1367,6 +1422,25 @@ class TestOpenTimeSeries(unittest.TestCase):
         fig_json = json.loads(fig.to_json())
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ["data", "layout"])
+
+        fig_last, _ = plotframe.plot_series(
+            auto_open=False, output_type="div", show_last=True
+        )
+        fig_last_json = json.loads(fig_last.to_json())
+        last = fig_last_json["data"][-1]["y"][0]
+        self.assertEqual(f"{last:.12f}", "0.994000592625")
+
+        fig_last_fmt, _ = plotframe.plot_series(
+            auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
+        )
+        fig_last_fmt_json = json.loads(fig_last_fmt.to_json())
+        last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
+        self.assertEqual(last_fmt, "Last 99.400%")
+
+        with self.assertRaises(AssertionError) as e_plot:
+            _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
+
+        self.assertIsInstance(e_plot.exception, AssertionError)
 
     def test_openframe_passed_empty_list(self):
 
@@ -1830,6 +1904,20 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
 
+        simdata_fxd_per_yr = frame.rolling_info_ratio(
+            long_column=0, short_column=1, periods_in_a_year_fixed=251
+        )
+
+        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
+        checkdata_fxd_per_yr = [
+            "0.22045949626",
+            "0.16355046869",
+            "0.19969708449",
+            "0.19593703197",
+            "0.20361342094",
+        ]
+        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
+
     def test_openframe_rolling_beta(self):
 
         sims = ReturnSimulation.from_merton_jump_gbm(
@@ -1872,9 +1960,30 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.ret_vol_ratio_func(riskfree_column=-1)
+        simdataa = frame.ret_vol_ratio_func(riskfree_column=-1)
 
-        self.assertEqual(f"{simdata[0]:.10f}", "0.1580040085")
+        self.assertEqual(f"{simdataa[0]:.10f}", "0.1580040085")
+
+        simdatab = frame.ret_vol_ratio_func(
+            riskfree_column=-1, periods_in_a_year_fixed=251
+        )
+
+        self.assertEqual(f"{simdatab[0]:.10f}", "0.1578870346")
+
+        simdatac = frame.ret_vol_ratio_func(riskfree_column=("Asset_4", "Price(Close)"))
+
+        self.assertEqual(f"{simdatac[0]:.10f}", "0.1580040085")
+
+        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
+
+        with self.assertRaises(Exception) as e_retvolfunc:
+            # noinspection PyTypeChecker
+            _ = frame.ret_vol_ratio_func(riskfree_column="string")
+
+        self.assertEqual(
+            e_retvolfunc.exception.args[0],
+            "base_column should be a tuple or an integer.",
+        )
 
     def test_openframe_sortino_ratio_func(self):
 
@@ -1890,9 +1999,30 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.sortino_ratio_func(riskfree_column=-1)
+        simdataa = frame.sortino_ratio_func(riskfree_column=-1)
 
-        self.assertEqual(f"{simdata[0]:.10f}", "0.2009532877")
+        self.assertEqual(f"{simdataa[0]:.10f}", "0.2009532877")
+
+        simdatab = frame.sortino_ratio_func(
+            riskfree_column=-1, periods_in_a_year_fixed=251
+        )
+
+        self.assertEqual(f"{simdatab[0]:.10f}", "0.2008045175")
+
+        simdatac = frame.sortino_ratio_func(riskfree_column=("Asset_4", "Price(Close)"))
+
+        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
+
+        self.assertEqual(f"{simdatac[0]:.10f}", "0.2009532877")
+
+        with self.assertRaises(Exception) as e_func:
+            # noinspection PyTypeChecker
+            _ = frame.sortino_ratio_func(riskfree_column="string")
+
+        self.assertEqual(
+            e_func.exception.args[0],
+            "base_column should be a tuple or an integer.",
+        )
 
     def test_openframe_tracking_error_func(self):
 
@@ -1908,9 +2038,30 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.tracking_error_func(base_column=1)
+        simdataa = frame.tracking_error_func(base_column=-1)
 
-        self.assertEqual(f"{simdata[0]:.10f}", "0.1554104519")
+        self.assertEqual(f"{simdataa[0]:.10f}", "0.2462231908")
+
+        simdatab = frame.tracking_error_func(
+            base_column=-1, periods_in_a_year_fixed=251
+        )
+
+        self.assertEqual(f"{simdatab[0]:.10f}", "0.2460409063")
+
+        simdatac = frame.tracking_error_func(base_column=("Asset_4", "Price(Close)"))
+
+        self.assertEqual(f"{simdatac[0]:.10f}", "0.2462231908")
+
+        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
+
+        with self.assertRaises(Exception) as e_func:
+            # noinspection PyTypeChecker
+            _ = frame.tracking_error_func(base_column="string")
+
+        self.assertEqual(
+            e_func.exception.args[0],
+            "base_column should be a tuple or an integer.",
+        )
 
     def test_openframe_info_ratio_func(self):
 
@@ -1926,9 +2077,26 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         frame = sim_to_openframe(sims, dt.date(2019, 6, 30)).to_cumret()
 
-        simdata = frame.info_ratio_func(base_column=1)
+        simdataa = frame.info_ratio_func(base_column=-1)
 
-        self.assertEqual(f"{simdata[0]:.10f}", "0.3972681809")
+        self.assertEqual(f"{simdataa[0]:.10f}", "0.2063067697")
+
+        simdatab = frame.info_ratio_func(base_column=-1, periods_in_a_year_fixed=251)
+
+        self.assertEqual(f"{simdatab[0]:.10f}", "0.2061540363")
+
+        simdatac = frame.info_ratio_func(base_column=("Asset_4", "Price(Close)"))
+
+        self.assertEqual(f"{simdatac[0]:.10f}", "0.2063067697")
+
+        with self.assertRaises(Exception) as e_func:
+            # noinspection PyTypeChecker
+            _ = frame.info_ratio_func(base_column="string")
+
+        self.assertEqual(
+            e_func.exception.args[0],
+            "base_column should be a tuple or an integer.",
+        )
 
     def test_openframe_rolling_corr(self):
 
@@ -1986,6 +2154,20 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
+
+        simdata_fxd_per_yr = frame.rolling_vol(
+            column=0, observations=21, periods_in_a_year_fixed=251
+        )
+
+        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
+        checkdata_fxd_per_yr = [
+            "0.08738526385",
+            "0.08802529073",
+            "0.08825790869",
+            "0.08664850307",
+            "0.08294840469",
+        ]
+        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_openframe_rolling_return(self):
 
@@ -2090,6 +2272,18 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
+
+        simdata_fxd_per_yr = self.randomseries.rolling_vol(observations=21, periods_in_a_year_fixed=251)
+
+        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
+        checkdata_fxd_per_yr = [
+            "0.08738526385",
+            "0.08802529073",
+            "0.08825790869",
+            "0.08664850307",
+            "0.08294840469",
+        ]
+        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_opentimeseries_rolling_return(self):
 
@@ -2306,6 +2500,27 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertEqual(f"{up.iloc[0]:.12f}", "1.063842457805")
         self.assertEqual(f"{down.iloc[0]:.12f}", "0.922188852957")
         self.assertEqual(f"{both.iloc[0]:.12f}", "1.153605852417")
+
+        upfixed = cframe.capture_ratio_func(ratio="up", periods_in_a_year_fixed=12)
+
+        self.assertEqual(f"{upfixed.iloc[0]:.12f}", "1.063217236138")
+        self.assertAlmostEqual(up.iloc[0], upfixed.iloc[0], places=2)
+
+        uptuple = cframe.capture_ratio_func(
+            ratio="up", base_column=("indxx", "Price(Close)")
+        )
+
+        self.assertEqual(f"{uptuple.iloc[0]:.12f}", "1.063842457805")
+        self.assertEqual(f"{up.iloc[0]:.12f}", f"{uptuple.iloc[0]:.12f}")
+
+        with self.assertRaises(Exception) as e_func:
+            # noinspection PyTypeChecker
+            _ = cframe.capture_ratio_func(ratio="up", base_column="string")
+
+        self.assertEqual(
+            e_func.exception.args[0],
+            "base_column should be a tuple or an integer.",
+        )
 
     def test_opentimeseries_downside_deviation(self):
 
@@ -2698,6 +2913,47 @@ class TestOpenTimeSeries(unittest.TestCase):
             "Method must be either fill or drop passed as string.",
         )
 
+    def test_opentimeseries_return_nan_handle(self):
+
+        nanseries = OpenTimeSeries(
+            TimeSerie(
+                _id="",
+                name="nanseries",
+                currency="SEK",
+                instrumentId="",
+                local_ccy=True,
+                valuetype="Return(Total)",
+                dates=[
+                    "2022-07-11",
+                    "2022-07-12",
+                    "2022-07-13",
+                    "2022-07-14",
+                    "2022-07-15",
+                ],
+                values=[0.1, 0.05, 0.03, 0.01, 0.04],
+            )
+        )
+        nanseries.tsdf.iloc[2, 0] = None
+        dropseries = nanseries.from_deepcopy()
+        dropseries.return_nan_handle(method="drop")
+        self.assertListEqual(
+            [0.1, 0.05, 0.01, 0.04], dropseries.tsdf.iloc[:, 0].tolist()
+        )
+
+        fillseries = nanseries.from_deepcopy()
+        fillseries.return_nan_handle(method="fill")
+        self.assertListEqual(
+            [0.1, 0.05, 0.0, 0.01, 0.04], fillseries.tsdf.iloc[:, 0].tolist()
+        )
+
+        with self.assertRaises(AssertionError) as e_method:
+            _ = nanseries.return_nan_handle(method="other")
+
+        self.assertEqual(
+            e_method.exception.args[0],
+            "Method must be either fill or drop passed as string.",
+        )
+
     def test_openframe_value_nan_handle(self):
 
         nanframe = OpenFrame(
@@ -2764,6 +3020,89 @@ class TestOpenTimeSeries(unittest.TestCase):
             "Method must be either fill or drop passed as string.",
         )
 
+    def test_openframe_return_nan_handle(self):
+
+        nanframe = OpenFrame(
+            [
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="nanseries1",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Return(Total)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ],
+                        values=[0.1, 0.05, 0.03, 0.01, 0.04],
+                    )
+                ),
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="nanseries2",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Return(Total)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ],
+                        values=[0.01, 0.04, 0.02, 0.11, 0.06],
+                    )
+                ),
+            ]
+        )
+        nanframe.tsdf.iloc[2, 0] = None
+        nanframe.tsdf.iloc[3, 1] = None
+        dropframe = nanframe.from_deepcopy()
+        dropframe.return_nan_handle(method="drop")
+        self.assertListEqual([0.1, 0.05, 0.04], dropframe.tsdf.iloc[:, 0].tolist())
+        self.assertListEqual([0.01, 0.04, 0.06], dropframe.tsdf.iloc[:, 1].tolist())
+
+        fillframe = nanframe.from_deepcopy()
+        fillframe.return_nan_handle(method="fill")
+        self.assertListEqual(
+            [0.1, 0.05, 0.0, 0.01, 0.04], fillframe.tsdf.iloc[:, 0].tolist()
+        )
+        self.assertListEqual(
+            [0.01, 0.04, 0.02, 0.0, 0.06], fillframe.tsdf.iloc[:, 1].tolist()
+        )
+
+        with self.assertRaises(AssertionError) as e_methd:
+            _ = nanframe.return_nan_handle(method="other")
+
+        self.assertEqual(
+            e_methd.exception.args[0],
+            "Method must be either fill or drop passed as string.",
+        )
+
+    def test_openframe_relative(self):
+
+        rsims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
+        rframe = sim_to_openframe(rsims, dt.date(2019, 6, 30)).to_cumret()
+        sframe = rframe.from_deepcopy()
+
+        rframe.relative()
+        self.assertEqual("Asset_0_over_Asset_1", rframe.columns_lvl_zero[-1])
+        rframe.tsdf.iloc[:, -1] = rframe.tsdf.iloc[:, -1].add(1.0)
+
+        sframe.relative(base_zero=False)
+
+        rf = [f"{rr:.11f}" for rr in rframe.tsdf.iloc[:, -1]]
+        sf = [f"{rr:.11f}" for rr in sframe.tsdf.iloc[:, -1]]
+
+        self.assertListEqual(rf, sf)
+
     def test_openframe_miscellaneous(self):
 
         msims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
@@ -2793,6 +3132,32 @@ class TestOpenTimeSeries(unittest.TestCase):
                 "-0.040958695",
             ],
             ret,
+        )
+
+        impvol = [f"{iv:.11f}" for iv in mframe.vol_from_var_func(drift_adjust=False)]
+        impvoldrifted = [
+            f"{iv:.11f}" for iv in mframe.vol_from_var_func(drift_adjust=True)
+        ]
+
+        self.assertListEqual(
+            impvol,
+            [
+                "0.09346157986",
+                "0.09356336505",
+                "0.10329974747",
+                "0.10611467842",
+                "0.10533221112",
+            ],
+        )
+        self.assertListEqual(
+            impvoldrifted,
+            [
+                "0.09831616286",
+                "0.09307200988",
+                "0.10352124920",
+                "0.10745704093",
+                "0.10474133708",
+            ],
         )
 
         mframe.tsdf.iloc[0, 2] = 0.0
@@ -2834,6 +3199,11 @@ class TestOpenTimeSeries(unittest.TestCase):
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
             self.assertAlmostEqual(no_fixed, fixed, places=2)
             self.assertNotAlmostEqual(no_fixed, fixed, places=6)
+
+        impvol = mseries.vol_from_var_func(drift_adjust=False)
+        self.assertEqual(f"{impvol:.12f}", "0.093461579863")
+        impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
+        self.assertEqual(f"{impvoldrifted:.12f}", "0.098316162865")
 
     def test_value_ret_calendar_period(self):
 
@@ -2894,12 +3264,27 @@ class TestOpenTimeSeries(unittest.TestCase):
         osims = ReturnSimulation.from_lognormal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
         oframe = sim_to_openframe(osims, dt.date(2019, 6, 30)).to_cumret()
         oframe.value_to_log()
+
+        fsframe = oframe.from_deepcopy()
+        fsframe.ord_least_squares_fit(y_column=0, x_column=1, fitted_series=True)
+        self.assertEqual(fsframe.columns_lvl_zero[-1], oframe.columns_lvl_zero[0])
+        self.assertEqual(fsframe.columns_lvl_one[-1], oframe.columns_lvl_zero[1])
+
         results = []
         for i in range(oframe.item_count):
             for j in range(oframe.item_count):
                 results.append(
                     f"{oframe.ord_least_squares_fit(y_column=i, x_column=j, fitted_series=False):.11f}"
                 )
+
+        results_tuple = []
+        for i in oframe.tsdf:
+            for j in oframe.tsdf:
+                results_tuple.append(
+                    f"{oframe.ord_least_squares_fit(y_column=i, x_column=j, fitted_series=False):.11f}"
+                )
+
+        self.assertListEqual(results, results_tuple)
 
         self.assertListEqual(
             results,
@@ -2931,6 +3316,27 @@ class TestOpenTimeSeries(unittest.TestCase):
                 "1.00000000000",
             ],
         )
+        with self.assertRaises(Exception) as e_x:
+            # noinspection PyTypeChecker
+            _ = oframe.ord_least_squares_fit(
+                y_column=0, x_column="string", fitted_series=False
+            )
+
+        self.assertEqual(
+            e_x.exception.args[0],
+            "x_column should be a tuple or an integer.",
+        )
+
+        with self.assertRaises(Exception) as e_y:
+            # noinspection PyTypeChecker
+            _ = oframe.ord_least_squares_fit(
+                y_column="string", x_column=1, fitted_series=False
+            )
+
+        self.assertEqual(
+            e_y.exception.args[0],
+            "y_column should be a tuple or an integer.",
+        )
 
     def test_openframe_beta(self):
 
@@ -2941,6 +3347,13 @@ class TestOpenTimeSeries(unittest.TestCase):
         for i in range(bframe.item_count):
             for j in range(bframe.item_count):
                 results.append(f"{bframe.beta(asset=i, market=j):.11f}")
+
+        results_tuple = []
+        for i in bframe.tsdf:
+            for j in bframe.tsdf:
+                results_tuple.append(f"{bframe.beta(asset=i, market=j):.11f}")
+
+        self.assertListEqual(results, results_tuple)
 
         self.assertListEqual(
             results,
@@ -2972,3 +3385,104 @@ class TestOpenTimeSeries(unittest.TestCase):
                 "1.00000000000",
             ],
         )
+        with self.assertRaises(Exception) as e_asset:
+            # noinspection PyTypeChecker
+            _ = bframe.beta(asset="string", market=1)
+
+        self.assertEqual(
+            e_asset.exception.args[0],
+            "asset should be a tuple or an integer.",
+        )
+
+        with self.assertRaises(Exception) as e_market:
+            # noinspection PyTypeChecker
+            _ = bframe.beta(asset=0, market="string")
+
+        self.assertEqual(
+            e_market.exception.args[0],
+            "market should be a tuple or an integer.",
+        )
+
+    def test_openframe_beta_returns_input(self):
+
+        bsims = ReturnSimulation.from_lognormal(n=5, d=2520, mu=0.05, vol=0.1, seed=71)
+        bframe = sim_to_openframe(bsims, dt.date(2019, 6, 30))
+        bframe.resample("7D")
+        results = []
+        for i in range(bframe.item_count):
+            for j in range(bframe.item_count):
+                results.append(f"{bframe.beta(asset=i, market=j):.11f}")
+
+        results_tuple = []
+        for i in bframe.tsdf:
+            for j in bframe.tsdf:
+                results_tuple.append(f"{bframe.beta(asset=i, market=j):.11f}")
+
+        self.assertListEqual(results, results_tuple)
+
+        self.assertListEqual(
+            results,
+            [
+                "1.00000000000",
+                "0.05604932482",
+                "-0.10318577564",
+                "0.00403166381",
+                "0.03641081338",
+                "0.05125978278",
+                "1.00000000000",
+                "0.07019744912",
+                "-0.00011060548",
+                "0.03145441859",
+                "-0.10798723144",
+                "0.08032810625",
+                "1.00000000000",
+                "-0.01124691224",
+                "-0.07845911818",
+                "0.00329118754",
+                "-0.00009872760",
+                "-0.00877301863",
+                "1.00000000000",
+                "0.00136012991",
+                "0.03550321225",
+                "0.03353609985",
+                "-0.07310180776",
+                "0.00162461081",
+                "1.00000000000",
+            ],
+        )
+        with self.assertRaises(Exception) as e_asset:
+            # noinspection PyTypeChecker
+            _ = bframe.beta(asset="string", market=1)
+
+        self.assertEqual(
+            e_asset.exception.args[0],
+            "asset should be a tuple or an integer.",
+        )
+
+        with self.assertRaises(Exception) as e_market:
+            # noinspection PyTypeChecker
+            _ = bframe.beta(asset=0, market="string")
+
+        self.assertEqual(
+            e_market.exception.args[0],
+            "market should be a tuple or an integer.",
+        )
+
+    def test_opentimeseries_set_new_label(self):
+
+        lsims = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
+        lseries = sim_to_opentimeseries(lsims, dt.date(2019, 6, 30))
+
+        self.assertTupleEqual(lseries.tsdf.columns[0], ("Asset", "Return(Total)"))
+
+        lseries.set_new_label(lvl_zero="zero")
+        self.assertTupleEqual(lseries.tsdf.columns[0], ("zero", "Return(Total)"))
+
+        lseries.set_new_label(lvl_one="one")
+        self.assertTupleEqual(lseries.tsdf.columns[0], ("zero", "one"))
+
+        lseries.set_new_label(lvl_zero="two", lvl_one="three")
+        self.assertTupleEqual(lseries.tsdf.columns[0], ("two", "three"))
+
+        lseries.set_new_label(delete_lvl_one=True)
+        self.assertEqual(lseries.tsdf.columns[0], "two")

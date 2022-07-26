@@ -6,7 +6,6 @@ include =
     openseries/*
 
 [report]
-show_missing = False
 skip_empty = true
 
 exclude_lines =
