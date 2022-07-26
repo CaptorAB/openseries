@@ -1,15 +1,13 @@
 
 venv:
 	python3 -m venv ./venv
-	. venv/bin/activate
-	PYTHONPATH=${PWD} venv/bin/python --version
-	PYTHONPATH=${PWD} venv/bin/pip install --upgrade pip
-	PYTHONPATH=${PWD} venv/bin/pip install --upgrade -r requirements.txt
-	PYTHONPATH=${PWD} venv/bin/pip --version
+	venv/bin/python --version
+	venv/bin/pip install --upgrade pip
+	venv/bin/pip install --upgrade -r requirements.txt
 
 test:
 	PYTHONPATH=${PWD} venv/bin/coverage run -m pytest --verbose ./
-	PYTHONPATH=${PWD} venv/bin/coverage report -m --skip-covered --skip-empty
+	PYTHONPATH=${PWD} venv/bin/coverage report -m --skip-covered
 
 upgrade:
 	PYTHONPATH=${PWD} venv/bin/pip install --upgrade pip

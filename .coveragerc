@@ -7,6 +7,7 @@ include =
 
 [report]
 show_missing = False
+skip_empty = true
 
 exclude_lines =
     # Don't complain if non-runnable code isn't run:
