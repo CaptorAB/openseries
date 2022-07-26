@@ -803,9 +803,7 @@ class TestOpenTimeSeries(unittest.TestCase):
             f"{1.689055852583:.12f}",
             f"{float(adjustedseries.tsdf.iloc[-1]):.12f}",
         )
-        adjustedseries_returns = sim_to_opentimeseries(
-            simadj, end=dt.date(2019, 6, 30)
-        )
+        adjustedseries_returns = sim_to_opentimeseries(simadj, end=dt.date(2019, 6, 30))
         adjustedseries_returns.running_adjustment(0.05)
 
         self.assertEqual(
@@ -2273,7 +2271,9 @@ class TestOpenTimeSeries(unittest.TestCase):
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
 
-        simdata_fxd_per_yr = self.randomseries.rolling_vol(observations=21, periods_in_a_year_fixed=251)
+        simdata_fxd_per_yr = self.randomseries.rolling_vol(
+            observations=21, periods_in_a_year_fixed=251
+        )
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
         checkdata_fxd_per_yr = [
