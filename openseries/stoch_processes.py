@@ -395,7 +395,7 @@ def cox_ingersoll_ross_levels(
         param, ModelParameters
     ), "param must be an object of Class ModelParameters"
     brownian_motion = brownian_motion_log_returns(param, seed=seed)
-    # Setup the parameters for interest rates
+    # Set up the parameters for interest rates
     a, mu, zero = param.cir_a, param.cir_mu, param.all_r0
     # Assumes output is in levels
     levels: list = [zero]

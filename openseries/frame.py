@@ -3,22 +3,23 @@ import copy
 import datetime as dt
 import logging
 import math
-import os
-import random
-import string
-from pathlib import Path
-from typing import List
-
 import numpy as np
+import os
 import pandas as pd
-import plotly.graph_objs as go
+from pandas.tseries.offsets import CDay
+from pathlib import Path
+from plotly.graph_objs import Figure, Scatter
+from plotly.offline import plot
+import random
 import scipy.stats as ss
 import statsmodels.api as sm
-from pandas.tseries.offsets import CDay
-from plotly.offline import plot
+import string
+from typing import List
 
+from openseries.series import OpenTimeSeries
 from openseries.datefixer import date_offset_foll
 from openseries.load_plotly import load_plotly_dict
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.risk import (
     calc_max_drawdown,
     drawdown_series,
@@ -26,8 +27,6 @@ from openseries.risk import (
     cvar_down,
     var_down,
 )
-from openseries.series import OpenTimeSeries
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 class OpenFrame(object):
@@ -720,7 +719,7 @@ class OpenFrame(object):
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
         """The ratio of annualized arithmetic mean of returns and annualized volatility or,
-        if riskfree return provided, Sharpe ratio calculated as ( geometric return - risk free return )
+        if riskfree return provided, Sharpe ratio calculated as ( geometric return - risk-free return )
         / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
 
@@ -1897,9 +1896,9 @@ class OpenFrame(object):
         Parameters
         ----------
         start_cut: datetime.date, optional
-            Optional manually entered date
+            New first date
         end_cut: datetime.date, optional
-            Optional manually entered date
+            New last date
         before: bool, default: True
             If True method will truncate to the common earliest start date also when start_cut = None.
         after: bool, default: True
@@ -2527,7 +2526,7 @@ class OpenFrame(object):
         add_logo: bool = True,
         show_last: bool = False,
         output_type: str = "file",
-    ) -> (go.Figure, str):
+    ) -> (Figure, str):
         """Creates a Plotly Figure
 
         To scale the bubble size, use the attribute sizeref.
@@ -2547,7 +2546,7 @@ class OpenFrame(object):
         labels: list, optional
             A list of labels to manually override using the names of the input data
         auto_open: bool, default: True
-            Determines whether or not to open a browser window with the plot
+            Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
         show_last: bool, default: False
@@ -2576,7 +2575,7 @@ class OpenFrame(object):
         data = []
         for item in range(self.item_count):
             data.append(
-                go.Scatter(
+                Scatter(
                     x=self.tsdf.index,
                     y=self.tsdf.iloc[:, item],
                     hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
@@ -2588,7 +2587,7 @@ class OpenFrame(object):
 
         fig, logo = load_plotly_dict()
         fig["data"] = data
-        figure = go.Figure(fig)
+        figure = Figure(fig)
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
 
         if add_logo:

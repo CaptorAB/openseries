@@ -7,10 +7,9 @@ import math
 import numpy as np
 import os
 import pandas as pd
-from pandas.core.series import Series
 from pandas.tseries.offsets import CDay
 from pathlib import Path
-import plotly.graph_objs as go
+from plotly.graph_objs import Figure, Scatter
 from plotly.offline import plot
 from stdnum import isin as isincode
 import scipy.stats as ss
@@ -152,7 +151,7 @@ class OpenTimeSeries(object):
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
-            True if timeseries has not been converted into baseccy and False otherwise
+            Boolean flag indicating if timeseries is in local currency
 
         Returns
         -------
@@ -189,7 +188,7 @@ class OpenTimeSeries(object):
         valuetype : str, default: "Price(Close)"
             Type of timeseries
         local_ccy: bool, default: True
-            True if timeseries has not been converted into baseccy and False otherwise
+            Boolean flag indicating if timeseries is in local currency
 
         Returns
         -------
@@ -233,7 +232,7 @@ class OpenTimeSeries(object):
         valuetype : str, default: "Price(Close)"
             Type of timeseries
         local_ccy: bool, default: True
-            True if timeseries has not been converted into baseccy and False otherwise
+            Boolean flag indicating if timeseries is in local currency
 
         Returns
         -------
@@ -285,7 +284,7 @@ class OpenTimeSeries(object):
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
-            True if timeseries has not been converted into baseccy and False otherwise
+            Boolean flag indicating if timeseries is in local currency
 
         Returns
         -------
@@ -293,7 +292,7 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        if isinstance(df, Series):
+        if isinstance(df, pd.Series):
             if isinstance(df.name, tuple):
                 label, _ = df.name
             else:
@@ -343,7 +342,7 @@ class OpenTimeSeries(object):
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
-            True if timeseries has not been converted into baseccy and False otherwise
+            Boolean flag indicating if timeseries is in local currency
 
         Returns
         -------
@@ -413,7 +412,7 @@ class OpenTimeSeries(object):
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
-            True if timeseries has not been converted into baseccy and False otherwise
+            Boolean flag indicating if timeseries is in local currency
 
         Returns
         -------
@@ -1012,7 +1011,7 @@ class OpenTimeSeries(object):
         riskfree_rate: float = 0.0,
     ) -> float:
         """The ratio of annualized arithmetic mean of returns and annualized volatility or,
-        if risk free return provided, Sharpe ratio calculated as ( geometric return - risk free return )
+        if risk-free return provided, Sharpe ratio calculated as ( geometric return - risk-free return )
         / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
 
@@ -2071,7 +2070,7 @@ class OpenTimeSeries(object):
         add_logo: bool = True,
         show_last: bool = False,
         output_type: str = "file",
-    ) -> (go.Figure, str):
+    ) -> (Figure, str):
         """Creates a Plotly Figure
 
         Parameters
@@ -2083,7 +2082,7 @@ class OpenTimeSeries(object):
         directory: str, optional
             Directory where Plotly html file is saved
         auto_open: bool, default: True
-            Determines whether or not to open a browser window with the plot
+            Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
         show_last: bool, default: False
@@ -2105,7 +2104,7 @@ class OpenTimeSeries(object):
         values = [float(x) for x in self.tsdf.iloc[:, 0].tolist()]
 
         data = [
-            go.Scatter(
+            Scatter(
                 x=self.tsdf.index,
                 y=values,
                 hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
@@ -2117,7 +2116,7 @@ class OpenTimeSeries(object):
 
         fig, logo = load_plotly_dict()
         fig["data"] = data
-        figure = go.Figure(fig)
+        figure = Figure(fig)
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
 
         if add_logo:

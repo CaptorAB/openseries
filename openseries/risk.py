@@ -5,10 +5,9 @@ https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
 import math
-from typing import List
-
 import numpy as np
 import pandas as pd
+from typing import List
 
 
 def cvar_down(

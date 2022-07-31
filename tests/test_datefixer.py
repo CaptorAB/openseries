@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
 import numpy as np
+import pandas as pd
+from pandas.tseries.offsets import CDay
+import unittest
+
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.datefixer import (
     date_fix,
     get_previous_sweden_business_day_before_today,
     date_offset_foll,
 )
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
-import pandas as pd
-from pandas.tseries.offsets import CDay
-import unittest
 
 
 class TestDateFixer(unittest.TestCase):

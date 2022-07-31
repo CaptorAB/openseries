@@ -3,8 +3,8 @@ import datetime as dt
 import io
 import pandas as pd
 from pandas.testing import assert_frame_equal
-import sys
 from requests.exceptions import Timeout
+import sys
 import unittest
 from unittest.mock import Mock, patch
 

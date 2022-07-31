@@ -9,6 +9,7 @@ from pandas.tseries.offsets import CDay
 from stdnum.exceptions import InvalidChecksum
 import sys
 import unittest
+
 from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
 from openseries.sim_price import ReturnSimulation
 
