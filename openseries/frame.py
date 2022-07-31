@@ -1585,14 +1585,14 @@ class OpenFrame(object):
         OpenFrame
             An OpenFrame object
         """
-
-        if not any(
+        if any(
             [
-                True if x == "Return(Total)" else False
+                True if x == "Price(Close)" else False
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):
             self.value_to_ret()
+
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.apply(np.cumprod, axis="index") / self.tsdf.iloc[0]
         new_labels = ["Price(Close)"] * self.item_count

@@ -13,31 +13,17 @@ from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
 from openseries.sim_price import ReturnSimulation
 
 
-def sim_to_opentimeseries(sim: ReturnSimulation, end: dt.date) -> OpenTimeSeries:
-    date_range = [
-        d.date()
-        for d in pd.date_range(
-            periods=sim.trading_days,
-            end=end,
-            freq=CDay(calendar=OpenTimeSeries.sweden),
-        )
-    ]
-    sdf = sim.df.iloc[0].T.to_frame()
-    sdf.index = date_range
-    sdf.columns = pd.MultiIndex.from_product([["Asset"], ["Return(Total)"]])
-    return OpenTimeSeries.from_df(sdf, valuetype="Return(Total)")
-
-
 class TestOpenTimeSeries(unittest.TestCase):
-    randomseries: OpenTimeSeries
     sim: ReturnSimulation
+    randomseries: OpenTimeSeries
+    random_properties: dict
 
     @classmethod
     def setUpClass(cls):
 
         OpenTimeSeries.setup_class()
 
-        cls.sim = ReturnSimulation.from_merton_jump_gbm(
+        sim = ReturnSimulation.from_merton_jump_gbm(
             n=1,
             d=2512,
             mu=0.05,
@@ -47,9 +33,20 @@ class TestOpenTimeSeries(unittest.TestCase):
             jumps_mu=-0.2,
             seed=71,
         )
+        date_range = [
+            d.date()
+            for d in pd.date_range(
+                periods=sim.trading_days,
+                end=dt.date(2019, 6, 30),
+                freq=CDay(calendar=OpenTimeSeries.sweden),
+            )
+        ]
+        sdf = sim.df.iloc[0].T.to_frame()
+        sdf.index = date_range
+        sdf.columns = pd.MultiIndex.from_product([["Asset"], ["Return(Total)"]])
 
-        cls.randomseries = sim_to_opentimeseries(
-            cls.sim, end=dt.date(2019, 6, 30)
+        cls.randomseries = OpenTimeSeries.from_df(
+            sdf, valuetype="Return(Total)"
         ).to_cumret()
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
             ("Asset", "Price(Close)")
@@ -69,17 +66,6 @@ class TestOpenTimeSeries(unittest.TestCase):
         output = new_stdout.getvalue()
         sys.stdout = old_stdout
         self.assertEqual(r, output)
-
-    def test_opentimeseries_tsdf_not_empty(self):
-
-        json_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "series.json"
-        )
-        with open(json_file, "r") as ff:
-            output = json.load(ff)
-        timeseries = OpenTimeSeries(output)
-
-        self.assertFalse(timeseries.tsdf.empty)
 
     def test_opentimeseries_duplicates_handling(self):
         class NewTimeSeries(OpenTimeSeries):
@@ -286,17 +272,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_resample(self):
 
-        rs_sim = ReturnSimulation.from_merton_jump_gbm(
-            n=1,
-            d=2512,
-            mu=0.05,
-            vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            seed=71,
-        )
-        rs_series = sim_to_opentimeseries(rs_sim, end=dt.date(2019, 6, 30)).to_cumret()
+        rs_series = self.randomseries.from_deepcopy()
 
         before = rs_series.value_ret
 
@@ -364,8 +340,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_calc_range_ouput(self):
 
-        csim = ReturnSimulation.from_normal(n=1, d=1200, mu=0.05, vol=0.1, seed=71)
-        cseries = sim_to_opentimeseries(csim, end=dt.date(2019, 6, 30)).to_cumret()
+        cseries = self.randomseries.from_deepcopy()
 
         dates = cseries.calc_range(months_offset=48)
 
@@ -394,55 +369,51 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_value_to_diff(self):
 
-        diffsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
-        diffseries = sim_to_opentimeseries(
-            diffsim, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        diffseries = self.randomseries.from_deepcopy()
         diffseries.value_to_diff()
-        are_bes = [f"{nn[0]:.12f}" for nn in diffseries.tsdf.values]
+        are_bes = [f"{nn[0]:.12f}" for nn in diffseries.tsdf.values[:15]]
+        print(are_bes)
         should_bes = [
             "0.000000000000",
-            "-0.007322627296",
-            "-0.002581366067",
-            "0.003248920666",
-            "-0.002628519782",
-            "0.003851856296",
-            "0.007573468698",
-            "-0.005893167569",
-            "0.001567531620",
-            "-0.005246297149",
-            "-0.001822686581",
-            "0.009014775004",
-            "-0.004289844249",
-            "-0.008344628763",
-            "-0.010412377959",
+            "-0.002244525566",
+            "-0.002656444823",
+            "0.003856605762",
+            "0.007615942129",
+            "-0.005921701827",
+            "0.001555810865",
+            "-0.005275328842",
+            "-0.001848758036",
+            "0.009075607620",
+            "-0.004319311398",
+            "-0.008365867931",
+            "-0.010422707104",
+            "0.003626411898",
+            "-0.000274024491",
         ]
 
         self.assertListEqual(are_bes, should_bes)
 
     def test_opentimeseries_value_to_ret(self):
 
-        retsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
-        retseries = sim_to_opentimeseries(retsim, end=dt.date(2019, 6, 30)).to_cumret()
-
+        retseries = self.randomseries.from_deepcopy()
         retseries.value_to_ret()
-        are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.values]
+        are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.values[:15]]
         should_bes = [
             "0.000000000000",
-            "-0.007322627296",
-            "-0.002600407884",
-            "0.003281419826",
-            "-0.002646129969",
-            "0.003887950443",
-            "0.007614830448",
-            "-0.005880572955",
-            "0.001573434257",
-            "-0.005257779632",
-            "-0.001836330888",
-            "0.009098966716",
-            "-0.004290865956",
-            "-0.008382584742",
-            "-0.010548160048",
+            "-0.002244525566",
+            "-0.002662420694",
+            "0.003875599963",
+            "0.007623904265",
+            "-0.005883040967",
+            "0.001554800438",
+            "-0.005263718728",
+            "-0.001854450536",
+            "0.009120465722",
+            "-0.004301429464",
+            "-0.008367224292",
+            "-0.010512356183",
+            "0.003696462370",
+            "-0.000278289067",
         ]
 
         self.assertListEqual(are_bes, should_bes)
@@ -451,28 +422,25 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_valute_to_log(self):
 
-        logsim = ReturnSimulation.from_normal(n=1, d=15, mu=0.05, vol=0.1, seed=71)
-        logseries = sim_to_opentimeseries(logsim, end=dt.date(2019, 6, 30)).to_cumret()
-
+        logseries = self.randomseries.from_deepcopy()
         logseries.value_to_log()
-        are_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values]
-
+        are_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values[:15]]
         should_log = [
             "0.000000000000",
-            "-0.007349569336",
-            "-0.009953364154",
-            "-0.006677316437",
-            "-0.009326953597",
-            "-0.005446541699",
-            "0.002139442275",
-            "-0.003758489335",
-            "-0.002186291629",
-            "-0.007457942025",
-            "-0.009295961036",
-            "-0.000238140514",
-            "-0.004538238654",
-            "-0.012956154844",
-            "-0.023560341062",
+            "-0.002247048289",
+            "-0.004913019528",
+            "-0.001044910355",
+            "0.006550078823",
+            "0.000649664599",
+            "0.002203257585",
+            "-0.003074363317",
+            "-0.004930535474",
+            "0.004148589972",
+            "-0.000162117254",
+            "-0.008564543266",
+            "-0.019132544583",
+            "-0.015442897340",
+            "-0.015721225137",
         ]
 
         self.assertListEqual(are_log, should_log)
@@ -552,26 +520,15 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_running_adjustment(self):
 
-        simadj = ReturnSimulation.from_merton_jump_gbm(
-            n=1,
-            d=2512,
-            mu=0.05,
-            vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            seed=71,
-        )
-        adjustedseries = sim_to_opentimeseries(
-            simadj, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
         self.assertEqual(
             f"{1.689055852583:.12f}",
             f"{float(adjustedseries.tsdf.iloc[-1]):.12f}",
         )
-        adjustedseries_returns = sim_to_opentimeseries(simadj, end=dt.date(2019, 6, 30))
+        adjustedseries_returns = self.randomseries.from_deepcopy()
+        adjustedseries_returns.value_to_ret()
         adjustedseries_returns.running_adjustment(0.05)
 
         self.assertEqual(
@@ -587,10 +544,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_timeseries_chain(self):
 
-        full_sim = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
-        full_series = sim_to_opentimeseries(
-            full_sim, end=dt.date(2019, 6, 30)
-        ).to_cumret()
+        full_series = self.randomseries.from_deepcopy()
         full_values = [f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0].tolist()]
 
         front_series = OpenTimeSeries.from_df(full_series.tsdf.iloc[:126])
@@ -607,8 +561,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_plot_series(self):
 
-        plotsim = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
-        plotseries = sim_to_opentimeseries(plotsim, end=dt.date(2019, 6, 30))
+        plotseries = self.randomseries.from_deepcopy()
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
         fig_json = json.loads(fig.to_json())
         fig_keys = list(fig_json.keys())
@@ -619,14 +572,14 @@ class TestOpenTimeSeries(unittest.TestCase):
         )
         fig_last_json = json.loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
-        self.assertEqual(f"{last:.12f}", "0.001319755187")
+        self.assertEqual(f"{last:.12f}", "1.024471958022")
 
         fig_last_fmt, _ = plotseries.plot_series(
             auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
         )
         fig_last_fmt_json = json.loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
-        self.assertEqual(last_fmt, "Last 0.132%")
+        self.assertEqual(last_fmt, "Last 102.447%")
 
     def test_opentimeseries_drawdown_details(self):
 
@@ -1069,8 +1022,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_miscellaneous(self):
 
-        msims = ReturnSimulation.from_normal(n=1, d=504, mu=0.05, vol=0.1, seed=71)
-        mseries = sim_to_opentimeseries(msims, dt.date(2019, 6, 30)).to_cumret()
+        mseries = self.randomseries.from_deepcopy()
 
         methods = [
             "arithmetic_ret_func",
@@ -1086,14 +1038,13 @@ class TestOpenTimeSeries(unittest.TestCase):
             self.assertNotAlmostEqual(no_fixed, fixed, places=6)
 
         impvol = mseries.vol_from_var_func(drift_adjust=False)
-        self.assertEqual(f"{impvol:.12f}", "0.093461579863")
+        self.assertEqual(f"{impvol:.12f}", "0.102089329036")
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
-        self.assertEqual(f"{impvoldrifted:.12f}", "0.098316162865")
+        self.assertEqual(f"{impvoldrifted:.12f}", "0.102454621604")
 
     def test_opentimeseries_value_ret_calendar_period(self):
 
-        vrcsims = ReturnSimulation.from_normal(n=5, d=504, mu=0.05, vol=0.1, seed=71)
-        vrcseries = sim_to_opentimeseries(vrcsims, dt.date(2019, 6, 30)).to_cumret()
+        vrcseries = self.randomseries.from_deepcopy()
 
         vrfs_y = vrcseries.value_ret_func(
             from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28)
@@ -1109,8 +1060,7 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_to_drawdown_series(self):
 
-        msims = ReturnSimulation.from_normal(n=1, d=2520, mu=0.05, vol=0.1, seed=71)
-        mseries = sim_to_opentimeseries(msims, dt.date(2019, 6, 30)).to_cumret()
+        mseries = self.randomseries.from_deepcopy()
         dd = mseries.max_drawdown
         mseries.to_drawdown_series()
         dds = float(mseries.tsdf.min())
@@ -1118,13 +1068,12 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_set_new_label(self):
 
-        lsims = ReturnSimulation.from_normal(n=1, d=252, mu=0.05, vol=0.1, seed=71)
-        lseries = sim_to_opentimeseries(lsims, dt.date(2019, 6, 30))
+        lseries = self.randomseries.from_deepcopy()
 
-        self.assertTupleEqual(lseries.tsdf.columns[0], ("Asset", "Return(Total)"))
+        self.assertTupleEqual(lseries.tsdf.columns[0], ("Asset", "Price(Close)"))
 
         lseries.set_new_label(lvl_zero="zero")
-        self.assertTupleEqual(lseries.tsdf.columns[0], ("zero", "Return(Total)"))
+        self.assertTupleEqual(lseries.tsdf.columns[0], ("zero", "Price(Close)"))
 
         lseries.set_new_label(lvl_one="one")
         self.assertTupleEqual(lseries.tsdf.columns[0], ("zero", "one"))
