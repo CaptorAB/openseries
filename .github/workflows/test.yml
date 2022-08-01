@@ -4,10 +4,11 @@ on: workflow_dispatch
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
+        os: [ubuntu-latest]
         group: [1, 2, 3, 4, 5]
         python-version: ["3.10.4"]
 
@@ -47,7 +48,7 @@ jobs:
 
   coverage:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Check out GitHub repository ${{ github.repository }}
