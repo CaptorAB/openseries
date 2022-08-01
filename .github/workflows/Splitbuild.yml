@@ -47,7 +47,7 @@ jobs:
         python -m twine check dist/*
 
   coverage:
-    needs: test
+    needs: splitbuild
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
