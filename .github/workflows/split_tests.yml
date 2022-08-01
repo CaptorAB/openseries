@@ -1,4 +1,4 @@
-name: Split tests
+name: Tests
 
 on: workflow_dispatch
 
