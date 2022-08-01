@@ -3,7 +3,7 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import CDay
-import unittest
+from unittest import TestCase
 
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.datefixer import (
@@ -13,7 +13,7 @@ from openseries.datefixer import (
 )
 
 
-class TestDateFixer(unittest.TestCase):
+class TestDateFixer(TestCase):
     def test_date_fix_arg_types(self):
 
         formats = [

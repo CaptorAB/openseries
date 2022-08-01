@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
-import io
-import json
+from io import StringIO
+from json import loads
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CDay
 import sys
 from testfixtures import LogCapture
-import unittest
+from unittest import TestCase
 
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
@@ -15,7 +15,7 @@ from openseries.series import OpenTimeSeries, TimeSerie
 from openseries.sim_price import ReturnSimulation
 
 
-class TestOpenFrame(unittest.TestCase):
+class TestOpenFrame(TestCase):
     sim: ReturnSimulation
     randomframe: OpenFrame
     randomseries: OpenTimeSeries
@@ -65,7 +65,7 @@ class TestOpenFrame(unittest.TestCase):
     def test_openframe_repr(self):
 
         old_stdout = sys.stdout
-        new_stdout = io.StringIO()
+        new_stdout = StringIO()
         sys.stdout = new_stdout
         reprframe = OpenFrame(
             [
@@ -735,21 +735,21 @@ class TestOpenFrame(unittest.TestCase):
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
-        fig_json = json.loads(fig.to_json())
+        fig_json = loads(fig.to_json())
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ["data", "layout"])
 
         fig_last, _ = plotframe.plot_series(
             auto_open=False, output_type="div", show_last=True
         )
-        fig_last_json = json.loads(fig_last.to_json())
+        fig_last_json = loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
         self.assertEqual(f"{last:.12f}", "0.778129717727")
 
         fig_last_fmt, _ = plotframe.plot_series(
             auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
         )
-        fig_last_fmt_json = json.loads(fig_last_fmt.to_json())
+        fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
         self.assertEqual(last_fmt, "Last 77.813%")
 

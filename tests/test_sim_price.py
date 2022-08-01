@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from pandas import DataFrame
-import unittest
+from unittest import TestCase
 
 from openseries.sim_price import ReturnSimulation
 
 
-class TestSimPrice(unittest.TestCase):
+class TestSimPrice(TestCase):
     def test_return_simulation_processes(self):
 
         args = {"n": 1, "d": 2520, "mu": 0.05, "vol": 0.2, "seed": 71}

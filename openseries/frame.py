@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-import copy
+from copy import deepcopy
 import datetime as dt
-import logging
-import math
+from logging import warning
+from math import ceil, sqrt
 import numpy as np
-import os
+from os import path
 import pandas as pd
 from pandas.tseries.offsets import CDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
 from plotly.offline import plot
-import random
-import scipy.stats as ss
-import statsmodels.api as sm
-import string
+from random import choices
+from scipy.stats import kurtosis, norm, skew
+from statsmodels.api import OLS
+from string import ascii_letters
 from typing import List
 
 from openseries.series import OpenTimeSeries
@@ -65,7 +65,7 @@ class OpenFrame(object):
                 [x.tsdf for x in self.constituents], axis="columns", sort=sort
             )
         else:
-            logging.warning("OpenFrame() was passed an empty list.")
+            warning("OpenFrame() was passed an empty list.")
 
         if weights is not None:
             assert len(self.constituents) == len(
@@ -96,7 +96,7 @@ class OpenFrame(object):
             An OpenFrame object
         """
 
-        return copy.deepcopy(self)
+        return deepcopy(self)
 
     def all_properties(self, properties: list | None = None) -> pd.DataFrame:
         """Calculates the chosen timeseries properties
@@ -878,9 +878,7 @@ class OpenFrame(object):
                     riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
                     dddf = longdf.pct_change()
                     downdev = float(
-                        math.sqrt(
-                            (dddf[dddf.values < 0.0].values ** 2).sum() / how_many
-                        )
+                        sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
                         * np.sqrt(time_factor)
                     )
                     ratios.append((ret - riskfree_ret) / downdev)
@@ -896,7 +894,7 @@ class OpenFrame(object):
                 ret = float(longdf.pct_change().mean() * time_factor)
                 dddf = longdf.pct_change()
                 downdev = float(
-                    math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
+                    sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
                     * np.sqrt(time_factor)
                 )
                 ratios.append((ret - riskfree_rate) / downdev)
@@ -1143,7 +1141,7 @@ class OpenFrame(object):
         """
 
         return pd.Series(
-            data=ss.skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit"),
+            data=skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit"),
             index=self.tsdf.columns,
             name="Skew",
         )
@@ -1174,7 +1172,7 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
         return pd.Series(
-            data=ss.skew(
+            data=skew(
                 self.tsdf.loc[earlier:later].pct_change(), bias=True, nan_policy="omit"
             ),
             index=self.tsdf.columns,
@@ -1192,7 +1190,7 @@ class OpenFrame(object):
         """
 
         return pd.Series(
-            data=ss.kurtosis(
+            data=kurtosis(
                 self.tsdf.pct_change(), fisher=True, bias=True, nan_policy="omit"
             ),
             index=self.tsdf.columns,
@@ -1225,7 +1223,7 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
         return pd.Series(
-            data=ss.kurtosis(
+            data=kurtosis(
                 self.tsdf.loc[earlier:later].pct_change(),
                 fisher=True,
                 bias=True,
@@ -1255,9 +1253,7 @@ class OpenFrame(object):
             cvar_df.loc[:, x]
             .pct_change()
             .sort_values()
-            .iloc[
-                : int(math.ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))
-            ]
+            .iloc[: int(ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))]
             .mean()
             for x in self.tsdf
         ]
@@ -1297,9 +1293,7 @@ class OpenFrame(object):
             cvar_df.loc[:, x]
             .pct_change()
             .sort_values()
-            .iloc[
-                : int(math.ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))
-            ]
+            .iloc[: int(ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))]
             .mean()
             for x in self.tsdf
         ]
@@ -1400,7 +1394,7 @@ class OpenFrame(object):
         imp_vol = (
             -np.sqrt(self.periods_in_a_year)
             * self.var_down_func(interpolation=interpolation)
-            / ss.norm.ppf(level)
+            / norm.ppf(level)
         )
         return pd.Series(data=imp_vol, name=f"Imp vol from VaR {level:.0%}")
 
@@ -1449,7 +1443,7 @@ class OpenFrame(object):
             how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
             time_factor = how_many / fraction
         if drift_adjust:
-            imp_vol = (-np.sqrt(time_factor) / ss.norm.ppf(level)) * (
+            imp_vol = (-np.sqrt(time_factor) / norm.ppf(level)) * (
                 self.tsdf.loc[earlier:later]
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
@@ -1462,7 +1456,7 @@ class OpenFrame(object):
                 * self.tsdf.loc[earlier:later]
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
-                / ss.norm.ppf(level)
+                / norm.ppf(level)
             )
         return pd.Series(data=imp_vol, name=f"Subset Imp vol from VaR {level:.0%}")
 
@@ -1919,7 +1913,7 @@ class OpenFrame(object):
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
         if len(set(self.first_indices)) != 1 or len(set(self.last_indices)) != 1:
-            logging.warning(
+            warning(
                 "One or more constituents still not truncated to same "
                 "start and/or end dates."
             )
@@ -2338,7 +2332,7 @@ class OpenFrame(object):
         else:
             raise Exception("x_column should be a tuple or an integer.")
 
-        model = sm.OLS(y, x).fit()
+        model = OLS(y, x).fit()
         if fitted_series:
             self.tsdf[y_label, x_label] = model.predict(x)
 
@@ -2567,10 +2561,10 @@ class OpenFrame(object):
         else:
             labels = self.columns_lvl_zero
         if not directory:
-            directory = os.path.join(str(Path.home()), "Documents")
+            directory = path.join(str(Path.home()), "Documents")
         if not filename:
-            filename = "".join(random.choices(string.ascii_letters, k=6)) + ".html"
-        plotfile = os.path.join(os.path.abspath(directory), filename)
+            filename = "".join(choices(ascii_letters, k=6)) + ".html"
+        plotfile = path.join(path.abspath(directory), filename)
 
         data = []
         for item in range(self.item_count):

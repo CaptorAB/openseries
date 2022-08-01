@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
-import io
-import json
+from io import StringIO
+from json import load, loads
 from jsonschema.exceptions import ValidationError
-import os
+from os import path, remove
 import pandas as pd
 from pandas.tseries.offsets import CDay
 from stdnum.exceptions import InvalidChecksum
 import sys
-import unittest
+from unittest import TestCase
 
 from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
 from openseries.sim_price import ReturnSimulation
 
 
-class TestOpenTimeSeries(unittest.TestCase):
+class TestOpenTimeSeries(TestCase):
     sim: ReturnSimulation
     randomseries: OpenTimeSeries
     random_properties: dict
@@ -56,7 +56,7 @@ class TestOpenTimeSeries(unittest.TestCase):
     def test_opentimeseries_repr(self):
 
         old_stdout = sys.stdout
-        new_stdout = io.StringIO()
+        new_stdout = StringIO()
         sys.stdout = new_stdout
         repseries = self.randomseries
         r = (
@@ -77,11 +77,11 @@ class TestOpenTimeSeries(unittest.TestCase):
             @classmethod
             def from_file(cls, remove_duplicates: bool = False):
 
-                json_file = os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)), "series.json"
+                json_file = path.join(
+                    path.dirname(path.abspath(__file__)), "series.json"
                 )
                 with open(json_file, "r") as ff:
-                    output = json.load(ff)
+                    output = load(ff)
 
                 dates = (
                     output["dates"][:63]
@@ -226,18 +226,16 @@ class TestOpenTimeSeries(unittest.TestCase):
 
     def test_opentimeseries_save_to_json(self):
 
-        seriesfile = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "seriessaved.json"
-        )
+        seriesfile = path.join(path.dirname(path.abspath(__file__)), "seriessaved.json")
 
         jseries = self.randomseries.from_deepcopy()
         jseries.to_json(filename=seriesfile)
 
-        self.assertTrue(os.path.exists(seriesfile))
+        self.assertTrue(path.exists(seriesfile))
 
-        os.remove(seriesfile)
+        remove(seriesfile)
 
-        self.assertFalse(os.path.exists(seriesfile))
+        self.assertFalse(path.exists(seriesfile))
 
     def test_create_opentimeseries_from_fixed_rate(self):
 
@@ -564,21 +562,21 @@ class TestOpenTimeSeries(unittest.TestCase):
 
         plotseries = self.randomseries.from_deepcopy()
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
-        fig_json = json.loads(fig.to_json())
+        fig_json = loads(fig.to_json())
         fig_keys = list(fig_json.keys())
         self.assertListEqual(fig_keys, ["data", "layout"])
 
         fig_last, _ = plotseries.plot_series(
             auto_open=False, output_type="div", show_last=True
         )
-        fig_last_json = json.loads(fig_last.to_json())
+        fig_last_json = loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
         self.assertEqual(f"{last:.12f}", "1.024471958022")
 
         fig_last_fmt, _ = plotseries.plot_series(
             auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
         )
-        fig_last_fmt_json = json.loads(fig_last_fmt.to_json())
+        fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
         self.assertEqual(last_fmt, "Last 102.447%")
 

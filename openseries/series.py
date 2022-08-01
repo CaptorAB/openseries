@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-import copy
+from copy import deepcopy
 import datetime as dt
-import json
+from json import dump, load
 from jsonschema import Draft7Validator
-import math
+from math import ceil, sqrt
 import numpy as np
-import os
+from os import path
 import pandas as pd
 from pandas.tseries.offsets import CDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
 from plotly.offline import plot
 from stdnum import isin as isincode
-import scipy.stats as ss
+from scipy.stats import kurtosis, norm, skew
 from typing import List, TypedDict
 
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
@@ -90,11 +90,9 @@ class OpenTimeSeries(object):
             Object of the class OpenTimeSeries
         """
 
-        schema_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "openseries.json"
-        )
+        schema_file = path.join(path.dirname(path.abspath(__file__)), "openseries.json")
         with open(file=schema_file, mode="r", encoding="utf-8") as f:
-            series_schema = json.load(f)
+            series_schema = load(f)
 
         Draft7Validator.check_schema(schema=series_schema)
         validator = Draft7Validator(series_schema)
@@ -376,7 +374,7 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        return copy.deepcopy(self)
+        return deepcopy(self)
 
     @classmethod
     def from_fixed_rate(
@@ -458,7 +456,7 @@ class OpenTimeSeries(object):
             A dictionary
         """
         if not directory:
-            directory = os.path.dirname(os.path.abspath(__file__))
+            directory = path.dirname(path.abspath(__file__))
 
         data = self.__dict__
 
@@ -466,8 +464,8 @@ class OpenTimeSeries(object):
         for item in cleaner_list:
             data.pop(item)
 
-        with open(os.path.join(directory, filename), "w") as ff:
-            json.dump(data, ff, indent=2, sort_keys=False)
+        with open(path.join(directory, filename), "w") as ff:
+            dump(data, ff, indent=2, sort_keys=False)
 
         return data
 
@@ -937,7 +935,7 @@ class OpenTimeSeries(object):
         dddf = self.tsdf.pct_change()
 
         return float(
-            math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / self.length)
+            sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / self.length)
             * np.sqrt(self.periods_in_a_year)
         )
 
@@ -989,7 +987,7 @@ class OpenTimeSeries(object):
         )
 
         return float(
-            math.sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
+            sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
             * np.sqrt(time_factor)
         )
 
@@ -1327,9 +1325,7 @@ class OpenTimeSeries(object):
             Skew of the return distribution
         """
 
-        return float(
-            ss.skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit")
-        )
+        return float(skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit"))
 
     def skew_func(
         self,
@@ -1356,7 +1352,7 @@ class OpenTimeSeries(object):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return float(
-            ss.skew(
+            skew(
                 self.tsdf.loc[earlier:later].pct_change(),
                 bias=True,
                 nan_policy="omit",
@@ -1373,7 +1369,7 @@ class OpenTimeSeries(object):
             Kurtosis of the return distribution
         """
         return float(
-            ss.kurtosis(
+            kurtosis(
                 self.tsdf.pct_change(),
                 fisher=True,
                 bias=True,
@@ -1407,7 +1403,7 @@ class OpenTimeSeries(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
         return float(
-            ss.kurtosis(
+            kurtosis(
                 self.tsdf.loc[earlier:later].pct_change(),
                 fisher=True,
                 bias=True,
@@ -1435,7 +1431,7 @@ class OpenTimeSeries(object):
             self.tsdf.iloc[:, 0]
             .pct_change()
             .sort_values()
-            .iloc[: int(math.ceil((1 - level) * items))]
+            .iloc[: int(ceil((1 - level) * items))]
             .mean()
         )
 
@@ -1475,7 +1471,7 @@ class OpenTimeSeries(object):
             self.tsdf.loc[earlier:later, self.tsdf.columns.values[0]]
             .pct_change()
             .sort_values()
-            .iloc[: int(math.ceil((1 - level) * how_many))]
+            .iloc[: int(ceil((1 - level) * how_many))]
             .mean()
         )
 
@@ -1566,7 +1562,7 @@ class OpenTimeSeries(object):
         return float(
             -np.sqrt(self.periods_in_a_year)
             * self.var_down_func(level, interpolation=interpolation)
-            / ss.norm.ppf(level)
+            / norm.ppf(level)
         )
 
     def vol_from_var_func(
@@ -1615,7 +1611,7 @@ class OpenTimeSeries(object):
             time_factor = how_many / fraction
         if drift_adjust:
             return float(
-                (-np.sqrt(time_factor) / ss.norm.ppf(level))
+                (-np.sqrt(time_factor) / norm.ppf(level))
                 * (
                     self.var_down_func(
                         level,
@@ -1634,7 +1630,7 @@ class OpenTimeSeries(object):
                 * self.var_down_func(
                     level, months_from_last, from_date, to_date, interpolation
                 )
-                / ss.norm.ppf(level)
+                / norm.ppf(level)
             )
 
     def target_weight_from_var(
@@ -2097,9 +2093,9 @@ class OpenTimeSeries(object):
         """
 
         if not directory:
-            directory = os.path.join(str(Path.home()), "Documents")
+            directory = path.join(str(Path.home()), "Documents")
         filename = self.label.replace("/", "").replace("#", "").replace(" ", "").upper()
-        plotfile = os.path.join(os.path.abspath(directory), "{}.html".format(filename))
+        plotfile = path.join(path.abspath(directory), "{}.html".format(filename))
 
         values = [float(x) for x in self.tsdf.iloc[:, 0].tolist()]
 

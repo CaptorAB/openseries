@@ -4,7 +4,7 @@ Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
-import math
+from math import ceil
 import numpy as np
 import pandas as pd
 from typing import List
@@ -34,7 +34,7 @@ def cvar_down(
         clean = np.nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
     array = np.sort(ret)
-    return float(np.mean(array[: int(math.ceil(len(array) * (1 - level)))]))
+    return float(np.mean(array[: int(ceil(len(array) * (1 - level)))]))
 
 
 def var_down(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
 import pandas as pd
-import unittest
+from unittest import TestCase
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
@@ -16,7 +16,7 @@ from openseries.stoch_processes import (
 )
 
 
-class TestStochProcesses(unittest.TestCase):
+class TestStochProcesses(TestCase):
     def test_stoch_processes_assets(self):
         days = 2520
         target_returns = [

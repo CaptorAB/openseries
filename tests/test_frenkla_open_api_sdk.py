@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
-import io
+from io import StringIO
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from requests.exceptions import Timeout
 import sys
-import unittest
+from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
@@ -13,7 +13,7 @@ from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
 requests = Mock()
 
 
-class TestFrenklaOpenApiService(unittest.TestCase):
+class TestFrenklaOpenApiService(TestCase):
     @patch("openseries.frenkla_open_api_sdk.requests")
     def test_openapi_timeout(self, mock_requests):
 
@@ -70,7 +70,7 @@ class TestFrenklaOpenApiService(unittest.TestCase):
     def test_frenklaopenapiservice_repr(self):
 
         old_stdout = sys.stdout
-        new_stdout = io.StringIO()
+        new_stdout = StringIO()
         sys.stdout = new_stdout
         service = FrenklaOpenApiService()
         r = "FrenklaOpenApiService(" "base_url=https://api.frenkla.com/public/api/)\n"
