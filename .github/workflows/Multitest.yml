@@ -60,11 +60,9 @@ jobs:
           python -m pip install -e .[dev]
           python -m pip install -U wheel twine setuptools
       - name: Download all artifacts
-        # Downloads coverage1, coverage2, etc.
         uses: actions/download-artifact@v2
-      - name: Run coverage
+      - name: Report coverage
         run: |
           coverage combine coverage*/.coverage*
           coverage report --fail-under=99
           coverage report
-      - uses: codecov/codecov-action@v1
