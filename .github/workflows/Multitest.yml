@@ -23,13 +23,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -e .[dev]
+        python -m pip install -U setuptools
 
     - name: Format with Black
       run: python -m black ./
 
     - name: Lint check with Flake8
       run: python -m flake8 ./
-      continue-on-error: true
 
     - name: Tests with Pytest
       run: pytest --verbose --cov --splits 5 --group ${{ matrix.group }}
@@ -52,7 +52,9 @@ jobs:
           python-version-file: '.python-version'
           cache: 'pip'
       - name: Install dependencies
-        run: python -m pip install -e .[dev]
+        run: |
+          python -m pip install -e .[dev]
+          python -m pip install -U setuptools
       - name: Download all artifacts
         uses: actions/download-artifact@v2
       - name: Report coverage
