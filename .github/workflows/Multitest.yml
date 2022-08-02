@@ -53,8 +53,8 @@ jobs:
           python-version-file: '.python-version'
           cache: 'pip'
 
-      - name: Install dependencies
-        run: python -m pip install -e .[dev]
+      - name: Install coverage
+        run: python -m pip install coverage
 
       - name: Download all artifacts
         uses: actions/download-artifact@v2
