@@ -25,12 +25,7 @@ setup(
         "dev": [
             "black",
             "coverage",
-            "flake8",
-            "flake8-black",
             "pytest",
-            "pytest-cov",
-            "pytest-split",
-            "pytest-xdist",
         ],
     },
     url="https://github.com/CaptorAB/OpenSeries",
