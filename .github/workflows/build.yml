@@ -33,7 +33,7 @@ jobs:
       run: coverage run -m pytest --verbose
 
     - name: Report coverage
-      run: coverage report --fail-under=99
+      run: coverage report
 
     - name: Package and check
       run: |

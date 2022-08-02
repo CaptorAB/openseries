@@ -42,7 +42,7 @@ jobs:
           name: Report coverage
           command: |
             . venv/bin/activate
-            coverage report --fail-under=99
+            coverage report
 
 workflows:
   version: 2

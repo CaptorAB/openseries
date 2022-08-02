@@ -7,6 +7,7 @@ include =
 
 [report]
 skip_empty = true
+fail_under = 99
 
 [html]
 directory = htmlcov
