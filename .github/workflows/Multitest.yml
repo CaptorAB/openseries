@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
       run: |
         python -m pip install -e .[dev]
-        python -m pip install -U pytest-cov pytest-split
+        python -m pip install pytest-split
 
     - name: Format with Black
       run: python -m black ./
