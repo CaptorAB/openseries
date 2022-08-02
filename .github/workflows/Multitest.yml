@@ -66,4 +66,3 @@ jobs:
         run: |
           coverage combine coverage*/.coverage*
           coverage report --fail-under=99
-          coverage report
