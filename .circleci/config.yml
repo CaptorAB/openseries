@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  testing:
     docker:
       - image: cimg/python:3.10.4
     steps:
@@ -42,10 +42,10 @@ jobs:
           name: Report coverage
           command: |
             . venv/bin/activate
-            coverage report
+            coverage report --fail-under=99
 
 workflows:
   version: 2
-  build-master:
+  testing-master:
     jobs:
-      - build
+      - testing
