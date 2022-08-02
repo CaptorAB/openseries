@@ -44,7 +44,7 @@ jobs:
     needs: testing
     runs-on: ubuntu-latest
     steps:
-      - name: Check out GitHub repository ${{ github.repository }}
+      - name: Check out GitHub repository
       - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
