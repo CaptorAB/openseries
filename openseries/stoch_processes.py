@@ -346,6 +346,10 @@ def heston_model_levels(
     process. Step one on this method is to construct two correlated
     GBM processes. One is used for the underlying asset prices and the other
     is used for the stochastic volatility levels
+    Get two correlated brownian motion sequences for the volatility parameter
+    and the underlying asset brownian_motion_market,
+    brownian_motion_vol = get_correlated_paths_simple(param)
+
     :param param: model parameters object
     :param seed:
     :return: the prices for an underlying following a Heston process
@@ -353,11 +357,6 @@ def heston_model_levels(
     assert isinstance(
         param, ModelParameters
     ), "param must be an object of Class ModelParameters"
-    """
-    Get two correlated brownian motion sequences for the volatility parameter 
-    and the underlying asset brownian_motion_market, 
-    brownian_motion_vol = get_correlated_paths_simple(param)
-    """
     brownian, cir_process = cox_ingersoll_ross_heston(param, seed=seed)
     brownian, brownian_motion_market = heston_construct_correlated_path(
         param, brownian, seed=seed
@@ -401,10 +400,6 @@ def cox_ingersoll_ross_levels(
     levels: list = [zero]
     for h in range(1, param.all_time):
         drift = a * (mu - levels[h - 1]) * param.all_delta
-        """ The main difference between this and the Ornstein Uhlenbeck model 
-        is that we multiply the 'random' component by the square-root of the 
-        previous level i.e. the process has level dependent interest 
-        rates. """
         randomness = math.sqrt(levels[h - 1]) * brownian_motion[h - 1]
         levels.append(levels[h - 1] + drift + randomness)
     return np.array(levels)

@@ -61,10 +61,13 @@ tee = False
 exclude =
     # git folder
     .git,
+    .github,
     # python cache
     __pycache__,
     build,
     dist,
+    venv,
+    .circleci,
 # Provide a comma-separate list of glob patterns to include for checks.
 filename =
     *.py
@@ -103,7 +106,7 @@ hang-closing = True
 # W503 - line break before binary operator
 
 # Specify a list of codes to ignore.
-ignore = BLK100, C901, E133, E203, E266, E501, W291, W503, F403, F401
+extend-ignore = C901, E133, E203, E501, W503
 
 # Specify the list of error codes you wish Flake8 to report.
 select = B, C, E, F, W, T4, B9
