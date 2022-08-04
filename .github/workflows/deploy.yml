@@ -20,9 +20,6 @@ jobs:
         python -m pip install -e .[dev]
         python -m pip install -U wheel twine setuptools
 
-    - name: Format with Black
-      run: python -m black ./
-
     - name: Tests with Pytest
       run: coverage run -m pytest --verbose
 

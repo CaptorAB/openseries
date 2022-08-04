@@ -25,6 +25,9 @@ setup(
         "dev": [
             "black",
             "coverage",
+            "flake8",
+            "flake8-black",
+            "pre-commit",
             "pytest",
         ],
     },
