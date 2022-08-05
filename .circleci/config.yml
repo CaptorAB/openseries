@@ -11,7 +11,7 @@ executors:
 jobs:
   test:
     working_directory: ~/repo
-    parallelism: 4
+    parallelism: 3
     parameters:
       os:
         type: executor
