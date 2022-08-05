@@ -7,11 +7,11 @@ executors:
   docker:
     docker:
       - image: cimg/python:3.10.4
-    parallelism: 5
 
 jobs:
   test:
     working_directory: ~/repo
+    parallelism: 5
     parameters:
       os:
         type: executor
