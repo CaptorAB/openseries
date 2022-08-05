@@ -7,6 +7,7 @@ executors:
   docker:
     docker:
       - image: cimg/python:3.10.4
+    parallelism: 5
 
 jobs:
   test:
@@ -43,13 +44,23 @@ jobs:
             pip install -r requirements.txt
       - run:
           name: Tests with pytest
+          parallel: true
           command: |
             . venv/bin/activate
-            PYTHONPATH=${PWD} coverage run -m pytest --verbose ./
+            shopt -s globstar
+            TESTFILES=$(circleci tests glob tests/**/test*.py | circleci tests split --split-by=timings)
+            mkdir -p test-results
+            shopt -u globstar
+            PYTHONPATH=${PWD} coverage run -m pytest --verbose $TESTFILES
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
       - run:
           name: Report coverage
           command: |
             . venv/bin/activate
+            PYTHONPATH=${PWD} coverage combine
             PYTHONPATH=${PWD} coverage report
 
 workflows:
