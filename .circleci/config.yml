@@ -11,7 +11,7 @@ executors:
 jobs:
   test:
     working_directory: ~/repo
-    parallelism: 3
+    parallelism: 4
     parameters:
       os:
         type: executor
@@ -51,7 +51,7 @@ jobs:
             TESTFILES=$(circleci tests glob tests/**/test*.py | circleci tests split --split-by=timings)
             mkdir -p test-results
             shopt -u globstar
-            PYTHONPATH=${PWD} coverage run -m pytest --verbose $TESTFILES
+            PYTHONPATH=${PWD} coverage run --data-file ./test-results/.coverage --module pytest --verbose $TESTFILES
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -60,7 +60,7 @@ jobs:
           name: Report coverage
           command: |
             . venv/bin/activate
-            PYTHONPATH=${PWD} coverage combine
+            PYTHONPATH=${PWD} coverage combine test-results/
             PYTHONPATH=${PWD} coverage report
 
 workflows:

@@ -6,7 +6,7 @@ omit =
 [paths]
 source =
     ./
-    test-results/*
+    test-results/
 
 include =
     openseries/*
