@@ -1,12 +1,6 @@
 [run]
-parallel=True
 omit =
     venv/*
-
-[paths]
-source =
-    ./
-    test-results/
 
 include =
     openseries/*
