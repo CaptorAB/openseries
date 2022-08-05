@@ -1,8 +1,21 @@
-version: 2
-jobs:
-  testing:
+version: 2.1
+
+orbs:
+  python: circleci/python@2.0.3
+
+executors:
+  docker:
     docker:
       - image: cimg/python:3.10.4
+
+jobs:
+  test:
+    working_directory: ~/repo
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+
     steps:
       - checkout
       - run:
@@ -32,15 +45,17 @@ jobs:
           name: Tests with pytest
           command: |
             . venv/bin/activate
-            coverage run -m pytest --verbose ./
+            PYTHONPATH=${PWD} coverage run -m pytest --verbose ./
       - run:
           name: Report coverage
           command: |
             . venv/bin/activate
-            coverage report
+            PYTHONPATH=${PWD} coverage report
 
 workflows:
-  version: 2
-  testing-master:
+  all-tests:
     jobs:
-      - testing
+      - test:
+          matrix:
+            parameters:
+              os: [docker]
