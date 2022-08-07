@@ -56,7 +56,7 @@ The data cleaning helper methods can be chained like this:
 A new portfolio timeseries can be constructed from an OpenFrame like this:
 
     basket.weights = [0.6, 0.4]
-    portfolio = OpenTimeSeries.from_df(basket.make_portfolio('porfolio'))
+    portfolio = OpenTimeSeries.from_df(basket.make_portfolio("porfolio"))
     basket.add_timeseries(portfolio)
 
 To print return and volatility:
@@ -90,7 +90,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 |:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
 | [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
-| [frenkla_open_api_sdk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frenkla_open_api_sdk.py) | A Python SDK to interact with the [Frenkla Open API](https://apiv2.captor.se/public/api/).                                                                                                          |
+| [frenkla_open_api_sdk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frenkla_open_api_sdk.py) | A Python SDK to interact with the [Frenkla Open API](https://api.frenkla.com/public/api/).                                                                                                          |
 | [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/datefixer.py)                       | A module with date utilities.                                                                                                                                                                       |
 | [openseries.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/openseries.json)                 | The jsonschema of the OpenTimeSeries class.                                                                                                                                                         |
 | [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_layouts.json)         | A module setting [Plotly](https://plotly.com/python/) defaults used in the `plot_series` methods.                                                                                                   |
