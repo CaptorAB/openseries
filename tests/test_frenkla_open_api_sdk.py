@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
 from io import StringIO
-import pandas as pd
-from pandas.testing import assert_frame_equal
 from requests.exceptions import Timeout
 import sys
 from unittest import TestCase
@@ -123,35 +121,6 @@ class TestFrenklaOpenApiService(TestCase):
         with self.assertRaises(Exception) as e_unique:
             isin_cde = ""
             _ = sevice.get_nav(isin=isin_cde)
-
-        self.assertEqual(
-            f"Request for NAV series using ISIN {isin_cde} returned no data.",
-            e_unique.exception.args[0],
-        )
-
-    def test_frenklaopenapiservice_get_nav_to_dataframe(self):
-
-        sevice = FrenklaOpenApiService()
-        isin_code = "SE0009807308"
-        df = sevice.get_nav_to_dataframe(isin=isin_code).head()
-        ddf = pd.DataFrame(
-            data=[100.0000, 100.0978, 100.2821, 100.1741, 100.4561],
-            index=pd.DatetimeIndex(
-                [
-                    "2017-05-29",
-                    "2017-05-30",
-                    "2017-05-31",
-                    "2017-06-01",
-                    "2017-06-02",
-                ]
-            ),
-            columns=["Captor Iris Bond, SE0009807308"],
-        )
-        assert_frame_equal(df, ddf)
-
-        with self.assertRaises(Exception) as e_unique:
-            isin_cde = ""
-            _ = sevice.get_nav_to_dataframe(isin=isin_cde).head()
 
         self.assertEqual(
             f"Request for NAV series using ISIN {isin_cde} returned no data.",

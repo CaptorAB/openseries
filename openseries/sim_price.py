@@ -12,7 +12,7 @@ from openseries.stoch_processes import (
 
 
 class Simulation(TypedDict, total=False):
-    """Class to hold the type of input data for the OpenTimeSeries class."""
+    """Class to hold the type of input data for the ReturnSimulation class."""
 
     number_of_sims: int
     trading_days: int
@@ -23,9 +23,6 @@ class Simulation(TypedDict, total=False):
 
 
 class ReturnSimulation(object):
-    """
-    A general class to hold return simulations.
-    """
 
     number_of_sims: int
     trading_days: int
@@ -35,25 +32,46 @@ class ReturnSimulation(object):
     df: pd.DataFrame
 
     def __init__(self, d: Simulation):
-        """
-        :param d: Dictionary containing class attributes set by class method.
+        """Instantiates an object of the class ReturnSimulation
+
+        Parameters
+        ----------
+        d: Simulation
+            A subclass of TypedDict with the required and optional parameters
         """
 
         self.__dict__ = d
 
     @property
     def results(self) -> pd.DataFrame:
-        """Data output as Pandas.DataFrame"""
+        """
+        Returns
+        -------
+        pandas.DataFrame
+            Simulation data
+        """
         return self.df.add(1.0).cumprod(axis="columns").T
 
     @property
     def realized_mean_return(self) -> float:
-        """Annualized arithmetic mean of log returns"""
-        return float(np.log(self.results).diff().mean() * self.trading_days_in_year)
+        """
+        Returns
+        -------
+        float
+            Annualized arithmetic mean of returns
+        """
+
+        return float(self.results.pct_change().mean() * self.trading_days_in_year)
 
     @property
     def realized_vol(self) -> float:
-        """Annualized volatility"""
+        """
+        Returns
+        -------
+        float
+            Annualized volatility
+        """
+
         return float(
             self.results.pct_change().std() * np.sqrt(self.trading_days_in_year)
         )
@@ -68,17 +86,29 @@ class ReturnSimulation(object):
         t: int = 252,
         seed: int | None = 71,
     ):
+        """Normal distribution simulation
+
+        Parameters
+        ----------
+        n: int
+            Number of simulations to generate
+        d: int
+            Number of trading days to simulate
+        mu: float
+            Mean return
+        vol: float
+            Mean standard deviation
+        t: int, default: 252
+            Number of trading days used to annualize
+        seed: int | None, default 71
+            Random seed going into numpy.random.seed()
+
+        Returns
+        -------
+        ReturnSimulation
+            Normal distribution simulation
         """
-        This  function generates n number of random prices over
-        t number of trading days
-        :param n: The number of simulations to generate
-        :param d: Number of trading days to simulate
-        :param mu: The mean return
-        :param vol: The mean standard deviation
-        :param t: The number of trading days used to annualize return and
-                  volatility
-        :param seed: This is the random seed going into numpy.random.seed()
-        """
+
         if seed:
             np.random.seed(seed)
         daily_returns = np.random.normal(
@@ -104,17 +134,29 @@ class ReturnSimulation(object):
         t: int = 252,
         seed: int | None = 71,
     ):
+        """Lognormal distribution simulation
+
+        Parameters
+        ----------
+        n: int
+            Number of simulations to generate
+        d: int
+            Number of trading days to simulate
+        mu: float
+            Mean return
+        vol: float
+            Mean standard deviation
+        t: int, default: 252
+            Number of trading days used to annualize
+        seed: int | None, default 71
+            Random seed going into numpy.random.seed()
+
+        Returns
+        -------
+        ReturnSimulation
+            Lognormal distribution simulation
         """
-        This  function generates n number of random prices over
-        t number of trading days
-        :param n: The number of simulations to generate
-        :param d: Number of trading days to simulate
-        :param mu: The mean return
-        :param vol: The mean standard deviation
-        :param t: The number of trading days used to annualize return and
-                  volatility
-        :param seed: This is the random seed going into numpy.random.seed()
-        """
+
         if seed:
             np.random.seed(seed)
         daily_returns = (
@@ -140,22 +182,36 @@ class ReturnSimulation(object):
         t: int = 252,
         seed: int | None = 71,
     ):
-        """
-        This method constructs a sequence of log returns which, when
+        """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM)
-        :param n: The number of simulations to generate
-        :param d: Number of trading days to simulate
-        :param mu: The mean return
-        :param vol: The mean standard deviation
-        :param t: The number of trading days used to annualize return and
-                  volatility
-        :param seed: This is the random seed going into numpy.random.seed()
+
+        Parameters
+        ----------
+        n: int
+            Number of simulations to generate
+        d: int
+            Number of trading days to simulate
+        mu: float
+            Mean return
+        vol: float
+            Mean standard deviation
+        t: int, default: 252
+            Number of trading days used to annualize
+        seed: int | None, default 71
+            Random seed going into numpy.random.seed()
+
+        Returns
+        -------
+        ReturnSimulation
+            Normal distribution simulation
         """
+
+        if seed:
+            np.random.seed(seed)
+
         mp = ModelParameters(
             all_s0=1, all_time=d, all_delta=1.0 / t, all_sigma=vol, gbm_mu=mu
         )
-        if seed:
-            np.random.seed(seed)
         daily_returns = []
         for i in range(n):
             daily_returns.append(geometric_brownian_motion_log_returns(mp))
@@ -181,23 +237,36 @@ class ReturnSimulation(object):
         t: int = 252,
         seed: int | None = 71,
     ):
+        """Heston model is the geometric brownian motion model with stochastic volatility
+
+        Parameters
+        ----------
+        n: int
+            Number of simulations to generate
+        d: int
+            Number of trading days to simulate
+        mu: float
+            Mean return
+        vol: float
+            Mean standard deviation
+        t: int, default: 252
+            Number of trading days used to annualize
+        heston_mu: float
+            This is the long run average volatility for the Heston model
+        heston_a: float
+            This is the rate of mean reversion for volatility in the Heston model
+        seed: int | None, default 71
+            Random seed going into numpy.random.seed()
+
+        Returns
+        -------
+        ReturnSimulation
+            Heston model simulation
         """
-        NOTE - this method is dodgy! Need to debug!
-        The Heston model is the geometric brownian motion model with
-        stochastic volatility
-        :param n: The number of simulations to generate
-        :param d: Number of trading days to simulate
-        :param mu: The mean return
-        :param vol: This is the volatility of the stochastic processes and the
-                    starting volatility for the Heston model
-        :param heston_mu: This is the long run average volatility for
-                          the Heston model
-        :param heston_a: This is the rate of mean reversion for volatility in
-                         the Heston model
-        :param t: The number of trading days used to annualize return and
-                  volatility
-        :param seed: This is the random seed going into numpy.random.seed()
-        """
+
+        if seed:
+            np.random.seed(seed)
+
         mp = ModelParameters(
             all_s0=1,
             all_time=d,
@@ -208,8 +277,6 @@ class ReturnSimulation(object):
             heston_mu=heston_mu,
             heston_a=heston_a,
         )
-        if seed:
-            np.random.seed(seed)
         daily_returns = []
         for i in range(n):
             aray = heston_model_levels(mp)[0]
@@ -238,20 +305,36 @@ class ReturnSimulation(object):
         t: int = 252,
         seed: int | None = 71,
     ):
+        """Heston Vol model simulation
+
+        Parameters
+        ----------
+        n: int
+            Number of simulations to generate
+        d: int
+            Number of trading days to simulate
+        mu: float
+            Mean return
+        vol: float
+            Mean standard deviation
+        t: int, default: 252
+            Number of trading days used to annualize
+        heston_mu: float
+            This is the long run average volatility for the Heston model
+        heston_a: float
+            This is the rate of mean reversion for volatility in the Heston model
+        seed: int | None, default 71
+            Random seed going into numpy.random.seed()
+
+        Returns
+        -------
+        ReturnSimulation
+            Heston Vol model simulation
         """
-        :param n: The number of simulations to generate
-        :param d: Number of trading days to simulate
-        :param mu: The mean return
-        :param vol: This is the volatility of the stochastic processes and the
-                    starting volatility for the Heston model
-        :param heston_mu: This is the long run average volatility for
-                          the Heston model
-        :param heston_a: This is the rate of mean reversion for volatility in
-                         the Heston model
-        :param t: The number of trading days used to annualize return and
-                  volatility
-        :param seed: This is the random seed going into numpy.random.seed()
-        """
+
+        if seed:
+            np.random.seed(seed)
+
         mp = ModelParameters(
             all_s0=1,
             all_time=d,
@@ -262,8 +345,6 @@ class ReturnSimulation(object):
             heston_mu=heston_mu,
             heston_a=heston_a,
         )
-        if seed:
-            np.random.seed(seed)
         daily_returns = []
         for i in range(n):
             aray = heston_model_levels(mp)[1]
@@ -293,21 +374,38 @@ class ReturnSimulation(object):
         t: int = 252,
         seed: int | None = 71,
     ):
+        """Merton Jump-Diffusion model simulation
+
+        Parameters
+        ----------
+        n: int
+            Number of simulations to generate
+        d: int
+            Number of trading days to simulate
+        mu: float
+            Mean return
+        vol: float
+            Mean standard deviation
+        t: int, default: 252
+            Number of trading days used to annualize
+        jumps_lamda: float
+            This is the probability of a jump happening at each point in time
+        jumps_sigma: float
+            This is the volatility of the jump size
+        jumps_mu: float
+            This is the average jump size
+        seed: int | None, default 71
+            Random seed going into numpy.random.seed()
+
+        Returns
+        -------
+        ReturnSimulation
+            Merton Jump-Diffusion model simulation
         """
 
-        :param n: The number of simulations to generate
-        :param d: Number of trading days to simulate
-        :param mu: The mean return
-        :param vol: This is the volatility of the stochastic processes and
-                    the starting volatility for the Heston model
-        :param jumps_lamda: This is the probability of a jump happening at
-                            each point in time
-        :param jumps_sigma: This is the volatility of the jump size
-        :param jumps_mu: This is the average jump size
-        :param t: The number of trading days used to annualize return and
-                  volatility
-        :param seed: This is the random seed going into numpy.random.seed()
-        """
+        if seed:
+            np.random.seed(seed)
+
         mp = ModelParameters(
             all_s0=1,
             all_time=d,
@@ -318,8 +416,6 @@ class ReturnSimulation(object):
             jumps_sigma=jumps_sigma,
             jumps_mu=jumps_mu,
         )
-        if seed:
-            np.random.seed(seed)
         daily_returns = []
         for i in range(n):
             aray = geometric_brownian_motion_jump_diffusion_levels(mp)

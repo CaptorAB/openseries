@@ -16,14 +16,9 @@ Processes that can be simulated in this module are:
 import math
 import numpy as np
 import numpy.random as nrand
-from typing import Tuple
 
 
 class ModelParameters(object):
-    """
-    Encapsulates model parameters
-    """
-
     def __init__(
         self,
         all_s0: float,
@@ -44,34 +39,44 @@ class ModelParameters(object):
         heston_mu: float = 0.0,
         heston_vol0: float = 0.0,
     ):
-        """
+        """Instantiates an object of the class ModelParameters
 
-        :param all_s0: This is the starting asset value
-        :param all_time: This is the amount of time to simulate for
-        :param all_delta: This is the delta, the rate of time
-                          e.g. 1/252 = daily, 1/12 = monthly
-        :param all_sigma: This is the volatility of the stochastic processes
-        :param all_r0: This is the starting interest rate value
-        :param gbm_mu: This is the annual drift factor for geometric
-                       brownian motion
-        :param jumps_lamda: This is the probability of a jump happening at
-                            each point in time
-        :param jumps_sigma: This is the volatility of the jump size
-        :param jumps_mu: This is the average jump size
-        :param cir_a: This is the rate of mean reversion for Cox Ingersoll Ross
-        :param cir_mu: This is the long run average interest rate for
-                       Cox Ingersoll Ross
-        :param cir_rho: This is the correlation between the wiener processes
-                        of the Heston model
-        :param ou_a: This is the rate of mean reversion for Ornstein Uhlenbeck
-        :param ou_mu: This is the long run average interest rate for
-                      Ornstein Uhlenbeck
-        :param heston_a: This is the rate of mean reversion for volatility in
-                         the Heston model
-        :param heston_mu: This is the long run average volatility for
-                          the Heston model
-        :param heston_vol0: This is the starting volatility value for
-                            the Heston model
+        Parameters
+        ----------
+        all_s0: float
+            Starting asset value
+        all_time: float
+            Amount of time to simulate for
+        all_delta: float
+            Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
+        all_sigma: float
+            Volatility of the stochastic processes
+        all_r0: float, default: 0.0
+            Starting interest rate value
+        gbm_mu: float
+            Annual drift factor for geometric brownian motion
+        jumps_lamda: float, default: 0.0
+            Probability of a jump happening at each point in time
+        jumps_sigma: float, default: 0.0
+            Volatility of the jump size
+        jumps_mu: float, default: 0.0
+            Average jump size
+        cir_a: float, default: 0.0
+            Rate of mean reversion for Cox Ingersoll Ross
+        cir_mu: float, default: 0.0
+            Long run average interest rate for Cox Ingersoll Ross
+        cir_rho: float, default: 0.0
+            Correlation between the wiener processes of the Heston model
+        ou_a: float, default: 0.0
+            Rate of mean reversion for Ornstein Uhlenbeck
+        ou_mu: float, default: 0.0
+            Long run average interest rate for Ornstein Uhlenbeck
+        heston_a: float, default: 0.0
+            Rate of mean reversion for volatility in the Heston model
+        heston_mu: float, default: 0.0
+            Long run average volatility for the Heston model
+        heston_vol0: float, default: 0.0
+            Starting volatility value for the Heston vol model
         """
         self.all_s0 = all_s0
         self.all_time = all_time
@@ -92,28 +97,24 @@ class ModelParameters(object):
         self.heston_vol0 = heston_vol0
 
 
-def convert_to_returns(log_returns: np.ndarray) -> np.ndarray:
-    """
-    This method exponentiates a sequence of log returns to get daily returns
-    :param log_returns: the log returns to exponentiated
-    :return: the exponentiated returns
-    """
-    return np.exp(log_returns)
-
-
 def convert_to_prices(param: ModelParameters, log_returns: np.ndarray) -> np.ndarray:
+    """Converts a sequence of log returns into normal returns (exponentiation)
+    and then computes a price sequence given a starting price, param.all_s0.
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    log_returns:
+        Log returns to exponentiate
+
+    Returns
+    -------
+    numpy.ndarray
+        Price series
     """
-    This method converts a sequence of log returns into normal returns
-    (exponentiation) and then computes a price
-    sequence given a starting price, param.all_s0.
-    :param param: the model parameters object
-    :param log_returns: the log returns to exponentiated
-    :return:
-    """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
-    returns = convert_to_returns(log_returns)
+
+    returns = np.exp(log_returns)
     # A sequence of prices starting with param.all_s0
     price_sequence: list = [param.all_s0]
     for n in range(1, len(returns)):
@@ -125,19 +126,26 @@ def convert_to_prices(param: ModelParameters, log_returns: np.ndarray) -> np.nda
 def brownian_motion_log_returns(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
-    """
-    This method returns a Wiener process. The Wiener process is also called
+    """This method returns a Wiener process. The Wiener process is also called
     Brownian motion. For more information about the Wiener process check out
     the Wikipedia page: http://en.wikipedia.org/wiki/Wiener_process
-    :param param: the model parameters object
-    :param seed:
-    :return: brownian motion log returns
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    numpy.ndarray
+        Brownian Motion log returns
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     if seed is not None:
         nrand.seed(seed)
+
     sqrt_delta_sigma = math.sqrt(param.all_delta) * param.all_sigma
     return nrand.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time)
 
@@ -145,33 +153,45 @@ def brownian_motion_log_returns(
 def brownian_motion_levels(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
+    """Delivers a price sequence whose returns evolve according to a brownian motion
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    numpy.ndarray
+        Price sequence which follows a brownian motion
     """
-    Delivers a price sequence whose returns evolve according to a brownian motion
-    :param param: model parameters object
-    :param seed:
-    :return: returns a price sequence which follows a brownian motion
-    """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     return convert_to_prices(param, brownian_motion_log_returns(param, seed=seed))
 
 
 def geometric_brownian_motion_log_returns(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
-    """
-    This method constructs a sequence of log returns which, when
+    """This method constructs a sequence of log returns which, when
     exponentiated, produce a random Geometric Brownian Motion (GBM).
     GBM is the stochastic process underlying the Black Scholes
     options pricing formula
-    :param param: model parameters object
-    :param seed:
-    :return: returns the log returns of a geometric brownian motion process
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    numpy.ndarray
+        Log returns of a Geometric Brownian Motion process
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     wiener_process = np.array(brownian_motion_log_returns(param, seed=seed))
     sigma_pow_mu_delta = (
         param.gbm_mu - 0.5 * math.pow(param.all_sigma, 2.0)
@@ -182,34 +202,44 @@ def geometric_brownian_motion_log_returns(
 def geometric_brownian_motion_levels(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
+    """Prices for an asset which evolves according to a geometric brownian motion
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    numpy.ndarray
+        Price levels for the asset
     """
-    Returns a sequence of price levels for an asset which evolves according
-    to a geometric brownian motion
-    :param param: model parameters object
-    :param seed:
-    :return: the price levels for the asset
-    """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     return convert_to_prices(
         param, geometric_brownian_motion_log_returns(param, seed=seed)
     )
 
 
 def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> list:
-    """
-    This method produces a sequence of Jump Sizes which represent a jump
+    """This method produces a sequence of Jump Sizes which represent a jump
     diffusion process. These jumps are combined with a geometric brownian
     motion (log returns) to produce the Merton model
-    :param param: the model parameters object
-    :param seed:
-    :return: jump sizes for each point in time
-             (mostly zeroes if jumps are infrequent)
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    numpy.ndarray
+        Jump sizes for each point in time (mostly zeroes if jumps are infrequent)
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     if seed is not None:
         nrand.seed(seed)
     s_n = time = 0
@@ -234,17 +264,23 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
 def geometric_brownian_motion_jump_diffusion_log_returns(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
-    """
-    This method constructs combines a geometric brownian motion process
+    """This method constructs combines a geometric brownian motion process
     (log returns) with a jump diffusion process (log returns) to produce a
     sequence of gbm jump returns
-    :param param: model parameters object
-    :param seed:
-    :return: returns a GBM process with jumps in it
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    numpy.ndarray
+        Geometric Brownian Motion process with jumps in it
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     jump_diffusion = jump_diffusion_process(param, seed=seed)
     geometric_brownian_motion = geometric_brownian_motion_log_returns(param, seed=seed)
     return np.add(jump_diffusion, geometric_brownian_motion)
@@ -253,17 +289,22 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 def geometric_brownian_motion_jump_diffusion_levels(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
+    """Converts returns generated with a Geometric Brownian Motion process
+    with jumps into prices
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    numpy.ndarray
+        Geometric Brownian Motion generated prices
     """
-    This method converts a sequence of gbm jmp returns into a price sequence
-    which evolves according to a geometric brownian motion but can contain
-    jumps at any point in time
-    :param param: model parameters object
-    :param seed:
-    :return: the price levels
-    """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     return convert_to_prices(
         param,
         geometric_brownian_motion_jump_diffusion_log_returns(param, seed=seed),
@@ -272,19 +313,25 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
 def heston_construct_correlated_path(
     param: ModelParameters, brownian_motion_one: np.ndarray, seed: int | None = None
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> (np.ndarray, np.ndarray):
+    """This method is a simplified version of the Cholesky decomposition method for just two assets.
+    It does not make use of matrix algebra and is therefore quite easy to implement
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    brownian_motion_one: numpy.ndarray
+        A first path to correlate against
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    (numpy.ndarray, numpy.ndarray)
+        A correlated Brownian Motion path
     """
-    This method is a simplified version of the Cholesky decomposition method
-    for just two assets. It does not make use of matrix algebra and is
-    therefore quite easy to implement
-    :param param: model parameters object
-    :param brownian_motion_one: A first path to correlate against
-    :param seed:
-    :return: a correlated brownian motion path
-    """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     if seed is not None:
         nrand.seed(seed)
     # We do not multiply by sigma here, we do that in the Heston model
@@ -302,23 +349,30 @@ def heston_construct_correlated_path(
 
 def cox_ingersoll_ross_heston(
     param: ModelParameters, seed: int | None = None
-) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
+) -> (np.ndarray, np.ndarray):
+    """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
     volatility in the Heston model. Because the returns between the underlying
     and the stochastic volatility should be correlated we pass a correlated
     Brownian motion process into the method from which the interest rate levels
     are constructed. The other correlated process is used in the Heston model
-    :param param: the model parameters objects
-    :param seed:
-    :return: the interest rate levels for the CIR process
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    (numpy.ndarray, numpy.ndarray)
+        The interest rate levels for the CIR process
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     if seed is not None:
         nrand.seed(seed)
+
     # We don't multiply by sigma here because we do that in heston
     sqrt_delta_sigma = math.sqrt(param.all_delta) * param.all_sigma
     brownian_motion_volatility = nrand.normal(
@@ -338,10 +392,8 @@ def cox_ingersoll_ross_heston(
 
 def heston_model_levels(
     param: ModelParameters, seed: int | None = None
-) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    NOTE - this method is dodgy! Need to debug!
-    The Heston model is the geometric brownian motion model with stochastic
+) -> (np.ndarray, np.ndarray):
+    """The Heston model is the geometric brownian motion model with stochastic
     volatility. This stochastic volatility is given by the Cox Ingersoll Ross
     process. Step one on this method is to construct two correlated
     GBM processes. One is used for the underlying asset prices and the other
@@ -350,13 +402,19 @@ def heston_model_levels(
     and the underlying asset brownian_motion_market,
     brownian_motion_vol = get_correlated_paths_simple(param)
 
-    :param param: model parameters object
-    :param seed:
-    :return: the prices for an underlying following a Heston process
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    (numpy.ndarray, numpy.ndarray)
+        The prices for an asset following a Heston process
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     brownian, cir_process = cox_ingersoll_ross_heston(param, seed=seed)
     brownian, brownian_motion_market = heston_construct_correlated_path(
         param, brownian, seed=seed
@@ -379,20 +437,26 @@ def heston_model_levels(
 def cox_ingersoll_ross_levels(
     param: ModelParameters, seed: int | None = None
 ) -> np.ndarray:
-    """
-    This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
+    """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
     volatility in the Heston model. Because the returns between the underlying
     and the stochastic volatility should be correlated we pass a correlated
     Brownian motion process into the method from which the interest rate levels
     are constructed. The other correlated process is used in the Heston model
-    :param param: the model parameters object
-    :param seed:
-    :return: the interest rate levels for the CIR process
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    (numpy.ndarray, numpy.ndarray)
+        The interest rate levels for the CIR process
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     brownian_motion = brownian_motion_log_returns(param, seed=seed)
     # Set up the parameters for interest rates
     a, mu, zero = param.cir_a, param.cir_mu, param.all_r0
@@ -406,16 +470,22 @@ def cox_ingersoll_ross_levels(
 
 
 def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -> list:
-    """
-    This method returns the rate levels of a mean-reverting
+    """This method returns the rate levels of a mean-reverting
     Ornstein Uhlenbeck process
-    :param param: the model parameters object
-    :param seed:
-    :return: the interest rate levels for the Ornstein Uhlenbeck process
+
+    Parameters
+    ----------
+    param: ModelParameters
+        Model input
+    seed: int | None, optional
+        Random seed going into numpy.random.seed()
+
+    Returns
+    -------
+    (numpy.ndarray, numpy.ndarray)
+        The interest rate levels for the Ornstein Uhlenbeck process
     """
-    assert isinstance(
-        param, ModelParameters
-    ), "param must be an object of Class ModelParameters"
+
     ou_levels: list = [param.all_r0]
     brownian_motion_returns = brownian_motion_log_returns(param, seed=seed)
     for h in range(1, param.all_time):

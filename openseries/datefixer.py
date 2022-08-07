@@ -10,8 +10,16 @@ from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> dt.date:
     """Function to parse from different date formats into datetime.date
-    :param d: the data item to parse
-    :returns : datetime.date
+
+    Parameters
+    ----------
+    d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp
+        The data item to parse
+
+    Returns
+    -------
+    datetime.date
+        Parsed date
     """
 
     if isinstance(d, dt.datetime) or isinstance(d, pd.Timestamp):
@@ -36,14 +44,24 @@ def date_offset_foll(
     following: bool = True,
 ) -> dt.date:
     """Function to offset dates according to a given calendar
-    :param raw_date: The date to offset from
-    :param calendar: Pandas date offset business calendar
-    :param months_offset: Number of months as integer
-    :param adjust: Boolean condition controlling if offset should adjust for
-                   business days
-    :param following: Boolean condition controlling days should be offset
-                      forward (following=True) or backward
-    :returns : datetime.date
+
+    Parameters
+    ----------
+    raw_date: str | datetime.date | datetime.datetime | numpy.datetime64 | pandas.Timestamp
+        The date to offset from
+    calendar: CDay
+        Pandas date offset business calendar
+    months_offset: int, default: 12
+        Number of months as integer
+    adjust: bool, default: False
+        Determines if offset should adjust for business days
+    following: bool, default: True
+        Determines if days should be offset forward (following) or backward
+
+    Returns
+    -------
+    datetime.date
+        Off-set date
     """
 
     start_dt = dt.date(1970, 12, 30)
@@ -70,8 +88,16 @@ def date_offset_foll(
 
 def get_previous_sweden_business_day_before_today(today: dt.date | None = None):
     """Function to bump backwards to find the previous Swedish business day before today
-    :param today: the data item to parse
-    :returns : datetime.date
+
+    Parameters
+    ----------
+    today: datetime.date, optional
+        Manual input of the day from where the previous business day is found
+
+    Returns
+    -------
+    datetime.date
+        The previous Swedish business day
     """
 
     sweden = SwedenHolidayCalendar(rules=holidays_sw)

@@ -21,7 +21,6 @@ from openseries.datefixer import date_offset_foll
 from openseries.load_plotly import load_plotly_dict
 from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.risk import (
-    calc_max_drawdown,
     drawdown_series,
     drawdown_details,
     cvar_down,
@@ -957,7 +956,10 @@ class OpenFrame(object):
             Maximum drawdown without any limit on date range
         """
 
-        return pd.Series(data=calc_max_drawdown(self.tsdf), name="Max drawdown")
+        return pd.Series(
+            data=(self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1,
+            name="Max drawdown",
+        )
 
     @property
     def max_drawdown_date(self) -> pd.Series:
@@ -999,7 +1001,11 @@ class OpenFrame(object):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return pd.Series(
-            data=calc_max_drawdown(self.tsdf.loc[earlier:later]),
+            data=(
+                self.tsdf.loc[earlier:later]
+                / self.tsdf.loc[earlier:later].expanding(min_periods=1).max()
+            ).min()
+            - 1,
             name="Subset Max drawdown",
         )
 
@@ -1015,7 +1021,10 @@ class OpenFrame(object):
 
         md = (
             self.tsdf.groupby([pd.DatetimeIndex(self.tsdf.index).year])
-            .apply(lambda x: calc_max_drawdown(x))
+            .apply(
+                lambda prices: (prices / prices.expanding(min_periods=1).max()).min()
+                - 1
+            )
             .min()
         )
         md.name = "Max drawdown in cal yr"

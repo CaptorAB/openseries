@@ -26,12 +26,12 @@ class TestSimPrice(TestCase):
             {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
         ]
         target_returns = [
-            "-0.011157857",
             "0.008917436",
-            "-0.031161130",
-            "0.032446979",
-            "0.004575385",
-            "-0.029813702",
+            "0.029000099",
+            "-0.011082564",
+            "0.067119310",
+            "0.101488620",
+            "-0.007388824",
         ]
         target_volatilities = [
             "0.200429415",
@@ -62,6 +62,6 @@ class TestSimPrice(TestCase):
 
         self.assertEqual(psim.results.shape[0], days)
 
-        self.assertEqual(f"{psim.realized_mean_return:.9f}", "0.028832246")
+        self.assertEqual(f"{psim.realized_mean_return:.9f}", "0.033493161")
 
         self.assertEqual(f"{psim.realized_vol:.9f}", "0.096596353")

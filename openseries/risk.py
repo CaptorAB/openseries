@@ -72,17 +72,23 @@ def var_down(
 
 
 def drawdown_series(prices: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Series:
-    """
-    Calculates https://www.investopedia.com/terms/d/drawdown.asp
-    This returns a series representing a drawdown.
-    When the price is at all-time highs, the drawdown
-    is 0. However, when prices are below high watermarks,
-    the drawdown series = current / hwm - 1
-    The max drawdown can be obtained by simply calling .min()
-    on the result (since the drawdown series is negative)
+    """Calculates https://www.investopedia.com/terms/d/drawdown.asp
+    This returns a series representing a drawdown. When the price is at all-time highs, the drawdown
+    is 0. However, when prices are below high watermarks, the drawdown series = current / hwm - 1
+    The max drawdown can be obtained by simply calling .min() on the result (since the drawdown series is negative)
     Method ignores all gaps of NaN's in the price series.
-    :param prices: (Series or DataFrame) Series of prices.
+
+    Parameters
+    ----------
+    prices: pd.DataFrame | pd.Series
+        A timeserie of dates and values
+
+    Returns
+    -------
+    pd.DataFrame | pd.Series
+        A drawdown timeserie
     """
+
     # make a copy so that we don't modify original data
     drawdown = prices.copy()
 
@@ -98,19 +104,20 @@ def drawdown_series(prices: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Serie
     return drawdown
 
 
-def calc_max_drawdown(prices: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Series:
-    """
-    Calculates the max drawdown of a price series. If you want the
-    actual drawdown series, please use to_drawdown_series.
-    :param prices: (Series or DataFrame) Series of prices.
-    """
-    return (prices / prices.expanding(min_periods=1).max()).min() - 1
-
-
 def max_drawdown_date(prices: pd.DataFrame | pd.Series) -> dt.date:
+    """Date when maximum drawdown occurred
+
+    Parameters
+    ----------
+    prices: pd.DataFrame | pd.Series
+        A timeserie of dates and values
+
+    Returns
+    -------
+    datetime.date
+        Maximum drawdown date
     """
-    Date when Max drawdown occurred.
-    """
+
     mdd_date = (
         (prices / prices.expanding(min_periods=1).max())
         .idxmin()
@@ -121,12 +128,25 @@ def max_drawdown_date(prices: pd.DataFrame | pd.Series) -> dt.date:
 
 
 def drawdown_details(prices: pd.DataFrame | pd.Series) -> pd.Series:
+    """Details of the maximum drawdown
+
+    Parameters
+    ----------
+    prices: pd.DataFrame | pd.Series
+        A timeserie of dates and values
+
+    Returns
+    -------
+    pd.Series
+        Max Drawdown
+        Start of drawdown
+        Date of bottom
+        Days from start to bottom
+        Average fall per day
     """
 
-    :param prices:
-    """
     mdate = max_drawdown_date(prices)
-    md = float(calc_max_drawdown(prices))
+    md = float((prices / prices.expanding(min_periods=1).max()).min() - 1)
     dd = prices.copy()
     drwdwn = drawdown_series(dd).loc[:mdate]
     drwdwn.sort_index(ascending=False, inplace=True)
