@@ -1,18 +1,10 @@
 version: 2.1
 
-executors:
-  docker:
-    docker:
-      - image: cimg/python:3.10.4
-
 jobs:
   test:
     working_directory: ~/repo
-    parameters:
-      os:
-        type: executor
-    executor: << parameters.os >>
-
+    docker:
+      - image: cimg/python:3.10.4
     steps:
       - checkout
       - run:
@@ -52,7 +44,4 @@ jobs:
 workflows:
   all-tests:
     jobs:
-      - test:
-          matrix:
-            parameters:
-              os: [docker]
+      - test
