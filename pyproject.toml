@@ -41,6 +41,21 @@ classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
 ]
+keywords = [
+    "python",
+    "python3",
+    "plotly", 
+    "pandas",
+    "finance",
+    "fintech",
+    "data-science",
+    "timeseries",
+    "timeseries-data",
+    "timeseries-analysis",
+    "investment",
+    "investment-analysis",
+    "investing"
+]
 
 [project.optional-dependencies]
 dev = [
