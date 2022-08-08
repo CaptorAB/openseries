@@ -9,13 +9,10 @@ exclude = ["tests*"]
 [tool.setuptools.package-data]
 openseries = ["*.json"]
 
-[tool.setuptools.dynamic]
-readme = {file = ["README.md", "CHANGELOG.md"]}
-
 [project]
 name = "openseries"
 version = "0.6.2"
-dynamic = ["readme"]
+readme = "README.md"
 description = "Package for simple financial time series analysis."
 license = {file = "LICENSE"}
 authors = [
