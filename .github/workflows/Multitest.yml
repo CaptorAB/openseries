@@ -4,6 +4,7 @@ on: workflow_dispatch
 
 defaults:
   run:
+    shell: bash
     working-directory: ~/repo
 
 jobs:
