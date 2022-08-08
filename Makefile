@@ -3,7 +3,7 @@ venv:
 	python3 -m venv ./venv
 	venv/bin/python --version
 	venv/bin/pip install --upgrade pip
-	venv/bin/pip install --upgrade .[test]
+	venv/bin/pip install --upgrade .[dev]
 
 test:
 	PYTHONPATH=${PWD} venv/bin/coverage run -m pytest --verbose ./

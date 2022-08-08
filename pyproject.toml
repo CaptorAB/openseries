@@ -61,6 +61,13 @@ test = [
     "coverage>=5.5",
     "pytest>=7.1.2"
 ]
+dev = [
+    "coverage>=5.5",
+    "pytest>=7.1.2",
+    "black==22.6.0",
+    "flake8==5.0.4",
+    "flake8-black==0.3.3"
+]
 build = [
     "coverage>=5.5",
     "pytest>=7.1.2",
