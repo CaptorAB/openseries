@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import datetime as dt
 from io import StringIO
 from json import load, loads

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from pandas import DataFrame
 from unittest import TestCase
 

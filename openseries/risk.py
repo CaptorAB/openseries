@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py

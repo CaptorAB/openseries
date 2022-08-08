@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import datetime as dt
 from dateutil.relativedelta import relativedelta
 import numpy as np

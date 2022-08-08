@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from pandas.tseries.holiday import (
     AbstractHolidayCalendar,
     DateOffset,

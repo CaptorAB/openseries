@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Source:
 http://www.turingfinance.com/random-walks-down-wall-street-stochastic-processes-in-python/
