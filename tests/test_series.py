@@ -9,8 +9,8 @@ from stdnum.exceptions import InvalidChecksum
 import sys
 from unittest import TestCase
 
-from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
-from openseries.sim_price import ReturnSimulation
+from src.series import OpenTimeSeries, timeseries_chain, TimeSerie
+from src.sim_price import ReturnSimulation
 
 
 class TestOpenTimeSeries(TestCase):

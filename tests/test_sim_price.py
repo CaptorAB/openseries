@@ -1,7 +1,7 @@
 from pandas import DataFrame
 from unittest import TestCase
 
-from openseries.sim_price import ReturnSimulation
+from src.sim_price import ReturnSimulation
 
 
 class TestSimPrice(TestCase):

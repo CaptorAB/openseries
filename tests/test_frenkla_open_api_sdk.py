@@ -5,13 +5,13 @@ import sys
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
+from src.frenkla_open_api_sdk import FrenklaOpenApiService
 
 requests = Mock()
 
 
 class TestFrenklaOpenApiService(TestCase):
-    @patch("openseries.frenkla_open_api_sdk.requests")
+    @patch("src.frenkla_open_api_sdk.requests")
     def test_openapi_timeout(self, mock_requests):
 
         mock_requests.get.side_effect = Timeout
@@ -22,7 +22,7 @@ class TestFrenklaOpenApiService(TestCase):
             _ = sevice.get_nav(isin=isin_code)
             mock_requests.get.assert_called_once()
 
-    @patch("openseries.frenkla_open_api_sdk.requests.get")
+    @patch("src.frenkla_open_api_sdk.requests.get")
     def test_openapi_get_nav_status_code(self, mock_get):
 
         mock_get.return_value.status_code = 400
@@ -36,7 +36,7 @@ class TestFrenklaOpenApiService(TestCase):
 
         self.assertIsInstance(e_status.exception, Exception)
 
-    @patch("openseries.frenkla_open_api_sdk.requests.get")
+    @patch("src.frenkla_open_api_sdk.requests.get")
     def test_openapi_get_timeseries_status_code(self, mock_get):
 
         mock_get.return_value.status_code = 404
@@ -50,7 +50,7 @@ class TestFrenklaOpenApiService(TestCase):
 
         self.assertIsInstance(e_status.exception, Exception)
 
-    @patch("openseries.frenkla_open_api_sdk.requests.get")
+    @patch("src.frenkla_open_api_sdk.requests.get")
     def test_openapi_get_fundinfo_status_code(self, mock_get):
 
         mock_get.return_value.status_code = 400

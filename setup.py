@@ -6,9 +6,9 @@ with open("README.md", "r") as fh:
 
 setup(
     name="openseries",
-    version="0.6.0",
+    version="0.6.1",
     packages=find_packages(),
-    package_data={"openseries": ["*.json"], ".": ["*.json"]},
+    package_data={"src": ["*.json"], ".": ["*.json"]},
     install_requires=[
         "jsonschema",
         "numpy",

@@ -15,11 +15,11 @@ from statsmodels.api import OLS
 from string import ascii_letters
 from typing import List
 
-from openseries.series import OpenTimeSeries
-from openseries.datefixer import date_offset_foll
-from openseries.load_plotly import load_plotly_dict
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
-from openseries.risk import (
+from src.series import OpenTimeSeries
+from src.datefixer import date_offset_foll
+from src.load_plotly import load_plotly_dict
+from src.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+from src.risk import (
     drawdown_series,
     drawdown_details,
     cvar_down,
