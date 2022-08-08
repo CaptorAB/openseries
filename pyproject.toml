@@ -2,8 +2,10 @@
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.dynamic]
+readme = {file = ["README.md", "CHANGELOG.md"]}
+
 [tool.setuptools.packages.find]
-where = ["openseries"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
@@ -11,10 +13,10 @@ openseries = ["*.json"]
 
 [project]
 name = "openseries"
-version = "0.6.4"
+version = "0.6.5"
 description = "Package for simple financial time series analysis."
-readme = "README.md"
-license = {file = "LICENSE"}
+dynamic = ["readme"]
+license = {text = "BSD 3-Clause License"}
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
     {email = "info@captor.se"}
@@ -59,18 +61,12 @@ keywords = [
 
 [project.optional-dependencies]
 dev = [
-    "black",
     "coverage",
-    "flake8",
-    "flake8-black",
-    "pre-commit",
     "pytest",
     "testfixtures"
 ]
 
 [project.urls]
-homepage = "https://github.com/CaptorAB/OpenSeries"
-documentation = "https://github.com/CaptorAB/OpenSeries"
 repository = "https://github.com/CaptorAB/OpenSeries"
 
 [tool.black]

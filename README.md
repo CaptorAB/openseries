@@ -10,8 +10,6 @@
 **OpenSeries** is a project with tools to perform timeseries analysis on a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
-<span style="font-size:2em;">[Changelog](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
-
 To install:
 ```
 pip install openseries
