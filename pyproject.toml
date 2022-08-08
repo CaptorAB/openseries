@@ -20,15 +20,15 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-        "jsonschema",
-        "numpy",
-        "pandas",
-        "plotly",
-        "python-dateutil",
-        "python-stdnum",
-        "requests",
-        "scipy",
-        "statsmodels"
+        "jsonschema>=3.2.0",
+        "numpy>=1.22.4",
+        "pandas>=1.4.2",
+        "plotly>=4.14.1",
+        "python-dateutil>=2.8.1",
+        "python-stdnum>=1.17",
+        "requests>=2.25.1",
+        "scipy>=1.8.1",
+        "statsmodels>=0.12.1"
 ]
 classifiers=[
     "Programming Language :: Python :: 3 :: Only",
@@ -57,10 +57,16 @@ keywords = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "coverage",
-    "pytest",
-    "testfixtures"
+test = [
+    "coverage>=5.5",
+    "pytest>=7.1.2"
+]
+build = [
+    "coverage>=5.5",
+    "pytest>=7.1.2",
+    "wheel",
+    "twine",
+    "setuptools"
 ]
 
 [project.urls]

@@ -17,8 +17,7 @@ jobs:
 
     - name: Make editable pip install of project
       run: |
-        python -m pip install --upgrade -e .[dev]
-        python -m pip install -U wheel twine setuptools
+        python -m pip install --upgrade -e .[build]
 
     - name: Tests with Pytest
       run: coverage run -m pytest --verbose

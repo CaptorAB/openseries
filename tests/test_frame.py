@@ -5,7 +5,6 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CDay
 import sys
-from testfixtures import LogCapture
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
@@ -759,13 +758,11 @@ class TestOpenFrame(TestCase):
 
     def test_openframe_passed_empty_list(self):
 
-        with LogCapture() as log:
+        with self.assertLogs() as cm:
             OpenFrame([])
-            ll = log.actual()
-            self.assertEqual(
-                ll,
-                [("root", "WARNING", "OpenFrame() was passed an empty list.")],
-            )
+        self.assertListEqual(
+            cm.output, ["WARNING:root:OpenFrame() was passed an empty list."]
+        )
 
     def test_openframe_wrong_number_of_weights_passed(self):
 
