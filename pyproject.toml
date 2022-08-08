@@ -44,7 +44,7 @@ classifiers=[
 keywords = [
     "python",
     "python3",
-    "plotly", 
+    "plotly",
     "pandas",
     "finance",
     "fintech",
