@@ -15,9 +15,9 @@ jobs:
         python-version-file: '.python-version'
         cache: 'pip'
 
-    - name: Install dependencies
+    - name: Make editable VCS install of project
       run: |
-        python -m pip install --upgrade -e -r requirements.txt
+        python -m pip install --upgrade -e "https://github.com/CaptorAB/OpenSeries.git/#egg=openseries"
         python -m pip install -U wheel twine setuptools
 
     - name: Tests with Pytest
