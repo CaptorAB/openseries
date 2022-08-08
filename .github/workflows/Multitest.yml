@@ -47,7 +47,6 @@ jobs:
         id: pycov
         with:
           python-version-file: '.python-version'
-          cache: 'pip'
 
       - name: Install coverage on Python ${{ steps.pycov.outputs.python-version }}
         run: python -m pip install --upgrade coverage
