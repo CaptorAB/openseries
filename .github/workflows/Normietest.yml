@@ -5,6 +5,9 @@ on: workflow_dispatch
 jobs:
   testing:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: repo
 
     steps:
     - name: Check out GitHub repository ${{ github.repository }}

@@ -2,6 +2,10 @@ name: Multitest
 
 on: workflow_dispatch
 
+defaults:
+  run:
+    working-directory: repo
+
 jobs:
   testing:
     strategy:
