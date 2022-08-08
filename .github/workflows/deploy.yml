@@ -14,8 +14,6 @@ jobs:
       id: py
       with:
         python-version-file: '.python-version'
-        cache: 'pip'
-        cache-dependency-path: 'pyproject.toml'
 
     - name: Editable pip install on Python ${{ steps.py.outputs.python-version }}
       run: |
