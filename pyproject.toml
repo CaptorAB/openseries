@@ -64,9 +64,8 @@ test = [
 build = [
     "coverage>=5.5",
     "pytest>=7.1.2",
-    "wheel",
-    "twine",
-    "setuptools"
+    "build",
+    "twine"
 ]
 
 [project.urls]

@@ -27,7 +27,7 @@ jobs:
 
     - name: Package and check
       run: |
-        python setup.py sdist bdist_wheel
+        python -m build
         python -m twine check dist/*
 
     - name: Publish distribution 📦 to Test PyPI
