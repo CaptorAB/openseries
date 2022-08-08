@@ -17,7 +17,7 @@ jobs:
 
     - name: Make editable VCS install of project
       run: |
-        python -m pip install --upgrade -e "git+${{ github.repositoryUrl }}/#egg=openseries"
+        python -m pip install --upgrade -e "git+https://github.com/CaptorAB/OpenSeries.git/#egg=openseries"
         python -m pip install -U wheel twine setuptools
 
     - name: Tests with Pytest
