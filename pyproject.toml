@@ -2,9 +2,6 @@
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.dynamic]
-readme = {file = ["README.md", "CHANGELOG.md"]}
-
 [tool.setuptools.packages.find]
 exclude = ["tests*"]
 
@@ -15,7 +12,7 @@ openseries = ["*.json"]
 name = "openseries"
 version = "0.6.5"
 description = "Package for simple financial time series analysis."
-dynamic = ["readme"]
+readme = "README.md"
 license = {text = "BSD 3-Clause License"}
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
