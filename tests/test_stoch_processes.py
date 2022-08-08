@@ -2,9 +2,9 @@ import datetime as dt
 import pandas as pd
 from unittest import TestCase
 
-from src.frame import OpenFrame
-from src.series import OpenTimeSeries
-from src.stoch_processes import (
+from openseries.frame import OpenFrame
+from openseries.series import OpenTimeSeries
+from openseries.stoch_processes import (
     ModelParameters,
     cox_ingersoll_ross_levels,
     ornstein_uhlenbeck_levels,

@@ -4,8 +4,8 @@ import pandas as pd
 from pandas.tseries.offsets import CDay
 from unittest import TestCase
 
-from src.sweden_holidays import SwedenHolidayCalendar, holidays_sw
-from src.datefixer import (
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+from openseries.datefixer import (
     date_fix,
     get_previous_sweden_business_day_before_today,
     date_offset_foll,

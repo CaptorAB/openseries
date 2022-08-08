@@ -14,11 +14,11 @@ from stdnum import isin as isincode
 from scipy.stats import kurtosis, norm, skew
 from typing import List, TypedDict
 
-from src.sweden_holidays import SwedenHolidayCalendar, holidays_sw
-from src.frenkla_open_api_sdk import FrenklaOpenApiService
-from src.datefixer import date_offset_foll, date_fix
-from src.load_plotly import load_plotly_dict
-from src.risk import (
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
+from openseries.datefixer import date_offset_foll, date_fix
+from openseries.load_plotly import load_plotly_dict
+from openseries.risk import (
     cvar_down,
     var_down,
     drawdown_series,

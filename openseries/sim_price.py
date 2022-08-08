@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import TypedDict
 
-from src.stoch_processes import (
+from openseries.stoch_processes import (
     ModelParameters,
     geometric_brownian_motion_log_returns,
     geometric_brownian_motion_jump_diffusion_levels,

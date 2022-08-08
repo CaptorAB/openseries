@@ -8,10 +8,10 @@ import sys
 from testfixtures import LogCapture
 from unittest import TestCase
 
-from src.frame import OpenFrame
-from src.risk import cvar_down, var_down
-from src.series import OpenTimeSeries, TimeSerie
-from src.sim_price import ReturnSimulation
+from openseries.frame import OpenFrame
+from openseries.risk import cvar_down, var_down
+from openseries.series import OpenTimeSeries, TimeSerie
+from openseries.sim_price import ReturnSimulation
 
 
 class TestOpenFrame(TestCase):

@@ -69,7 +69,7 @@ Finally, plotting is simple. This will plot the timeseries in a browser window:
 
     basket.plot_series(tick_fmt=".2%")
 
-To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/src/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
+To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
 ## Table of Contents
 
@@ -88,19 +88,19 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 
 | Module                                                                                                           | Description                                                                                                                                                                                         |
 |:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
-| [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
-| [frenkla_open_api_sdk.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/frenkla_open_api_sdk.py) | A Python SDK to interact with the [Frenkla Open API](https://api.frenkla.com/public/api/).                                                                                                          |
-| [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/datefixer.py)                       | A module with date utilities.                                                                                                                                                                       |
-| [openseries.json](https://github.com/CaptorAB/OpenSeries/blob/master/src/openseries.json)                 | The jsonschema of the OpenTimeSeries class.                                                                                                                                                         |
-| [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/src/plotly_layouts.json)         | A module setting [Plotly](https://plotly.com/python/) defaults used in the `plot_series` methods.                                                                                                   |
-| [plotly_captor_logo.json](https://github.com/CaptorAB/OpenSeries/blob/master/src/plotly_captor_logo.json) | A module with a link to the Captor logo used in the `plot_series` methods.                                                                                                                          |
-| [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/risk.py)                                 | Module with methods used to calculate VaR, CVaR and drawdowns.                                                                                                                                      |
-| [sim_price.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/sim_price.py)                       | Module to simulate OpenTimeSeries from different stochastic processes.                                                                                                                              |
-| [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/stoch_processes.py)           | Module to generate stochastic processes used in the `sim_price.py` module.                                                                                                                          |
-| [sweden_holidays.py](https://github.com/CaptorAB/OpenSeries/blob/master/src/sweden_holidays.py)           | Module that defines a Swedish business calendar.                                                                                                                                                    |
+| [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
+| [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
+| [frenkla_open_api_sdk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frenkla_open_api_sdk.py) | A Python SDK to interact with the [Frenkla Open API](https://api.frenkla.com/public/api/).                                                                                                          |
+| [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/datefixer.py)                       | A module with date utilities.                                                                                                                                                                       |
+| [openseries.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/openseries.json)                 | The jsonschema of the OpenTimeSeries class.                                                                                                                                                         |
+| [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_layouts.json)         | A module setting [Plotly](https://plotly.com/python/) defaults used in the `plot_series` methods.                                                                                                   |
+| [plotly_captor_logo.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_captor_logo.json) | A module with a link to the Captor logo used in the `plot_series` methods.                                                                                                                          |
+| [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/risk.py)                                 | Module with methods used to calculate VaR, CVaR and drawdowns.                                                                                                                                      |
+| [sim_price.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/sim_price.py)                       | Module to simulate OpenTimeSeries from different stochastic processes.                                                                                                                              |
+| [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/stoch_processes.py)           | Module to generate stochastic processes used in the `sim_price.py` module.                                                                                                                          |
+| [sweden_holidays.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/sweden_holidays.py)           | Module that defines a Swedish business calendar.                                                                                                                                                    |
 
-#### Below are the class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py) object.
+#### Below are the class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
 
 | Method               | Applies to                    | Description                                                                                        |
 |:---------------------|:------------------------------|:---------------------------------------------------------------------------------------------------|
@@ -112,7 +112,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `from_fixed_rate`    | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
 | `from_deepcopy`      | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
 
-#### In this table are the non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py) class.
+#### In this table are the non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
 | Attribute      | type                    | Applies to       | Description                                                                                                                                  |
 |:---------------|:------------------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -129,7 +129,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `sweden`       | `SwedenHolidayCalendar` | `OpenTimeSeries` | A calendar object used to generate business days.                                                                                            |
 | `valuetype`    | `str`                   | `OpenTimeSeries` | Field identifies a series of values, "Price(Close)", or a series of returns, "Return(Total)".                                                |
 
-#### In this table are the non-numeric or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/src/frame.py) class.
+#### In this table are the non-numeric or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
 | Attribute          | type                   | Applies to  | Description                                                              |
 |:-------------------|:-----------------------|:------------|:-------------------------------------------------------------------------|
@@ -143,7 +143,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `lengths_of_items` | `pandas.Series`        | `OpenFrame` | Number of items in each of the series in the OpenFrame.                  |
 | `span_of_days_all` | `pandas.Series`        | `OpenFrame` | Number of days from the first to the last in each of the series.         |
 
-#### In this table are the non-numeric or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/src/frame.py) class.
+#### In this table are the non-numeric or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
 | Attribute           | type                             | Applies to                    | Description                                                                       |
 |:--------------------|:---------------------------------|:------------------------------|:----------------------------------------------------------------------------------|
@@ -156,7 +156,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `periods_in_a_year` | `float`                          | `OpenTimeSeries`, `OpenFrame` | The number of observations in an average year for all days in the data.           |
 | `yearfrac`          | `float`                          | `OpenTimeSeries`, `OpenFrame` | Length of timeseries expressed as np.float64 fraction of a year with 365.25 days. |
 
-#### In this table are the methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py) class.
+#### In this table are the methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
 | Method               | Applies to       | Description                                                                              |
 |:---------------------|:-----------------|:-----------------------------------------------------------------------------------------|
@@ -166,7 +166,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `set_new_label`      | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                 |
 | `running_adjustment` | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                    |
 
-#### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/src/frame.py) class.
+#### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
 | Method                  | Applies to  | Description                                                                                                                                         |
 |:------------------------|:------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -184,7 +184,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `rolling_beta`          | `OpenFrame` | Returns a pandas.DataFrame with the rolling [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                    |
 | `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.              |
 
-#### In this table are the methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/src/frame.py) class.
+#### In this table are the methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
 | Method                       | Applies to                    | Description                                                                                                                                            |
 |:-----------------------------|:------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -206,7 +206,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `rolling_cvar_down`          | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling CVaR figures.                                                                                                  |
 | `calc_range`                 | `OpenTimeSeries`, `OpenFrame` | Returns the start and end dates of a range from specific period definitions. Used by the below numeric methods and not meant to be used independently. |
 
-#### Below are the numeric properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/src/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/src/frame.py).
+#### Below are the numeric properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py).
 
 | Attribute               | type                     | Applies to                    | Description                                                                                                                                                                                                             |
 |:------------------------|:-------------------------|:------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

@@ -1,6 +1,65 @@
 [build-system]
-# Minimum requirements for the build system to execute.
 requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["openseries"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+openseries = ["*.json"]
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md", "CHANGELOG.md"]}
+
+[project]
+name = "openseries"
+version = "0.6.2"
+dynamic = ["readme"]
+description = "Package for simple financial time series analysis."
+license = {text = "BSD 3-Clause License", file = "LICENSE"}
+authors = [
+    { name = "Martin Karrin", email = "martin.karrin@captor.se" },
+    {email = "info@captor.se"}
+]
+requires-python = ">=3.10"
+dependencies = [
+        "jsonschema",
+        "numpy",
+        "pandas",
+        "plotly",
+        "python-dateutil",
+        "python-stdnum",
+        "requests",
+        "scipy",
+        "statsmodels"
+]
+classifiers=[
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Natural Language :: English",
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "coverage",
+    "flake8",
+    "flake8-black",
+    "pre-commit",
+    "pytest",
+    "testfixtures"
+]
+
+[project.urls]
+homepage = "https://github.com/CaptorAB/OpenSeries"
+documentation = "https://github.com/CaptorAB/OpenSeries"
+repository = "https://github.com/CaptorAB/OpenSeries"
 
 [tool.black]
 line-length = 88

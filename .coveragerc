@@ -3,7 +3,7 @@ omit =
     venv/*
 
 include =
-    src/*
+    openseries/*
 
 [report]
 skip_empty = true

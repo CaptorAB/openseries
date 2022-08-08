@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import CDay
 
-from src.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 
 
 def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> dt.date:
