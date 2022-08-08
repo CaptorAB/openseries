@@ -11,11 +11,12 @@ jobs:
 
     - name: Set up Python
       uses: actions/setup-python@v4
+      id: py
       with:
         python-version-file: '.python-version'
         cache: 'pip'
 
-    - name: Make editable pip install of project
+    - name: Editable pip install on Python ${{ steps.py.outputs.python-version }}
       run: |
         python -m pip install --upgrade -e .[build]
 

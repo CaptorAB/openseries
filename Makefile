@@ -3,7 +3,7 @@ venv:
 	python3 -m venv ./venv
 	venv/bin/python --version
 	venv/bin/pip install --upgrade pip
-	venv/bin/pip install --upgrade -r requirements.txt
+	venv/bin/pip install --upgrade .[test]
 
 test:
 	PYTHONPATH=${PWD} venv/bin/coverage run -m pytest --verbose ./
@@ -11,19 +11,7 @@ test:
 
 upgrade:
 	PYTHONPATH=${PWD} venv/bin/pip install --upgrade pip
-	PYTHONPATH=${PWD} venv/bin/pip install --upgrade -r requirements.txt
-
-lint:
-	PYTHONPATH=${PWD} venv/bin/flake8 ./
-
-fix:
-	PYTHONPATH=${PWD} venv/bin/black ./
-
-dist:
-	PYTHONPATH=${PWD} venv/bin/python setup.py sdist
-
-upload:
-	PYTHONPATH=${PWD} venv/bin/twine upload dist/*
+	PYTHONPATH=${PWD} venv/bin/pip install --upgrade .
 
 clean:
 	rm -rf dist
