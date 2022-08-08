@@ -17,7 +17,7 @@ name = "openseries"
 version = "0.6.2"
 dynamic = ["readme"]
 description = "Package for simple financial time series analysis."
-license = {text = "BSD 3-Clause License", file = "LICENSE"}
+license = {file = "LICENSE"}
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
     {email = "info@captor.se"}
