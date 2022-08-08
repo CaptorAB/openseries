@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 defaults:
   run:
-    working-directory: repo
+    working-directory: ~/repo
 
 jobs:
   testing:

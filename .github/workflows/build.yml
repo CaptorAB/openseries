@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        working-directory: repo
+        working-directory: ~/repo
 
     strategy:
       matrix:
