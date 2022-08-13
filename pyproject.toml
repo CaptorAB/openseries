@@ -6,17 +6,16 @@ build-backend = "setuptools.build_meta"
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-openseries = ["*.json"]
+openseries = ["*.json", "*.png"]
 
 [project]
 name = "openseries"
-version = "0.6.5"
+version = "0.6.6"
 description = "Package for simple financial time series analysis."
 readme = "README.md"
 license = {text = "BSD 3-Clause License"}
 authors = [
-    { name = "Martin Karrin", email = "martin.karrin@captor.se" },
-    {email = "info@captor.se"}
+    { name = "Martin Karrin", email = "martin.karrin@captor.se" }
 ]
 requires-python = ">=3.10"
 dependencies = [
