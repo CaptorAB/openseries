@@ -1,6 +1,12 @@
 name: Normietest
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - "*" # matches every branch that doesn't contain a '/'
+      - "*/*" # matches every branch containing a single '/'
+      - "**" # matches every branch
+  workflow_dispatch:
 
 jobs:
   testing:
@@ -23,3 +29,9 @@ jobs:
 
     - name: Report coverage
       run: coverage report
+
+    - name: Send GitHub Action trigger data to Slack workflow
+      id: slack
+      uses: slackapi/slack-github-action@v1.21.0
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
