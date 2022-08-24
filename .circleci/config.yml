@@ -1,0 +1,46 @@
+version: 2.1
+
+jobs:
+  test:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/python:3.10.4
+    steps:
+      - checkout
+      - run:
+          name: Linux kernel version
+          command: cat /proc/version
+      - run:
+          name: Install Python in a virtual environment
+          command: python3 -m venv venv
+      - run:
+          name: Check Python version
+          command: |
+            . venv/bin/activate
+            python --version
+            which python
+      - run:
+          name: Upgrade pip and check version
+          command: |
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip --version
+      - run:
+          name: Install dependencies
+          command: |
+            . venv/bin/activate
+            pip install --upgrade .[test]
+      - run:
+          name: Tests with pytest
+          command: |
+            . venv/bin/activate
+            PYTHONPATH=${PWD} coverage run -m pytest --verbose
+      - run:
+          name: Report coverage
+          command: |
+            . venv/bin/activate
+            PYTHONPATH=${PWD} coverage report
+workflows:
+  all-tests:
+    jobs:
+      - test
