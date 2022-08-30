@@ -2609,6 +2609,7 @@ class OpenFrame(object):
                     marker={"color": "red", "size": 12},
                     hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
                     showlegend=False,
+                    name=labels[item],
                     text=[txt.format(self.tsdf.iloc[-1, item])],
                     textposition="top center",
                 )

@@ -2130,6 +2130,7 @@ class OpenTimeSeries(object):
                 marker={"color": "red", "size": 12},
                 hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
                 showlegend=False,
+                name=self.label,
                 text=[txt.format(self.tsdf.iloc[-1, 0])],
                 textposition="top center",
             )

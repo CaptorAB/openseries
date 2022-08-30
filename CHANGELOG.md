@@ -2,6 +2,10 @@
 
 For a long time I have not kept a log of the changes implemented in the different versions of the openseries package. In this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
+## Version [0.6.8] - 2022-08-30
+
+Added missing name of last highlighted point in plot series.
+
 ## Version [0.6.7] - 2022-08-13
 
 Added new .png for Captor logo and resized and realigned it for plotly plots.
