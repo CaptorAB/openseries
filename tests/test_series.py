@@ -557,6 +557,32 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(full_series.dates, chained_series.dates)
         self.assertListEqual(full_values, chained_values)
 
+        pushed_date = front_series.last_idx + dt.timedelta(days=10)
+        no_overlap_series = OpenTimeSeries.from_df(full_series.tsdf.loc[pushed_date:])
+        with self.assertRaises(Exception) as e_chain:
+            _ = timeseries_chain(front_series, no_overlap_series)
+
+        self.assertIsInstance(e_chain.exception, AssertionError)
+
+        front_series_two = OpenTimeSeries.from_df(full_series.tsdf.iloc[:136])
+        front_series_two.resample(freq="8D")
+
+        self.assertTrue(back_series.first_idx not in front_series_two.tsdf.index)
+        new_chained_series = timeseries_chain(front_series_two, back_series)
+        self.assertIsInstance(new_chained_series, OpenTimeSeries)
+
+        front_series_three = OpenTimeSeries.from_df(full_series.tsdf.iloc[:136])
+        front_series_three.resample(freq="10D")
+
+        self.assertTrue(back_series.first_idx not in front_series_three.tsdf.index)
+
+        with self.assertRaises(Exception) as e_fail:
+            _ = timeseries_chain(front_series_three, back_series)
+
+        self.assertEqual(
+            e_fail.exception.args[0], "Failed to find a matching date between series"
+        )
+
     def test_opentimeseries_plot_series(self):
 
         plotseries = self.randomseries.from_deepcopy()

@@ -2167,12 +2167,24 @@ def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
     """
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)
-    new = back.from_deepcopy()
-
     olddf = old.tsdf.copy()
-    dates = [x.strftime("%Y-%m-%d") for x in olddf.index if x < new.first_idx]
+    new = back.from_deepcopy()
+    idx = 0
+    first = new.tsdf.index[idx]
+
+    assert (
+        old.last_idx >= first
+    ), "Timeseries dates must overlap to allow them to be chained."
+
+    while first not in olddf.index:
+        idx += 1
+        first = new.tsdf.index[idx]
+        if first > olddf.index[-1]:
+            raise Exception("Failed to find a matching date between series")
+
+    dates = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
     values = np.array([float(x) for x in old.tsdf.values][: len(dates)])
-    values = list(values * float(new.tsdf.iloc[0]) / float(olddf.loc[new.first_idx]))
+    values = list(values * float(new.tsdf.loc[first]) / float(olddf.loc[first]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
     values.extend([float(x) for x in new.tsdf.values])
