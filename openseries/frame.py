@@ -1918,6 +1918,9 @@ class OpenFrame(object):
             end_cut = self.last_indices.min()
         self.tsdf.sort_index(inplace=True)
         self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
+        re_cut = self.tsdf[~self.tsdf.isnull()].index[-1]
+        self.tsdf = self.tsdf.truncate(after=re_cut, copy=False)
+
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
         if len(set(self.first_indices)) != 1 or len(set(self.last_indices)) != 1:

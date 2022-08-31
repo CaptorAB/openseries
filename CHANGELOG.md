@@ -2,6 +2,10 @@
 
 For a long time I have not kept a log of the changes implemented in the different versions of the openseries package. In this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
+## Version [0.7.0] - 2022-08-31
+
+Improved OpenFrame.trunc_frame().
+
 ## Version [0.6.9] - 2022-08-30
 
 Fixed timeseries_chain to better capture date mismatches.
