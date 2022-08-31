@@ -1892,6 +1892,7 @@ class OpenFrame(object):
         end_cut: dt.date | None = None,
         before: bool = True,
         after: bool = True,
+        force_end_cut: bool = False,
     ):
         """Truncates DataFrame such that all timeseries have the same length
 
@@ -1905,6 +1906,8 @@ class OpenFrame(object):
             If True method will truncate to the common earliest start date also when start_cut = None.
         after: bool, default: True
             If True method will truncate to the common latest end date also when end_cut = None.
+        force_end_cut: bool, default: False
+            If True method will do a .loc[] selection to ensure a clean cut at the end of the DataFrame.
 
         Returns
         -------
@@ -1918,8 +1921,9 @@ class OpenFrame(object):
             end_cut = self.last_indices.min()
         self.tsdf.sort_index(inplace=True)
         self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
-        re_cut = self.tsdf[~self.tsdf.isnull()].index[-1]
-        self.tsdf = self.tsdf.truncate(after=re_cut, copy=False)
+        if force_end_cut:
+            re_cut = self.tsdf[~self.tsdf.isnull()].index[-1]
+            self.tsdf = self.tsdf.loc[:re_cut]
 
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
