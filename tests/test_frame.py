@@ -611,6 +611,7 @@ class TestOpenFrame(TestCase):
         ]
 
         series_unique = [
+            "ewma_vol_func",
             "pandas_df",
             "running_adjustment",
             "set_new_label",
@@ -622,6 +623,7 @@ class TestOpenFrame(TestCase):
             "add_timeseries",
             "beta",
             "delete_timeseries",
+            "ewma_risk",
             "rolling_info_ratio",
             "info_ratio_func",
             "tracking_error_func",
@@ -1661,6 +1663,16 @@ class TestOpenFrame(TestCase):
             for nf, f in zip(no_fixed, fixed):
                 self.assertAlmostEqual(nf, f, places=2)
                 self.assertNotAlmostEqual(nf, f, places=6)
+        for methd in methods:
+            dated = getattr(mframe, methd)(
+                from_date=mframe.first_idx, to_date=mframe.last_idx
+            )
+            undated = getattr(mframe, methd)(
+                from_date=mframe.first_idx,
+                to_date=mframe.last_idx,
+            )
+            for dd, ud in zip(dated, undated):
+                self.assertEqual(f"{dd:.10f}", f"{ud:.10f}")
 
         ret = [f"{rr:.9f}" for rr in mframe.value_ret_func()]
         self.assertListEqual(
@@ -1974,4 +1986,111 @@ class TestOpenFrame(TestCase):
         self.assertEqual(
             e_market.exception.args[0],
             "market should be a tuple or an integer.",
+        )
+
+    def test_openframe_ewma_risk(self):
+
+        eframe = self.randomframe.from_deepcopy()
+        eframe.to_cumret()
+        edf = eframe.ewma_risk()
+
+        list_one = [f"{e:.11f}" for e in edf.head(10).iloc[:, 0]]
+        list_two = [f"{e:.11f}" for e in edf.head(10).iloc[:, 1]]
+        corr_one = [f"{e:.11f}" for e in edf.head(10).iloc[:, 2]]
+        self.assertListEqual(
+            list_one,
+            [
+                "0.07995872621",
+                "0.07801248670",
+                "0.07634125583",
+                "0.07552465738",
+                "0.07894138379",
+                "0.07989322216",
+                "0.07769398173",
+                "0.07806577815",
+                "0.07603008639",
+                "0.08171281006",
+            ],
+        )
+        self.assertListEqual(
+            list_two,
+            [
+                "0.10153833268",
+                "0.09869274051",
+                "0.09583812971",
+                "0.09483161937",
+                "0.09470601474",
+                "0.09210588859",
+                "0.11261673980",
+                "0.11113938828",
+                "0.11043515326",
+                "0.10817921616",
+            ],
+        )
+        self.assertListEqual(
+            corr_one,
+            [
+                "-0.00015294210",
+                "0.00380837753",
+                "0.00758444757",
+                "-0.01259265721",
+                "0.03346034482",
+                "0.02068245047",
+                "-0.00730691767",
+                "0.01757764619",
+                "0.02745689252",
+                "-0.00629004298",
+            ],
+        )
+
+        fdf = eframe.ewma_risk(
+            first_column=3, second_column=4, periods_in_a_year_fixed=251
+        )
+        list_three = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 0]]
+        list_four = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 1]]
+        corr_two = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 2]]
+        self.assertListEqual(
+            list_three,
+            [
+                "0.07712206989",
+                "0.07942595349",
+                "0.08666330524",
+                "0.09336934376",
+                "0.09064864248",
+                "0.08834725868",
+                "0.08578870069",
+                "0.08372351448",
+                "0.08828894057",
+                "0.08718509958",
+            ],
+        )
+        self.assertListEqual(
+            list_four,
+            [
+                "0.07787841405",
+                "0.07727035322",
+                "0.07498769117",
+                "0.07273500879",
+                "0.07786226476",
+                "0.07880499823",
+                "0.08075244706",
+                "0.07832868687",
+                "0.07594379202",
+                "0.08107054465",
+            ],
+        )
+        self.assertListEqual(
+            corr_two,
+            [
+                "0.00068511835",
+                "-0.03519976419",
+                "-0.02124735579",
+                "-0.02555360096",
+                "-0.01204201129",
+                "0.00315017923",
+                "0.01198035018",
+                "0.01363505146",
+                "0.01369207054",
+                "0.05193595929",
+            ],
         )

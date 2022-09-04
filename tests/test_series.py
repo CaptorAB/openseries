@@ -647,6 +647,36 @@ class TestOpenTimeSeries(TestCase):
         aseries.align_index_to_local_cdays()
         self.assertFalse(midsummer in aseries.tsdf.index)
 
+    def test_opentimeseries_ewma_vol_func(self):
+
+        simdata = self.randomseries.ewma_vol_func()
+        simseries = OpenTimeSeries.from_df(simdata, valuetype="EWMA")
+        values = [f"{v:.11f}" for v in simdata.iloc[:5]]
+        checkdata = [
+            "0.07995872621",
+            "0.07801248670",
+            "0.07634125583",
+            "0.07552465738",
+            "0.07894138379",
+        ]
+
+        self.assertListEqual(values, checkdata)
+        self.assertIsInstance(simseries, OpenTimeSeries)
+
+        simdata_fxd_per_yr = self.randomseries.ewma_vol_func(
+            periods_in_a_year_fixed=251
+        )
+
+        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5]]
+        checkdata_fxd_per_yr = [
+            "0.07989953100",
+            "0.07795473234",
+            "0.07628473871",
+            "0.07546874481",
+            "0.07888294174",
+        ]
+        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
+
     def test_opentimeseries_rolling_vol(self):
 
         simdata = self.randomseries.rolling_vol(observations=21)

@@ -479,7 +479,9 @@ class OpenFrame(object):
             time_factor = periods_in_a_year_fixed
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
+            how_many = int(
+                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+            )
             time_factor = how_many / fraction
         return pd.Series(
             data=self.tsdf.loc[earlier:later].pct_change().mean() * time_factor,
@@ -616,7 +618,9 @@ class OpenFrame(object):
             time_factor = periods_in_a_year_fixed
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
+            how_many = int(
+                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+            )
             time_factor = how_many / fraction
         return pd.Series(
             data=self.tsdf.loc[earlier:later].pct_change().std() * np.sqrt(time_factor),
@@ -1448,7 +1452,9 @@ class OpenFrame(object):
             time_factor = periods_in_a_year_fixed
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
+            how_many = int(
+                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+            )
             time_factor = how_many / fraction
         if drift_adjust:
             imp_vol = (-np.sqrt(time_factor) / norm.ppf(level)) * (
@@ -1650,6 +1656,118 @@ class OpenFrame(object):
             dd.name = i.label
             mddf = pd.concat([mddf, dd], axis="columns")
         return mddf
+
+    def ewma_risk(
+        self,
+        lmbda: float = 0.94,
+        day_chunk: int = 11,
+        dlta_degr_freedms: int = 0,
+        first_column: int = 0,
+        second_column: int = 1,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
+    ) -> pd.DataFrame:
+        """Exponentially Weighted Moving Average Model for Volatilities and Correlation.
+        https://www.investopedia.com/articles/07/ewma.asp
+
+        Parameters
+        ----------
+        lmbda: float, default: 0.94
+            Scaling factor to determine weighting.
+        day_chunk: int, default: 0
+            Sampling the data which is assumed to be daily.
+        dlta_degr_freedms: int, default: 0
+            Variance bias factor taking the value 0 or 1.
+        first_column: int, default: 0
+            Column of first timeseries.
+        second_column: int, default: 1
+            Column of second timeseries.
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Series volatilities and correlation
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        if periods_in_a_year_fixed is None:
+            fraction = (later - earlier).days / 365.25
+            how_many = int(
+                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+            )
+            time_factor = how_many / fraction
+        else:
+            time_factor = periods_in_a_year_fixed
+            how_many = int(self.length)
+
+        corr_label = (
+            self.tsdf.iloc[:, first_column].name[0]
+            + "_VS_"
+            + self.tsdf.iloc[:, second_column].name[0]
+        )
+        cols = [
+            self.tsdf.iloc[:, first_column].name[0],
+            self.tsdf.iloc[:, second_column].name[0],
+        ]
+
+        data = self.tsdf.loc[earlier:later].copy()
+
+        for rtn in cols:
+            data[rtn, "Returns"] = np.log(data.loc[:, (rtn, "Price(Close)")]).diff()
+            data[rtn, "EWMA"] = np.zeros(how_many)
+            data.loc[:, (rtn, "EWMA")].iloc[0] = data.loc[:, (rtn, "Returns")].iloc[
+                1:day_chunk
+            ].std(ddof=dlta_degr_freedms) * np.sqrt(time_factor)
+
+        data["Cov", "EWMA"] = np.zeros(how_many)
+        data[corr_label, "EWMA"] = np.zeros(how_many)
+        data.loc[:, ("Cov", "EWMA")].iloc[0] = np.cov(
+            m=data.loc[:, (cols[0], "Returns")].iloc[1:day_chunk].to_numpy(),
+            y=data.loc[:, (cols[1], "Returns")].iloc[1:day_chunk].to_numpy(),
+            ddof=dlta_degr_freedms,
+        )[0][1]
+        data.loc[:, (corr_label, "EWMA")].iloc[0] = data.loc[:, ("Cov", "EWMA")].iloc[
+            0
+        ] / (
+            2
+            * data.loc[:, (cols[0], "EWMA")].iloc[0]
+            * data.loc[:, (cols[1], "EWMA")].iloc[0]
+        )
+
+        prev = data.loc[self.first_idx]
+        for _, row in data.iloc[1:].iterrows():
+            row.loc[cols, "EWMA"] = np.sqrt(
+                np.square(row.loc[cols, "Returns"].to_numpy())
+                * time_factor
+                * (1 - lmbda)
+                + np.square(prev.loc[cols, "EWMA"].to_numpy()) * lmbda
+            )
+            row.loc["Cov", "EWMA"] = (
+                row.loc[cols[0], "Returns"]
+                * row.loc[cols[1], "Returns"]
+                * time_factor
+                * (1 - lmbda)
+                + prev.loc["Cov", "EWMA"] * lmbda
+            )
+            row.loc[corr_label, "EWMA"] = row.loc["Cov", "EWMA"] / (
+                2 * row.loc[cols[0], "EWMA"] * row.loc[cols[1], "EWMA"]
+            )
+            prev = row.copy()
+
+        ewma_df = data.loc[:, (cols + [corr_label], "EWMA")]
+        ewma_df.columns = ewma_df.columns.droplevel(level=1)
+
+        return ewma_df
 
     def rolling_vol(
         self,
@@ -1892,7 +2010,6 @@ class OpenFrame(object):
         end_cut: dt.date | None = None,
         before: bool = True,
         after: bool = True,
-        force_end_cut: bool = False,
     ):
         """Truncates DataFrame such that all timeseries have the same length
 
@@ -1906,8 +2023,6 @@ class OpenFrame(object):
             If True method will truncate to the common earliest start date also when start_cut = None.
         after: bool, default: True
             If True method will truncate to the common latest end date also when end_cut = None.
-        force_end_cut: bool, default: False
-            If True method will do a .loc[] selection to ensure a clean cut at the end of the DataFrame.
 
         Returns
         -------
@@ -1921,9 +2036,6 @@ class OpenFrame(object):
             end_cut = self.last_indices.min()
         self.tsdf.sort_index(inplace=True)
         self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
-        if force_end_cut:
-            re_cut = self.tsdf[~self.tsdf.isnull()].index[-1]
-            self.tsdf = self.tsdf.loc[:re_cut]
 
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)

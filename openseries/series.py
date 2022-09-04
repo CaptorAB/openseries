@@ -794,7 +794,7 @@ class OpenTimeSeries(object):
             time_factor = periods_in_a_year_fixed
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
+            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
             time_factor = how_many / fraction
         return float(self.tsdf.loc[earlier:later].pct_change().mean() * time_factor)
 
@@ -912,7 +912,7 @@ class OpenTimeSeries(object):
             time_factor = periods_in_a_year_fixed
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
+            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
             time_factor = how_many / fraction
 
         return float(
@@ -1606,7 +1606,7 @@ class OpenTimeSeries(object):
             time_factor = periods_in_a_year_fixed
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[earlier:later].count(numeric_only=True)
+            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
             time_factor = how_many / fraction
         if drift_adjust:
             return float(
@@ -1809,6 +1809,71 @@ class OpenTimeSeries(object):
         dddf = self.tsdf.copy()
         dddf.index = pd.DatetimeIndex(dddf.index)
         return drawdown_details(dddf).to_frame()
+
+    def ewma_vol_func(
+        self,
+        lmbda: float = 0.94,
+        day_chunk: int = 11,
+        dlta_degr_freedms: int = 0,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
+    ) -> pd.Series:
+        """Exponentially Weighted Moving Average Model for Volatility.
+        https://www.investopedia.com/articles/07/ewma.asp
+
+        Parameters
+        ----------
+        lmbda: float, default: 0.94
+            Scaling factor to determine weighting.
+        day_chunk: int, default: 0
+            Sampling the data which is assumed to be daily.
+        dlta_degr_freedms: int, default: 0
+            Variance bias factor taking the value 0 or 1.
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and comparisons
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Series EWMA volatility
+        """
+
+        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        if periods_in_a_year_fixed:
+            time_factor = periods_in_a_year_fixed
+            how_many = int(self.length)
+        else:
+            fraction = (later - earlier).days / 365.25
+            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
+            time_factor = how_many / fraction
+
+        data = self.tsdf.loc[earlier:later].copy()
+
+        data[self.label, "Returns"] = np.log(
+            data.loc[:, (self.label, "Price(Close)")]
+        ).diff()
+        data[self.label, "EWMA"] = np.zeros(how_many)
+        data.loc[:, (self.label, "EWMA")].iloc[0] = data.loc[
+            :, (self.label, "Returns")
+        ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * np.sqrt(time_factor)
+
+        prev = data.loc[self.first_idx]
+        for _, row in data.iloc[1:].iterrows():
+            row.loc[self.label, "EWMA"] = np.sqrt(
+                np.square(row.loc[self.label, "Returns"]) * time_factor * (1 - lmbda)
+                + np.square(prev.loc[self.label, "EWMA"]) * lmbda
+            )
+            prev = row.copy()
+
+        return data.loc[:, (self.label, "EWMA")]
 
     def rolling_vol(
         self, observations: int = 21, periods_in_a_year_fixed: int | None = None

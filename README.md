@@ -158,31 +158,33 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 
 #### In this table are the methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Method               | Applies to       | Description                                                                              |
-|:---------------------|:-----------------|:-----------------------------------------------------------------------------------------|
-| `setup_class`        | `OpenTimeSeries` | Class method that defines the `domestic` attribute and a `sweden` business day calendar. |
-| `to_json`            | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                           |
-| `pandas_df`          | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.              |
-| `set_new_label`      | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                 |
-| `running_adjustment` | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                    |
+| Method               | Applies to       | Description                                                                                                                                    |
+|:---------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| `setup_class`        | `OpenTimeSeries` | Class method that defines the `domestic` attribute and a `sweden` business day calendar.                                                       |
+| `to_json`            | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                                                                                 |
+| `pandas_df`          | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.                                                                    |
+| `set_new_label`      | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                                                                       |
+| `running_adjustment` | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
+| `ewma_vol_func`      | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 
 #### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
-| Method                  | Applies to  | Description                                                                                                                                         |
-|:------------------------|:------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `trunc_frame`           | `OpenFrame` | Truncates the OpenFrame to a common period.                                                                                                         |
-| `add_timeseries`        | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                                                                                       |
-| `delete_timeseries`     | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                                                                                       |
-| `relative`              | `OpenFrame` | Calculates a new series that is the relative performance of two others.                                                                             |
-| `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                                                                                          |
-| `ord_least_squares_fit` | `OpenFrame` | Calculates an [Ordinary Least Squares](https://www.investopedia.com/terms/l/least-squares-method.asp) fitted parameter and series.                  |
-| `beta`                  | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                     |
-| `tracking_error_func`   | `OpenFrame` | Calculates the [tracking errors](https://www.investopedia.com/terms/t/trackingerror.asp) relative to a selected series in the OpenFrame.            |
-| `info_ratio_func`       | `OpenFrame` | Calculates the [information ratios](https://www.investopedia.com/terms/i/informationratio.asp) relative to a selected series in the OpenFrame.      |
-| `capture_ratio_func`    | `OpenFrame` | Calculates up, down and up/down [capture ratios](https://www.investopedia.com/terms/d/down-market-capture-ratio.asp) relative to a selected series. |
-| `rolling_info_ratio`    | `OpenFrame` | Returns a pandas.DataFrame with the rolling [information ratio](https://www.investopedia.com/terms/i/informationratio.asp) between two series.      |
-| `rolling_beta`          | `OpenFrame` | Returns a pandas.DataFrame with the rolling [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                    |
-| `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.              |
+| Method                  | Applies to  | Description                                                                                                                                                       |
+|:------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `trunc_frame`           | `OpenFrame` | Truncates the OpenFrame to a common period.                                                                                                                       |
+| `add_timeseries`        | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                                                                                                     |
+| `delete_timeseries`     | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                                                                                                     |
+| `relative`              | `OpenFrame` | Calculates a new series that is the relative performance of two others.                                                                                           |
+| `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                                                                                                        |
+| `ord_least_squares_fit` | `OpenFrame` | Calculates an [Ordinary Least Squares](https://www.investopedia.com/terms/l/least-squares-method.asp) fitted parameter and series.                                |
+| `beta`                  | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                                   |
+| `tracking_error_func`   | `OpenFrame` | Calculates the [tracking errors](https://www.investopedia.com/terms/t/trackingerror.asp) relative to a selected series in the OpenFrame.                          |
+| `info_ratio_func`       | `OpenFrame` | Calculates the [information ratios](https://www.investopedia.com/terms/i/informationratio.asp) relative to a selected series in the OpenFrame.                    |
+| `capture_ratio_func`    | `OpenFrame` | Calculates up, down and up/down [capture ratios](https://www.investopedia.com/terms/d/down-market-capture-ratio.asp) relative to a selected series.               |
+| `rolling_info_ratio`    | `OpenFrame` | Returns a pandas.DataFrame with the rolling [information ratio](https://www.investopedia.com/terms/i/informationratio.asp) between two series.                    |
+| `rolling_beta`          | `OpenFrame` | Returns a pandas.DataFrame with the rolling [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                  |
+| `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.                            |
+| `ewma_risk`             | `OpenFrame` | Returns a `pandas.DataFrame` with volatility and correlation based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 
 #### In this table are the methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
