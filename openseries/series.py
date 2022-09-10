@@ -476,8 +476,12 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        df = pd.DataFrame(data=self.values, index=self.dates, dtype="float64")
-        df.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        df = pd.DataFrame(
+            data=self.values,
+            index=self.dates,
+            columns=[[self.label], [self.valuetype]],
+            dtype="float64",
+        )
         df.index = [d.date() for d in pd.DatetimeIndex(df.index)]
 
         df.sort_index(inplace=True)
@@ -1707,7 +1711,7 @@ class OpenTimeSeries(object):
         self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = "Return(Total)"
-        self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = [[self.label], [self.valuetype]]
         return self
 
     def value_to_diff(self, periods: int = 1):
@@ -1727,7 +1731,7 @@ class OpenTimeSeries(object):
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
         self.valuetype = "Return(Total)"
-        self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = [[self.label], [self.valuetype]]
         return self
 
     def value_to_log(self):
@@ -1759,10 +1763,12 @@ class OpenTimeSeries(object):
             ]
         ):
             self.value_to_ret()
+
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
         self.valuetype = "Price(Close)"
-        self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = [[self.label], [self.valuetype]]
+
         return self
 
     def resample(self, freq: str = "BM"):
@@ -1794,7 +1800,8 @@ class OpenTimeSeries(object):
         """
 
         self.tsdf = drawdown_series(self.tsdf)
-        self.tsdf.columns = pd.MultiIndex.from_product([[self.label], ["Drawdowns"]])
+        self.tsdf.columns = [[self.label], ["Drawdowns"]]
+
         return self
 
     def drawdown_details(self) -> pd.DataFrame:
@@ -1901,9 +1908,8 @@ class OpenTimeSeries(object):
             time_factor
         )
         voldf.dropna(inplace=True)
-        voldf.columns = pd.MultiIndex.from_product(
-            [[self.label], ["Rolling volatility"]]
-        )
+        voldf.columns = [[self.label], ["Rolling volatility"]]
+
         return voldf
 
     def rolling_return(self, observations: int = 21) -> pd.DataFrame:
@@ -1922,7 +1928,8 @@ class OpenTimeSeries(object):
         retdf = (
             self.tsdf.pct_change().rolling(observations, min_periods=observations).sum()
         )
-        retdf.columns = pd.MultiIndex.from_product([[self.label], ["Rolling returns"]])
+        retdf.columns = [[self.label], ["Rolling returns"]]
+
         return retdf.dropna()
 
     def rolling_cvar_down(
@@ -1946,7 +1953,8 @@ class OpenTimeSeries(object):
             lambda x: cvar_down(x, level=level)
         )
         cvardf = cvardf.dropna()
-        cvardf.columns = pd.MultiIndex.from_product([[self.label], ["Rolling CVaR"]])
+        cvardf.columns = [[self.label], ["Rolling CVaR"]]
+
         return cvardf
 
     def rolling_var_down(
@@ -1976,7 +1984,8 @@ class OpenTimeSeries(object):
             lambda x: var_down(x, level=level, interpolation=interpolation)
         )
         vardf = vardf.dropna()
-        vardf.columns = pd.MultiIndex.from_product([[self.label], ["Rolling VaR"]])
+        vardf.columns = [[self.label], ["Rolling VaR"]]
+
         return vardf
 
     def value_nan_handle(self, method: str = "fill"):
@@ -2072,7 +2081,7 @@ class OpenTimeSeries(object):
             prev = idx
         self.tsdf = pd.DataFrame(data=values, index=dates)
         self.valuetype = "Price(Close)"
-        self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [self.valuetype]])
+        self.tsdf.columns = [[self.label], [self.valuetype]]
         self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
         if returns_input:
             self.value_to_ret()
@@ -2103,21 +2112,18 @@ class OpenTimeSeries(object):
         """
 
         if lvl_zero is None and lvl_one is None:
-            self.tsdf.columns = pd.MultiIndex.from_product(
-                [[self.label], [self.valuetype]]
-            )
+            self.tsdf.columns = [[self.label], [self.valuetype]]
         elif lvl_zero is not None and lvl_one is None:
-            self.tsdf.columns = pd.MultiIndex.from_product(
-                [[lvl_zero], [self.valuetype]]
-            )
+            self.tsdf.columns = [[lvl_zero], [self.valuetype]]
             self.label = lvl_zero
         elif lvl_zero is None and lvl_one is not None:
-            self.tsdf.columns = pd.MultiIndex.from_product([[self.label], [lvl_one]])
+            self.tsdf.columns = [[self.label], [lvl_one]]
             self.valuetype = lvl_one
         else:
-            self.tsdf.columns = pd.MultiIndex.from_product([[lvl_zero], [lvl_one]])
+            self.tsdf.columns = [[lvl_zero], [lvl_one]]
             self.label, self.valuetype = lvl_zero, lvl_one
         if delete_lvl_one:
+            # noinspection PyUnresolvedReferences
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
         return self
 

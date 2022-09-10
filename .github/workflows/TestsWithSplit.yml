@@ -1,4 +1,4 @@
-name: Multitest
+name: TestsWithSplit
 
 on: workflow_dispatch
 

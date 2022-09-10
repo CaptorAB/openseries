@@ -43,7 +43,7 @@ class TestOpenFrame(TestCase):
         ]
         sdf = sim.df.iloc[0].T.to_frame()
         sdf.index = date_range
-        sdf.columns = pd.MultiIndex.from_product([["Asset"], ["Return(Total)"]])
+        sdf.columns = [["Asset"], ["Return(Total)"]]
 
         cls.randomseries = OpenTimeSeries.from_df(
             sdf, valuetype="Return(Total)"
@@ -53,9 +53,7 @@ class TestOpenFrame(TestCase):
         for item in range(sim.number_of_sims):
             sdf = sim.df.iloc[item].T.to_frame()
             sdf.index = date_range
-            sdf.columns = pd.MultiIndex.from_product(
-                [[f"Asset_{item}"], ["Return(Total)"]]
-            )
+            sdf.columns = [[f"Asset_{item}"], ["Return(Total)"]]
             tslist.append(OpenTimeSeries.from_df(sdf, valuetype="Return(Total)"))
 
         cls.randomframe = OpenFrame(tslist)
@@ -200,7 +198,7 @@ class TestOpenFrame(TestCase):
         correct = ["0.832536", "0.830516", "0.829576", "0.826926", "0.824288"]
         wrong = ["0.832536", "0.830516", "0.829576", "0.826926", "0.824285"]
         true_tail = pd.DataFrame(
-            columns=pd.MultiIndex.from_product([[name], ["Price(Close)"]]),
+            columns=[[name], ["Price(Close)"]],
             index=[
                 dt.date(2019, 6, 24),
                 dt.date(2019, 6, 25),
@@ -211,7 +209,7 @@ class TestOpenFrame(TestCase):
             data=correct,
         )
         false_tail = pd.DataFrame(
-            columns=pd.MultiIndex.from_product([[name], ["Price(Close)"]]),
+            columns=[[name], ["Price(Close)"]],
             index=[
                 dt.date(2019, 6, 24),
                 dt.date(2019, 6, 25),
@@ -867,7 +865,7 @@ class TestOpenFrame(TestCase):
         adf = pd.DataFrame(
             data=asim,
             index=date_range,
-            columns=pd.MultiIndex.from_product([["Asset_a"], ["Price(Close)"]]),
+            columns=[["Asset_a"], ["Price(Close)"]],
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
         bseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")

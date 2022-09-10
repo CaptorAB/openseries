@@ -119,9 +119,7 @@ class TestStochProcesses(TestCase):
             sdf = pd.DataFrame(
                 data=onesim,
                 index=date_range,
-                columns=pd.MultiIndex.from_product(
-                    [[f"Asset_{name[:-7]}"], ["Price(Close)"]]
-                ),
+                columns=[[f"Asset_{name[:-7]}"], ["Price(Close)"]],
             )
             series.append(OpenTimeSeries.from_df(sdf, valuetype="Price(Close)"))
 

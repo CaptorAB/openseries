@@ -43,7 +43,7 @@ class TestOpenTimeSeries(TestCase):
         ]
         sdf = sim.df.iloc[0].T.to_frame()
         sdf.index = date_range
-        sdf.columns = pd.MultiIndex.from_product([["Asset"], ["Return(Total)"]])
+        sdf.columns = [["Asset"], ["Return(Total)"]]
 
         cls.randomseries = OpenTimeSeries.from_df(
             sdf, valuetype="Return(Total)"
@@ -637,7 +637,7 @@ class TestOpenTimeSeries(TestCase):
         adf = pd.DataFrame(
             data=asim,
             index=date_range,
-            columns=pd.MultiIndex.from_product([["Asset"], ["Price(Close)"]]),
+            columns=[["Asset"], ["Price(Close)"]],
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
 

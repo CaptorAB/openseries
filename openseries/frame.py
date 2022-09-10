@@ -1801,9 +1801,8 @@ class OpenFrame(object):
             time_factor
         )
         voldf = voldf.dropna().to_frame()
-        voldf.columns = pd.MultiIndex.from_product(
-            [[vol_label], ["Rolling volatility"]]
-        )
+        voldf.columns = [[vol_label], ["Rolling volatility"]]
+
         return voldf
 
     def rolling_return(self, column: int, observations: int = 21) -> pd.DataFrame:
@@ -1829,7 +1828,8 @@ class OpenFrame(object):
             .sum()
         )
         retdf = retdf.dropna().to_frame()
-        retdf.columns = pd.MultiIndex.from_product([[ret_label], ["Rolling returns"]])
+        retdf.columns = [[ret_label], ["Rolling returns"]]
+
         return retdf
 
     def rolling_cvar_down(
@@ -1858,7 +1858,8 @@ class OpenFrame(object):
             .apply(lambda x: cvar_down(x, level=level))
         )
         cvardf = cvardf.dropna().to_frame()
-        cvardf.columns = pd.MultiIndex.from_product([[cvar_label], ["Rolling CVaR"]])
+        cvardf.columns = [[cvar_label], ["Rolling CVaR"]]
+
         return cvardf
 
     def rolling_var_down(
@@ -1894,7 +1895,8 @@ class OpenFrame(object):
             .apply(lambda x: var_down(x, level=level, interpolation=interpolation))
         )
         vardf = vardf.dropna().to_frame()
-        vardf.columns = pd.MultiIndex.from_product([[var_label], ["Rolling VaR"]])
+        vardf.columns = [[var_label], ["Rolling VaR"]]
+
         return vardf
 
     def value_nan_handle(self, method: str = "fill"):
@@ -2494,7 +2496,7 @@ class OpenFrame(object):
             df.iloc[0] = 0
         portfolio = df.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
-        portfolio.columns = pd.MultiIndex.from_product([[name], ["Price(Close)"]])
+        portfolio.columns = [[name], ["Price(Close)"]]
         return portfolio
 
     def rolling_info_ratio(
@@ -2549,9 +2551,8 @@ class OpenFrame(object):
         voldf = voldf.dropna().to_frame()
 
         ratiodf = (retdf.iloc[:, 0] / voldf.iloc[:, 0]).to_frame()
-        ratiodf.columns = pd.MultiIndex.from_product(
-            [[ratio_label], ["Information Ratio"]]
-        )
+        ratiodf.columns = [[ratio_label], ["Information Ratio"]]
+
         return ratiodf
 
     def rolling_beta(
@@ -2591,7 +2592,7 @@ class OpenFrame(object):
         ].xs(market_label, level=1)
         rollbeta = rollbeta.to_frame()
         rollbeta.index = rollbeta.index.droplevel(level=1)
-        rollbeta.columns = pd.MultiIndex.from_product([[beta_label], ["Beta"]])
+        rollbeta.columns = [[beta_label], ["Beta"]]
 
         return rollbeta
 
@@ -2631,9 +2632,8 @@ class OpenFrame(object):
             .corr(self.tsdf.iloc[:, second_column].pct_change()[1:])
         )
         corrdf = corrdf.dropna().to_frame()
-        corrdf.columns = pd.MultiIndex.from_product(
-            [[corr_label], ["Rolling correlation"]]
-        )
+        corrdf.columns = [[corr_label], ["Rolling correlation"]]
+
         return corrdf
 
     def plot_series(
