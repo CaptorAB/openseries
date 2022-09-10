@@ -20,7 +20,7 @@ jobs:
         python -m pip install --upgrade -e .[build]
 
     - name: Tests with Pytest
-      run: coverage run -m pytest --verbose
+      run: PYTHONPATH=${PWD} coverage run -m pytest --verbose
 
     - name: Report coverage
       run: coverage report
