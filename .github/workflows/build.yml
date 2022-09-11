@@ -22,7 +22,7 @@ jobs:
     - name: Check out GitHub repository ${{ github.repository }}
       uses: actions/checkout@v3
 
-    - name: Set up Python ${{ matrix.python-version }} ${{ runner.os }} ${{ matrix.os }}
+    - name: Set up Python ${{ matrix.python-version }} on ${{ runner.os }}
       uses: actions/setup-python@v4
       id: py
       with:
