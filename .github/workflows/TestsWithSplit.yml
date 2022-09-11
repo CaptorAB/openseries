@@ -1,6 +1,11 @@
 name: TestsWithSplit
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - "*" # matches every branch that doesn't contain a '/'
+      - "*/*" # matches every branch containing a single '/'
+      - "**" # matches every branch
 
 jobs:
   testing:
@@ -22,7 +27,6 @@ jobs:
         cache: 'pip'
 
     - name: Cache dependencies
-      id: cache
       uses: actions/cache@v3
       with:
         path: ${{ env.pythonLocation }}

@@ -1,11 +1,6 @@
 name: StandardTest
 
-on:
-  push:
-    branches:
-      - "*" # matches every branch that doesn't contain a '/'
-      - "*/*" # matches every branch containing a single '/'
-      - "**" # matches every branch
+on: workflow_dispatch
 
 jobs:
   testing:
@@ -19,9 +14,9 @@ jobs:
       id: py
       with:
         python-version-file: '.python-version'
+        cache: 'pip'
 
     - name: Cache dependencies
-      id: cache
       uses: actions/cache@v3
       with:
         path: ${{ env.pythonLocation }}

@@ -19,6 +19,15 @@ jobs:
       id: py
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ env.pythonLocation }}-
 
     - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
       run: |
