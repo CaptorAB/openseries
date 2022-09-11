@@ -19,6 +19,16 @@ jobs:
       id: py
       with:
         python-version-file: '.python-version'
+        cache: 'pip'
+
+    - name: Cache dependencies
+      id: pip-cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
       run: |
