@@ -10,6 +10,13 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         python-version: ["3.10.4"]
+        include:
+        - os: ubuntu-latest
+          path: ~/.cache/pip
+        - os: macos-latest
+          path: ~/Library/Caches/pip
+        - os: windows-latest
+          path: ~\AppData\Local\pip\Cache
 
     steps:
     - name: Check out GitHub repository ${{ github.repository }}
@@ -22,7 +29,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
 
-    - if: ${{ matrix.os == 'Windows' }}
+    - if: ${{ runner.os == 'Windows' }}
       name: Use GNU tar
       shell: cmd
       run: |
@@ -32,10 +39,10 @@ jobs:
     - name: Cache dependencies
       uses: actions/cache@v3
       with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}
+        path: ${{ matrix.path }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
-          ${{ env.pythonLocation }}-
+         ${{ runner.os }}-pip-
 
     - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
       run: |
