@@ -29,8 +29,7 @@ jobs:
         restore-keys: |
           ${{ env.pythonLocation }}-
 
-    - if: steps.cache.outputs.cache-hit != 'true'
-      name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
+    - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
       run: python -m pip install --upgrade .[test]
 
     - name: Tests with Pytest
