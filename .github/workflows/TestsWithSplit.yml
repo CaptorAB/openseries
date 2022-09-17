@@ -7,6 +7,10 @@ on:
       - "*/*" # matches every branch containing a single '/'
       - "**" # matches every branch
 
+defaults:
+  run:
+    working-directory: workgit
+
 jobs:
   testing:
     strategy:
