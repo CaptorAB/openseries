@@ -1793,16 +1793,18 @@ class TestOpenFrame(TestCase):
         results = []
         for i in range(oframe.item_count):
             for j in range(oframe.item_count):
-                results.append(
-                    f"{oframe.ord_least_squares_fit(y_column=i, x_column=j, fitted_series=False):.11f}"
+                tmp = oframe.ord_least_squares_fit(
+                    y_column=i, x_column=j, fitted_series=False
                 )
+                results.append(f"{float(tmp.params):.11f}")
 
         results_tuple = []
         for i in oframe.tsdf:
             for j in oframe.tsdf:
-                results_tuple.append(
-                    f"{oframe.ord_least_squares_fit(y_column=i, x_column=j, fitted_series=False):.11f}"
+                tmp = oframe.ord_least_squares_fit(
+                    y_column=i, x_column=j, fitted_series=False
                 )
+                results_tuple.append(f"{float(tmp.params):.11f}")
 
         self.assertListEqual(results, results_tuple)
         self.assertListEqual(

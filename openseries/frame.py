@@ -12,6 +12,9 @@ from plotly.offline import plot
 from random import choices
 from scipy.stats import kurtosis, norm, skew
 from statsmodels.api import OLS
+
+# noinspection PyProtectedMember
+from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
 from typing import List
 
@@ -2425,8 +2428,10 @@ class OpenFrame(object):
 
     def ord_least_squares_fit(
         self, y_column: tuple | int, x_column: tuple | int, fitted_series: bool = True
-    ) -> float:
-        """Calculates Beta and adds a new column with a fitted line using Ordinary Least Squares fit
+    ) -> RegressionResults:
+        """https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
+        Performs a linear regression and adds a new column with a fitted line
+        using Ordinary Least Squares fit
 
         Parameters
         ----------
@@ -2439,8 +2444,8 @@ class OpenFrame(object):
 
         Returns
         -------
-        float
-            The Beta between two timeseries estimated using an Ordinary Least Squares fit
+        RegressionResults
+            The Statsmodels regression output
         """
 
         if isinstance(y_column, tuple):
@@ -2461,11 +2466,11 @@ class OpenFrame(object):
         else:
             raise Exception("x_column should be a tuple or an integer.")
 
-        model = OLS(y, x).fit()
+        results = OLS(y, x).fit()
         if fitted_series:
-            self.tsdf[y_label, x_label] = model.predict(x)
+            self.tsdf[y_label, x_label] = results.predict(x)
 
-        return float(model.params)
+        return results
 
     def make_portfolio(self, name: str) -> pd.DataFrame:
         """Calculates a basket timeseries based on the supplied weights

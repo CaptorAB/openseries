@@ -2,6 +2,10 @@
 
 For a long time I have not kept a log of the changes implemented in the different versions of the openseries package. In this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
+## Version [0.7.4] - 22-09-17
+
+Opened up the output from OpenFrame.ord_least_squares_fit()
+
 ## Version [0.7.3] - 2022-09-10
 
 Removed pandas.MultiIndex.from_product() as constructor for columns to fix hard to replicate test failure.
