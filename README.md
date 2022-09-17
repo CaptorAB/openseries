@@ -176,7 +176,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | `delete_timeseries`     | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                                                                                                     |
 | `relative`              | `OpenFrame` | Calculates a new series that is the relative performance of two others.                                                                                           |
 | `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                                                                                                        |
-| `ord_least_squares_fit` | `OpenFrame` | Calculates an [Ordinary Least Squares](https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html) fitted parameter and series.                     |
+| `ord_least_squares_fit` | `OpenFrame` | Performs a regression and an [Ordinary Least Squares](https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html) fit.                              |
 | `beta`                  | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                                   |
 | `tracking_error_func`   | `OpenFrame` | Calculates the [tracking errors](https://www.investopedia.com/terms/t/trackingerror.asp) relative to a selected series in the OpenFrame.                          |
 | `info_ratio_func`       | `OpenFrame` | Calculates the [information ratios](https://www.investopedia.com/terms/i/informationratio.asp) relative to a selected series in the OpenFrame.                    |
