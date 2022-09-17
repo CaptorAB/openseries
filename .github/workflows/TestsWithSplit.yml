@@ -7,10 +7,6 @@ on:
       - "*/*" # matches every branch containing a single '/'
       - "**" # matches every branch
 
-defaults:
-  run:
-    working-directory: workgit
-
 jobs:
   testing:
     strategy:
@@ -18,6 +14,9 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ~/workgit
 
     steps:
     - name: Check out GitHub repository ${{ github.repository }}
