@@ -14,9 +14,6 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ~/workgit
 
     steps:
     - name: Check out GitHub repository ${{ github.repository }}
