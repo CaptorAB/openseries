@@ -1,6 +1,6 @@
 # OpenSeries
 
-[![CircleCI](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master.svg?style=svg)](https://circleci.com/gh/CaptorAB/OpenSeries/tree/master)
+[![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![PyPI version](https://badge.fury.io/py/openseries.svg)](https://badge.fury.io/py/openseries)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)
