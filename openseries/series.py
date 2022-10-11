@@ -6,17 +6,16 @@ from math import ceil, sqrt
 import numpy as np
 from os import path
 import pandas as pd
-from pandas.tseries.offsets import CDay
+from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
 from plotly.offline import plot
 from stdnum import isin as isincode
 from scipy.stats import kurtosis, norm, skew
-from typing import List, TypedDict
+from typing import List, Literal, TypedDict
 
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.frenkla_open_api_sdk import FrenklaOpenApiService
-from openseries.datefixer import date_offset_foll, date_fix
+from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.risk import (
     cvar_down,
@@ -38,7 +37,7 @@ class TimeSerie(TypedDict, total=False):
     isin: str
     label: str
     schema: dict
-    sweden: SwedenHolidayCalendar
+    sweden: np.busdaycalendar
     valuetype: str
     values: List[float]
     local_ccy: bool
@@ -56,22 +55,26 @@ class OpenTimeSeries(object):
     isin: str
     label: str
     schema: dict
-    sweden: SwedenHolidayCalendar
+    sweden: np.busdaycalendar
     valuetype: str
     values: List[float]
     local_ccy: bool
     tsdf: pd.DataFrame
 
     @classmethod
-    def setup_class(cls):
+    def setup_class(cls, domestic_ccy: str = "SEK", country: str = "SE"):
         """Sets the domestic currency and calendar of the user.
 
-        The values default to SEK and a calendar for Sweden designed by Captor Fund Management.
-        We have no plans to support other calendars within this project.
+        Parameters
+        ----------
+        domestic_ccy : str, default: "SEK"
+            Currency code
+        country : str, default: "SE"
+            Country code
         """
 
-        cls.domestic = "SEK"
-        cls.sweden = SwedenHolidayCalendar(holidays_sw)
+        cls.domestic = domestic_ccy
+        cls.sweden = holiday_calendar(country=country)
 
     def __init__(self, d: TimeSerie):
         """Instantiates an object of the class OpenTimeSeries \n
@@ -517,7 +520,6 @@ class OpenTimeSeries(object):
                 self.setup_class()
                 earlier = date_offset_foll(
                     self.last_idx,
-                    calendar=CDay(calendar=self.sweden),
                     months_offset=-months_offset,
                 )
                 assert (
@@ -567,7 +569,7 @@ class OpenTimeSeries(object):
             for d in pd.date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
-                freq=CDay(calendar=self.sweden),
+                freq=CustomBusinessDay(calendar=self.sweden),
             )
         ]
 
@@ -1479,7 +1481,13 @@ class OpenTimeSeries(object):
         )
 
     @property
-    def var_down(self, level: float = 0.95, interpolation: str = "lower") -> float:
+    def var_down(
+        self,
+        level: float = 0.95,
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
+    ) -> float:
         """Downside Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
         https://www.investopedia.com/terms/v/var.asp
@@ -1489,9 +1497,8 @@ class OpenTimeSeries(object):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
 
         Returns
         -------
@@ -1509,7 +1516,9 @@ class OpenTimeSeries(object):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
     ) -> float:
         """https://www.investopedia.com/terms/v/var.asp
         Downside Value At Risk, "VaR". The equivalent of
@@ -1526,9 +1535,8 @@ class OpenTimeSeries(object):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
 
         Returns
         -------
@@ -1544,16 +1552,21 @@ class OpenTimeSeries(object):
         )
 
     @property
-    def vol_from_var(self, level: float = 0.95, interpolation: str = "lower") -> float:
+    def vol_from_var(
+        self,
+        level: float = 0.95,
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
+    ) -> float:
         """
         Parameters
         ----------
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
 
         Returns
         -------
@@ -1574,7 +1587,9 @@ class OpenTimeSeries(object):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
@@ -1590,9 +1605,8 @@ class OpenTimeSeries(object):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
@@ -1645,7 +1659,9 @@ class OpenTimeSeries(object):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
@@ -1668,9 +1684,8 @@ class OpenTimeSeries(object):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
@@ -1961,7 +1976,9 @@ class OpenTimeSeries(object):
         self,
         level: float = 0.95,
         observations: int = 252,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
     ) -> pd.DataFrame:
         """
         Parameters
@@ -1970,9 +1987,8 @@ class OpenTimeSeries(object):
             The sought Value At Risk level
         observations: int, default: 252
             Number of observations in the overlapping window.
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
 
         Returns
         -------

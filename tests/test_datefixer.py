@@ -1,10 +1,8 @@
 import datetime as dt
 import numpy as np
 import pandas as pd
-from pandas.tseries.offsets import CDay
 from unittest import TestCase
 
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.datefixer import (
     date_fix,
     get_previous_sweden_business_day_before_today,
@@ -57,7 +55,6 @@ class TestDateFixer(TestCase):
             get_previous_sweden_business_day_before_today(),
             date_offset_foll(
                 raw_date=dt.date.today() - dt.timedelta(days=1),
-                calendar=CDay(calendar=SwedenHolidayCalendar(rules=holidays_sw)),
                 months_offset=0,
                 adjust=True,
                 following=False,
@@ -70,14 +67,12 @@ class TestDateFixer(TestCase):
 
         earlier = date_offset_foll(
             raw_date=original,
-            calendar=CDay(calendar=SwedenHolidayCalendar(rules=holidays_sw)),
             months_offset=0,
             adjust=True,
             following=False,
         )
         later = date_offset_foll(
             raw_date=original,
-            calendar=CDay(calendar=SwedenHolidayCalendar(rules=holidays_sw)),
             months_offset=0,
             adjust=True,
             following=True,
@@ -88,7 +83,6 @@ class TestDateFixer(TestCase):
 
         static = date_offset_foll(
             raw_date=original,
-            calendar=CDay(calendar=SwedenHolidayCalendar(rules=holidays_sw)),
             months_offset=0,
             adjust=False,
         )
@@ -96,7 +90,6 @@ class TestDateFixer(TestCase):
 
         offset = date_offset_foll(
             raw_date=original,
-            calendar=CDay(calendar=SwedenHolidayCalendar(rules=holidays_sw)),
             months_offset=1,
             adjust=False,
         )
@@ -109,7 +102,6 @@ class TestDateFixer(TestCase):
         with self.assertRaises(ValueError) as e_date:
             _ = date_offset_foll(
                 raw_date=nonsense,
-                calendar=CDay(calendar=SwedenHolidayCalendar(rules=holidays_sw)),
             )
 
         self.assertIsInstance(e_date.exception, ValueError)

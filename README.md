@@ -98,7 +98,6 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 | [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/risk.py)                                 | Module with methods used to calculate VaR, CVaR and drawdowns.                                                                                                                                      |
 | [sim_price.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/sim_price.py)                       | Module to simulate OpenTimeSeries from different stochastic processes.                                                                                                                              |
 | [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/stoch_processes.py)           | Module to generate stochastic processes used in the `sim_price.py` module.                                                                                                                          |
-| [sweden_holidays.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/sweden_holidays.py)           | Module that defines a Swedish business calendar.                                                                                                                                                    |
 
 #### Below are the class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
 

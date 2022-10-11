@@ -1,10 +1,41 @@
 import datetime as dt
 from dateutil.relativedelta import relativedelta
+import holidays
 import numpy as np
 import pandas as pd
-from pandas.tseries.offsets import CDay
+from pandas.tseries.offsets import CustomBusinessDay
 
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
+
+def holiday_calendar(country: str = "SE") -> np.busdaycalendar:
+    """Function to generate a business calendar
+
+    Parameters
+    ----------
+    country: str, default: "SE"
+        Numpy busdaycalendar country code
+
+    Returns
+    -------
+    numpy.busdaycalendar
+        Numpy busdaycalendar object
+    """
+
+    all_dates = np.arange("1970-12-30", "2070-12-30", dtype="datetime64[D]")
+
+    years = [y for y in range(1970, 2071)]
+    country_holidays = holidays.country_holidays(country=country, years=years)
+    hols = []
+    for date in sorted(country_holidays.keys()):
+        hols.append(np.datetime64(date))
+
+    hols = np.array(hols, dtype="datetime64[D]")
+
+    while hols[0] < all_dates[0]:
+        hols = hols[1:]
+    while hols[-1] > all_dates[-1]:
+        hols = hols[:-1]
+
+    return np.busdaycalendar(holidays=hols)
 
 
 def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> dt.date:
@@ -37,7 +68,7 @@ def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> d
 
 def date_offset_foll(
     raw_date: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp,
-    calendar: CDay,
+    country: str = "SE",
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
@@ -48,8 +79,8 @@ def date_offset_foll(
     ----------
     raw_date: str | datetime.date | datetime.datetime | numpy.datetime64 | pandas.Timestamp
         The date to offset from
-    calendar: CDay
-        Pandas date offset business calendar
+    country: str, default: "SE"
+        Numpy busdaycalendar country code
     months_offset: int, default: 12
         Number of months as integer
     adjust: bool, default: False
@@ -65,8 +96,12 @@ def date_offset_foll(
 
     start_dt = dt.date(1970, 12, 30)
     end_dt = dt.date(start_dt.year + 90, 12, 30)
+
+    calendar = holiday_calendar(country=country)
+    cday = CustomBusinessDay(calendar=calendar)
+
     local_bdays = [
-        d.date() for d in pd.date_range(start=start_dt, end=end_dt, freq=calendar)
+        d.date() for d in pd.date_range(start=start_dt, end=end_dt, freq=cday)
     ]
     raw_date = date_fix(raw_date)
 
@@ -99,14 +134,12 @@ def get_previous_sweden_business_day_before_today(today: dt.date | None = None):
         The previous Swedish business day
     """
 
-    sweden = SwedenHolidayCalendar(rules=holidays_sw)
-
     if today is None:
         today = dt.date.today()
 
     return date_offset_foll(
         today - dt.timedelta(days=1),
-        calendar=CDay(calendar=sweden),
+        country="SE",
         months_offset=0,
         adjust=True,
         following=False,

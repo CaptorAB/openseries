@@ -5,7 +5,7 @@ from math import ceil, sqrt
 import numpy as np
 from os import path
 import pandas as pd
-from pandas.tseries.offsets import CDay
+from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
 from plotly.offline import plot
@@ -16,12 +16,11 @@ from statsmodels.api import OLS
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import List
+from typing import List, Literal
 
 from openseries.series import OpenTimeSeries
-from openseries.datefixer import date_offset_foll
+from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
-from openseries.sweden_holidays import SwedenHolidayCalendar, holidays_sw
 from openseries.risk import (
     drawdown_series,
     drawdown_details,
@@ -170,7 +169,6 @@ class OpenFrame(object):
             if months_offset is not None:
                 earlier = date_offset_foll(
                     self.last_idx,
-                    calendar=CDay(calendar=SwedenHolidayCalendar(holidays_sw)),
                     months_offset=-months_offset,
                 )
                 assert (
@@ -204,7 +202,7 @@ class OpenFrame(object):
 
         return earlier, later
 
-    def align_index_to_local_cdays(self):
+    def align_index_to_local_cdays(self, country: str = "SE"):
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
         local calendar business days
 
@@ -213,13 +211,15 @@ class OpenFrame(object):
         OpenFrame
             An OpenFrame object
         """
+        calendar = holiday_calendar(country=country)
+        cday = CustomBusinessDay(calendar=calendar)
 
         date_range = [
             d.date()
             for d in pd.date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
-                freq=CDay(calendar=SwedenHolidayCalendar(holidays_sw)),
+                freq=cday,
             )
         ]
         self.tsdf = self.tsdf.reindex(date_range, method=None, copy=False)
@@ -1317,7 +1317,13 @@ class OpenFrame(object):
         )
 
     @property
-    def var_down(self, level: float = 0.95, interpolation: str = "lower") -> pd.Series:
+    def var_down(
+        self,
+        level: float = 0.95,
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
+    ) -> pd.Series:
         """Downside Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
         https://www.investopedia.com/terms/v/var.asp
@@ -1327,9 +1333,8 @@ class OpenFrame(object):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
 
         Returns
         -------
@@ -1350,7 +1355,9 @@ class OpenFrame(object):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
     ) -> pd.Series:
         """https://www.investopedia.com/terms/v/var.asp
         Downside Value At Risk, "VaR". The equivalent of
@@ -1367,9 +1374,8 @@ class OpenFrame(object):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
 
         Returns
         -------
@@ -1387,7 +1393,11 @@ class OpenFrame(object):
 
     @property
     def vol_from_var(
-        self, level: float = 0.95, interpolation: str = "lower"
+        self,
+        level: float = 0.95,
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
     ) -> pd.Series:
         """
         Parameters
@@ -1395,9 +1405,8 @@ class OpenFrame(object):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
 
         Returns
         -------
@@ -1419,7 +1428,9 @@ class OpenFrame(object):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
@@ -1435,9 +1446,8 @@ class OpenFrame(object):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
@@ -1486,7 +1496,9 @@ class OpenFrame(object):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
@@ -1509,9 +1521,8 @@ class OpenFrame(object):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: str, default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
