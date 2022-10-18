@@ -23,7 +23,7 @@ def holiday_calendar(country: str = "SE") -> np.busdaycalendar:
     all_dates = np.arange("1970-12-30", "2070-12-30", dtype="datetime64[D]")
 
     years = [y for y in range(1970, 2071)]
-    country_holidays = holidays.CountryHoliday(country=country, years=years)
+    country_holidays = holidays.country_holidays(country=country, years=years)
     hols = []
     for date in sorted(country_holidays.keys()):
         hols.append(np.datetime64(date))

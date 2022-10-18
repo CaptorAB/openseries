@@ -10,7 +10,7 @@ openseries = ["*.json", "*.png"]
 
 [project]
 name = "openseries"
-version = "0.7.5"
+version = "0.7.6"
 description = "Package for simple financial time series analysis."
 readme = "README.md"
 license = {text = "BSD 3-Clause License"}
@@ -19,7 +19,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-        "holidays==0.11.2",
+        "holidays==0.16",
         "jsonschema>=3.2.0",
         "numpy>=1.22.4",
         "pandas>=1.4.2",
