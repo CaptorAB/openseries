@@ -1,3 +1,7 @@
+<img src="https://sales.captor.se/captor_logo_sv_1600_icketransparent.png" alt="Captor Fund Management AB" 
+width="81" height="100" align="left" float="right"/><br/>
+
+<br><br>
 # OpenSeries
 
 [![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml)
@@ -7,10 +11,6 @@
 [![Downloads](https://pepy.tech/badge/openseries)](https://pepy.tech/project/openseries)
 [![Downloads](https://pepy.tech/badge/openseries/month)](https://pepy.tech/project/openseries)
 
-<img src="https://sales.captor.se/captor_logo_sv_1600_icketransparent.png" alt="Captor Fund Management AB" 
-width="81" height="100" align="left" float="right"/><br/>
-
-<br><br><br>
 **OpenSeries** is a project with tools to perform timeseries analysis on a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
