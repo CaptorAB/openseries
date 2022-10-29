@@ -3,7 +3,6 @@ from dateutil.relativedelta import relativedelta
 import holidays
 import numpy as np
 import pandas as pd
-from pandas.tseries.offsets import CustomBusinessDay
 
 
 def holiday_calendar(country: str = "SE") -> np.busdaycalendar:
@@ -94,27 +93,19 @@ def date_offset_foll(
         Off-set date
     """
 
-    start_dt = dt.date(1970, 12, 30)
-    end_dt = dt.date(start_dt.year + 90, 12, 30)
-
     calendar = holiday_calendar(country=country)
-    cday = CustomBusinessDay(calendar=calendar)
-
-    local_bdays = [
-        d.date() for d in pd.date_range(start=start_dt, end=end_dt, freq=cday)
-    ]
     raw_date = date_fix(raw_date)
-
     month_delta = relativedelta(months=months_offset)
 
     if following:
         day_delta = relativedelta(days=1)
     else:
         day_delta = relativedelta(days=-1)
+
     new_date = raw_date + month_delta
 
     if adjust:
-        while new_date not in local_bdays:
+        while not np.is_busday(dates=new_date, busdaycal=calendar):
             new_date += day_delta
 
     return new_date

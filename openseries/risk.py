@@ -6,7 +6,7 @@ import datetime as dt
 from math import ceil
 import numpy as np
 import pandas as pd
-from typing import List
+from typing import List, Literal
 
 
 def cvar_down(
@@ -39,7 +39,9 @@ def cvar_down(
 def var_down(
     data: pd.DataFrame | pd.Series | List[float],
     level: float = 0.95,
-    interpolation: str = "lower",
+    interpolation: Literal[
+        "linear", "lower", "higher", "midpoint", "nearest"
+    ] = "lower",
 ) -> float:
     """Downside Value At Risk, "VaR". The equivalent of
     percentile.inc([...], 1-level) over returns in MS Excel \n
@@ -51,9 +53,8 @@ def var_down(
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
-    interpolation: str, default: "lower"
+    interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
-        Default value is linear
 
     Returns
     -------

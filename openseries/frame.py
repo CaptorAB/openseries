@@ -1,5 +1,6 @@
 from copy import deepcopy
 import datetime as dt
+from functools import reduce
 from logging import warning
 from math import ceil, sqrt
 import numpy as np
@@ -30,7 +31,6 @@ from openseries.risk import (
 
 
 class OpenFrame(object):
-
     constituents: List[OpenTimeSeries]
     tsdf: pd.DataFrame
     weights: List[float]
@@ -61,8 +61,9 @@ class OpenFrame(object):
         self.tsdf = pd.DataFrame()
         self.constituents = constituents
         if constituents is not None and len(constituents) != 0:
-            self.tsdf = pd.concat(
-                [x.tsdf for x in self.constituents], axis="columns", sort=sort
+            self.tsdf = reduce(
+                lambda left, right: pd.concat([left, right], axis="columns", sort=sort),
+                [x.tsdf for x in self.constituents],
             )
         else:
             warning("OpenFrame() was passed an empty list.")
@@ -97,6 +98,32 @@ class OpenFrame(object):
         """
 
         return deepcopy(self)
+
+    def merge_series(self, how: Literal["outer", "inner"] = "outer"):
+        """Merges the Pandas Dataframes of the constituent OpenTimeSeries
+
+        Parameters
+        ----------
+        how: Literal["outer", "inner"], default: "outer"
+            The Pandas merge method.
+        """
+
+        self.tsdf = reduce(
+            lambda left, right: pd.merge(
+                left=left,
+                right=right,
+                how=how,
+                left_index=True,
+                right_index=True,
+                suffixes=(None, None),
+            ),
+            [x.tsdf for x in self.constituents],
+        )
+        if self.tsdf.empty:
+            raise Exception(
+                f"Merging OpenTimeSeries DataFrames with "
+                f"argument how={how} produced an empty DataFrame."
+            )
 
     def all_properties(self, properties: list | None = None) -> pd.DataFrame:
         """Calculates the chosen timeseries properties
@@ -2027,7 +2054,7 @@ class OpenFrame(object):
         before: bool = True,
         after: bool = True,
     ):
-        """Truncates DataFrame such that all timeseries have the same length
+        """Truncates DataFrame such that all timeseries have the same time span
 
         Parameters
         ----------
@@ -2055,11 +2082,10 @@ class OpenFrame(object):
 
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
-        if len(set(self.first_indices)) != 1 or len(set(self.last_indices)) != 1:
-            warning(
-                "One or more constituents still not truncated to same "
-                "start and/or end dates."
-            )
+        if len(set(self.first_indices)) != 1:
+            warning("One or more constituents still not truncated to same start dates.")
+        if len(set(self.last_indices)) != 1:
+            warning("One or more constituents still not truncated to same end dates.")
         return self
 
     def relative(

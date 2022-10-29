@@ -3,7 +3,7 @@ from io import StringIO
 from json import loads
 import pandas as pd
 from pandas.testing import assert_frame_equal
-from pandas.tseries.offsets import CDay
+from pandas.tseries.offsets import CustomBusinessDay
 import sys
 from unittest import TestCase
 
@@ -38,7 +38,7 @@ class TestOpenFrame(TestCase):
             for d in pd.date_range(
                 periods=sim.trading_days,
                 end=dt.date(2019, 6, 30),
-                freq=CDay(calendar=OpenTimeSeries.sweden),
+                freq=CustomBusinessDay(calendar=OpenTimeSeries.sweden),
             )
         ]
         sdf = sim.df.iloc[0].T.to_frame()
@@ -628,6 +628,7 @@ class TestOpenFrame(TestCase):
             "capture_ratio_func",
             "ord_least_squares_fit",
             "make_portfolio",
+            "merge_series",
             "relative",
             "rolling_corr",
             "rolling_beta",
@@ -822,6 +823,145 @@ class TestOpenFrame(TestCase):
         frame.trunc_frame(start_cut=trunced[0], end_cut=trunced[1])
 
         self.assertListEqual(trunced, [frame.first_idx, frame.last_idx])
+
+    def test_openframe_trunc_frame_start_fail(self):
+
+        frame = OpenFrame(
+            [
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["a"],
+                        data=[1, 2, 3, 4, 5],
+                        index=[
+                            "2022-10-01",
+                            "2022-10-02",
+                            "2022-10-03",
+                            "2022-10-04",
+                            "2022-10-05",
+                        ],
+                    )
+                ),
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["b"],
+                        data=[6, 7, 8, 9, 10],
+                        index=[
+                            "2022-10-01",
+                            "2022-10-03",
+                            "2022-10-04",
+                            "2022-10-05",
+                            "2022-10-06",
+                        ],
+                    )
+                ),
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["c"],
+                        data=[11, 12, 13, 14, 15],
+                        index=[
+                            "2022-10-02",
+                            "2022-10-04",
+                            "2022-10-05",
+                            "2022-10-06",
+                            "2022-10-07",
+                        ],
+                    )
+                ),
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["d"],
+                        data=[16, 17, 18, 19, 20],
+                        index=[
+                            "2022-10-01",
+                            "2022-10-04",
+                            "2022-10-05",
+                            "2022-10-06",
+                            "2022-10-07",
+                        ],
+                    )
+                ),
+            ]
+        )
+        with self.assertLogs("root", level="WARNING") as logs:
+            frame.trunc_frame()
+        self.assertEqual(
+            logs.output,
+            [
+                (
+                    "WARNING:root:One or more constituents"
+                    " still not truncated to same start dates."
+                )
+            ],
+        )
+
+    def test_openframe_trunc_frame_end_fail(self):
+
+        frame = OpenFrame(
+            [
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["a"],
+                        data=[1, 2, 3, 4, 5],
+                        index=[
+                            "2022-10-01",
+                            "2022-10-02",
+                            "2022-10-03",
+                            "2022-10-04",
+                            "2022-10-07",
+                        ],
+                    )
+                ),
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["b"],
+                        data=[6, 7, 8, 9],
+                        index=[
+                            "2022-10-03",
+                            "2022-10-04",
+                            "2022-10-05",
+                            "2022-10-07",
+                        ],
+                    )
+                ),
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["c"],
+                        data=[10, 11, 12, 13, 14],
+                        index=[
+                            "2022-10-02",
+                            "2022-10-03",
+                            "2022-10-04",
+                            "2022-10-05",
+                            "2022-10-07",
+                        ],
+                    )
+                ),
+                OpenTimeSeries.from_df(
+                    df=pd.DataFrame(
+                        columns=["d"],
+                        data=[15, 16, 17, 18, 19],
+                        index=[
+                            "2022-10-01",
+                            "2022-10-02",
+                            "2022-10-03",
+                            "2022-10-04",
+                            "2022-10-05",
+                        ],
+                    )
+                ),
+            ]
+        )
+        with self.assertLogs("root", level="WARNING") as logs:
+            frame.trunc_frame()
+        self.assertEqual(
+            logs.output,
+            [
+                (
+                    "WARNING:root:One or more constituents"
+                    " still not truncated to same end dates."
+                )
+            ],
+        )
 
     def test_openframe_all_properties(self):
 
@@ -1177,6 +1317,64 @@ class TestOpenFrame(TestCase):
         uframe = OpenFrame([aseries, bseries])
 
         self.assertEqual(len(set(uframe.columns_lvl_zero)), 2)
+
+    def test_openframe_merge_series(self):
+
+        aframe = OpenFrame(
+            [
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="Asset_one",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ],
+                        values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    )
+                ),
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="Asset_two",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-08-11",
+                            "2022-08-12",
+                            "2022-08-13",
+                            "2022-08-14",
+                            "2022-08-15",
+                        ],
+                        values=[2.1, 2.0, 1.8, 2.1, 2.0],
+                    )
+                ),
+            ]
+        )
+
+        b4df = aframe.tsdf.copy()
+        aframe.merge_series(how="outer")
+        assert_frame_equal(b4df, aframe.tsdf, check_exact=True)
+
+        with self.assertRaises(Exception) as e_merged:
+            aframe.merge_series(how="inner")
+
+        self.assertEqual(
+            (
+                "Merging OpenTimeSeries DataFrames with argument how=inner produced an empty "
+                "DataFrame."
+            ),
+            e_merged.exception.args[0],
+        )
 
     def test_openframe_capture_ratio(self):
 

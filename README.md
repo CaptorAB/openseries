@@ -1,7 +1,8 @@
-<img src="https://sales.captor.se/captor_logo_sv_1600_icketransparent.png" alt="Captor Fund Management AB" 
+<img src="https://sales.captor.se/captor_logo_sv_1600_icketransparent.png" alt="Captor Fund Management AB"
 width="81" height="100" align="left" float="right"/><br/>
 
 <br><br>
+
 # OpenSeries
 
 [![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml)
@@ -17,15 +18,20 @@ asset or a group of assets. It is solely made for daily or less frequent data.
 <span style="font-size:2em;">[Changelog](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
 
 To install:
+
 ```
 pip install openseries
 ```
+
 Import statements
+
 ```
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries, TimeSerie
 ```
+
 To construct an OpenTimeSeries object from raw data in a TypedDict:
+
 ```
 data = TimeSerie(
     _id="",
@@ -38,42 +44,60 @@ data = TimeSerie(
     valuetype="Price(Close)",
 )
 ```
+
 Instantiate OpenTimeSeries object:
+
 ```
 series = OpenTimeSeries(data)
 ```
+
 To construct using the class method designed to get a NAV timeseries for a Captor Fund:
+
 ```
 capirisc = "SE0009807308"
 scillagc = "SE0011670843"
 bonds = OpenTimeSeries.from_open_nav(isin=capirisc)
 equities = OpenTimeSeries.from_open_nav(isin=scillagc)
 ```
+
 To compare assets an OpenFrame is constructed as below.
+
 ```
 basket = OpenFrame([bonds, equities])
 ```
+
 The data cleaning helper methods can be chained like this:
+
 ```
 basket.trunc_frame().value_nan_handle().to_cumret()
 ```
+
 A new portfolio timeseries can be constructed from an OpenFrame like this:
+
 ```
 basket.weights = [0.6, 0.4]
 portfolio = OpenTimeSeries.from_df(basket.make_portfolio("porfolio"))
 basket.add_timeseries(portfolio)
 ```
+
 To print return and volatility:
+
 ```
 data = basket.all_properties(properties=["arithmetic_ret", "vol"]).T
 data = data.applymap(lambda x: f"{x:.2%}")
 print(data)
 ```
+
 Finally, plotting is simple. This will plot the timeseries in a browser window:
+
 ```
 basket.plot_series(tick_fmt=".2%")
 ```
-To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) classes have an attribute `tsdf` which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
+
+To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library
+the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)
+and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) classes have an attribute `tsdf`
+which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
 ## Table of Contents
 
@@ -174,6 +198,7 @@ To make use of some tools available in the [Pandas](https://pandas.pydata.org/) 
 
 | Method                  | Applies to  | Description                                                                                                                                                       |
 |:------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `merge_series`          | `OpenFrame` | Merges the Pandas Dataframes of the constituent OpenTimeSeries.                                                                                                   |
 | `trunc_frame`           | `OpenFrame` | Truncates the OpenFrame to a common period.                                                                                                                       |
 | `add_timeseries`        | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                                                                                                     |
 | `delete_timeseries`     | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                                                                                                     |
