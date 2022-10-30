@@ -4,7 +4,7 @@ For a long time I have not kept a log of the changes implemented in the differen
 this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
-## Version [0.7.8] - 2022-10-29
+## Version [0.7.9] - 2022-10-30
 
 Sped up holidays check, added merge_series method on OpenFrame, and added tests on failing trunc_frame scenarios.
 

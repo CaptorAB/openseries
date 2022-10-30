@@ -106,6 +106,11 @@ class OpenFrame(object):
         ----------
         how: Literal["outer", "inner"], default: "outer"
             The Pandas merge method.
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
         """
 
         self.tsdf = reduce(
@@ -115,7 +120,6 @@ class OpenFrame(object):
                 how=how,
                 left_index=True,
                 right_index=True,
-                suffixes=(None, None),
             ),
             [x.tsdf for x in self.constituents],
         )
@@ -124,6 +128,7 @@ class OpenFrame(object):
                 f"Merging OpenTimeSeries DataFrames with "
                 f"argument how={how} produced an empty DataFrame."
             )
+        return self
 
     def all_properties(self, properties: list | None = None) -> pd.DataFrame:
         """Calculates the chosen timeseries properties
