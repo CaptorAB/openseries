@@ -1412,7 +1412,7 @@ class OpenFrame(object):
         to_date : datetime.date, optional
             Specific to date
         interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
+            Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
         -------
@@ -1917,7 +1917,9 @@ class OpenFrame(object):
         self,
         column: int,
         level: float = 0.95,
-        interpolation: str = "lower",
+        interpolation: Literal[
+            "linear", "lower", "higher", "midpoint", "nearest"
+        ] = "lower",
         observations: int = 252,
     ) -> pd.DataFrame:
         """
@@ -1929,9 +1931,8 @@ class OpenFrame(object):
             The sought Value At Risk level
         observations: int, default: 252
             Number of observations in the overlapping window.
-        interpolation: str, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-            Default value is linear
+        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+            Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
         -------

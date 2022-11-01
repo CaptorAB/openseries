@@ -1987,7 +1987,7 @@ class OpenTimeSeries(object):
         observations: int, default: 252
             Number of observations in the overlapping window.
         interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
+            Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
         -------
