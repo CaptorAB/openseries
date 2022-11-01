@@ -2003,12 +2003,12 @@ class OpenTimeSeries(object):
 
         return vardf
 
-    def value_nan_handle(self, method: str = "fill"):
+    def value_nan_handle(self, method: Literal["fill", "drop"] = "fill"):
         """Handling of missing values in a valueseries
 
         Parameters
         ----------
-        method: str, default: "fill"
+        method: Literal["fill", "drop"], default: "fill"
             Method used to handle NaN. Either fill with last known or drop
 
         Returns
@@ -2027,12 +2027,12 @@ class OpenTimeSeries(object):
             self.tsdf.dropna(inplace=True)
         return self
 
-    def return_nan_handle(self, method: str = "fill"):
+    def return_nan_handle(self, method: Literal["fill", "drop"] = "fill"):
         """Handling of missing values in a returnseries
 
         Parameters
         ----------
-        method: str, default: "fill"
+        method: Literal["fill", "drop"], default: "fill"
             Method used to handle NaN. Either fill with zero or drop
 
         Returns
@@ -2144,7 +2144,7 @@ class OpenTimeSeries(object):
 
     def plot_series(
         self,
-        mode: str = "lines",
+        mode: Literal["lines", "markers", "lines+markers"] = "lines",
         tick_fmt: str | None = None,
         directory: str | None = None,
         auto_open: bool = True,
@@ -2156,8 +2156,8 @@ class OpenTimeSeries(object):
 
         Parameters
         ----------
-        mode: str, default: "lines"
-            The type of scatter to use. lines, markers or lines+markers
+        mode: Literal["lines", "markers", "lines+markers"], default: "lines"
+            The type of scatter to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
         directory: str, optional
