@@ -45,7 +45,6 @@ class TimeSerie(TypedDict, total=False):
 
 
 class OpenTimeSeries(object):
-
     _id: str
     instrumentId: str
     currency: str
@@ -68,9 +67,9 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         domestic_ccy : str, default: "SEK"
-            Currency code
-        country : str, default: "SE"
-            Country code
+            Currency code according to ISO 4217
+        country: str, default: "SE"
+            Country code according to ISO 3166-1 alpha-2
         """
 
         cls.domestic = domestic_ccy

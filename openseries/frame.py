@@ -238,6 +238,11 @@ class OpenFrame(object):
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
         local calendar business days
 
+        Parameters
+        ----------
+        country: str, default: "SE"
+            Country code according to ISO 3166-1 alpha-2
+
         Returns
         -------
         OpenFrame
