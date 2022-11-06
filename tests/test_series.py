@@ -813,25 +813,31 @@ class TestOpenTimeSeries(TestCase):
         valid_isin = "SE0009807308"
         invalid_isin_one = "SE0009807307"
         invalid_isin_two = "SE000980730B"
+        valid_instrument_id = "58135911b239b413482758c9"
+        invalid_instrument_id_one = "58135911b239b413482758c"
+        invalid_instrument_id_two = "5_135911b239b413482758c9"
+        valid_timeseries_id = "5813595971051506189ba416"
+        invalid_timeseries_id_one = "5813595971051506189ba41"
+        invalid_timeseries_id_two = "5_13595971051506189ba416"
 
         timeseries_with_valid_isin = OpenTimeSeries(
-            {
-                "_id": "",
-                "currency": "SEK",
-                "dates": [
+            TimeSerie(
+                _id=valid_timeseries_id,
+                currency="SEK",
+                dates=[
                     "2017-05-29",
                     "2017-05-30",
                 ],
-                "instrumentId": "",
-                "isin": valid_isin,
-                "local_ccy": True,
-                "name": "asset",
-                "values": [
+                instrumentId=valid_instrument_id,
+                isin=valid_isin,
+                local_ccy=True,
+                name="asset",
+                values=[
                     100.0,
                     100.0978,
                 ],
-                "valuetype": "Price(Close)",
-            }
+                valuetype="Price(Close)",
+            )
         )
         self.assertIsInstance(timeseries_with_valid_isin, OpenTimeSeries)
 
@@ -862,48 +868,155 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(Exception) as e_one:
             OpenTimeSeries(
-                {
-                    "_id": "",
-                    "currency": "SEK",
-                    "dates": [
+                TimeSerie(
+                    _id=valid_timeseries_id,
+                    currency="SEK",
+                    dates=[
                         "2017-05-29",
                         "2017-05-30",
                     ],
-                    "instrumentId": "",
-                    "isin": invalid_isin_one,
-                    "local_ccy": True,
-                    "name": "asset",
-                    "values": [
+                    instrumentId=valid_instrument_id,
+                    isin=invalid_isin_one,
+                    local_ccy=True,
+                    name="asset",
+                    values=[
                         100.0,
                         100.0978,
                     ],
-                    "valuetype": "Price(Close)",
-                }
+                    valuetype="Price(Close)",
+                )
             )
         self.assertIsInstance(e_one.exception, InvalidChecksum)
 
         with self.assertRaises(Exception) as e_two:
             OpenTimeSeries(
-                {
-                    "_id": "",
-                    "currency": "SEK",
-                    "dates": [
+                TimeSerie(
+                    _id=valid_timeseries_id,
+                    currency="SEK",
+                    dates=[
                         "2017-05-29",
                         "2017-05-30",
                     ],
-                    "instrumentId": "",
-                    "isin": invalid_isin_two,
-                    "local_ccy": True,
-                    "name": "asset",
-                    "values": [
+                    instrumentId=valid_instrument_id,
+                    isin=invalid_isin_two,
+                    local_ccy=True,
+                    name="asset",
+                    values=[
                         100.0,
                         100.0978,
                     ],
-                    "valuetype": "Price(Close)",
-                }
+                    valuetype="Price(Close)",
+                )
             )
         # noinspection PyUnresolvedReferences
-        self.assertIn(member="does not match", container=e_two.exception.message)
+        self.assertIn(
+            member="does not match '^$|([A-Z]{2})([\\\\dA-Z]{9})(\\\\d)$'",
+            container=e_two.exception.message,
+        )
+
+        with self.assertRaises(Exception) as e_three:
+            OpenTimeSeries(
+                TimeSerie(
+                    _id=invalid_timeseries_id_one,
+                    currency="SEK",
+                    dates=[
+                        "2017-05-29",
+                        "2017-05-30",
+                    ],
+                    instrumentId=valid_instrument_id,
+                    isin=valid_isin,
+                    local_ccy=True,
+                    name="asset",
+                    values=[
+                        100.0,
+                        100.0978,
+                    ],
+                    valuetype="Price(Close)",
+                )
+            )
+        # noinspection PyUnresolvedReferences
+        self.assertIn(
+            member="does not match '^$|([a-f\\\\d]{24})'",
+            container=e_three.exception.message,
+        )
+
+        with self.assertRaises(Exception) as e_four:
+            OpenTimeSeries(
+                TimeSerie(
+                    _id=invalid_timeseries_id_two,
+                    currency="SEK",
+                    dates=[
+                        "2017-05-29",
+                        "2017-05-30",
+                    ],
+                    instrumentId=valid_instrument_id,
+                    isin=valid_isin,
+                    local_ccy=True,
+                    name="asset",
+                    values=[
+                        100.0,
+                        100.0978,
+                    ],
+                    valuetype="Price(Close)",
+                )
+            )
+        # noinspection PyUnresolvedReferences
+        self.assertIn(
+            member="does not match '^$|([a-f\\\\d]{24})'",
+            container=e_four.exception.message,
+        )
+
+        with self.assertRaises(Exception) as e_five:
+            OpenTimeSeries(
+                TimeSerie(
+                    _id=valid_timeseries_id,
+                    currency="SEK",
+                    dates=[
+                        "2017-05-29",
+                        "2017-05-30",
+                    ],
+                    instrumentId=invalid_instrument_id_one,
+                    isin=valid_isin,
+                    local_ccy=True,
+                    name="asset",
+                    values=[
+                        100.0,
+                        100.0978,
+                    ],
+                    valuetype="Price(Close)",
+                )
+            )
+        # noinspection PyUnresolvedReferences
+        self.assertIn(
+            member="does not match '^$|([a-f\\\\d]{24})'",
+            container=e_five.exception.message,
+        )
+
+        with self.assertRaises(Exception) as e_six:
+            OpenTimeSeries(
+                TimeSerie(
+                    _id=valid_timeseries_id,
+                    currency="SEK",
+                    dates=[
+                        "2017-05-29",
+                        "2017-05-30",
+                    ],
+                    instrumentId=invalid_instrument_id_two,
+                    isin=valid_isin,
+                    local_ccy=True,
+                    name="asset",
+                    values=[
+                        100.0,
+                        100.0978,
+                    ],
+                    valuetype="Price(Close)",
+                )
+            )
+        # noinspection PyUnresolvedReferences
+        self.assertIn(
+            member="does not match '^$|([a-f\\\\d]{24})'",
+            container=e_six.exception.message,
+        )
 
     def test_opentimeseries_geo_ret_value_ret_exceptions(self):
 
@@ -1026,6 +1139,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
+            # noinspection PyTypeChecker
             _ = nanseries.value_nan_handle(method="other")
 
         self.assertEqual(
@@ -1067,6 +1181,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
+            # noinspection PyTypeChecker
             _ = nanseries.return_nan_handle(method="other")
 
         self.assertEqual(

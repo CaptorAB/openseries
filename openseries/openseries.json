@@ -16,10 +16,12 @@
   ],
   "properties": {
     "_id": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^$|([a-f\\d]{24})"
     },
     "instrumentId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^$|([a-f\\d]{24})"
     },
     "local_ccy": {
       "type": "boolean"
@@ -32,7 +34,10 @@
       "pattern": "^[A-Z]{3}$"
     },
     "isin": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "pattern": "^$|([A-Z]{2})([\\dA-Z]{9})(\\d)$"
     },
     "valuetype": {
