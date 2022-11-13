@@ -49,7 +49,7 @@ jobs:
         python -m pip install --upgrade .[build]
 
     - name: Tests with Pytest
-      run: coverage run -m pytest --verbose
+      run: coverage run -m pytest --verbose --capture=no
 
     - name: Report coverage
       run: coverage report

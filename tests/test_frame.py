@@ -173,7 +173,6 @@ class TestOpenFrame(TestCase):
 
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
-        print(mddframe.max_drawdown_date.tolist())
         self.assertListEqual(
             [
                 dt.date(2009, 7, 1),
@@ -686,9 +685,6 @@ class TestOpenFrame(TestCase):
         corrframe = self.randomframe.from_deepcopy()
         corrframe.to_cumret()
         dict1 = corrframe.correl_matrix.applymap(lambda nn: f"{nn:.12f}").to_dict()
-        import pprint
-
-        pprint.pprint(dict1)
         dict2 = {
             "Asset_0": {
                 "Asset_0": "1.000000000000",
@@ -1707,6 +1703,7 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_methd:
+            # noinspection PyTypeChecker
             _ = nanframe.value_nan_handle(method="other")
 
         self.assertEqual(
@@ -1773,6 +1770,7 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_methd:
+            # noinspection PyTypeChecker
             _ = nanframe.return_nan_handle(method="other")
 
         self.assertEqual(

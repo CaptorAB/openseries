@@ -370,7 +370,6 @@ class TestOpenTimeSeries(TestCase):
         diffseries = self.randomseries.from_deepcopy()
         diffseries.value_to_diff()
         are_bes = [f"{nn[0]:.12f}" for nn in diffseries.tsdf.values[:15]]
-        print(are_bes)
         should_bes = [
             "0.000000000000",
             "-0.002244525566",

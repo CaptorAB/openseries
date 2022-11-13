@@ -6,7 +6,7 @@ venv:
 	venv/bin/pip install --upgrade .[dev]
 
 test:
-	PYTHONPATH=${PWD} venv/bin/coverage run -m pytest --verbose ./
+	PYTHONPATH=${PWD} venv/bin/coverage run -m pytest --verbose --capture=no ./
 	PYTHONPATH=${PWD} venv/bin/coverage report -m
 
 upgrade:
