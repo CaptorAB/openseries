@@ -2150,7 +2150,7 @@ class OpenTimeSeries(object):
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
-        output_type: str = "file",
+        output_type: Literal["file", "div"] = "file",
     ) -> (Figure, str):
         """Creates a Plotly Figure
 

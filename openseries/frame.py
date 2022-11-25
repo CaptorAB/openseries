@@ -286,6 +286,7 @@ class OpenFrame(object):
             data=[self.tsdf.loc[:, d].count() for d in self.tsdf],
             index=self.tsdf.columns,
             name="observations",
+            dtype=pd.Int64Dtype(),
         )
 
     @property
@@ -344,6 +345,7 @@ class OpenFrame(object):
             data=[i.first_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="first indices",
+            dtype="datetime64[D]",
         )
 
     @property
@@ -369,6 +371,7 @@ class OpenFrame(object):
             data=[i.last_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="last indices",
+            dtype="datetime64[D]",
         )
 
     @property
@@ -392,6 +395,7 @@ class OpenFrame(object):
             data=[c.span_of_days for c in self.constituents],
             index=self.tsdf.columns,
             name="span of days",
+            dtype=pd.Int64Dtype(),
         )
 
     @property
@@ -431,6 +435,7 @@ class OpenFrame(object):
         return pd.Series(
             data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac) - 1,
             name="Geometric return",
+            dtype="float64",
         )
 
     def geo_ret_func(
@@ -471,6 +476,7 @@ class OpenFrame(object):
         return pd.Series(
             data=(self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1,
             name="Subset Geometric return",
+            dtype="float64",
         )
 
     @property
@@ -486,6 +492,7 @@ class OpenFrame(object):
         return pd.Series(
             data=self.tsdf.pct_change().mean() * self.periods_in_a_year,
             name="Arithmetic return",
+            dtype="float64",
         )
 
     def arithmetic_ret_func(
@@ -526,6 +533,7 @@ class OpenFrame(object):
         return pd.Series(
             data=self.tsdf.loc[earlier:later].pct_change().mean() * time_factor,
             name="Subset Arithmetic return",
+            dtype="float64",
         )
 
     @property
@@ -546,6 +554,7 @@ class OpenFrame(object):
             return pd.Series(
                 data=self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1,
                 name="Total return",
+                dtype="float64",
             )
 
     def value_ret_func(
@@ -579,6 +588,7 @@ class OpenFrame(object):
         return pd.Series(
             data=self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1,
             name="Subset Total return",
+            dtype="float64",
         )
 
     def value_ret_calendar_period(
@@ -608,6 +618,7 @@ class OpenFrame(object):
         rtn = rtn.loc[period] + 1
         rtn = rtn.apply(np.cumprod, axis="index").iloc[-1] - 1
         rtn.name = period
+        rtn = rtn.astype("float64")
         return rtn
 
     @property
@@ -624,6 +635,7 @@ class OpenFrame(object):
         return pd.Series(
             data=self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year),
             name="Volatility",
+            dtype="float64",
         )
 
     def vol_func(
@@ -665,6 +677,7 @@ class OpenFrame(object):
         return pd.Series(
             data=self.tsdf.loc[earlier:later].pct_change().std() * np.sqrt(time_factor),
             name="Subset Volatility",
+            dtype="float64",
         )
 
     @property
@@ -685,6 +698,7 @@ class OpenFrame(object):
             data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / self.length)
             * np.sqrt(self.periods_in_a_year),
             name="Downside deviation",
+            dtype="float64",
         )
 
     def downside_deviation_func(
@@ -736,6 +750,7 @@ class OpenFrame(object):
             data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / how_many)
             * np.sqrt(time_factor),
             name="Subset Downside deviation",
+            dtype="float64",
         )
 
     @property
@@ -749,6 +764,7 @@ class OpenFrame(object):
 
         ratio = self.arithmetic_ret / self.vol
         ratio.name = "Return vol ratio"
+        ratio = ratio.astype("float64")
         return ratio
 
     def ret_vol_ratio_func(
@@ -823,6 +839,7 @@ class OpenFrame(object):
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sharpe Ratios vs {riskfree_label}",
+                dtype="float64",
             )
         else:
             for item in self.tsdf:
@@ -835,6 +852,7 @@ class OpenFrame(object):
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sharpe Ratios (rf={riskfree_rate:.2%})",
+                dtype="float64",
             )
 
     @property
@@ -851,6 +869,7 @@ class OpenFrame(object):
 
         sortino = self.arithmetic_ret / self.downside_deviation
         sortino.name = "Sortino ratio"
+        sortino = sortino.astype("float64")
         return sortino
 
     def sortino_ratio_func(
@@ -929,6 +948,7 @@ class OpenFrame(object):
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sortino Ratios vs {riskfree_label}",
+                dtype="float64",
             )
         else:
             for item in self.tsdf:
@@ -945,6 +965,7 @@ class OpenFrame(object):
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sortino Ratios (rf={riskfree_rate:.2%},mar=0.0%)",
+                dtype="float64",
             )
 
     @property
@@ -958,7 +979,11 @@ class OpenFrame(object):
         """
 
         zd = self.tsdf.pct_change()
-        return pd.Series(data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Z-score")
+        return pd.Series(
+            data=(zd.iloc[-1] - zd.mean()) / zd.std(),
+            name="Z-score",
+            dtype="float64",
+        )
 
     def z_score_func(
         self,
@@ -986,7 +1011,9 @@ class OpenFrame(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         zd = self.tsdf.loc[earlier:later].pct_change()
         return pd.Series(
-            data=(zd.iloc[-1] - zd.mean()) / zd.std(), name="Subset Z-score"
+            data=(zd.iloc[-1] - zd.mean()) / zd.std(),
+            name="Subset Z-score",
+            dtype="float64",
         )
 
     @property
@@ -1002,6 +1029,7 @@ class OpenFrame(object):
         return pd.Series(
             data=(self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1,
             name="Max drawdown",
+            dtype="float64",
         )
 
     @property
@@ -1016,7 +1044,10 @@ class OpenFrame(object):
 
         md_dates = [c.max_drawdown_date for c in self.constituents]
         return pd.Series(
-            data=md_dates, index=self.tsdf.columns, name="Max drawdown dates"
+            data=md_dates,
+            index=self.tsdf.columns,
+            name="Max drawdown dates",
+            dtype="datetime64[D]",
         )
 
     def max_drawdown_func(
@@ -1050,6 +1081,7 @@ class OpenFrame(object):
             ).min()
             - 1,
             name="Subset Max drawdown",
+            dtype="float64",
         )
 
     @property
@@ -1071,6 +1103,7 @@ class OpenFrame(object):
             .min()
         )
         md.name = "Max drawdown in cal yr"
+        md = md.astype("float64")
         return md
 
     @property
@@ -1082,7 +1115,9 @@ class OpenFrame(object):
             Most negative percentage change
         """
 
-        return pd.Series(data=self.tsdf.pct_change().min(), name="Worst")
+        return pd.Series(
+            data=self.tsdf.pct_change().min(), name="Worst", dtype="float64"
+        )
 
     @property
     def worst_month(self) -> pd.Series:
@@ -1098,6 +1133,7 @@ class OpenFrame(object):
         return pd.Series(
             data=wdf.resample("BM").last().pct_change().min(),
             name="Worst month",
+            dtype="float64",
         )
 
     def worst_func(
@@ -1133,6 +1169,7 @@ class OpenFrame(object):
             .sum()
             .min(),
             name=f"Subset Worst {observations}day period",
+            dtype="float64",
         )
 
     @property
@@ -1147,6 +1184,7 @@ class OpenFrame(object):
         tot = self.tsdf.pct_change()[1:].count()
         answer = pos / tot
         answer.name = "Positive share"
+        answer = answer.astype("float64")
         return answer
 
     def positive_share_func(
@@ -1180,6 +1218,7 @@ class OpenFrame(object):
         tot = self.tsdf.loc[earlier:later].pct_change()[1:].count()
         answer = pos / tot
         answer.name = "Positive share"
+        answer = answer.astype("float64")
         return answer
 
     @property
@@ -1196,6 +1235,7 @@ class OpenFrame(object):
             data=skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit"),
             index=self.tsdf.columns,
             name="Skew",
+            dtype="float64",
         )
 
     def skew_func(
@@ -1229,6 +1269,7 @@ class OpenFrame(object):
             ),
             index=self.tsdf.columns,
             name="Subset Skew",
+            dtype="float64",
         )
 
     @property
@@ -1247,6 +1288,7 @@ class OpenFrame(object):
             ),
             index=self.tsdf.columns,
             name="Kurtosis",
+            dtype="float64",
         )
 
     def kurtosis_func(
@@ -1283,6 +1325,7 @@ class OpenFrame(object):
             ),
             index=self.tsdf.columns,
             name="Subset Kurtosis",
+            dtype="float64",
         )
 
     @property
@@ -1310,7 +1353,10 @@ class OpenFrame(object):
             for x in self.tsdf
         ]
         return pd.Series(
-            data=var_list, index=self.tsdf.columns, name=f"CVaR {level:.1%}"
+            data=var_list,
+            index=self.tsdf.columns,
+            name=f"CVaR {level:.1%}",
+            dtype="float64",
         )
 
     def cvar_down_func(
@@ -1350,7 +1396,10 @@ class OpenFrame(object):
             for x in self.tsdf
         ]
         return pd.Series(
-            data=var_list, index=self.tsdf.columns, name=f"CVaR {level:.1%}"
+            data=var_list,
+            index=self.tsdf.columns,
+            name=f"CVaR {level:.1%}",
+            dtype="float64",
         )
 
     @property
@@ -1384,6 +1433,7 @@ class OpenFrame(object):
                 1 - level, interpolation=interpolation
             ),
             name=f"VaR {level:.1%}",
+            dtype="float64",
         )
 
     def var_down_func(
@@ -1426,6 +1476,7 @@ class OpenFrame(object):
             .pct_change()
             .quantile(1 - level, interpolation=interpolation),
             name=f"VaR {level:.1%}",
+            dtype="float64",
         )
 
     @property
@@ -1457,7 +1508,9 @@ class OpenFrame(object):
             * self.var_down_func(interpolation=interpolation)
             / norm.ppf(level)
         )
-        return pd.Series(data=imp_vol, name=f"Imp vol from VaR {level:.0%}")
+        return pd.Series(
+            data=imp_vol, name=f"Imp vol from VaR {level:.0%}", dtype="float64"
+        )
 
     def vol_from_var_func(
         self,
@@ -1522,7 +1575,9 @@ class OpenFrame(object):
                 .quantile(1 - level, interpolation=interpolation)
                 / norm.ppf(level)
             )
-        return pd.Series(data=imp_vol, name=f"Subset Imp vol from VaR {level:.0%}")
+        return pd.Series(
+            data=imp_vol, name=f"Subset Imp vol from VaR {level:.0%}", dtype="float64"
+        )
 
     def target_weight_from_var(
         self,
@@ -1584,7 +1639,9 @@ class OpenFrame(object):
         vfv = vfv.apply(
             lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local))
         )
-        return pd.Series(data=vfv, name=f"Weight from target vol {target_vol:.1%}")
+        return pd.Series(
+            data=vfv, name=f"Weight from target vol {target_vol:.1%}", dtype="float64"
+        )
 
     def value_to_ret(self):
         """
@@ -2197,6 +2254,7 @@ class OpenFrame(object):
             data=terrors,
             index=self.tsdf.columns,
             name=f"Tracking Errors vs {short_label}",
+            dtype="float64",
         )
 
     def info_ratio_func(
@@ -2265,6 +2323,7 @@ class OpenFrame(object):
             data=ratios,
             index=self.tsdf.columns,
             name=f"Info Ratios vs {short_label}",
+            dtype="float64",
         )
 
     def capture_ratio_func(
@@ -2419,6 +2478,7 @@ class OpenFrame(object):
             data=ratios,
             index=self.tsdf.columns,
             name=resultname,
+            dtype="float64",
         )
 
     def beta(self, asset: tuple | int, market: tuple | int) -> float:
@@ -2699,7 +2759,7 @@ class OpenFrame(object):
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
-        output_type: str = "file",
+        output_type: Literal["file", "div"] = "file",
     ) -> (Figure, str):
         """Creates a Plotly Figure
 

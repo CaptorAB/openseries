@@ -184,6 +184,7 @@ class TestOpenTimeSeries(TestCase):
                 "2019-06-28",
             ],
             name="Asset_0",
+            dtype="float64",
         )
         sen = pd.Series(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
@@ -195,6 +196,7 @@ class TestOpenTimeSeries(TestCase):
                 "2019-06-28",
             ],
             name=("Asset_0", "Price(Close)"),
+            dtype="float64",
         )
         df = pd.DataFrame(
             data=[
@@ -212,6 +214,7 @@ class TestOpenTimeSeries(TestCase):
                 "2019-06-28",
             ],
             columns=["Asset_0", "Asset_1"],
+            dtype="float64",
         )
 
         seseries = OpenTimeSeries.from_df(df=se)

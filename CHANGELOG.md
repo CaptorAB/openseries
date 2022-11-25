@@ -4,6 +4,10 @@ For a long time I have not kept a log of the changes implemented in the differen
 this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
+## Version [0.8.1] - 2022-11-25
+
+Typed all Pandas.Series outputs from OpenFrame methods.
+
 ## Version [0.8.0] - 2022-11-20
 
 Updated dependencies.
