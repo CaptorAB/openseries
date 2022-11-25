@@ -345,7 +345,6 @@ class OpenFrame(object):
             data=[i.first_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="first indices",
-            dtype="datetime64[D]",
         )
 
     @property
@@ -371,7 +370,6 @@ class OpenFrame(object):
             data=[i.last_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="last indices",
-            dtype="datetime64[D]",
         )
 
     @property
@@ -1047,7 +1045,6 @@ class OpenFrame(object):
             data=md_dates,
             index=self.tsdf.columns,
             name="Max drawdown dates",
-            dtype="datetime64[D]",
         )
 
     def max_drawdown_func(
