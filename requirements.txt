@@ -2,7 +2,7 @@
 --index-url https://pypi.org/simple/
 
 coverage>=6.5.0
-holidays>=0.17
+holidays>=0.17.2
 jsonschema>=4.17.0
 numpy>=1.23.5
 pandas>=1.5.1
