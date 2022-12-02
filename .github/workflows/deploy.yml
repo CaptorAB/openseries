@@ -16,14 +16,6 @@ jobs:
         python-version-file: '.python-version'
         cache: 'pip'
 
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ env.pythonLocation }}-
-
     - name: Editable pip install on Python ${{ steps.py.outputs.python-version }}
       run: |
         ${{ steps.py.outputs.python-path }} -m pip install --upgrade -e .[build]
