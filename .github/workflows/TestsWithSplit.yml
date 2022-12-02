@@ -28,6 +28,7 @@ jobs:
 
     - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
       run: |
+        ${{ steps.py.outputs.python-path }} -m pip install --upgrade wheel
         ${{ steps.py.outputs.python-path }} -m pip install --upgrade .[test]
         ${{ steps.py.outputs.python-path }} -m pip install --upgrade pytest-split
 

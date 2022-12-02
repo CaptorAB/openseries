@@ -18,6 +18,7 @@ jobs:
 
     - name: Editable pip install on Python ${{ steps.py.outputs.python-version }}
       run: |
+        ${{ steps.py.outputs.python-path }} -m pip install --upgrade wheel
         ${{ steps.py.outputs.python-path }} -m pip install --upgrade -e .[build]
 
     - name: Tests with Pytest
