@@ -46,7 +46,7 @@ jobs:
 
     - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
       run: |
-        python -m pip install --upgrade .[build]
+        ${{ steps.py.outputs.python-path }} -m pip install --upgrade .[build]
 
     - name: Tests with Pytest
       run: coverage run -m pytest --verbose --capture=no
@@ -56,5 +56,5 @@ jobs:
 
     - name: Package and check
       run: |
-        python -m build
-        python -m twine check dist/*
+        ${{ steps.py.outputs.python-path }} -m build
+        ${{ steps.py.outputs.python-path }} -m twine check dist/*
