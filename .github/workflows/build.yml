@@ -42,7 +42,7 @@ jobs:
         ${{ steps.py.outputs.python-path }} -m pip install --upgrade .[build]
 
     - name: Tests with Pytest
-      run: coverage run -m pytest --verbose --capture=no
+      run: coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
     - name: Report coverage
       run: coverage report
