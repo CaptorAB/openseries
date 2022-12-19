@@ -2194,43 +2194,43 @@ class TestOpenFrame(TestCase):
         results = []
         for i in range(jframe.item_count):
             for j in range(jframe.item_count):
-                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
 
         results_tuple = []
         for i in jframe.tsdf:
             for j in jframe.tsdf:
-                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
 
         self.assertListEqual(results, results_tuple)
 
         self.assertListEqual(
             results,
             [
-                "0.00000000000",
-                "0.20910086900",
-                "0.20447762649",
-                "0.05303016392",
-                "0.14890796553",
-                "-0.49658069900",
-                "0.00000000000",
-                "-0.12340472021",
-                "-0.34727517342",
-                "-0.29791539155",
-                "-0.24310239359",
-                "-0.05185026169",
-                "0.00000000000",
-                "-0.17457233661",
-                "-0.17306706858",
-                "0.06396738091",
-                "0.11605423644",
-                "0.12199195982",
-                "0.00000000000",
-                "0.15985992489",
-                "0.14073451051",
-                "0.09289737990",
-                "0.11927530593",
-                "0.15262109247",
-                "0.00000000000",
+                "0.000000000",
+                "0.209100869",
+                "0.204477626",
+                "0.053030164",
+                "0.148907966",
+                "-0.496580699",
+                "0.000000000",
+                "-0.123404720",
+                "-0.347275173",
+                "-0.297915392",
+                "-0.243102394",
+                "-0.051850262",
+                "0.000000000",
+                "-0.174572337",
+                "-0.173067069",
+                "0.063967381",
+                "0.116054236",
+                "0.121991960",
+                "0.000000000",
+                "0.159859925",
+                "0.140734511",
+                "0.092897380",
+                "0.119275306",
+                "0.152621092",
+                "0.000000000",
             ],
         )
         with self.assertRaises(Exception) as e_asset:
@@ -2258,43 +2258,43 @@ class TestOpenFrame(TestCase):
         results = []
         for i in range(jframe.item_count):
             for j in range(jframe.item_count):
-                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
 
         results_tuple = []
         for i in jframe.tsdf:
             for j in jframe.tsdf:
-                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
 
         self.assertListEqual(results, results_tuple)
 
         self.assertListEqual(
             results,
             [
-                "0.00000000000",
-                "-0.00019885145",
-                "-0.00018757448",
-                "-0.00019918215",
-                "-0.00018679586",
-                "-0.00019898731",
-                "0.00000000000",
-                "-0.00022508190",
-                "-0.00020027816",
-                "-0.00018038239",
-                "0.00022726157",
-                "0.00024419322",
-                "0.00000000000",
-                "0.00023651514",
-                "0.00021930283",
-                "-0.00000217768",
-                "-0.00001179658",
-                "-0.00000432937",
-                "0.00000000000",
-                "-0.00000898410",
-                "-0.00047679480",
-                "-0.00048482261",
-                "-0.00046167617",
-                "-0.00049726042",
-                "0.00000000000",
+                "0.000000000",
+                "-0.000198851",
+                "-0.000187574",
+                "-0.000199182",
+                "-0.000186796",
+                "-0.000198987",
+                "0.000000000",
+                "-0.000225082",
+                "-0.000200278",
+                "-0.000180382",
+                "0.000227262",
+                "0.000244193",
+                "0.000000000",
+                "0.000236515",
+                "0.000219303",
+                "-0.000002178",
+                "-0.000011797",
+                "-0.000004329",
+                "0.000000000",
+                "-0.000008984",
+                "-0.000476795",
+                "-0.000484823",
+                "-0.000461676",
+                "-0.000497260",
+                "0.000000000",
             ],
         )
         with self.assertRaises(Exception) as e_asset:
