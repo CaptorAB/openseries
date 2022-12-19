@@ -609,6 +609,7 @@ class TestOpenFrame(TestCase):
 
         series_unique = [
             "ewma_vol_func",
+            "from_1d_rate_to_cumret",
             "pandas_df",
             "running_adjustment",
             "set_new_label",
@@ -623,6 +624,7 @@ class TestOpenFrame(TestCase):
             "ewma_risk",
             "rolling_info_ratio",
             "info_ratio_func",
+            "jensen_alpha",
             "tracking_error_func",
             "capture_ratio_func",
             "ord_least_squares_fit",
@@ -2178,6 +2180,135 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker
             _ = bframe.beta(asset=0, market="string")
+
+        self.assertEqual(
+            e_market.exception.args[0],
+            "market should be a tuple or an integer.",
+        )
+
+    def test_openframe_jensen_alpha(self):
+
+        jframe = self.randomframe.from_deepcopy()
+        jframe.to_cumret()
+        jframe.resample("7D")
+        results = []
+        for i in range(jframe.item_count):
+            for j in range(jframe.item_count):
+                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+
+        results_tuple = []
+        for i in jframe.tsdf:
+            for j in jframe.tsdf:
+                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+
+        self.assertListEqual(results, results_tuple)
+
+        self.assertListEqual(
+            results,
+            [
+                "0.00000000000",
+                "0.20910086900",
+                "0.20447762649",
+                "0.05303016392",
+                "0.14890796553",
+                "-0.49658069900",
+                "0.00000000000",
+                "-0.12340472021",
+                "-0.34727517342",
+                "-0.29791539155",
+                "-0.24310239359",
+                "-0.05185026169",
+                "0.00000000000",
+                "-0.17457233661",
+                "-0.17306706858",
+                "0.06396738091",
+                "0.11605423644",
+                "0.12199195982",
+                "0.00000000000",
+                "0.15985992489",
+                "0.14073451051",
+                "0.09289737990",
+                "0.11927530593",
+                "0.15262109247",
+                "0.00000000000",
+            ],
+        )
+        with self.assertRaises(Exception) as e_asset:
+            # noinspection PyTypeChecker
+            _ = jframe.jensen_alpha(asset="string", market=1)
+
+        self.assertEqual(
+            e_asset.exception.args[0],
+            "asset should be a tuple or an integer.",
+        )
+
+        with self.assertRaises(Exception) as e_market:
+            # noinspection PyTypeChecker
+            _ = jframe.jensen_alpha(asset=0, market="string")
+
+        self.assertEqual(
+            e_market.exception.args[0],
+            "market should be a tuple or an integer.",
+        )
+
+    def test_openframe_jensen_alpha_returns_input(self):
+
+        jframe = self.randomframe.from_deepcopy()
+        jframe.resample("7D")
+        results = []
+        for i in range(jframe.item_count):
+            for j in range(jframe.item_count):
+                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+
+        results_tuple = []
+        for i in jframe.tsdf:
+            for j in jframe.tsdf:
+                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.11f}")
+
+        self.assertListEqual(results, results_tuple)
+
+        self.assertListEqual(
+            results,
+            [
+                "0.00000000000",
+                "-0.00019885145",
+                "-0.00018757448",
+                "-0.00019918215",
+                "-0.00018679586",
+                "-0.00019898731",
+                "0.00000000000",
+                "-0.00022508190",
+                "-0.00020027816",
+                "-0.00018038239",
+                "0.00022726157",
+                "0.00024419322",
+                "0.00000000000",
+                "0.00023651514",
+                "0.00021930283",
+                "-0.00000217768",
+                "-0.00001179658",
+                "-0.00000432937",
+                "0.00000000000",
+                "-0.00000898410",
+                "-0.00047679480",
+                "-0.00048482261",
+                "-0.00046167617",
+                "-0.00049726042",
+                "0.00000000000",
+            ],
+        )
+        with self.assertRaises(Exception) as e_asset:
+            # noinspection PyTypeChecker
+            _ = jframe.jensen_alpha(asset="string", market=1)
+
+        self.assertEqual(
+            e_asset.exception.args[0],
+            "asset should be a tuple or an integer.",
+        )
+
+        with self.assertRaises(Exception) as e_market:
+            # noinspection PyTypeChecker
+            _ = jframe.jensen_alpha(asset=0, market="string")
 
         self.assertEqual(
             e_market.exception.args[0],

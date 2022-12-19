@@ -1785,6 +1785,34 @@ class OpenTimeSeries(object):
 
         return self
 
+    def from_1d_rate_to_cumret(self, days_in_year: int = 365, divider: float = 1.0):
+        """Converts a series of 1-day rates into a cumulative valueseries
+
+        Parameters
+        ----------
+        days_in_year: int, default 365
+            Calendar days per year used as divisor
+        divider: float, default 100.0
+            Convenience divider for when the 1-day rate is not scaled correctly
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
+
+        array = np.array(self.values) / divider
+
+        deltas = np.array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
+        array = np.cumprod(np.insert(1.0 + deltas * array[:-1] / days_in_year, 0, 1.0))
+
+        self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
+        self.values = list(array)
+        self.valuetype = "Price(Close)"
+        self.pandas_df()
+
+        return self
+
     def resample(self, freq: str = "BM"):
         """Resamples the timeseries frequency
 

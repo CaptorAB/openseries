@@ -853,6 +853,72 @@ class OpenFrame(object):
                 dtype="float64",
             )
 
+    def jensen_alpha(
+        self,
+        asset: tuple | int,
+        market: tuple | int,
+        riskfree_rate: float = 0.0,
+    ) -> float:
+        """The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
+        measure that represents the average return on a portfolio or investment,
+        above or below that predicted by the capital asset pricing model (CAPM),
+        given the portfolio's or investment's beta and the average market return.
+        This metric is also commonly referred to as simply alpha.
+        https://www.investopedia.com/terms/j/jensensmeasure.asp
+
+        Parameters
+        ----------
+        asset: tuple | int
+            The column of the asset
+        market: tuple | int
+            The column of the market against which Jensen's alpha is measured
+        riskfree_rate : float, default: 0.0
+            The return of the zero volatility riskfree asset
+
+        Returns
+        -------
+        float
+            Jensen's alpha
+        """
+        if all(
+            [
+                True if x == "Return(Total)" else False
+                for x in self.tsdf.columns.get_level_values(1).values
+            ]
+        ):
+            if isinstance(asset, tuple):
+                y = self.tsdf.loc[:, asset]
+            elif isinstance(asset, int):
+                y = self.tsdf.iloc[:, asset]
+            else:
+                raise Exception("asset should be a tuple or an integer.")
+            if isinstance(market, tuple):
+                x = self.tsdf.loc[:, market]
+            elif isinstance(market, int):
+                x = self.tsdf.iloc[:, market]
+            else:
+                raise Exception("market should be a tuple or an integer.")
+        else:
+            if isinstance(asset, tuple):
+                y = np.log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
+            elif isinstance(asset, int):
+                y = np.log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+            else:
+                raise Exception("asset should be a tuple or an integer.")
+            if isinstance(market, tuple):
+                x = np.log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
+            elif isinstance(market, int):
+                x = np.log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+            else:
+                raise Exception("market should be a tuple or an integer.")
+
+        asset_mean = y.mean()
+        market_mean = x.mean()
+        covariance = np.cov(y, x, ddof=1)
+        beta = covariance[0, 1] / covariance[1, 1]
+
+        return float(asset_mean - riskfree_rate - beta * (market_mean - riskfree_rate))
+
     @property
     def sortino_ratio(self) -> pd.Series:
         """https://www.investopedia.com/terms/s/sortinoratio.asp

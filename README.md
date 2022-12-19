@@ -183,14 +183,15 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 #### In this table are the methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Method               | Applies to       | Description                                                                                                                                    |
-|:---------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
-| `setup_class`        | `OpenTimeSeries` | Class method that defines the `domestic` attribute and a `sweden` business day calendar.                                                       |
-| `to_json`            | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                                                                                 |
-| `pandas_df`          | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.                                                                    |
-| `set_new_label`      | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                                                                       |
-| `running_adjustment` | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
-| `ewma_vol_func`      | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
+| Method                   | Applies to       | Description                                                                                                                                    |
+|:-------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| `setup_class`            | `OpenTimeSeries` | Class method that defines the `domestic` attribute and a `sweden` business day calendar.                                                       |
+| `to_json`                | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                                                                                 |
+| `pandas_df`              | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.                                                                    |
+| `set_new_label`          | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                                                                       |
+| `running_adjustment`     | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
+| `ewma_vol_func`          | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
+| `from_1d_rate_to_cumret` | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
 
 #### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
@@ -204,6 +205,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                                                                                                        |
 | `ord_least_squares_fit` | `OpenFrame` | Performs a regression and an [Ordinary Least Squares](https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html) fit.                              |
 | `beta`                  | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                                   |
+| `jensen_alpha`          | `OpenFrame` | Calculates [Jensen's Alpha](https://www.investopedia.com/terms/j/jensensmeasure.asp) of an asset relative a market.                                               |
 | `tracking_error_func`   | `OpenFrame` | Calculates the [tracking errors](https://www.investopedia.com/terms/t/trackingerror.asp) relative to a selected series in the OpenFrame.                          |
 | `info_ratio_func`       | `OpenFrame` | Calculates the [information ratios](https://www.investopedia.com/terms/i/informationratio.asp) relative to a selected series in the OpenFrame.                    |
 | `capture_ratio_func`    | `OpenFrame` | Calculates up, down and up/down [capture ratios](https://www.investopedia.com/terms/d/down-market-capture-ratio.asp) relative to a selected series.               |

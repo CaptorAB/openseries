@@ -4,6 +4,11 @@ For a long time I have not kept a log of the changes implemented in the differen
 this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
+## Version [0.8.2] - 2022-12-19
+
+Added an OpenTimeSeries method that converts a series of 1-day rates into a cumulative valueseries, and added an
+OpenFrame method to calculate the Jensen's alpha of an asset relative a market.
+
 ## Version [0.8.1] - 2022-11-25
 
 Typed all Pandas.Series outputs from OpenFrame methods.

@@ -1020,6 +1020,52 @@ class TestOpenTimeSeries(TestCase):
             container=e_six.exception.message,
         )
 
+    def test_opentimeseries_from_1d_rate_to_cumret(self):
+
+        tms = OpenTimeSeries(
+            TimeSerie(
+                _id="",
+                instrumentId="",
+                currency="SEK",
+                dates=[
+                    "2022-12-05",
+                    "2022-12-06",
+                    "2022-12-07",
+                    "2022-12-08",
+                    "2022-12-09",
+                    "2022-12-12",
+                    "2022-12-13",
+                    "2022-12-14",
+                    "2022-12-15",
+                    "2022-12-16",
+                    "2022-12-19",
+                ],
+                local_ccy=True,
+                name="asset",
+                values=[
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                ],
+                valuetype="Price(Close)",
+            )
+        )
+        ave_rate = f"{tms.tsdf.mean().iloc[0]:.5f}"
+        self.assertEqual(ave_rate, "0.02434")
+
+        tms.from_1d_rate_to_cumret()
+
+        val_ret = f"{tms.value_ret:.5f}"
+        self.assertEqual(val_ret, "0.00093")
+
     def test_opentimeseries_geo_ret_value_ret_exceptions(self):
 
         geoseries = OpenTimeSeries(
