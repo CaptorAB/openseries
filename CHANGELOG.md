@@ -4,7 +4,7 @@ For a long time I have not kept a log of the changes implemented in the differen
 this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
 
-## Version [0.8.3] - 2022-12-20
+## Version [0.8.4] - 2022-12-20
 
 Changed Jensen's alpha to be based on asset and market CAGR, instead of cumulative log return.
 

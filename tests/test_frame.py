@@ -2249,6 +2249,54 @@ class TestOpenFrame(TestCase):
             e_market.exception.args[0],
             "market should be a tuple or an integer.",
         )
+        from openseries.datefixer import date_offset_foll
+
+        ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
+        shortframe = jframe.trunc_frame(start_cut=ninemth)
+        shortframe.to_cumret()
+        sresults = []
+        for i in range(shortframe.item_count):
+            for j in range(shortframe.item_count):
+                sresults.append(f"{shortframe.jensen_alpha(asset=i, market=j):.9f}")
+
+        sresults_tuple = []
+        for i in shortframe.tsdf:
+            for j in shortframe.tsdf:
+                sresults_tuple.append(
+                    f"{shortframe.jensen_alpha(asset=i, market=j):.9f}"
+                )
+
+        self.assertListEqual(sresults, sresults_tuple)
+        self.assertListEqual(
+            sresults,
+            [
+                "0.000000000",
+                "-0.043721481",
+                "0.091725480",
+                "0.108780390",
+                "0.012244249",
+                "-0.078588038",
+                "0.000000000",
+                "-0.126003759",
+                "-0.137148953",
+                "-0.069468578",
+                "0.006395139",
+                "-0.050191011",
+                "0.000000000",
+                "0.018726894",
+                "-0.000440884",
+                "-0.018697252",
+                "-0.011027547",
+                "-0.013438783",
+                "0.000000000",
+                "-0.005692602",
+                "-0.119326162",
+                "0.056709768",
+                "-0.293744566",
+                "-0.274853038",
+                "0.000000000",
+            ],
+        )
 
     def test_openframe_jensen_alpha_returns_input(self):
 

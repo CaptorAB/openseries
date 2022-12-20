@@ -907,30 +907,56 @@ class OpenFrame(object):
                 asset_log = np.log(
                     self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0]
                 )
-                asset_cagr = (
-                    self.tsdf.loc[:, asset].iloc[-1] / self.tsdf.loc[:, asset].iloc[0]
-                ) ** (1 / self.yearfrac) - 1
+                if self.yearfrac > 1.0:
+                    asset_cagr = (
+                        self.tsdf.loc[:, asset].iloc[-1]
+                        / self.tsdf.loc[:, asset].iloc[0]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    asset_cagr = (
+                        self.tsdf.loc[:, asset].iloc[-1]
+                        / self.tsdf.loc[:, asset].iloc[0]
+                        - 1
+                    )
             elif isinstance(asset, int):
                 asset_log = np.log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
-                asset_cagr = (self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]) ** (
-                    1 / self.yearfrac
-                ) - 1
+                if self.yearfrac > 1.0:
+                    asset_cagr = (
+                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    asset_cagr = (
+                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
+                    )
             else:
                 raise Exception("asset should be a tuple or an integer.")
             if isinstance(market, tuple):
                 market_log = np.log(
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0]
                 )
-                market_cagr = (
-                    self.tsdf.loc[:, market].iloc[-1] / self.tsdf.loc[:, market].iloc[0]
-                ) ** (1 / self.yearfrac) - 1
+                if self.yearfrac > 1.0:
+                    market_cagr = (
+                        self.tsdf.loc[:, market].iloc[-1]
+                        / self.tsdf.loc[:, market].iloc[0]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    market_cagr = (
+                        self.tsdf.loc[:, market].iloc[-1]
+                        / self.tsdf.loc[:, market].iloc[0]
+                        - 1
+                    )
             elif isinstance(market, int):
                 market_log = np.log(
                     self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market]
                 )
-                market_cagr = (
-                    self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
-                ) ** (1 / self.yearfrac) - 1
+                if self.yearfrac > 1.0:
+                    market_cagr = (
+                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    market_cagr = (
+                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
+                    )
             else:
                 raise Exception("market should be a tuple or an integer.")
 
