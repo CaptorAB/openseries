@@ -887,37 +887,57 @@ class OpenFrame(object):
             ]
         ):
             if isinstance(asset, tuple):
-                y = self.tsdf.loc[:, asset]
+                asset_log = self.tsdf.loc[:, asset]
+                asset_cagr = asset_log.mean()
             elif isinstance(asset, int):
-                y = self.tsdf.iloc[:, asset]
+                asset_log = self.tsdf.iloc[:, asset]
+                asset_cagr = asset_log.mean()
             else:
                 raise Exception("asset should be a tuple or an integer.")
             if isinstance(market, tuple):
-                x = self.tsdf.loc[:, market]
+                market_log = self.tsdf.loc[:, market]
+                market_cagr = market_log.mean()
             elif isinstance(market, int):
-                x = self.tsdf.iloc[:, market]
+                market_log = self.tsdf.iloc[:, market]
+                market_cagr = market_log.mean()
             else:
                 raise Exception("market should be a tuple or an integer.")
         else:
             if isinstance(asset, tuple):
-                y = np.log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
+                asset_log = np.log(
+                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0]
+                )
+                asset_cagr = (
+                    self.tsdf.loc[:, asset].iloc[-1] / self.tsdf.loc[:, asset].iloc[0]
+                ) ** (1 / self.yearfrac) - 1
             elif isinstance(asset, int):
-                y = np.log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                asset_log = np.log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                asset_cagr = (self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]) ** (
+                    1 / self.yearfrac
+                ) - 1
             else:
                 raise Exception("asset should be a tuple or an integer.")
             if isinstance(market, tuple):
-                x = np.log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
+                market_log = np.log(
+                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0]
+                )
+                market_cagr = (
+                    self.tsdf.loc[:, market].iloc[-1] / self.tsdf.loc[:, market].iloc[0]
+                ) ** (1 / self.yearfrac) - 1
             elif isinstance(market, int):
-                x = np.log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                market_log = np.log(
+                    self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market]
+                )
+                market_cagr = (
+                    self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
+                ) ** (1 / self.yearfrac) - 1
             else:
                 raise Exception("market should be a tuple or an integer.")
 
-        asset_mean = y.mean()
-        market_mean = x.mean()
-        covariance = np.cov(y, x, ddof=1)
+        covariance = np.cov(asset_log, market_log, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
 
-        return float(asset_mean - riskfree_rate - beta * (market_mean - riskfree_rate))
+        return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     @property
     def sortino_ratio(self) -> pd.Series:
