@@ -401,9 +401,11 @@ class OpenTimeSeries(object):
         date_range: pd.DatetimeIndex, optional
             A given range of dates
         days: int, optional
-            Number of days to generate when date_range not provided. Must be combined with end_dt
+            Number of days to generate when date_range not provided. Must be combined
+            with end_dt
         end_dt: datetime.date, optional
-            End date of date range to generate when date_range not provided. Must be combined with days
+            End date of date range to generate when date_range not provided. Must be
+            combined with days
         label : str
             Name for the timeseries
         valuetype : str, default: "Price(Close)"
@@ -471,7 +473,8 @@ class OpenTimeSeries(object):
         return data
 
     def pandas_df(self):
-        """Sets the .tsdf parameter as a Pandas DataFrame from the .dates and .values lists
+        """Sets the .tsdf parameter as a Pandas DataFrame from the .dates and
+        .values lists
 
         Returns
         -------
@@ -502,7 +505,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_offset: int, optional
-            Number of months offset as positive integer. Overrides use of from_date and to_date
+            Number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_dt: datetime.date, optional
             Specific from date
         to_dt: datetime.date, optional
@@ -677,7 +681,8 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Length of the timeseries expressed in years assuming all years have 365.25 days
+            Length of the timeseries expressed in years assuming all years
+            have 365.25 days
         """
 
         return self.span_of_days / 365.25
@@ -728,7 +733,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -780,13 +786,15 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -814,7 +822,8 @@ class OpenTimeSeries(object):
 
         if float(self.tsdf.iloc[0]) == 0.0:
             raise Exception(
-                "Simple Return cannot be calculated due to an initial value being zero."
+                "Simple Return cannot be calculated due to an initial value being"
+                "zero."
             )
         return float(self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1)
 
@@ -828,7 +837,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -843,7 +853,8 @@ class OpenTimeSeries(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception(
-                "Simple Return cannot be calculated due to an initial value being zero."
+                "Simple Return cannot be calculated due to an initial value being"
+                "zero."
             )
         return float(self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1)
 
@@ -874,7 +885,8 @@ class OpenTimeSeries(object):
 
     @property
     def vol(self) -> float:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
+        """Based on Pandas .std() which is the equivalent of stdev.s([...])
+        in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
 
         Returns
@@ -892,19 +904,22 @@ class OpenTimeSeries(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
+        """Based on Pandas .std() which is the equivalent of stdev.s([...])
+        in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
 
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases
+            and comparisons
 
         Returns
         -------
@@ -926,7 +941,8 @@ class OpenTimeSeries(object):
 
     @property
     def downside_deviation(self) -> float:
-        """The standard deviation of returns that are below a Minimum Accepted Return of zero.
+        """The standard deviation of returns that are below a Minimum Accepted
+        Return of zero.
         It is used to calculate the Sortino Ratio \n
         https://www.investopedia.com/terms/d/downside-deviation.asp
 
@@ -951,7 +967,8 @@ class OpenTimeSeries(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
-        """The standard deviation of returns that are below a Minimum Accepted Return of zero.
+        """The standard deviation of returns that are below a Minimum Accepted
+        Return of zero.
         It is used to calculate the Sortino Ratio \n
         https://www.investopedia.com/terms/d/downside-deviation.asp
 
@@ -960,13 +977,15 @@ class OpenTimeSeries(object):
         min_accepted_return : float, optional
             The annualized Minimum Accepted Return (MAR)
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -1001,7 +1020,8 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of the annualized arithmetic mean of returns and annualized volatility.
+            Ratio of the annualized arithmetic mean of returns and annualized
+            volatility.
         """
         return self.arithmetic_ret / self.vol
 
@@ -1012,15 +1032,17 @@ class OpenTimeSeries(object):
         to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
-        """The ratio of annualized arithmetic mean of returns and annualized volatility or,
-        if risk-free return provided, Sharpe ratio calculated as ( geometric return - risk-free return )
-        / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
+        """The ratio of annualized arithmetic mean of returns and annualized
+        volatility or, if risk-free return provided, Sharpe ratio calculated
+        as ( geometric return - risk-free return ) / volatility. The latter ratio
+        implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
 
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1031,7 +1053,8 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Ratio of the annualized arithmetic mean of returns and annualized volatility or,
+            Ratio of the annualized arithmetic mean of returns and annualized
+            volatility or,
             if risk-free return provided, Sharpe ratio
         """
 
@@ -1070,7 +1093,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1122,7 +1146,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1181,7 +1206,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1254,7 +1280,8 @@ class OpenTimeSeries(object):
         ----------
         observations: int, default: 1
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1263,7 +1290,8 @@ class OpenTimeSeries(object):
         Returns
         -------
         float
-            Most negative percentage change over a rolling number of observations within
+            Most negative percentage change over a rolling number of observations
+            within
             a chosen date range
         """
 
@@ -1300,7 +1328,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1329,7 +1358,9 @@ class OpenTimeSeries(object):
             Skew of the return distribution
         """
 
-        return float(skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit"))
+        return float(
+            skew(a=self.tsdf.pct_change().values, bias=True, nan_policy="omit")
+        )
 
     def skew_func(
         self,
@@ -1342,7 +1373,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1392,7 +1424,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1453,7 +1486,8 @@ class OpenTimeSeries(object):
         level: float, default: 0.95
             The sought CVaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1496,7 +1530,8 @@ class OpenTimeSeries(object):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1529,12 +1564,14 @@ class OpenTimeSeries(object):
         level: float, default: 0.95
             The sought VaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1564,7 +1601,8 @@ class OpenTimeSeries(object):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1599,17 +1637,20 @@ class OpenTimeSeries(object):
         level: float, default: 0.95
             The sought VaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -1678,17 +1719,20 @@ class OpenTimeSeries(object):
         level: float, default: 0.95
             The sought VaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -1734,7 +1778,8 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         periods: int, default: 1
-            The number of periods between observations over which difference is calculated
+            The number of periods between observations over which difference
+            is calculated
 
         Returns
         -------
@@ -1819,7 +1864,7 @@ class OpenTimeSeries(object):
         Parameters
         ----------
         freq: str, default "BM"
-            Valid values https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
+            Some of the valid values are D, B, M, BM, Q, BQ, A, BA
 
         Returns
         -------
@@ -1881,7 +1926,8 @@ class OpenTimeSeries(object):
         dlta_degr_freedms: int, default: 0
             Variance bias factor taking the value 0 or 1.
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -2014,7 +2060,8 @@ class OpenTimeSeries(object):
             The sought Value At Risk level
         observations: int, default: 252
             Number of observations in the overlapping window.
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns

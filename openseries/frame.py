@@ -50,7 +50,8 @@ class OpenFrame(object):
         weights: List[float], optional
             List of weights in float64 format.
         sort: bool, default: True
-            argument in Pandas df.concat added to fix issue when upgrading Python & Pandas
+            argument in Pandas df.concat added to fix issue when upgrading
+            Python & Pandas
 
         Returns
         -------
@@ -185,7 +186,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_offset: int, optional
-            Number of months offset as positive integer. Overrides use of from_date and to_date
+            Number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_dt: datetime.date, optional
             Specific from date
         to_dt: datetime.date, optional
@@ -306,7 +308,8 @@ class OpenFrame(object):
         Returns
         -------
         list
-            Level 0 values of the Pandas.MultiIndex columns in the .tsdf Pandas.DataFrame
+            Level 0 values of the Pandas.MultiIndex columns in the .tsdf
+            Pandas.DataFrame
         """
 
         return self.tsdf.columns.get_level_values(0).tolist()
@@ -317,7 +320,8 @@ class OpenFrame(object):
         Returns
         -------
         list
-            Level 1 values of the Pandas.MultiIndex columns in the .tsdf Pandas.DataFrame
+            Level 1 values of the Pandas.MultiIndex columns in the .tsdf
+            Pandas.DataFrame
         """
 
         return self.tsdf.columns.get_level_values(1).tolist()
@@ -428,7 +432,8 @@ class OpenFrame(object):
 
         if self.tsdf.iloc[0].isin([0.0]).any() or self.tsdf.lt(0.0).any().any():
             raise Exception(
-                "Geometric return cannot be calculated due to an initial value being zero or a negative value."
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
             )
         return pd.Series(
             data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac) - 1,
@@ -447,7 +452,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -466,7 +472,8 @@ class OpenFrame(object):
             or self.tsdf.loc[[earlier, later]].lt(0.0).any().any()
         ):
             raise Exception(
-                "Geometric return cannot be calculated due to an initial value being zero or a negative value."
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
             )
 
         fraction = (later - earlier).days / 365.25
@@ -505,7 +512,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -565,7 +573,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -621,7 +630,8 @@ class OpenFrame(object):
 
     @property
     def vol(self) -> pd.Series:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
+        """Based on Pandas .std() which is the equivalent of stdev.s([...])
+        in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
 
         Returns
@@ -643,13 +653,15 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel \n
+        """Based on Pandas .std() which is the equivalent of stdev.s([...])
+        in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
 
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -680,7 +692,8 @@ class OpenFrame(object):
 
     @property
     def downside_deviation(self) -> pd.Series:
-        """The standard deviation of returns that are below a Minimum Accepted Return of zero.
+        """The standard deviation of returns that are below a Minimum Accepted
+        Return of zero.
         It is used to calculate the Sortino Ratio \n
         https://www.investopedia.com/terms/d/downside-deviation.asp
 
@@ -707,7 +720,8 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """The standard deviation of returns that are below a Minimum Accepted Return of zero.
+        """The standard deviation of returns that are below a Minimum Accepted
+        Return of zero.
         It is used to calculate the Sortino Ratio \n
         https://www.investopedia.com/terms/d/downside-deviation.asp
 
@@ -716,13 +730,15 @@ class OpenFrame(object):
         min_accepted_return : float, optional
             The annualized Minimum Accepted Return (MAR)
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -757,7 +773,8 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Ratio of the annualized arithmetic mean of returns and annualized volatility.
+            Ratio of the annualized arithmetic mean of returns and annualized
+            volatility.
         """
 
         ratio = self.arithmetic_ret / self.vol
@@ -774,9 +791,10 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """The ratio of annualized arithmetic mean of returns and annualized volatility or,
-        if riskfree return provided, Sharpe ratio calculated as ( geometric return - risk-free return )
-        / volatility. The latter ratio implies that the riskfree asset has zero volatility. \n
+        """The ratio of annualized arithmetic mean of returns and annualized
+        volatility or, if riskfree return provided, Sharpe ratio calculated
+        as ( geometric return - risk-free return ) / volatility. The latter ratio
+        implies that the riskfree asset has zero volatility. \n
         https://www.investopedia.com/terms/s/sharperatio.asp
 
         Parameters
@@ -786,18 +804,21 @@ class OpenFrame(object):
         riskfree_column : int | None, default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
         Pandas.Series
-            Ratio of the annualized arithmetic mean of returns and annualized volatility or,
+            Ratio of the annualized arithmetic mean of returns and annualized
+            volatility or,
             if risk-free return provided, Sharpe ratio
         """
 
@@ -1004,18 +1025,21 @@ class OpenFrame(object):
         riskfree_column : int | None, default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
         Pandas.Series
-            Sortino ratio calculated as ( return - riskfree return ) / downside deviation
+            Sortino ratio calculated as ( return - riskfree return ) /
+            downside deviation
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1106,7 +1130,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1170,7 +1195,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1257,7 +1283,8 @@ class OpenFrame(object):
         ----------
         observations: int, default: 1
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1266,8 +1293,8 @@ class OpenFrame(object):
         Returns
         -------
         Pandas.Series
-            Most negative percentage change over a rolling number of observations within
-            a chosen date range
+            Most negative percentage change over a rolling number of observations
+            within a chosen date range
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1306,7 +1333,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1358,7 +1386,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1374,7 +1403,9 @@ class OpenFrame(object):
 
         return pd.Series(
             data=skew(
-                self.tsdf.loc[earlier:later].pct_change(), bias=True, nan_policy="omit"
+                a=self.tsdf.loc[earlier:later].pct_change(),
+                bias=True,
+                nan_policy="omit",
             ),
             index=self.tsdf.columns,
             name="Subset Skew",
@@ -1411,7 +1442,8 @@ class OpenFrame(object):
         Parameters
         ----------
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1482,7 +1514,8 @@ class OpenFrame(object):
         level: float, default: 0.95
             The sought CVaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
@@ -1528,7 +1561,8 @@ class OpenFrame(object):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1565,12 +1599,14 @@ class OpenFrame(object):
         level: float, default: 0.95
             The sought VaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1602,7 +1638,8 @@ class OpenFrame(object):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1640,17 +1677,20 @@ class OpenFrame(object):
         level: float, default: 0.95
             The sought VaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -1717,17 +1757,20 @@ class OpenFrame(object):
         level: float, default: 0.95
             The sought VaR level
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -1773,7 +1816,8 @@ class OpenFrame(object):
         Parameters
         ----------
         periods: int, default: 1
-            The number of periods between observations over which difference is calculated
+            The number of periods between observations over which difference
+            is calculated
 
         Returns
         -------
@@ -1830,7 +1874,7 @@ class OpenFrame(object):
         Parameters
         ----------
         freq: str, default "BM"
-            Valid values https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
+            Some of the valid values are D, B, M, BM, Q, BQ, A, BA
 
         Returns
         -------
@@ -1886,7 +1930,8 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.DataFrame:
-        """Exponentially Weighted Moving Average Model for Volatilities and Correlation.
+        """Exponentially Weighted Moving Average Model for Volatilities and
+        Correlation.
         https://www.investopedia.com/articles/07/ewma.asp
 
         Parameters
@@ -1902,13 +1947,15 @@ class OpenFrame(object):
         second_column: int, default: 1
             Column of second timeseries.
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -2000,7 +2047,8 @@ class OpenFrame(object):
         observations: int, default: 21
             Number of observations in the overlapping window.
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -2097,7 +2145,8 @@ class OpenFrame(object):
             The sought Value At Risk level
         observations: int, default: 252
             Number of observations in the overlapping window.
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+        interpolation: Literal["linear", "lower", "higher", "midpoint",
+        "nearest"], default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -2240,9 +2289,11 @@ class OpenFrame(object):
         end_cut: datetime.date, optional
             New last date
         before: bool, default: True
-            If True method will truncate to the common earliest start date also when start_cut = None.
+            If True method will truncate to the common earliest start date also
+            when start_cut = None.
         after: bool, default: True
-            If True method will truncate to the common latest end date also when end_cut = None.
+            If True method will truncate to the common latest end date also
+            when end_cut = None.
 
         Returns
         -------
@@ -2260,9 +2311,13 @@ class OpenFrame(object):
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
         if len(set(self.first_indices)) != 1:
-            warning("One or more constituents still not truncated to same start dates.")
+            warning(
+                "One or more constituents still " "not truncated to same start dates."
+            )
         if len(set(self.last_indices)) != 1:
-            warning("One or more constituents still not truncated to same end dates.")
+            warning(
+                "One or more constituents still " "not truncated to same end dates."
+            )
         return self
 
     def relative(
@@ -2316,13 +2371,15 @@ class OpenFrame(object):
         base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -2374,9 +2431,9 @@ class OpenFrame(object):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> pd.Series:
-        """The Information Ratio equals ( fund return less index return ) divided by the
-        Tracking Error. And the Tracking Error is the standard deviation of the
-        difference between the fund and its index returns.
+        """The Information Ratio equals ( fund return less index return ) divided
+        by the Tracking Error. And the Tracking Error is the standard deviation of
+        the difference between the fund and its index returns.
         The ratio is calculated using the annualized arithmetic mean of returns.
 
         Parameters
@@ -2384,13 +2441,15 @@ class OpenFrame(object):
         base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -2460,13 +2519,15 @@ class OpenFrame(object):
         base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date and to_date
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
         from_date : datetime.date, optional
             Specific from date
         to_date : datetime.date, optional
             Specific to date
         periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
