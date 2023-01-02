@@ -3,6 +3,7 @@ venv:
 	python3 -m venv ./venv
 	venv/bin/python --version
 	venv/bin/pip install --upgrade pip
+	venv/bin/pip install --upgrade wheel
 	venv/bin/pip install --upgrade .[dev]
 
 test:
