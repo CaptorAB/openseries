@@ -822,7 +822,7 @@ class OpenTimeSeries(object):
 
         if float(self.tsdf.iloc[0]) == 0.0:
             raise Exception(
-                "Simple Return cannot be calculated due to an initial value being"
+                "Simple Return cannot be calculated due to an initial value being "
                 "zero."
             )
         return float(self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1)
@@ -853,7 +853,7 @@ class OpenTimeSeries(object):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if float(self.tsdf.loc[earlier]) == 0.0:
             raise Exception(
-                "Simple Return cannot be calculated due to an initial value being"
+                "Simple Return cannot be calculated due to an initial value being "
                 "zero."
             )
         return float(self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1)

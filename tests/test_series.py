@@ -59,7 +59,8 @@ class TestOpenTimeSeries(TestCase):
         sys.stdout = new_stdout
         repseries = self.randomseries
         r = (
-            "OpenTimeSeries(name=Asset, _id=, instrumentId=, valuetype=Price(Close), currency=SEK, "
+            "OpenTimeSeries(name=Asset, _id=, instrumentId=, "
+            "valuetype=Price(Close), currency=SEK, "
             "start=2009-06-30, end=2019-06-28, local_ccy=True)\n"
         )
         print(repseries)
@@ -1100,7 +1101,10 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(
             e_gr_zero.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
+            ),
         )
 
         with self.assertRaises(Exception) as e_grf_zero:
@@ -1108,14 +1112,20 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(
             e_grf_zero.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
+            ),
         )
         with self.assertRaises(Exception) as e_vr_zero:
             _ = zeroseries.value_ret
 
         self.assertEqual(
             e_vr_zero.exception.args[0],
-            "Simple Return cannot be calculated due to an initial value being zero.",
+            (
+                "Simple Return cannot be calculated due to an "
+                "initial value being zero."
+            ),
         )
 
         with self.assertRaises(Exception) as e_vrf_zero:
@@ -1123,7 +1133,10 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(
             e_vrf_zero.exception.args[0],
-            "Simple Return cannot be calculated due to an initial value being zero.",
+            (
+                "Simple Return cannot be calculated due to an "
+                "initial value being zero."
+            ),
         )
 
         negseries = OpenTimeSeries(
@@ -1144,7 +1157,10 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(
             e_gr_neg.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
+            ),
         )
 
         with self.assertRaises(Exception) as e_grf_neg:
@@ -1152,7 +1168,10 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(
             e_grf_neg.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
+            ),
         )
 
     def test_opentimeseries_value_nan_handle(self):
