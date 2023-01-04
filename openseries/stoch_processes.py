@@ -313,8 +313,9 @@ def geometric_brownian_motion_jump_diffusion_levels(
 def heston_construct_correlated_path(
     param: ModelParameters, brownian_motion_one: np.ndarray, seed: int | None = None
 ) -> (np.ndarray, np.ndarray):
-    """This method is a simplified version of the Cholesky decomposition method for just two assets.
-    It does not make use of matrix algebra and is therefore quite easy to implement
+    """This method is a simplified version of the Cholesky decomposition method for
+    just two assets. It does not make use of matrix algebra and is therefore quite
+    easy to implement
 
     Parameters
     ----------

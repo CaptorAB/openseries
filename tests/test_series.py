@@ -131,48 +131,6 @@ class TestOpenTimeSeries(TestCase):
         ts = NewTimeSeries.from_file(remove_duplicates=True)
         self.assertIsInstance(ts, OpenTimeSeries)
 
-    def test_create_opentimeseries_from_open_api(self):
-
-        timeseries_id = "59977d91f3fa6319ecb41cbd"
-        timeseries = OpenTimeSeries.from_open_api(timeseries_id=timeseries_id)
-
-        self.assertTrue(isinstance(timeseries, OpenTimeSeries))
-
-    def test_create_opentimeseries_from_open_nav(self):
-
-        fund = "SE0009807308"
-        timeseries = OpenTimeSeries.from_open_nav(isin=fund)
-
-        self.assertTrue(isinstance(timeseries, OpenTimeSeries))
-
-        with self.assertRaises(Exception) as e_unique:
-            fnd = ""
-            _ = OpenTimeSeries.from_open_nav(isin=fnd)
-
-        self.assertEqual(
-            f"Request for NAV series using ISIN {fnd} returned no data.",
-            e_unique.exception.args[0],
-        )
-
-    def test_create_opentimeseries_from_open_fundinfo(self):
-
-        fund = "SE0009807308"
-        timeseries = OpenTimeSeries.from_open_fundinfo(isin=fund)
-
-        self.assertTrue(isinstance(timeseries, OpenTimeSeries))
-
-        with self.assertRaises(Exception) as e_unique:
-            fnd = ""
-            _ = OpenTimeSeries.from_open_fundinfo(isin=fnd)
-
-        self.assertEqual(int(e_unique.exception.args[0].split(",")[0]), 400)
-
-        with self.assertRaises(Exception) as e_unique:
-            fundd = "SE000"
-            _ = OpenTimeSeries.from_open_fundinfo(isin=fundd)
-
-        self.assertTrue(f"{fundd} is not a valid ISIN" in e_unique.exception.args[0])
-
     def test_create_opentimeseries_from_pandas_df(self):
 
         se = pd.Series(

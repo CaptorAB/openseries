@@ -1,4 +1,5 @@
-<img src="https://sales.captor.se/captor_logo_sv_1600_icketransparent.png" alt="Captor Fund Management AB"
+<img src="https://sales.captor.se/captor_logo_sv_1600_icketransparent.png" alt="Captor
+Fund Management AB"
 width="81" height="100" align="left" float="right"/><br/>
 
 <br><br>
@@ -49,52 +50,10 @@ Instantiate OpenTimeSeries object:
 series = OpenTimeSeries(data)
 ```
 
-To construct using the class method designed to get a NAV timeseries for a Captor Fund:
-
-```
-capirisc = "SE0009807308"
-scillagc = "SE0011670843"
-bonds = OpenTimeSeries.from_open_nav(isin=capirisc)
-equities = OpenTimeSeries.from_open_nav(isin=scillagc)
-```
-
-To compare assets an OpenFrame is constructed as below.
-
-```
-basket = OpenFrame([bonds, equities])
-```
-
-The data cleaning helper methods can be chained like this:
-
-```
-basket.trunc_frame().value_nan_handle().to_cumret()
-```
-
-A new portfolio timeseries can be constructed from an OpenFrame like this:
-
-```
-basket.weights = [0.6, 0.4]
-portfolio = OpenTimeSeries.from_df(basket.make_portfolio("porfolio"))
-basket.add_timeseries(portfolio)
-```
-
-To print return and volatility:
-
-```
-data = basket.all_properties(properties=["arithmetic_ret", "vol"]).T
-data = data.applymap(lambda x: f"{x:.2%}")
-print(data)
-```
-
-Finally, plotting is simple. This will plot the timeseries in a browser window:
-
-```
-basket.plot_series(tick_fmt=".2%")
-```
-
 To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library
 the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)
-and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) classes have an attribute `tsdf`
+and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)
+classes have an attribute `tsdf`
 which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
 ## Table of Contents
@@ -116,7 +75,6 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 |:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
 | [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
-| [frenkla_open_api_sdk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frenkla_open_api_sdk.py) | A Python SDK to interact with the [Frenkla Open API](https://api.frenkla.com/public/api/).                                                                                                          |
 | [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/datefixer.py)                       | A module with date utilities.                                                                                                                                                                       |
 | [openseries.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/openseries.json)                 | The jsonschema of the OpenTimeSeries class.                                                                                                                                                         |
 | [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_layouts.json)         | A module setting [Plotly](https://plotly.com/python/) defaults used in the `plot_series` methods.                                                                                                   |
@@ -127,15 +85,12 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 #### Below are the class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
 
-| Method               | Applies to                    | Description                                                                                        |
-|:---------------------|:------------------------------|:---------------------------------------------------------------------------------------------------|
-| `from_open_api`      | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a Frenkla API endpoint.                       |
-| `from_open_nav`      | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a Frenkla API endpoint.                       |
-| `from_open_fundinfo` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a Frenkla API endpoint.                       |
-| `from_df`            | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame column.                    |
-| `from_frame`         | `OpenTimeSeries`              | Class method to create a new OpenTimeSeries object from a series within an OpenFrame.              |
-| `from_fixed_rate`    | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
-| `from_deepcopy`      | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
+| Method            | Applies to                    | Description                                                                                        |
+|:------------------|:------------------------------|:---------------------------------------------------------------------------------------------------|
+| `from_df`         | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame column.                    |
+| `from_frame`      | `OpenTimeSeries`              | Class method to create a new OpenTimeSeries object from a series within an OpenFrame.              |
+| `from_fixed_rate` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
+| `from_deepcopy`   | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
 
 #### In this table are the non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
@@ -263,7 +218,8 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 #### The methods below are identical to the numeric properties above.
 
-_They are simply methods that take different date or length inputs to return the properties for subset periods._
+_They are simply methods that take different date or length inputs to return the
+properties for subset periods._
 
 | Method                    | type                     | Applies to                    | Description                                                                                                                                                                                                                                                    |
 |:--------------------------|:-------------------------|:------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

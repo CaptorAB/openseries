@@ -393,12 +393,24 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             f"{sames.ret_vol_ratio_func(months_from_last=12):.11f}",
-            f"{float(samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]):.11f}",
+            "{:.11f}".format(
+                float(
+                    samef.ret_vol_ratio_func(
+                        riskfree_rate=0.0, months_from_last=12
+                    ).iloc[0]
+                )
+            ),
         )
 
         self.assertEqual(
             f"{sames.sortino_ratio_func(months_from_last=12):.11f}",
-            f"{float(samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]):.11f}",
+            "{:.11f}".format(
+                float(
+                    samef.sortino_ratio_func(
+                        riskfree_rate=0.0, months_from_last=12
+                    ).iloc[0]
+                )
+            ),
         )
 
     def test_opentimeseries_measures_same_as_openframe_measures(self):
@@ -599,9 +611,6 @@ class TestOpenFrame(TestCase):
         ]
 
         series_createmethods = [
-            "from_open_api",
-            "from_open_nav",
-            "from_open_fundinfo",
             "from_df",
             "from_frame",
             "from_fixed_rate",
@@ -1368,8 +1377,8 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             (
-                "Merging OpenTimeSeries DataFrames with argument how=inner produced an empty "
-                "DataFrame."
+                "Merging OpenTimeSeries DataFrames with argument how=inner produced "
+                "an empty DataFrame."
             ),
             e_merged.exception.args[0],
         )
@@ -1599,7 +1608,10 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_gr_zero.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an initial value being "
+                "zero or a negative value."
+            ),
         )
 
         with self.assertRaises(Exception) as e_grf_zero:
@@ -1607,7 +1619,10 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_grf_zero.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an initial value being "
+                "zero or a negative value."
+            ),
         )
 
         geoframe.delete_timeseries(lvl_zero_item="geoseries3")
@@ -1635,7 +1650,10 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_gr_neg.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an initial value being "
+                "zero or a negative value."
+            ),
         )
 
         with self.assertRaises(Exception) as e_grf_neg:
@@ -1643,7 +1661,10 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_grf_neg.exception.args[0],
-            "Geometric return cannot be calculated due to an initial value being zero or a negative value.",
+            (
+                "Geometric return cannot be calculated due to an initial value being "
+                "zero or a negative value."
+            ),
         )
 
     def test_openframe_value_nan_handle(self):

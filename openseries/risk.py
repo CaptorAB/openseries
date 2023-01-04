@@ -53,7 +53,8 @@ def var_down(
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
-    interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"], default: "lower"
+    interpolation: Literal["linear", "lower", "higher",
+                           "midpoint", "nearest"], default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
 
     Returns
@@ -73,9 +74,10 @@ def var_down(
 
 def drawdown_series(prices: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Series:
     """Calculates https://www.investopedia.com/terms/d/drawdown.asp
-    This returns a series representing a drawdown. When the price is at all-time highs, the drawdown
-    is 0. However, when prices are below high watermarks, the drawdown series = current / hwm - 1
-    The max drawdown can be obtained by simply calling .min() on the result (since the drawdown series is negative)
+    This returns a series representing a drawdown. When the price is at all-time
+    highs, the drawdown is 0. However, when prices are below high watermarks,
+    the drawdown series = current / hwm - 1 The max drawdown can be obtained by
+    simply calling .min() on the result (since the drawdown series is negative)
     Method ignores all gaps of NaN's in the price series.
 
     Parameters

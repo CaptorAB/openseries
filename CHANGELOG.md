@@ -1,16 +1,25 @@
 # Changelog
 
-For a long time I have not kept a log of the changes implemented in the different versions of the openseries package. In
-this file I am attempting to rectify this somewhat. However, unfortunately I do not have the resources to issue any form
-of guarantee that this log will cover all changes, and I will not attempt to go back very far in history.
+For a long time I have not kept a log of the changes implemented in the different
+versions of the openseries package. In
+this file I am attempting to rectify this somewhat. However, unfortunately I do not have
+the resources to issue any form
+of guarantee that this log will cover all changes, and I will not attempt to go back
+very far in history.
+
+## Version [0.9.0] - 2023-01-04
+
+Removed all connections to Frenkla API.
 
 ## Version [0.8.4] - 2022-12-20
 
-Changed Jensen's alpha to be based on asset and market CAGR, instead of cumulative log return.
+Changed Jensen's alpha to be based on asset and market CAGR, instead of cumulative log
+return.
 
 ## Version [0.8.2] - 2022-12-19
 
-Added an OpenTimeSeries method that converts a series of 1-day rates into a cumulative valueseries, and added an
+Added an OpenTimeSeries method that converts a series of 1-day rates into a cumulative
+valueseries, and added an
 OpenFrame method to calculate the Jensen's alpha of an asset relative a market.
 
 ## Version [0.8.1] - 2022-11-25
@@ -23,7 +32,8 @@ Updated dependencies.
 
 ## Version [0.7.9] - 2022-10-30
 
-Sped up holidays check, added merge_series method on OpenFrame, and added tests on failing trunc_frame scenarios.
+Sped up holidays check, added merge_series method on OpenFrame, and added tests on
+failing trunc_frame scenarios.
 
 ## Version [0.7.7] - 2022-10-24
 
@@ -35,7 +45,8 @@ Updated to remove deprecation warnings related to holidays==0.16.
 
 ## Version [0.7.5] - 22-10-12
 
-Removed sweden_holidays module and replaced it with Numpy busdaycalendar. Also added Literal type interpolation input
+Removed sweden_holidays module and replaced it with Numpy busdaycalendar. Also added
+Literal type interpolation input
 for VaR related functions.
 
 ## Version [0.7.4] - 22-09-17
@@ -44,7 +55,8 @@ Opened up the output from OpenFrame.ord_least_squares_fit()
 
 ## Version [0.7.3] - 2022-09-10
 
-Removed pandas.MultiIndex.from_product() as constructor for columns to fix hard to replicate test failure.
+Removed pandas.MultiIndex.from_product() as constructor for columns to fix hard to
+replicate test failure.
 
 ## Version [0.7.2] - 2022-09-05
 
@@ -84,17 +96,21 @@ Improved test coverage to 99%.
 
 ## Version [0.5.7] - 2022-07-24
 
-Fixed rolling correlation, added beta attribute and rolling beta for OpenFrame and associated tests.
+Fixed rolling correlation, added beta attribute and rolling beta for OpenFrame and
+associated tests.
 
 ## Version [0.5.5] - 2022-07-17
 
-Removed log returns everywhere. Removed keyvaluetable and reduced use of date_fix function. Improved test coverage
+Removed log returns everywhere. Removed keyvaluetable and reduced use of date_fix
+function. Improved test coverage
 further and will leave at this level for now.
 
 ## Version [0.5.2] - 2022-07-15
 
-Fixed so that ratios based on geometric returns will use arithmetic return instead to avoid some failures. The geo_ret
-functions will now raise and exception on initial zeroes and on negative values. Improved test coverage and also added
+Fixed so that ratios based on geometric returns will use arithmetic return instead to
+avoid some failures. The geo_ret
+functions will now raise and exception on initial zeroes and on negative values.
+Improved test coverage and also added
 missing PEP604 type hints.
 
 ## Version [0.5.0] - 2022-07-12
@@ -104,15 +120,19 @@ following [PEP 604](https://peps.python.org/pep-0604/).
 
 ## Version [0.4.1] - 2022-07-12
 
-This version is backwards compatible only from Python version 3.8 due to the implementation
+This version is backwards compatible only from Python version 3.8 due to the
+implementation
 of [PEP 589](https://peps.python.org/pep-0589/).
 
 ## Version [0.4.0] - 2022-06-30
 
-This version is backwards compatible to Python version 3.6 and works up to version 3.10, docstrings have been improved
+This version is backwards compatible to Python version 3.6 and works up to version 3.10,
+docstrings have been improved
 and deprecation warnings fixed.
 
 ## Version [0.3.8] - 2022-05-30
 
-This is the first draft version to work with Python version 3.10. It runs but with several deprecation warnings
-primarily from Pandas. Prior to this version openseries was not compatible with Python version 3.10.
+This is the first draft version to work with Python version 3.10. It runs but with
+several deprecation warnings
+primarily from Pandas. Prior to this version openseries was not compatible with Python
+version 3.10.

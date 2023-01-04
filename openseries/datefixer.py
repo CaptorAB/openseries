@@ -76,7 +76,7 @@ def date_offset_foll(
 
     Parameters
     ----------
-    raw_date: str | datetime.date | datetime.datetime | numpy.datetime64 | pandas.Timestamp
+    raw_date: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp
         The date to offset from
     country: str, default: "SE"
         Numpy busdaycalendar country code

@@ -22,7 +22,6 @@ class Simulation(TypedDict, total=False):
 
 
 class ReturnSimulation(object):
-
     number_of_sims: int
     trading_days: int
     trading_days_in_year: int
@@ -236,7 +235,8 @@ class ReturnSimulation(object):
         t: int = 252,
         seed: int | None = 71,
     ):
-        """Heston model is the geometric brownian motion model with stochastic volatility
+        """Heston model is the geometric brownian motion model
+        with stochastic volatility
 
         Parameters
         ----------
