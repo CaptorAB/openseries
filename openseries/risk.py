@@ -16,7 +16,7 @@ def cvar_down(
 
     Parameters
     ----------
-    data: pd.DataFrame | List[float]
+    data: pd.DataFrame | pd.Series | List[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought CVaR level
@@ -49,7 +49,7 @@ def var_down(
 
     Parameters
     ----------
-    data: pd.DataFrame | List[float]
+    data: pd.DataFrame | pd.Series | List[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
