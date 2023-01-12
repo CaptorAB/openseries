@@ -1,11 +1,20 @@
 from copy import deepcopy
-import datetime as dt
+from datetime import date, timedelta
 from functools import reduce
 from logging import warning
-from math import ceil, sqrt
-import numpy as np
+from math import ceil
+from numpy import cov, cumprod, log, sqrt, square, zeros
 from os import path
-import pandas as pd
+from pandas import (
+    concat,
+    DataFrame,
+    date_range,
+    DatetimeIndex,
+    Int64Dtype,
+    merge,
+    MultiIndex,
+    Series,
+)
 from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
@@ -32,7 +41,7 @@ from openseries.risk import (
 
 class OpenFrame(object):
     constituents: List[OpenTimeSeries]
-    tsdf: pd.DataFrame
+    tsdf: DataFrame
     weights: List[float]
 
     def __init__(
@@ -59,11 +68,11 @@ class OpenFrame(object):
             Object of the class OpenFrame
         """
         self.weights = weights
-        self.tsdf = pd.DataFrame()
+        self.tsdf = DataFrame()
         self.constituents = constituents
         if constituents is not None and len(constituents) != 0:
             self.tsdf = reduce(
-                lambda left, right: pd.concat([left, right], axis="columns", sort=sort),
+                lambda left, right: concat([left, right], axis="columns", sort=sort),
                 [x.tsdf for x in self.constituents],
             )
         else:
@@ -115,7 +124,7 @@ class OpenFrame(object):
         """
 
         self.tsdf = reduce(
-            lambda left, right: pd.merge(
+            lambda left, right: merge(
                 left=left,
                 right=right,
                 how=how,
@@ -131,7 +140,7 @@ class OpenFrame(object):
             )
         return self
 
-    def all_properties(self, properties: list | None = None) -> pd.DataFrame:
+    def all_properties(self, properties: list | None = None) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
@@ -172,15 +181,15 @@ class OpenFrame(object):
                 "span_of_days_all",
             ]
         prop_list = [getattr(self, x) for x in properties]
-        results = pd.concat(prop_list, axis="columns").T
+        results = concat(prop_list, axis="columns").T
         return results
 
     def calc_range(
         self,
         months_offset: int | None = None,
-        from_dt: dt.date | None = None,
-        to_dt: dt.date | None = None,
-    ) -> (dt.date, dt.date):
+        from_dt: date | None = None,
+        to_dt: date | None = None,
+    ) -> (date, date):
         """Creates user defined date range
 
         Parameters
@@ -227,10 +236,10 @@ class OpenFrame(object):
                     earlier, later = from_dt, to_dt
             if earlier is not None:
                 while not self.tsdf.index.isin([earlier]).any():
-                    earlier -= dt.timedelta(days=1)
+                    earlier -= timedelta(days=1)
             if later is not None:
                 while not self.tsdf.index.isin([later]).any():
-                    later += dt.timedelta(days=1)
+                    later += timedelta(days=1)
         else:
             earlier, later = self.first_idx, self.last_idx
 
@@ -253,15 +262,15 @@ class OpenFrame(object):
         calendar = holiday_calendar(country=country)
         cday = CustomBusinessDay(calendar=calendar)
 
-        date_range = [
+        d_range = [
             d.date()
-            for d in pd.date_range(
+            for d in date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
                 freq=cday,
             )
         ]
-        self.tsdf = self.tsdf.reindex(date_range, method=None, copy=False)
+        self.tsdf = self.tsdf.reindex(d_range, method=None, copy=False)
         return self
 
     @property
@@ -276,7 +285,7 @@ class OpenFrame(object):
         return len(self.tsdf.index)
 
     @property
-    def lengths_of_items(self) -> pd.Series:
+    def lengths_of_items(self) -> Series:
         """
         Returns
         -------
@@ -284,11 +293,11 @@ class OpenFrame(object):
             Number of observations of all constituents
         """
 
-        return pd.Series(
+        return Series(
             data=[self.tsdf.loc[:, d].count() for d in self.tsdf],
             index=self.tsdf.columns,
             name="observations",
-            dtype=pd.Int64Dtype(),
+            dtype=Int64Dtype(),
         )
 
     @property
@@ -327,7 +336,7 @@ class OpenFrame(object):
         return self.tsdf.columns.get_level_values(1).tolist()
 
     @property
-    def first_idx(self) -> dt.date:
+    def first_idx(self) -> date:
         """
         Returns
         -------
@@ -337,7 +346,7 @@ class OpenFrame(object):
         return self.tsdf.index[0]
 
     @property
-    def first_indices(self) -> pd.Series:
+    def first_indices(self) -> Series:
         """
         Returns
         -------
@@ -345,14 +354,14 @@ class OpenFrame(object):
             The first dates in the timeseries of all constituents
         """
 
-        return pd.Series(
+        return Series(
             data=[i.first_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="first indices",
         )
 
     @property
-    def last_idx(self) -> dt.date:
+    def last_idx(self) -> date:
         """
         Returns
         -------
@@ -362,7 +371,7 @@ class OpenFrame(object):
         return self.tsdf.index[-1]
 
     @property
-    def last_indices(self) -> pd.Series:
+    def last_indices(self) -> Series:
         """
         Returns
         -------
@@ -370,7 +379,7 @@ class OpenFrame(object):
             The last dates in the timeseries of all constituents
         """
 
-        return pd.Series(
+        return Series(
             data=[i.last_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="last indices",
@@ -389,15 +398,15 @@ class OpenFrame(object):
         return (self.last_idx - self.first_idx).days
 
     @property
-    def span_of_days_all(self) -> pd.Series:
+    def span_of_days_all(self) -> Series:
         """
         Number of days from the first date to the last for all items in the frame.
         """
-        return pd.Series(
+        return Series(
             data=[c.span_of_days for c in self.constituents],
             index=self.tsdf.columns,
             name="span of days",
-            dtype=pd.Int64Dtype(),
+            dtype=Int64Dtype(),
         )
 
     @property
@@ -421,7 +430,7 @@ class OpenFrame(object):
         return self.length / self.yearfrac
 
     @property
-    def geo_ret(self) -> pd.Series:
+    def geo_ret(self) -> Series:
         """https://www.investopedia.com/terms/c/cagr.asp
 
         Returns
@@ -435,7 +444,7 @@ class OpenFrame(object):
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
             )
-        return pd.Series(
+        return Series(
             data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac) - 1,
             name="Geometric return",
             dtype="float64",
@@ -444,9 +453,9 @@ class OpenFrame(object):
     def geo_ret_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """https://www.investopedia.com/terms/c/cagr.asp
 
         Parameters
@@ -478,14 +487,14 @@ class OpenFrame(object):
 
         fraction = (later - earlier).days / 365.25
 
-        return pd.Series(
+        return Series(
             data=(self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1,
             name="Subset Geometric return",
             dtype="float64",
         )
 
     @property
-    def arithmetic_ret(self) -> pd.Series:
+    def arithmetic_ret(self) -> Series:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
         Returns
@@ -494,7 +503,7 @@ class OpenFrame(object):
             Annualized arithmetic mean of returns
         """
 
-        return pd.Series(
+        return Series(
             data=self.tsdf.pct_change().mean() * self.periods_in_a_year,
             name="Arithmetic return",
             dtype="float64",
@@ -503,10 +512,10 @@ class OpenFrame(object):
     def arithmetic_ret_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
         Parameters
@@ -536,14 +545,14 @@ class OpenFrame(object):
                 self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
             )
             time_factor = how_many / fraction
-        return pd.Series(
+        return Series(
             data=self.tsdf.loc[earlier:later].pct_change().mean() * time_factor,
             name="Subset Arithmetic return",
             dtype="float64",
         )
 
     @property
-    def value_ret(self) -> pd.Series:
+    def value_ret(self) -> Series:
         """
         Returns
         -------
@@ -557,7 +566,7 @@ class OpenFrame(object):
                 f"being zero. ({self.tsdf.head(3)})"
             )
         else:
-            return pd.Series(
+            return Series(
                 data=self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1,
                 name="Total return",
                 dtype="float64",
@@ -566,9 +575,9 @@ class OpenFrame(object):
     def value_ret_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """
         Parameters
         ----------
@@ -592,15 +601,13 @@ class OpenFrame(object):
                 f"Error in function value_ret due to an initial value "
                 f"being zero. ({self.tsdf.head(3)})"
             )
-        return pd.Series(
+        return Series(
             data=self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1,
             name="Subset Total return",
             dtype="float64",
         )
 
-    def value_ret_calendar_period(
-        self, year: int, month: int | None = None
-    ) -> pd.Series:
+    def value_ret_calendar_period(self, year: int, month: int | None = None) -> Series:
         """
         Parameters
         ----------
@@ -620,16 +627,16 @@ class OpenFrame(object):
         else:
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
-        vrdf.index = pd.DatetimeIndex(vrdf.index)
+        vrdf.index = DatetimeIndex(vrdf.index)
         rtn = vrdf.pct_change().copy()
         rtn = rtn.loc[period] + 1
-        rtn = rtn.apply(np.cumprod, axis="index").iloc[-1] - 1
+        rtn = rtn.apply(cumprod, axis="index").iloc[-1] - 1
         rtn.name = period
         rtn = rtn.astype("float64")
         return rtn
 
     @property
-    def vol(self) -> pd.Series:
+    def vol(self) -> Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
         in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
@@ -640,8 +647,8 @@ class OpenFrame(object):
             Annualized volatility
         """
 
-        return pd.Series(
-            data=self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year),
+        return Series(
+            data=self.tsdf.pct_change().std() * sqrt(self.periods_in_a_year),
             name="Volatility",
             dtype="float64",
         )
@@ -649,10 +656,10 @@ class OpenFrame(object):
     def vol_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
         in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
@@ -684,14 +691,14 @@ class OpenFrame(object):
                 self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
             )
             time_factor = how_many / fraction
-        return pd.Series(
-            data=self.tsdf.loc[earlier:later].pct_change().std() * np.sqrt(time_factor),
+        return Series(
+            data=self.tsdf.loc[earlier:later].pct_change().std() * sqrt(time_factor),
             name="Subset Volatility",
             dtype="float64",
         )
 
     @property
-    def downside_deviation(self) -> pd.Series:
+    def downside_deviation(self) -> Series:
         """The standard deviation of returns that are below a Minimum Accepted
         Return of zero.
         It is used to calculate the Sortino Ratio \n
@@ -705,9 +712,9 @@ class OpenFrame(object):
 
         dddf = self.tsdf.pct_change()
 
-        return pd.Series(
-            data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / self.length)
-            * np.sqrt(self.periods_in_a_year),
+        return Series(
+            data=sqrt((dddf[dddf < 0.0] ** 2).sum() / self.length)
+            * sqrt(self.periods_in_a_year),
             name="Downside deviation",
             dtype="float64",
         )
@@ -716,10 +723,10 @@ class OpenFrame(object):
         self,
         min_accepted_return: float = 0.0,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """The standard deviation of returns that are below a Minimum Accepted
         Return of zero.
         It is used to calculate the Sortino Ratio \n
@@ -760,15 +767,14 @@ class OpenFrame(object):
             .sub(min_accepted_return / time_factor)
         )
 
-        return pd.Series(
-            data=np.sqrt((dddf[dddf < 0.0] ** 2).sum() / how_many)
-            * np.sqrt(time_factor),
+        return Series(
+            data=sqrt((dddf[dddf < 0.0] ** 2).sum() / how_many) * sqrt(time_factor),
             name="Subset Downside deviation",
             dtype="float64",
         )
 
     @property
-    def ret_vol_ratio(self) -> pd.Series:
+    def ret_vol_ratio(self) -> Series:
         """
         Returns
         -------
@@ -787,10 +793,10 @@ class OpenFrame(object):
         riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """The ratio of annualized arithmetic mean of returns and annualized
         volatility or, if riskfree return provided, Sharpe ratio calculated
         as ( geometric return - risk-free return ) / volatility. The latter ratio
@@ -851,10 +857,10 @@ class OpenFrame(object):
                     longdf = self.tsdf.loc[earlier:later].loc[:, item]
                     ret = float(longdf.pct_change().mean() * time_factor)
                     riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
-                    vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
+                    vol = float(longdf.pct_change().std() * sqrt(time_factor))
                     ratios.append((ret - riskfree_ret) / vol)
 
-            return pd.Series(
+            return Series(
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sharpe Ratios vs {riskfree_label}",
@@ -864,10 +870,10 @@ class OpenFrame(object):
             for item in self.tsdf:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 ret = float(longdf.pct_change().mean() * time_factor)
-                vol = float(longdf.pct_change().std() * np.sqrt(time_factor))
+                vol = float(longdf.pct_change().std() * sqrt(time_factor))
                 ratios.append((ret - riskfree_rate) / vol)
 
-            return pd.Series(
+            return Series(
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sharpe Ratios (rf={riskfree_rate:.2%})",
@@ -925,7 +931,7 @@ class OpenFrame(object):
                 raise Exception("market should be a tuple or an integer.")
         else:
             if isinstance(asset, tuple):
-                asset_log = np.log(
+                asset_log = log(
                     self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0]
                 )
                 if self.yearfrac > 1.0:
@@ -940,7 +946,7 @@ class OpenFrame(object):
                         - 1
                     )
             elif isinstance(asset, int):
-                asset_log = np.log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                asset_log = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
                 if self.yearfrac > 1.0:
                     asset_cagr = (
                         self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
@@ -952,7 +958,7 @@ class OpenFrame(object):
             else:
                 raise Exception("asset should be a tuple or an integer.")
             if isinstance(market, tuple):
-                market_log = np.log(
+                market_log = log(
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0]
                 )
                 if self.yearfrac > 1.0:
@@ -967,9 +973,7 @@ class OpenFrame(object):
                         - 1
                     )
             elif isinstance(market, int):
-                market_log = np.log(
-                    self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market]
-                )
+                market_log = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
                 if self.yearfrac > 1.0:
                     market_cagr = (
                         self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
@@ -981,13 +985,13 @@ class OpenFrame(object):
             else:
                 raise Exception("market should be a tuple or an integer.")
 
-        covariance = np.cov(asset_log, market_log, ddof=1)
+        covariance = cov(asset_log, market_log, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     @property
-    def sortino_ratio(self) -> pd.Series:
+    def sortino_ratio(self) -> Series:
         """https://www.investopedia.com/terms/s/sortinoratio.asp
 
         Returns
@@ -1008,10 +1012,10 @@ class OpenFrame(object):
         riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """The Sortino ratio calculated as ( return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has zero
         volatility, and a minimum acceptable return of zero. The ratio is
@@ -1074,11 +1078,11 @@ class OpenFrame(object):
                     dddf = longdf.pct_change()
                     downdev = float(
                         sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-                        * np.sqrt(time_factor)
+                        * sqrt(time_factor)
                     )
                     ratios.append((ret - riskfree_ret) / downdev)
 
-            return pd.Series(
+            return Series(
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sortino Ratios vs {riskfree_label}",
@@ -1091,11 +1095,11 @@ class OpenFrame(object):
                 dddf = longdf.pct_change()
                 downdev = float(
                     sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-                    * np.sqrt(time_factor)
+                    * sqrt(time_factor)
                 )
                 ratios.append((ret - riskfree_rate) / downdev)
 
-            return pd.Series(
+            return Series(
                 data=ratios,
                 index=self.tsdf.columns,
                 name=f"Sortino Ratios (rf={riskfree_rate:.2%},mar=0.0%)",
@@ -1103,7 +1107,7 @@ class OpenFrame(object):
             )
 
     @property
-    def z_score(self) -> pd.Series:
+    def z_score(self) -> Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
         Returns
@@ -1113,7 +1117,7 @@ class OpenFrame(object):
         """
 
         zd = self.tsdf.pct_change()
-        return pd.Series(
+        return Series(
             data=(zd.iloc[-1] - zd.mean()) / zd.std(),
             name="Z-score",
             dtype="float64",
@@ -1122,9 +1126,9 @@ class OpenFrame(object):
     def z_score_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
         Parameters
@@ -1145,14 +1149,14 @@ class OpenFrame(object):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         zd = self.tsdf.loc[earlier:later].pct_change()
-        return pd.Series(
+        return Series(
             data=(zd.iloc[-1] - zd.mean()) / zd.std(),
             name="Subset Z-score",
             dtype="float64",
         )
 
     @property
-    def max_drawdown(self) -> pd.Series:
+    def max_drawdown(self) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1161,14 +1165,14 @@ class OpenFrame(object):
             Maximum drawdown without any limit on date range
         """
 
-        return pd.Series(
+        return Series(
             data=(self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1,
             name="Max drawdown",
             dtype="float64",
         )
 
     @property
-    def max_drawdown_date(self) -> pd.Series:
+    def max_drawdown_date(self) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1178,7 +1182,7 @@ class OpenFrame(object):
         """
 
         md_dates = [c.max_drawdown_date for c in self.constituents]
-        return pd.Series(
+        return Series(
             data=md_dates,
             index=self.tsdf.columns,
             name="Max drawdown dates",
@@ -1187,9 +1191,9 @@ class OpenFrame(object):
     def max_drawdown_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Parameters
@@ -1209,7 +1213,7 @@ class OpenFrame(object):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return pd.Series(
+        return Series(
             data=(
                 self.tsdf.loc[earlier:later]
                 / self.tsdf.loc[earlier:later].expanding(min_periods=1).max()
@@ -1220,7 +1224,7 @@ class OpenFrame(object):
         )
 
     @property
-    def max_drawdown_cal_year(self) -> pd.Series:
+    def max_drawdown_cal_year(self) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1230,7 +1234,7 @@ class OpenFrame(object):
         """
 
         md = (
-            self.tsdf.groupby([pd.DatetimeIndex(self.tsdf.index).year])
+            self.tsdf.groupby([DatetimeIndex(self.tsdf.index).year])
             .apply(
                 lambda prices: (prices / prices.expanding(min_periods=1).max()).min()
                 - 1
@@ -1242,7 +1246,7 @@ class OpenFrame(object):
         return md
 
     @property
-    def worst(self) -> pd.Series:
+    def worst(self) -> Series:
         """
         Returns
         -------
@@ -1250,12 +1254,10 @@ class OpenFrame(object):
             Most negative percentage change
         """
 
-        return pd.Series(
-            data=self.tsdf.pct_change().min(), name="Worst", dtype="float64"
-        )
+        return Series(data=self.tsdf.pct_change().min(), name="Worst", dtype="float64")
 
     @property
-    def worst_month(self) -> pd.Series:
+    def worst_month(self) -> Series:
         """
         Returns
         -------
@@ -1264,8 +1266,8 @@ class OpenFrame(object):
         """
 
         wdf = self.tsdf.copy()
-        wdf.index = pd.DatetimeIndex(wdf.index)
-        return pd.Series(
+        wdf.index = DatetimeIndex(wdf.index)
+        return Series(
             data=wdf.resample("BM").last().pct_change().min(),
             name="Worst month",
             dtype="float64",
@@ -1275,9 +1277,9 @@ class OpenFrame(object):
         self,
         observations: int = 1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """
         Parameters
         ----------
@@ -1298,7 +1300,7 @@ class OpenFrame(object):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return pd.Series(
+        return Series(
             data=self.tsdf.loc[earlier:later]
             .pct_change()
             .rolling(observations, min_periods=observations)
@@ -1309,7 +1311,7 @@ class OpenFrame(object):
         )
 
     @property
-    def positive_share(self) -> pd.Series:
+    def positive_share(self) -> Series:
         """
         Returns
         -------
@@ -1326,9 +1328,9 @@ class OpenFrame(object):
     def positive_share_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """
         Parameters
         ----------
@@ -1359,7 +1361,7 @@ class OpenFrame(object):
         return answer
 
     @property
-    def skew(self) -> pd.Series:
+    def skew(self) -> Series:
         """https://www.investopedia.com/terms/s/skewness.asp
 
         Returns
@@ -1368,7 +1370,7 @@ class OpenFrame(object):
             Skew of the return distribution
         """
 
-        return pd.Series(
+        return Series(
             data=skew(self.tsdf.pct_change().values, bias=True, nan_policy="omit"),
             index=self.tsdf.columns,
             name="Skew",
@@ -1378,9 +1380,9 @@ class OpenFrame(object):
     def skew_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """https://www.investopedia.com/terms/s/skewness.asp
 
         Parameters
@@ -1401,7 +1403,7 @@ class OpenFrame(object):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
-        return pd.Series(
+        return Series(
             data=skew(
                 a=self.tsdf.loc[earlier:later].pct_change(),
                 bias=True,
@@ -1413,7 +1415,7 @@ class OpenFrame(object):
         )
 
     @property
-    def kurtosis(self) -> pd.Series:
+    def kurtosis(self) -> Series:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
         Returns
@@ -1422,7 +1424,7 @@ class OpenFrame(object):
             Kurtosis of the return distribution
         """
 
-        return pd.Series(
+        return Series(
             data=kurtosis(
                 self.tsdf.pct_change(), fisher=True, bias=True, nan_policy="omit"
             ),
@@ -1434,9 +1436,9 @@ class OpenFrame(object):
     def kurtosis_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
         Parameters
@@ -1457,7 +1459,7 @@ class OpenFrame(object):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
-        return pd.Series(
+        return Series(
             data=kurtosis(
                 self.tsdf.loc[earlier:later].pct_change(),
                 fisher=True,
@@ -1470,7 +1472,7 @@ class OpenFrame(object):
         )
 
     @property
-    def cvar_down(self, level: float = 0.95) -> pd.Series:
+    def cvar_down(self, level: float = 0.95) -> Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
         Parameters
@@ -1493,7 +1495,7 @@ class OpenFrame(object):
             .mean()
             for x in self.tsdf
         ]
-        return pd.Series(
+        return Series(
             data=var_list,
             index=self.tsdf.columns,
             name=f"CVaR {level:.1%}",
@@ -1504,9 +1506,9 @@ class OpenFrame(object):
         self,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-    ) -> pd.Series:
+        from_date: date | None = None,
+        to_date: date | None = None,
+    ) -> Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
         Parameters
@@ -1537,7 +1539,7 @@ class OpenFrame(object):
             .mean()
             for x in self.tsdf
         ]
-        return pd.Series(
+        return Series(
             data=var_list,
             index=self.tsdf.columns,
             name=f"CVaR {level:.1%}",
@@ -1551,7 +1553,7 @@ class OpenFrame(object):
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
-    ) -> pd.Series:
+    ) -> Series:
         """Downside Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
         https://www.investopedia.com/terms/v/var.asp
@@ -1571,7 +1573,7 @@ class OpenFrame(object):
             Downside Value At Risk
         """
 
-        return pd.Series(
+        return Series(
             data=self.tsdf.pct_change().quantile(
                 1 - level, interpolation=interpolation
             ),
@@ -1583,12 +1585,12 @@ class OpenFrame(object):
         self,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
-    ) -> pd.Series:
+    ) -> Series:
         """https://www.investopedia.com/terms/v/var.asp
         Downside Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel.
@@ -1616,7 +1618,7 @@ class OpenFrame(object):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return pd.Series(
+        return Series(
             data=self.tsdf.loc[earlier:later]
             .pct_change()
             .quantile(1 - level, interpolation=interpolation),
@@ -1631,7 +1633,7 @@ class OpenFrame(object):
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
-    ) -> pd.Series:
+    ) -> Series:
         """
         Parameters
         ----------
@@ -1650,11 +1652,11 @@ class OpenFrame(object):
         """
 
         imp_vol = (
-            -np.sqrt(self.periods_in_a_year)
+            -sqrt(self.periods_in_a_year)
             * self.var_down_func(interpolation=interpolation)
             / norm.ppf(level)
         )
-        return pd.Series(
+        return Series(
             data=imp_vol, name=f"Imp vol from VaR {level:.0%}", dtype="float64"
         )
 
@@ -1662,14 +1664,14 @@ class OpenFrame(object):
         self,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """
         Parameters
         ----------
@@ -1709,7 +1711,7 @@ class OpenFrame(object):
             )
             time_factor = how_many / fraction
         if drift_adjust:
-            imp_vol = (-np.sqrt(time_factor) / norm.ppf(level)) * (
+            imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
                 self.tsdf.loc[earlier:later]
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
@@ -1718,13 +1720,13 @@ class OpenFrame(object):
             )
         else:
             imp_vol = (
-                -np.sqrt(time_factor)
+                -sqrt(time_factor)
                 * self.tsdf.loc[earlier:later]
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
                 / norm.ppf(level)
             )
-        return pd.Series(
+        return Series(
             data=imp_vol, name=f"Subset Imp vol from VaR {level:.0%}", dtype="float64"
         )
 
@@ -1735,14 +1737,14 @@ class OpenFrame(object):
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """A position weight multiplier from the ratio between a VaR implied
         volatility and a given target volatility. Multiplier = 1.0 -> target met
 
@@ -1791,7 +1793,7 @@ class OpenFrame(object):
         vfv = vfv.apply(
             lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local))
         )
-        return pd.Series(
+        return Series(
             data=vfv, name=f"Weight from target vol {target_vol:.1%}", dtype="float64"
         )
 
@@ -1807,7 +1809,7 @@ class OpenFrame(object):
         self.tsdf.iloc[0] = 0
         new_labels = ["Return(Total)"] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
     def value_to_diff(self, periods: int = 1):
@@ -1829,7 +1831,7 @@ class OpenFrame(object):
         self.tsdf.iloc[0] = 0
         new_labels = ["Return(Total)"] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
     def value_to_log(self):
@@ -1842,7 +1844,7 @@ class OpenFrame(object):
             An OpenFrame object
         """
 
-        self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
+        self.tsdf = log(self.tsdf / self.tsdf.iloc[0])
         return self
 
     def to_cumret(self):
@@ -1862,10 +1864,10 @@ class OpenFrame(object):
             self.value_to_ret()
 
         self.tsdf = self.tsdf.add(1.0)
-        self.tsdf = self.tsdf.apply(np.cumprod, axis="index") / self.tsdf.iloc[0]
+        self.tsdf = self.tsdf.apply(cumprod, axis="index") / self.tsdf.iloc[0]
         new_labels = ["Price(Close)"] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        self.tsdf.columns = pd.MultiIndex.from_arrays(arrays)
+        self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
     def resample(self, freq="BM"):
@@ -1882,9 +1884,9 @@ class OpenFrame(object):
             An OpenFrame object
         """
 
-        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
+        self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
+        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
         return self
 
     def to_drawdown_series(self):
@@ -1900,7 +1902,7 @@ class OpenFrame(object):
             self.tsdf.loc[:, t] = drawdown_series(self.tsdf.loc[:, t])
         return self
 
-    def drawdown_details(self) -> pd.DataFrame:
+    def drawdown_details(self) -> DataFrame:
         """
         Returns
         -------
@@ -1909,13 +1911,13 @@ class OpenFrame(object):
             'Days from start to bottom', & 'Average fall per day'
         """
 
-        mddf = pd.DataFrame()
+        mddf = DataFrame()
         for i in self.constituents:
             tmpdf = i.tsdf.copy()
-            tmpdf.index = pd.DatetimeIndex(tmpdf.index)
+            tmpdf.index = DatetimeIndex(tmpdf.index)
             dd = drawdown_details(tmpdf)
             dd.name = i.label
-            mddf = pd.concat([mddf, dd], axis="columns")
+            mddf = concat([mddf, dd], axis="columns")
         return mddf
 
     def ewma_risk(
@@ -1926,10 +1928,10 @@ class OpenFrame(object):
         first_column: int = 0,
         second_column: int = 1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """Exponentially Weighted Moving Average Model for Volatilities and
         Correlation.
         https://www.investopedia.com/articles/07/ewma.asp
@@ -1987,15 +1989,15 @@ class OpenFrame(object):
         data = self.tsdf.loc[earlier:later].copy()
 
         for rtn in cols:
-            data[rtn, "Returns"] = np.log(data.loc[:, (rtn, "Price(Close)")]).diff()
-            data[rtn, "EWMA"] = np.zeros(how_many)
+            data[rtn, "Returns"] = log(data.loc[:, (rtn, "Price(Close)")]).diff()
+            data[rtn, "EWMA"] = zeros(how_many)
             data.loc[:, (rtn, "EWMA")].iloc[0] = data.loc[:, (rtn, "Returns")].iloc[
                 1:day_chunk
-            ].std(ddof=dlta_degr_freedms) * np.sqrt(time_factor)
+            ].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
-        data["Cov", "EWMA"] = np.zeros(how_many)
-        data[corr_label, "EWMA"] = np.zeros(how_many)
-        data.loc[:, ("Cov", "EWMA")].iloc[0] = np.cov(
+        data["Cov", "EWMA"] = zeros(how_many)
+        data[corr_label, "EWMA"] = zeros(how_many)
+        data.loc[:, ("Cov", "EWMA")].iloc[0] = cov(
             m=data.loc[:, (cols[0], "Returns")].iloc[1:day_chunk].to_numpy(),
             y=data.loc[:, (cols[1], "Returns")].iloc[1:day_chunk].to_numpy(),
             ddof=dlta_degr_freedms,
@@ -2010,11 +2012,9 @@ class OpenFrame(object):
 
         prev = data.loc[self.first_idx]
         for _, row in data.iloc[1:].iterrows():
-            row.loc[cols, "EWMA"] = np.sqrt(
-                np.square(row.loc[cols, "Returns"].to_numpy())
-                * time_factor
-                * (1 - lmbda)
-                + np.square(prev.loc[cols, "EWMA"].to_numpy()) * lmbda
+            row.loc[cols, "EWMA"] = sqrt(
+                square(row.loc[cols, "Returns"].to_numpy()) * time_factor * (1 - lmbda)
+                + square(prev.loc[cols, "EWMA"].to_numpy()) * lmbda
             )
             row.loc["Cov", "EWMA"] = (
                 row.loc[cols[0], "Returns"]
@@ -2038,7 +2038,7 @@ class OpenFrame(object):
         column: int,
         observations: int = 21,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """
         Parameters
         ----------
@@ -2062,7 +2062,7 @@ class OpenFrame(object):
             time_factor = self.periods_in_a_year
         vol_label = self.tsdf.iloc[:, column].name[0]
         df = self.tsdf.iloc[:, column].pct_change()
-        voldf = df.rolling(observations, min_periods=observations).std() * np.sqrt(
+        voldf = df.rolling(observations, min_periods=observations).std() * sqrt(
             time_factor
         )
         voldf = voldf.dropna().to_frame()
@@ -2070,7 +2070,7 @@ class OpenFrame(object):
 
         return voldf
 
-    def rolling_return(self, column: int, observations: int = 21) -> pd.DataFrame:
+    def rolling_return(self, column: int, observations: int = 21) -> DataFrame:
         """
         Parameters
         ----------
@@ -2099,7 +2099,7 @@ class OpenFrame(object):
 
     def rolling_cvar_down(
         self, column: int, level: float = 0.95, observations: int = 252
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """
         Parameters
         ----------
@@ -2135,7 +2135,7 @@ class OpenFrame(object):
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
         observations: int = 252,
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """
         Parameters
         ----------
@@ -2215,7 +2215,7 @@ class OpenFrame(object):
         return self
 
     @property
-    def correl_matrix(self) -> pd.DataFrame:
+    def correl_matrix(self) -> DataFrame:
         """
         Returns
         -------
@@ -2242,7 +2242,7 @@ class OpenFrame(object):
         """
 
         self.constituents += [new_series]
-        self.tsdf = pd.concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
+        self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
     def delete_timeseries(self, lvl_zero_item: str):
@@ -2275,8 +2275,8 @@ class OpenFrame(object):
 
     def trunc_frame(
         self,
-        start_cut: dt.date | None = None,
-        end_cut: dt.date | None = None,
+        start_cut: date | None = None,
+        end_cut: date | None = None,
         before: bool = True,
         after: bool = True,
     ):
@@ -2358,10 +2358,10 @@ class OpenFrame(object):
         self,
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """Calculates the Tracking Error which is the standard deviation of the
         difference between the fund and its index returns. \n
         https://www.investopedia.com/terms/t/trackingerror.asp
@@ -2413,10 +2413,10 @@ class OpenFrame(object):
             else:
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 relative = 1.0 + longdf - shortdf
-                vol = float(relative.pct_change().std() * np.sqrt(time_factor))
+                vol = float(relative.pct_change().std() * sqrt(time_factor))
                 terrors.append(vol)
 
-        return pd.Series(
+        return Series(
             data=terrors,
             index=self.tsdf.columns,
             name=f"Tracking Errors vs {short_label}",
@@ -2427,10 +2427,10 @@ class OpenFrame(object):
         self,
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """The Information Ratio equals ( fund return less index return ) divided
         by the Tracking Error. And the Tracking Error is the standard deviation of
         the difference between the fund and its index returns.
@@ -2484,10 +2484,10 @@ class OpenFrame(object):
                 longdf = self.tsdf.loc[earlier:later].loc[:, item]
                 relative = 1.0 + longdf - shortdf
                 ret = float(relative.pct_change().mean() * time_factor)
-                vol = float(relative.pct_change().std() * np.sqrt(time_factor))
+                vol = float(relative.pct_change().std() * sqrt(time_factor))
                 ratios.append(ret / vol)
 
-        return pd.Series(
+        return Series(
             data=ratios,
             index=self.tsdf.columns,
             name=f"Info Ratios vs {short_label}",
@@ -2499,10 +2499,10 @@ class OpenFrame(object):
         ratio: str,
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """The Up (Down) Capture Ratio is calculated by dividing the CAGR
         of the asset during periods that the benchmark returns are positive (negative)
         by the CAGR of the benchmark during the same periods.
@@ -2644,7 +2644,7 @@ class OpenFrame(object):
         else:
             resultname = f"Up-Down Capture Ratios vs {short_label}"
 
-        return pd.Series(
+        return Series(
             data=ratios,
             index=self.tsdf.columns,
             name=resultname,
@@ -2687,19 +2687,19 @@ class OpenFrame(object):
                 raise Exception("market should be a tuple or an integer.")
         else:
             if isinstance(asset, tuple):
-                y = np.log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
+                y = log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
             elif isinstance(asset, int):
-                y = np.log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                y = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
                 raise Exception("asset should be a tuple or an integer.")
             if isinstance(market, tuple):
-                x = np.log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
+                x = log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
             elif isinstance(market, int):
-                x = np.log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                x = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
             else:
                 raise Exception("market should be a tuple or an integer.")
 
-        covariance = np.cov(y, x, ddof=1)
+        covariance = cov(y, x, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return beta
@@ -2750,7 +2750,7 @@ class OpenFrame(object):
 
         return results
 
-    def make_portfolio(self, name: str) -> pd.DataFrame:
+    def make_portfolio(self, name: str) -> DataFrame:
         """Calculates a basket timeseries based on the supplied weights
 
         Parameters
@@ -2788,7 +2788,7 @@ class OpenFrame(object):
         short_column: int = 1,
         observations: int = 21,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """The Information Ratio equals ( fund return less index return ) divided by the
         Tracking Error. And the Tracking Error is the standard deviation of the
         difference between the fund and its index returns.
@@ -2830,7 +2830,7 @@ class OpenFrame(object):
 
         voldf = relative.pct_change().rolling(
             observations, min_periods=observations
-        ).std() * np.sqrt(time_factor)
+        ).std() * sqrt(time_factor)
         voldf = voldf.dropna().to_frame()
 
         ratiodf = (retdf.iloc[:, 0] / voldf.iloc[:, 0]).to_frame()
@@ -2843,7 +2843,7 @@ class OpenFrame(object):
         asset_column: int = 0,
         market_column: int = 1,
         observations: int = 21,
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """https://www.investopedia.com/terms/b/beta.asp
         Calculates Beta as Co-variance of asset & market divided by Variance of market
 
@@ -2867,10 +2867,10 @@ class OpenFrame(object):
         rolling = self.tsdf.copy()
         rolling = rolling.pct_change().rolling(observations, min_periods=observations)
 
-        cov = rolling.cov()
-        cov.dropna(inplace=True)
+        rcov = rolling.cov()
+        rcov.dropna(inplace=True)
 
-        rollbeta = cov.iloc[:, asset_column].xs(market_label, level=1) / cov.iloc[
+        rollbeta = rcov.iloc[:, asset_column].xs(market_label, level=1) / rcov.iloc[
             :, market_column
         ].xs(market_label, level=1)
         rollbeta = rollbeta.to_frame()
@@ -2884,7 +2884,7 @@ class OpenFrame(object):
         first_column: int = 0,
         second_column: int = 1,
         observations: int = 21,
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """Calculates correlation between two series. The period with
         at least the given number of observations is the first period calculated.
 

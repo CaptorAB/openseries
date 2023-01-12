@@ -1,5 +1,5 @@
-import numpy as np
-import pandas as pd
+from numpy import insert, random, sqrt
+from pandas import DataFrame
 from typing import TypedDict
 
 from openseries.stoch_processes import (
@@ -18,7 +18,7 @@ class Simulation(TypedDict, total=False):
     trading_days_in_year: int
     mean_annual_return: float
     mean_annual_vol: float
-    df: pd.DataFrame
+    df: DataFrame
 
 
 class ReturnSimulation(object):
@@ -27,7 +27,7 @@ class ReturnSimulation(object):
     trading_days_in_year: int
     mean_annual_return: float
     mean_annual_vol: float
-    df: pd.DataFrame
+    df: DataFrame
 
     def __init__(self, d: Simulation):
         """Instantiates an object of the class ReturnSimulation
@@ -41,7 +41,7 @@ class ReturnSimulation(object):
         self.__dict__ = d
 
     @property
-    def results(self) -> pd.DataFrame:
+    def results(self) -> DataFrame:
         """
         Returns
         -------
@@ -70,9 +70,7 @@ class ReturnSimulation(object):
             Annualized volatility
         """
 
-        return float(
-            self.results.pct_change().std() * np.sqrt(self.trading_days_in_year)
-        )
+        return float(self.results.pct_change().std() * sqrt(self.trading_days_in_year))
 
     @classmethod
     def from_normal(
@@ -108,17 +106,15 @@ class ReturnSimulation(object):
         """
 
         if seed:
-            np.random.seed(seed)
-        daily_returns = np.random.normal(
-            loc=mu / t, scale=vol / np.sqrt(t), size=(n, d)
-        )
+            random.seed(seed)
+        daily_returns = random.normal(loc=mu / t, scale=vol / sqrt(t), size=(n, d))
         output = Simulation(
             number_of_sims=n,
             trading_days=d,
             trading_days_in_year=t,
             mean_annual_return=mu,
             mean_annual_vol=vol,
-            df=pd.DataFrame(data=daily_returns),
+            df=DataFrame(data=daily_returns),
         )
         return cls(d=output)
 
@@ -156,9 +152,9 @@ class ReturnSimulation(object):
         """
 
         if seed:
-            np.random.seed(seed)
+            random.seed(seed)
         daily_returns = (
-            np.random.lognormal(mean=mu / t, sigma=vol / np.sqrt(t), size=(n, d)) - 1
+            random.lognormal(mean=mu / t, sigma=vol / sqrt(t), size=(n, d)) - 1
         )
         output = Simulation(
             number_of_sims=n,
@@ -166,7 +162,7 @@ class ReturnSimulation(object):
             trading_days_in_year=t,
             mean_annual_return=mu,
             mean_annual_vol=vol,
-            df=pd.DataFrame(data=daily_returns),
+            df=DataFrame(data=daily_returns),
         )
         return cls(d=output)
 
@@ -205,7 +201,7 @@ class ReturnSimulation(object):
         """
 
         if seed:
-            np.random.seed(seed)
+            random.seed(seed)
 
         mp = ModelParameters(
             all_s0=1, all_time=d, all_delta=1.0 / t, all_sigma=vol, gbm_mu=mu
@@ -219,7 +215,7 @@ class ReturnSimulation(object):
             trading_days_in_year=t,
             mean_annual_return=mu,
             mean_annual_vol=vol,
-            df=pd.DataFrame(data=daily_returns),
+            df=DataFrame(data=daily_returns),
         )
         return cls(d=output)
 
@@ -264,7 +260,7 @@ class ReturnSimulation(object):
         """
 
         if seed:
-            np.random.seed(seed)
+            random.seed(seed)
 
         mp = ModelParameters(
             all_s0=1,
@@ -280,7 +276,7 @@ class ReturnSimulation(object):
         for i in range(n):
             aray = heston_model_levels(mp)[0]
             r = aray[1:] / aray[:-1] - 1
-            r = np.insert(r, 0, 0.0)
+            r = insert(r, 0, 0.0)
             daily_returns.append(r)
         output = Simulation(
             number_of_sims=n,
@@ -288,7 +284,7 @@ class ReturnSimulation(object):
             trading_days_in_year=t,
             mean_annual_return=mu,
             mean_annual_vol=vol,
-            df=pd.DataFrame(data=daily_returns),
+            df=DataFrame(data=daily_returns),
         )
         return cls(d=output)
 
@@ -332,7 +328,7 @@ class ReturnSimulation(object):
         """
 
         if seed:
-            np.random.seed(seed)
+            random.seed(seed)
 
         mp = ModelParameters(
             all_s0=1,
@@ -348,7 +344,7 @@ class ReturnSimulation(object):
         for i in range(n):
             aray = heston_model_levels(mp)[1]
             r = aray[1:] / aray[:-1] - 1
-            r = np.insert(r, 0, 0.0)
+            r = insert(r, 0, 0.0)
             daily_returns.append(r)
         output = Simulation(
             number_of_sims=n,
@@ -356,7 +352,7 @@ class ReturnSimulation(object):
             trading_days_in_year=t,
             mean_annual_return=mu,
             mean_annual_vol=vol,
-            df=pd.DataFrame(data=daily_returns),
+            df=DataFrame(data=daily_returns),
         )
         return cls(d=output)
 
@@ -403,7 +399,7 @@ class ReturnSimulation(object):
         """
 
         if seed:
-            np.random.seed(seed)
+            random.seed(seed)
 
         mp = ModelParameters(
             all_s0=1,
@@ -419,7 +415,7 @@ class ReturnSimulation(object):
         for i in range(n):
             aray = geometric_brownian_motion_jump_diffusion_levels(mp)
             r = aray[1:] / aray[:-1] - 1
-            r = np.insert(r, 0, 0.0)
+            r = insert(r, 0, 0.0)
             daily_returns.append(r)
         output = Simulation(
             number_of_sims=n,
@@ -427,6 +423,6 @@ class ReturnSimulation(object):
             trading_days_in_year=t,
             mean_annual_return=mu,
             mean_annual_vol=vol,
-            df=pd.DataFrame(data=daily_returns),
+            df=DataFrame(data=daily_returns),
         )
         return cls(d=output)

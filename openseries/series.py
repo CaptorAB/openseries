@@ -1,11 +1,11 @@
 from copy import deepcopy
-import datetime as dt
+from datetime import date, datetime, timedelta
 from json import dump, load
 from jsonschema import Draft7Validator
-from math import ceil, sqrt
-import numpy as np
+from math import ceil
+from numpy import array, busdaycalendar, cumprod, insert, log, sqrt, square, zeros
 from os import path
-import pandas as pd
+from pandas import DataFrame, DatetimeIndex, date_range, MultiIndex, Series
 from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
@@ -36,11 +36,11 @@ class TimeSerie(TypedDict, total=False):
     isin: str
     label: str
     schema: dict
-    sweden: np.busdaycalendar
+    sweden: busdaycalendar
     valuetype: str
     values: List[float]
     local_ccy: bool
-    tsdf: pd.DataFrame
+    tsdf: DataFrame
 
 
 class OpenTimeSeries(object):
@@ -53,11 +53,11 @@ class OpenTimeSeries(object):
     isin: str
     label: str
     schema: dict
-    sweden: np.busdaycalendar
+    sweden: busdaycalendar
     valuetype: str
     values: List[float]
     local_ccy: bool
-    tsdf: pd.DataFrame
+    tsdf: DataFrame
 
     @classmethod
     def setup_class(cls, domestic_ccy: str = "SEK", country: str = "SE"):
@@ -133,7 +133,7 @@ class OpenTimeSeries(object):
     @classmethod
     def from_df(
         cls,
-        df: pd.DataFrame | pd.Series,
+        df: DataFrame | Series,
         column_nmbr: int = 0,
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
@@ -143,7 +143,7 @@ class OpenTimeSeries(object):
 
         Parameters
         ----------
-        df: pd.DataFrame | pd.Series
+        df: DataFrame | Series
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
@@ -160,7 +160,7 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        if isinstance(df, pd.Series):
+        if isinstance(df, Series):
             if isinstance(df.name, tuple):
                 label, _ = df.name
             else:
@@ -168,7 +168,7 @@ class OpenTimeSeries(object):
             values = df.values.tolist()
         else:
             values = df.iloc[:, column_nmbr].tolist()
-            if isinstance(df.columns, pd.MultiIndex):
+            if isinstance(df.columns, MultiIndex):
                 label = df.columns.get_level_values(0).values[column_nmbr]
                 valuetype = df.columns.get_level_values(1).values[column_nmbr]
             else:
@@ -250,9 +250,9 @@ class OpenTimeSeries(object):
     def from_fixed_rate(
         cls,
         rate: float,
-        date_range: pd.DatetimeIndex | None = None,
+        d_range: DatetimeIndex | None = None,
         days: int | None = None,
-        end_dt: dt.date | None = None,
+        end_dt: date | None = None,
         label: str = "Series",
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
@@ -267,7 +267,7 @@ class OpenTimeSeries(object):
         ----------
         rate: float
             The accrual rate
-        date_range: pd.DatetimeIndex, optional
+        d_range: DatetimeIndex, optional
             A given range of dates
         days: int, optional
             Number of days to generate when date_range not provided. Must be combined
@@ -289,13 +289,13 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        if date_range is None:
-            date_range = pd.DatetimeIndex(
-                [d.date() for d in pd.date_range(periods=days, end=end_dt, freq="D")]
+        if d_range is None:
+            d_range = DatetimeIndex(
+                [d.date() for d in date_range(periods=days, end=end_dt, freq="D")]
             )
-        deltas = np.array([i.days for i in date_range[1:] - date_range[:-1]])
-        array = list(np.cumprod(np.insert(1 + deltas * rate / 365, 0, 1.0)))
-        date_range = [d.strftime("%Y-%m-%d") for d in date_range]
+        deltas = array([i.days for i in d_range[1:] - d_range[:-1]])
+        arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
+        d_range = [d.strftime("%Y-%m-%d") for d in d_range]
 
         output = TimeSerie(
             _id="",
@@ -305,8 +305,8 @@ class OpenTimeSeries(object):
             isin="",
             local_ccy=local_ccy,
             valuetype=valuetype,
-            dates=date_range,
-            values=array,
+            dates=d_range,
+            values=arr,
         )
 
         return cls(d=output)
@@ -350,13 +350,13 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        df = pd.DataFrame(
+        df = DataFrame(
             data=self.values,
             index=self.dates,
             columns=[[self.label], [self.valuetype]],
             dtype="float64",
         )
-        df.index = [d.date() for d in pd.DatetimeIndex(df.index)]
+        df.index = [d.date() for d in DatetimeIndex(df.index)]
 
         df.sort_index(inplace=True)
         self.tsdf = df
@@ -366,9 +366,9 @@ class OpenTimeSeries(object):
     def calc_range(
         self,
         months_offset: int | None = None,
-        from_dt: dt.date | None = None,
-        to_dt: dt.date | None = None,
-    ) -> (dt.date, dt.date):
+        from_dt: date | None = None,
+        to_dt: date | None = None,
+    ) -> (date, date):
         """Creates user defined date range
 
         Parameters
@@ -416,10 +416,10 @@ class OpenTimeSeries(object):
                     earlier, later = from_dt, to_dt
             if earlier is not None:
                 while not self.tsdf.index.isin([earlier]).any():
-                    earlier -= dt.timedelta(days=1)
+                    earlier -= timedelta(days=1)
             if later is not None:
                 while not self.tsdf.index.isin([later]).any():
-                    later += dt.timedelta(days=1)
+                    later += timedelta(days=1)
         else:
             earlier, later = self.first_idx, self.last_idx
 
@@ -436,20 +436,20 @@ class OpenTimeSeries(object):
         """
 
         self.setup_class()
-        date_range = [
+        d_range = [
             d.date()
-            for d in pd.date_range(
+            for d in date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
                 freq=CustomBusinessDay(calendar=self.sweden),
             )
         ]
 
-        self.tsdf = self.tsdf.reindex(date_range, method=None, copy=False)
+        self.tsdf = self.tsdf.reindex(d_range, method=None, copy=False)
 
         return self
 
-    def all_properties(self, properties: list | None = None) -> pd.DataFrame:
+    def all_properties(self, properties: list | None = None) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
@@ -492,7 +492,7 @@ class OpenTimeSeries(object):
                 "periods_in_a_year",
             ]
 
-        pdf = pd.DataFrame.from_dict(
+        pdf = DataFrame.from_dict(
             {x: getattr(self, x) for x in properties}, orient="index"
         )
 
@@ -512,7 +512,7 @@ class OpenTimeSeries(object):
         return len(self.tsdf.index)
 
     @property
-    def first_idx(self) -> dt.date:
+    def first_idx(self) -> date:
         """
         Returns
         -------
@@ -523,7 +523,7 @@ class OpenTimeSeries(object):
         return self.tsdf.index[0]
 
     @property
-    def last_idx(self) -> dt.date:
+    def last_idx(self) -> date:
         """
         Returns
         -------
@@ -594,8 +594,8 @@ class OpenTimeSeries(object):
     def geo_ret_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/cagr.asp
 
@@ -646,8 +646,8 @@ class OpenTimeSeries(object):
     def arithmetic_ret_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
@@ -699,8 +699,8 @@ class OpenTimeSeries(object):
     def value_ret_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """
         Parameters
@@ -743,14 +743,14 @@ class OpenTimeSeries(object):
         """
 
         caldf = self.tsdf.copy()
-        caldf.index = pd.DatetimeIndex(caldf.index)
+        caldf.index = DatetimeIndex(caldf.index)
         if month is None:
             period = str(year)
         else:
             period = "-".join([str(year), str(month).zfill(2)])
         rtn = caldf.copy().pct_change()
         rtn = rtn.loc[period] + 1
-        return float(rtn.apply(np.cumprod, axis="index").iloc[-1] - 1)
+        return float(rtn.apply(cumprod, axis="index").iloc[-1] - 1)
 
     @property
     def vol(self) -> float:
@@ -764,13 +764,13 @@ class OpenTimeSeries(object):
             Annualized volatility
         """
 
-        return float(self.tsdf.pct_change().std() * np.sqrt(self.periods_in_a_year))
+        return float(self.tsdf.pct_change().std() * sqrt(self.periods_in_a_year))
 
     def vol_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
@@ -805,7 +805,7 @@ class OpenTimeSeries(object):
             time_factor = how_many / fraction
 
         return float(
-            self.tsdf.loc[earlier:later].pct_change().std() * np.sqrt(time_factor)
+            self.tsdf.loc[earlier:later].pct_change().std() * sqrt(time_factor)
         )
 
     @property
@@ -825,15 +825,15 @@ class OpenTimeSeries(object):
 
         return float(
             sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / self.length)
-            * np.sqrt(self.periods_in_a_year)
+            * sqrt(self.periods_in_a_year)
         )
 
     def downside_deviation_func(
         self,
         min_accepted_return: float = 0.0,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """The standard deviation of returns that are below a Minimum Accepted
@@ -880,7 +880,7 @@ class OpenTimeSeries(object):
 
         return float(
             sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-            * np.sqrt(time_factor)
+            * sqrt(time_factor)
         )
 
     @property
@@ -897,8 +897,8 @@ class OpenTimeSeries(object):
     def ret_vol_ratio_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The ratio of annualized arithmetic mean of returns and annualized
@@ -950,8 +950,8 @@ class OpenTimeSeries(object):
     def sortino_ratio_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Sortino ratio calculated as ( asset return - risk free return )
@@ -1007,8 +1007,8 @@ class OpenTimeSeries(object):
     def z_score_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/z/zscore.asp
 
@@ -1045,7 +1045,7 @@ class OpenTimeSeries(object):
         return float((self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1)
 
     @property
-    def max_drawdown_date(self) -> dt.date:
+    def max_drawdown_date(self) -> date:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1055,20 +1055,20 @@ class OpenTimeSeries(object):
         """
 
         mdddf = self.tsdf.copy()
-        mdddf.index = pd.DatetimeIndex(mdddf.index)
+        mdddf.index = DatetimeIndex(mdddf.index)
         mdd_date = (
             (mdddf / mdddf.expanding(min_periods=1).max())
             .idxmin()
             .values[0]
-            .astype(dt.datetime)
+            .astype(datetime)
         )
-        return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
+        return datetime.fromtimestamp(mdd_date / 1e9).date()
 
     def max_drawdown_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1108,7 +1108,7 @@ class OpenTimeSeries(object):
         """
 
         return float(
-            self.tsdf.groupby([pd.DatetimeIndex(self.tsdf.index).year])
+            self.tsdf.groupby([DatetimeIndex(self.tsdf.index).year])
             .apply(lambda x: (x / x.expanding(min_periods=1).max()).min() - 1)
             .min()
         )
@@ -1134,15 +1134,15 @@ class OpenTimeSeries(object):
         """
 
         resdf = self.tsdf.copy()
-        resdf.index = pd.DatetimeIndex(resdf.index)
+        resdf.index = DatetimeIndex(resdf.index)
         return float(resdf.resample("BM").last().pct_change().min())
 
     def worst_func(
         self,
         observations: int = 1,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """
         Parameters
@@ -1190,8 +1190,8 @@ class OpenTimeSeries(object):
     def positive_share_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """
         Parameters
@@ -1234,8 +1234,8 @@ class OpenTimeSeries(object):
     def skew_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/s/skewness.asp
 
@@ -1285,8 +1285,8 @@ class OpenTimeSeries(object):
     def kurtosis_func(
         self,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
@@ -1345,8 +1345,8 @@ class OpenTimeSeries(object):
         self,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
@@ -1417,8 +1417,8 @@ class OpenTimeSeries(object):
         self,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1482,7 +1482,7 @@ class OpenTimeSeries(object):
         """
 
         return float(
-            -np.sqrt(self.periods_in_a_year)
+            -sqrt(self.periods_in_a_year)
             * self.var_down_func(level, interpolation=interpolation)
             / norm.ppf(level)
         )
@@ -1491,8 +1491,8 @@ class OpenTimeSeries(object):
         self,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1537,7 +1537,7 @@ class OpenTimeSeries(object):
             time_factor = how_many / fraction
         if drift_adjust:
             return float(
-                (-np.sqrt(time_factor) / norm.ppf(level))
+                (-sqrt(time_factor) / norm.ppf(level))
                 * (
                     self.var_down_func(
                         level,
@@ -1552,7 +1552,7 @@ class OpenTimeSeries(object):
             )
         else:
             return float(
-                -np.sqrt(time_factor)
+                -sqrt(time_factor)
                 * self.var_down_func(
                     level, months_from_last, from_date, to_date, interpolation
                 )
@@ -1566,8 +1566,8 @@ class OpenTimeSeries(object):
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1672,7 +1672,7 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        self.tsdf = np.log(self.tsdf / self.tsdf.iloc[0])
+        self.tsdf = log(self.tsdf / self.tsdf.iloc[0])
         return self
 
     def to_cumret(self):
@@ -1715,13 +1715,13 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        array = np.array(self.values) / divider
+        arr = array(self.values) / divider
 
-        deltas = np.array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
-        array = np.cumprod(np.insert(1.0 + deltas * array[:-1] / days_in_year, 0, 1.0))
+        deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
+        arr = cumprod(insert(1.0 + deltas * arr[:-1] / days_in_year, 0, 1.0))
 
         self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
-        self.values = list(array)
+        self.values = list(arr)
         self.valuetype = "Price(Close)"
         self.pandas_df()
 
@@ -1741,9 +1741,9 @@ class OpenTimeSeries(object):
             An OpenTimeSeries object
         """
 
-        self.tsdf.index = pd.DatetimeIndex(self.tsdf.index)
+        self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
+        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
         return self
 
     def to_drawdown_series(self):
@@ -1760,7 +1760,7 @@ class OpenTimeSeries(object):
 
         return self
 
-    def drawdown_details(self) -> pd.DataFrame:
+    def drawdown_details(self) -> DataFrame:
         """
         Returns
         -------
@@ -1770,7 +1770,7 @@ class OpenTimeSeries(object):
         """
 
         dddf = self.tsdf.copy()
-        dddf.index = pd.DatetimeIndex(dddf.index)
+        dddf.index = DatetimeIndex(dddf.index)
         return drawdown_details(dddf).to_frame()
 
     def ewma_vol_func(
@@ -1779,10 +1779,10 @@ class OpenTimeSeries(object):
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
         months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
         periods_in_a_year_fixed: int | None = None,
-    ) -> pd.Series:
+    ) -> Series:
         """Exponentially Weighted Moving Average Model for Volatility.
         https://www.investopedia.com/articles/07/ewma.asp
 
@@ -1821,19 +1821,19 @@ class OpenTimeSeries(object):
 
         data = self.tsdf.loc[earlier:later].copy()
 
-        data[self.label, "Returns"] = np.log(
+        data[self.label, "Returns"] = log(
             data.loc[:, (self.label, "Price(Close)")]
         ).diff()
-        data[self.label, "EWMA"] = np.zeros(how_many)
+        data[self.label, "EWMA"] = zeros(how_many)
         data.loc[:, (self.label, "EWMA")].iloc[0] = data.loc[
             :, (self.label, "Returns")
-        ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * np.sqrt(time_factor)
+        ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
         prev = data.loc[self.first_idx]
         for _, row in data.iloc[1:].iterrows():
-            row.loc[self.label, "EWMA"] = np.sqrt(
-                np.square(row.loc[self.label, "Returns"]) * time_factor * (1 - lmbda)
-                + np.square(prev.loc[self.label, "EWMA"]) * lmbda
+            row.loc[self.label, "EWMA"] = sqrt(
+                square(row.loc[self.label, "Returns"]) * time_factor * (1 - lmbda)
+                + square(prev.loc[self.label, "EWMA"]) * lmbda
             )
             prev = row.copy()
 
@@ -1841,7 +1841,7 @@ class OpenTimeSeries(object):
 
     def rolling_vol(
         self, observations: int = 21, periods_in_a_year_fixed: int | None = None
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """
         Parameters
         ----------
@@ -1861,7 +1861,7 @@ class OpenTimeSeries(object):
         else:
             time_factor = self.periods_in_a_year
         df = self.tsdf.pct_change().copy()
-        voldf = df.rolling(observations, min_periods=observations).std() * np.sqrt(
+        voldf = df.rolling(observations, min_periods=observations).std() * sqrt(
             time_factor
         )
         voldf.dropna(inplace=True)
@@ -1869,7 +1869,7 @@ class OpenTimeSeries(object):
 
         return voldf
 
-    def rolling_return(self, observations: int = 21) -> pd.DataFrame:
+    def rolling_return(self, observations: int = 21) -> DataFrame:
         """
         Parameters
         ----------
@@ -1891,7 +1891,7 @@ class OpenTimeSeries(object):
 
     def rolling_cvar_down(
         self, level: float = 0.95, observations: int = 252
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """
         Parameters
         ----------
@@ -1921,7 +1921,7 @@ class OpenTimeSeries(object):
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         """
         Parameters
         ----------
@@ -2028,7 +2028,7 @@ class OpenTimeSeries(object):
         ra_df.dropna(inplace=True)
 
         prev = self.first_idx
-        idx: dt.date
+        idx: date
         dates: list = [prev]
 
         for idx, row in ra_df.iterrows():
@@ -2038,10 +2038,10 @@ class OpenTimeSeries(object):
                 * (1 + float(row) + adjustment * (idx - prev).days / days_in_year)
             )
             prev = idx
-        self.tsdf = pd.DataFrame(data=values, index=dates)
+        self.tsdf = DataFrame(data=values, index=dates)
         self.valuetype = "Price(Close)"
         self.tsdf.columns = [[self.label], [self.valuetype]]
-        self.tsdf.index = [d.date() for d in pd.DatetimeIndex(self.tsdf.index)]
+        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
         if returns_input:
             self.value_to_ret()
         return self
@@ -2213,7 +2213,7 @@ def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
             raise Exception("Failed to find a matching date between series")
 
     dates = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
-    values = np.array([float(x) for x in old.tsdf.values][: len(dates)])
+    values = array([float(x) for x in old.tsdf.values][: len(dates)])
     values = list(values * float(new.tsdf.loc[first]) / float(olddf.loc[first]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])

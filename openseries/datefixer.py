@@ -1,11 +1,11 @@
-import datetime as dt
+from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import holidays
-import numpy as np
-import pandas as pd
+from holidays import country_holidays
+from numpy import array, arange, busdaycalendar, datetime64, is_busday
+from pandas import Timestamp, to_datetime
 
 
-def holiday_calendar(country: str = "SE") -> np.busdaycalendar:
+def holiday_calendar(country: str = "SE") -> busdaycalendar:
     """Function to generate a business calendar
 
     Parameters
@@ -19,30 +19,30 @@ def holiday_calendar(country: str = "SE") -> np.busdaycalendar:
         Numpy busdaycalendar object
     """
 
-    all_dates = np.arange("1970-12-30", "2070-12-30", dtype="datetime64[D]")
+    all_dates = arange("1970-12-30", "2070-12-30", dtype="datetime64[D]")
 
     years = [y for y in range(1970, 2071)]
-    country_holidays = holidays.country_holidays(country=country, years=years)
+    countryholidays = country_holidays(country=country, years=years)
     hols = []
-    for date in sorted(country_holidays.keys()):
-        hols.append(np.datetime64(date))
+    for dte in sorted(countryholidays.keys()):
+        hols.append(datetime64(dte))
 
-    hols = np.array(hols, dtype="datetime64[D]")
+    hols = array(hols, dtype="datetime64[D]")
 
     while hols[0] < all_dates[0]:
         hols = hols[1:]
     while hols[-1] > all_dates[-1]:
         hols = hols[:-1]
 
-    return np.busdaycalendar(holidays=hols)
+    return busdaycalendar(holidays=hols)
 
 
-def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> dt.date:
+def date_fix(d: str | date | datetime | datetime64 | Timestamp) -> date:
     """Function to parse from different date formats into datetime.date
 
     Parameters
     ----------
-    d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp
+    d: str | date | datetime | datetime64 | Timestamp
         The data item to parse
 
     Returns
@@ -51,14 +51,14 @@ def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> d
         Parsed date
     """
 
-    if isinstance(d, dt.datetime) or isinstance(d, pd.Timestamp):
+    if isinstance(d, datetime) or isinstance(d, Timestamp):
         return d.date()
-    elif isinstance(d, dt.date):
+    elif isinstance(d, date):
         return d
-    elif isinstance(d, np.datetime64):
-        return pd.to_datetime(str(d)).date()
+    elif isinstance(d, datetime64):
+        return to_datetime(str(d)).date()
     elif isinstance(d, str):
-        return dt.datetime.strptime(d, "%Y-%m-%d").date()
+        return datetime.strptime(d, "%Y-%m-%d").date()
     else:
         raise Exception(
             f"Unknown date format {str(d)} of type {str(type(d))} encountered"
@@ -66,17 +66,17 @@ def date_fix(d: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp) -> d
 
 
 def date_offset_foll(
-    raw_date: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp,
+    raw_date: str | date | datetime | datetime64 | Timestamp,
     country: str = "SE",
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
-) -> dt.date:
+) -> date:
     """Function to offset dates according to a given calendar
 
     Parameters
     ----------
-    raw_date: str | dt.date | dt.datetime | np.datetime64 | pd.Timestamp
+    raw_date: str | date | datetime | datetime64 | Timestamp
         The date to offset from
     country: str, default: "SE"
         Numpy busdaycalendar country code
@@ -105,13 +105,13 @@ def date_offset_foll(
     new_date = raw_date + month_delta
 
     if adjust:
-        while not np.is_busday(dates=new_date, busdaycal=calendar):
+        while not is_busday(dates=new_date, busdaycal=calendar):
             new_date += day_delta
 
     return new_date
 
 
-def get_previous_sweden_business_day_before_today(today: dt.date | None = None):
+def get_previous_sweden_business_day_before_today(today: date | None = None):
     """Function to bump backwards to find the previous Swedish business day before today
 
     Parameters
@@ -126,10 +126,10 @@ def get_previous_sweden_business_day_before_today(today: dt.date | None = None):
     """
 
     if today is None:
-        today = dt.date.today()
+        today = date.today()
 
     return date_offset_foll(
-        today - dt.timedelta(days=1),
+        today - timedelta(days=1),
         country="SE",
         months_offset=0,
         adjust=True,

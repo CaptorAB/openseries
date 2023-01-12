@@ -1,19 +1,14 @@
-import json
-import os
+from json import load
+from os.path import abspath, dirname, join
 
 
 def load_plotly_dict() -> (dict, dict):
-
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    layoutfile = os.path.join(
-        os.path.abspath(project_root), "openseries", "plotly_layouts.json"
-    )
-    logofile = os.path.join(
-        os.path.abspath(project_root), "openseries", "plotly_captor_logo.json"
-    )
+    project_root = dirname(dirname(abspath(__file__)))
+    layoutfile = join(abspath(project_root), "openseries", "plotly_layouts.json")
+    logofile = join(abspath(project_root), "openseries", "plotly_captor_logo.json")
     with open(layoutfile, "r", encoding="utf-8") as f:
-        fig = json.load(f)
+        fig = load(f)
     with open(logofile, "r", encoding="utf-8") as ff:
-        logo = json.load(ff)
+        logo = load(ff)
 
     return fig, logo

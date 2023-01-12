@@ -1,9 +1,9 @@
-import datetime as dt
+from datetime import date, timedelta
 from io import StringIO
 from json import load, loads
 from jsonschema.exceptions import ValidationError
 from os import path, remove
-import pandas as pd
+from pandas import DataFrame, date_range, Series
 from pandas.tseries.offsets import CDay
 from stdnum.exceptions import InvalidChecksum
 import sys
@@ -33,16 +33,16 @@ class TestOpenTimeSeries(TestCase):
             jumps_mu=-0.2,
             seed=71,
         )
-        date_range = [
+        d_range = [
             d.date()
-            for d in pd.date_range(
+            for d in date_range(
                 periods=sim.trading_days,
-                end=dt.date(2019, 6, 30),
+                end=date(2019, 6, 30),
                 freq=CDay(calendar=OpenTimeSeries.sweden),
             )
         ]
         sdf = sim.df.iloc[0].T.to_frame()
-        sdf.index = date_range
+        sdf.index = d_range
         sdf.columns = [["Asset"], ["Return(Total)"]]
 
         cls.randomseries = OpenTimeSeries.from_df(
@@ -100,7 +100,7 @@ class TestOpenTimeSeries(TestCase):
                 output.update({"dates": dates, "values": values})
 
                 if remove_duplicates:
-                    udf = pd.DataFrame(
+                    udf = DataFrame(
                         index=output["dates"],
                         columns=[output["name"]],
                         data=output["values"],
@@ -133,7 +133,7 @@ class TestOpenTimeSeries(TestCase):
 
     def test_create_opentimeseries_from_pandas_df(self):
 
-        se = pd.Series(
+        se = Series(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
             index=[
                 "2019-06-24",
@@ -145,7 +145,7 @@ class TestOpenTimeSeries(TestCase):
             name="Asset_0",
             dtype="float64",
         )
-        sen = pd.Series(
+        sen = Series(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
             index=[
                 "2019-06-24",
@@ -157,7 +157,7 @@ class TestOpenTimeSeries(TestCase):
             name=("Asset_0", "Price(Close)"),
             dtype="float64",
         )
-        df = pd.DataFrame(
+        df = DataFrame(
             data=[
                 [1.0, 1.0],
                 [1.01, 0.98],
@@ -201,7 +201,7 @@ class TestOpenTimeSeries(TestCase):
     def test_create_opentimeseries_from_fixed_rate(self):
 
         fixseries = OpenTimeSeries.from_fixed_rate(
-            rate=0.03, days=756, end_dt=dt.date(2019, 6, 30)
+            rate=0.03, days=756, end_dt=date(2019, 6, 30)
         )
 
         self.assertTrue(isinstance(fixseries, OpenTimeSeries))
@@ -259,44 +259,42 @@ class TestOpenTimeSeries(TestCase):
         self.assertIsInstance(too_far.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as too_early:
-            _, _ = cseries.calc_range(from_dt=dt.date(2009, 5, 31))
+            _, _ = cseries.calc_range(from_dt=date(2009, 5, 31))
         self.assertIsInstance(too_early.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as too_late:
-            _, _ = cseries.calc_range(to_dt=dt.date(2019, 7, 31))
+            _, _ = cseries.calc_range(to_dt=date(2019, 7, 31))
         self.assertIsInstance(too_late.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside:
             _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 7, 31)
+                from_dt=date(2009, 5, 31), to_dt=date(2019, 7, 31)
             )
         self.assertIsInstance(outside.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_end:
             _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 7, 31), to_dt=dt.date(2019, 7, 31)
+                from_dt=date(2009, 7, 31), to_dt=date(2019, 7, 31)
             )
         self.assertIsInstance(outside_end.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_start:
             _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 5, 31)
+                from_dt=date(2009, 5, 31), to_dt=date(2019, 5, 31)
             )
         self.assertIsInstance(outside_start.exception, AssertionError)
 
-        nst, nen = cseries.calc_range(
-            from_dt=dt.date(2009, 7, 3), to_dt=dt.date(2019, 6, 25)
-        )
-        self.assertEqual(nst, dt.date(2009, 7, 3))
-        self.assertEqual(nen, dt.date(2019, 6, 25))
+        nst, nen = cseries.calc_range(from_dt=date(2009, 7, 3), to_dt=date(2019, 6, 25))
+        self.assertEqual(nst, date(2009, 7, 3))
+        self.assertEqual(nen, date(2019, 6, 25))
 
         cseries.resample()
 
-        earlier_moved, _ = cseries.calc_range(from_dt=dt.date(2009, 8, 10))
-        self.assertEqual(earlier_moved, dt.date(2009, 7, 31))
+        earlier_moved, _ = cseries.calc_range(from_dt=date(2009, 8, 10))
+        self.assertEqual(earlier_moved, date(2009, 7, 31))
 
-        _, later_moved = cseries.calc_range(to_dt=dt.date(2009, 8, 20))
-        self.assertEqual(later_moved, dt.date(2009, 8, 31))
+        _, later_moved = cseries.calc_range(to_dt=date(2009, 8, 20))
+        self.assertEqual(later_moved, date(2009, 8, 31))
 
     def test_opentimeseries_calc_range_ouput(self):
 
@@ -308,7 +306,7 @@ class TestOpenTimeSeries(TestCase):
             ["2015-06-26", "2019-06-28"],
             [dates[0].strftime("%Y-%m-%d"), dates[1].strftime("%Y-%m-%d")],
         )
-        dates = self.randomseries.calc_range(from_dt=dt.date(2016, 6, 30))
+        dates = self.randomseries.calc_range(from_dt=date(2016, 6, 30))
 
         self.assertListEqual(
             ["2016-06-30", "2019-06-28"],
@@ -473,7 +471,7 @@ class TestOpenTimeSeries(TestCase):
 
     def test_opentimeseries_max_drawdown_date(self):
 
-        self.assertEqual(dt.date(2018, 11, 8), self.randomseries.max_drawdown_date)
+        self.assertEqual(date(2018, 11, 8), self.randomseries.max_drawdown_date)
         all_prop = self.random_properties["max_drawdown_date"]
         self.assertEqual(all_prop, self.randomseries.max_drawdown_date)
 
@@ -518,7 +516,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(full_series.dates, chained_series.dates)
         self.assertListEqual(full_values, chained_values)
 
-        pushed_date = front_series.last_idx + dt.timedelta(days=10)
+        pushed_date = front_series.last_idx + timedelta(days=10)
         no_overlap_series = OpenTimeSeries.from_df(full_series.tsdf.loc[pushed_date:])
         with self.assertRaises(Exception) as e_chain:
             _ = timeseries_chain(front_series, no_overlap_series)
@@ -575,11 +573,11 @@ class TestOpenTimeSeries(TestCase):
         )
         self.assertEqual(
             details.loc["Start of drawdown", "Drawdown details"],
-            dt.date(2012, 7, 5),
+            date(2012, 7, 5),
         )
         self.assertEqual(
             details.loc["Date of bottom", "Drawdown details"],
-            dt.date(2018, 11, 8),
+            date(2018, 11, 8),
         )
         self.assertEqual(
             details.loc["Days from start to bottom", "Drawdown details"], 2317
@@ -591,19 +589,17 @@ class TestOpenTimeSeries(TestCase):
 
     def test_opentimeseries_align_index_to_local_cdays(self):
 
-        date_range = [
-            d.date() for d in pd.date_range(start="2020-06-15", end="2020-06-25")
-        ]
-        asim = [1.0] * len(date_range)
-        adf = pd.DataFrame(
+        d_range = [d.date() for d in date_range(start="2020-06-15", end="2020-06-25")]
+        asim = [1.0] * len(d_range)
+        adf = DataFrame(
             data=asim,
-            index=date_range,
+            index=d_range,
             columns=[["Asset"], ["Price(Close)"]],
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
 
-        midsummer = dt.date(2020, 6, 19)
-        self.assertTrue(midsummer in date_range)
+        midsummer = date(2020, 6, 19)
+        self.assertTrue(midsummer in d_range)
 
         aseries.align_index_to_local_cdays()
         self.assertFalse(midsummer in aseries.tsdf.index)
@@ -1241,13 +1237,13 @@ class TestOpenTimeSeries(TestCase):
         vrcseries = self.randomseries.from_deepcopy()
 
         vrfs_y = vrcseries.value_ret_func(
-            from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28)
+            from_date=date(2017, 12, 29), to_date=date(2018, 12, 28)
         )
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
         self.assertEqual(f"{vrfs_y:.11f}", f"{vrvrcs_y:.11f}")
 
         vrfs_ym = vrcseries.value_ret_func(
-            from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31)
+            from_date=date(2018, 4, 30), to_date=date(2018, 5, 31)
         )
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
         self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")

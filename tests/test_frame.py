@@ -1,7 +1,7 @@
-import datetime as dt
+from datetime import date
 from io import StringIO
 from json import loads
-import pandas as pd
+from pandas import DataFrame, date_range
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
 import sys
@@ -33,16 +33,16 @@ class TestOpenFrame(TestCase):
             jumps_mu=-0.2,
             seed=71,
         )
-        date_range = [
+        d_range = [
             d.date()
-            for d in pd.date_range(
+            for d in date_range(
                 periods=sim.trading_days,
-                end=dt.date(2019, 6, 30),
+                end=date(2019, 6, 30),
                 freq=CustomBusinessDay(calendar=OpenTimeSeries.sweden),
             )
         ]
         sdf = sim.df.iloc[0].T.to_frame()
-        sdf.index = date_range
+        sdf.index = d_range
         sdf.columns = [["Asset"], ["Return(Total)"]]
 
         cls.randomseries = OpenTimeSeries.from_df(
@@ -52,7 +52,7 @@ class TestOpenFrame(TestCase):
         tslist = []
         for item in range(sim.number_of_sims):
             sdf = sim.df.iloc[item].T.to_frame()
-            sdf.index = date_range
+            sdf.index = d_range
             sdf.columns = [[f"Asset_{item}"], ["Return(Total)"]]
             tslist.append(OpenTimeSeries.from_df(sdf, valuetype="Return(Total)"))
 
@@ -130,44 +130,42 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(too_far.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as too_early:
-            _, _ = crframe.calc_range(from_dt=dt.date(2009, 5, 31))
+            _, _ = crframe.calc_range(from_dt=date(2009, 5, 31))
         self.assertIsInstance(too_early.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as too_late:
-            _, _ = crframe.calc_range(to_dt=dt.date(2019, 7, 31))
+            _, _ = crframe.calc_range(to_dt=date(2019, 7, 31))
         self.assertIsInstance(too_late.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside:
             _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 7, 31)
+                from_dt=date(2009, 5, 31), to_dt=date(2019, 7, 31)
             )
         self.assertIsInstance(outside.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_end:
             _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 7, 31), to_dt=dt.date(2019, 7, 31)
+                from_dt=date(2009, 7, 31), to_dt=date(2019, 7, 31)
             )
         self.assertIsInstance(outside_end.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_start:
             _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 5, 31)
+                from_dt=date(2009, 5, 31), to_dt=date(2019, 5, 31)
             )
         self.assertIsInstance(outside_start.exception, AssertionError)
 
-        nst, nen = crframe.calc_range(
-            from_dt=dt.date(2009, 7, 3), to_dt=dt.date(2019, 6, 25)
-        )
-        self.assertEqual(nst, dt.date(2009, 7, 3))
-        self.assertEqual(nen, dt.date(2019, 6, 25))
+        nst, nen = crframe.calc_range(from_dt=date(2009, 7, 3), to_dt=date(2019, 6, 25))
+        self.assertEqual(nst, date(2009, 7, 3))
+        self.assertEqual(nen, date(2019, 6, 25))
 
         crframe.resample()
 
-        earlier_moved, _ = crframe.calc_range(from_dt=dt.date(2009, 8, 10))
-        self.assertEqual(earlier_moved, dt.date(2009, 7, 31))
+        earlier_moved, _ = crframe.calc_range(from_dt=date(2009, 8, 10))
+        self.assertEqual(earlier_moved, date(2009, 7, 31))
 
-        _, later_moved = crframe.calc_range(to_dt=dt.date(2009, 8, 20))
-        self.assertEqual(later_moved, dt.date(2009, 8, 31))
+        _, later_moved = crframe.calc_range(to_dt=date(2009, 8, 20))
+        self.assertEqual(later_moved, date(2009, 8, 31))
 
     def test_openframe_max_drawdown_date(self):
 
@@ -175,11 +173,11 @@ class TestOpenFrame(TestCase):
         mddframe.to_cumret()
         self.assertListEqual(
             [
-                dt.date(2009, 7, 1),
-                dt.date(2009, 7, 1),
-                dt.date(2012, 4, 17),
-                dt.date(2013, 7, 29),
-                dt.date(2009, 7, 1),
+                date(2009, 7, 1),
+                date(2009, 7, 1),
+                date(2012, 4, 17),
+                date(2013, 7, 29),
+                date(2009, 7, 1),
             ],
             mddframe.max_drawdown_date.tolist(),
         )
@@ -196,25 +194,25 @@ class TestOpenFrame(TestCase):
 
         correct = ["0.832536", "0.830516", "0.829576", "0.826926", "0.824288"]
         wrong = ["0.832536", "0.830516", "0.829576", "0.826926", "0.824285"]
-        true_tail = pd.DataFrame(
+        true_tail = DataFrame(
             columns=[[name], ["Price(Close)"]],
             index=[
-                dt.date(2019, 6, 24),
-                dt.date(2019, 6, 25),
-                dt.date(2019, 6, 26),
-                dt.date(2019, 6, 27),
-                dt.date(2019, 6, 28),
+                date(2019, 6, 24),
+                date(2019, 6, 25),
+                date(2019, 6, 26),
+                date(2019, 6, 27),
+                date(2019, 6, 28),
             ],
             data=correct,
         )
-        false_tail = pd.DataFrame(
+        false_tail = DataFrame(
             columns=[[name], ["Price(Close)"]],
             index=[
-                dt.date(2019, 6, 24),
-                dt.date(2019, 6, 25),
-                dt.date(2019, 6, 26),
-                dt.date(2019, 6, 27),
-                dt.date(2019, 6, 28),
+                date(2019, 6, 24),
+                date(2019, 6, 25),
+                date(2019, 6, 26),
+                date(2019, 6, 27),
+                date(2019, 6, 28),
             ],
             data=wrong,
         )
@@ -802,19 +800,19 @@ class TestOpenFrame(TestCase):
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                dt.date(2017, 6, 27) : dt.date(2018, 6, 27), ("Asset", "Price(Close)")
+                date(2017, 6, 27) : date(2018, 6, 27), ("Asset", "Price(Close)")
             ]
         )
         series_short.set_new_label("Short")
         frame = OpenFrame([series_long, series_short])
 
         firsts = [
-            dt.date(2017, 6, 27),
-            dt.date(2017, 6, 27),
+            date(2017, 6, 27),
+            date(2017, 6, 27),
         ]
         lasts = [
-            dt.date(2018, 6, 27),
-            dt.date(2018, 6, 27),
+            date(2018, 6, 27),
+            date(2018, 6, 27),
         ]
 
         self.assertNotEqual(firsts, frame.first_indices.tolist())
@@ -825,7 +823,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(firsts, frame.first_indices.tolist())
         self.assertListEqual(lasts, frame.last_indices.tolist())
 
-        trunced = [dt.date(2017, 12, 29), dt.date(2018, 3, 29)]
+        trunced = [date(2017, 12, 29), date(2018, 3, 29)]
 
         frame.trunc_frame(start_cut=trunced[0], end_cut=trunced[1])
 
@@ -836,7 +834,7 @@ class TestOpenFrame(TestCase):
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["a"],
                         data=[1, 2, 3, 4, 5],
                         index=[
@@ -849,7 +847,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["b"],
                         data=[6, 7, 8, 9, 10],
                         index=[
@@ -862,7 +860,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["c"],
                         data=[11, 12, 13, 14, 15],
                         index=[
@@ -875,7 +873,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["d"],
                         data=[16, 17, 18, 19, 20],
                         index=[
@@ -906,7 +904,7 @@ class TestOpenFrame(TestCase):
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["a"],
                         data=[1, 2, 3, 4, 5],
                         index=[
@@ -919,7 +917,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["b"],
                         data=[6, 7, 8, 9],
                         index=[
@@ -931,7 +929,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["c"],
                         data=[10, 11, 12, 13, 14],
                         index=[
@@ -944,7 +942,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=pd.DataFrame(
+                    df=DataFrame(
                         columns=["d"],
                         data=[15, 16, 17, 18, 19],
                         index=[
@@ -1005,13 +1003,11 @@ class TestOpenFrame(TestCase):
 
     def test_openframe_align_index_to_local_cdays(self):
 
-        date_range = [
-            d.date() for d in pd.date_range(start="2022-06-01", end="2022-06-15")
-        ]
-        asim = [1.0] * len(date_range)
-        adf = pd.DataFrame(
+        d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
+        asim = [1.0] * len(d_range)
+        adf = DataFrame(
             data=asim,
-            index=date_range,
+            index=d_range,
             columns=[["Asset_a"], ["Price(Close)"]],
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype="Price(Close)")
@@ -1019,8 +1015,8 @@ class TestOpenFrame(TestCase):
         bseries.set_new_label("Asset_b")
         aframe = OpenFrame([aseries, bseries])
 
-        midsummer = dt.date(2022, 6, 6)
-        self.assertTrue(midsummer in date_range)
+        midsummer = date(2022, 6, 6)
+        self.assertTrue(midsummer in d_range)
 
         aframe.align_index_to_local_cdays()
         self.assertFalse(midsummer in aframe.tsdf.index)
@@ -1959,10 +1955,10 @@ class TestOpenFrame(TestCase):
         vrcframe.to_cumret()
 
         vrfs_y = vrcseries.value_ret_func(
-            from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28)
+            from_date=date(2017, 12, 29), to_date=date(2018, 12, 28)
         )
         vrff_y = vrcframe.value_ret_func(
-            from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28)
+            from_date=date(2017, 12, 29), to_date=date(2018, 12, 28)
         )
         vrffl_y = [f"{rr:.11f}" for rr in vrff_y]
 
@@ -1974,10 +1970,10 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(vrffl_y, vrvrcfl_y)
 
         vrfs_ym = vrcseries.value_ret_func(
-            from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31)
+            from_date=date(2018, 4, 30), to_date=date(2018, 5, 31)
         )
         vrff_ym = vrcframe.value_ret_func(
-            from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31)
+            from_date=date(2018, 4, 30), to_date=date(2018, 5, 31)
         )
         vrffl_ym = [f"{rr:.11f}" for rr in vrff_ym]
 

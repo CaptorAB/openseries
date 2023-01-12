@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.9.1] - 2023-01-12
+
+Minimized imports
+
 ## Version [0.9.0] - 2023-01-04
 
 Removed all connections to Frenkla API.

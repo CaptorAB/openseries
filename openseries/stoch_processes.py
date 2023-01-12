@@ -12,8 +12,8 @@ Processes that can be simulated in this module are:
 - Ornstein Uhlenbeck
 
 """
-import math
-import numpy as np
+from math import log, pow, sqrt
+from numpy import add, array, ndarray, exp
 import numpy.random as nrand
 
 
@@ -96,7 +96,7 @@ class ModelParameters(object):
         self.heston_vol0 = heston_vol0
 
 
-def convert_to_prices(param: ModelParameters, log_returns: np.ndarray) -> np.ndarray:
+def convert_to_prices(param: ModelParameters, log_returns: ndarray) -> ndarray:
     """Converts a sequence of log returns into normal returns (exponentiation)
     and then computes a price sequence given a starting price, param.all_s0.
 
@@ -113,18 +113,18 @@ def convert_to_prices(param: ModelParameters, log_returns: np.ndarray) -> np.nda
         Price series
     """
 
-    returns = np.exp(log_returns)
+    returns = exp(log_returns)
     # A sequence of prices starting with param.all_s0
     price_sequence: list = [param.all_s0]
     for n in range(1, len(returns)):
         # Add the price at t-1 * return at t
         price_sequence.append(price_sequence[n - 1] * returns[n - 1])
-    return np.array(price_sequence)
+    return array(price_sequence)
 
 
 def brownian_motion_log_returns(
     param: ModelParameters, seed: int | None = None
-) -> np.ndarray:
+) -> ndarray:
     """This method returns a Wiener process. The Wiener process is also called
     Brownian motion. For more information about the Wiener process check out
     the Wikipedia page: http://en.wikipedia.org/wiki/Wiener_process
@@ -145,13 +145,11 @@ def brownian_motion_log_returns(
     if seed is not None:
         nrand.seed(seed)
 
-    sqrt_delta_sigma = math.sqrt(param.all_delta) * param.all_sigma
+    sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
     return nrand.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time)
 
 
-def brownian_motion_levels(
-    param: ModelParameters, seed: int | None = None
-) -> np.ndarray:
+def brownian_motion_levels(param: ModelParameters, seed: int | None = None) -> ndarray:
     """Delivers a price sequence whose returns evolve according to a brownian motion
 
     Parameters
@@ -172,7 +170,7 @@ def brownian_motion_levels(
 
 def geometric_brownian_motion_log_returns(
     param: ModelParameters, seed: int | None = None
-) -> np.ndarray:
+) -> ndarray:
     """This method constructs a sequence of log returns which, when
     exponentiated, produce a random Geometric Brownian Motion (GBM).
     GBM is the stochastic process underlying the Black Scholes
@@ -191,16 +189,16 @@ def geometric_brownian_motion_log_returns(
         Log returns of a Geometric Brownian Motion process
     """
 
-    wiener_process = np.array(brownian_motion_log_returns(param, seed=seed))
+    wiener_process = array(brownian_motion_log_returns(param, seed=seed))
     sigma_pow_mu_delta = (
-        param.gbm_mu - 0.5 * math.pow(param.all_sigma, 2.0)
+        param.gbm_mu - 0.5 * pow(param.all_sigma, 2.0)
     ) * param.all_delta
     return wiener_process + sigma_pow_mu_delta
 
 
 def geometric_brownian_motion_levels(
     param: ModelParameters, seed: int | None = None
-) -> np.ndarray:
+) -> ndarray:
     """Prices for an asset which evolves according to a geometric brownian motion
 
     Parameters
@@ -247,7 +245,7 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
     for k in range(0, param.all_time):
         jump_sizes.append(0.0)
     while s_n < param.all_time:
-        s_n += small_lamda * math.log(nrand.uniform(0, 1))
+        s_n += small_lamda * log(nrand.uniform(0, 1))
         for j in range(0, param.all_time):
             if (
                 time * param.all_delta
@@ -262,7 +260,7 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
 
 def geometric_brownian_motion_jump_diffusion_log_returns(
     param: ModelParameters, seed: int | None = None
-) -> np.ndarray:
+) -> ndarray:
     """This method constructs combines a geometric brownian motion process
     (log returns) with a jump diffusion process (log returns) to produce a
     sequence of gbm jump returns
@@ -282,12 +280,12 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 
     jump_diffusion = jump_diffusion_process(param, seed=seed)
     geometric_brownian_motion = geometric_brownian_motion_log_returns(param, seed=seed)
-    return np.add(jump_diffusion, geometric_brownian_motion)
+    return add(jump_diffusion, geometric_brownian_motion)
 
 
 def geometric_brownian_motion_jump_diffusion_levels(
     param: ModelParameters, seed: int | None = None
-) -> np.ndarray:
+) -> ndarray:
     """Converts returns generated with a Geometric Brownian Motion process
     with jumps into prices
 
@@ -311,8 +309,8 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
 
 def heston_construct_correlated_path(
-    param: ModelParameters, brownian_motion_one: np.ndarray, seed: int | None = None
-) -> (np.ndarray, np.ndarray):
+    param: ModelParameters, brownian_motion_one: ndarray, seed: int | None = None
+) -> (ndarray, ndarray):
     """This method is a simplified version of the Cholesky decomposition method for
     just two assets. It does not make use of matrix algebra and is therefore quite
     easy to implement
@@ -335,21 +333,19 @@ def heston_construct_correlated_path(
     if seed is not None:
         nrand.seed(seed)
     # We do not multiply by sigma here, we do that in the Heston model
-    sqrt_delta = math.sqrt(param.all_delta)
+    sqrt_delta = sqrt(param.all_delta)
     # Construct a path correlated to the first path
     brownian_motion_two = []
     for n in range(param.all_time - 1):
         term_one = param.cir_rho * brownian_motion_one[n]
-        term_two = math.sqrt(1 - math.pow(param.cir_rho, 2.0)) * nrand.normal(
-            0, sqrt_delta
-        )
+        term_two = sqrt(1 - pow(param.cir_rho, 2.0)) * nrand.normal(0, sqrt_delta)
         brownian_motion_two.append(term_one + term_two)
-    return np.array(brownian_motion_one), np.array(brownian_motion_two)
+    return array(brownian_motion_one), array(brownian_motion_two)
 
 
 def cox_ingersoll_ross_heston(
     param: ModelParameters, seed: int | None = None
-) -> (np.ndarray, np.ndarray):
+) -> (ndarray, ndarray):
     """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
     volatility in the Heston model. Because the returns between the underlying
@@ -374,7 +370,7 @@ def cox_ingersoll_ross_heston(
         nrand.seed(seed)
 
     # We don't multiply by sigma here because we do that in heston
-    sqrt_delta_sigma = math.sqrt(param.all_delta) * param.all_sigma
+    sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
     brownian_motion_volatility = nrand.normal(
         loc=0, scale=sqrt_delta_sigma, size=param.all_time
     )
@@ -383,16 +379,15 @@ def cox_ingersoll_ross_heston(
     for h in range(1, param.all_time):
         drift = a * (mu - volatilities[-1]) * param.all_delta
         randomness = (
-            math.sqrt(max(volatilities[h - 1], 0.05))
-            * brownian_motion_volatility[h - 1]
+            sqrt(max(volatilities[h - 1], 0.05)) * brownian_motion_volatility[h - 1]
         )
         volatilities.append(max(volatilities[-1], 0.05) + drift + randomness)
-    return np.array(brownian_motion_volatility), np.array(volatilities)
+    return array(brownian_motion_volatility), array(volatilities)
 
 
 def heston_model_levels(
     param: ModelParameters, seed: int | None = None
-) -> (np.ndarray, np.ndarray):
+) -> (ndarray, ndarray):
     """The Heston model is the geometric brownian motion model with stochastic
     volatility. This stochastic volatility is given by the Cox Ingersoll Ross
     process. Step one on this method is to construct two correlated
@@ -431,12 +426,12 @@ def heston_model_levels(
         heston_market_price_levels.append(
             heston_market_price_levels[h - 1] + drift + vol
         )
-    return np.array(heston_market_price_levels), np.array(cir_process)
+    return array(heston_market_price_levels), array(cir_process)
 
 
 def cox_ingersoll_ross_levels(
     param: ModelParameters, seed: int | None = None
-) -> np.ndarray:
+) -> ndarray:
     """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
     volatility in the Heston model. Because the returns between the underlying
@@ -464,9 +459,9 @@ def cox_ingersoll_ross_levels(
     levels: list = [zero]
     for h in range(1, param.all_time):
         drift = a * (mu - levels[h - 1]) * param.all_delta
-        randomness = math.sqrt(levels[h - 1]) * brownian_motion[h - 1]
+        randomness = sqrt(levels[h - 1]) * brownian_motion[h - 1]
         levels.append(levels[h - 1] + drift + randomness)
-    return np.array(levels)
+    return array(levels)
 
 
 def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -> list:

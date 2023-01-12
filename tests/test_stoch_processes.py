@@ -1,5 +1,5 @@
-import datetime as dt
-import pandas as pd
+from datetime import date
+from pandas import DataFrame, date_range
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
@@ -62,13 +62,13 @@ class TestStochProcesses(TestCase):
             modelresult = process(param=mp, seed=71)
             if isinstance(modelresult, tuple):
                 modelresult = modelresult[residx]
-            date_range = [
+            d_range = [
                 d.date()
-                for d in pd.date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
+                for d in date_range(periods=days, end=date(2019, 6, 30), freq="D")
             ]
-            sdf = pd.DataFrame(
+            sdf = DataFrame(
                 data=modelresult,
-                index=date_range,
+                index=d_range,
                 columns=[f"Simulation_{i}"],
             )
             series.append(
@@ -112,13 +112,13 @@ class TestStochProcesses(TestCase):
         for process in processes:
             onesim = process(mp, seed=71)
             name = process.__name__
-            date_range = [
+            d_range = [
                 d.date()
-                for d in pd.date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
+                for d in date_range(periods=days, end=date(2019, 6, 30), freq="D")
             ]
-            sdf = pd.DataFrame(
+            sdf = DataFrame(
                 data=onesim,
-                index=date_range,
+                index=d_range,
                 columns=[[f"Asset_{name[:-7]}"], ["Price(Close)"]],
             )
             series.append(OpenTimeSeries.from_df(sdf, valuetype="Price(Close)"))
