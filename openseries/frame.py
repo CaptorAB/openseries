@@ -133,6 +133,10 @@ class OpenFrame(object):
             ),
             [x.tsdf for x in self.constituents],
         )
+        if len(set(self.first_indices)) != 1 and how == "inner":
+            warning("One or more constituents still do not share the same start dates.")
+        if len(set(self.last_indices)) != 1 and how == "inner":
+            warning("One or more constituents still do not share the same end dates.")
         if self.tsdf.empty:
             raise Exception(
                 f"Merging OpenTimeSeries DataFrames with "
@@ -2311,13 +2315,9 @@ class OpenFrame(object):
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
         if len(set(self.first_indices)) != 1:
-            warning(
-                "One or more constituents still " "not truncated to same start dates."
-            )
+            warning("One or more constituents still not truncated to same start dates.")
         if len(set(self.last_indices)) != 1:
-            warning(
-                "One or more constituents still " "not truncated to same end dates."
-            )
+            warning("One or more constituents still not truncated to same end dates.")
         return self
 
     def relative(
