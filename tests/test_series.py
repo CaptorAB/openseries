@@ -975,6 +975,32 @@ class TestOpenTimeSeries(TestCase):
             container=e_six.exception.message,
         )
 
+        with self.assertRaises(Exception) as e_seven:
+            OpenTimeSeries(
+                TimeSerie(
+                    _id=valid_timeseries_id,
+                    currency="SEK",
+                    dates=[
+                        "2017-05-29",
+                        "2017-05-29",
+                    ],
+                    instrumentId=valid_instrument_id,
+                    isin=valid_isin,
+                    local_ccy=True,
+                    name="asset",
+                    values=[
+                        100.0,
+                        100.0978,
+                    ],
+                    valuetype="Price(Close)",
+                )
+            )
+        # noinspection PyUnresolvedReferences
+        self.assertIn(
+            member="has non-unique elements",
+            container=e_seven.exception.message,
+        )
+
     def test_opentimeseries_from_1d_rate_to_cumret(self):
 
         tms = OpenTimeSeries(
