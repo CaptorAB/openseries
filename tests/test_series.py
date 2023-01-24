@@ -809,8 +809,7 @@ class TestOpenTimeSeries(TestCase):
         with self.assertRaises(Exception) as e_ccy:
             OpenTimeSeries(new_dict)
 
-        # noinspection PyUnresolvedReferences
-        self.assertIn(member="local_ccy", container=e_ccy.exception.message)
+        self.assertIn(member="local_ccy", container=getattr(e_ccy.exception, "message"))
 
         new_dict.pop("label")
         new_dict.update(
@@ -820,8 +819,9 @@ class TestOpenTimeSeries(TestCase):
         with self.assertRaises(Exception) as e_min_items:
             OpenTimeSeries(new_dict)
 
-        # noinspection PyUnresolvedReferences
-        self.assertIn(member="is too short", container=e_min_items.exception.message)
+        self.assertIn(
+            member="is too short", container=getattr(e_min_items.exception, "message")
+        )
 
         with self.assertRaises(Exception) as e_one:
             OpenTimeSeries(
@@ -865,10 +865,9 @@ class TestOpenTimeSeries(TestCase):
                     valuetype="Price(Close)",
                 )
             )
-        # noinspection PyUnresolvedReferences
         self.assertIn(
             member="does not match '^$|([A-Z]{2})([\\\\dA-Z]{9})(\\\\d)$'",
-            container=e_two.exception.message,
+            container=getattr(e_two.exception, "message"),
         )
 
         with self.assertRaises(Exception) as e_three:
@@ -891,10 +890,9 @@ class TestOpenTimeSeries(TestCase):
                     valuetype="Price(Close)",
                 )
             )
-        # noinspection PyUnresolvedReferences
         self.assertIn(
             member="does not match '^$|([a-f\\\\d]{24})'",
-            container=e_three.exception.message,
+            container=getattr(e_three.exception, "message"),
         )
 
         with self.assertRaises(Exception) as e_four:
@@ -917,10 +915,9 @@ class TestOpenTimeSeries(TestCase):
                     valuetype="Price(Close)",
                 )
             )
-        # noinspection PyUnresolvedReferences
         self.assertIn(
             member="does not match '^$|([a-f\\\\d]{24})'",
-            container=e_four.exception.message,
+            container=getattr(e_four.exception, "message"),
         )
 
         with self.assertRaises(Exception) as e_five:
@@ -943,10 +940,9 @@ class TestOpenTimeSeries(TestCase):
                     valuetype="Price(Close)",
                 )
             )
-        # noinspection PyUnresolvedReferences
         self.assertIn(
             member="does not match '^$|([a-f\\\\d]{24})'",
-            container=e_five.exception.message,
+            container=getattr(e_five.exception, "message"),
         )
 
         with self.assertRaises(Exception) as e_six:
@@ -969,10 +965,10 @@ class TestOpenTimeSeries(TestCase):
                     valuetype="Price(Close)",
                 )
             )
-        # noinspection PyUnresolvedReferences
+
         self.assertIn(
             member="does not match '^$|([a-f\\\\d]{24})'",
-            container=e_six.exception.message,
+            container=getattr(e_six.exception, "message"),
         )
 
         with self.assertRaises(Exception) as e_seven:
@@ -995,10 +991,10 @@ class TestOpenTimeSeries(TestCase):
                     valuetype="Price(Close)",
                 )
             )
-        # noinspection PyUnresolvedReferences
+
         self.assertIn(
             member="has non-unique elements",
-            container=e_seven.exception.message,
+            container=getattr(e_seven.exception, "message"),
         )
 
     def test_opentimeseries_from_1d_rate_to_cumret(self):
