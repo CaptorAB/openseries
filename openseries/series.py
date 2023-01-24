@@ -260,7 +260,7 @@ class OpenTimeSeries(object):
     ):
         """Creates a timeseries from a series of values accruing with a given fixed rate
 
-        Providing a date_range of type Pandas.DatetimeIndex takes priority over
+        Providing a date_range of type Pandas DatetimeIndex takes priority over
         providing a combination of days and an end date.
 
         Parameters
