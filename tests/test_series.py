@@ -131,7 +131,7 @@ class TestOpenTimeSeries(TestCase):
         ts = NewTimeSeries.from_file(remove_duplicates=True)
         self.assertIsInstance(ts, OpenTimeSeries)
 
-    def test_create_opentimeseries_from_pandas_df(self):
+    def test_opentimeseries_create_from_pandas_df(self):
 
         se = Series(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
@@ -198,7 +198,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertFalse(path.exists(seriesfile))
 
-    def test_create_opentimeseries_from_fixed_rate(self):
+    def test_opentimeseries_create_from_fixed_rate(self):
 
         fixseries = OpenTimeSeries.from_fixed_rate(
             rate=0.03, days=756, end_dt=date(2019, 6, 30)

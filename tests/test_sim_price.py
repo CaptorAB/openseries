@@ -6,7 +6,6 @@ from openseries.sim_price import ReturnSimulation
 
 class TestSimPrice(TestCase):
     def test_return_simulation_processes(self):
-
         args = {"n": 1, "d": 2520, "mu": 0.05, "vol": 0.2, "seed": 71}
         methods = [
             "from_normal",
@@ -52,8 +51,7 @@ class TestSimPrice(TestCase):
         self.assertListEqual(target_returns, returns)
         self.assertListEqual(target_volatilities, volatilities)
 
-    def test_returnsimulation_properties(self):
-
+    def test_return_simulation_properties(self):
         days = 1200
         psim = ReturnSimulation.from_normal(n=1, d=days, mu=0.05, vol=0.1, seed=71)
 

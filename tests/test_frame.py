@@ -262,7 +262,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(labels, ["Asset_0", "Asset_2", "Asset_3", "Asset_4"])
         self.assertListEqual(frame.weights, [0.4, 0.2, 0.1, 0.2])
 
-    def test_risk_functions_same_as_series_and_frame_methods(self):
+    def test_openframe_risk_functions_same_as_opentimeseries(self):
 
         riskseries = self.randomseries.from_deepcopy()
         riskseries.set_new_label(lvl_zero="Asset_0")
@@ -411,7 +411,7 @@ class TestOpenFrame(TestCase):
             ),
         )
 
-    def test_opentimeseries_measures_same_as_openframe_measures(self):
+    def test_openframe_measures_same_as_opentimeseries(self):
 
         frame_0 = self.randomframe.from_deepcopy()
         for s in frame_0.constituents:
@@ -461,7 +461,7 @@ class TestOpenFrame(TestCase):
         for c in common_props_to_compare:
             self.assertEqual(getattr(sameseries, c), getattr(sameframe, c))
 
-    def test_keeping_attributes_aligned_openframe_vs_opentimeseries(self):
+    def test_openframe_keeping_attributes_aligned_vs_opentimeseries(self):
 
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
@@ -559,7 +559,7 @@ class TestOpenFrame(TestCase):
             len(frame_compared) == 0, msg=f"Difference is: {frame_compared}"
         )
 
-    def test_keeping_methods_aligned_openframe_vs_opentimeseries(self):
+    def test_openframe_keeping_methods_aligned_vs_opentimeseries(self):
 
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
