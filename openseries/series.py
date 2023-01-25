@@ -1756,13 +1756,13 @@ class OpenTimeSeries(object):
 
         return self
 
-    def resample(self, freq: str = "BM"):
+    def resample(self, freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"] = "BM"):
         """Resamples the timeseries frequency
 
         Parameters
         ----------
-        freq: str, default "BM"
-            Some of the valid values are D, B, M, BM, Q, BQ, A, BA
+        freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"], default "BM"
+            The date offset string that sets the resampled frequency
 
         Returns
         -------

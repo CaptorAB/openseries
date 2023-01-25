@@ -1874,13 +1874,13 @@ class OpenFrame(object):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def resample(self, freq="BM"):
+    def resample(self, freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"] = "BM"):
         """Resamples the timeseries frequency
 
         Parameters
         ----------
-        freq: str, default "BM"
-            Some of the valid values are D, B, M, BM, Q, BQ, A, BA
+        freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"], default "BM"
+            The date offset string that sets the resampled frequency
 
         Returns
         -------
@@ -2496,7 +2496,7 @@ class OpenFrame(object):
 
     def capture_ratio_func(
         self,
-        ratio: str,
+        ratio: Literal["up", "down", "both"],
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
         from_date: date | None = None,
@@ -2514,7 +2514,7 @@ class OpenFrame(object):
 
         Parameters
         ----------
-        ratio: str
+        ratio: Literal["up", "down", "both"]
             Either 'up', 'down' or 'both'
         base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
