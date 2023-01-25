@@ -37,6 +37,7 @@ class TimeSerie(TypedDict, total=False):
         ISO 4217 currency code of the timeseries
     dates : List[str]
         Dates of the individual timeseries items
+        These dates will not be altered by methods
     domestic : str
         ISO 4217 currency code of the user's home currency
     name : str
@@ -45,14 +46,17 @@ class TimeSerie(TypedDict, total=False):
         ISO 6166 identifier code of the associated instrument
     label : str
         Placeholder for a name of the timeseries
-    calendar : str
-        Placeholder for a name of the timeseries
+    calendar : numpy.busdaycalendar
+        Placeholder for a business calendar
     valuetype : str
-        Name for the timeseries
+        Identifies if the series is a series of values or returns
     values : List[float]
-        The currency of the timeseries
-    local_ccy: bool, default: True
+        The value or return values of the timeseries items
+        These values will not be altered by methods
+    local_ccy: bool
         Boolean flag indicating if timeseries is in local currency
+    tsdf: pandas.DataFrame
+        Pandas object holding dates and values that can be altered via methods
     """
 
     _id: str
@@ -101,9 +105,8 @@ class OpenTimeSeries(object):
         cls.calendar = holiday_calendar(country=country)
 
     def __init__(self, d: TimeSerie):
-        """Instantiates an object of the class OpenTimeSeries \n
-
-        The data can have daily frequency, but not more frequent.
+        """Instantiates an object of the class OpenTimeSeries
+         The data can have daily frequency, but not more frequent
 
         Parameters
         ----------

@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.9.2] - 2023-01-25
+## Version [0.9.3] - 2023-01-25
 
 Renamed Numpy.busdaycalendar attribute on OpenTimeSeries class from `sweden` to
 `calendar` and corrected type description in README.md. Aiming to make package
