@@ -38,7 +38,7 @@ class TestOpenTimeSeries(TestCase):
             for d in date_range(
                 periods=sim.trading_days,
                 end=date(2019, 6, 30),
-                freq=CDay(calendar=OpenTimeSeries.sweden),
+                freq=CDay(calendar=OpenTimeSeries.calendar),
             )
         ]
         sdf = sim.df.iloc[0].T.to_frame()

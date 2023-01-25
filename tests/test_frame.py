@@ -38,7 +38,7 @@ class TestOpenFrame(TestCase):
             for d in date_range(
                 periods=sim.trading_days,
                 end=date(2019, 6, 30),
-                freq=CustomBusinessDay(calendar=OpenTimeSeries.sweden),
+                freq=CustomBusinessDay(calendar=OpenTimeSeries.calendar),
             )
         ]
         sdf = sim.df.iloc[0].T.to_frame()
@@ -511,7 +511,7 @@ class TestOpenFrame(TestCase):
             "valuetype",
             "label",
             "domestic",
-            "sweden",
+            "calendar",
         ]
 
         frame_attributes = [

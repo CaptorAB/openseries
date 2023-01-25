@@ -25,7 +25,35 @@ from openseries.risk import (
 
 
 class TimeSerie(TypedDict, total=False):
-    """Class to hold the type of input data for the OpenTimeSeries class."""
+    """Class to hold the type of input data for the OpenTimeSeries class.
+
+    Parameters
+    ----------
+    _id : str
+        Database identifier of the timeseries
+    instrumentId: str
+        Database identifier of the instrument associated with the timeseries
+    currency : str
+        ISO 4217 currency code of the timeseries
+    dates : List[str]
+        Dates of the individual timeseries items
+    domestic : str
+        ISO 4217 currency code of the user's home currency
+    name : str
+        string identifier of the timeseries and/or instrument
+    isin : str
+        ISO 6166 identifier code of the associated instrument
+    label : str
+        Placeholder for a name of the timeseries
+    calendar : str
+        Placeholder for a name of the timeseries
+    valuetype : str
+        Name for the timeseries
+    values : List[float]
+        The currency of the timeseries
+    local_ccy: bool, default: True
+        Boolean flag indicating if timeseries is in local currency
+    """
 
     _id: str
     instrumentId: str
@@ -35,8 +63,7 @@ class TimeSerie(TypedDict, total=False):
     name: str
     isin: str
     label: str
-    schema: dict
-    sweden: busdaycalendar
+    calendar: busdaycalendar
     valuetype: str
     values: List[float]
     local_ccy: bool
@@ -52,8 +79,7 @@ class OpenTimeSeries(object):
     name: str
     isin: str
     label: str
-    schema: dict
-    sweden: busdaycalendar
+    calendar: busdaycalendar
     valuetype: str
     values: List[float]
     local_ccy: bool
@@ -72,7 +98,7 @@ class OpenTimeSeries(object):
         """
 
         cls.domestic = domestic_ccy
-        cls.sweden = holiday_calendar(country=country)
+        cls.calendar = holiday_calendar(country=country)
 
     def __init__(self, d: TimeSerie):
         """Instantiates an object of the class OpenTimeSeries \n
@@ -148,7 +174,7 @@ class OpenTimeSeries(object):
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
         valuetype : str, default: "Price(Close)"
-            Name for the timeseries
+            Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
@@ -204,9 +230,9 @@ class OpenTimeSeries(object):
         frame: OpenFrame
             openseries.frame.OpenFrame
         label : str
-            Name for the timeseries
+            Placeholder for a name of the timeseries
         valuetype : str, default: "Price(Close)"
-            Name for the timeseries
+            Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
@@ -276,9 +302,9 @@ class OpenTimeSeries(object):
             End date of date range to generate when date_range not provided. Must be
             combined with days
         label : str
-            Name for the timeseries
+            Placeholder for a name of the timeseries
         valuetype : str, default: "Price(Close)"
-            Name for the timeseries
+            Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
@@ -441,7 +467,7 @@ class OpenTimeSeries(object):
             for d in date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
-                freq=CustomBusinessDay(calendar=self.sweden),
+                freq=CustomBusinessDay(calendar=self.calendar),
             )
         ]
 
