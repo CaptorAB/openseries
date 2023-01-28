@@ -2207,6 +2207,64 @@ class OpenTimeSeries(object):
 
         return figure, plotfile
 
+    def plot_bars(
+        self,
+        tick_fmt: str | None = None,
+        directory: str | None = None,
+        auto_open: bool = True,
+        add_logo: bool = True,
+        output_type: Literal["file", "div"] = "file",
+    ) -> (Figure, str):
+        """Creates a Plotly Bar Figure
+
+        Parameters
+        ----------
+        tick_fmt: str, optional
+            None, '%', '.1%' depending on number of decimals to show
+        directory: str, optional
+            Directory where Plotly html file is saved
+        auto_open: bool, default: True
+            Determines whether to open a browser window with the plot
+        add_logo: bool, default: True
+            If True a Captor logo is added to the plot
+        output_type: str, default: "file"
+            file or div
+
+        Returns
+        -------
+        (plotly.go.Figure, str)
+            Plotly Figure and html filename with location
+        """
+        if not directory:
+            directory = path.join(str(Path.home()), "Documents")
+        filename = self.label.replace("/", "").replace("#", "").replace(" ", "").upper()
+        plotfile = path.join(path.abspath(directory), "{}.html".format(filename))
+
+        fig, logo = load_plotly_dict()
+        figure = Figure(fig)
+        figure.add_bar(
+            x=self.tsdf.index,
+            y=self.tsdf.iloc[:, 0],
+            hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+            name=self.label,
+        )
+        figure.update_layout(yaxis=dict(tickformat=tick_fmt))
+
+        if add_logo:
+            figure.add_layout_image(logo)
+
+        plot(
+            figure,
+            filename=plotfile,
+            auto_open=auto_open,
+            link_text="",
+            include_plotlyjs="cdn",
+            config=fig["config"],
+            output_type=output_type,
+        )
+
+        return figure, plotfile
+
 
 def timeseries_chain(front, back, old_fee: float = 0.0) -> OpenTimeSeries:
     """Chain two timeseries together

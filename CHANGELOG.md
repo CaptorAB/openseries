@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.9.5] - 2023-01-28
+
+Added a plot_bars method to both OpenTimeSeries and OpenFrame classes.
+
 ## Version [0.9.4] - 2023-01-28
 
 Reverted Literal typing for offset argument in .resample() methods. Fixed merge_series

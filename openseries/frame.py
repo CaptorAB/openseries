@@ -17,7 +17,7 @@ from pandas import (
 )
 from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
-from plotly.graph_objs import Figure, Scatter
+from plotly.graph_objs import Figure
 from plotly.offline import plot
 from random import choices
 from scipy.stats import kurtosis, norm, skew
@@ -2984,22 +2984,17 @@ class OpenFrame(object):
             filename = "".join(choices(ascii_letters, k=6)) + ".html"
         plotfile = path.join(path.abspath(directory), filename)
 
-        data = []
-        for item in range(self.item_count):
-            data.append(
-                Scatter(
-                    x=self.tsdf.index,
-                    y=self.tsdf.iloc[:, item],
-                    hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-                    line=dict(width=2.5, dash="solid"),
-                    mode=mode,
-                    name=labels[item],
-                )
-            )
-
         fig, logo = load_plotly_dict()
-        fig["data"] = data
         figure = Figure(fig)
+        for item in range(self.item_count):
+            figure.add_scatter(
+                x=self.tsdf.index,
+                y=self.tsdf.iloc[:, item],
+                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+                line=dict(width=2.5, dash="solid"),
+                mode=mode,
+                name=labels[item],
+            )
         figure.update_layout(yaxis=dict(tickformat=tick_fmt))
 
         if add_logo:
@@ -3023,6 +3018,87 @@ class OpenFrame(object):
                     text=[txt.format(self.tsdf.iloc[-1, item])],
                     textposition="top center",
                 )
+
+        plot(
+            figure,
+            filename=plotfile,
+            auto_open=auto_open,
+            link_text="",
+            include_plotlyjs="cdn",
+            config=fig["config"],
+            output_type=output_type,
+        )
+
+        return figure, plotfile
+
+    def plot_bars(
+        self,
+        mode: Literal["stack", "group", "overlay", "relative"] = "group",
+        tick_fmt: str | None = None,
+        filename: str | None = None,
+        directory: str | None = None,
+        labels: list | None = None,
+        auto_open: bool = True,
+        add_logo: bool = True,
+        output_type: Literal["file", "div"] = "file",
+    ) -> (Figure, str):
+        """Creates a Plotly Bar Figure
+
+        Parameters
+        ----------
+        mode: Literal["stack", "group", "overlay", "relative"], default: "group"
+            The type of bar to use
+        tick_fmt: str, optional
+            None, '%', '.1%' depending on number of decimals to show
+        filename: str, optional
+            Name of the Plotly html file
+        directory: str, optional
+            Directory where Plotly html file is saved
+        labels: list, optional
+            A list of labels to manually override using the names of the input data
+        auto_open: bool, default: True
+            Determines whether to open a browser window with the plot
+        add_logo: bool, default: True
+            If True a Captor logo is added to the plot
+        output_type: str, default: "file"
+            file or div
+
+        Returns
+        -------
+        (plotly.go.Figure, str)
+            Plotly Figure and html filename with location
+        """
+        if labels:
+            assert (
+                len(labels) == self.item_count
+            ), "Must provide same number of labels as items in frame."
+        else:
+            labels = self.columns_lvl_zero
+        if not directory:
+            directory = path.join(str(Path.home()), "Documents")
+        if not filename:
+            filename = "".join(choices(ascii_letters, k=6)) + ".html"
+        plotfile = path.join(path.abspath(directory), filename)
+
+        if mode == "overlay":
+            opacity = 0.7
+        else:
+            opacity = None
+
+        fig, logo = load_plotly_dict()
+        figure = Figure(fig)
+        for item in range(self.item_count):
+            figure.add_bar(
+                x=self.tsdf.index,
+                y=self.tsdf.iloc[:, item],
+                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+                name=labels[item],
+                opacity=opacity,
+            )
+        figure.update_layout(barmode=mode, yaxis=dict(tickformat=tick_fmt))
+
+        if add_logo:
+            figure.add_layout_image(logo)
 
         plot(
             figure,

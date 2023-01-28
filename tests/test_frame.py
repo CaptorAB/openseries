@@ -592,6 +592,7 @@ class TestOpenFrame(TestCase):
             "calc_range",
             "drawdown_details",
             "from_deepcopy",
+            "plot_bars",
             "plot_series",
             "resample",
             "return_nan_handle",
@@ -738,17 +739,22 @@ class TestOpenFrame(TestCase):
 
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
+
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
-        fig_keys = list(fig_json.keys())
-        self.assertListEqual(fig_keys, ["data", "layout"])
+
+        for i in range(plotframe.item_count):
+            rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
+            fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
+            self.assertListEqual(rawdata, fig_data)
 
         fig_last, _ = plotframe.plot_series(
             auto_open=False, output_type="div", show_last=True
         )
         fig_last_json = loads(fig_last.to_json())
-        last = fig_last_json["data"][-1]["y"][0]
-        self.assertEqual(f"{last:.12f}", "0.778129717727")
+        rawlast = plotframe.tsdf.iloc[-1, -1]
+        figlast = fig_last_json["data"][-1]["y"][0]
+        self.assertEqual(f"{figlast:.12f}", f"{rawlast:.12f}")
 
         fig_last_fmt, _ = plotframe.plot_series(
             auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
@@ -761,6 +767,33 @@ class TestOpenFrame(TestCase):
             _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
 
         self.assertIsInstance(e_plot.exception, AssertionError)
+
+    def test_openframe_plot_bars(self):
+
+        plotframe = self.randomframe.from_deepcopy()
+
+        fig_keys = ["hovertemplate", "name", "x", "y", "type"]
+        fig, _ = plotframe.plot_bars(auto_open=False, output_type="div")
+        fig_json = loads(fig.to_json())
+        self.assertListEqual(list(fig_json["data"][0].keys()), fig_keys)
+
+        for i in range(plotframe.item_count):
+            rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
+            fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
+            self.assertListEqual(rawdata, fig_data)
+
+        with self.assertRaises(AssertionError) as e_plot:
+            _, _ = plotframe.plot_bars(auto_open=False, labels=["a", "b"])
+
+        self.assertIsInstance(e_plot.exception, AssertionError)
+
+        overlayfig, _ = plotframe.plot_bars(auto_open=False, mode="overlay")
+        overlayfig_json = loads(overlayfig.to_json())
+
+        fig_keys.append("opacity")
+        self.assertListEqual(
+            sorted(list(overlayfig_json["data"][0].keys())), sorted(fig_keys)
+        )
 
     def test_openframe_passed_empty_list(self):
 

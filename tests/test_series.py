@@ -545,10 +545,13 @@ class TestOpenTimeSeries(TestCase):
     def test_opentimeseries_plot_series(self):
 
         plotseries = self.randomseries.from_deepcopy()
+        rawdata = [f"{x:.11f}" for x in plotseries.tsdf.iloc[1:5, 0]]
+
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
-        fig_keys = list(fig_json.keys())
-        self.assertListEqual(fig_keys, ["data", "layout"])
+        fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
+
+        self.assertListEqual(rawdata, fig_data)
 
         fig_last, _ = plotseries.plot_series(
             auto_open=False, output_type="div", show_last=True
@@ -563,6 +566,18 @@ class TestOpenTimeSeries(TestCase):
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
         self.assertEqual(last_fmt, "Last 102.447%")
+
+    def test_opentimeseries_plot_bars(self):
+
+        barseries = self.randomseries.from_deepcopy()
+        barseries.resample(freq="BM").value_to_ret()
+        rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
+
+        fig, _ = barseries.plot_bars(auto_open=False, output_type="div")
+        fig_json = loads(fig.to_json())
+        fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
+
+        self.assertListEqual(rawdata, fig_data)
 
     def test_opentimeseries_drawdown_details(self):
 
