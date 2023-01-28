@@ -489,7 +489,7 @@ class OpenTimeSeries(object):
         Returns
         -------
         pandas.DataFrame
-            Pandas DataFrame
+            Properties of the OpenTimeSeries
         """
 
         if not properties:
@@ -1756,13 +1756,14 @@ class OpenTimeSeries(object):
 
         return self
 
-    def resample(self, freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"] = "BM"):
+    def resample(self, freq: str = "BM"):
         """Resamples the timeseries frequency
 
         Parameters
         ----------
-        freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"], default "BM"
+        freq: str, default "BM"
             The date offset string that sets the resampled frequency
+            Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 
         Returns
         -------

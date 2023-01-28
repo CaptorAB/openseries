@@ -133,15 +133,14 @@ class OpenFrame(object):
             ),
             [x.tsdf for x in self.constituents],
         )
-        if len(set(self.first_indices)) != 1 and how == "inner":
-            warning("One or more constituents still do not share the same start dates.")
-        if len(set(self.last_indices)) != 1 and how == "inner":
-            warning("One or more constituents still do not share the same end dates.")
         if self.tsdf.empty:
             raise Exception(
                 f"Merging OpenTimeSeries DataFrames with "
                 f"argument how={how} produced an empty DataFrame."
             )
+        elif how == "inner":
+            for x in self.constituents:
+                x.tsdf = x.tsdf.loc[self.tsdf.index]
         return self
 
     def all_properties(self, properties: list | None = None) -> DataFrame:
@@ -155,7 +154,7 @@ class OpenFrame(object):
         Returns
         -------
         pandas.DataFrame
-            Pandas DataFrame
+            Properties of the contituent OpenTimeSeries
         """
 
         if not properties:
@@ -1874,13 +1873,14 @@ class OpenFrame(object):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def resample(self, freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"] = "BM"):
+    def resample(self, freq: str = "BM"):
         """Resamples the timeseries frequency
 
         Parameters
         ----------
-        freq: Literal["D", "B", "M", "BM", "Q", "BQ", "A", "BA"], default "BM"
+        freq: str, default "BM"
             The date offset string that sets the resampled frequency
+            Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 
         Returns
         -------
@@ -2315,9 +2315,17 @@ class OpenFrame(object):
         for x in self.constituents:
             x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
         if len(set(self.first_indices)) != 1:
-            warning("One or more constituents still not truncated to same start dates.")
+            warning(
+                f"One or more constituents still not truncated to same "
+                f"start dates.\n"
+                f"{self.tsdf.head()}"
+            )
         if len(set(self.last_indices)) != 1:
-            warning("One or more constituents still not truncated to same end dates.")
+            warning(
+                f"One or more constituents still not truncated to same "
+                f"end dates.\n"
+                f"{self.tsdf.tail()}"
+            )
         return self
 
     def relative(

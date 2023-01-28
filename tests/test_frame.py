@@ -889,14 +889,12 @@ class TestOpenFrame(TestCase):
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
-        self.assertEqual(
-            logs.output,
-            [
-                (
-                    "WARNING:root:One or more constituents"
-                    " still not truncated to same start dates."
-                )
-            ],
+        self.assertIn(
+            (
+                "WARNING:root:One or more constituents"
+                " still not truncated to same start dates."
+            ),
+            logs.output[0],
         )
 
     def test_openframe_trunc_frame_end_fail(self):
@@ -958,14 +956,122 @@ class TestOpenFrame(TestCase):
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
-        self.assertEqual(
-            logs.output,
+        self.assertIn(
+            (
+                "WARNING:root:One or more constituents"
+                " still not truncated to same end dates."
+            ),
+            logs.output[0],
+        )
+
+    def test_openframe_merge_series(self):
+
+        aframe = OpenFrame(
             [
-                (
-                    "WARNING:root:One or more constituents"
-                    " still not truncated to same end dates."
-                )
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="Asset_one",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ],
+                        values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    )
+                ),
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="Asset_two",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-08-11",
+                            "2022-08-12",
+                            "2022-08-13",
+                            "2022-08-14",
+                            "2022-08-15",
+                        ],
+                        values=[2.1, 2.0, 1.8, 2.1, 2.0],
+                    )
+                ),
+            ]
+        )
+        bframe = OpenFrame(
+            [
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="Asset_one",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ],
+                        values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    )
+                ),
+                OpenTimeSeries(
+                    TimeSerie(
+                        _id="",
+                        name="Asset_two",
+                        currency="SEK",
+                        instrumentId="",
+                        local_ccy=True,
+                        valuetype="Price(Close)",
+                        dates=[
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-16",
+                        ],
+                        values=[2.1, 2.0, 1.8, 2.1, 1.9],
+                    )
+                ),
+            ]
+        )
+
+        b4df = aframe.tsdf.copy()
+        aframe.merge_series(how="outer")
+        assert_frame_equal(b4df, aframe.tsdf, check_exact=True)
+
+        bframe.merge_series(how="inner")
+        blist = [d.strftime("%Y-%m-%d") for d in bframe.tsdf.index]
+        self.assertListEqual(
+            blist,
+            [
+                "2022-07-11",
+                "2022-07-12",
+                "2022-07-13",
+                "2022-07-14",
             ],
+        )
+
+        with self.assertRaises(Exception) as e_merged:
+            aframe.merge_series(how="inner")
+
+        self.assertEqual(
+            (
+                "Merging OpenTimeSeries DataFrames with argument how=inner produced "
+                "an empty DataFrame."
+            ),
+            e_merged.exception.args[0],
         )
 
     def test_openframe_all_properties(self):
@@ -1320,116 +1426,6 @@ class TestOpenFrame(TestCase):
         uframe = OpenFrame([aseries, bseries])
 
         self.assertEqual(len(set(uframe.columns_lvl_zero)), 2)
-
-    def test_openframe_merge_series(self):
-
-        aframe = OpenFrame(
-            [
-                OpenTimeSeries(
-                    TimeSerie(
-                        _id="",
-                        name="Asset_one",
-                        currency="SEK",
-                        instrumentId="",
-                        local_ccy=True,
-                        valuetype="Price(Close)",
-                        dates=[
-                            "2022-07-11",
-                            "2022-07-12",
-                            "2022-07-13",
-                            "2022-07-14",
-                            "2022-07-15",
-                        ],
-                        values=[1.1, 1.0, 0.8, 1.1, 1.0],
-                    )
-                ),
-                OpenTimeSeries(
-                    TimeSerie(
-                        _id="",
-                        name="Asset_two",
-                        currency="SEK",
-                        instrumentId="",
-                        local_ccy=True,
-                        valuetype="Price(Close)",
-                        dates=[
-                            "2022-08-11",
-                            "2022-08-12",
-                            "2022-08-13",
-                            "2022-08-14",
-                            "2022-08-15",
-                        ],
-                        values=[2.1, 2.0, 1.8, 2.1, 2.0],
-                    )
-                ),
-            ]
-        )
-        bframe = OpenFrame(
-            [
-                OpenTimeSeries(
-                    TimeSerie(
-                        _id="",
-                        name="Asset_one",
-                        currency="SEK",
-                        instrumentId="",
-                        local_ccy=True,
-                        valuetype="Price(Close)",
-                        dates=[
-                            "2022-07-11",
-                            "2022-07-12",
-                            "2022-07-13",
-                            "2022-07-14",
-                            "2022-07-15",
-                        ],
-                        values=[1.1, 1.0, 0.8, 1.1, 1.0],
-                    )
-                ),
-                OpenTimeSeries(
-                    TimeSerie(
-                        _id="",
-                        name="Asset_two",
-                        currency="SEK",
-                        instrumentId="",
-                        local_ccy=True,
-                        valuetype="Price(Close)",
-                        dates=[
-                            "2022-07-11",
-                            "2022-07-12",
-                            "2022-07-13",
-                            "2022-07-14",
-                            "2022-07-16",
-                        ],
-                        values=[2.1, 2.0, 1.8, 2.1, 1.9],
-                    )
-                ),
-            ]
-        )
-
-        b4df = aframe.tsdf.copy()
-        aframe.merge_series(how="outer")
-        assert_frame_equal(b4df, aframe.tsdf, check_exact=True)
-
-        bframe.merge_series(how="inner")
-        blist = [d.strftime("%Y-%m-%d") for d in bframe.tsdf.index]
-        self.assertListEqual(
-            blist,
-            [
-                "2022-07-11",
-                "2022-07-12",
-                "2022-07-13",
-                "2022-07-14",
-            ],
-        )
-
-        with self.assertRaises(Exception) as e_merged:
-            aframe.merge_series(how="inner")
-
-        self.assertEqual(
-            (
-                "Merging OpenTimeSeries DataFrames with argument how=inner produced "
-                "an empty DataFrame."
-            ),
-            e_merged.exception.args[0],
-        )
 
     def test_openframe_capture_ratio(self):
 

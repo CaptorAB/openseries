@@ -7,6 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.9.4] - 2023-01-28
+
+Reverted Literal typing for offset argument in .resample() methods. Fixed merge_series
+method on OpenFrame so that constituent DataFrames are aligned on inner merge.
+
 ## Version [0.9.3] - 2023-01-25
 
 Renamed Numpy.busdaycalendar attribute on OpenTimeSeries class from `sweden` to
