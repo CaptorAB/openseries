@@ -787,7 +787,9 @@ class TestOpenFrame(TestCase):
 
         self.assertIsInstance(e_plot.exception, AssertionError)
 
-        overlayfig, _ = plotframe.plot_bars(auto_open=False, mode="overlay")
+        overlayfig, _ = plotframe.plot_bars(
+            auto_open=False, output_type="div", mode="overlay"
+        )
         overlayfig_json = loads(overlayfig.to_json())
 
         fig_keys.append("opacity")
