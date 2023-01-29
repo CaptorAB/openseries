@@ -1,11 +1,14 @@
 from pandas import DataFrame
+from typing import TypeVar
 from unittest import TestCase
 
 from openseries.sim_price import ReturnSimulation
 
+TTestSimPrice = TypeVar("TTestSimPrice", bound="TestSimPrice")
+
 
 class TestSimPrice(TestCase):
-    def test_return_simulation_processes(self):
+    def test_return_simulation_processes(self: TTestSimPrice):
         args = {"n": 1, "d": 2520, "mu": 0.05, "vol": 0.2, "seed": 71}
         methods = [
             "from_normal",
@@ -51,7 +54,7 @@ class TestSimPrice(TestCase):
         self.assertListEqual(target_returns, returns)
         self.assertListEqual(target_volatilities, volatilities)
 
-    def test_return_simulation_properties(self):
+    def test_return_simulation_properties(self: TTestSimPrice):
         days = 1200
         psim = ReturnSimulation.from_normal(n=1, d=days, mu=0.05, vol=0.1, seed=71)
 

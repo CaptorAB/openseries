@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.9.6] - 2023-01-29
+
+Added typing for self.
+
 ## Version [0.9.5] - 2023-01-28
 
 Added a plot_bars method to both OpenTimeSeries and OpenFrame classes.

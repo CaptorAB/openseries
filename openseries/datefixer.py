@@ -111,13 +111,17 @@ def date_offset_foll(
     return new_date
 
 
-def get_previous_sweden_business_day_before_today(today: date | None = None):
-    """Function to bump backwards to find the previous Swedish business day before today
+def get_previous_business_day_before_today(
+    today: date | None = None, country: str = "SE"
+):
+    """Function to bump backwards to find the previous business day before today
 
     Parameters
     ----------
     today: datetime.date, optional
         Manual input of the day from where the previous business day is found
+    country: str, default: "SE"
+        Numpy busdaycalendar country code
 
     Returns
     -------
@@ -130,7 +134,7 @@ def get_previous_sweden_business_day_before_today(today: date | None = None):
 
     return date_offset_foll(
         today - timedelta(days=1),
-        country="SE",
+        country=country,
         months_offset=0,
         adjust=True,
         following=False,

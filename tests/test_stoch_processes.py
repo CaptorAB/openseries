@@ -1,5 +1,6 @@
 from datetime import date
 from pandas import DataFrame, date_range
+from typing import TypeVar
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
@@ -14,9 +15,11 @@ from openseries.stoch_processes import (
     heston_model_levels,
 )
 
+TTestStochProcesses = TypeVar("TTestStochProcesses", bound="TestStochProcesses")
+
 
 class TestStochProcesses(TestCase):
-    def test_stoch_processes_assets(self):
+    def test_stoch_processes_assets(self: TTestStochProcesses):
         days = 2520
         target_returns = [
             "-0.031826675",
@@ -82,7 +85,7 @@ class TestStochProcesses(TestCase):
         self.assertListEqual(target_returns, means)
         self.assertListEqual(target_volatilities, deviations)
 
-    def test_stoch_processes_cir_and_ou(self):
+    def test_stoch_processes_cir_and_ou(self: TTestStochProcesses):
         series = []
         days = 2520
         target_means = ["0.024184423", "0.019893950"]
