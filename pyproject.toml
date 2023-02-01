@@ -59,7 +59,9 @@ keywords = [
 [project.optional-dependencies]
 test = [
     "coverage",
-    "pytest"
+    "pytest",
+    "pytest-split",
+    "pytest-xdist"
 ]
 dev = [
     "coverage",
