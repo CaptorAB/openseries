@@ -60,6 +60,7 @@ keywords = [
 test = [
     "coverage",
     "pytest",
+    "pytest-cov",
     "pytest-split",
     "pytest-xdist"
 ]
