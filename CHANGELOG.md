@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.9.7] - 2023-02-02
+## Version [0.9.8] - 2023-02-02
 
 Improved OpenTimeSeries.from_fixed_rate() method, added exceptions module to provide
 better user feedback and added typing to output from class methods.

@@ -325,7 +325,7 @@ class OpenTimeSeries(object):
             d_range = DatetimeIndex(
                 [d.date() for d in date_range(periods=days, end=end_dt, freq="D")]
             )
-        else:
+        elif d_range is None and not all([days, end_dt]):
             raise FromFixedRateDatesInputError
         deltas = array([i.days for i in d_range[1:] - d_range[:-1]])
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))

@@ -4,7 +4,7 @@ from json import load, loads
 from jsonschema.exceptions import ValidationError
 from numpy import busdaycalendar
 from os import path, remove
-from pandas import DataFrame, date_range, Series
+from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pandas.tseries.offsets import CDay
 from stdnum.exceptions import InvalidChecksum
 import sys
@@ -235,15 +235,16 @@ class TestOpenTimeSeries(TestCase):
 
     def test_opentimeseries_create_from_fixed_rate(self: TTestOpenTimeSeries):
 
-        fixseries = OpenTimeSeries.from_fixed_rate(
+        fixseries_one = OpenTimeSeries.from_fixed_rate(
             rate=0.03, days=756, end_dt=date(2019, 6, 30)
         )
+        self.assertTrue(isinstance(fixseries_one, OpenTimeSeries))
 
-        self.assertTrue(isinstance(fixseries, OpenTimeSeries))
-
-        with self.assertRaises(TypeError) as no_args:
-            _ = OpenTimeSeries.from_fixed_rate()
-        self.assertIsInstance(no_args.exception, TypeError)
+        rnd_series = self.randomseries.from_deepcopy()
+        fixseries_two = OpenTimeSeries.from_fixed_rate(
+            rate=0.03, d_range=DatetimeIndex(rnd_series.tsdf.index)
+        )
+        self.assertTrue(isinstance(fixseries_two, OpenTimeSeries))
 
         with self.assertRaises(FromFixedRateDatesInputError) as only_rate_arg:
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03)
