@@ -5,7 +5,7 @@ from pandas import DataFrame, date_range
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
 import sys
-from typing import List, TypeVar
+from typing import get_type_hints, List, TypeVar
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
@@ -108,7 +108,7 @@ class TestOpenFrame(TestCase):
         sys.stdout = old_stdout
         self.assertEqual(r, output)
 
-    def test_openframe_annotations(self: TTestOpenFrame):
+    def test_openframe_annotations_and_typehints(self: TTestOpenFrame):
 
         annotations = dict(OpenFrame.__annotations__)
         self.assertDictEqual(
@@ -119,6 +119,8 @@ class TestOpenFrame(TestCase):
                 "weights": List[float],
             },
         )
+        typehints = get_type_hints(OpenFrame)
+        self.assertDictEqual(annotations, typehints)
 
     def test_create_opentimeseries_from_frame(self: TTestOpenFrame):
 

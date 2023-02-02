@@ -8,11 +8,12 @@ from pandas import DataFrame, date_range, Series
 from pandas.tseries.offsets import CDay
 from stdnum.exceptions import InvalidChecksum
 import sys
-from typing import List, TypeVar
+from typing import get_type_hints, List, TypeVar
 from unittest import TestCase
 
 from openseries.series import OpenTimeSeries, timeseries_chain, TimeSerie
 from openseries.sim_price import ReturnSimulation
+from openseries.exceptions import FromFixedRateDatesInputError
 
 TTestOpenTimeSeries = TypeVar("TTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
@@ -56,10 +57,10 @@ class TestOpenTimeSeries(TestCase):
             ("Asset", "Price(Close)")
         ]
 
-    def test_opentimeseries_annotations(self: TTestOpenTimeSeries):
+    def test_opentimeseries_annotations_and_typehints(self: TTestOpenTimeSeries):
 
         opentimeseries_annotations = dict(OpenTimeSeries.__annotations__)
-        timeserieannotations = dict(TimeSerie.__annotations__)
+        timeserie_annotations = dict(TimeSerie.__annotations__)
 
         self.assertDictEqual(
             opentimeseries_annotations,
@@ -79,7 +80,12 @@ class TestOpenTimeSeries(TestCase):
                 "tsdf": DataFrame,
             },
         )
-        self.assertDictEqual(opentimeseries_annotations, timeserieannotations)
+        self.assertDictEqual(opentimeseries_annotations, timeserie_annotations)
+
+        opentimeseries_typehints = get_type_hints(OpenTimeSeries)
+        timeserie_typehints = get_type_hints(TimeSerie)
+        self.assertDictEqual(opentimeseries_annotations, opentimeseries_typehints)
+        self.assertDictEqual(opentimeseries_typehints, timeserie_typehints)
 
     def test_opentimeseries_repr(self: TTestOpenTimeSeries):
 
@@ -234,6 +240,23 @@ class TestOpenTimeSeries(TestCase):
         )
 
         self.assertTrue(isinstance(fixseries, OpenTimeSeries))
+
+        with self.assertRaises(TypeError) as no_args:
+            _ = OpenTimeSeries.from_fixed_rate()
+        self.assertIsInstance(no_args.exception, TypeError)
+
+        with self.assertRaises(FromFixedRateDatesInputError) as only_rate_arg:
+            _ = OpenTimeSeries.from_fixed_rate(rate=0.03)
+        self.assertIsInstance(only_rate_arg.exception, FromFixedRateDatesInputError)
+
+        self.assertEqual(
+            str(only_rate_arg.exception),
+            "If d_range is not provided both days and end_dt must be.",
+        )
+
+        with self.assertRaises(FromFixedRateDatesInputError) as only_days_noend:
+            _ = OpenTimeSeries.from_fixed_rate(rate=0.03, days=30)
+        self.assertIsInstance(only_days_noend.exception, FromFixedRateDatesInputError)
 
     def test_opentimeseries_periods_in_a_year(self: TTestOpenTimeSeries):
 

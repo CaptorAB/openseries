@@ -15,6 +15,7 @@ from scipy.stats import kurtosis, norm, skew
 from typing import List, Literal, TypedDict, TypeVar
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
+from openseries.exceptions import FromFixedRateDatesInputError
 from openseries.load_plotly import load_plotly_dict
 from openseries.risk import (
     cvar_down,
@@ -106,7 +107,7 @@ class OpenTimeSeries(object):
         cls.domestic = domestic_ccy
         cls.calendar = holiday_calendar(country=country)
 
-    def __init__(self: TOpenTimeSeries, d: TimeSerie):
+    def __init__(self: TOpenTimeSeries, d: TimeSerie) -> None:
         """Instantiates an object of the class OpenTimeSeries
          The data can have daily frequency, but not more frequent
 
@@ -169,7 +170,7 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
         local_ccy: bool = True,
-    ):
+    ) -> TOpenTimeSeries:
         """Creates a timeseries from a Pandas DataFrame or Series
 
         Parameters
@@ -227,7 +228,7 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
         local_ccy: bool = True,
-    ):
+    ) -> TOpenTimeSeries:
         """Creates a timeseries from an openseries.frame.OpenFrame
 
         Parameters
@@ -288,7 +289,7 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
         local_ccy: bool = True,
-    ):
+    ) -> TOpenTimeSeries:
         """Creates a timeseries from a series of values accruing with a given fixed rate
 
         Providing a date_range of type Pandas DatetimeIndex takes priority over
@@ -320,10 +321,12 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        if d_range is None:
+        if d_range is None and all([days, end_dt]):
             d_range = DatetimeIndex(
                 [d.date() for d in date_range(periods=days, end=end_dt, freq="D")]
             )
+        else:
+            raise FromFixedRateDatesInputError
         deltas = array([i.days for i in d_range[1:] - d_range[:-1]])
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
         d_range = [d.strftime("%Y-%m-%d") for d in d_range]

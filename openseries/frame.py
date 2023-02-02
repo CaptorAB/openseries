@@ -51,7 +51,7 @@ class OpenFrame(object):
         constituents: List[OpenTimeSeries],
         weights: List[float] | None = None,
         sort: bool = True,
-    ):
+    ) -> None:
         """Instantiates an object of the class OpenFrame
 
         Parameters

@@ -10,7 +10,7 @@ openseries = ["*.json", "*.png"]
 
 [project]
 name = "openseries"
-version = "0.9.6"
+version = "0.9.7"
 description = "Package for simple financial time series analysis."
 readme = "README.md"
 license = { text = "BSD 3-Clause License" }

@@ -70,7 +70,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 - [Numeric properties for both classes](https://github.com/CaptorAB/OpenSeries#below-are-the-numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
 - [Numeric methods with period arguments for both classes](https://github.com/CaptorAB/OpenSeries#the-methods-below-are-identical-to-the-numeric-properties-above)
 
-#### These are the files / modules described.
+#### These are the files / modules in the project.
 
 | Module                                                                                                           | Description                                                                                                                                                                                         |
 |:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -83,6 +83,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/risk.py)                                 | Module with methods used to calculate VaR, CVaR and drawdowns.                                                                                                                                      |
 | [sim_price.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/sim_price.py)                       | Module to simulate OpenTimeSeries from different stochastic processes.                                                                                                                              |
 | [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/stoch_processes.py)           | Module to generate stochastic processes used in the `sim_price.py` module.                                                                                                                          |
+| [exceptions.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/exceptions.py)                     | Module with sub-classed exceptions to provide better user feedback on errors.                                                                                                                       |
 
 #### Below are the class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
 
