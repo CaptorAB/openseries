@@ -22,9 +22,7 @@ jobs:
           ${{ steps.py.outputs.python-path }} -m pip install --upgrade .[test]
 
       - name: Tests with Pytest
-        env:
-          CONCURRENCY: 5
-        run: PYTHONPATH=${PWD} pytest --cov=${PWD} -n ${CONCURRENCY} --verbose --durations=20 --durations-min=2.0
+        run: PYTHONPATH=${PWD} coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
       - name: Report coverage
         run: coverage report
