@@ -1,5 +1,6 @@
 from copy import deepcopy
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 from functools import reduce
 from logging import warning
 from math import ceil
@@ -218,8 +219,10 @@ class OpenFrame(object):
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
-                    self.last_idx,
+                    raw_date=self.last_idx,
                     months_offset=-months_offset,
+                    adjust=False,
+                    following=True,
                 )
                 assert (
                     earlier >= self.first_idx
@@ -1897,6 +1900,82 @@ class OpenFrame(object):
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
         self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
+        for x in self.constituents:
+            x.tsdf.index = DatetimeIndex(x.tsdf.index)
+            x.tsdf = x.tsdf.resample(freq).last()
+            x.tsdf.index = [d.date() for d in DatetimeIndex(x.tsdf.index)]
+
+        return self
+
+    def resample_to_business_period_ends(
+        self: TOpenFrame,
+        freq: Literal["BM", "BQ", "BA"] = "BM",
+        country: str = "SE",
+        convention: Literal["start", "s", "end", "e"] = "end",
+        method: Literal[
+            None, "pad", "ffill", "backfill", "bfill", "nearest"
+        ] = "nearest",
+    ) -> TOpenFrame:
+        """Resamples timeseries frequency to the business calendar
+        month end dates of each period while leaving any stubs
+        in place. Stubs will be aligned to the shortest stub
+
+        Parameters
+        ----------
+        freq: Literal["BM", "BQ", "BA"], default BM
+            The date offset string that sets the resampled frequency
+        country: str | None, default: SE for Sweden
+            Country code to create a business day calendar used for
+            date adjustments
+        convention: Literal["start", "s", "end", "e"], default; end
+            Controls whether to use the start or end of `rule`.
+        method: Literal[None, "pad", "ffill", "backfill", "bfill",
+        "nearest"], default: nearest
+            Controls the method used to align values across columns
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+
+        head = self.tsdf.loc[self.first_indices.max()].copy()
+        head = head.to_frame().T
+        tail = self.tsdf.loc[self.last_indices.min()].copy()
+        tail = tail.to_frame().T
+        self.tsdf.index = DatetimeIndex(self.tsdf.index)
+        self.tsdf = self.tsdf.resample(rule=freq, convention=convention).last()
+        self.tsdf.drop(index=self.tsdf.index[-1], inplace=True)
+        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
+
+        if head.index[0] not in self.tsdf.index:
+            self.tsdf = concat([self.tsdf, head])
+
+        if tail.index[0] not in self.tsdf.index:
+            self.tsdf = concat([self.tsdf, tail])
+
+        self.tsdf.sort_index(inplace=True)
+
+        dates = DatetimeIndex(
+            [self.tsdf.index[0]]
+            + [
+                date_offset_foll(
+                    date(d.year, d.month, 1)
+                    + relativedelta(months=1)
+                    - timedelta(days=1),
+                    country=country,
+                    months_offset=0,
+                    adjust=True,
+                    following=False,
+                )
+                for d in self.tsdf.index[1:-1]
+            ]
+            + [self.tsdf.index[-1]]
+        )
+        dates = dates.drop_duplicates()
+        self.tsdf = self.tsdf.reindex([d.date() for d in dates], method=method)
+        for x in self.constituents:
+            x.tsdf = x.tsdf.reindex([d.date() for d in dates], method=method)
         return self
 
     def to_drawdown_series(self: TOpenFrame) -> TOpenFrame:

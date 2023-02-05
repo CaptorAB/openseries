@@ -7,6 +7,12 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.9.9] - 2023-02-05
+
+Added strip_duplicates() function in series module used with new remove_duplicates
+option on the OpenTimeSeries class. Also added resample_to_business_period_ends()
+method on both OpenTimeSeries and OpenFrame. Finalizes issue #23.
+
 ## Version [0.9.8] - 2023-02-02
 
 Improved OpenTimeSeries.from_fixed_rate() method, added exceptions module to provide

@@ -67,7 +67,8 @@ def date_fix(d: str | date | datetime | datetime64 | Timestamp) -> date:
 
 def date_offset_foll(
     raw_date: str | date | datetime | datetime64 | Timestamp,
-    country: str = "SE",
+    calendar: busdaycalendar | None = None,
+    country: str | None = "SE",
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
@@ -78,8 +79,11 @@ def date_offset_foll(
     ----------
     raw_date: str | date | datetime | datetime64 | Timestamp
         The date to offset from
-    country: str, default: "SE"
-        Numpy busdaycalendar country code
+    calendar: numpy.busdaycalendar | None, default: None
+        Calendar used for date adjustment. If None a calendar object will
+        be set based on the country argument
+    country: str | None, default: None
+        Country code to create a business day calendar
     months_offset: int, default: 12
         Number of months as integer
     adjust: bool, default: False
@@ -93,7 +97,6 @@ def date_offset_foll(
         Off-set date
     """
 
-    calendar = holiday_calendar(country=country)
     raw_date = date_fix(raw_date)
     month_delta = relativedelta(months=months_offset)
 
@@ -105,6 +108,8 @@ def date_offset_foll(
     new_date = raw_date + month_delta
 
     if adjust:
+        if calendar is None:
+            calendar = holiday_calendar(country=country)
         while not is_busday(dates=new_date, busdaycal=calendar):
             new_date += day_delta
 
@@ -112,7 +117,9 @@ def date_offset_foll(
 
 
 def get_previous_business_day_before_today(
-    today: date | None = None, country: str = "SE"
+    today: date | None = None,
+    calendar: busdaycalendar | None = None,
+    country: str = "SE",
 ):
     """Function to bump backwards to find the previous business day before today
 
@@ -120,9 +127,11 @@ def get_previous_business_day_before_today(
     ----------
     today: datetime.date, optional
         Manual input of the day from where the previous business day is found
+    calendar: numpy.busdaycalendar | None, default: None
+        Calendar used for date adjustment. If None a calendar object will
+        be set based on the country argument
     country: str, default: "SE"
-        Numpy busdaycalendar country code
-
+        Country code to create a business day calendar
     Returns
     -------
     datetime.date
@@ -132,9 +141,12 @@ def get_previous_business_day_before_today(
     if today is None:
         today = date.today()
 
+    if calendar is None:
+        calendar = holiday_calendar(country=country)
+
     return date_offset_foll(
         today - timedelta(days=1),
-        country=country,
+        calendar=calendar,
         months_offset=0,
         adjust=True,
         following=False,

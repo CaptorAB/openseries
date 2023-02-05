@@ -1,11 +1,13 @@
 from copy import deepcopy
 from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from json import dump, load
 from jsonschema import Draft7Validator
+from logging import warning
 from math import ceil
 from numpy import array, busdaycalendar, cumprod, insert, log, sqrt, square, zeros
 from os import path
-from pandas import DataFrame, DatetimeIndex, date_range, MultiIndex, Series
+from pandas import concat, DataFrame, DatetimeIndex, date_range, MultiIndex, Series
 from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
@@ -23,6 +25,42 @@ from openseries.risk import (
     drawdown_series,
     drawdown_details,
 )
+
+
+def strip_duplicates(dates: List[str], values: List[float], warn: bool = True) -> dict:
+    """Function to remove duplicate dates and their values.
+    There is no check done whether the same number of dates
+    and values are given as arguments
+
+    Parameters
+    ----------
+    dates : List[str]
+        Raw dates
+    values : List[float]
+        Raw values
+    warn: bool, default: True
+        Boolean flag indicating if a warning will be made
+        to highlight the duplicate items removed
+
+    Returns
+    -------
+    dict
+        Cleaned dates as dict.keys and values as dict.values
+    """
+    unique_items = {}
+    dupe_log = []
+
+    for dte, valu in zip(dates, values):
+        if dte not in unique_items:
+            unique_items[dte] = valu
+        else:
+            dupe_log.append({dte: valu})
+
+    if warn:
+        warning(f"Duplicate dates and their values removed:\n" f"{dupe_log}")
+
+    return unique_items
+
 
 TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound="OpenTimeSeries")
 
@@ -107,7 +145,9 @@ class OpenTimeSeries(object):
         cls.domestic = domestic_ccy
         cls.calendar = holiday_calendar(country=country)
 
-    def __init__(self: TOpenTimeSeries, d: TimeSerie) -> None:
+    def __init__(
+        self: TOpenTimeSeries, d: TimeSerie, remove_duplicates: bool = False
+    ) -> None:
         """Instantiates an object of the class OpenTimeSeries
          The data can have daily frequency, but not more frequent
 
@@ -115,12 +155,26 @@ class OpenTimeSeries(object):
         ----------
         d: TimeSerie
             A subclass of TypedDict with the required and optional parameters
+        remove_duplicates: bool, default: False
+            Determines if duplicate dates and their values will be removed before
+            an object of this class is instantiated
 
         Returns
         -------
         OpenTimeSeries
             Object of the class OpenTimeSeries
         """
+
+        if remove_duplicates:
+            cleaned_items = strip_duplicates(
+                dates=d["dates"], values=d["values"], warn=True
+            )
+            d.update(
+                {
+                    "dates": list(cleaned_items.keys()),
+                    "values": list(cleaned_items.values()),
+                }
+            )
 
         schema_file = path.join(path.dirname(path.abspath(__file__)), "openseries.json")
         with open(file=schema_file, mode="r", encoding="utf-8") as f:
@@ -170,6 +224,7 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
         local_ccy: bool = True,
+        remove_duplicates: bool = False,
     ) -> TOpenTimeSeries:
         """Creates a timeseries from a Pandas DataFrame or Series
 
@@ -185,6 +240,9 @@ class OpenTimeSeries(object):
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
+        remove_duplicates: bool, default: False
+            Determines if duplicate dates and their values will be removed before
+            an object of this class is instantiated
 
         Returns
         -------
@@ -218,7 +276,7 @@ class OpenTimeSeries(object):
             values=values,
         )
 
-        return cls(d=output)
+        return cls(d=output, remove_duplicates=remove_duplicates)
 
     @classmethod
     def from_frame(
@@ -228,6 +286,7 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
         local_ccy: bool = True,
+        remove_duplicates: bool = False,
     ) -> TOpenTimeSeries:
         """Creates a timeseries from an openseries.frame.OpenFrame
 
@@ -243,6 +302,9 @@ class OpenTimeSeries(object):
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
+        remove_duplicates: bool, default: False
+            Determines if duplicate dates and their values will be removed before
+            an object of this class is instantiated
 
         Returns
         -------
@@ -265,7 +327,7 @@ class OpenTimeSeries(object):
             values=df.values.tolist(),
         )
 
-        return cls(d=output)
+        return cls(d=output, remove_duplicates=remove_duplicates)
 
     def from_deepcopy(self: TOpenTimeSeries) -> TOpenTimeSeries:
         """Creates a copy of an OpenTimeSeries object
@@ -289,6 +351,7 @@ class OpenTimeSeries(object):
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
         local_ccy: bool = True,
+        remove_duplicates: bool = False,
     ) -> TOpenTimeSeries:
         """Creates a timeseries from a series of values accruing with a given fixed rate
 
@@ -315,6 +378,9 @@ class OpenTimeSeries(object):
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
+        remove_duplicates: bool, default: False
+            Determines if duplicate dates and their values will be removed before
+            an object of this class is instantiated
 
         Returns
         -------
@@ -343,7 +409,7 @@ class OpenTimeSeries(object):
             values=arr,
         )
 
-        return cls(d=output)
+        return cls(d=output, remove_duplicates=remove_duplicates)
 
     def to_json(
         self: TOpenTimeSeries, filename: str, directory: str | None = None
@@ -427,8 +493,10 @@ class OpenTimeSeries(object):
             if months_offset is not None:
                 self.setup_class()
                 earlier = date_offset_foll(
-                    self.last_idx,
+                    raw_date=self.last_idx,
                     months_offset=-months_offset,
+                    adjust=False,
+                    following=True,
                 )
                 assert (
                     earlier >= self.first_idx
@@ -1787,6 +1855,71 @@ class OpenTimeSeries(object):
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
         self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
+        return self
+
+    def resample_to_business_period_ends(
+        self: TOpenTimeSeries,
+        freq: Literal["BM", "BQ", "BA"] = "BM",
+        convention: Literal["start", "s", "end", "e"] = "end",
+        method: Literal[
+            None, "pad", "ffill", "backfill", "bfill", "nearest"
+        ] = "nearest",
+    ) -> TOpenTimeSeries:
+        """Resamples timeseries frequency to the business calendar
+        month end dates of each period while leaving any stubs
+        in place
+
+        Parameters
+        ----------
+        freq: Literal["BM", "BQ", "BA"], default BM
+            The date offset string that sets the resampled frequency
+        convention: Literal["start", "s", "end", "e"], default; end
+            Controls whether to use the start or end of `rule`.
+        method: Literal[None, "pad", "ffill", "backfill", "bfill",
+        "nearest"], default: nearest
+            Controls the method used to align values across columns
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
+
+        head = self.tsdf.iloc[0].copy()
+        head = head.to_frame().T
+        tail = self.tsdf.iloc[-1].copy()
+        tail = tail.to_frame().T
+        self.tsdf.index = DatetimeIndex(self.tsdf.index)
+        self.tsdf = self.tsdf.resample(rule=freq, convention=convention).last()
+        self.tsdf.drop(index=self.tsdf.index[-1], inplace=True)
+        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
+
+        if head.index[0] not in self.tsdf.index:
+            self.tsdf = concat([self.tsdf, head])
+
+        if tail.index[0] not in self.tsdf.index:
+            self.tsdf = concat([self.tsdf, tail])
+
+        self.tsdf.sort_index(inplace=True)
+
+        dates = DatetimeIndex(
+            [self.tsdf.index[0]]
+            + [
+                date_offset_foll(
+                    date(d.year, d.month, 1)
+                    + relativedelta(months=1)
+                    - timedelta(days=1),
+                    calendar=self.calendar,
+                    months_offset=0,
+                    adjust=True,
+                    following=False,
+                )
+                for d in self.tsdf.index[1:-1]
+            ]
+            + [self.tsdf.index[-1]]
+        )
+        dates = dates.drop_duplicates()
+        self.tsdf = self.tsdf.reindex([d.date() for d in dates], method=method)
         return self
 
     def to_drawdown_series(self: TOpenTimeSeries) -> TOpenTimeSeries:

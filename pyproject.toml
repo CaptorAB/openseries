@@ -10,7 +10,7 @@ openseries = ["*.json", "*.png"]
 
 [project]
 name = "openseries"
-version = "0.9.8"
+version = "0.9.9"
 description = "Package for simple financial time series analysis."
 readme = "README.md"
 license = { text = "BSD 3-Clause License" }
@@ -65,15 +65,16 @@ test = [
 dev = [
     "coverage",
     "pytest",
-    "black==22.12.0",
+    "black==23.1.0",
     "flake8==6.0.0",
     "flake8-black"
 ]
 build = [
+    "build",
     "coverage",
     "pytest",
-    "build",
-    "twine"
+    "twine",
+    "wheel"
 ]
 
 [project.urls]

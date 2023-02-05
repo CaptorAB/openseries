@@ -23,7 +23,6 @@ class TestOpenFrame(TestCase):
 
     @classmethod
     def setUpClass(cls):
-
         OpenTimeSeries.setup_class()
 
         sim = ReturnSimulation.from_merton_jump_gbm(
@@ -62,7 +61,6 @@ class TestOpenFrame(TestCase):
         cls.randomframe = OpenFrame(tslist)
 
     def test_openframe_repr(self: TTestOpenFrame):
-
         old_stdout = sys.stdout
         new_stdout = StringIO()
         sys.stdout = new_stdout
@@ -109,7 +107,6 @@ class TestOpenFrame(TestCase):
         self.assertEqual(r, output)
 
     def test_openframe_annotations_and_typehints(self: TTestOpenFrame):
-
         annotations = dict(OpenFrame.__annotations__)
         self.assertDictEqual(
             annotations,
@@ -123,7 +120,6 @@ class TestOpenFrame(TestCase):
         self.assertDictEqual(annotations, typehints)
 
     def test_create_opentimeseries_from_frame(self: TTestOpenFrame):
-
         frame_f = self.randomframe.from_deepcopy()
         frame_f.to_cumret()
         fseries = OpenTimeSeries.from_frame(frame_f, label="Asset_1")
@@ -131,7 +127,6 @@ class TestOpenFrame(TestCase):
         self.assertTrue(isinstance(fseries, OpenTimeSeries))
 
     def test_openframe_calc_range(self: TTestOpenFrame):
-
         crframe = self.randomframe.from_deepcopy()
         st, en = crframe.first_idx.strftime("%Y-%m-%d"), crframe.last_idx.strftime(
             "%Y-%m-%d"
@@ -184,8 +179,70 @@ class TestOpenFrame(TestCase):
         _, later_moved = crframe.calc_range(to_dt=date(2009, 8, 20))
         self.assertEqual(later_moved, date(2009, 8, 31))
 
-    def test_openframe_max_drawdown_date(self: TTestOpenFrame):
+    def test_openframe_resample(self: TTestOpenFrame):
+        rs_frame = self.randomframe.from_deepcopy()
+        rs_frame.to_cumret()
 
+        before = rs_frame.value_ret.to_dict()
+
+        rs_frame.resample(freq="BM")
+
+        self.assertEqual(121, rs_frame.length)
+        after = rs_frame.value_ret.to_dict()
+        self.assertDictEqual(before, after)
+
+    def test_openframe_resample_to_business_period_ends(self: TTestOpenFrame):
+        rsb_stubs_frame = OpenFrame(
+            [
+                OpenTimeSeries.from_fixed_rate(
+                    rate=0.01, days=121, end_dt=date(2023, 5, 15)
+                ).set_new_label("A"),
+                OpenTimeSeries.from_fixed_rate(
+                    rate=0.01, days=123, end_dt=date(2023, 5, 16)
+                ).set_new_label("B"),
+            ]
+        )
+
+        rsb_stubs_frame.resample_to_business_period_ends(freq="BM")
+        new_stubs_dates = rsb_stubs_frame.tsdf.index.tolist()
+
+        self.assertListEqual(
+            new_stubs_dates,
+            [
+                date(2023, 1, 15),
+                date(2023, 1, 31),
+                date(2023, 2, 28),
+                date(2023, 3, 31),
+                date(2023, 4, 28),
+                date(2023, 5, 15),
+            ],
+        )
+
+        rsb_frame = OpenFrame(
+            [
+                OpenTimeSeries.from_fixed_rate(
+                    rate=0.01, days=88, end_dt=date(2023, 4, 28)
+                ).set_new_label("A"),
+                OpenTimeSeries.from_fixed_rate(
+                    rate=0.01, days=8, end_dt=date(2023, 4, 28)
+                ).set_new_label("B"),
+            ]
+        )
+
+        rsb_frame.resample_to_business_period_ends(freq="BM")
+        new_dates = rsb_frame.tsdf.index.tolist()
+
+        self.assertListEqual(
+            new_dates,
+            [
+                date(2023, 1, 31),
+                date(2023, 2, 28),
+                date(2023, 3, 31),
+                date(2023, 4, 28),
+            ],
+        )
+
+    def test_openframe_max_drawdown_date(self: TTestOpenFrame):
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
         self.assertListEqual(
@@ -200,7 +257,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_make_portfolio(self: TTestOpenFrame):
-
         mpframe = self.randomframe.from_deepcopy()
         mpframe.to_cumret()
         mpframe.weights = [1.0 / mpframe.item_count] * mpframe.item_count
@@ -254,7 +310,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_add_timeseries(self: TTestOpenFrame):
-
         frameas = self.randomframe.from_deepcopy()
         items = int(frameas.item_count)
         cols = list(frameas.columns_lvl_zero)
@@ -268,7 +323,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(cols + ["Asset_6"], frameas.columns_lvl_zero)
 
     def test_openframe_delete_timeseries(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.weights = [0.4, 0.1, 0.2, 0.1, 0.2]
 
@@ -280,7 +334,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(frame.weights, [0.4, 0.2, 0.1, 0.2])
 
     def test_openframe_risk_functions_same_as_opentimeseries(self: TTestOpenFrame):
-
         riskseries = self.randomseries.from_deepcopy()
         riskseries.set_new_label(lvl_zero="Asset_0")
         riskframe = self.randomframe.from_deepcopy()
@@ -321,7 +374,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_methods_same_as_opentimeseries(self: TTestOpenFrame):
-
         sameseries = self.randomseries.from_deepcopy()
         sameseries.set_new_label(lvl_zero="Asset_0")
         sameseries.value_to_ret()
@@ -368,7 +420,6 @@ class TestOpenFrame(TestCase):
         assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
 
     def test_openframe_calc_methods_same_as_opentimeseries(self: TTestOpenFrame):
-
         sames = self.randomseries.from_deepcopy()
         sames.to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
@@ -399,7 +450,6 @@ class TestOpenFrame(TestCase):
             )
 
     def test_openframe_ratio_methods_same_as_opentimeseries(self: TTestOpenFrame):
-
         sames = self.randomseries.from_deepcopy()
         sames.to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
@@ -429,7 +479,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_measures_same_as_opentimeseries(self: TTestOpenFrame):
-
         frame_0 = self.randomframe.from_deepcopy()
         for s in frame_0.constituents:
             s.to_cumret()
@@ -468,7 +517,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(series_measures, frame_measures)
 
     def test_openframe_properties_same_as_opentimeseries(self: TTestOpenFrame):
-
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
         sameframe = self.randomframe.from_deepcopy()
@@ -481,7 +529,6 @@ class TestOpenFrame(TestCase):
     def test_openframe_keeping_attributes_aligned_vs_opentimeseries(
         self: TTestOpenFrame,
     ):
-
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
         sameframe = self.randomframe.from_deepcopy()
@@ -579,7 +626,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_keeping_methods_aligned_vs_opentimeseries(self: TTestOpenFrame):
-
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
         sameframe = self.randomframe.from_deepcopy()
@@ -614,6 +660,7 @@ class TestOpenFrame(TestCase):
             "plot_bars",
             "plot_series",
             "resample",
+            "resample_to_business_period_ends",
             "return_nan_handle",
             "rolling_return",
             "rolling_vol",
@@ -693,7 +740,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_value_to_log(self: TTestOpenFrame):
-
         logframe = self.randomframe.from_deepcopy()
         logframe.to_cumret()
 
@@ -710,7 +756,6 @@ class TestOpenFrame(TestCase):
         self.assertNotEqual(b4_log, middle_log)
 
     def test_openframe_correl_matrix(self: TTestOpenFrame):
-
         corrframe = self.randomframe.from_deepcopy()
         corrframe.to_cumret()
         dict1 = corrframe.correl_matrix.applymap(lambda nn: f"{nn:.12f}").to_dict()
@@ -755,7 +800,6 @@ class TestOpenFrame(TestCase):
         self.assertDictEqual(dict1, dict2)
 
     def test_openframe_plot_series(self: TTestOpenFrame):
-
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
@@ -788,7 +832,6 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(e_plot.exception, AssertionError)
 
     def test_openframe_plot_bars(self: TTestOpenFrame):
-
         plotframe = self.randomframe.from_deepcopy()
 
         fig_keys = ["hovertemplate", "name", "x", "y", "type"]
@@ -817,7 +860,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_passed_empty_list(self: TTestOpenFrame):
-
         with self.assertLogs() as cm:
             OpenFrame([])
         self.assertListEqual(
@@ -825,7 +867,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_wrong_number_of_weights_passed(self: TTestOpenFrame):
-
         wrongsims = self.randomframe.from_deepcopy()
         tslist = list(wrongsims.constituents)
         wghts = [1.0 / wrongsims.item_count] * (wrongsims.item_count + 1)
@@ -839,7 +880,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_drawdown_details(self: TTestOpenFrame):
-
         ddframe = self.randomframe.from_deepcopy()
         for s in ddframe.constituents:
             s.to_cumret()
@@ -848,7 +888,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual([2317, 1797, 2439, 1024, 1278], dds)
 
     def test_openframe_trunc_frame(self: TTestOpenFrame):
-
         series_long = self.randomseries.from_deepcopy()
         series_long.set_new_label("Long")
         tmp_series = self.randomseries.from_deepcopy()
@@ -884,7 +923,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(trunced, [frame.first_idx, frame.last_idx])
 
     def test_openframe_trunc_frame_start_fail(self: TTestOpenFrame):
-
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
@@ -952,7 +990,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_trunc_frame_end_fail(self: TTestOpenFrame):
-
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
@@ -1019,7 +1056,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_merge_series(self: TTestOpenFrame):
-
         aframe = OpenFrame(
             [
                 OpenTimeSeries(
@@ -1129,7 +1165,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_all_properties(self: TTestOpenFrame):
-
         prop_index = [
             "Total return",
             "Geometric return",
@@ -1162,7 +1197,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(prop_index, result_index)
 
     def test_openframe_align_index_to_local_cdays(self: TTestOpenFrame):
-
         d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
         asim = [1.0] * len(d_range)
         adf = DataFrame(
@@ -1182,7 +1216,6 @@ class TestOpenFrame(TestCase):
         self.assertFalse(midsummer in aframe.tsdf.index)
 
     def test_openframe_rolling_info_ratio(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1216,7 +1249,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_openframe_rolling_beta(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
         simdata = frame.rolling_beta(asset_column=0, market_column=1)
@@ -1235,7 +1267,6 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_ret_vol_ratio_func(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1265,7 +1296,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_sortino_ratio_func(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1295,7 +1325,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_tracking_error_func(self):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1325,7 +1354,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_info_ratio_func(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1351,7 +1379,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_rolling_corr(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1371,7 +1398,6 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_vol(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1405,7 +1431,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_openframe_rolling_return(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1425,7 +1450,6 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_cvar_down(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1445,7 +1469,6 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_rolling_var_down(self: TTestOpenFrame):
-
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1465,7 +1488,6 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_openframe_label_uniqueness(self: TTestOpenFrame):
-
         aseries = self.randomseries.from_deepcopy()
         bseries = self.randomseries.from_deepcopy()
 
@@ -1482,7 +1504,6 @@ class TestOpenFrame(TestCase):
         self.assertEqual(len(set(uframe.columns_lvl_zero)), 2)
 
     def test_openframe_capture_ratio(self: TTestOpenFrame):
-
         """
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and
@@ -1650,7 +1671,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_georet_exceptions(self: TTestOpenFrame):
-
         geoframe = OpenFrame(
             [
                 OpenTimeSeries(
@@ -1766,7 +1786,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_value_nan_handle(self: TTestOpenFrame):
-
         nanframe = OpenFrame(
             [
                 OpenTimeSeries(
@@ -1833,7 +1852,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_return_nan_handle(self: TTestOpenFrame):
-
         nanframe = OpenFrame(
             [
                 OpenTimeSeries(
@@ -1900,7 +1918,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_relative(self: TTestOpenFrame):
-
         rframe = self.randomframe.from_deepcopy()
         rframe.to_cumret()
         sframe = self.randomframe.from_deepcopy()
@@ -1918,7 +1935,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(rf, sf)
 
     def test_openframe_to_cumret(self: TTestOpenFrame):
-
         rseries = self.randomseries.from_deepcopy()
         rseries.value_to_ret()
         rrseries = rseries.from_deepcopy()
@@ -1961,7 +1977,6 @@ class TestOpenFrame(TestCase):
         self.assertDictEqual(dict_toframe_0, dict_toframe_1)
 
     def test_openframe_miscellaneous(self: TTestOpenFrame):
-
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
 
@@ -2050,7 +2065,6 @@ class TestOpenFrame(TestCase):
         self.assertEqual(e_vrf.exception.args[0], r)
 
     def test_openframe_value_ret_calendar_period(self: TTestOpenFrame):
-
         vrcseries = self.randomseries.from_deepcopy()
         vrcseries.to_cumret()
         vrcframe = self.randomframe.from_deepcopy()
@@ -2087,7 +2101,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(vrffl_ym, vrvrcfl_ym)
 
     def test_openframe_to_drawdown_series(self: TTestOpenFrame):
-
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
         dd = [f"{dmax:.11f}" for dmax in mframe.max_drawdown]
@@ -2096,7 +2109,6 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(dd, dds)
 
     def test_openframe_ord_least_squares_fit(self: TTestOpenFrame):
-
         oframe = self.randomframe.from_deepcopy()
         oframe.to_cumret()
         oframe.value_to_log()
@@ -2177,7 +2189,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_beta(self: TTestOpenFrame):
-
         bframe = self.randomframe.from_deepcopy()
         bframe.to_cumret()
         bframe.resample("7D")
@@ -2242,7 +2253,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_beta_returns_input(self: TTestOpenFrame):
-
         bframe = self.randomframe.from_deepcopy()
         bframe.resample("7D")
         results = []
@@ -2306,7 +2316,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_jensen_alpha(self: TTestOpenFrame):
-
         jframe = self.randomframe.from_deepcopy()
         jframe.to_cumret()
         jframe.resample("7D")
@@ -2418,7 +2427,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_jensen_alpha_returns_input(self: TTestOpenFrame):
-
         jframe = self.randomframe.from_deepcopy()
         jframe.resample("7D")
         results = []
@@ -2482,7 +2490,6 @@ class TestOpenFrame(TestCase):
         )
 
     def test_openframe_ewma_risk(self: TTestOpenFrame):
-
         eframe = self.randomframe.from_deepcopy()
         eframe.to_cumret()
         edf = eframe.ewma_risk()
