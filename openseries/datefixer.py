@@ -11,7 +11,7 @@ def holiday_calendar(country: str = "SE") -> busdaycalendar:
     Parameters
     ----------
     country: str, default: "SE"
-        Numpy busdaycalendar country code
+        Country code according to ISO 3166-1 alpha-2
 
     Returns
     -------
@@ -83,7 +83,7 @@ def date_offset_foll(
         Calendar used for date adjustment. If None a calendar object will
         be set based on the country argument
     country: str | None, default: None
-        Country code to create a business day calendar
+        Country code according to ISO 3166-1 alpha-2
     months_offset: int, default: 12
         Number of months as integer
     adjust: bool, default: False
@@ -131,7 +131,7 @@ def get_previous_business_day_before_today(
         Calendar used for date adjustment. If None a calendar object will
         be set based on the country argument
     country: str, default: "SE"
-        Country code to create a business day calendar
+        Country code according to ISO 3166-1 alpha-2
     Returns
     -------
     datetime.date

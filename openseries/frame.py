@@ -1925,8 +1925,8 @@ class OpenFrame(object):
         freq: Literal["BM", "BQ", "BA"], default BM
             The date offset string that sets the resampled frequency
         country: str | None, default: SE for Sweden
-            Country code to create a business day calendar used for
-            date adjustments
+            Country code according to ISO 3166-1 alpha-2 to create
+            a business day calendar used for date adjustments
         convention: Literal["start", "s", "end", "e"], default; end
             Controls whether to use the start or end of `rule`.
         method: Literal[None, "pad", "ffill", "backfill", "bfill",

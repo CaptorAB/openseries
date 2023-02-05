@@ -1,6 +1,6 @@
 from datetime import date
 from pandas import DataFrame, date_range
-from typing import TypeVar
+from typing import get_type_hints, TypeVar
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
@@ -19,6 +19,35 @@ TTestStochProcesses = TypeVar("TTestStochProcesses", bound="TestStochProcesses")
 
 
 class TestStochProcesses(TestCase):
+    def test_stoch_processes_annotations_and_typehints(self: TTestStochProcesses):
+        stochprocess_annotations = dict(ModelParameters.__annotations__)
+
+        self.assertDictEqual(
+            stochprocess_annotations,
+            {
+                "all_s0": float,
+                "all_time": int,
+                "all_delta": float,
+                "all_sigma": float,
+                "gbm_mu": float,
+                "jumps_lamda": float,
+                "jumps_sigma": float,
+                "jumps_mu": float,
+                "cir_a": float,
+                "cir_mu": float,
+                "all_r0": float,
+                "cir_rho": float,
+                "ou_a": float,
+                "ou_mu": float,
+                "heston_a": float,
+                "heston_mu": float,
+                "heston_vol0": float,
+            },
+        )
+
+        stochprocess_typehints = get_type_hints(ModelParameters)
+        self.assertDictEqual(stochprocess_annotations, stochprocess_typehints)
+
     def test_stoch_processes_assets(self: TTestStochProcesses):
         days = 2520
         target_returns = [

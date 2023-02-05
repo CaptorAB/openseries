@@ -1,15 +1,43 @@
 from pandas import DataFrame
-from typing import TypeVar
+from typing import get_type_hints, TypeVar
 from unittest import TestCase
 
-from openseries.sim_price import ReturnSimulation
+from openseries.sim_price import ReturnSimulation, Simulation
 
 TTestSimPrice = TypeVar("TTestSimPrice", bound="TestSimPrice")
 
 
 class TestSimPrice(TestCase):
+    def test_return_simulations_annotations_and_typehints(self: TTestSimPrice):
+        returnsimulation_annotations = dict(ReturnSimulation.__annotations__)
+        simulation_annotations = dict(Simulation.__annotations__)
+
+        self.assertDictEqual(
+            returnsimulation_annotations,
+            {
+                "number_of_sims": int,
+                "trading_days": int,
+                "trading_days_in_year": int,
+                "mean_annual_return": float,
+                "mean_annual_vol": float,
+                "df": DataFrame,
+            },
+        )
+        self.assertDictEqual(returnsimulation_annotations, simulation_annotations)
+
+        returnsimulation_typehints = get_type_hints(ReturnSimulation)
+        simulation_typehints = get_type_hints(Simulation)
+        self.assertDictEqual(returnsimulation_annotations, returnsimulation_typehints)
+        self.assertDictEqual(returnsimulation_typehints, simulation_typehints)
+
     def test_return_simulation_processes(self: TTestSimPrice):
-        args = {"n": 1, "d": 2520, "mu": 0.05, "vol": 0.2, "seed": 71}
+        args = {
+            "number_of_sims": 1,
+            "trading_days": 2520,
+            "mean_annual_return": 0.05,
+            "mean_annual_vol": 0.2,
+            "seed": 71,
+        }
         methods = [
             "from_normal",
             "from_lognormal",
@@ -56,7 +84,13 @@ class TestSimPrice(TestCase):
 
     def test_return_simulation_properties(self: TTestSimPrice):
         days = 1200
-        psim = ReturnSimulation.from_normal(n=1, d=days, mu=0.05, vol=0.1, seed=71)
+        psim = ReturnSimulation.from_normal(
+            number_of_sims=1,
+            trading_days=days,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            seed=71,
+        )
 
         self.assertIsInstance(psim.results, DataFrame)
 

@@ -28,10 +28,10 @@ class TestOpenTimeSeries(TestCase):
         OpenTimeSeries.setup_class()
 
         sim = ReturnSimulation.from_merton_jump_gbm(
-            n=1,
-            d=2512,
-            mu=0.05,
-            vol=0.1,
+            number_of_sims=1,
+            trading_days=2512,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
             jumps_lamda=0.00125,
             jumps_sigma=0.001,
             jumps_mu=-0.2,

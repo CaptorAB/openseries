@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.10.0] - 2023-02-05
+
+Clean-up of variable names, annotations and type hints with test of their alignment.
+
 ## Version [0.9.9] - 2023-02-05
 
 Added strip_duplicates() function in series module used with new remove_duplicates
