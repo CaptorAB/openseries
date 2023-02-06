@@ -56,7 +56,7 @@ def strip_duplicates(dates: List[str], values: List[float], warn: bool = True) -
         else:
             dupe_log.append({dte: valu})
 
-    if warn:
+    if warn and len(dupe_log) != 0:
         warning(f"Duplicate dates and their values removed:\n" f"{dupe_log}")
 
     return unique_items

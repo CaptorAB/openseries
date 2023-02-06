@@ -126,7 +126,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertIsInstance(e_dup.exception, ValidationError)
 
-        with self.assertLogs("root", level="WARNING") as logs:
+        with self.assertLogs("root", level="WARNING") as warn_logs:
             ts = OpenTimeSeries(d=output, remove_duplicates=True)
         self.assertIn(
             (
@@ -134,9 +134,14 @@ class TestOpenTimeSeries(TestCase):
                 "{'2017-11-27': 100.8974}, "
                 "{'2017-11-27': 100.8974}]"
             ),
-            logs.output[0],
+            warn_logs.output[0],
         )
         self.assertIsInstance(ts, OpenTimeSeries)
+
+        with self.assertRaises(AssertionError) as e_clean:
+            with self.assertLogs("root", level="WARNING"):
+                _ = self.randomseries.from_deepcopy()
+        self.assertIsInstance(e_clean.exception, AssertionError)
 
     def test_opentimeseries_create_from_pandas_df(self: TTestOpenTimeSeries):
         se = Series(
