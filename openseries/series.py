@@ -1,11 +1,11 @@
 from copy import deepcopy
-from datetime import date, datetime, timedelta
+import datetime as dt
 from dateutil.relativedelta import relativedelta
 from json import dump, load
 from jsonschema import Draft7Validator
 from logging import warning
 from math import ceil
-from numpy import array, busdaycalendar, cumprod, insert, log, sqrt, square, zeros
+from numpy import array, cumprod, insert, log, sqrt, square, zeros
 from os import path
 from pandas import concat, DataFrame, DatetimeIndex, date_range, MultiIndex, Series
 from pandas.tseries.offsets import CustomBusinessDay
@@ -87,8 +87,8 @@ class TimeSerie(TypedDict, total=False):
         ISO 6166 identifier code of the associated instrument
     label : str
         Placeholder for a name of the timeseries
-    calendar : numpy.busdaycalendar
-        Placeholder for a business calendar
+    countries: list | str, default: "SE"
+        (List of) country code(s) according to ISO 3166-1 alpha-2
     valuetype : str
         Identifies if the series is a series of values or returns
     values : List[float]
@@ -108,7 +108,7 @@ class TimeSerie(TypedDict, total=False):
     name: str
     isin: str
     label: str
-    calendar: busdaycalendar
+    countries: list | str
     valuetype: str
     values: List[float]
     local_ccy: bool
@@ -124,26 +124,26 @@ class OpenTimeSeries(object):
     name: str
     isin: str
     label: str
-    calendar: busdaycalendar
+    countries: list | str
     valuetype: str
     values: List[float]
     local_ccy: bool
     tsdf: DataFrame
 
     @classmethod
-    def setup_class(cls, domestic_ccy: str = "SEK", country: str = "SE"):
+    def setup_class(cls, domestic_ccy: str = "SEK", countries: list | str = "SE"):
         """Sets the domestic currency and calendar of the user.
 
         Parameters
         ----------
         domestic_ccy : str, default: "SEK"
             Currency code according to ISO 4217
-        country: str, default: "SE"
-            Country code according to ISO 3166-1 alpha-2
+        countries: list | str, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
         """
 
         cls.domestic = domestic_ccy
-        cls.calendar = holiday_calendar(country=country)
+        cls.countries = countries
 
     def __init__(
         self: TOpenTimeSeries, d: TimeSerie, remove_duplicates: bool = False
@@ -346,7 +346,7 @@ class OpenTimeSeries(object):
         rate: float,
         d_range: DatetimeIndex | None = None,
         days: int | None = None,
-        end_dt: date | None = None,
+        end_dt: dt.date | None = None,
         label: str = "Series",
         valuetype: str = "Price(Close)",
         baseccy: str = "SEK",
@@ -468,9 +468,9 @@ class OpenTimeSeries(object):
     def calc_range(
         self: TOpenTimeSeries,
         months_offset: int | None = None,
-        from_dt: date | None = None,
-        to_dt: date | None = None,
-    ) -> (date, date):
+        from_dt: dt.date | None = None,
+        to_dt: dt.date | None = None,
+    ) -> (dt.date, dt.date):
         """Creates user defined date range
 
         Parameters
@@ -520,10 +520,10 @@ class OpenTimeSeries(object):
                     earlier, later = from_dt, to_dt
             if earlier is not None:
                 while not self.tsdf.index.isin([earlier]).any():
-                    earlier -= timedelta(days=1)
+                    earlier -= dt.timedelta(days=1)
             if later is not None:
                 while not self.tsdf.index.isin([later]).any():
-                    later += timedelta(days=1)
+                    later += dt.timedelta(days=1)
         else:
             earlier, later = self.first_idx, self.last_idx
 
@@ -540,12 +540,17 @@ class OpenTimeSeries(object):
         """
 
         self.setup_class()
+        startyear = self.first_idx.year
+        endyear = self.last_idx.year
+        calendar = holiday_calendar(
+            startyear=startyear, endyear=endyear, countries=self.countries
+        )
         d_range = [
             d.date()
             for d in date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
-                freq=CustomBusinessDay(calendar=self.calendar),
+                freq=CustomBusinessDay(calendar=calendar),
             )
         ]
 
@@ -618,7 +623,7 @@ class OpenTimeSeries(object):
         return len(self.tsdf.index)
 
     @property
-    def first_idx(self: TOpenTimeSeries) -> date:
+    def first_idx(self: TOpenTimeSeries) -> dt.date:
         """
         Returns
         -------
@@ -629,7 +634,7 @@ class OpenTimeSeries(object):
         return self.tsdf.index[0]
 
     @property
-    def last_idx(self: TOpenTimeSeries) -> date:
+    def last_idx(self: TOpenTimeSeries) -> dt.date:
         """
         Returns
         -------
@@ -700,8 +705,8 @@ class OpenTimeSeries(object):
     def geo_ret_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/cagr.asp
 
@@ -752,8 +757,8 @@ class OpenTimeSeries(object):
     def arithmetic_ret_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
@@ -805,8 +810,8 @@ class OpenTimeSeries(object):
     def value_ret_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """
         Parameters
@@ -877,8 +882,8 @@ class OpenTimeSeries(object):
     def vol_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
@@ -940,8 +945,8 @@ class OpenTimeSeries(object):
         self: TOpenTimeSeries,
         min_accepted_return: float = 0.0,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
         """The standard deviation of returns that are below a Minimum Accepted
@@ -1005,8 +1010,8 @@ class OpenTimeSeries(object):
     def ret_vol_ratio_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The ratio of annualized arithmetic mean of returns and annualized
@@ -1058,8 +1063,8 @@ class OpenTimeSeries(object):
     def sortino_ratio_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Sortino ratio calculated as ( asset return - risk free return )
@@ -1115,8 +1120,8 @@ class OpenTimeSeries(object):
     def z_score_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/z/zscore.asp
 
@@ -1153,7 +1158,7 @@ class OpenTimeSeries(object):
         return float((self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1)
 
     @property
-    def max_drawdown_date(self: TOpenTimeSeries) -> date:
+    def max_drawdown_date(self: TOpenTimeSeries) -> dt.date:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1168,15 +1173,15 @@ class OpenTimeSeries(object):
             (mdddf / mdddf.expanding(min_periods=1).max())
             .idxmin()
             .values[0]
-            .astype(datetime)
+            .astype(dt.datetime)
         )
-        return datetime.fromtimestamp(mdd_date / 1e9).date()
+        return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
 
     def max_drawdown_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1249,8 +1254,8 @@ class OpenTimeSeries(object):
         self: TOpenTimeSeries,
         observations: int = 1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """
         Parameters
@@ -1298,8 +1303,8 @@ class OpenTimeSeries(object):
     def positive_share_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """
         Parameters
@@ -1342,8 +1347,8 @@ class OpenTimeSeries(object):
     def skew_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/s/skewness.asp
 
@@ -1393,8 +1398,8 @@ class OpenTimeSeries(object):
     def kurtosis_func(
         self: TOpenTimeSeries,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
@@ -1453,8 +1458,8 @@ class OpenTimeSeries(object):
         self: TOpenTimeSeries,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
@@ -1525,8 +1530,8 @@ class OpenTimeSeries(object):
         self: TOpenTimeSeries,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1599,8 +1604,8 @@ class OpenTimeSeries(object):
         self: TOpenTimeSeries,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1674,8 +1679,8 @@ class OpenTimeSeries(object):
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1906,10 +1911,10 @@ class OpenTimeSeries(object):
             [self.tsdf.index[0]]
             + [
                 date_offset_foll(
-                    date(d.year, d.month, 1)
+                    dt.date(d.year, d.month, 1)
                     + relativedelta(months=1)
-                    - timedelta(days=1),
-                    calendar=self.calendar,
+                    - dt.timedelta(days=1),
+                    countries=self.countries,
                     months_offset=0,
                     adjust=True,
                     following=False,
@@ -1955,8 +1960,8 @@ class OpenTimeSeries(object):
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """Exponentially Weighted Moving Average Model for Volatility.
@@ -2212,7 +2217,7 @@ class OpenTimeSeries(object):
         ra_df.dropna(inplace=True)
 
         prev = self.first_idx
-        idx: date
+        idx: dt.date
         dates: list = [prev]
 
         for idx, row in ra_df.iterrows():

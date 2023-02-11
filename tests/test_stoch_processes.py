@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date as dtdate
 from pandas import DataFrame, date_range
 from typing import get_type_hints, TypeVar
 from unittest import TestCase
@@ -96,7 +96,7 @@ class TestStochProcesses(TestCase):
                 modelresult = modelresult[residx]
             d_range = [
                 d.date()
-                for d in date_range(periods=days, end=date(2019, 6, 30), freq="D")
+                for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
             ]
             sdf = DataFrame(
                 data=modelresult,
@@ -146,7 +146,7 @@ class TestStochProcesses(TestCase):
             name = process.__name__
             d_range = [
                 d.date()
-                for d in date_range(periods=days, end=date(2019, 6, 30), freq="D")
+                for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
             ]
             sdf = DataFrame(
                 data=onesim,

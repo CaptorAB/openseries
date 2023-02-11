@@ -96,20 +96,20 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 #### In this table are the non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Attribute      | type                   | Applies to       | Description                                                                                                                                  |
-|:---------------|:-----------------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
-| `_id`          | `str`                  | `OpenTimeSeries` | Frenkla database identifier for the timeseries.                                                                                              |
-| `instrumentId` | `str`                  | `OpenTimeSeries` | Frenkla database identifier for the instrument associated with the timeseries.                                                               |
-| `dates`        | `List[str]`            | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
-| `values`       | `List[float]`          | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
-| `currency`     | `str`                  | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                               |
-| `domestic`     | `str`                  | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                 |
-| `local_ccy`    | `bool`                 | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added. |
-| `name`         | `str`                  | `OpenTimeSeries` | An identifier field.                                                                                                                         |
-| `isin`         | `str`                  | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
-| `label`        | `str`                  | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
-| `calendar`     | `Numpy.busdaycalendar` | `OpenTimeSeries` | A calendar object used to generate business days.                                                                                            |
-| `valuetype`    | `str`                  | `OpenTimeSeries` | Field identifies a series of values, "Price(Close)", or a series of returns, "Return(Total)".                                                |
+| Attribute      | type            | Applies to       | Description                                                                                                                                  |
+|:---------------|:----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
+| `_id`          | `str`           | `OpenTimeSeries` | Frenkla database identifier for the timeseries.                                                                                              |
+| `instrumentId` | `str`           | `OpenTimeSeries` | Frenkla database identifier for the instrument associated with the timeseries.                                                               |
+| `dates`        | `List[str]`     | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
+| `values`       | `List[float]`   | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
+| `currency`     | `str`           | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                               |
+| `domestic`     | `str`           | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                 |
+| `local_ccy`    | `bool`          | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added. |
+| `name`         | `str`           | `OpenTimeSeries` | An identifier field.                                                                                                                         |
+| `isin`         | `str`           | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
+| `label`        | `str`           | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
+| `countries`    | `list` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used to generate business days.                                                    |
+| `valuetype`    | `str`           | `OpenTimeSeries` | Field identifies a series of values, "Price(Close)", or a series of returns, "Return(Total)".                                                |
 
 #### In this table are the non-numeric or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
@@ -142,7 +142,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 | Method                   | Applies to       | Description                                                                                                                                    |
 |:-------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
-| `setup_class`            | `OpenTimeSeries` | Class method that defines the `domestic` home currency attribute and a business day calendar.                                                  |
+| `setup_class`            | `OpenTimeSeries` | Class method that defines the `domestic` home currency and the `countries` home countries attributes.                                          |
 | `to_json`                | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                                                                                 |
 | `pandas_df`              | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.                                                                    |
 | `set_new_label`          | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                                                                       |

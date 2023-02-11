@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.10.2] - 2023-02-11
+
+Added ability to use multiple countries calendars in combination.
+
 ## Version [0.10.1] - 2023-02-06
 
 Clean-up of variable names, annotations and type hints with test of their alignment.

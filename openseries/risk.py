@@ -2,7 +2,7 @@
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
-from datetime import date, datetime
+import datetime as dt
 from math import ceil
 from numpy import Inf, isnan, maximum, mean, nan_to_num, quantile, sort
 from pandas import DataFrame, Series
@@ -104,7 +104,7 @@ def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
     return drawdown
 
 
-def max_drawdown_date(prices: DataFrame | Series) -> date:
+def max_drawdown_date(prices: DataFrame | Series) -> dt.date:
     """Date when maximum drawdown occurred
 
     Parameters
@@ -122,9 +122,9 @@ def max_drawdown_date(prices: DataFrame | Series) -> date:
         (prices / prices.expanding(min_periods=1).max())
         .idxmin()
         .values[0]
-        .astype(datetime)
+        .astype(dt.datetime)
     )
-    return datetime.fromtimestamp(mdd_date / 1e9).date()
+    return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
 
 
 def drawdown_details(prices: DataFrame | Series) -> Series:
@@ -150,8 +150,8 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
     dd = prices.copy()
     drwdwn = drawdown_series(dd).loc[:mdate]
     drwdwn.sort_index(ascending=False, inplace=True)
-    sdate = drwdwn[drwdwn == 0.0].idxmax().values[0].astype(datetime)
-    sdate = datetime.fromtimestamp(sdate / 1e9).date()
+    sdate = drwdwn[drwdwn == 0.0].idxmax().values[0].astype(dt.datetime)
+    sdate = dt.datetime.fromtimestamp(sdate / 1e9).date()
     duration = (mdate - sdate).days
     ret_per_day = md / duration
     df = Series(

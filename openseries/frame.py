@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import date, timedelta
+import datetime as dt
 from dateutil.relativedelta import relativedelta
 from functools import reduce
 from logging import warning
@@ -195,9 +195,9 @@ class OpenFrame(object):
     def calc_range(
         self: TOpenFrame,
         months_offset: int | None = None,
-        from_dt: date | None = None,
-        to_dt: date | None = None,
-    ) -> (date, date):
+        from_dt: dt.date | None = None,
+        to_dt: dt.date | None = None,
+    ) -> (dt.date, dt.date):
         """Creates user defined date range
 
         Parameters
@@ -246,38 +246,43 @@ class OpenFrame(object):
                     earlier, later = from_dt, to_dt
             if earlier is not None:
                 while not self.tsdf.index.isin([earlier]).any():
-                    earlier -= timedelta(days=1)
+                    earlier -= dt.timedelta(days=1)
             if later is not None:
                 while not self.tsdf.index.isin([later]).any():
-                    later += timedelta(days=1)
+                    later += dt.timedelta(days=1)
         else:
             earlier, later = self.first_idx, self.last_idx
 
         return earlier, later
 
-    def align_index_to_local_cdays(self: TOpenFrame, country: str = "SE") -> TOpenFrame:
+    def align_index_to_local_cdays(
+        self: TOpenFrame, countries: list | str = "SE"
+    ) -> TOpenFrame:
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
         local calendar business days
 
         Parameters
         ----------
-        country: str, default: "SE"
-            Country code according to ISO 3166-1 alpha-2
+        countries: list | str, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
         -------
         OpenFrame
             An OpenFrame object
         """
-        calendar = holiday_calendar(country=country)
-        cday = CustomBusinessDay(calendar=calendar)
+        startyear = self.first_idx.year
+        endyear = self.last_idx.year
+        calendar = holiday_calendar(
+            startyear=startyear, endyear=endyear, countries=countries
+        )
 
         d_range = [
             d.date()
             for d in date_range(
                 start=self.tsdf.first_valid_index(),
                 end=self.tsdf.last_valid_index(),
-                freq=cday,
+                freq=CustomBusinessDay(calendar=calendar),
             )
         ]
         self.tsdf = self.tsdf.reindex(d_range, method=None, copy=False)
@@ -346,7 +351,7 @@ class OpenFrame(object):
         return self.tsdf.columns.get_level_values(1).tolist()
 
     @property
-    def first_idx(self: TOpenFrame) -> date:
+    def first_idx(self: TOpenFrame) -> dt.date:
         """
         Returns
         -------
@@ -371,7 +376,7 @@ class OpenFrame(object):
         )
 
     @property
-    def last_idx(self: TOpenFrame) -> date:
+    def last_idx(self: TOpenFrame) -> dt.date:
         """
         Returns
         -------
@@ -463,8 +468,8 @@ class OpenFrame(object):
     def geo_ret_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """https://www.investopedia.com/terms/c/cagr.asp
 
@@ -522,8 +527,8 @@ class OpenFrame(object):
     def arithmetic_ret_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
@@ -585,8 +590,8 @@ class OpenFrame(object):
     def value_ret_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """
         Parameters
@@ -668,8 +673,8 @@ class OpenFrame(object):
     def vol_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
@@ -735,8 +740,8 @@ class OpenFrame(object):
         self: TOpenFrame,
         min_accepted_return: float = 0.0,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """The standard deviation of returns that are below a Minimum Accepted
@@ -805,8 +810,8 @@ class OpenFrame(object):
         riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """The ratio of annualized arithmetic mean of returns and annualized
@@ -1024,8 +1029,8 @@ class OpenFrame(object):
         riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """The Sortino ratio calculated as ( return - risk free return )
@@ -1138,8 +1143,8 @@ class OpenFrame(object):
     def z_score_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
@@ -1203,8 +1208,8 @@ class OpenFrame(object):
     def max_drawdown_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1289,8 +1294,8 @@ class OpenFrame(object):
         self: TOpenFrame,
         observations: int = 1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """
         Parameters
@@ -1340,8 +1345,8 @@ class OpenFrame(object):
     def positive_share_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """
         Parameters
@@ -1392,8 +1397,8 @@ class OpenFrame(object):
     def skew_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """https://www.investopedia.com/terms/s/skewness.asp
 
@@ -1448,8 +1453,8 @@ class OpenFrame(object):
     def kurtosis_func(
         self: TOpenFrame,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
@@ -1518,8 +1523,8 @@ class OpenFrame(object):
         self: TOpenFrame,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
     ) -> Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
@@ -1597,8 +1602,8 @@ class OpenFrame(object):
         self: TOpenFrame,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1676,8 +1681,8 @@ class OpenFrame(object):
         self: TOpenFrame,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1749,8 +1754,8 @@ class OpenFrame(object):
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: Literal[
             "linear", "lower", "higher", "midpoint", "nearest"
         ] = "lower",
@@ -1910,7 +1915,7 @@ class OpenFrame(object):
     def resample_to_business_period_ends(
         self: TOpenFrame,
         freq: Literal["BM", "BQ", "BA"] = "BM",
-        country: str = "SE",
+        countries: list | str = "SE",
         convention: Literal["start", "s", "end", "e"] = "end",
         method: Literal[
             None, "pad", "ffill", "backfill", "bfill", "nearest"
@@ -1924,9 +1929,9 @@ class OpenFrame(object):
         ----------
         freq: Literal["BM", "BQ", "BA"], default BM
             The date offset string that sets the resampled frequency
-        country: str | None, default: SE for Sweden
-            Country code according to ISO 3166-1 alpha-2 to create
-            a business day calendar used for date adjustments
+        countries: list | str, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
+            to create a business day calendar used for date adjustments
         convention: Literal["start", "s", "end", "e"], default; end
             Controls whether to use the start or end of `rule`.
         method: Literal[None, "pad", "ffill", "backfill", "bfill",
@@ -1960,10 +1965,10 @@ class OpenFrame(object):
             [self.tsdf.index[0]]
             + [
                 date_offset_foll(
-                    date(d.year, d.month, 1)
+                    dt.date(d.year, d.month, 1)
                     + relativedelta(months=1)
-                    - timedelta(days=1),
-                    country=country,
+                    - dt.timedelta(days=1),
+                    countries=countries,
                     months_offset=0,
                     adjust=True,
                     following=False,
@@ -2017,8 +2022,8 @@ class OpenFrame(object):
         first_column: int = 0,
         second_column: int = 1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> DataFrame:
         """Exponentially Weighted Moving Average Model for Volatilities and
@@ -2370,8 +2375,8 @@ class OpenFrame(object):
 
     def trunc_frame(
         self: TOpenFrame,
-        start_cut: date | None = None,
-        end_cut: date | None = None,
+        start_cut: dt.date | None = None,
+        end_cut: dt.date | None = None,
         before: bool = True,
         after: bool = True,
     ) -> TOpenFrame:
@@ -2457,8 +2462,8 @@ class OpenFrame(object):
         self: TOpenFrame,
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """Calculates the Tracking Error which is the standard deviation of the
@@ -2526,8 +2531,8 @@ class OpenFrame(object):
         self: TOpenFrame,
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """The Information Ratio equals ( fund return less index return ) divided
@@ -2598,8 +2603,8 @@ class OpenFrame(object):
         ratio: Literal["up", "down", "both"],
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """The Up (Down) Capture Ratio is calculated by dividing the CAGR
