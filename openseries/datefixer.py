@@ -212,7 +212,7 @@ def offset_business_days(
         The new offset business day
     """
     ndate = ddate + dt.timedelta(days=days)
-    if days < 0:
+    if days <= 0:
         calendar = holiday_calendar(
             startyear=ndate.year,
             endyear=ddate.year,
@@ -234,7 +234,7 @@ def offset_business_days(
         ).date
 
     while ddate not in local_bdays:
-        if days < 0:
+        if days <= 0:
             ddate -= dt.timedelta(days=1)
         else:
             ddate += dt.timedelta(days=1)

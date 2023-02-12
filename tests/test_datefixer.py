@@ -219,9 +219,10 @@ class TestDateFixer(TestCase):
         se_nationalday = dt.date(2022, 6, 6)
         dates = [
             (dt.date(2022, 6, 2), dt.date(2022, 6, 3)),
+            (dt.date(2022, 6, 3), dt.date(2022, 6, 6)),
             (dt.date(2022, 6, 8), dt.date(2022, 6, 7)),
         ]
-        offsets = [-1, 1]
+        offsets = [-1, 0, 1]
         for date, offset in zip(dates, offsets):
             se_offsetdate = offset_business_days(
                 ddate=se_nationalday, days=offset, countries="SE"
