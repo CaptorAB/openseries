@@ -114,7 +114,7 @@ def date_offset_foll(
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: list | dict | None, default: None
         Argument where missing holidays can be added as
-        {"2023-02-12": "Jack's birthday"} or ["2023-02-12"]
+        {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
     Returns
     -------
@@ -151,7 +151,7 @@ def get_previous_business_day_before_today(
     today: dt.date | None = None,
     countries: str | list = "SE",
     custom_holidays: list | dict | None = None,
-):
+) -> dt.date:
     """Function to bump backwards to find the previous business day before today
 
     Parameters
@@ -162,7 +162,7 @@ def get_previous_business_day_before_today(
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: list | dict | None, default: None
         Argument where missing holidays can be added as
-        {"2023-02-12": "Jack's birthday"} or ["2023-02-12"]
+        {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
     Returns
     -------
@@ -201,7 +201,7 @@ def offset_business_days(
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: list | dict | None, default: None
         Argument where missing holidays can be added as
-        {"2023-02-12": "Jack's birthday"} or ["2023-02-12"]
+        {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
     Returns
     -------
