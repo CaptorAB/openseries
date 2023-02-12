@@ -9,6 +9,7 @@ from openseries.datefixer import (
     date_offset_foll,
     get_previous_business_day_before_today,
     holiday_calendar,
+    offset_business_days,
 )
 
 TTestDateFixer = TypeVar("TTestDateFixer", bound="TestDateFixer")
@@ -165,18 +166,115 @@ class TestDateFixer(TestCase):
 
     def test_holiday_calendar(self: TTestDateFixer):
         twentytwentythreeholidays = [
-            "2023-01-06",
-            "2023-04-07",
-            "2023-04-10",
-            "2023-05-01",
-            "2023-05-18",
-            "2023-06-06",
-            "2023-06-23",
-            "2023-12-25",
-            "2023-12-26",
+            datetime64("2023-01-06"),
+            datetime64("2023-04-07"),
+            datetime64("2023-04-10"),
+            datetime64("2023-05-01"),
+            datetime64("2023-05-18"),
+            datetime64("2023-06-06"),
+            datetime64("2023-06-23"),
+            datetime64("2023-12-25"),
+            datetime64("2023-12-26"),
         ]
         for st, en in zip([2023, 2024], [2023, 2022]):
             cdr = holiday_calendar(startyear=st, endyear=en, countries="SE")
-            hols = [str(hol) for hol in cdr.holidays]
-            check = all(date_str in hols for date_str in twentytwentythreeholidays)
+            check = all(
+                date_str in cdr.holidays for date_str in twentytwentythreeholidays
+            )
             self.assertTrue(check)
+
+    def test_holiday_calendar_with_custom_days(self: TTestDateFixer):
+        twentytwentyoneholidays = [
+            dt.date(2021, 1, 1),
+            dt.date(2021, 1, 6),
+            dt.date(2021, 4, 2),
+            dt.date(2021, 4, 5),
+            dt.date(2021, 5, 13),
+            dt.date(2021, 6, 25),
+            dt.date(2021, 12, 24),
+            dt.date(2021, 12, 31),
+        ]
+        cdr_without = holiday_calendar(startyear=2021, endyear=2021, countries="SE")
+        hols_without = [
+            date_fix(d) for d in cdr_without.holidays if date_fix(d).year == 2021
+        ]
+        self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_without)
+
+        jacks_birthday = {"2021-02-12": "Jack's birthday"}
+        cdr_with = holiday_calendar(
+            startyear=2021, endyear=2021, countries="SE", custom_holidays=jacks_birthday
+        )
+        hols_with = [date_fix(d) for d in cdr_with.holidays if date_fix(d).year == 2021]
+
+        with self.assertRaises(AssertionError) as e_jack:
+            self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)
+        self.assertIsInstance(e_jack.exception, AssertionError)
+
+        twentytwentyoneholidays.append(date_fix(list(jacks_birthday.keys())[0]))
+        twentytwentyoneholidays.sort()
+
+        self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)
+
+    def test_offset_business_days(self: TTestDateFixer):
+        se_nationalday = dt.date(2022, 6, 6)
+        dates = [
+            (dt.date(2022, 6, 2), dt.date(2022, 6, 3)),
+            (dt.date(2022, 6, 8), dt.date(2022, 6, 7)),
+        ]
+        offsets = [-1, 1]
+        for date, offset in zip(dates, offsets):
+            se_offsetdate = offset_business_days(
+                ddate=se_nationalday, days=offset, countries="SE"
+            )
+            self.assertEqual(se_offsetdate, date[0])
+            us_offsetdate = offset_business_days(
+                ddate=se_nationalday, days=offset, countries="US"
+            )
+            self.assertEqual(us_offsetdate, date[1])
+
+    def test_offset_business_days_calender_options(self: TTestDateFixer):
+        day_after_se_nationalday = dt.date(2022, 6, 7)
+        se_enddate = offset_business_days(
+            ddate=day_after_se_nationalday, days=-2, countries="SE"
+        )
+        self.assertEqual(dt.date(2022, 6, 2), se_enddate)
+        us_enddate = offset_business_days(
+            ddate=day_after_se_nationalday, days=-2, countries="US"
+        )
+        self.assertEqual(dt.date(2022, 6, 3), us_enddate)
+        se_us_enddate = offset_business_days(
+            ddate=day_after_se_nationalday, days=-2, countries=["SE", "US"]
+        )
+        self.assertEqual(dt.date(2022, 6, 2), se_us_enddate)
+
+        day_after_us_independenceday = dt.date(2022, 7, 5)
+        se_nddate = offset_business_days(
+            ddate=day_after_us_independenceday, days=-2, countries="SE"
+        )
+        self.assertEqual(dt.date(2022, 7, 1), se_nddate)
+        us_nddate = offset_business_days(
+            ddate=day_after_us_independenceday, days=-2, countries="US"
+        )
+        self.assertEqual(dt.date(2022, 6, 30), us_nddate)
+        se_us_nddate = offset_business_days(
+            ddate=day_after_us_independenceday, days=-2, countries=["SE", "US"]
+        )
+        self.assertEqual(dt.date(2022, 6, 30), se_us_nddate)
+
+    def test_offset_business_days_with_custom_days(self: TTestDateFixer):
+        day_after_jacks_birthday = dt.date(2021, 2, 15)
+
+        offsetdate_without = offset_business_days(
+            ddate=day_after_jacks_birthday,
+            days=-2,
+            countries=["SE", "US"],
+        )
+        self.assertEqual(dt.date(2021, 2, 10), offsetdate_without)
+
+        offsetdate_with = offset_business_days(
+            ddate=day_after_jacks_birthday,
+            days=-2,
+            countries=["SE", "US"],
+            custom_holidays={"2021-02-12": "Jack's birthday"},
+        )
+        self.assertEqual(dt.date(2021, 2, 9), offsetdate_with)

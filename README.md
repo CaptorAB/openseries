@@ -70,13 +70,13 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 - [Numeric properties for both classes](https://github.com/CaptorAB/OpenSeries#below-are-the-numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
 - [Numeric methods with period arguments for both classes](https://github.com/CaptorAB/OpenSeries#the-methods-below-are-identical-to-the-numeric-properties-above)
 
-#### These are the files / modules in the project.
+#### Files / Modules in the project.
 
 | Module                                                                                                           | Description                                                                                                                                                                                         |
 |:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
 | [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
-| [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/datefixer.py)                       | A module with date utilities.                                                                                                                                                                       |
+| [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/datefixer.py)                       | A module with date utilities. Described in the docstring of the respective functions.                                                                                                               |
 | [openseries.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/openseries.json)                 | The jsonschema of the OpenTimeSeries class.                                                                                                                                                         |
 | [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_layouts.json)         | A module setting [Plotly](https://plotly.com/python/) defaults used in the `plot_series` methods.                                                                                                   |
 | [plotly_captor_logo.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_captor_logo.json) | A module with a link to the Captor logo used in the `plot_series` methods.                                                                                                                          |
@@ -85,7 +85,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/stoch_processes.py)           | Module to generate stochastic processes used in the `sim_price.py` module.                                                                                                                          |
 | [exceptions.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/exceptions.py)                     | Module with sub-classed exceptions to provide better user feedback on errors.                                                                                                                       |
 
-#### Below are the class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
+#### Class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
 
 | Method            | Applies to                    | Description                                                                                        |
 |:------------------|:------------------------------|:---------------------------------------------------------------------------------------------------|
@@ -94,9 +94,9 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `from_fixed_rate` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
 | `from_deepcopy`   | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
 
-#### In this table are the non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
+#### Non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Attribute      | type            | Applies to       | Description                                                                                                                                  |
+| Property       | type            | Applies to       | Description                                                                                                                                  |
 |:---------------|:----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
 | `_id`          | `str`           | `OpenTimeSeries` | Frenkla database identifier for the timeseries.                                                                                              |
 | `instrumentId` | `str`           | `OpenTimeSeries` | Frenkla database identifier for the instrument associated with the timeseries.                                                               |
@@ -111,9 +111,9 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `countries`    | `list` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used to generate business days.                                                    |
 | `valuetype`    | `str`           | `OpenTimeSeries` | Field identifies a series of values, "Price(Close)", or a series of returns, "Return(Total)".                                                |
 
-#### In this table are the non-numeric or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+#### Non-numeric or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
-| Attribute          | type                   | Applies to  | Description                                                              |
+| Property           | type                   | Applies to  | Description                                                              |
 |:-------------------|:-----------------------|:------------|:-------------------------------------------------------------------------|
 | `constituents`     | `List[OpenTimeSeries]` | `OpenFrame` | A list of the OpenTimeSeries that make up an OpenFrame.                  |
 | `columns_lvl_zero` | `list`                 | `OpenFrame` | A list of the level zero column names in the OpenFrame pandas.DataFrame. |
@@ -125,9 +125,9 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `lengths_of_items` | `pandas.Series`        | `OpenFrame` | Number of items in each of the series in the OpenFrame.                  |
 | `span_of_days_all` | `pandas.Series`        | `OpenFrame` | Number of days from the first to the last in each of the series.         |
 
-#### In this table are the non-numeric or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+#### Non-numeric or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
-| Attribute           | type                             | Applies to                    | Description                                                                       |
+| Property            | type                             | Applies to                    | Description                                                                       |
 |:--------------------|:---------------------------------|:------------------------------|:----------------------------------------------------------------------------------|
 | `first_idx`         | `datetime.date`                  | `OpenTimeSeries`, `OpenFrame` | First date of the series.                                                         |
 | `last_idx`          | `datetime.date`                  | `OpenTimeSeries`, `OpenFrame` | Last date of the series.                                                          |
@@ -138,7 +138,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `periods_in_a_year` | `float`                          | `OpenTimeSeries`, `OpenFrame` | The number of observations in an average year for all days in the data.           |
 | `yearfrac`          | `float`                          | `OpenTimeSeries`, `OpenFrame` | Length of timeseries expressed as np.float64 fraction of a year with 365.25 days. |
 
-#### In this table are the methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
+#### Methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
 | Method                   | Applies to       | Description                                                                                                                                    |
 |:-------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -150,7 +150,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `ewma_vol_func`          | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 | `from_1d_rate_to_cumret` | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
 
-#### In this table are the methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+#### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
 | Method                  | Applies to  | Description                                                                                                                                                       |
 |:------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -171,7 +171,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.                            |
 | `ewma_risk`             | `OpenFrame` | Returns a `pandas.DataFrame` with volatility and correlation based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 
-#### In this table are the methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+#### Methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
 | Method                             | Applies to                    | Description                                                                                                                                            |
 |:-----------------------------------|:------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -195,9 +195,9 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `rolling_cvar_down`                | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling CVaR figures.                                                                                                  |
 | `calc_range`                       | `OpenTimeSeries`, `OpenFrame` | Returns the start and end dates of a range from specific period definitions. Used by the below numeric methods and not meant to be used independently. |
 
-#### Below are the numeric properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py).
+#### Numeric properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py).
 
-| Attribute               | type                     | Applies to                    | Description                                                                                                                                                                                                             |
+| Property                | type                     | Applies to                    | Description                                                                                                                                                                                                             |
 |:------------------------|:-------------------------|:------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `all_properties`        | `pandas.DataFrame`       | `OpenTimeSeries`, `OpenFrame` | Returns most of the properties in one go.                                                                                                                                                                               |
 | `arithmetic_ret`        | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Annualized arithmetic mean of returns](https://www.investopedia.com/terms/a/arithmeticmean.asp).                                                                                                                       |
@@ -220,7 +220,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `z_score`               | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Z-score](https://www.investopedia.com/terms/z/zscore.asp) as (last return - mean return) / standard deviation of returns.                                                                                              |
 | `correl_matrix`         | `pandas.DataFrame`       | `OpenFrame`                   | A correlation matrix.                                                                                                                                                                                                   |
 
-#### The methods below are identical to the numeric properties above.
+#### Methods below are identical to the Numeric Properties above.
 
 _They are simply methods that take different date or length inputs to return the
 properties for subset periods._
