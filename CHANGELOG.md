@@ -57,7 +57,7 @@ Minimized imports
 
 ## Version [0.9.0] - 2023-01-04
 
-Removed all connections to Frenkla API.
+Removed all connections to outside API.
 
 ## Version [0.8.4] - 2022-12-20
 
