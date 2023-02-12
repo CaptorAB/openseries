@@ -189,14 +189,17 @@ def offset_business_days(
     countries: list | str = "SE",
     custom_holidays: list | dict | None = None,
 ) -> dt.date:
-    """Function to bump a date by business days instead of calendar days
+    """Function to bump a date by business days instead of calendar days.
+    It first adjusts to a valid business day and then bumps with given
+    number of business days from there
 
     Parameters
     ----------
     ddate: datetime.date
-        Manual input of the day from where the previous business day is found
+        A starting date that does not have to be a business day
     days: int
-        The number of business days to offset the original date
+        The number of business days to offset from the business day that is
+        the closest preceding the day given
     countries: list | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: list | dict | None, default: None
