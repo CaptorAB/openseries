@@ -4,13 +4,14 @@ from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where
 from pandas import date_range, Timestamp, to_datetime
 from pandas.tseries.offsets import CustomBusinessDay
+from typing import Union
 
 
 def holiday_calendar(
     startyear: int,
     endyear: int,
-    countries: list | str = "SE",
-    custom_holidays: list | dict | None = None,
+    countries: Union[list, str] = "SE",
+    custom_holidays: Union[list, dict, None] = None,
 ) -> busdaycalendar:
     """Function to generate a business calendar
 
@@ -20,9 +21,9 @@ def holiday_calendar(
         First year in date range generated
     endyear: int
         Last year in date range generated
-    countries: list | str, default: "SE"
+    countries: Union[list, str], default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: list | dict | None, default: None
+    custom_holidays: Union[list, dict, None], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
@@ -61,12 +62,12 @@ def holiday_calendar(
     return busdaycalendar(holidays=hols)
 
 
-def date_fix(d: str | dt.date | dt.datetime | datetime64 | Timestamp) -> dt.date:
+def date_fix(d: Union[str, dt.date, dt.datetime, datetime64, Timestamp]) -> dt.date:
     """Function to parse from different date formats into datetime.date
 
     Parameters
     ----------
-    d: str | datetime.date | datetime.datetime | numpy.datetime64 | pandas.Timestamp
+    d: Union[str, datetime.date, datetime.datetime, numpy.datetime64, pandas.Timestamp]
         The data item to parse
 
     Returns
@@ -90,19 +91,19 @@ def date_fix(d: str | dt.date | dt.datetime | datetime64 | Timestamp) -> dt.date
 
 
 def date_offset_foll(
-    raw_date: str | dt.date | dt.datetime | datetime64 | Timestamp,
+    raw_date: Union[str, dt.date, dt.datetime, datetime64, Timestamp],
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
-    countries: str | list = "SE",
-    custom_holidays: list | dict | None = None,
+    countries: Union[list, str] = "SE",
+    custom_holidays: Union[list, dict, None] = None,
 ) -> dt.date:
     """Function to offset dates according to a given calendar
 
     Parameters
     ----------
-    raw_date: str | datetime.date | datetime.datetime | numpy.datetime64 |
-    pandas.Timestamp
+    raw_date: Union[str, datetime.date, datetime.datetime, numpy.datetime64,
+    pandas.Timestamp]
         The date to offset from
     months_offset: int, default: 12
         Number of months as integer
@@ -110,9 +111,9 @@ def date_offset_foll(
         Determines if offset should adjust for business days
     following: bool, default: True
         Determines if days should be offset forward (following) or backward
-    countries: list | str, default: "SE"
+    countries: Union[list, str], default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: list | dict | None, default: None
+    custom_holidays: Union[list, dict, None], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
@@ -148,9 +149,9 @@ def date_offset_foll(
 
 
 def get_previous_business_day_before_today(
-    today: dt.date | None = None,
-    countries: str | list = "SE",
-    custom_holidays: list | dict | None = None,
+    today: Union[dt.date, None] = None,
+    countries: Union[list, str] = "SE",
+    custom_holidays: Union[list, dict, None] = None,
 ) -> dt.date:
     """Function to bump backwards to find the previous business day before today
 
@@ -158,9 +159,9 @@ def get_previous_business_day_before_today(
     ----------
     today: datetime.date, optional
         Manual input of the day from where the previous business day is found
-    countries: list | str, default: "SE"
+    countries: Union[list, str], default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: list | dict | None, default: None
+    custom_holidays: Union[list, dict, None], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
@@ -186,8 +187,8 @@ def get_previous_business_day_before_today(
 def offset_business_days(
     ddate: dt.date,
     days: int,
-    countries: list | str = "SE",
-    custom_holidays: list | dict | None = None,
+    countries: Union[list, str] = "SE",
+    custom_holidays: Union[list, dict, None] = None,
 ) -> dt.date:
     """Function to bump a date by business days instead of calendar days.
     It first adjusts to a valid business day and then bumps with given
@@ -200,9 +201,9 @@ def offset_business_days(
     days: int
         The number of business days to offset from the business day that is
         the closest preceding the day given
-    countries: list | str, default: "SE"
+    countries: Union[list, str], default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: list | dict | None, default: None
+    custom_holidays: Union[list, dict, None], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
