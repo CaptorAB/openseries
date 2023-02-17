@@ -60,13 +60,11 @@ keywords = [
 test = [
     "coverage",
     "pytest",
-    "pytest-split",
-    "pytest-sugar"
+    "pytest-split"
 ]
 dev = [
     "coverage",
     "pytest",
-    "pytest-sugar",
     "black==23.1.0",
     "flake8==6.0.0",
     "flake8-black"
@@ -75,7 +73,6 @@ build = [
     "build",
     "coverage",
     "pytest",
-    "pytest-sugar",
     "twine",
     "wheel"
 ]
