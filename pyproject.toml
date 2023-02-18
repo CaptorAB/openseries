@@ -58,6 +58,9 @@ coverage = "*"
 pytest = "*"
 pytest-split = "*"
 
+[tool.poetry.group.coverage.dependencies]
+coverage = "*"
+
 [tool.poetry.group.dev.dependencies]
 black = "23.1.0"
 coverage = "*"
