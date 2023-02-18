@@ -7,10 +7,6 @@ on:
       - "*/*" # matches every branch containing a single '/'
       - "**" # matches every branch
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   testing:
     strategy:
