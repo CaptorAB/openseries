@@ -47,7 +47,7 @@ jobs:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
+      - name: Install Dependencies
         run: |
           poetry install --with test
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
