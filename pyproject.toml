@@ -1,35 +1,18 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-exclude = ["tests*"]
-
-[tool.setuptools.package-data]
-openseries = ["*.json", "*.png"]
-
-[project]
+[tool.poetry]
 name = "openseries"
-version = "0.10.3"
+version = "0.10.4"
 description = "Package for simple financial time series analysis."
+authors = ["Martin Karrin <martin.karrin@captor.se>"]
+license = "BSD-3-Clause"
 readme = "README.md"
-license = { text = "BSD 3-Clause License" }
-authors = [
-    { name = "Martin Karrin", email = "martin.karrin@captor.se" }
-]
-requires-python = ">=3.10"
-dependencies = [
-    "holidays>=0.18",
-    "jsonschema>=4.17.3",
-    "numpy>=1.24.1",
-    "pandas>=1.5.2",
-    "plotly>=5.11.0",
-    "python-dateutil>=2.8.2",
-    "python-stdnum>=1.18",
-    "requests>=2.28.1",
-    "scipy>=1.9.3",
-    "statsmodels>=0.13.5"
-]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[project.urls]
+repository = "https://github.com/CaptorAB/OpenSeries"
+
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
@@ -40,6 +23,7 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
 ]
+
 keywords = [
     "python",
     "python3",
@@ -56,29 +40,31 @@ keywords = [
     "investing"
 ]
 
-[project.optional-dependencies]
-test = [
-    "coverage",
-    "pytest",
-    "pytest-split"
-]
-dev = [
-    "coverage",
-    "pytest",
-    "black==23.1.0",
-    "flake8==6.0.0",
-    "flake8-black"
-]
-build = [
-    "build",
-    "coverage",
-    "pytest",
-    "twine",
-    "wheel"
-]
+[tool.poetry.dependencies]
+python = "^3.10"
+holidays = "^0.18"
+jsonschema = "^4.17.3"
+numpy = "^1.24.1"
+pandas = "^1.5.2"
+plotly = "^5.11.0"
+python-dateutil = "^2.8.2"
+python-stdnum = "^1.18"
+requests = "^2.28.1"
+scipy = "^1.9.3"
+statsmodels = "^0.13.5"
 
-[project.urls]
-repository = "https://github.com/CaptorAB/OpenSeries"
+[tool.poetry.group.test.dependencies]
+coverage = "*"
+pytest = "*"
+pytest-split = "*"
+
+[tool.poetry.group.dev.dependencies]
+black = "23.1.0"
+coverage = "*"
+flake8 = "6.0.0"
+flake8-black = "*"
+pre-commit = "*"
+pytest = "*"
 
 [tool.black]
 line-length = 88

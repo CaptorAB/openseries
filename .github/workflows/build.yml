@@ -8,46 +8,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        python-version: ["3.10.4"]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        python-version: [ "3.10.4" ]
         include:
-        - os: ubuntu-latest
-          path: ~/.cache/pip
-        - os: macos-latest
-          path: ~/Library/Caches/pip
-        - os: windows-latest
-          path: ~\AppData\Local\pip\Cache
+          - os: ubuntu-latest
+            path: ~/.cache/pip
+          - os: macos-latest
+            path: ~/Library/Caches/pip
+          - os: windows-latest
+            path: ~\AppData\Local\pip\Cache
 
     steps:
-    - name: Check out GitHub repository ${{ github.repository }}
-      uses: actions/checkout@v3
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
 
-    - name: Set up Python ${{ matrix.python-version }} on ${{ runner.os }}
-      uses: actions/setup-python@v4
-      id: py
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip'
+      - name: Set up Python ${{ matrix.python-version }} on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: py
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
-    - if: ${{ matrix.os == 'windows-latest' }}
-      name: Use GNU tar
-      shell: cmd
-      run: |
-        echo "Adding GNU tar to PATH"
-        echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
+      - if: ${{ matrix.os == 'windows-latest' }}
+        name: Use GNU tar
+        shell: cmd
+        run: |
+          echo "Adding GNU tar to PATH"
+          echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
 
-    - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
-      run: |
-        ${{ steps.py.outputs.python-path }} -m pip install --upgrade wheel
-        ${{ steps.py.outputs.python-path }} -m pip install --upgrade .[build]
+      - name: Install dependencies on Python ${{ steps.py.outputs.python-version }}
+        run: |
+          ${{ steps.py.outputs.python-path }} -m pip install --upgrade poetry
+          ${{ steps.py.outputs.python-path }} -m poetry install --with test
 
-    - name: Tests with Pytest
-      run: coverage run -m pytest --verbose --durations=20 --durations-min=2.0
+      - name: Tests with Pytest
+        run: coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
-    - name: Report coverage
-      run: coverage report
+      - name: Report coverage
+        run: coverage report
 
-    - name: Package and check
-      run: |
-        ${{ steps.py.outputs.python-path }} -m build
-        ${{ steps.py.outputs.python-path }} -m twine check dist/*
+      - name: Package and check
+        run: |
+          ${{ steps.py.outputs.python-path }} -m poetry build
+          ${{ steps.py.outputs.python-path }} -m poetry check
