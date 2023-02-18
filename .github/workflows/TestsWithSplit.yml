@@ -79,7 +79,7 @@ jobs:
 
       - name: Install dependencies on Python ${{ steps.pycov.outputs.python-version }}
         run: |
-          ${{ steps.pycov.outputs.python-path }} -m poetry install --only test
+          ${{ steps.pycov.outputs.python-path }} -m poetry install --only coverage
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
       - name: Download all artifacts
