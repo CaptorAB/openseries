@@ -77,7 +77,7 @@ jobs:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install dependencies on Python ${{ steps.pycov.outputs.python-version }}
+      - name: Install Dependencies
         run: |
           ${{ steps.pycov.outputs.python-path }} -m poetry install --only coverage
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
