@@ -9,7 +9,7 @@ very far in history.
 
 ## Version [0.10.5] - 2023-02-19
 
-Using Poetry to build and deploy.
+Using [Poetry](https://python-poetry.org/) to build and deploy.
 
 ## Version [0.10.3] - 2023-02-12
 
