@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.10.4] - 2023-02-18
+## Version [0.10.5] - 2023-02-19
 
 Using Poetry to build and deploy.
 
