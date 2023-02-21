@@ -59,18 +59,19 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 ## Table of Contents
 
-- [Modules described](https://github.com/CaptorAB/OpenSeries#these-are-the-files--modules-described)
-- [Methods to construct OpenTimeSeries](https://github.com/CaptorAB/OpenSeries#below-are-the-class-methods-used-to-create-an-opentimeseries-object)
-- [OpenTimeSeries non-numeric properties](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-non-numeric-or-helper-properties-that-apply-only-to-the-opentimeseries-class)
-- [OpenFrame non-numeric properties](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-non-numeric-or-helper-properties-that-apply-only-to-the-openframe-class)
-- [Non-numeric properties for both classes](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-non-numeric-or-helper-properties-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
-- [OpenTimeSeries only methods](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-methods-that-apply-only-to-the-opentimeseries-class)
-- [OpenFrame only methods](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-methods-that-apply-only-to-the-openframe-class)
-- [Methods for both classes](https://github.com/CaptorAB/OpenSeries#in-this-table-are-the-methods-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
-- [Numeric properties for both classes](https://github.com/CaptorAB/OpenSeries#below-are-the-numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
-- [Numeric methods with period arguments for both classes](https://github.com/CaptorAB/OpenSeries#the-methods-below-are-identical-to-the-numeric-properties-above)
+- [Files / Modules in the project](#files--modules-in-the-project)
+- [Class methods used to construct an OpenTimeSeries](#class-methods-used-to-construct-an-opentimeseries-object)
+- [OpenTimeSeries non-numeric properties](#non-numeric-or--helper--properties-that-apply-only-to-the-opentimeseries-class)
+- [OpenFrame non-numeric properties](#non-numeric-or--helper--properties-that-apply-only-to-the-openframe-class)
+- [Non-numeric properties for both classes](#non-numeric-or--helper--properties-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
+- [OpenTimeSeries only methods](#methods-that-apply-only-to-the-opentimeseries-class)
+- [OpenFrame only methods](#methods-that-apply-only-to-the-openframe-class)
+- [Methods for both classes](#methods-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
+- [Numeric properties for both classes](#numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe-)
+- [Numeric methods with period arguments for both classes](#methods-below-are-identical-to-the-numeric-properties-above)
+- [Development Instructions](#development-instructions)
 
-### Files / Modules in the project.
+### Files / Modules in the project
 
 | Module                                                                                                           | Description                                                                                                                                                                                         |
 |:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -247,12 +248,14 @@ properties for subset periods._
 
 ## Development instructions
 
-These instructions assume that you have [Python 3.10.4](https://docs.python.org/release/3.10.4/) and
+These instructions assume that you
+have [Python 3.10.4](https://docs.python.org/release/3.10.4/) and
 [Poetry](https://python-poetry.org/) installed on your machine and that you are OK
 to install this project in a virtual environment. If not, feel free to do it your
 own way.
 
 ### In Windows Powershell execute the below commands:
+
 ```
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
@@ -262,10 +265,12 @@ pip install --upgrade pip
 pip install poetry==1.3.2
 poetry install
 ```
-For me, the step upgrading pip sometimes encounters a permission issue that disappears if the command is executed a second time.
 
+For me, the step upgrading pip sometimes encounters a permission issue that disappears
+if the command is executed a second time.
 
 ### In a Mac Terminal/Linux execute the below commands:
+
 ```
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
