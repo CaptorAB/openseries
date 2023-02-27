@@ -106,16 +106,48 @@ class OpenTimeSeries(BaseModel):
         return values
 
     @classmethod
-    def setup_class(cls, domestic_ccy: str = "SEK", countries: list | str = "SE"):
+    def setup_class(cls, domestic_ccy: str = "SEK", countries: List[str] | str = "SE"):
         """Sets the domestic currency and calendar of the user.
 
         Parameters
         ----------
         domestic_ccy : str, default: "SEK"
             Currency code according to ISO 4217
-        countries: list | str, default: "SE"
+        countries: List[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
+        ccy_pattern = compile(r"^[A-Z]{3}$")
+        ctry_pattern = compile(r"^[A-Z]{2}$")
+        try:
+            ccy_ok = ccy_pattern.match(domestic_ccy)
+        except TypeError:
+            raise ValueError("domestic currency must be a code according to ISO 4217")
+        if not ccy_ok:
+            raise ValueError("domestic currency must be a code according to ISO 4217")
+        if isinstance(countries, str):
+            if not ctry_pattern.match(countries):
+                raise ValueError(
+                    "countries must be a country code according to "
+                    "ISO 3166-1 alpha-2"
+                )
+        elif isinstance(countries, list):
+            try:
+                all_ctries = all([ctry_pattern.match(ctry) for ctry in countries])
+            except TypeError:
+                raise ValueError(
+                    "countries must be a list of country codes "
+                    "according to ISO 3166-1 alpha-2"
+                )
+            if not all_ctries:
+                raise ValueError(
+                    "countries must be a list of country codes "
+                    "according to ISO 3166-1 alpha-2"
+                )
+        else:
+            raise ValueError(
+                "countries must be a (list of) country code(s) "
+                "according to ISO 3166-1 alpha-2"
+            )
 
         cls.domestic = domestic_ccy
         cls.countries = countries
@@ -409,7 +441,6 @@ class OpenTimeSeries(BaseModel):
         earlier, later = None, None
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
-                self.setup_class()
                 earlier = date_offset_foll(
                     raw_date=self.last_idx,
                     months_offset=-months_offset,
@@ -456,8 +487,6 @@ class OpenTimeSeries(BaseModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
-        self.setup_class()
         startyear = self.first_idx.year
         endyear = self.last_idx.year
         calendar = holiday_calendar(

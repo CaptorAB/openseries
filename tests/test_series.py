@@ -141,6 +141,52 @@ class TestOpenTimeSeries(TestCase):
             ("Asset", ValueType.PRICE)
         ]
 
+    def test_opentimeseries_setup_class(self: TTestOpenTimeSeries):
+        with self.assertRaises(ValueError) as e_dom:
+            OpenTimeSeries.setup_class(domestic_ccy="12")
+        self.assertIn(
+            member="domestic currency must be a code according to ISO 4217",
+            container=str(e_dom.exception),
+        )
+        with self.assertRaises(ValueError) as e_domestic:
+            # noinspection PyTypeChecker
+            OpenTimeSeries.setup_class(domestic_ccy=12)
+        self.assertIn(
+            member="domestic currency must be a code according to ISO 4217",
+            container=str(e_domestic.exception),
+        )
+        with self.assertRaises(ValueError) as e_country:
+            OpenTimeSeries.setup_class(countries="12")
+        self.assertIn(
+            member="according to ISO 3166-1 alpha-2",
+            container=str(e_country.exception),
+        )
+        with self.assertRaises(ValueError) as e_ctries:
+            OpenTimeSeries.setup_class(countries=["SE", 12])
+        self.assertIn(
+            member=(
+                "countries must be a list of country codes "
+                "according to ISO 3166-1 alpha-2"
+            ),
+            container=str(e_ctries.exception),
+        )
+        with self.assertRaises(ValueError) as e_countries:
+            OpenTimeSeries.setup_class(countries=["SE", "12"])
+        self.assertIn(
+            member=(
+                "countries must be a list of country codes "
+                "according to ISO 3166-1 alpha-2"
+            ),
+            container=str(e_countries.exception),
+        )
+        with self.assertRaises(ValueError) as e_none:
+            # noinspection PyTypeChecker
+            OpenTimeSeries.setup_class(countries=None)
+        self.assertIn(
+            member="according to ISO 3166-1 alpha-2",
+            container=str(e_none.exception),
+        )
+
     def test_opentimeseries_annotations_and_typehints(self: TTestOpenTimeSeries):
         opentimeseries_annotations = dict(OpenTimeSeries.__annotations__)
         opentimeseries_typehints = get_type_hints(OpenTimeSeries)
