@@ -57,7 +57,7 @@ hang-closing = False
 # W503 - line break before binary operator
 
 # Specify a list of codes to ignore.
-extend-ignore = C901, E203, E501, W503
+extend-ignore = C901, E203, E501, W503, F722
 
 # Specify the list of error codes you wish Flake8 to report.
 select = B, C, E, F, W, T4, B9

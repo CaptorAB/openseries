@@ -20,6 +20,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
+from pydantic import BaseModel, validator
 from random import choices
 from scipy.stats import kurtosis, norm, skew
 from statsmodels.api import OLS
@@ -29,7 +30,7 @@ from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
 from typing import List, Literal, TypeVar
 
-from openseries.series import OpenTimeSeries
+from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.risk import (
@@ -42,37 +43,34 @@ from openseries.risk import (
 TOpenFrame = TypeVar("TOpenFrame", bound="OpenFrame")
 
 
-class OpenFrame(object):
+class OpenFrame(BaseModel):
     constituents: List[OpenTimeSeries]
-    tsdf: DataFrame
-    weights: List[float]
+    tsdf: None | DataFrame
+    weights: None | List[float]
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    @validator("tsdf")
+    def check_dataframe(cls, df):
+        if not isinstance(df, DataFrame):
+            raise ValueError("tsdf must be a Pandas DataFrame")
+        return df
 
     def __init__(
         self: TOpenFrame,
         constituents: List[OpenTimeSeries],
         weights: List[float] | None = None,
         sort: bool = True,
+        *args,
+        **kwargs,
     ) -> None:
-        """Instantiates an object of the class OpenFrame
+        super().__init__(constituents=constituents, weights=weights, *args, **kwargs)
 
-        Parameters
-        ----------
-        constituents: List[OpenTimeSeries]
-            List of objects of Class OpenTimeSeries
-        weights: List[float], optional
-            List of weights in float64 format.
-        sort: bool, default: True
-            argument in Pandas df.concat added to fix issue when upgrading
-            Python & Pandas
-
-        Returns
-        -------
-        OpenFrame
-            Object of the class OpenFrame
-        """
-        self.weights = weights
-        self.tsdf = DataFrame()
         self.constituents = constituents
+        self.tsdf = DataFrame()
+        self.weights = weights
+
         if constituents is not None and len(constituents) != 0:
             self.tsdf = reduce(
                 lambda left, right: concat([left, right], axis="columns", sort=sort),
@@ -81,25 +79,13 @@ class OpenFrame(object):
         else:
             warning("OpenFrame() was passed an empty list.")
 
-        if weights is not None:
+        if self.weights is not None:
             assert len(self.constituents) == len(
                 self.weights
             ), "Number of TimeSeries must equal number of weights."
 
         if len(set(self.columns_lvl_zero)) != len(self.columns_lvl_zero):
             raise Exception("TimeSeries names/labels must be unique.")
-
-    def __repr__(self: TOpenFrame) -> str:
-        """
-        Returns
-        -------
-        str
-            A representation of an OpenFrame object
-        """
-
-        return "{}(constituents={}, weights={})".format(
-            self.__class__.__name__, self.constituents, self.weights
-        )
 
     def from_deepcopy(self: TOpenFrame) -> TOpenFrame:
         """Creates a copy of an OpenFrame object
@@ -926,7 +912,7 @@ class OpenFrame(object):
         """
         if all(
             [
-                True if x == "Return(Total)" else False
+                True if x == ValueType.RTRN else False
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):
@@ -1824,7 +1810,7 @@ class OpenFrame(object):
 
         self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
-        new_labels = ["Return(Total)"] * self.item_count
+        new_labels = [ValueType.RTRN] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
@@ -1846,7 +1832,7 @@ class OpenFrame(object):
 
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
-        new_labels = ["Return(Total)"] * self.item_count
+        new_labels = [ValueType.RTRN] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
@@ -2773,7 +2759,7 @@ class OpenFrame(object):
         """
         if all(
             [
-                True if x == "Return(Total)" else False
+                True if x == ValueType.RTRN else False
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):
@@ -2878,7 +2864,7 @@ class OpenFrame(object):
         df = self.tsdf.copy()
         if not any(
             [
-                True if x == "Return(Total)" else False
+                True if x == ValueType.RTRN else False
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):

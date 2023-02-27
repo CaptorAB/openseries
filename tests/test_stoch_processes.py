@@ -4,7 +4,7 @@ from typing import get_type_hints, TypeVar
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
-from openseries.series import OpenTimeSeries
+from openseries.series import OpenTimeSeries, ValueType
 from openseries.stoch_processes import (
     ModelParameters,
     cox_ingersoll_ross_levels,
@@ -104,7 +104,7 @@ class TestStochProcesses(TestCase):
                 columns=[f"Simulation_{i}"],
             )
             series.append(
-                OpenTimeSeries.from_df(sdf, valuetype="Price(Close)").to_cumret()
+                OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE).to_cumret()
             )
 
         frame = OpenFrame(series)
@@ -151,9 +151,9 @@ class TestStochProcesses(TestCase):
             sdf = DataFrame(
                 data=onesim,
                 index=d_range,
-                columns=[[f"Asset_{name[:-7]}"], ["Price(Close)"]],
+                columns=[[f"Asset_{name[:-7]}"], [ValueType.PRICE]],
             )
-            series.append(OpenTimeSeries.from_df(sdf, valuetype="Price(Close)"))
+            series.append(OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE))
 
         frame = OpenFrame(series)
         means = [f"{r:.9f}" for r in frame.tsdf.mean()]
