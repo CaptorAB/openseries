@@ -11,7 +11,8 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
 from plotly.offline import plot
-from pydantic import BaseModel, constr, Field, NoneStr, validator
+from pydantic import BaseModel, constr, Field, root_validator
+from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from typing import List, Literal, TypeVar
@@ -30,6 +31,7 @@ TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound="OpenTimeSeries")
 
 
 class ValueType(str, Enum):
+    EWMA = "EWMA"
     PRICE = "Price(Close)"
     RTRN = "Return(Total)"
     ROLLBETA = "Beta"
@@ -45,11 +47,7 @@ class OpenTimeSeries(BaseModel):
     timeseriesId: constr(regex=r"^([0-9a-f]{24})?$")
     instrumentId: constr(regex=r"^([0-9a-f]{24})?$")
     currency: constr(regex=r"^[A-Z]{3}$")
-    dates: List[
-        constr(
-            regex=r"^((18|19|20|21|22)\\d\\d)-(0[1-9]|1[012])-(0[1-9]|[12]\\d|3[01])$"
-        )
-    ] = Field(
+    dates: List[constr(regex=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")] = Field(
         ...,
         min_length=1,
         unique_items=True,
@@ -57,8 +55,8 @@ class OpenTimeSeries(BaseModel):
     )
     domestic: constr(regex=r"^[A-Z]{3}$") = "SEK"
     name: str
-    isin: NoneStr
-    label: NoneStr
+    isin: str = None
+    label: str = None
     countries: List[constr(regex=r"^[A-Z]{2}$")] | constr(regex=r"^[A-Z]{2}$") = "SE"
     valuetype: ValueType
     values: List[float] = Field(
@@ -67,28 +65,45 @@ class OpenTimeSeries(BaseModel):
         description="The value or return values of the timeseries items",
     )
     local_ccy: bool
-    tsdf: None | DataFrame
+    tsdf: DataFrame
 
     class Config:
         arbitrary_types_allowed = True
 
-    @validator("dates")
-    def dates_not_empty(cls, dats):
-        if not dats:
+    @root_validator(pre=True)
+    def dates_not_empty(cls, values):
+        if not values.get("dates", None):
             raise ValueError("Dates list cannot be empty")
-        return dats
+        dts = values.get("dates")
+        pattern = compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
+        for dte in dts:
+            if not pattern.match(dte):
+                raise ValueError("Dates contain an invalid date")
+        return values
 
-    @validator("values")
-    def values_not_empty(cls, valus):
-        if not valus:
+    @root_validator(pre=True)
+    def values_not_empty(cls, values):
+        if not values.get("values", None):
             raise ValueError("Values list cannot be empty")
-        return valus
+        return values
 
-    @validator("tsdf")
-    def check_dataframe(cls, df):
-        if not isinstance(df, DataFrame):
-            raise ValueError("tsdf must be a Pandas DataFrame")
-        return df
+    @root_validator
+    def check_dates_values_same_length(cls, values):
+        dats, vals = values.get("dates"), values.get("values")
+        if dats is not None and vals is not None and len(dats) != len(vals):
+            raise ValueError("Lengths of dates and values do not match")
+        return values
+
+    @root_validator
+    def check_values_match(cls, values):
+        vals, df = values.get("values"), values.get("tsdf")
+        if (
+            vals is not None
+            and df is not None
+            and vals != df.iloc[:, 0].values.tolist()
+        ):
+            raise ValueError("Values and tsdf.values do not match")
+        return values
 
     @classmethod
     def setup_class(cls, domestic_ccy: str = "SEK", countries: list | str = "SE"):
@@ -105,23 +120,34 @@ class OpenTimeSeries(BaseModel):
         cls.domestic = domestic_ccy
         cls.countries = countries
 
-    def __init__(self: TOpenTimeSeries, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    @classmethod
+    def parse_opentimeseries(cls, data: dict) -> dict:
+        if data.get("isin", None):
+            isincode.validate(data["isin"])
 
-        if self.isin:
-            isincode.validate(self.isin)
+        if data["name"] != "":
+            data.update({"label": data["name"]})
 
-        if self.name != "":
-            self.label = self.name
+        if not isinstance(data.get("tsdf", None), DataFrame):
+            df = DataFrame(
+                data=data["values"],
+                index=data["dates"],
+                columns=[[data["name"]], [data["valuetype"]]],
+                dtype="float64",
+            )
+            df.index = [d.date() for d in DatetimeIndex(df.index)]
 
-        self.pandas_df()
+            df.sort_index(inplace=True)
+            data.update({"tsdf": df})
+
+        return data
 
     @classmethod
     def from_df(
         cls,
         df: DataFrame | Series,
         column_nmbr: int = 0,
-        valuetype: ValueType = "Price(Close)",
+        valuetype: ValueType = ValueType.PRICE,
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ) -> TOpenTimeSeries:
@@ -133,7 +159,7 @@ class OpenTimeSeries(BaseModel):
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
-        valuetype : str, default: "Price(Close)"
+        valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
@@ -161,8 +187,8 @@ class OpenTimeSeries(BaseModel):
                 label = df.columns.values[column_nmbr]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
 
-        return cls.parse_obj(
-            {
+        output = cls.parse_opentimeseries(
+            data={
                 "timeseriesId": "",
                 "currency": baseccy,
                 "instrumentId": "",
@@ -174,12 +200,14 @@ class OpenTimeSeries(BaseModel):
             }
         )
 
+        return cls.parse_obj(output)
+
     @classmethod
     def from_frame(
         cls,
         frame,
         label: str,
-        valuetype: str = "Price(Close)",
+        valuetype: ValueType = ValueType.PRICE,
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ) -> TOpenTimeSeries:
@@ -191,7 +219,7 @@ class OpenTimeSeries(BaseModel):
             openseries.frame.OpenFrame
         label : str
             Placeholder for a name of the timeseries
-        valuetype : str, default: "Price(Close)"
+        valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
@@ -207,8 +235,8 @@ class OpenTimeSeries(BaseModel):
         df = frame.tsdf.loc[:, (label, valuetype)]
         dates = [d.strftime("%Y-%m-%d") for d in df.index]
 
-        return cls.parse_obj(
-            {
+        output = cls.parse_opentimeseries(
+            data={
                 "timeseriesId": "",
                 "currency": baseccy,
                 "instrumentId": "",
@@ -220,16 +248,7 @@ class OpenTimeSeries(BaseModel):
             }
         )
 
-    def from_deepcopy(self: TOpenTimeSeries) -> TOpenTimeSeries:
-        """Creates a copy of an OpenTimeSeries object
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-
-        return deepcopy(self)
+        return cls.parse_obj(output)
 
     @classmethod
     def from_fixed_rate(
@@ -239,7 +258,7 @@ class OpenTimeSeries(BaseModel):
         days: int | None = None,
         end_dt: dt.date | None = None,
         label: str = "Series",
-        valuetype: str = "Price(Close)",
+        valuetype: ValueType = ValueType.PRICE,
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ) -> TOpenTimeSeries:
@@ -262,7 +281,7 @@ class OpenTimeSeries(BaseModel):
             combined with days
         label : str
             Placeholder for a name of the timeseries
-        valuetype : str, default: "Price(Close)"
+        valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
@@ -284,8 +303,8 @@ class OpenTimeSeries(BaseModel):
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
         d_range = [d.strftime("%Y-%m-%d") for d in d_range]
 
-        return cls.parse_obj(
-            {
+        output = cls.parse_opentimeseries(
+            data={
                 "timeseriesId": "",
                 "currency": baseccy,
                 "instrumentId": "",
@@ -296,6 +315,19 @@ class OpenTimeSeries(BaseModel):
                 "values": arr,
             }
         )
+
+        return cls.parse_obj(output)
+
+    def from_deepcopy(self: TOpenTimeSeries) -> TOpenTimeSeries:
+        """Creates a copy of an OpenTimeSeries object
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
+
+        return deepcopy(self)
 
     def to_json(
         self: TOpenTimeSeries, filename: str, directory: str | None = None
@@ -1889,22 +1921,22 @@ class OpenTimeSeries(BaseModel):
         data = self.tsdf.loc[earlier:later].copy()
 
         data[self.label, "Returns"] = log(
-            data.loc[:, (self.label, "Price(Close)")]
+            data.loc[:, (self.label, ValueType.PRICE)]
         ).diff()
-        data[self.label, "EWMA"] = zeros(how_many)
-        data.loc[:, (self.label, "EWMA")].iloc[0] = data.loc[
+        data[self.label, ValueType.EWMA] = zeros(how_many)
+        data.loc[:, (self.label, ValueType.EWMA)].iloc[0] = data.loc[
             :, (self.label, "Returns")
         ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
         prev = data.loc[self.first_idx]
         for _, row in data.iloc[1:].iterrows():
-            row.loc[self.label, "EWMA"] = sqrt(
+            row.loc[self.label, ValueType.EWMA] = sqrt(
                 square(row.loc[self.label, "Returns"]) * time_factor * (1 - lmbda)
-                + square(prev.loc[self.label, "EWMA"]) * lmbda
+                + square(prev.loc[self.label, ValueType.EWMA]) * lmbda
             )
             prev = row.copy()
 
-        return data.loc[:, (self.label, "EWMA")]
+        return data.loc[:, (self.label, ValueType.EWMA)]
 
     def rolling_vol(
         self: TOpenTimeSeries,
@@ -2359,4 +2391,4 @@ def timeseries_chain(
     for item in cleaner_list:
         new_dict.pop(item)
     new_dict.update(dates=dates, values=values)
-    return type(back).parse_obj(new_dict)
+    return type(back).parse_obj(OpenTimeSeries.parse_opentimeseries(new_dict))

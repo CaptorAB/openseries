@@ -20,7 +20,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from random import choices
 from scipy.stats import kurtosis, norm, skew
 from statsmodels.api import OLS
@@ -50,12 +50,6 @@ class OpenFrame(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-
-    @validator("tsdf")
-    def check_dataframe(cls, df):
-        if not isinstance(df, DataFrame):
-            raise ValueError("tsdf must be a Pandas DataFrame")
-        return df
 
     def __init__(
         self: TOpenFrame,
@@ -2070,45 +2064,45 @@ class OpenFrame(BaseModel):
 
         for rtn in cols:
             data[rtn, "Returns"] = log(data.loc[:, (rtn, "Price(Close)")]).diff()
-            data[rtn, "EWMA"] = zeros(how_many)
-            data.loc[:, (rtn, "EWMA")].iloc[0] = data.loc[:, (rtn, "Returns")].iloc[
-                1:day_chunk
-            ].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
+            data[rtn, ValueType.EWMA] = zeros(how_many)
+            data.loc[:, (rtn, ValueType.EWMA)].iloc[0] = data.loc[
+                :, (rtn, "Returns")
+            ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
-        data["Cov", "EWMA"] = zeros(how_many)
-        data[corr_label, "EWMA"] = zeros(how_many)
-        data.loc[:, ("Cov", "EWMA")].iloc[0] = cov(
+        data["Cov", ValueType.EWMA] = zeros(how_many)
+        data[corr_label, ValueType.EWMA] = zeros(how_many)
+        data.loc[:, ("Cov", ValueType.EWMA)].iloc[0] = cov(
             m=data.loc[:, (cols[0], "Returns")].iloc[1:day_chunk].to_numpy(),
             y=data.loc[:, (cols[1], "Returns")].iloc[1:day_chunk].to_numpy(),
             ddof=dlta_degr_freedms,
         )[0][1]
-        data.loc[:, (corr_label, "EWMA")].iloc[0] = data.loc[:, ("Cov", "EWMA")].iloc[
-            0
-        ] / (
+        data.loc[:, (corr_label, ValueType.EWMA)].iloc[0] = data.loc[
+            :, ("Cov", ValueType.EWMA)
+        ].iloc[0] / (
             2
-            * data.loc[:, (cols[0], "EWMA")].iloc[0]
-            * data.loc[:, (cols[1], "EWMA")].iloc[0]
+            * data.loc[:, (cols[0], ValueType.EWMA)].iloc[0]
+            * data.loc[:, (cols[1], ValueType.EWMA)].iloc[0]
         )
 
         prev = data.loc[self.first_idx]
         for _, row in data.iloc[1:].iterrows():
-            row.loc[cols, "EWMA"] = sqrt(
+            row.loc[cols, ValueType.EWMA] = sqrt(
                 square(row.loc[cols, "Returns"].to_numpy()) * time_factor * (1 - lmbda)
-                + square(prev.loc[cols, "EWMA"].to_numpy()) * lmbda
+                + square(prev.loc[cols, ValueType.EWMA].to_numpy()) * lmbda
             )
-            row.loc["Cov", "EWMA"] = (
+            row.loc["Cov", ValueType.EWMA] = (
                 row.loc[cols[0], "Returns"]
                 * row.loc[cols[1], "Returns"]
                 * time_factor
                 * (1 - lmbda)
-                + prev.loc["Cov", "EWMA"] * lmbda
+                + prev.loc["Cov", ValueType.EWMA] * lmbda
             )
-            row.loc[corr_label, "EWMA"] = row.loc["Cov", "EWMA"] / (
-                2 * row.loc[cols[0], "EWMA"] * row.loc[cols[1], "EWMA"]
+            row.loc[corr_label, ValueType.EWMA] = row.loc["Cov", ValueType.EWMA] / (
+                2 * row.loc[cols[0], ValueType.EWMA] * row.loc[cols[1], ValueType.EWMA]
             )
             prev = row.copy()
 
-        ewma_df = data.loc[:, (cols + [corr_label], "EWMA")]
+        ewma_df = data.loc[:, (cols + [corr_label], ValueType.EWMA)]
         ewma_df.columns = ewma_df.columns.droplevel(level=1)
 
         return ewma_df
