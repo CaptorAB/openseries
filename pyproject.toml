@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "0.10.5"
+version = "0.10.6"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 license = "BSD-3-Clause"
@@ -43,7 +43,6 @@ keywords = [
 [tool.poetry.dependencies]
 python = "^3.10"
 holidays = "^0.18"
-jsonschema = "^4.17.3"
 numpy = "^1.24.1"
 pandas = "^1.5.2"
 plotly = "^5.11.0"
@@ -52,6 +51,7 @@ python-stdnum = "^1.18"
 requests = "^2.28.1"
 scipy = "^1.9.3"
 statsmodels = "^0.13.5"
+pydantic = "^1.10.5"
 
 [tool.poetry.group.test.dependencies]
 coverage = "*"

@@ -7,6 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.10.6] - 2023-02-27
+
+Using [Pydantic](https://docs.pydantic.dev/) for data validation using Python type
+annotations.
+
 ## Version [0.10.5] - 2023-02-19
 
 Using [Poetry](https://python-poetry.org/) to build and deploy.

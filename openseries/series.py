@@ -1,9 +1,8 @@
 from copy import deepcopy
 import datetime as dt
 from dateutil.relativedelta import relativedelta
-from json import dump, load
-from jsonschema import Draft7Validator
-from logging import warning
+from enum import Enum
+from json import dump
 from math import ceil
 from numpy import array, cumprod, insert, log, sqrt, square, zeros
 from os import path
@@ -12,9 +11,11 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure, Scatter
 from plotly.offline import plot
-from stdnum import isin as isincode
+from pydantic import BaseModel, constr, Field, root_validator
+from re import compile
 from scipy.stats import kurtosis, norm, skew
-from typing import List, Literal, TypedDict, TypeVar
+from stdnum import isin as isincode
+from typing import List, Literal, TypeVar
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.exceptions import FromFixedRateDatesInputError
@@ -26,205 +27,161 @@ from openseries.risk import (
     drawdown_details,
 )
 
-
-def strip_duplicates(dates: List[str], values: List[float], warn: bool = True) -> dict:
-    """Function to remove duplicate dates and their values.
-    There is no check done whether the same number of dates
-    and values are given as arguments
-
-    Parameters
-    ----------
-    dates : List[str]
-        Raw dates
-    values : List[float]
-        Raw values
-    warn: bool, default: True
-        Boolean flag indicating if a warning will be made
-        to highlight the duplicate items removed
-
-    Returns
-    -------
-    dict
-        Cleaned dates as dict.keys and values as dict.values
-    """
-    unique_items = {}
-    dupe_log = []
-
-    for dte, valu in zip(dates, values):
-        if dte not in unique_items:
-            unique_items[dte] = valu
-        else:
-            dupe_log.append({dte: valu})
-
-    if warn and len(dupe_log) != 0:
-        warning(f"Duplicate dates and their values removed:\n" f"{dupe_log}")
-
-    return unique_items
-
-
 TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class TimeSerie(TypedDict, total=False):
-    """Class to hold the type of input data for the OpenTimeSeries class.
+class ValueType(str, Enum):
+    EWMA = "EWMA"
+    PRICE = "Price(Close)"
+    RTRN = "Return(Total)"
+    ROLLBETA = "Beta"
+    ROLLCORR = "Rolling correlation"
+    ROLLCVAR = "Rolling CVaR"
+    ROLLINFORATIO = "Information Ratio"
+    ROLLRTRN = "Rolling returns"
+    ROLLVAR = "Rolling VaR"
+    ROLLVOL = "Rolling volatility"
 
-    Parameters
-    ----------
-    _id : str
-        Database identifier of the timeseries
-    instrumentId: str
-        Database identifier of the instrument associated with the timeseries
-    currency : str
-        ISO 4217 currency code of the timeseries
-    dates : List[str]
-        Dates of the individual timeseries items
-        These dates will not be altered by methods
-    domestic : str
-        ISO 4217 currency code of the user's home currency
-    name : str
-        string identifier of the timeseries and/or instrument
-    isin : str
-        ISO 6166 identifier code of the associated instrument
-    label : str
-        Placeholder for a name of the timeseries
-    countries: list | str, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    valuetype : str
-        Identifies if the series is a series of values or returns
-    values : List[float]
-        The value or return values of the timeseries items
-        These values will not be altered by methods
-    local_ccy: bool
-        Boolean flag indicating if timeseries is in local currency
-    tsdf: pandas.DataFrame
-        Pandas object holding dates and values that can be altered via methods
-    """
 
-    _id: str
-    instrumentId: str
-    currency: str
-    dates: List[str]
-    domestic: str
+class OpenTimeSeries(BaseModel):
+    timeseriesId: constr(regex=r"^([0-9a-f]{24})?$")
+    instrumentId: constr(regex=r"^([0-9a-f]{24})?$")
+    currency: constr(regex=r"^[A-Z]{3}$")
+    dates: List[constr(regex=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")] = Field(
+        ...,
+        min_length=1,
+        unique_items=True,
+        description="Dates of the individual timeseries items",
+    )
+    domestic: constr(regex=r"^[A-Z]{3}$") = "SEK"
     name: str
-    isin: str
-    label: str
-    countries: list | str
-    valuetype: str
-    values: List[float]
+    isin: str = None
+    label: str = None
+    countries: List[constr(regex=r"^[A-Z]{2}$")] | constr(regex=r"^[A-Z]{2}$") = "SE"
+    valuetype: ValueType
+    values: List[float] = Field(
+        ...,
+        unique_items=False,
+        description="The value or return values of the timeseries items",
+    )
     local_ccy: bool
     tsdf: DataFrame
 
+    class Config:
+        arbitrary_types_allowed = True
 
-class OpenTimeSeries(object):
-    _id: str
-    instrumentId: str
-    currency: str
-    dates: List[str]
-    domestic: str
-    name: str
-    isin: str
-    label: str
-    countries: list | str
-    valuetype: str
-    values: List[float]
-    local_ccy: bool
-    tsdf: DataFrame
+    @root_validator(pre=True)
+    def dates_not_empty(cls, values):
+        if not values.get("dates", None):
+            raise ValueError("Dates list cannot be empty")
+        dts = values.get("dates")
+        pattern = compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
+        for dte in dts:
+            if not pattern.match(dte):
+                raise ValueError("Dates contain an invalid date")
+        return values
+
+    @root_validator(pre=True)
+    def values_not_empty(cls, values):
+        if not values.get("values", None):
+            raise ValueError("Values list cannot be empty")
+        return values
+
+    @root_validator
+    def check_dates_values_same_length(cls, values):
+        dats, vals = values.get("dates"), values.get("values")
+        if dats is not None and vals is not None and len(dats) != len(vals):
+            raise ValueError("Lengths of dates and values do not match")
+        return values
+
+    @root_validator
+    def check_values_match(cls, values):
+        vals, df = values.get("values"), values.get("tsdf")
+        if (
+            vals is not None
+            and df is not None
+            and vals != df.iloc[:, 0].values.tolist()
+        ):
+            raise ValueError("Values and tsdf.values do not match")
+        return values
 
     @classmethod
-    def setup_class(cls, domestic_ccy: str = "SEK", countries: list | str = "SE"):
+    def setup_class(cls, domestic_ccy: str = "SEK", countries: List[str] | str = "SE"):
         """Sets the domestic currency and calendar of the user.
 
         Parameters
         ----------
         domestic_ccy : str, default: "SEK"
             Currency code according to ISO 4217
-        countries: list | str, default: "SE"
+        countries: List[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
+        ccy_pattern = compile(r"^[A-Z]{3}$")
+        ctry_pattern = compile(r"^[A-Z]{2}$")
+        try:
+            ccy_ok = ccy_pattern.match(domestic_ccy)
+        except TypeError:
+            raise ValueError("domestic currency must be a code according to ISO 4217")
+        if not ccy_ok:
+            raise ValueError("domestic currency must be a code according to ISO 4217")
+        if isinstance(countries, str):
+            if not ctry_pattern.match(countries):
+                raise ValueError(
+                    "countries must be a country code according to "
+                    "ISO 3166-1 alpha-2"
+                )
+        elif isinstance(countries, list):
+            try:
+                all_ctries = all([ctry_pattern.match(ctry) for ctry in countries])
+            except TypeError:
+                raise ValueError(
+                    "countries must be a list of country codes "
+                    "according to ISO 3166-1 alpha-2"
+                )
+            if not all_ctries:
+                raise ValueError(
+                    "countries must be a list of country codes "
+                    "according to ISO 3166-1 alpha-2"
+                )
+        else:
+            raise ValueError(
+                "countries must be a (list of) country code(s) "
+                "according to ISO 3166-1 alpha-2"
+            )
 
         cls.domestic = domestic_ccy
         cls.countries = countries
 
-    def __init__(
-        self: TOpenTimeSeries, d: TimeSerie, remove_duplicates: bool = False
-    ) -> None:
-        """Instantiates an object of the class OpenTimeSeries
-         The data can have daily frequency, but not more frequent
+    @classmethod
+    def parse_opentimeseries(cls, data: dict) -> dict:
+        if data.get("isin", None):
+            isincode.validate(data["isin"])
 
-        Parameters
-        ----------
-        d: TimeSerie
-            A subclass of TypedDict with the required and optional parameters
-        remove_duplicates: bool, default: False
-            Determines if duplicate dates and their values will be removed before
-            an object of this class is instantiated
+        if data["name"] != "":
+            data.update({"label": data["name"]})
 
-        Returns
-        -------
-        OpenTimeSeries
-            Object of the class OpenTimeSeries
-        """
-
-        if remove_duplicates:
-            cleaned_items = strip_duplicates(
-                dates=d["dates"], values=d["values"], warn=True
+        if not isinstance(data.get("tsdf", None), DataFrame):
+            df = DataFrame(
+                data=data["values"],
+                index=data["dates"],
+                columns=[[data["name"]], [data["valuetype"]]],
+                dtype="float64",
             )
-            d.update(
-                {
-                    "dates": list(cleaned_items.keys()),
-                    "values": list(cleaned_items.values()),
-                }
-            )
+            df.index = [d.date() for d in DatetimeIndex(df.index)]
 
-        schema_file = path.join(path.dirname(path.abspath(__file__)), "openseries.json")
-        with open(file=schema_file, mode="r", encoding="utf-8") as f:
-            series_schema = load(f)
+            df.sort_index(inplace=True)
+            data.update({"tsdf": df})
 
-        Draft7Validator.check_schema(schema=series_schema)
-        validator = Draft7Validator(series_schema)
-        validator.validate(d)
-
-        if d.get("isin", None):
-            isincode.validate(d["isin"])
-
-        self.__dict__ = d
-
-        if self.name != "":
-            self.label = self.name
-
-        self.pandas_df()
-
-    def __repr__(self: TOpenTimeSeries) -> str:
-        """
-        Returns
-        -------
-        str
-            A representation of an OpenTimeSeries object
-        """
-        return (
-            "{}(name={}, _id={}, instrumentId={}, valuetype={}, "
-            "currency={}, start={}, end={}, local_ccy={})"
-        ).format(
-            self.__class__.__name__,
-            self.name,
-            self._id,
-            self.instrumentId,
-            self.valuetype,
-            self.currency,
-            self.first_idx.strftime("%Y-%m-%d"),
-            self.last_idx.strftime("%Y-%m-%d"),
-            self.local_ccy,
-        )
+        return data
 
     @classmethod
     def from_df(
         cls,
         df: DataFrame | Series,
         column_nmbr: int = 0,
-        valuetype: str = "Price(Close)",
+        valuetype: ValueType = ValueType.PRICE,
         baseccy: str = "SEK",
         local_ccy: bool = True,
-        remove_duplicates: bool = False,
     ) -> TOpenTimeSeries:
         """Creates a timeseries from a Pandas DataFrame or Series
 
@@ -234,15 +191,12 @@ class OpenTimeSeries(object):
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
-        valuetype : str, default: "Price(Close)"
+        valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
-        remove_duplicates: bool, default: False
-            Determines if duplicate dates and their values will be removed before
-            an object of this class is instantiated
 
         Returns
         -------
@@ -264,29 +218,30 @@ class OpenTimeSeries(object):
             else:
                 label = df.columns.values[column_nmbr]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
-        output = TimeSerie(
-            _id="",
-            currency=baseccy,
-            instrumentId="",
-            isin="",
-            local_ccy=local_ccy,
-            name=label,
-            valuetype=valuetype,
-            dates=dates,
-            values=values,
+
+        output = cls.parse_opentimeseries(
+            data={
+                "timeseriesId": "",
+                "currency": baseccy,
+                "instrumentId": "",
+                "local_ccy": local_ccy,
+                "name": label,
+                "valuetype": valuetype,
+                "dates": dates,
+                "values": values,
+            }
         )
 
-        return cls(d=output, remove_duplicates=remove_duplicates)
+        return cls.parse_obj(output)
 
     @classmethod
     def from_frame(
         cls,
         frame,
         label: str,
-        valuetype: str = "Price(Close)",
+        valuetype: ValueType = ValueType.PRICE,
         baseccy: str = "SEK",
         local_ccy: bool = True,
-        remove_duplicates: bool = False,
     ) -> TOpenTimeSeries:
         """Creates a timeseries from an openseries.frame.OpenFrame
 
@@ -296,15 +251,12 @@ class OpenTimeSeries(object):
             openseries.frame.OpenFrame
         label : str
             Placeholder for a name of the timeseries
-        valuetype : str, default: "Price(Close)"
+        valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
-        remove_duplicates: bool, default: False
-            Determines if duplicate dates and their values will be removed before
-            an object of this class is instantiated
 
         Returns
         -------
@@ -315,30 +267,20 @@ class OpenTimeSeries(object):
         df = frame.tsdf.loc[:, (label, valuetype)]
         dates = [d.strftime("%Y-%m-%d") for d in df.index]
 
-        output = TimeSerie(
-            _id="",
-            currency=baseccy,
-            instrumentId="",
-            isin="",
-            local_ccy=local_ccy,
-            name=df.name[0],
-            valuetype=df.name[1],
-            dates=dates,
-            values=df.values.tolist(),
+        output = cls.parse_opentimeseries(
+            data={
+                "timeseriesId": "",
+                "currency": baseccy,
+                "instrumentId": "",
+                "local_ccy": local_ccy,
+                "name": df.name[0],
+                "valuetype": df.name[1],
+                "dates": dates,
+                "values": df.values.tolist(),
+            }
         )
 
-        return cls(d=output, remove_duplicates=remove_duplicates)
-
-    def from_deepcopy(self: TOpenTimeSeries) -> TOpenTimeSeries:
-        """Creates a copy of an OpenTimeSeries object
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-
-        return deepcopy(self)
+        return cls.parse_obj(output)
 
     @classmethod
     def from_fixed_rate(
@@ -348,10 +290,9 @@ class OpenTimeSeries(object):
         days: int | None = None,
         end_dt: dt.date | None = None,
         label: str = "Series",
-        valuetype: str = "Price(Close)",
+        valuetype: ValueType = ValueType.PRICE,
         baseccy: str = "SEK",
         local_ccy: bool = True,
-        remove_duplicates: bool = False,
     ) -> TOpenTimeSeries:
         """Creates a timeseries from a series of values accruing with a given fixed rate
 
@@ -372,15 +313,12 @@ class OpenTimeSeries(object):
             combined with days
         label : str
             Placeholder for a name of the timeseries
-        valuetype : str, default: "Price(Close)"
+        valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
-        remove_duplicates: bool, default: False
-            Determines if duplicate dates and their values will be removed before
-            an object of this class is instantiated
 
         Returns
         -------
@@ -397,19 +335,31 @@ class OpenTimeSeries(object):
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
         d_range = [d.strftime("%Y-%m-%d") for d in d_range]
 
-        output = TimeSerie(
-            _id="",
-            name=label,
-            currency=baseccy,
-            instrumentId="",
-            isin="",
-            local_ccy=local_ccy,
-            valuetype=valuetype,
-            dates=d_range,
-            values=arr,
+        output = cls.parse_opentimeseries(
+            data={
+                "timeseriesId": "",
+                "currency": baseccy,
+                "instrumentId": "",
+                "local_ccy": local_ccy,
+                "name": label,
+                "valuetype": valuetype,
+                "dates": d_range,
+                "values": arr,
+            }
         )
 
-        return cls(d=output, remove_duplicates=remove_duplicates)
+        return cls.parse_obj(output)
+
+    def from_deepcopy(self: TOpenTimeSeries) -> TOpenTimeSeries:
+        """Creates a copy of an OpenTimeSeries object
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
+
+        return deepcopy(self)
 
     def to_json(
         self: TOpenTimeSeries, filename: str, directory: str | None = None
@@ -491,7 +441,6 @@ class OpenTimeSeries(object):
         earlier, later = None, None
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
-                self.setup_class()
                 earlier = date_offset_foll(
                     raw_date=self.last_idx,
                     months_offset=-months_offset,
@@ -538,8 +487,6 @@ class OpenTimeSeries(object):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
-        self.setup_class()
         startyear = self.first_idx.year
         endyear = self.last_idx.year
         calendar = holiday_calendar(
@@ -1750,7 +1697,7 @@ class OpenTimeSeries(object):
 
         self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
-        self.valuetype = "Return(Total)"
+        self.valuetype = ValueType.RTRN
         self.tsdf.columns = [[self.label], [self.valuetype]]
         return self
 
@@ -1771,7 +1718,7 @@ class OpenTimeSeries(object):
 
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
-        self.valuetype = "Return(Total)"
+        self.valuetype = ValueType.RTRN
         self.tsdf.columns = [[self.label], [self.valuetype]]
         return self
 
@@ -1799,7 +1746,7 @@ class OpenTimeSeries(object):
 
         if not any(
             [
-                True if x == "Return(Total)" else False
+                True if x == ValueType.RTRN else False
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):
@@ -1807,7 +1754,7 @@ class OpenTimeSeries(object):
 
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
-        self.valuetype = "Price(Close)"
+        self.valuetype = ValueType.PRICE
         self.tsdf.columns = [[self.label], [self.valuetype]]
 
         return self
@@ -1837,7 +1784,7 @@ class OpenTimeSeries(object):
 
         self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
         self.values = list(arr)
-        self.valuetype = "Price(Close)"
+        self.valuetype = ValueType.PRICE
         self.pandas_df()
 
         return self
@@ -2003,22 +1950,22 @@ class OpenTimeSeries(object):
         data = self.tsdf.loc[earlier:later].copy()
 
         data[self.label, "Returns"] = log(
-            data.loc[:, (self.label, "Price(Close)")]
+            data.loc[:, (self.label, ValueType.PRICE)]
         ).diff()
-        data[self.label, "EWMA"] = zeros(how_many)
-        data.loc[:, (self.label, "EWMA")].iloc[0] = data.loc[
+        data[self.label, ValueType.EWMA] = zeros(how_many)
+        data.loc[:, (self.label, ValueType.EWMA)].iloc[0] = data.loc[
             :, (self.label, "Returns")
         ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
         prev = data.loc[self.first_idx]
         for _, row in data.iloc[1:].iterrows():
-            row.loc[self.label, "EWMA"] = sqrt(
+            row.loc[self.label, ValueType.EWMA] = sqrt(
                 square(row.loc[self.label, "Returns"]) * time_factor * (1 - lmbda)
-                + square(prev.loc[self.label, "EWMA"]) * lmbda
+                + square(prev.loc[self.label, ValueType.EWMA]) * lmbda
             )
             prev = row.copy()
 
-        return data.loc[:, (self.label, "EWMA")]
+        return data.loc[:, (self.label, ValueType.EWMA)]
 
     def rolling_vol(
         self: TOpenTimeSeries,
@@ -2203,7 +2150,7 @@ class OpenTimeSeries(object):
 
         if any(
             [
-                True if x == "Return(Total)" else False
+                True if x == ValueType.RTRN else False
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):
@@ -2228,7 +2175,7 @@ class OpenTimeSeries(object):
             )
             prev = idx
         self.tsdf = DataFrame(data=values, index=dates)
-        self.valuetype = "Price(Close)"
+        self.valuetype = ValueType.PRICE
         self.tsdf.columns = [[self.label], [self.valuetype]]
         self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
         if returns_input:
@@ -2238,7 +2185,7 @@ class OpenTimeSeries(object):
     def set_new_label(
         self: TOpenTimeSeries,
         lvl_zero: str | None = None,
-        lvl_one: str | None = None,
+        lvl_one: ValueType | None = None,
         delete_lvl_one: bool = False,
     ) -> TOpenTimeSeries:
         """Sets the column labels of the .tsdf Pandas Dataframe associated
@@ -2473,4 +2420,4 @@ def timeseries_chain(
     for item in cleaner_list:
         new_dict.pop(item)
     new_dict.update(dates=dates, values=values)
-    return type(back)(new_dict)
+    return type(back).parse_obj(OpenTimeSeries.parse_opentimeseries(new_dict))

@@ -24,8 +24,10 @@ repos:
       - id: check-yaml
       - id: debug-statements
       - id: end-of-file-fixer
+        exclude: '^.test_durations'
       - id: trailing-whitespace
       - id: mixed-line-ending
+        exclude: '^.test_durations'
   - repo: https://github.com/python-poetry/poetry
     rev: 1.3.2
     hooks:
