@@ -34,6 +34,7 @@ class ValueType(str, Enum):
     EWMA = "EWMA"
     PRICE = "Price(Close)"
     RTRN = "Return(Total)"
+    RELRTRN = "Relative return"
     ROLLBETA = "Beta"
     ROLLCORR = "Rolling correlation"
     ROLLCVAR = "Rolling CVaR"
@@ -44,6 +45,40 @@ class ValueType(str, Enum):
 
 
 class OpenTimeSeries(BaseModel):
+    """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
+
+    Parameters
+    ----------
+    timeseriesId : str
+        Database identifier of the timeseries
+    instrumentId: str
+        Database identifier of the instrument associated with the timeseries
+    currency : str
+        ISO 4217 currency code of the timeseries
+    dates : List[str]
+        Dates of the individual timeseries items
+        These dates will not be altered by methods
+    domestic : str
+        ISO 4217 currency code of the user's home currency
+    name : str
+        string identifier of the timeseries and/or instrument
+    isin : str
+        ISO 6166 identifier code of the associated instrument
+    label : str
+        Placeholder for a name of the timeseries
+    countries: list | str, default: "SE"
+        (List of) country code(s) according to ISO 3166-1 alpha-2
+    valuetype : ValueType
+        Identifies if the series is a series of values or returns
+    values : List[float]
+        The value or return values of the timeseries items
+        These values will not be altered by methods
+    local_ccy: bool
+        Boolean flag indicating if timeseries is in local currency
+    tsdf: pandas.DataFrame
+        Pandas object holding dates and values that can be altered via methods
+    """
+
     timeseriesId: constr(regex=r"^([0-9a-f]{24})?$")
     instrumentId: constr(regex=r"^([0-9a-f]{24})?$")
     currency: constr(regex=r"^[A-Z]{3}$")

@@ -2096,25 +2096,21 @@ class TestOpenFrame(TestCase):
 
         mframe.tsdf.iloc[0, 2] = 0.0
 
-        r = (
-            "Error in function value_ret due to an initial value being zero. "
-            "(                Asset_0      Asset_1      Asset_2      Asset_3      "
-            "Asset_4\n"
-            "           Price(Close) Price(Close) Price(Close) Price(Close) Price(Close)\n"
-            "2009-06-30     1.000000     1.000000     0.000000     1.000000     1.000000\n"
-            "2009-07-01     0.997755     0.998202     1.005330     1.006926     0.995778\n"
-            "2009-07-02     0.995099     0.996817     1.018729     1.017295     0.996617)"
-        )
-
         with self.assertRaises(Exception) as e_vr:
             _ = mframe.value_ret
 
-        self.assertEqual(e_vr.exception.args[0], r)
+        self.assertIn(
+            member="Error in function value_ret due to an initial value being zero",
+            container=str(e_vr.exception),
+        )
 
         with self.assertRaises(Exception) as e_vrf:
             _ = mframe.value_ret_func()
 
-        self.assertEqual(e_vrf.exception.args[0], r)
+        self.assertIn(
+            member="Error in function value_ret due to an initial value " "being zero",
+            container=str(e_vrf.exception),
+        )
 
     def test_openframe_value_ret_calendar_period(self: TTestOpenFrame):
         vrcseries = self.randomseries.from_deepcopy()

@@ -44,6 +44,26 @@ TOpenFrame = TypeVar("TOpenFrame", bound="OpenFrame")
 
 
 class OpenFrame(BaseModel):
+    """Object of the class OpenFrame. Subclass of the Pydantic BaseModel
+
+    Parameters
+    ----------
+    constituents: List[OpenTimeSeries]
+        List of objects of Class OpenTimeSeries
+    weights: List[float], optional
+        List of weights in float64 format.
+    sort: bool, default: True
+        argument in Pandas df.concat added to fix issue when upgrading
+        Python & Pandas
+    tsdf: pandas.DataFrame
+        Pandas object holding dates and values that can be altered via methods
+
+    Returns
+    -------
+    OpenFrame
+        Object of the class OpenFrame
+    """
+
     constituents: List[OpenTimeSeries]
     tsdf: None | DataFrame
     weights: None | List[float]
@@ -1854,7 +1874,7 @@ class OpenFrame(BaseModel):
         """
         if any(
             [
-                True if x == "Price(Close)" else False
+                True if x == ValueType.PRICE else False
                 for x in self.tsdf.columns.get_level_values(1).values
             ]
         ):
@@ -1862,7 +1882,7 @@ class OpenFrame(BaseModel):
 
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.apply(cumprod, axis="index") / self.tsdf.iloc[0]
-        new_labels = ["Price(Close)"] * self.item_count
+        new_labels = [ValueType.PRICE] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
@@ -2063,7 +2083,7 @@ class OpenFrame(BaseModel):
         data = self.tsdf.loc[earlier:later].copy()
 
         for rtn in cols:
-            data[rtn, "Returns"] = log(data.loc[:, (rtn, "Price(Close)")]).diff()
+            data[rtn, "Returns"] = log(data.loc[:, (rtn, ValueType.PRICE)]).diff()
             data[rtn, ValueType.EWMA] = zeros(how_many)
             data.loc[:, (rtn, ValueType.EWMA)].iloc[0] = data.loc[
                 :, (rtn, "Returns")
@@ -2430,11 +2450,11 @@ class OpenFrame(BaseModel):
             + self.tsdf.iloc[:, short_column].name[0]
         )
         if base_zero:
-            self.tsdf[rel_label, "Relative return"] = (
+            self.tsdf[rel_label, ValueType.RELRTRN] = (
                 self.tsdf.iloc[:, long_column] - self.tsdf.iloc[:, short_column]
             )
         else:
-            self.tsdf[rel_label, "Relative return"] = (
+            self.tsdf[rel_label, ValueType.RELRTRN] = (
                 1.0 + self.tsdf.iloc[:, long_column] - self.tsdf.iloc[:, short_column]
             )
 
@@ -2866,7 +2886,7 @@ class OpenFrame(BaseModel):
             df.iloc[0] = 0
         portfolio = df.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
-        portfolio.columns = [[name], ["Price(Close)"]]
+        portfolio.columns = [[name], [ValueType.PRICE]]
         return portfolio
 
     def rolling_info_ratio(
