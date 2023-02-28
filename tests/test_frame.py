@@ -69,7 +69,7 @@ class TestOpenFrame(TestCase):
         typehints = get_type_hints(OpenFrame)
         self.assertDictEqual(annotations, typehints)
 
-    def test_create_opentimeseries_from_frame(self: TTestOpenFrame):
+    def test_openframe_series_from_frame(self: TTestOpenFrame):
         frame_f = self.randomframe.from_deepcopy()
         frame_f.to_cumret()
         fseries = OpenTimeSeries.from_frame(frame_f, label="Asset_1")

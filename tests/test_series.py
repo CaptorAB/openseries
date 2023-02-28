@@ -17,6 +17,51 @@ from openseries.exceptions import FromFixedRateDatesInputError
 TTestOpenTimeSeries = TypeVar("TTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
 
+@pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
+def test_opentimeseries_valid_valuetype(valuetype):
+    assert isinstance(
+        OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=["2023-01-01"],
+            name="Asset",
+            valuetype=valuetype,
+            values=[1.0],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[1.0],
+                index=["2023-01-01"],
+                columns=[["Asset"], [valuetype]],
+                dtype="float64",
+            ),
+        ),
+        OpenTimeSeries,
+    )
+
+
+@pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])
+def test_opentimeseries_invalid_valuetype(valuetype):
+    with pytest.raises(PydanticValidationError):
+        # noinspection PyTypeChecker
+        OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=["2023-01-01"],
+            name="Asset",
+            valuetype=valuetype,
+            values=[1.0],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[1.0],
+                index=["2023-01-01"],
+                columns=[["Asset"], [valuetype]],
+                dtype="float64",
+            ),
+        )
+
+
 @pytest.mark.parametrize("currency", ["SE", True, "12", 1, None])
 def test_opentimeseries_invalid_currency(currency):
     with pytest.raises(PydanticValidationError):
@@ -735,7 +780,7 @@ class TestOpenTimeSeries(TestCase):
             f"{float(adjustedseries_returns.tsdf.iloc[-1]):.12f}",
         )
 
-    def test_timeseries_chain(self: TTestOpenTimeSeries):
+    def test_opentimeseries_timeseries_chain(self: TTestOpenTimeSeries):
         full_series = self.randomseries.from_deepcopy()
         full_values = [f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0].tolist()]
 

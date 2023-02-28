@@ -163,13 +163,10 @@ class OpenTimeSeries(BaseModel):
         if not isinstance(data.get("tsdf", None), DataFrame):
             df = DataFrame(
                 data=data["values"],
-                index=data["dates"],
+                index=[d.date() for d in DatetimeIndex(data["dates"])],
                 columns=[[data["name"]], [data["valuetype"]]],
                 dtype="float64",
             )
-            df.index = [d.date() for d in DatetimeIndex(df.index)]
-
-            df.sort_index(inplace=True)
             data.update({"tsdf": df})
 
         return data
@@ -219,20 +216,23 @@ class OpenTimeSeries(BaseModel):
                 label = df.columns.values[column_nmbr]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
 
-        output = cls.parse_opentimeseries(
-            data={
-                "timeseriesId": "",
-                "currency": baseccy,
-                "instrumentId": "",
-                "local_ccy": local_ccy,
-                "name": label,
-                "valuetype": valuetype,
-                "dates": dates,
-                "values": values,
-            }
+        return cls(
+            timeseriesId="",
+            instrumentId="",
+            currency=baseccy,
+            dates=dates,
+            name=label,
+            label=label,
+            valuetype=valuetype,
+            values=values,
+            local_ccy=local_ccy,
+            tsdf=DataFrame(
+                data=values,
+                index=[d.date() for d in DatetimeIndex(dates)],
+                columns=[[label], [valuetype]],
+                dtype="float64",
+            ),
         )
-
-        return cls.parse_obj(output)
 
     @classmethod
     def from_frame(
@@ -267,20 +267,23 @@ class OpenTimeSeries(BaseModel):
         df = frame.tsdf.loc[:, (label, valuetype)]
         dates = [d.strftime("%Y-%m-%d") for d in df.index]
 
-        output = cls.parse_opentimeseries(
-            data={
-                "timeseriesId": "",
-                "currency": baseccy,
-                "instrumentId": "",
-                "local_ccy": local_ccy,
-                "name": df.name[0],
-                "valuetype": df.name[1],
-                "dates": dates,
-                "values": df.values.tolist(),
-            }
+        return cls(
+            timeseriesId="",
+            instrumentId="",
+            currency=baseccy,
+            dates=dates,
+            name=df.name[0],
+            label=df.name[0],
+            valuetype=valuetype,
+            values=df.values.tolist(),
+            local_ccy=local_ccy,
+            tsdf=DataFrame(
+                data=df.values,
+                index=[d.date() for d in DatetimeIndex(df.index)],
+                columns=[[df.name[0]], [valuetype]],
+                dtype="float64",
+            ),
         )
-
-        return cls.parse_obj(output)
 
     @classmethod
     def from_fixed_rate(
@@ -335,20 +338,23 @@ class OpenTimeSeries(BaseModel):
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
         d_range = [d.strftime("%Y-%m-%d") for d in d_range]
 
-        output = cls.parse_opentimeseries(
-            data={
-                "timeseriesId": "",
-                "currency": baseccy,
-                "instrumentId": "",
-                "local_ccy": local_ccy,
-                "name": label,
-                "valuetype": valuetype,
-                "dates": d_range,
-                "values": arr,
-            }
+        return cls(
+            timeseriesId="",
+            instrumentId="",
+            currency=baseccy,
+            dates=d_range,
+            name=label,
+            label=label,
+            valuetype=valuetype,
+            values=arr,
+            local_ccy=local_ccy,
+            tsdf=DataFrame(
+                data=arr,
+                index=[d.date() for d in DatetimeIndex(d_range)],
+                columns=[[label], [valuetype]],
+                dtype="float64",
+            ),
         )
-
-        return cls.parse_obj(output)
 
     def from_deepcopy(self: TOpenTimeSeries) -> TOpenTimeSeries:
         """Creates a copy of an OpenTimeSeries object

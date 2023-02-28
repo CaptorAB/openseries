@@ -23,32 +23,45 @@ To install:
 pip install openseries
 ```
 
-Import statements
+An overview of an OpenTimeSeries object is shown in the below example. Most of the
+time an object will be constructed from the constructing class methods. The
+OpenTimeSeries and OpenFrame classes are both subclasses of
+the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/).
 
 ```
-from openseries.frame import OpenFrame
-from openseries.series import OpenTimeSeries, TimeSerie
+from pandas import DataFrame, DatetimeIndex
+from openseries.series import OpenTimeSeries, ValueType
 ```
 
-To construct an OpenTimeSeries object from raw data in a TypedDict:
-
 ```
-data = TimeSerie(
-    _id="",
+series = OpenTimeSeries(
+    timeseriesId="",
+    instrumentId="",
     currency="SEK",
     dates=["2020-09-03", "2020-09-04", "2020-09-07", "2020-09-08", "2020-09-09"],
-    instrumentId="",
-    local_ccy=True,
     name="Timeseries",
+    label="Timeseries",
+    valuetype=ValueType.PRICE,
     values=[114.9965, 114.8355, 114.8694, 115.1131, 114.8643],
-    valuetype="Price(Close)",
+    local_ccy=True,
+    tsdf=DataFrame(
+        data=[114.9965, 114.8355, 114.8694, 115.1131, 114.8643],
+        index=[
+            d.date()
+            for d in DatetimeIndex(
+                [
+                    "2020-09-03",
+                    "2020-09-04",
+                    "2020-09-07",
+                    "2020-09-08",
+                    "2020-09-09",
+                ]
+            )
+        ],
+        columns=[["Timeseries"], [ValueType.PRICE]],
+        dtype="float64",
+    ),
 )
-```
-
-Instantiate OpenTimeSeries object:
-
-```
-series = OpenTimeSeries(data)
 ```
 
 To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library
@@ -87,18 +100,20 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 ### Class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
 
-| Method            | Applies to                    | Description                                                                                        |
-|:------------------|:------------------------------|:---------------------------------------------------------------------------------------------------|
-| `from_df`         | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame column.                    |
-| `from_frame`      | `OpenTimeSeries`              | Class method to create a new OpenTimeSeries object from a series within an OpenFrame.              |
-| `from_fixed_rate` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
-| `from_deepcopy`   | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
+| Method                 | Applies to                    | Description                                                                                              |
+|:-----------------------|:------------------------------|:---------------------------------------------------------------------------------------------------------|
+| `from_df`              | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame column.                          |
+| `from_frame`           | `OpenTimeSeries`              | Class method to create a new OpenTimeSeries object from a series within an OpenFrame.                    |
+| `from_fixed_rate`      | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date.       |
+| `parse_obj`            | `OpenTimeSeries`              | A method inherited from the Pydantic BaseModel to construct an object from a `dict`.                     |
+| `parse_opentimeseries` | `OpenTimeSeries`              | A helper method that adds the required DataFrame to a dict before constructing an OpenTimeSeries object. |
+| `from_deepcopy`        | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                              |
 
 ### Non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
 | Property       | type            | Applies to       | Description                                                                                                                                  |
 |:---------------|:----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
-| `_id`          | `str`           | `OpenTimeSeries` | Placeholder for database identifier for the timeseries. Can be left as empty string.                                                         |
+| `timeseriesId` | `str`           | `OpenTimeSeries` | Placeholder for database identifier for the timeseries. Can be left as empty string.                                                         |
 | `instrumentId` | `str`           | `OpenTimeSeries` | Placeholder for database identifier for the instrument associated with the timeseries. Can be left as empty string.                          |
 | `dates`        | `List[str]`     | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
 | `values`       | `List[float]`   | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
@@ -109,7 +124,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `isin`         | `str`           | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
 | `label`        | `str`           | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
 | `countries`    | `list` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used to generate business days.                                                    |
-| `valuetype`    | `str`           | `OpenTimeSeries` | Field identifies a series of values, "Price(Close)", or a series of returns, "Return(Total)".                                                |
+| `valuetype`    | `ValueType`     | `OpenTimeSeries` | Field identifies the type of values in the series. ValueType is an Enum.                                                                     |
 
 ### Non-numeric or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
@@ -140,15 +155,19 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 ### Methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Method                   | Applies to       | Description                                                                                                                                    |
-|:-------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
-| `setup_class`            | `OpenTimeSeries` | Class method that defines the `domestic` home currency and the `countries` home countries attributes.                                          |
-| `to_json`                | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                                                                                 |
-| `pandas_df`              | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.                                                                    |
-| `set_new_label`          | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                                                                       |
-| `running_adjustment`     | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
-| `ewma_vol_func`          | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
-| `from_1d_rate_to_cumret` | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
+| Method                           | Applies to       | Description                                                                                                                                    |
+|:---------------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| `setup_class`                    | `OpenTimeSeries` | Class method that defines the `domestic` home currency and the `countries` home countries attributes.                                          |
+| `to_json`                        | `OpenTimeSeries` | Method to export the OpenTimeSeries `__dict__` to a json file.                                                                                 |
+| `pandas_df`                      | `OpenTimeSeries` | Method to create the `tsdf` pandas.DataFrame from the `dates` and `values`.                                                                    |
+| `set_new_label`                  | `OpenTimeSeries` | Method to change the pandas.DataFrame column MultiIndex.                                                                                       |
+| `running_adjustment`             | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
+| `ewma_vol_func`                  | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
+| `from_1d_rate_to_cumret`         | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
+| `dates_not_empty`                | `OpenTimeSeries` | Pydantic root_validator method to validate that dates are not empty.                                                                           |
+| `values_not_empty`               | `OpenTimeSeries` | Pydantic root_validator method to validate that values are not emptys.                                                                         |
+| `check_dates_values_same_length` | `OpenTimeSeries` | Pydantic root_validator method to validate that date and value arrays are the same length.                                                     |
+| `check_values_match`             | `OpenTimeSeries` | Pydantic root_validator method to validate that the value array matches the values in the DataFrame when object is constructed.                |
 
 ### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
