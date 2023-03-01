@@ -1,5 +1,7 @@
 import datetime as dt
 from json import load, loads
+from numpy import nan as npnan
+from numpy import float64 as npfloat64
 from os import path, remove
 from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pandas.tseries.offsets import CustomBusinessDay
@@ -10,7 +12,7 @@ from typing import get_type_hints, TypeVar
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
-from openseries.series import OpenTimeSeries, timeseries_chain, ValueType
+from openseries.series import compare_lists, OpenTimeSeries, timeseries_chain, ValueType
 from openseries.sim_price import ReturnSimulation
 from openseries.exceptions import FromFixedRateDatesInputError
 
@@ -18,7 +20,7 @@ TTestOpenTimeSeries = TypeVar("TTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
-def test_opentimeseries_valid_valuetype(valuetype):
+def test_opentimeseries_valid_valuetype(valuetype: ValueType):
     assert isinstance(
         OpenTimeSeries(
             timeseriesId="",
@@ -41,7 +43,7 @@ def test_opentimeseries_valid_valuetype(valuetype):
 
 
 @pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])
-def test_opentimeseries_invalid_valuetype(valuetype):
+def test_opentimeseries_invalid_valuetype(valuetype: ValueType):
     with pytest.raises(PydanticValidationError):
         # noinspection PyTypeChecker
         OpenTimeSeries(
@@ -63,7 +65,7 @@ def test_opentimeseries_invalid_valuetype(valuetype):
 
 
 @pytest.mark.parametrize("currency", ["SE", True, "12", 1, None])
-def test_opentimeseries_invalid_currency(currency):
+def test_opentimeseries_invalid_currency(currency: str):
     with pytest.raises(PydanticValidationError):
         OpenTimeSeries(
             timeseriesId="",
@@ -93,7 +95,7 @@ def test_opentimeseries_invalid_currency(currency):
         (["2023-01-bb", "2023-01-02"], [1.0, 1.1]),
     ],
 )
-def test_opentimeseries_invalid_dates(dates, values):
+def test_opentimeseries_invalid_dates(dates: list, values: list):
     with pytest.raises(PydanticValidationError):
         OpenTimeSeries(
             timeseriesId="",
@@ -123,7 +125,7 @@ def test_opentimeseries_invalid_dates(dates, values):
         (["2023-01-01", "2023-01-02"], [1.0, "bb"]),
     ],
 )
-def test_opentimeseries_invalid_values(dates, values):
+def test_opentimeseries_invalid_values(dates: list, values: list):
     with pytest.raises(PydanticValidationError):
         OpenTimeSeries(
             timeseriesId="",
@@ -141,6 +143,30 @@ def test_opentimeseries_invalid_values(dates, values):
                 dtype="float64",
             ),
         )
+
+
+@pytest.mark.parametrize(
+    "a,b,result",
+    [
+        ([1], [1], True),
+        ([1, 0], [1, 1], False),
+        ([1.0], [1.0], True),
+        ([1.0, 0.0], [1.0, 1.0], False),
+        (["a"], ["a"], True),
+        (["a", "b"], ["a", "a"], False),
+        ([1, npnan], [1, float("nan")], True),
+        ([1, npnan], [1, 1.0], False),
+        ([1, npnan], [1, npfloat64(1.0)], False),
+        ([1, 1.0], [1, npfloat64(1.0)], True),
+        ([1, npnan], [1, npnan], True),
+        ([1, float("nan")], [1, float("nan")], True),
+        ([1, float("nan")], [1, None], False),
+        ([1, npnan], [1, None], False),
+        ([1, None], [1, None], True),
+    ],
+)
+def test_opentimeseries_compare_lists(a: list, b: list, result: bool):
+    assert compare_lists(a=a, b=b) == result
 
 
 class TestOpenTimeSeries(TestCase):
@@ -358,7 +384,9 @@ class TestOpenTimeSeries(TestCase):
         unmatched_data = dict(**data, values=unmatched_values)
 
         matched_obj = OpenTimeSeries.parse_obj(matched_data)
-        self.assertListEqual(list(matched_obj.tsdf.values), matched_obj.values)
+        self.assertListEqual(
+            list(matched_obj.tsdf.iloc[:, 0].values), matched_obj.values
+        )
         self.assertTrue(isinstance(matched_obj, OpenTimeSeries))
 
         with self.assertRaises(PydanticValidationError) as e_pdtype:
@@ -369,6 +397,34 @@ class TestOpenTimeSeries(TestCase):
             member="Values and tsdf.values do not match",
             container=str(e_pdtype.exception),
         )
+        nan_values = [1.0, 1.01, float("nan"), 1.015, 1.003]
+        nandf = DataFrame(
+            data=nan_values,
+            index=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            columns=[["Asset_0"], [ValueType.PRICE]],
+            dtype="float64",
+        )
+        data.update({"tsdf": nandf})
+        floatnan_data = dict(**data, values=nan_values)
+
+        nan_obj = OpenTimeSeries.parse_obj(floatnan_data)
+        self.assertTrue(
+            compare_lists(list(nan_obj.tsdf.iloc[:, 0].values), nan_obj.values)
+        )
+        self.assertTrue(isinstance(nan_obj, OpenTimeSeries))
+
+        # This test is to remind that float('nan') and numpy.float64('nan)
+        # differences have been silenced in how the values to tsdf.values
+        # validation is performed
+        with self.assertRaises(AssertionError) as e_nan:
+            self.assertListEqual(list(nan_obj.tsdf.iloc[:, 0].values), nan_obj.values)
+        self.assertIsInstance(e_nan.exception, AssertionError)
 
     def test_opentimeseries_create_from_pandas_df(self: TTestOpenTimeSeries):
         se = Series(

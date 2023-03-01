@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from enum import Enum
 from json import dump
 from math import ceil
-from numpy import array, cumprod, insert, log, sqrt, square, zeros
+from numpy import array, cumprod, insert, isnan, log, sqrt, square, zeros
 from os import path
 from pandas import concat, DataFrame, DatetimeIndex, date_range, MultiIndex, Series
 from pandas.tseries.offsets import CustomBusinessDay
@@ -28,6 +28,23 @@ from openseries.risk import (
 )
 
 TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound="OpenTimeSeries")
+
+
+def compare_lists(a: list, b: list) -> bool:
+    assert len(a) == len(b), "lists must be equal in length"
+    for i in range(len(a)):
+        if all([a[i] is None, b[i] is None]):
+            continue
+        elif any([a[i] is None, b[i] is None]):
+            return False
+        elif any([isinstance(a[i], str), isinstance(b[i], str)]):
+            if a[i] != b[i]:
+                return False
+        elif isnan(a[i]) and isnan(b[i]):
+            continue
+        elif a[i] != b[i]:
+            return False
+    return True
 
 
 class ValueType(str, Enum):
@@ -135,7 +152,7 @@ class OpenTimeSeries(BaseModel):
         if (
             vals is not None
             and df is not None
-            and vals != df.iloc[:, 0].values.tolist()
+            and not compare_lists(a=vals, b=df.iloc[:, 0].values.tolist())
         ):
             raise ValueError("Values and tsdf.values do not match")
         return values
