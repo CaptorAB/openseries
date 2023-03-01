@@ -30,6 +30,19 @@ from openseries.risk import (
 TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound="OpenTimeSeries")
 
 
+def check_if_none(item) -> bool:
+    try:
+        if isnan(item):
+            return True
+    except TypeError:
+        if item is None:
+            return True
+        elif len(str(item)) == 0:
+            return True
+        else:
+            return False
+
+
 def compare_lists(a: list, b: list) -> bool:
     assert len(a) == len(b), "lists must be equal in length"
     for i in range(len(a)):
@@ -262,8 +275,20 @@ class OpenTimeSeries(BaseModel):
         else:
             values = df.iloc[:, column_nmbr].tolist()
             if isinstance(df.columns, MultiIndex):
-                label = df.columns.get_level_values(0).values[column_nmbr]
-                valuetype = df.columns.get_level_values(1).values[column_nmbr]
+                if check_if_none(df.columns.get_level_values(0).values[column_nmbr]):
+                    print(
+                        "checked item",
+                        df.columns.get_level_values(0).values[column_nmbr],
+                    )
+                    label = "Series"
+                    print(f"label missing. Adding '{label}' as label")
+                else:
+                    label = df.columns.get_level_values(0).values[column_nmbr]
+                if check_if_none(df.columns.get_level_values(1).values[column_nmbr]):
+                    valuetype = ValueType.PRICE
+                    print(f"valuetype missing. Adding '{valuetype.value}' as valuetype")
+                else:
+                    valuetype = df.columns.get_level_values(1).values[column_nmbr]
             else:
                 label = df.columns.values[column_nmbr]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]

@@ -1,4 +1,5 @@
 import datetime as dt
+from io import StringIO
 from json import load, loads
 from numpy import nan as npnan
 from numpy import float64 as npfloat64
@@ -8,11 +9,18 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pydantic.error_wrappers import ValidationError as PydanticValidationError
 import pytest
 from stdnum.exceptions import InvalidChecksum
+import sys
 from typing import get_type_hints, TypeVar
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
-from openseries.series import compare_lists, OpenTimeSeries, timeseries_chain, ValueType
+from openseries.series import (
+    compare_lists,
+    OpenTimeSeries,
+    timeseries_chain,
+    ValueType,
+    check_if_none,
+)
 from openseries.sim_price import ReturnSimulation
 from openseries.exceptions import FromFixedRateDatesInputError
 
@@ -451,7 +459,7 @@ class TestOpenTimeSeries(TestCase):
             name=("Asset_0", ValueType.PRICE),
             dtype="float64",
         )
-        df = DataFrame(
+        df1 = DataFrame(
             data=[
                 [1.0, 1.0],
                 [1.01, 0.98],
@@ -469,15 +477,73 @@ class TestOpenTimeSeries(TestCase):
             columns=["Asset_0", "Asset_1"],
             dtype="float64",
         )
+        df2 = DataFrame(
+            data=[1.0, 1.01, 0.99, 1.015, 1.003],
+            index=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            columns=[["Asset_0"], [ValueType.PRICE]],
+            dtype="float64",
+        )
+        df3 = DataFrame(
+            data=[1.0, 1.01, 0.99, 1.015, 1.003],
+            index=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            columns=[[""], [ValueType.PRICE]],
+            dtype="float64",
+        )
+        df4 = DataFrame(
+            data=[1.0, 1.01, 0.99, 1.015, 1.003],
+            index=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            columns=[["Asset_0"], [None]],
+            dtype="float64",
+        )
 
         seseries = OpenTimeSeries.from_df(df=se)
         senseries = OpenTimeSeries.from_df(df=sen)
-        dfseries = OpenTimeSeries.from_df(df=df, column_nmbr=1)
+        df1series = OpenTimeSeries.from_df(df=df1, column_nmbr=1)
+        df2series = OpenTimeSeries.from_df(df=df2, column_nmbr=0)
 
         self.assertTrue(isinstance(seseries, OpenTimeSeries))
         self.assertTrue(isinstance(senseries, OpenTimeSeries))
-        self.assertTrue(isinstance(dfseries, OpenTimeSeries))
         self.assertEqual(seseries.label, senseries.label)
+
+        self.assertTrue(isinstance(df1series, OpenTimeSeries))
+        self.assertTrue(isinstance(df2series, OpenTimeSeries))
+        label_message = "label missing. Adding 'Series' as label"
+        type_message = "valuetype missing. Adding 'Price(Close)' as valuetype"
+        old_stdout = sys.stdout
+        new_stdout = StringIO()
+        sys.stdout = new_stdout
+
+        df3series = OpenTimeSeries.from_df(df=df3, column_nmbr=0)
+        df3_output = new_stdout.getvalue()
+        df4series = OpenTimeSeries.from_df(df=df4, column_nmbr=0)
+        df4_output = new_stdout.getvalue()
+
+        sys.stdout = old_stdout
+        self.assertIn(member=label_message, container=df3_output)
+        self.assertIn(member=type_message, container=df4_output)
+
+        self.assertTrue(isinstance(df3series, OpenTimeSeries))
+        self.assertTrue(isinstance(df4series, OpenTimeSeries))
+
+        self.assertTrue(check_if_none(None))
 
     def test_opentimeseries_save_to_json(self: TTestOpenTimeSeries):
         seriesfile = path.join(path.dirname(path.abspath(__file__)), "seriessaved.json")

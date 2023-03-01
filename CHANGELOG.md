@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.10.9] - 2023-03-01
+## Version [0.11.0] - 2023-03-01
 
 Silenced float('nan') and numpy.float64('nan) differences when validating values
 input against tsdf.values.
