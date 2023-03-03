@@ -7,7 +7,7 @@ width="81" height="100" align="left" float="right"/><br/>
 # OpenSeries
 
 [![PyPI version](https://img.shields.io/pypi/v/openseries.svg)](https://pypi.org/project/openseries/)
-[![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://docs.python.org/release/3.10.4/)
+[![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://docs.python.org/3.10/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/TestsWithSplit.yml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
@@ -267,7 +267,7 @@ properties for subset periods._
 ## Development instructions
 
 These instructions assume that you
-have [Python 3.10.4](https://docs.python.org/release/3.10.4/) and
+have [Python 3.10](https://docs.python.org/3.10/) and
 [Poetry](https://python-poetry.org/) installed on your machine and that you are OK
 to install this project in a virtual environment. If not, feel free to do it your
 own way.
