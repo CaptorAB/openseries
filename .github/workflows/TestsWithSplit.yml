@@ -1,6 +1,7 @@
 name: TestsWithSplit
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "*" # matches every branch that doesn't contain a '/'

@@ -24,16 +24,12 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
 
-    - name: Delete error-causing bash
-      shell: bash
-      if: ${{ inputs.os == 'windows-latest' }}
-      run: rm.exe "C:/WINDOWS/system32/bash.EXE"
-
-    - name: Set path to bash for example runner
-      shell: bash
-      if: ${{ inputs.os == 'windows-latest' }}
+    - if: ${{ runner.os == 'windows-latest' }}
+      name: Use GNU tar
+      shell: cmd
       run: |
-        echo "SHELL_EXECUTABLE=C:\Program Files\Git\bin\bash.exe" >> $GITHUB_ENV
+        echo "Adding GNU tar to PATH"
+        echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
 
     - name: Install and configure Poetry
       shell: bash
