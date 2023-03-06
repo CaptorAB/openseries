@@ -33,5 +33,5 @@ jobs:
       - name: Report coverage
         shell: bash
         run: |
-          poetry run coverage combine coverage*/.coverage*
+          poetry run coverage combine coverage*/.coverage${{ matrix.os }}${{ matrix.python-version }}*
           poetry run coverage report
