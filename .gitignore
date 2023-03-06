@@ -41,14 +41,24 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-/Pipfile
-/Pipfile.lock
 /venvten/
 venvten/
 
-# My own additions
+# Poetry / Dependency Management
+poetry.lock
+requirements.txt
+/Pipfile
+/Pipfile.lock
+
+# Pycharm
 .idea/*
+
+# Mac OSX
+.DS_Store
+
+# Visual Studio Code
 .vscode/*
+
+# My own additions
 /.inspectionProfiles/
 .xml
-.DS_Store
