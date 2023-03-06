@@ -20,6 +20,7 @@ runs:
   steps:
     - name: Set up Python
       uses: actions/setup-python@v4
+      id: py
       with:
         python-version: ${{ inputs.python-version }}
 
@@ -34,6 +35,12 @@ runs:
       run: |
         echo "SHELL_EXECUTABLE=C:\Program Files\Git\bin\bash.exe" >> $GITHUB_ENV
 
+    - name: Install and configure Poetry
+      shell: bash
+      run: |
+        ${{ steps.py.outputs.python-path }} -m pip install poetry==1.3.2
+        ${{ steps.py.outputs.python-path }} -m poetry config virtualenvs.in-project true
+
     - name: Get current date
       shell: bash
       id: date
@@ -46,27 +53,15 @@ runs:
         CACHE_VERSION: ${{inputs.cache_version}}
 
     - name: Load cached venv
-      id: cached-virtualenv
+      id: cached-poetry-dependencies
       uses: actions/cache@v3
       with:
-        path: .venv
+        path: |
+          .venv
+          poetry-lock
         key: venv-${{ runner.os }}-python-${{ inputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ steps.date.outputs.date }}-${{ hashFiles('cache_version') }}
-
-    - name: Set virtualenv activation script env variable (windows)
-      shell: bash
-      run: echo "VENV=.venv/scripts/activate" >> "$GITHUB_ENV"
-      if: runner.os == 'Windows'
-
-    - name: Set virtualenv activation script env variable (unix)
-      shell: bash
-      run: echo "VENV=.venv/bin/activate" >> "$GITHUB_ENV"
-      if: runner.os != 'Windows'
 
     - name: Install Project
       shell: bash
-      if: steps.cached-virtualenv.outputs.cache-hit != 'true'
-      run: |
-        python -m venv .venv
-        source $VENV
-        python -m pip install --upgrade pip
-        python -m pip install poetry==1.3.2
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --with test

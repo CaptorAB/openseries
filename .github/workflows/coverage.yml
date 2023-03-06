@@ -1,4 +1,4 @@
-name: Download and report Coverage
+name: Download and report coverage
 
 on:
   workflow_dispatch:
@@ -27,15 +27,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           os: ${{ matrix.os }}
 
-      - name: Install Dependencies
-        run: |
-          source $VENV
-          poetry install --only coverage
-
       - name: Download all artifacts
         uses: actions/download-artifact@v3
 
       - name: Report coverage
+        shell: bash
         run: |
           poetry run coverage combine coverage*/.coverage*
           poetry run coverage report
