@@ -75,6 +75,7 @@ runs:
     - name: Install and configure Poetry
       shell: bash
       run: |
+        ${{ steps.py.outputs.python-path }} -m ensurepip --upgrade
         ${{ steps.py.outputs.python-path }} -m pip install poetry==1.3.2
         ${{ steps.py.outputs.python-path }} -m poetry config virtualenvs.in-project true
 
