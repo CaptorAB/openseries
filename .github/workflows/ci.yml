@@ -1,0 +1,24 @@
+name: New version of test workflow
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+concurrency: # New commit on branch cancels running workflows of the same branch
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  setup-python-environment:
+    uses: ./.github/workflows/setup-python-environment.yml
+    secrets: inherit
+
+  unit-test:
+    needs: setup-python-environment
+    uses: ./.github/workflows/unit-test.yml
+    secrets: inherit
+
+  coverage:
+    needs: unit-test
+    uses: ./.github/workflows/coverage.yml
+    secrets: inherit

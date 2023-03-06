@@ -1,0 +1,35 @@
+name: Unit Test & Upload Coverage
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  unittest:
+    name: unittest
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
+      - name: Setup environment
+        uses: ./.github/actions/setup_environment
+        with:
+          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
+          python-version: ${{ matrix.python-version }}
+          os: ${{ matrix.os }}
+
+      - name: Install Dependencies
+        run: |
+          source $VENV
+          poetry install --with test
+
+      - name: Tests with Pytest
+        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage${{ matrix.group }}
+          path: .coverage

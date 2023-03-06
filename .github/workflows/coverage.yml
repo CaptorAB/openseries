@@ -1,0 +1,34 @@
+name: Download and report Coverage
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  coverage:
+    name: coverage
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
+      - name: Setup environment
+        uses: ./.github/actions/setup_environment
+        with:
+          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
+          python-version: ${{ matrix.python-version }}
+          os: ${{ matrix.os }}
+
+      - name: Install Dependencies
+        run: |
+          source $VENV
+          poetry install --only coverage
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Report coverage
+        run: |
+          poetry run coverage combine coverage*/.coverage*
+          poetry run coverage report

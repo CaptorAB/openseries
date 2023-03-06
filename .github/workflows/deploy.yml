@@ -24,13 +24,15 @@ jobs:
         id: cached-poetry-dependencies
         uses: actions/cache@v3
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          path: |
+            .venv
+            poetry.lock
+          key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}
 
       - name: Install Dependencies
-        run: |
-          poetry install --with test
+        shell: bash
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --with test
 
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
