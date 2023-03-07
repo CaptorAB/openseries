@@ -1,4 +1,4 @@
-name: Run tests
+name: Report coverage
 
 on:
   workflow_dispatch:
@@ -11,7 +11,6 @@ jobs:
 
     strategy:
       matrix:
-        group: [ 1, 2, 3, 4, 5 ]
         os: [ ubuntu-latest ]
         python-version: [ '3.10' ]
       fail-fast: false
@@ -27,12 +26,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           os: ${{ matrix.os }}
 
-      - name: Tests with Pytest
-        shell: bash
-        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
 
-      - name: Upload coverage
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage${{ matrix.group }}
-          path: .coverage
+      - name: Report coverage
+        shell: bash
+        run: |
+          poetry run coverage combine coverage*/.coverage*
+          poetry run coverage report

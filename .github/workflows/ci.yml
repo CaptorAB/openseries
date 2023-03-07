@@ -9,11 +9,11 @@ concurrency: # New commit on branch cancels running workflows of the same branch
   cancel-in-progress: true
 
 jobs:
-  setup-python-environment:
-    uses: ./.github/workflows/setup-python-environment.yml
+  unit-test:
+    uses: ./.github/workflows/unit-test.yml
     secrets: inherit
 
-  unit-test:
-    needs: setup-python-environment
-    uses: ./.github/workflows/unit-test.yml
+  coverage:
+    needs: unit-test
+    uses: ./.github/workflows/coverage.yml
     secrets: inherit
