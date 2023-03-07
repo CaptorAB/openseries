@@ -13,7 +13,6 @@ jobs:
 
     strategy:
       matrix:
-        group: [ 1, 2, 3, 4, 5 ]
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         python-version: [ '3.10' ]
       fail-fast: false

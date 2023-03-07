@@ -17,8 +17,3 @@ jobs:
     needs: setup-python-environment
     uses: ./.github/workflows/unit-test.yml
     secrets: inherit
-
-  coverage:
-    needs: unit-test
-    uses: ./.github/workflows/coverage.yml
-    secrets: inherit
