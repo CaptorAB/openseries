@@ -16,16 +16,6 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: Check out GitHub repository ${{ github.repository }}
-        uses: actions/checkout@v3
-
-      - name: Setup environment
-        uses: ./.github/actions/setup_environment
-        with:
-          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
-          python-version: ${{ matrix.python-version }}
-          os: ${{ matrix.os }}
-
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
