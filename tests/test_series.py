@@ -228,7 +228,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_dom.exception),
         )
         with self.assertRaises(ValueError) as e_domestic:
-            # noinspection PyTypeChecker
+            # noinspection PyTypeChecker,PydanticTypeChecker
             OpenTimeSeries.setup_class(domestic_ccy=12)
         self.assertIn(
             member="domestic currency must be a code according to ISO 4217",
@@ -259,7 +259,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_countries.exception),
         )
         with self.assertRaises(ValueError) as e_none:
-            # noinspection PyTypeChecker
+            # noinspection PyTypeChecker,PydanticTypeChecker
             OpenTimeSeries.setup_class(countries=None)
         self.assertIn(
             member="according to ISO 3166-1 alpha-2",
@@ -1638,7 +1638,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
-            # noinspection PyTypeChecker
+            # noinspection PyTypeChecker,PydanticTypeChecker
             _ = nanseries.value_nan_handle(method="other")
 
         self.assertEqual(
@@ -1681,7 +1681,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
-            # noinspection PyTypeChecker
+            # noinspection PyTypeChecker,PydanticTypeChecker
             _ = nanseries.return_nan_handle(method="other")
 
         self.assertEqual(

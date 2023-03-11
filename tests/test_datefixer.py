@@ -34,7 +34,7 @@ class TestDateFixer(TestCase):
         digit: int = 3
 
         with self.assertRaises(Exception) as e_type:
-            # noinspection PyTypeChecker
+            # noinspection PyTypeChecker,PydanticTypeChecker
             _ = date_fix(digit)
 
         self.assertIsInstance(e_type.exception, Exception)
