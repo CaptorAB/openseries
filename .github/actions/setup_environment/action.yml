@@ -5,6 +5,10 @@ inputs:
   cache_version:
     description: 'Value gets appended to the cache key and will invalidate the cache if it changes'
     required: true
+  python_version:
+    description: 'Python version from matrix or file'
+    type: string
+    required: true
   poetry_group:
     description: 'Controlling which poetry group to install from'
     type: string
@@ -17,7 +21,7 @@ runs:
       uses: actions/setup-python@v4
       id: py
       with:
-        python-version-file: '.python-version'
+        python-version: ${{ inputs.python_version }}
 
     - name: Use GNU tar
       shell: cmd
@@ -25,11 +29,6 @@ runs:
         echo "Adding GNU tar to PATH"
         echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
       if: ${{ runner.os == 'windows-latest' }}
-
-    - name: Read file contents
-      shell: bash
-      run: |
-        $(cat "$GITHUB_WORKSPACE/.python-version") >> py_version
 
     - name: Write cache version
       shell: bash
@@ -49,7 +48,6 @@ runs:
     - name: Install and configure Poetry
       shell: bash
       run: |
-        echo py_version
         python -m pip install poetry==1.3.2
         python -m poetry config virtualenvs.in-project true
 
