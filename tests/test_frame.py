@@ -2591,6 +2591,9 @@ class TestOpenFrame(TestCase):
             ],
         )
 
+    def test_openframe_ewma_risk_set_columns(self: TTestOpenFrame):
+        eframe = self.randomframe.from_deepcopy()
+        eframe.to_cumret()
         fdf = eframe.ewma_risk(
             first_column=3, second_column=4, periods_in_a_year_fixed=251
         )
