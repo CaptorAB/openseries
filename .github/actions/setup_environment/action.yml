@@ -11,7 +11,7 @@ inputs:
     required: true
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -25,6 +25,12 @@ runs:
         echo "Adding GNU tar to PATH"
         echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
       if: ${{ runner.os == 'windows-latest' }}
+
+    - name: Read file contents
+      shell: bash
+      run: |
+        my_file_contents=$(cat "$GITHUB_WORKSPACE/.python-version")
+        echo "$my_file_contents"
 
     - name: Write cache version
       shell: bash
