@@ -8,6 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: [ '3.10' ]
         os: [ macos-latest, windows-latest, ubuntu-latest ]
         include:
           - os: ubuntu-latest
@@ -21,10 +22,11 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Setup environment
+      - name: Setup environment with Python ${{ matrix.python-version }}
         uses: ./.github/actions/setup_environment
         with:
           cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
+          python_version: ${{ matrix.python-version }}
           poetry_group: --with test
 
       - name: Tests with Pytest
