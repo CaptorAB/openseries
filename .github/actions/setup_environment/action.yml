@@ -1,5 +1,5 @@
-name: "Install Environment and Dependencies"
-description: "Install environment, loads cached venv and install dependencies"
+name: 'Install Environment and Dependencies'
+description: 'Install environment, loads cached venv and install dependencies'
 
 inputs:
   cache_version:
@@ -15,7 +15,7 @@ inputs:
     required: true
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Set up Python
       uses: actions/setup-python@v4
