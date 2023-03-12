@@ -22,14 +22,16 @@ jobs:
 
       - name: Read Python version from file '.python-version'
         shell: bash
+        id: pyver
         run: |
           py_version=$(cat "$GITHUB_WORKSPACE/.python-version")
+          echo "::set-output name=py_version::$py_version"
 
-      - name: Setup environment with Python ${{ py_version }}
+      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
         uses: ./.github/actions/setup_environment
         with:
           cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
-          python_version: ${{ py_version }}
+          python_version: ${{ steps.pyver.outputs.py_version }}
           poetry_group: --with test
 
       - name: Tests with Pytest
