@@ -24,8 +24,7 @@ jobs:
         uses: ./.github/actions/setup_environment
         with:
           cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
-          python-version: ${{ matrix.python-version }}
-          os: ${{ matrix.os }}
+          poetry_group: --with test
 
       - name: Tests with Pytest
         shell: bash

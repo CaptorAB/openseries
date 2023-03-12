@@ -1,17 +1,12 @@
-name: "Install Environment"
-description: "Install environment, loads cached venv if applicable, and performs
-miscellaneous other operations"
+name: "Install Environment and Dependencies"
+description: "Install environment, loads cached venv and install dependencies"
 
 inputs:
   cache_version:
-    description: 'Value gets appended to the cache key and will therefore invalidate the cache if it changes'
+    description: 'Value gets appended to the cache key and will invalidate the cache if it changes'
     required: true
-  python-version:
-    description: 'Python version'
-    type: string
-    required: true
-  os:
-    description: 'OS'
+  poetry_group:
+    description: 'Controlling which poetry group to install'
     type: string
     required: true
 
@@ -22,7 +17,7 @@ runs:
       uses: actions/setup-python@v4
       id: py
       with:
-        python-version: ${{ inputs.python-version }}
+        python-version-file: '.python-version'
 
     - name: Use GNU tar
       shell: cmd
@@ -35,7 +30,7 @@ runs:
       shell: bash
       run: echo $CACHE_VERSION >> cache_version
       env:
-        CACHE_VERSION: ${{inputs.cache_version}}
+        CACHE_VERSION: ${{ inputs.cache_version }}
 
     - name: Load cached venv
       id: cached-poetry-dependencies
@@ -44,7 +39,7 @@ runs:
         path: |
           .venv
           poetry-lock
-        key: venv-${{ runner.os }}-python-${{ inputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('cache_version') }}
+        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('cache_version') }}
 
     - name: Install and configure Poetry
       shell: bash
@@ -55,4 +50,4 @@ runs:
     - name: Install Project
       shell: bash
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --with test
+      run: poetry install ${{ inputs.poetry_group }}
