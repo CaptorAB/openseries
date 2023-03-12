@@ -6,7 +6,7 @@ inputs:
     description: 'Value gets appended to the cache key and will invalidate the cache if it changes'
     required: true
   poetry_group:
-    description: 'Controlling which poetry group to install'
+    description: 'Controlling which poetry group to install from'
     type: string
     required: true
 
