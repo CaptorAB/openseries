@@ -13,8 +13,8 @@ jobs:
         shell: bash
         id: pyver
         run: |
-          py_version=$(cat "$GITHUB_WORKSPACE/.python-version")
-          echo "{py_version}={$py_version}" >> $GITHUB_OUTPUT
+          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
+          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
 
       - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
         uses: ./.github/actions/setup_environment
