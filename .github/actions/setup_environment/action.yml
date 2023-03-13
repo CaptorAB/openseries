@@ -22,7 +22,21 @@ runs:
       id: py
       with:
         python-version: ${{ inputs.python_version }}
-        cache: 'poetry'
+
+    - name: Write cache version
+      shell: bash
+      run: echo $CACHE_VERSION >> cache_version
+      env:
+        CACHE_VERSION: ${{ inputs.cache_version }}
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          .venv
+          poetry-lock
+        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('cache_version') }}
 
     - name: Install and configure Poetry
       shell: bash
@@ -34,5 +48,5 @@ runs:
 
     - name: Install Dependencies. From cache if it matches
       shell: bash
-      if: steps.py.cache-hit != 'true'
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install ${{ inputs.poetry_group }}

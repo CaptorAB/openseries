@@ -20,31 +20,19 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Install Poetry
+      - name: Read Python version from file '.python-version'
         shell: bash
+        id: pyver
         run: |
-          curl -O -sSL https://install.python-poetry.org/install-poetry.py
-          python install-poetry.py -y --version 1.3.2
-          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          rm install-poetry.py
+          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
+          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
 
-      - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
-        id: py
+      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
+        uses: ./.github/actions/setup_environment
         with:
-          python-version-file: '.python-version'
-          cache: 'poetry'
-          cache-dependency-path: '**/pyproject.toml'
-
-      - name: Install Dependencies on Python ${{ steps.py.outputs.python-version }}. From cache if it matches
-        shell: bash
-        if: steps.py.cache-hit != 'true'
-        run: |
-          poetry env use ${{ steps.py.outputs.python-version }}
-          poetry install --with test
+          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
+          python_version: ${{ steps.pyver.outputs.py_version }}
+          poetry_group: --with test
 
       - name: Tests with Pytest
         shell: bash
@@ -64,31 +52,19 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Install Poetry
+      - name: Read Python version from file '.python-version'
         shell: bash
+        id: pyver
         run: |
-          curl -O -sSL https://install.python-poetry.org/install-poetry.py
-          python install-poetry.py -y --version 1.3.2
-          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          rm install-poetry.py
+          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
+          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
 
-      - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
-        id: pycov
+      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
+        uses: ./.github/actions/setup_environment
         with:
-          python-version-file: '.python-version'
-          cache: 'poetry'
-          cache-dependency-path: '**/pyproject.toml'
-
-      - name: Install Coverage on Python ${{ steps.pycov.outputs.python-version }}. From cache if it matches
-        shell: bash
-        if: steps.pycov.cache-hit != 'true'
-        run: |
-          poetry env use ${{ steps.pycov.outputs.python-version }}
-          poetry install --only coverage
+          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
+          python_version: ${{ steps.pyver.outputs.py_version }}
+          poetry_group: --only coverage
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
