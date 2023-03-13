@@ -1,0 +1,69 @@
+name: TestsWithSplitOLD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  testing:
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [ 1, 2, 3, 4, 5 ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
+      - name: Read Python version from file '.python-version'
+        shell: bash
+        id: pyver
+        run: |
+          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
+          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
+      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
+        uses: ./.github/actions/setup_environment
+        with:
+          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
+          python_version: ${{ steps.pyver.outputs.py_version }}
+          poetry_group: --with test
+
+      - name: Tests with Pytest
+        shell: bash
+        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage${{ matrix.group }}
+          path: .coverage
+
+  coverage:
+    needs: testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
+      - name: Read Python version from file '.python-version'
+        shell: bash
+        id: pyver
+        run: |
+          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
+          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
+      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
+        uses: ./.github/actions/setup_environment
+        with:
+          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
+          python_version: ${{ steps.pyver.outputs.py_version }}
+          poetry_group: --only coverage
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Report coverage
+        shell: bash
+        run: |
+          poetry run coverage combine coverage*/.coverage*
+          poetry run coverage report

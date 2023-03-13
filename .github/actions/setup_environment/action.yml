@@ -2,9 +2,6 @@ name: 'Install Environment and Dependencies'
 description: 'Install environment, loads cached venv and install dependencies'
 
 inputs:
-  cache_version:
-    description: 'Value gets appended to the cache key and will invalidate the cache if it changes'
-    required: true
   python_version:
     description: 'Python version from matrix or file'
     type: string
@@ -30,16 +27,10 @@ runs:
         poetry install ${{ inputs.poetry_group }}
         poetry config --list
 
-    - name: Write cache version
-      shell: bash
-      run: echo $CACHE_VERSION >> cache_version
-      env:
-        CACHE_VERSION: ${{ inputs.cache_version }}
-
     - name: Save dependencies to cache
       uses: actions/cache/save@v3
       with:
         path: |
           .venv
           poetry.lock
-        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('cache_version') }}
+        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-poetry_lock-${{ hashFiles('**/poetry.lock') }}-github_run_id-${{ github.run_id }}
