@@ -22,14 +22,19 @@ jobs:
 
       - name: Tests with Pytest
         shell: bash
-        run: PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
+        run: |
+          echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
+          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
       - name: Report coverage
         shell: bash
-        run: PYTHONPATH=${PWD} poetry run coverage report
+        run: |
+          echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
+          PYTHONPATH=${PWD} poetry run coverage report
 
       - name: Package and check
         shell: bash
         run: |
+          echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
           PYTHONPATH=${PWD} poetry build
           PYTHONPATH=${PWD} poetry check
