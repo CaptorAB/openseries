@@ -15,18 +15,36 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Read Python version from file '.python-version'
-        shell: bash
-        id: pyver
-        run: |
-          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
-          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
-      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
-        uses: ./.github/actions/setup_environment
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: py
         with:
-          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
-          python_version: ${{ steps.pyver.outputs.py_version }}
-          poetry_group: --with test
+          python-version-file: '.python-version'
+
+      - name: Load cached $HOME/.local
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: dotlocal-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('.github/workflows/TestsWithSplitOLD.yml') }}
+
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.3.2
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./.venv
+          key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/TestsWithSplitOLD.yml') }}
+
+      - name: Install Dependencies
+        shell: bash
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: |
+          poetry env use ${{ steps.py.outputs.python-version }}
+          poetry install --no-root --with test
 
       - name: Tests with Pytest
         shell: bash
@@ -46,18 +64,36 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Read Python version from file '.python-version'
-        shell: bash
-        id: pyver
-        run: |
-          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
-          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
-      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
-        uses: ./.github/actions/setup_environment
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: py
         with:
-          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
-          python_version: ${{ steps.pyver.outputs.py_version }}
-          poetry_group: --only coverage
+          python-version-file: '.python-version'
+
+      - name: Load cached $HOME/.local
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: dotlocal-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('.github/workflows/TestsWithSplitOLD.yml') }}
+
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.3.2
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./.venv
+          key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/TestsWithSplitOLD.yml') }}
+
+      - name: Install Dependencies
+        shell: bash
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: |
+          poetry env use ${{ steps.py.outputs.python-version }}
+          poetry install --no-root --only coverage
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
