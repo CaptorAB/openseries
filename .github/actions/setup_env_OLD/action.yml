@@ -23,7 +23,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ~/.local
-        key: dotlocal-${{ runner.os }}-python-${{ steps.py.outputs.python-version } }-${{ hashFiles(env.GITHUB_WORKFLOW) }}
+        key: dotlocal-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('.github/workflows/TestsWithSplitOLD.yml') }}
 
     - name: Install and configure Poetry
       uses: snok/install-poetry@v1
