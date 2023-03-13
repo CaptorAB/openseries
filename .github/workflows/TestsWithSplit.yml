@@ -40,10 +40,11 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Read Python version from file '.python-version'
-        shell: bash
-        id: pyver
-        run: echo "py_version=$(cat "$GITHUB_WORKSPACE/.python-version")" >> $GITHUB_OUTPUT
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        id: py
+        with:
+          python-version-file: '.python-version'
 
       - name: Restore dependencies from cache
         uses: actions/cache/restore@v3
@@ -62,12 +63,12 @@ jobs:
           echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
           rm install-poetry.py
 
-      - name: Install Dependencies
+      - name: Install Dependencies on ${{ steps.py.outputs.python-version }}
         shell: bash
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           poetry install --with test
-          poetry env use ${{ steps.pyver.outputs.py_version }}
+          poetry env use ${{ steps.py.outputs.python-version }}
 
       - name: Tests with Pytest
         shell: bash
@@ -87,10 +88,11 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Read Python version from file '.python-version'
-        shell: bash
-        id: pyver
-        run: echo "py_version=$(cat "$GITHUB_WORKSPACE/.python-version")" >> $GITHUB_OUTPUT
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        id: py
+        with:
+          python-version-file: '.python-version'
 
       - name: Restore dependencies from cache
         uses: actions/cache/restore@v3
@@ -101,7 +103,7 @@ jobs:
             poetry.lock
           key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('cache_version') }}
 
-      - name: Install poetry
+      - name: Install Poetry
         shell: bash
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
@@ -110,12 +112,12 @@ jobs:
           echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
           rm install-poetry.py
 
-      - name: Install Dependencies
+      - name: Install Dependencies on ${{ steps.py.outputs.python-version }}
         shell: bash
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           poetry install --only coverage
-          poetry env use ${{ steps.pyver.outputs.py_version }}
+          poetry env use ${{ steps.py.outputs.python-version }}
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
