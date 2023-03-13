@@ -34,6 +34,7 @@ jobs:
         with:
           python-version-file: '.python-version'
           cache: 'poetry'
+          cache-dependency-path: '**/pyproject.toml'
 
       - name: Install Dependencies. From cache if it matches
         shell: bash
