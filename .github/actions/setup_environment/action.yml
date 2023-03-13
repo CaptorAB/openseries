@@ -63,5 +63,5 @@ runs:
     - name: Print path and key
       shell: bash
       run: |
-        echo "path: ${{ steps.savedcache.outputs.path }}"
-        echo "key: ${{ steps.savedcache.outputs.key }}"
+        echo ${{ steps.savedcache.outputs.path }}
+        echo ${{ steps.savedcache.outputs.key }}
