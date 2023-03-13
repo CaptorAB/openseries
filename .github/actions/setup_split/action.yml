@@ -40,6 +40,4 @@ runs:
     - name: Install Dependencies
       shell: bash
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: |
-        poetry env use ${{ steps.py.outputs.python-version }}
-        poetry install --no-root ${{ inputs.poetry_arg }}
+      run: poetry install --no-root ${{ inputs.poetry_arg }}
