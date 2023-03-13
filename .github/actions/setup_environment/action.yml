@@ -59,5 +59,7 @@ runs:
     - name: Save dependencies to cache
       uses: actions/cache/save@v3
       with:
-        path: .venv
+        path: |
+          .venv
+          poetry.lock
         key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-poetry_lock-${{ hashFiles('**/poetry.lock') }}-github_run_id-${{ github.run_id }}
