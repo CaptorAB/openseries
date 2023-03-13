@@ -62,9 +62,8 @@ jobs:
             poetry.lock
           key: venv-${{ runner.os }}-python-${{ steps.pyver.outputs.py_version }}-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install poetry
+      - name: Install Poetry
         shell: bash
-        if: steps.cache.outputs.cache-hit == 'true'
         run: |
           curl -O -sSL https://install.python-poetry.org/install-poetry.py
           python install-poetry.py -y --version 1.3.2
