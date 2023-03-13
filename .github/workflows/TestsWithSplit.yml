@@ -68,7 +68,7 @@ jobs:
         shell: bash
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          poetry config --cache-dir ${{ steps.cache.outputs.path }}
+          poetry config cache-dir ${{ steps.cache.outputs.path }}
           poetry install --with test
           poetry env use ${{ steps.py.outputs.python-version }}
 
@@ -119,7 +119,7 @@ jobs:
         shell: bash
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          poetry config --cache-dir ${{ steps.cache.outputs.path }}
+          poetry config cache-dir ${{ steps.cache.outputs.path }}
           poetry install --only coverage
           poetry env use ${{ steps.py.outputs.python-version }}
 
