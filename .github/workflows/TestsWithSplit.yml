@@ -43,13 +43,18 @@ jobs:
       - name: Get Poetry cache-dir
         shell: bash
         id: poetry-cache
-        run: echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
+        run: |
+          echo "$(poetry config cache-dir)"
+          echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies from cache
         uses: actions/cache/restore@v3
         id: cache
         with:
-          path: ${{ steps.poetry-cache.outputs.dir }}
+          path: |
+            .venv
+            ${{ steps.poetry-cache.outputs.dir }}
+            poetry.lock
           key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Dependencies

@@ -40,5 +40,8 @@ runs:
     - name: Save dependencies to cache
       uses: actions/cache/save@v3
       with:
-        path: ${{ steps.poetry-cache.outputs.dir }}
+        path: |
+          .venv
+          ${{ steps.poetry-cache.outputs.dir }}
+          poetry.lock
         key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
