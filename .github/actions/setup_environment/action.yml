@@ -52,9 +52,16 @@ runs:
 
 
     - name: Save dependencies to cache
+      id: savedcache
       uses: actions/cache/save@v3
       with:
         path: |
           .venv
           poetry.lock
         key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-poetry_lock-${{ hashFiles('**/poetry.lock') }}-github_run_id-${{ github.run_id }}
+
+    - name: Print path and key
+      shell: bash
+      run: |
+        echo "path: ${{ steps.savedcache.outputs.path }}"
+        echo "key: ${{ steps.savedcache.outputs.key }}"
