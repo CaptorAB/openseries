@@ -20,6 +20,23 @@ runs:
       with:
         python-version: ${{ inputs.python_version }}
 
+    - name: Write cache version
+      shell: bash
+      run: echo $CACHE_VERSION >> cache_version
+      env:
+        CACHE_VERSION: ${{ inputs.cache_version }}
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          .venv
+          poetry-lock
+        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('cache_version') }}
+        restore-keys: |
+          venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}-
+
     - name: Install Poetry and dependencies
       shell: bash
       run: |
