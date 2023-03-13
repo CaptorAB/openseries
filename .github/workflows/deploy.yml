@@ -9,19 +9,10 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Read Python version from file '.python-version'
-        shell: bash
-        id: pyver
-        run: |
-          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
-          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
-
-      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
-        uses: ./.github/actions/setup_environment
+      - name: Setup environment
+        uses: ./.github/actions/setup_deploy
         with:
-          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
-          python_version: ${{ steps.pyver.outputs.py_version }}
-          poetry_group: --with test
+          poetry_arg: --with test
 
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
