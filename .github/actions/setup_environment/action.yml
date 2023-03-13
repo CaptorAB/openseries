@@ -29,24 +29,28 @@ runs:
       env:
         CACHE_VERSION: ${{ inputs.cache_version }}
 
-    - name: Load cached venv
+    - name: Get Poetry cache-dir
+      shell: bash
+      id: poetry-cache
+      run: |
+        echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
+
+    - name: Load cached dependencies
       id: cached-poetry-dependencies
       uses: actions/cache@v3
       with:
-        path: |
-          .venv
-          poetry-lock
+        path: ${{ steps.poetry-cache.outputs.dir }}
         key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('cache_version') }}
 
-    - name: Install and configure Poetry
+    - name: Install Poetry
       shell: bash
       run: |
         python -m pip install poetry==1.3.2
+        poetry env use ${{ steps.py.outputs.python-version }}
+        poetry config --list
 
     - name: Install Dependencies. From cache if it matches
       shell: bash
-      #      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: |
-        poetry env use ${{ steps.py.outputs.python-version }}
         poetry install ${{ inputs.poetry_group }}
-        poetry config --list
