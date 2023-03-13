@@ -17,6 +17,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
       - name: Setup environment
         uses: ./.github/actions/setup_env_OLD
         with:
@@ -37,6 +40,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
       - name: Setup environment
         uses: ./.github/actions/setup_env_OLD
         with:
