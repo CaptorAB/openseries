@@ -9,11 +9,7 @@ on:
       - "**" # matches every branch
 
 jobs:
-  testing:
-    strategy:
-      fail-fast: false
-      matrix:
-        group: [ 1, 2, 3, 4, 5 ]
+  restore:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +19,7 @@ jobs:
       - name: Read Python version from file '.python-version'
         shell: bash
         id: pyver
-        run: |
-          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
-          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
+        run: echo "py_version=$(cat "$GITHUB_WORKSPACE/.python-version")" >> $GITHUB_OUTPUT
 
       - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
         uses: ./.github/actions/setup_environment
@@ -33,6 +27,37 @@ jobs:
           cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
           python_version: ${{ steps.pyver.outputs.py_version }}
           poetry_group: --with test
+
+  testing:
+    needs: restore
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [ 1, 2, 3, 4, 5 ]
+
+    steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
+      - name: Get Poetry cache-dir
+        shell: bash
+        id: poetry-cache
+        run: echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
+
+      - name: Restore dependencies from cache
+        uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: ${{ steps.poetry-cache.outputs.dir }}
+          key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Dependencies
+        shell: bash
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          poetry install --with test
+          poetry env use ${{ steps.py.outputs.python-version }}
 
       - name: Tests with Pytest
         shell: bash
@@ -52,19 +77,24 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Read Python version from file '.python-version'
+      - name: Get Poetry cache-dir
         shell: bash
-        id: pyver
-        run: |
-          fromfile=$(cat "$GITHUB_WORKSPACE/.python-version")
-          echo "py_version=$fromfile" >> $GITHUB_OUTPUT
+        id: poetry-cache
+        run: echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
 
-      - name: Setup environment with Python ${{ steps.pyver.outputs.py_version }}
-        uses: ./.github/actions/setup_environment
+      - name: Restore dependencies from cache
+        uses: actions/cache/restore@v3
+        id: cache
         with:
-          cache_version: ${{ secrets.GH_ACTIONS_CACHE_KEY }}
-          python_version: ${{ steps.pyver.outputs.py_version }}
-          poetry_group: --only coverage
+          path: ${{ steps.poetry-cache.outputs.dir }}
+          key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Dependencies
+        shell: bash
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          poetry install --only coverage
+          poetry env use ${{ steps.py.outputs.python-version }}
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
