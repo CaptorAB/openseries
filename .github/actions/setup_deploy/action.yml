@@ -22,7 +22,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ~/.local
-        key: dotlocal-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('.github/workflows/deploy.yml') }}
+        key: dotlocal-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('.github/actions/setup_deploy/action.yml') }}
 
     - name: Install Poetry on Python ${{ steps.py.outputs.python-version }}
       shell: bash
@@ -37,7 +37,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ./.venv
-        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock', env.GITHUB_WORKFLOW) }}
+        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('.github/actions/setup_deploy/action.yml') }}
 
     - name: Install Dependencies
       shell: bash

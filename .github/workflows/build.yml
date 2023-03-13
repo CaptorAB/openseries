@@ -21,12 +21,15 @@ jobs:
           poetry_arg: --with test
 
       - name: Tests with Pytest
-        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
+        shell: bash
+        run: PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
       - name: Report coverage
-        run: poetry run coverage report
+        shell: bash
+        run: PYTHONPATH=${PWD} poetry run coverage report
 
       - name: Package and check
+        shell: bash
         run: |
-          poetry build
-          poetry check
+          PYTHONPATH=${PWD} poetry build
+          PYTHONPATH=${PWD} poetry check
