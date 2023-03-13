@@ -22,14 +22,14 @@ jobs:
 
       - name: Tests with Pytest
         shell: bash
-        run: python -m poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
+        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
       - name: Report coverage
         shell: bash
-        run: python -m poetry run coverage report
+        run: poetry run coverage report
 
       - name: Package and check
         shell: bash
         run: |
-          python -m poetry build
-          python -m poetry check
+          poetry build
+          poetry check
