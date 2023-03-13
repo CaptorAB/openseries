@@ -30,17 +30,16 @@ runs:
         poetry install ${{ inputs.poetry_group }}
         poetry config --list
 
-    - name: Get Poetry cache-dir
+    - name: Write cache version
       shell: bash
-      id: poetry-cache
-      run: |
-        echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
+      run: echo $CACHE_VERSION >> cache_version
+      env:
+        CACHE_VERSION: ${{ inputs.cache_version }}
 
     - name: Save dependencies to cache
       uses: actions/cache/save@v3
       with:
         path: |
           .venv
-          ${{ steps.poetry-cache.outputs.dir }}
           poetry.lock
-        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('cache_version') }}

@@ -40,13 +40,6 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Get Poetry cache-dir
-        shell: bash
-        id: poetry-cache
-        run: |
-          echo "$(poetry config cache-dir)"
-          echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
-
       - name: Read Python version from file '.python-version'
         shell: bash
         id: pyver
@@ -58,9 +51,8 @@ jobs:
         with:
           path: |
             .venv
-            ${{ steps.poetry-cache.outputs.dir }}
             poetry.lock
-          key: venv-${{ runner.os }}-python-${{ steps.pyver.outputs.py_version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('cache_version') }}
 
       - name: Install Poetry
         shell: bash
@@ -95,11 +87,6 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Get Poetry cache-dir
-        shell: bash
-        id: poetry-cache
-        run: echo "dir=$(poetry config cache-dir)" >> $GITHUB_OUTPUT
-
       - name: Read Python version from file '.python-version'
         shell: bash
         id: pyver
@@ -109,8 +96,10 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache
         with:
-          path: ${{ steps.poetry-cache.outputs.dir }}
-          key: venv-${{ runner.os }}-python-${{ steps.pyver.outputs.py_version }}-${{ hashFiles('**/poetry.lock') }}
+          path: |
+            .venv
+            poetry.lock
+          key: venv-${{ runner.os }}-python-${{ steps.py.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('cache_version') }}
 
       - name: Install poetry
         shell: bash
