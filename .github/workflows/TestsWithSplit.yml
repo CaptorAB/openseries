@@ -9,7 +9,7 @@ on:
       - "**" # matches every branch
 
 jobs:
-  prepare:
+  stage_python:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +17,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup environment
-        uses: ./.github/actions/setup_split
+        uses: ./.github/actions/setup_environment
 
-  testing:
-    needs: prepare
+  run_tests:
+    needs: stage_python
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup environment
-        uses: ./.github/actions/setup_split
+        uses: ./.github/actions/setup_environment
         with:
           poetry_arg: --with test
 
@@ -46,8 +46,8 @@ jobs:
           name: coverage${{ matrix.group }}
           path: .coverage
 
-  coverage:
-    needs: testing
+  report_coverage:
+    needs: run_tests
     runs-on: ubuntu-latest
 
     steps:
@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup environment
-        uses: ./.github/actions/setup_split
+        uses: ./.github/actions/setup_environment
         with:
           poetry_arg: --only coverage
 
