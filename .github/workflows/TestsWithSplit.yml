@@ -20,8 +20,19 @@ jobs:
         shell: bash
         run: pipx install poetry
 
-      - name: Setup environment
-        uses: ./.github/actions/setup_environment
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: setup_python
+        with:
+          python-version-file: '.python-version'
+          cache: 'poetry'
+
+      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
+        shell: bash
+        if: steps.setup_python.outputs.cache-hit != 'true'
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --with test
 
   run_tests:
     needs: stage_python
@@ -35,8 +46,19 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Setup environment
-        uses: ./.github/actions/setup_environment
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: setup_python
+        with:
+          python-version-file: '.python-version'
+          cache: 'poetry'
+
+      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
+        shell: bash
+        if: steps.setup_python.outputs.cache-hit != 'true'
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --with test
 
       - name: Tests with Pytest
         shell: bash
@@ -56,8 +78,19 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - name: Setup environment
-        uses: ./.github/actions/setup_environment
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: setup_python
+        with:
+          python-version-file: '.python-version'
+          cache: 'poetry'
+
+      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
+        shell: bash
+        if: steps.setup_python.outputs.cache-hit != 'true'
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --with test
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
