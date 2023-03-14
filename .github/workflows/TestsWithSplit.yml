@@ -16,6 +16,10 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
 
+      - name: Install Poetry
+        shell: bash
+        run: pipx install poetry
+
       - name: Setup environment
         uses: ./.github/actions/setup_environment
 
@@ -33,8 +37,6 @@ jobs:
 
       - name: Setup environment
         uses: ./.github/actions/setup_environment
-        with:
-          poetry_arg: --with test
 
       - name: Tests with Pytest
         shell: bash
@@ -56,8 +58,6 @@ jobs:
 
       - name: Setup environment
         uses: ./.github/actions/setup_environment
-        with:
-          poetry_arg: --only coverage
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3

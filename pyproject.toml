@@ -55,20 +55,13 @@ scipy = "^1.9.3"
 statsmodels = "^0.13.5"
 
 [tool.poetry.group.test.dependencies]
-coverage = "*"
-pytest = "*"
-pytest-split = "*"
-
-[tool.poetry.group.coverage.dependencies]
-coverage = "*"
-
-[tool.poetry.group.dev.dependencies]
 black = "23.1.0"
-coverage = "*"
+coverage = "^7.0.2"
 flake8 = "6.0.0"
-flake8-black = "*"
-pre-commit = "*"
-pytest = "*"
+flake8-black = "^0.3.6"
+pre-commit = "^3.1.1"
+pytest = "^7.2.0"
+pytest-split = "^0.8.0"
 
 [tool.black]
 line-length = 88
