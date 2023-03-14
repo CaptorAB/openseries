@@ -67,7 +67,6 @@ jobs:
           ${{ steps.setup_python.outputs.python-path }} -m poetry config virtualenvs.in-project true
 
       - name: Load cached venv
-        id: cached-venv
         uses: actions/cache@v3
         with:
           path: |
@@ -77,7 +76,6 @@ jobs:
 
       - name: Install Dependencies
         shell: bash
-        if: steps.cached-venv.outputs.cache-hit != 'true'
         run: poetry install --with test
 
       - name: Tests with Pytest
@@ -111,7 +109,6 @@ jobs:
           ${{ steps.setup_python.outputs.python-path }} -m poetry config virtualenvs.in-project true
 
       - name: Load cached venv
-        id: cached-venv
         uses: actions/cache@v3
         with:
           path: |
@@ -121,7 +118,6 @@ jobs:
 
       - name: Install Dependencies
         shell: bash
-        if: steps.cached-venv.outputs.cache-hit != 'true'
         run: poetry install --with test
 
       - name: Download all artifacts
