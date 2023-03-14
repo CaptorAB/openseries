@@ -25,7 +25,15 @@ jobs:
         with:
           python-version-file: '.python-version'
 
+      - name: Cache Poetry
+        id: cache-poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.poetry
+          key: poetry-${{ env.POETRY_VER }}
+
       - name: Install Poetry ${{ env.POETRY_VER }}
+        if: steps.cache-poetry.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -62,7 +70,15 @@ jobs:
         with:
           python-version-file: '.python-version'
 
+      - name: Cache Poetry
+        id: cache-poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.poetry
+          key: poetry-${{ env.POETRY_VER }}
+
       - name: Install Poetry ${{ env.POETRY_VER }}
+        if: steps.cache-poetry.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -105,7 +121,15 @@ jobs:
         with:
           python-version-file: '.python-version'
 
+      - name: Cache Poetry
+        id: cache-poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.poetry
+          key: poetry-${{ env.POETRY_VER }}
+
       - name: Install Poetry ${{ env.POETRY_VER }}
+        if: steps.cache-poetry.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
