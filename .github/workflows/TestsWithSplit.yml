@@ -43,7 +43,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .venv
-          key: pydeps-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          key: pydeps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Dependencies
         shell: bash
@@ -86,7 +86,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .venv
-          key: pydeps-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          key: pydeps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Dependencies
         shell: bash
@@ -135,7 +135,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .venv
-          key: pydeps-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          key: pydeps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Dependencies
         shell: bash
