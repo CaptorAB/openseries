@@ -18,7 +18,7 @@ jobs:
           - os: windows-latest
             local_path: ~/AppData/Roaming/Python/Python310/Scripts
           - os: macOS-latest
-            local_path: ${{ env.pythonLocation }}
+            local_path: ~/Library/Application Support
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
