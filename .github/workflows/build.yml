@@ -23,12 +23,6 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
-        id: setup_python
-        with:
-          python-version-file: '.python-version'
-
       - name: Load cached $HOME/.local
         uses: actions/cache@v3
         with:
