@@ -49,7 +49,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/TestsWithSplit.yml') }}-${{ hashFiles('**/poetry.l
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/TestsWithSplit.yml') }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install Dependencies
         shell: bash
         if: steps.cached_venv.outputs.cache-hit != 'true'
