@@ -25,12 +25,9 @@ jobs:
           key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}
 
       - name: Install Poetry on Python ${{ steps.setup_python.outputs.python-version }}
-        shell: bash
-        run: |
-          curl -O -sSL https://install.python-poetry.org/install-poetry.py
-          python install-poetry.py -y --version ${{ env.POETRY_VER }}
-          echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
-          rm install-poetry.py
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VER }}
 
       - name: Load cached venv
         id: cached_venv
