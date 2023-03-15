@@ -52,7 +52,7 @@ jobs:
         shell: bash
         if: steps.cached_venv.outputs.cache-hit != 'true'
         run: |
-          poetry env use ${{ steps.setup_python.outputs.python-version }}
+          poetry env use 3.10
           poetry install --no-root --with test
 
       - name: Tests with Pytest
