@@ -24,31 +24,15 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-
-      - name: Load cached venv
-        id: cached_venv
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install and configure Poetry ${{ env.POETRY_VER }}
-        run: |
-          curl -O -sSL https://install.python-poetry.org/install-poetry.py
-          python install-poetry.py -y --version ${{ env.POETRY_VER }}
-          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          poetry env use ${{ steps.setup_python.outputs.python-version }}
-          rm install-poetry.py
-        if: steps.cached_venv.outputs.cache-hit != 'true'
+          cache: 'poetry'
+          cache-dependency-path: |
+            .venv
+            '**/poetry.lock'
 
       - name: Install Dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        run: |
-          poetry install  --no-root --with test
-        if: steps.cached_venv.outputs.cache-hit != 'true'
+        shell: bash
+        if: steps.setup_python.outputs.cache-hit != 'true'
+        run: poetry install --no-root --with test
 
   run_tests:
     needs: stage_python
@@ -67,31 +51,15 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-
-      - name: Load cached venv
-        id: cached_venv
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install and configure Poetry ${{ env.POETRY_VER }}
-        run: |
-          curl -O -sSL https://install.python-poetry.org/install-poetry.py
-          python install-poetry.py -y --version ${{ env.POETRY_VER }}
-          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          poetry env use ${{ steps.setup_python.outputs.python-version }}
-          rm install-poetry.py
-        if: steps.cached_venv.outputs.cache-hit != 'true'
+          cache: 'poetry'
+          cache-dependency-path: |
+            .venv
+            '**/poetry.lock'
 
       - name: Install Dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        run: |
-          poetry install  --no-root --with test
-        if: steps.cached_venv.outputs.cache-hit != 'true'
+        shell: bash
+        if: steps.setup_python.outputs.cache-hit != 'true'
+        run: poetry install --no-root --with test
 
       - name: Tests with Pytest
         shell: bash
@@ -116,31 +84,15 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-
-      - name: Load cached venv
-        id: cached_venv
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install and configure Poetry ${{ env.POETRY_VER }}
-        run: |
-          curl -O -sSL https://install.python-poetry.org/install-poetry.py
-          python install-poetry.py -y --version ${{ env.POETRY_VER }}
-          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          poetry env use ${{ steps.setup_python.outputs.python-version }}
-          rm install-poetry.py
-        if: steps.cached_venv.outputs.cache-hit != 'true'
+          cache: 'poetry'
+          cache-dependency-path: |
+            .venv
+            '**/poetry.lock'
 
       - name: Install Dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        run: |
-          poetry install  --no-root --with test
-        if: steps.cached_venv.outputs.cache-hit != 'true'
+        shell: bash
+        if: steps.setup_python.outputs.cache-hit != 'true'
+        run: poetry install --no-root --with test
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
