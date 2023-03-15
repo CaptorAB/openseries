@@ -30,6 +30,10 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: show home
+        shell: bash
+        run: echo $HOME
+
       - name: Load cached $HOME/.local
         uses: actions/cache@v3
         with:
@@ -44,12 +48,17 @@ jobs:
           echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
           rm install-poetry.py
 
+      - name: check poetry
+        shell: bash
+        run: poetry config --list
+
       - name: Load cached venv
         id: cached_venv
         uses: actions/cache@v3
         with:
           path: ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/TestsWithSplit.yml') }}-${{ hashFiles('**/poetry.lock') }}
+
       - name: Install Dependencies
         shell: bash
         if: steps.cached_venv.outputs.cache-hit != 'true'
