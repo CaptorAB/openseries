@@ -29,9 +29,7 @@ jobs:
         id: cached_venv
         uses: actions/cache@v3
         with:
-          path: |
-            .venv
-            poetry.lock
+          path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install and configure Poetry ${{ env.POETRY_VER }}
@@ -74,9 +72,7 @@ jobs:
         id: cached_venv
         uses: actions/cache@v3
         with:
-          path: |
-            .venv
-            poetry.lock
+          path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install and configure Poetry ${{ env.POETRY_VER }}
@@ -125,9 +121,7 @@ jobs:
         id: cached_venv
         uses: actions/cache@v3
         with:
-          path: |
-            .venv
-            poetry.lock
+          path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install and configure Poetry ${{ env.POETRY_VER }}

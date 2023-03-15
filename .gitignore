@@ -45,7 +45,6 @@ venv.bak/
 venvten/
 
 # Poetry / Dependency Management
-poetry.lock
 requirements.txt
 /Pipfile
 /Pipfile.lock
