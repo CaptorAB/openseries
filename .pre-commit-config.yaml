@@ -22,7 +22,6 @@ repos:
       - id: check-docstring-first
       - id: check-json
       - id: check-yaml
-      - id: debug-statements
       - id: end-of-file-fixer
         exclude: '^.test_durations'
       - id: trailing-whitespace

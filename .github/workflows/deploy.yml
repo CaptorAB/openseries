@@ -18,19 +18,31 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Install Poetry ${{ env.POETRY_VER }}
-        uses: snok/install-poetry@v1
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: setup_python
         with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+          python-version-file: '.python-version'
+
+      - name: Install Poetry ${{ env.POETRY_VER }}
+        shell: bash
+        run: |
+          curl -O -sSL https://install.python-poetry.org/install-poetry.py
+          python install-poetry.py -y --version ${{ env.POETRY_VER }}
+          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
+          poetry env use ${{ steps.setup_python.outputs.python-version }}
+          rm install-poetry.py
 
       - name: Cache dependencies
         id: cache-deps
         uses: actions/cache@v3
         with:
           path: .venv
-          key: pydeps-${{ runner.os }}-${{ hashFiles('**/pyproject.toml') }}
+          key: pydeps-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
