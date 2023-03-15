@@ -25,9 +25,7 @@ jobs:
         with:
           python-version-file: '.python-version'
           cache: 'poetry'
-          cache-dependency-path: |
-            .venv
-            '**/poetry.lock'
+          cache-dependency-path: '**/poetry.lock'
 
       - name: Install Dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
@@ -52,9 +50,7 @@ jobs:
         with:
           python-version-file: '.python-version'
           cache: 'poetry'
-          cache-dependency-path: |
-            .venv
-            '**/poetry.lock'
+          cache-dependency-path: '**/poetry.lock'
 
       - name: Install Dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
@@ -85,9 +81,7 @@ jobs:
         with:
           python-version-file: '.python-version'
           cache: 'poetry'
-          cache-dependency-path: |
-            .venv
-            '**/poetry.lock'
+          cache-dependency-path: '**/poetry.lock'
 
       - name: Install Dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
