@@ -25,15 +25,7 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Cache Poetry
-        id: cache-poetry
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: poetry-${{ env.POETRY_VER }}-${{ hashFiles('**/poetry.toml') }}
-
       - name: Install Poetry ${{ env.POETRY_VER }}
-        if: steps.cache-poetry.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -70,15 +62,7 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Cache Poetry
-        id: cache-poetry
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: poetry-${{ env.POETRY_VER }}-${{ hashFiles('**/poetry.toml') }}
-
       - name: Install Poetry ${{ env.POETRY_VER }}
-        if: steps.cache-poetry.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -99,7 +83,7 @@ jobs:
 
       - name: Tests with Pytest
         shell: bash
-        run: coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
+        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
 
       - name: Upload coverage
         uses: actions/upload-artifact@v3
@@ -121,15 +105,7 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Cache Poetry
-        id: cache-poetry
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: poetry-${{ env.POETRY_VER }}-${{ hashFiles('**/poetry.toml') }}
-
       - name: Install Poetry ${{ env.POETRY_VER }}
-        if: steps.cache-poetry.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -154,5 +130,5 @@ jobs:
       - name: Report coverage
         shell: bash
         run: |
-          coverage combine coverage*/.coverage*
-          coverage report
+          poetry run coverage combine coverage*/.coverage*
+          poetry run coverage report
