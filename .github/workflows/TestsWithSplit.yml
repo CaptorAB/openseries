@@ -29,8 +29,8 @@ jobs:
         id: cache-poetry
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pypoetry
-          key: poetry-${{ env.POETRY_VER }}
+          path: .venv
+          key: poetry-${{ env.POETRY_VER }}-${{ hashFiles('**/poetry.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }}
         if: steps.cache-poetry.outputs.cache-hit != 'true'
@@ -39,12 +39,6 @@ jobs:
           version: ${{ env.POETRY_VER }}
           virtualenvs-create: true
           virtualenvs-in-project: true
-
-      - name: show env
-        run: env
-
-      - name: show poetry cache
-        run: poetry config cache-dir
 
       - name: Cache dependencies
         id: cache-deps
@@ -80,8 +74,8 @@ jobs:
         id: cache-poetry
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pypoetry
-          key: poetry-${{ env.POETRY_VER }}
+          path: .venv
+          key: poetry-${{ env.POETRY_VER }}-${{ hashFiles('**/poetry.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }}
         if: steps.cache-poetry.outputs.cache-hit != 'true'
@@ -131,8 +125,8 @@ jobs:
         id: cache-poetry
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pypoetry
-          key: poetry-${{ env.POETRY_VER }}
+          path: .venv
+          key: poetry-${{ env.POETRY_VER }}-${{ hashFiles('**/poetry.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }}
         if: steps.cache-poetry.outputs.cache-hit != 'true'
