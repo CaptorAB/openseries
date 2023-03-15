@@ -3,16 +3,10 @@ name = "openseries"
 version = "0.11.1"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
+homepage = "https://github.com/CaptorAB/OpenSeries"
+repository = "https://github.com/CaptorAB/OpenSeries"
 license = "BSD-3-Clause"
 readme = "README.md"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[project.urls]
-repository = "https://github.com/CaptorAB/OpenSeries"
-
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
@@ -23,7 +17,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
 ]
-
 keywords = [
     "python",
     "python3",
@@ -39,6 +32,10 @@ keywords = [
     "investment-analysis",
     "investing"
 ]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "^3.10"
