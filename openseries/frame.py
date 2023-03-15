@@ -3028,7 +3028,14 @@ class OpenFrame(BaseModel):
 
     def plot_series(
         self: TOpenFrame,
-        mode: Literal["lines", "markers", "lines+markers"] = "lines",
+        mode: Literal[
+            "lines",
+            "markers",
+            "lines+markers",
+            "lines+text",
+            "markers+text",
+            "lines+markers+text",
+        ] = "lines",
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: str | None = None,
@@ -3046,7 +3053,14 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        mode: Literal["lines", "markers", "lines+markers"], default: "lines"
+        mode: Literal[
+                "lines",
+                "markers",
+                "lines+markers",
+                "lines+text",
+                "markers+text",
+                "lines+markers+text",
+              ], default: "lines"
             The type of scatter to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
