@@ -26,11 +26,17 @@ jobs:
           python-version-file: '.python-version'
 
       - name: Install Poetry ${{ env.POETRY_VER }}
-        uses: snok/install-poetry@v1
-        with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+        shell: bash
+        run: |
+          curl -O -sSL https://install.python-poetry.org/install-poetry.py
+          python install-poetry.py -y --version ${{ env.POETRY_VER }}
+          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
+          poetry env use ${{ steps.setup_python.outputs.python-version }}
+          rm install-poetry.py
 
       - name: Cache dependencies
         id: cache-deps
@@ -63,11 +69,17 @@ jobs:
           python-version-file: '.python-version'
 
       - name: Install Poetry ${{ env.POETRY_VER }}
-        uses: snok/install-poetry@v1
-        with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+        shell: bash
+        run: |
+          curl -O -sSL https://install.python-poetry.org/install-poetry.py
+          python install-poetry.py -y --version ${{ env.POETRY_VER }}
+          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
+          poetry env use ${{ steps.setup_python.outputs.python-version }}
+          rm install-poetry.py
 
       - name: Cache dependencies
         id: cache-deps
@@ -106,11 +118,17 @@ jobs:
           python-version-file: '.python-version'
 
       - name: Install Poetry ${{ env.POETRY_VER }}
-        uses: snok/install-poetry@v1
-        with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+        shell: bash
+        run: |
+          curl -O -sSL https://install.python-poetry.org/install-poetry.py
+          python install-poetry.py -y --version ${{ env.POETRY_VER }}
+          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
+          poetry env use ${{ steps.setup_python.outputs.python-version }}
+          rm install-poetry.py
 
       - name: Cache dependencies
         id: cache-deps
