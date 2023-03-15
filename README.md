@@ -280,7 +280,7 @@ cd OpenSeries
 python3 -m venv ./venv
 ./source_me.ps1
 pip install --upgrade pip
-pip install poetry==1.3.2
+pip install poetry==1.4.0
 poetry install
 ```
 
