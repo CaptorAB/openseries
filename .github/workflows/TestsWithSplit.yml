@@ -40,6 +40,12 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
+      - name: show env
+        run: env
+
+      - name: show poetry cache
+        run: poetry config cache-dir
+
       - name: Cache dependencies
         id: cache-deps
         uses: actions/cache@v3
