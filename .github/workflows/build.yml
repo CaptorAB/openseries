@@ -23,6 +23,10 @@ jobs:
         with:
           python-version-file: '.python-version'
 
+      - name: show env
+        shell: bash
+        run: env
+
       - name: Load cached $HOME/.local
         uses: actions/cache@v3
         with:
