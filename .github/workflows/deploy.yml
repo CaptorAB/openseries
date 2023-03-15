@@ -22,7 +22,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.local
-          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/TestsWithSplit.yml') }}
+          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}
 
       - name: Install Poetry on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/TestsWithSplit.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Dependencies
         shell: bash

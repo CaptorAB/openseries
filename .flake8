@@ -22,14 +22,10 @@ tee = False
 
 # Provide a comma-separated list of glob patterns to exclude from checks.
 exclude =
-    # version control and testing
-    .circleci,
     .git,
     .github,
-    # virtual environment
     venv,
-    # python cache
-    __pycache__,
+    .pytest_cache,
 
 # Provide a comma-separate list of glob patterns to include for checks.
 filename =
