@@ -12,13 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
-        include:
-          - os: ubuntu-latest
-            local_path: ~/.local
-          - os: windows-latest
-            local_path: ~/AppData/Roaming/Python/Python310/Scripts
-          - os: macOS-latest
-            local_path: ~/Library/Application Support
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
@@ -33,7 +26,7 @@ jobs:
       - name: Load cached $HOME/.local
         uses: actions/cache@v3
         with:
-          path: ${{ matrix.local_path }}
+          path: ~/.local
           key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/build.yml') }}
 
       - name: Install Poetry on Python ${{ steps.setup_python.outputs.python-version }}
