@@ -279,13 +279,9 @@ git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
 python3 -m venv ./venv
 ./source_me.ps1
-pip install --upgrade pip
 pip install poetry==1.4.0
 poetry install
 ```
-
-For me, the step upgrading pip sometimes encounters a permission issue that disappears
-if the command is executed a second time.
 
 ### In a Mac Terminal/Linux execute the below commands:
 
