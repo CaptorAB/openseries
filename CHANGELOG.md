@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.11.1] - 2023-03-15
+## Version [0.11.2] - 2023-03-16
 
 Mostly tooling cleanup making.
 
