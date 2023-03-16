@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
+        python-version: [ '3.10', '3.11' ]
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
@@ -21,7 +22,7 @@ jobs:
         uses: actions/setup-python@v4
         id: setup_python
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
 
       - name: Load cached $HOME/.local
         uses: actions/cache@v3
@@ -46,7 +47,7 @@ jobs:
         if: steps.cached_venv.outputs.cache-hit != 'true'
         run: |
           poetry config virtualenvs.prefer-active-python true
-          poetry install --no-root --with test
+          poetry install --no-root --with dev
 
       - name: Tests with Pytest
         shell: bash

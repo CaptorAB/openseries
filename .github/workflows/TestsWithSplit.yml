@@ -48,7 +48,7 @@ jobs:
         if: steps.cached_venv.outputs.cache-hit != 'true'
         run: |
           poetry config virtualenvs.prefer-active-python true
-          poetry install --no-root --with test
+          poetry install --no-root --with dev
 
   run_tests:
     needs: stage_python
@@ -91,7 +91,7 @@ jobs:
         if: steps.cached_venv.outputs.cache-hit != 'true'
         run: |
           poetry config virtualenvs.prefer-active-python true
-          poetry install --no-root --with test
+          poetry install --no-root --with dev
 
       - name: Tests with Pytest
         shell: bash
@@ -140,7 +140,7 @@ jobs:
         if: steps.cached_venv.outputs.cache-hit != 'true'
         run: |
           poetry config virtualenvs.prefer-active-python true
-          poetry install --no-root --with test
+          poetry install --no-root --with dev
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3

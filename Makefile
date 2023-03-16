@@ -2,7 +2,7 @@ venv:
 	python3 -m venv ./venv
 	venv/bin/python --version
 	venv/bin/pip install poetry==1.4.0
-	poetry install --with test
+	poetry install --with dev
 
 test:
 	PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 ./

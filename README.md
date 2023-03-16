@@ -280,7 +280,7 @@ cd OpenSeries
 python3 -m venv ./venv
 ./source_me.ps1
 pip install poetry==1.4.0
-poetry install
+poetry install --with dev
 ```
 
 ### In a Mac Terminal/Linux execute the below commands:
