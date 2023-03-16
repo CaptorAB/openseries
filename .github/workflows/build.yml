@@ -48,21 +48,13 @@ jobs:
         run: |
           poetry config virtualenvs.prefer-active-python true
           poetry install --no-root --with dev
-
       - name: Tests with Pytest
         shell: bash
-        run: |
-          poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group 1 --splitting-algorithm least_duration
-          poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group 2 --splitting-algorithm least_duration
-          poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group 3 --splitting-algorithm least_duration
-          poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group 4 --splitting-algorithm least_duration
-          poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 --splits 5 --group 5 --splitting-algorithm least_duration
+        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
 
-      - name: Combine and report coverage
+      - name: Report coverage
         shell: bash
-        run: |
-          poetry run coverage combine coverage*/.coverage*
-          poetry run coverage report
+        run: poetry run coverage report
 
       - name: Package and check
         shell: bash
