@@ -61,7 +61,7 @@ jobs:
       - name: Combine and report coverage
         shell: bash
         run: |
-          poetry run coverage combine
+          poetry run coverage combine coverage*/.coverage*
           poetry run coverage report
 
       - name: Package and check
