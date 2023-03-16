@@ -51,11 +51,13 @@ jobs:
 
       - name: Tests with Pytest
         shell: bash
-        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
+        run: poetry run pytest --verbose --durations=20 --durations-min=2.0 --split=5 --splitting-algorithm least_duration
 
-      - name: Report coverage
+      - name: Combine and report coverage
         shell: bash
-        run: poetry run coverage report
+        run: |
+          poetry run coverage combine
+          poetry run coverage report
 
       - name: Package and check
         shell: bash
