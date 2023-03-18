@@ -28,7 +28,7 @@ from statsmodels.api import OLS
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import List, Literal, TypeVar
+from typing import List, Literal, Tuple, TypeVar
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -197,7 +197,7 @@ class OpenFrame(BaseModel):
         months_offset: int | None = None,
         from_dt: dt.date | None = None,
         to_dt: dt.date | None = None,
-    ) -> (dt.date, dt.date):
+    ) -> Tuple[dt.date, dt.date]:
         """Creates user defined date range
 
         Parameters
@@ -3044,7 +3044,7 @@ class OpenFrame(BaseModel):
         add_logo: bool = True,
         show_last: bool = False,
         output_type: Literal["file", "div"] = "file",
-    ) -> (Figure, str):
+    ) -> Tuple[Figure, str]:
         """Creates a Plotly Figure
 
         To scale the bubble size, use the attribute sizeref.
@@ -3154,7 +3154,7 @@ class OpenFrame(BaseModel):
         auto_open: bool = True,
         add_logo: bool = True,
         output_type: Literal["file", "div"] = "file",
-    ) -> (Figure, str):
+    ) -> Tuple[Figure, str]:
         """Creates a Plotly Bar Figure
 
         Parameters

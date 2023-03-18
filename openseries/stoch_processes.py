@@ -15,6 +15,7 @@ Processes that can be simulated in this module are:
 from math import log, pow, sqrt
 from numpy import add, array, ndarray, exp
 import numpy.random as nrand
+from typing import Tuple
 
 
 class ModelParameters(object):
@@ -329,7 +330,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
 def heston_construct_correlated_path(
     param: ModelParameters, brownian_motion_one: ndarray, seed: int | None = None
-) -> (ndarray, ndarray):
+) -> Tuple[ndarray, ndarray]:
     """This method is a simplified version of the Cholesky decomposition method for
     just two assets. It does not make use of matrix algebra and is therefore quite
     easy to implement
@@ -364,7 +365,7 @@ def heston_construct_correlated_path(
 
 def cox_ingersoll_ross_heston(
     param: ModelParameters, seed: int | None = None
-) -> (ndarray, ndarray):
+) -> Tuple[ndarray, ndarray]:
     """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
     volatility in the Heston model. Because the returns between the underlying
@@ -406,7 +407,7 @@ def cox_ingersoll_ross_heston(
 
 def heston_model_levels(
     param: ModelParameters, seed: int | None = None
-) -> (ndarray, ndarray):
+) -> Tuple[ndarray, ndarray]:
     """The Heston model is the geometric brownian motion model with stochastic
     volatility. This stochastic volatility is given by the Cox Ingersoll Ross
     process. Step one on this method is to construct two correlated

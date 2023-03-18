@@ -15,7 +15,7 @@ from pydantic import BaseModel, constr, Field, root_validator
 from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
-from typing import List, Literal, TypeVar
+from typing import List, Literal, Tuple, TypeVar
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.exceptions import FromFixedRateDatesInputError
@@ -503,7 +503,7 @@ class OpenTimeSeries(BaseModel):
         months_offset: int | None = None,
         from_dt: dt.date | None = None,
         to_dt: dt.date | None = None,
-    ) -> (dt.date, dt.date):
+    ) -> Tuple[dt.date, dt.date]:
         """Creates user defined date range
 
         Parameters
@@ -2314,7 +2314,7 @@ class OpenTimeSeries(BaseModel):
         add_logo: bool = True,
         show_last: bool = False,
         output_type: Literal["file", "div"] = "file",
-    ) -> (Figure, str):
+    ) -> Tuple[Figure, str]:
         """Creates a Plotly Figure
 
         Parameters
@@ -2403,7 +2403,7 @@ class OpenTimeSeries(BaseModel):
         auto_open: bool = True,
         add_logo: bool = True,
         output_type: Literal["file", "div"] = "file",
-    ) -> (Figure, str):
+    ) -> Tuple[Figure, str]:
         """Creates a Plotly Bar Figure
 
         Parameters

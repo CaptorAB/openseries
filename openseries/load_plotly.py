@@ -1,8 +1,9 @@
 from json import load
 from os.path import abspath, dirname, join
+from typing import Tuple
 
 
-def load_plotly_dict(responsive: bool = True, **kwargs) -> (dict, dict):
+def load_plotly_dict(responsive: bool = True, **kwargs) -> Tuple[dict, dict]:
     project_root = dirname(dirname(abspath(__file__)))
     layoutfile = join(abspath(project_root), "openseries", "plotly_layouts.json")
     logofile = join(abspath(project_root), "openseries", "plotly_captor_logo.json")
