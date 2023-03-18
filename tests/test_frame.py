@@ -3,16 +3,15 @@ from json import loads
 from pandas import DataFrame, date_range
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
-from typing import get_type_hints, TypeVar
+from typing import get_type_hints
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
 from openseries.frame import OpenFrame
+from openseries.types import TTestOpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.sim_price import ReturnSimulation
-
-TTestOpenFrame = TypeVar("TTestOpenFrame", bound="TestOpenFrame")
 
 
 class TestOpenFrame(TestCase):

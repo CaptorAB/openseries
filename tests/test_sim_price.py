@@ -1,16 +1,14 @@
 from pandas import DataFrame
-from typing import get_type_hints, TypeVar
+from typing import get_type_hints
 from unittest import TestCase
 
-from openseries.sim_price import ReturnSimulation, Simulation
-
-TTestSimPrice = TypeVar("TTestSimPrice", bound="TestSimPrice")
+from openseries.sim_price import ReturnSimulation
+from openseries.types import TTestSimPrice
 
 
 class TestSimPrice(TestCase):
     def test_return_simulations_annotations_and_typehints(self: TTestSimPrice):
         returnsimulation_annotations = dict(ReturnSimulation.__annotations__)
-        simulation_annotations = dict(Simulation.__annotations__)
 
         self.assertDictEqual(
             returnsimulation_annotations,
@@ -23,12 +21,9 @@ class TestSimPrice(TestCase):
                 "df": DataFrame,
             },
         )
-        self.assertDictEqual(returnsimulation_annotations, simulation_annotations)
 
         returnsimulation_typehints = get_type_hints(ReturnSimulation)
-        simulation_typehints = get_type_hints(Simulation)
         self.assertDictEqual(returnsimulation_annotations, returnsimulation_typehints)
-        self.assertDictEqual(returnsimulation_typehints, simulation_typehints)
 
     def test_return_simulation_processes(self: TTestSimPrice):
         args = {

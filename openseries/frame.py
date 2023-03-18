@@ -28,19 +28,30 @@ from statsmodels.api import OLS
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import List, Literal, Tuple, TypeVar
+from typing import List, Tuple
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
+from openseries.types import (
+    Lit_how_merge,
+    Lit_quantile_interpolation,
+    Lit_bizday_frequencies,
+    Lit_pandas_resample_convention,
+    Lit_pandas_reindex_method,
+    Lit_nan_method,
+    Lit_capture_ratio,
+    Lit_line_plot_mode,
+    Lit_bar_plot_mode,
+    Lit_plotly_output,
+    TOpenFrame,
+)
 from openseries.risk import (
     drawdown_series,
     drawdown_details,
     cvar_down,
     var_down,
 )
-
-TOpenFrame = TypeVar("TOpenFrame", bound="OpenFrame")
 
 
 class OpenFrame(BaseModel):
@@ -112,14 +123,12 @@ class OpenFrame(BaseModel):
 
         return deepcopy(self)
 
-    def merge_series(
-        self: TOpenFrame, how: Literal["outer", "inner"] = "outer"
-    ) -> TOpenFrame:
+    def merge_series(self: TOpenFrame, how: Lit_how_merge = "outer") -> TOpenFrame:
         """Merges the Pandas Dataframes of the constituent OpenTimeSeries
 
         Parameters
         ----------
-        how: Literal["outer", "inner"], default: "outer"
+        how: Lit_how_merge, default: "outer"
             The Pandas merge method.
 
         Returns
@@ -1567,9 +1576,7 @@ class OpenFrame(BaseModel):
     def var_down(
         self: TOpenFrame,
         level: float = 0.95,
-        interpolation: Literal[
-            "linear", "lower", "higher", "midpoint", "nearest"
-        ] = "lower",
+        interpolation: Lit_quantile_interpolation = "lower",
     ) -> Series:
         """Downside Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
@@ -1580,8 +1587,7 @@ class OpenFrame(BaseModel):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-        "nearest"], default: "lower"
+        interpolation: Lit_quantile_interpolation, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1604,9 +1610,7 @@ class OpenFrame(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Literal[
-            "linear", "lower", "higher", "midpoint", "nearest"
-        ] = "lower",
+        interpolation: Lit_quantile_interpolation = "lower",
     ) -> Series:
         """https://www.investopedia.com/terms/v/var.asp
         Downside Value At Risk, "VaR". The equivalent of
@@ -1624,8 +1628,7 @@ class OpenFrame(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-        "nearest"], default: "lower"
+        interpolation: Lit_quantile_interpolation, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1647,9 +1650,7 @@ class OpenFrame(BaseModel):
     def vol_from_var(
         self: TOpenFrame,
         level: float = 0.95,
-        interpolation: Literal[
-            "linear", "lower", "higher", "midpoint", "nearest"
-        ] = "lower",
+        interpolation: Lit_quantile_interpolation = "lower",
     ) -> Series:
         """
         Parameters
@@ -1657,8 +1658,7 @@ class OpenFrame(BaseModel):
 
         level: float, default: 0.95
             The sought VaR level
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-        "nearest"], default: "lower"
+        interpolation: Lit_quantile_interpolation, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1683,9 +1683,7 @@ class OpenFrame(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Literal[
-            "linear", "lower", "higher", "midpoint", "nearest"
-        ] = "lower",
+        interpolation: Lit_quantile_interpolation = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
@@ -1702,8 +1700,7 @@ class OpenFrame(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-        "nearest"], default: "lower"
+        interpolation: Lit_quantile_interpolation, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
@@ -1756,9 +1753,7 @@ class OpenFrame(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Literal[
-            "linear", "lower", "higher", "midpoint", "nearest"
-        ] = "lower",
+        interpolation: Lit_quantile_interpolation = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> Series:
@@ -1782,8 +1777,7 @@ class OpenFrame(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-        "nearest"], default: "lower"
+        interpolation: Lit_quantile_interpolation, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
@@ -1914,12 +1908,10 @@ class OpenFrame(BaseModel):
 
     def resample_to_business_period_ends(
         self: TOpenFrame,
-        freq: Literal["BM", "BQ", "BA"] = "BM",
+        freq: Lit_bizday_frequencies = "BM",
         countries: list | str = "SE",
-        convention: Literal["start", "s", "end", "e"] = "end",
-        method: Literal[
-            None, "pad", "ffill", "backfill", "bfill", "nearest"
-        ] = "nearest",
+        convention: Lit_pandas_resample_convention = "end",
+        method: Lit_pandas_reindex_method = "nearest",
     ) -> TOpenFrame:
         """Resamples timeseries frequency to the business calendar
         month end dates of each period while leaving any stubs
@@ -1927,15 +1919,14 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        freq: Literal["BM", "BQ", "BA"], default BM
+        freq: Lit_bizday_frequencies, default BM
             The date offset string that sets the resampled frequency
         countries: list | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
             to create a business day calendar used for date adjustments
-        convention: Literal["start", "s", "end", "e"], default; end
+        convention: Lit_pandas_resample_convention, default; end
             Controls whether to use the start or end of `rule`.
-        method: Literal[None, "pad", "ffill", "backfill", "bfill",
-        "nearest"], default: nearest
+        method: Lit_pandas_reindex_method, default: nearest
             Controls the method used to align values across columns
 
         Returns
@@ -2227,9 +2218,7 @@ class OpenFrame(BaseModel):
         self: TOpenFrame,
         column: int,
         level: float = 0.95,
-        interpolation: Literal[
-            "linear", "lower", "higher", "midpoint", "nearest"
-        ] = "lower",
+        interpolation: Lit_quantile_interpolation = "lower",
         observations: int = 252,
     ) -> DataFrame:
         """
@@ -2241,8 +2230,7 @@ class OpenFrame(BaseModel):
             The sought Value At Risk level
         observations: int, default: 252
             Number of observations in the overlapping window.
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-        "nearest"], default: "lower"
+        interpolation: Lit_quantile_interpolation, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -2263,13 +2251,13 @@ class OpenFrame(BaseModel):
         return vardf
 
     def value_nan_handle(
-        self: TOpenFrame, method: Literal["fill", "drop"] = "fill"
+        self: TOpenFrame, method: Lit_nan_method = "fill"
     ) -> TOpenFrame:
         """Handling of missing values in a valueseries
 
         Parameters
         ----------
-        method: Literal["fill", "drop"], default: "fill"
+        method: Lit_nan_method, default: "fill"
             Method used to handle NaN. Either fill with last known or drop
 
         Returns
@@ -2289,13 +2277,13 @@ class OpenFrame(BaseModel):
         return self
 
     def return_nan_handle(
-        self: TOpenFrame, method: Literal["fill", "drop"] = "fill"
+        self: TOpenFrame, method: Lit_nan_method = "fill"
     ) -> TOpenFrame:
         """Handling of missing values in a returnseries
 
         Parameters
         ----------
-        method: Literal["fill", "drop"], default: "fill"
+        method: Lit_nan_method, default: "fill"
             Method used to handle NaN. Either fill with zero or drop
 
         Returns
@@ -2600,7 +2588,7 @@ class OpenFrame(BaseModel):
 
     def capture_ratio_func(
         self: TOpenFrame,
-        ratio: Literal["up", "down", "both"],
+        ratio: Lit_capture_ratio,
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -2618,8 +2606,8 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        ratio: Literal["up", "down", "both"]
-            Either 'up', 'down' or 'both'
+        ratio: Lit_capture_ratio
+            The ratio to calculate
         base_column: int | None, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
@@ -2638,7 +2626,6 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Capture Ratios
         """
-
         assert ratio in [
             "up",
             "down",
@@ -3028,14 +3015,7 @@ class OpenFrame(BaseModel):
 
     def plot_series(
         self: TOpenFrame,
-        mode: Literal[
-            "lines",
-            "markers",
-            "lines+markers",
-            "lines+text",
-            "markers+text",
-            "lines+markers+text",
-        ] = "lines",
+        mode: Lit_line_plot_mode = "lines",
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: str | None = None,
@@ -3043,7 +3023,7 @@ class OpenFrame(BaseModel):
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
-        output_type: Literal["file", "div"] = "file",
+        output_type: Lit_plotly_output = "file",
     ) -> Tuple[Figure, str]:
         """Creates a Plotly Figure
 
@@ -3053,14 +3033,7 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        mode: Literal[
-                "lines",
-                "markers",
-                "lines+markers",
-                "lines+text",
-                "markers+text",
-                "lines+markers+text",
-              ], default: "lines"
+        mode: Lit_line_plot_mode, default: "lines"
             The type of scatter to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
@@ -3076,8 +3049,8 @@ class OpenFrame(BaseModel):
             If True a Captor logo is added to the plot
         show_last: bool, default: False
             If True the last data point is highlighted as red dot with a label
-        output_type: str, default: "file"
-            file or div
+        output_type: Lit_plotly_output, default: "file"
+            Determines output type
 
         Returns
         -------
@@ -3146,20 +3119,20 @@ class OpenFrame(BaseModel):
 
     def plot_bars(
         self: TOpenFrame,
-        mode: Literal["stack", "group", "overlay", "relative"] = "group",
+        mode: Lit_bar_plot_mode = "group",
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: str | None = None,
         labels: list | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
-        output_type: Literal["file", "div"] = "file",
+        output_type: Lit_plotly_output = "file",
     ) -> Tuple[Figure, str]:
         """Creates a Plotly Bar Figure
 
         Parameters
         ----------
-        mode: Literal["stack", "group", "overlay", "relative"], default: "group"
+        mode: Lit_bar_plot_mode, default: "group"
             The type of bar to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
@@ -3173,8 +3146,8 @@ class OpenFrame(BaseModel):
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
-        output_type: str, default: "file"
-            file or div
+        output_type: Lit_plotly_output, default: "file"
+            Determines output type
 
         Returns
         -------

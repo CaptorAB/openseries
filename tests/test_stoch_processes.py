@@ -1,10 +1,11 @@
 from datetime import date as dtdate
 from pandas import DataFrame, date_range
-from typing import get_type_hints, TypeVar
+from typing import get_type_hints
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries, ValueType
+from openseries.types import TTestStochProcesses
 from openseries.stoch_processes import (
     ModelParameters,
     cox_ingersoll_ross_levels,
@@ -14,8 +15,6 @@ from openseries.stoch_processes import (
     geometric_brownian_motion_jump_diffusion_levels,
     heston_model_levels,
 )
-
-TTestStochProcesses = TypeVar("TTestStochProcesses", bound="TestStochProcesses")
 
 
 class TestStochProcesses(TestCase):

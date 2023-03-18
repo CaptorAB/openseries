@@ -17,103 +17,7 @@ from numpy import add, array, ndarray, exp
 import numpy.random as nrand
 from typing import Tuple
 
-
-class ModelParameters(object):
-    """Instantiates an object of the class ModelParameters
-
-    Parameters
-    ----------
-    all_s0: float
-        Starting asset value
-    all_time: float
-        Amount of time to simulate for
-    all_delta: float
-        Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
-    all_sigma: float
-        Volatility of the stochastic processes
-    all_r0: float, default: 0.0
-        Starting interest rate value
-    gbm_mu: float
-        Annual drift factor for geometric brownian motion
-    jumps_lamda: float, default: 0.0
-        Probability of a jump happening at each point in time
-    jumps_sigma: float, default: 0.0
-        Volatility of the jump size
-    jumps_mu: float, default: 0.0
-        Average jump size
-    cir_a: float, default: 0.0
-        Rate of mean reversion for Cox Ingersoll Ross
-    cir_mu: float, default: 0.0
-        Long run average interest rate for Cox Ingersoll Ross
-    cir_rho: float, default: 0.0
-        Correlation between the wiener processes of the Heston model
-    ou_a: float, default: 0.0
-        Rate of mean reversion for Ornstein Uhlenbeck
-    ou_mu: float, default: 0.0
-        Long run average interest rate for Ornstein Uhlenbeck
-    heston_a: float, default: 0.0
-        Rate of mean reversion for volatility in the Heston model
-    heston_mu: float, default: 0.0
-        Long run average volatility for the Heston model
-    heston_vol0: float, default: 0.0
-        Starting volatility value for the Heston vol model
-    """
-
-    all_s0: float
-    all_time: int
-    all_delta: float
-    all_sigma: float
-    gbm_mu: float
-    jumps_lamda: float = 0.0
-    jumps_sigma: float = 0.0
-    jumps_mu: float = 0.0
-    cir_a: float = 0.0
-    cir_mu: float = 0.0
-    all_r0: float = 0.0
-    cir_rho: float = 0.0
-    ou_a: float = 0.0
-    ou_mu: float = 0.0
-    heston_a: float = 0.0
-    heston_mu: float = 0.0
-    heston_vol0: float = 0.0
-
-    def __init__(
-        self,
-        all_s0: float,
-        all_time: int,
-        all_delta: float,
-        all_sigma: float,
-        gbm_mu: float,
-        jumps_lamda: float = 0.0,
-        jumps_sigma: float = 0.0,
-        jumps_mu: float = 0.0,
-        cir_a: float = 0.0,
-        cir_mu: float = 0.0,
-        all_r0: float = 0.0,
-        cir_rho: float = 0.0,
-        ou_a: float = 0.0,
-        ou_mu: float = 0.0,
-        heston_a: float = 0.0,
-        heston_mu: float = 0.0,
-        heston_vol0: float = 0.0,
-    ) -> None:
-        self.all_s0 = all_s0
-        self.all_time = all_time
-        self.all_delta = all_delta
-        self.all_sigma = all_sigma
-        self.gbm_mu = gbm_mu
-        self.lamda = jumps_lamda
-        self.jumps_sigma = jumps_sigma
-        self.jumps_mu = jumps_mu
-        self.cir_a = cir_a
-        self.cir_mu = cir_mu
-        self.all_r0 = all_r0
-        self.cir_rho = cir_rho
-        self.ou_a = ou_a
-        self.ou_mu = ou_mu
-        self.heston_a = heston_a
-        self.heston_mu = heston_mu
-        self.heston_vol0 = heston_vol0
+from openseries.types import ModelParameters
 
 
 def convert_to_prices(param: ModelParameters, log_returns: ndarray) -> ndarray:
@@ -260,7 +164,7 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
     if seed is not None:
         nrand.seed(seed)
     s_n = time = 0
-    small_lamda = -(1.0 / param.lamda)
+    small_lamda = -(1.0 / param.jumps_lamda)
     jump_sizes = []
     for k in range(0, param.all_time):
         jump_sizes.append(0.0)

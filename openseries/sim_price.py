@@ -1,7 +1,8 @@
 from numpy import insert, random, sqrt
 from pandas import DataFrame
-from typing import TypedDict, TypeVar
+from pydantic import BaseModel
 
+from openseries.types import TReturnSimulation
 from openseries.stoch_processes import (
     ModelParameters,
     geometric_brownian_motion_log_returns,
@@ -9,11 +10,9 @@ from openseries.stoch_processes import (
     heston_model_levels,
 )
 
-TReturnSimulation = TypeVar("TReturnSimulation", bound="ReturnSimulation")
 
-
-class Simulation(TypedDict, total=False):
-    """Class to hold the type of input data for the ReturnSimulation class
+class ReturnSimulation(BaseModel):
+    """Object of the class ReturnSimulation. Subclass of the Pydantic BaseModel
 
     Parameters
     ----------
@@ -38,25 +37,8 @@ class Simulation(TypedDict, total=False):
     mean_annual_vol: float
     df: DataFrame
 
-
-class ReturnSimulation(object):
-    number_of_sims: int
-    trading_days: int
-    trading_days_in_year: int
-    mean_annual_return: float
-    mean_annual_vol: float
-    df: DataFrame
-
-    def __init__(self: TReturnSimulation, d: Simulation) -> None:
-        """Instantiates an object of the class ReturnSimulation
-
-        Parameters
-        ----------
-        d: Simulation
-            A subclass of TypedDict with the required and optional parameters
-        """
-
-        self.__dict__ = d
+    class Config:
+        arbitrary_types_allowed = True
 
     @property
     def results(self: TReturnSimulation) -> DataFrame:
@@ -130,7 +112,7 @@ class ReturnSimulation(object):
             scale=mean_annual_vol / sqrt(trading_days_in_year),
             size=(number_of_sims, trading_days),
         )
-        output = Simulation(
+        return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -138,7 +120,6 @@ class ReturnSimulation(object):
             mean_annual_vol=mean_annual_vol,
             df=DataFrame(data=daily_returns),
         )
-        return cls(d=output)
 
     @classmethod
     def from_lognormal(
@@ -183,7 +164,7 @@ class ReturnSimulation(object):
             )
             - 1
         )
-        output = Simulation(
+        return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -191,7 +172,6 @@ class ReturnSimulation(object):
             mean_annual_vol=mean_annual_vol,
             df=DataFrame(data=daily_returns),
         )
-        return cls(d=output)
 
     @classmethod
     def from_gbm(
@@ -240,7 +220,7 @@ class ReturnSimulation(object):
         daily_returns = []
         for i in range(number_of_sims):
             daily_returns.append(geometric_brownian_motion_log_returns(mp))
-        output = Simulation(
+        return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -248,7 +228,6 @@ class ReturnSimulation(object):
             mean_annual_vol=mean_annual_vol,
             df=DataFrame(data=daily_returns),
         )
-        return cls(d=output)
 
     @classmethod
     def from_heston(
@@ -309,7 +288,7 @@ class ReturnSimulation(object):
             r = aray[1:] / aray[:-1] - 1
             r = insert(r, 0, 0.0)
             daily_returns.append(r)
-        output = Simulation(
+        return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -317,7 +296,6 @@ class ReturnSimulation(object):
             mean_annual_vol=mean_annual_vol,
             df=DataFrame(data=daily_returns),
         )
-        return cls(d=output)
 
     @classmethod
     def from_heston_vol(
@@ -377,7 +355,7 @@ class ReturnSimulation(object):
             r = aray[1:] / aray[:-1] - 1
             r = insert(r, 0, 0.0)
             daily_returns.append(r)
-        output = Simulation(
+        return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -385,7 +363,6 @@ class ReturnSimulation(object):
             mean_annual_vol=mean_annual_vol,
             df=DataFrame(data=daily_returns),
         )
-        return cls(d=output)
 
     @classmethod
     def from_merton_jump_gbm(
@@ -448,7 +425,7 @@ class ReturnSimulation(object):
             r = aray[1:] / aray[:-1] - 1
             r = insert(r, 0, 0.0)
             daily_returns.append(r)
-        output = Simulation(
+        return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -456,4 +433,3 @@ class ReturnSimulation(object):
             mean_annual_vol=mean_annual_vol,
             df=DataFrame(data=daily_returns),
         )
-        return cls(d=output)
