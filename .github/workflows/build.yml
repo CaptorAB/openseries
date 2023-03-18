@@ -48,6 +48,7 @@ jobs:
         run: |
           poetry config virtualenvs.prefer-active-python true
           poetry install --no-root --with dev
+
       - name: Tests with Pytest
         shell: bash
         run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
