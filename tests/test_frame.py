@@ -1221,7 +1221,7 @@ class TestOpenFrame(TestCase):
         apframe.to_cumret()
         result_index = apframe.all_properties().index.tolist()
 
-        self.assertListEqual(prop_index, result_index)
+        self.assertTrue(set(prop_index) == set(result_index))
 
     def test_openframe_align_index_to_local_cdays(self: TTestOpenFrame):
         d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]

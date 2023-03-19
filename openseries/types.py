@@ -29,6 +29,119 @@ TTestSimPrice = TypeVar("TTestSimPrice", bound="TestSimPrice")
 TReturnSimulation = TypeVar("TReturnSimulation", bound="ReturnSimulation")
 TTestStochProcesses = TypeVar("TTestStochProcesses", bound="TestStochProcesses")
 TTestDateFixer = TypeVar("TTestDateFixer", bound="TestDateFixer")
+TTestTypes = TypeVar("TTestTypes", bound="TestTypes")
+
+
+class OpenTimeSeriesPropertiesList(list):
+    allowed_strings = {
+        "value_ret",
+        "geo_ret",
+        "arithmetic_ret",
+        "vol",
+        "downside_deviation",
+        "ret_vol_ratio",
+        "sortino_ratio",
+        "z_score",
+        "skew",
+        "kurtosis",
+        "positive_share",
+        "var_down",
+        "cvar_down",
+        "vol_from_var",
+        "worst",
+        "worst_month",
+        "max_drawdown_cal_year",
+        "max_drawdown",
+        "max_drawdown_date",
+        "first_idx",
+        "last_idx",
+        "length",
+        "span_of_days",
+        "yearfrac",
+        "periods_in_a_year",
+    }
+
+    def __init__(self, *args):
+        super().__init__(args)
+        self._validate()
+
+    def __setitem__(self, index, value):
+        super().__setitem__(index, value)
+        self._validate()
+
+    def append(self, value):
+        super().append(value)
+        self._validate()
+
+    def extend(self, values):
+        super().extend(values)
+        self._validate()
+
+    def _validate(self):
+        seen = set()
+        for item in self:
+            if item not in self.allowed_strings:
+                raise ValueError(
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                )
+            if item in seen:
+                raise ValueError(f"Duplicate string: {item}")
+            seen.add(item)
+
+
+class OpenFramePropertiesList(list):
+    allowed_strings = {
+        "value_ret",
+        "geo_ret",
+        "arithmetic_ret",
+        "vol",
+        "downside_deviation",
+        "ret_vol_ratio",
+        "sortino_ratio",
+        "z_score",
+        "skew",
+        "kurtosis",
+        "positive_share",
+        "var_down",
+        "cvar_down",
+        "vol_from_var",
+        "worst",
+        "worst_month",
+        "max_drawdown",
+        "max_drawdown_date",
+        "max_drawdown_cal_year",
+        "first_indices",
+        "last_indices",
+        "lengths_of_items",
+        "span_of_days_all",
+    }
+
+    def __init__(self, *args):
+        super().__init__(args)
+        self._validate()
+
+    def __setitem__(self, index, value):
+        super().__setitem__(index, value)
+        self._validate()
+
+    def append(self, value):
+        super().append(value)
+        self._validate()
+
+    def extend(self, values):
+        super().extend(values)
+        self._validate()
+
+    def _validate(self):
+        seen = set()
+        for item in self:
+            if item not in self.allowed_strings:
+                raise ValueError(
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                )
+            if item in seen:
+                raise ValueError(f"Duplicate string: {item}")
+            seen.add(item)
 
 
 class ModelParameters(BaseModel):

@@ -29,6 +29,7 @@ from openseries.types import (
     Lit_line_plot_mode,
     Lit_bar_plot_mode,
     Lit_plotly_output,
+    OpenTimeSeriesPropertiesList,
     TOpenTimeSeries,
 )
 from openseries.risk import (
@@ -598,13 +599,13 @@ class OpenTimeSeries(BaseModel):
         return self
 
     def all_properties(
-        self: TOpenTimeSeries, properties: list | None = None
+        self: TOpenTimeSeries, properties: OpenTimeSeriesPropertiesList | None = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
         ----------
-        properties: list, optional
+        properties: OpenTimeSeriesPropertiesList, optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -614,40 +615,12 @@ class OpenTimeSeries(BaseModel):
         """
 
         if not properties:
-            properties = [
-                "value_ret",
-                "geo_ret",
-                "arithmetic_ret",
-                "vol",
-                "downside_deviation",
-                "ret_vol_ratio",
-                "sortino_ratio",
-                "z_score",
-                "skew",
-                "kurtosis",
-                "positive_share",
-                "var_down",
-                "cvar_down",
-                "vol_from_var",
-                "worst",
-                "worst_month",
-                "max_drawdown_cal_year",
-                "max_drawdown",
-                "max_drawdown_date",
-                "first_idx",
-                "last_idx",
-                "length",
-                "span_of_days",
-                "yearfrac",
-                "periods_in_a_year",
-            ]
+            properties = OpenTimeSeriesPropertiesList.allowed_strings
 
         pdf = DataFrame.from_dict(
             {x: getattr(self, x) for x in properties}, orient="index"
         )
-
         pdf.columns = self.tsdf.columns
-
         return pdf
 
     @property

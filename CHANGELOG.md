@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.11.3] - 2023-03-18
+## Version [0.11.4] - 2023-03-19
 
 Moved all defined types into own module and replaced TypedDict with Pydantic
 BaseModel throughout.

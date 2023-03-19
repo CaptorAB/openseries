@@ -44,6 +44,7 @@ from openseries.types import (
     Lit_line_plot_mode,
     Lit_bar_plot_mode,
     Lit_plotly_output,
+    OpenFramePropertiesList,
     TOpenFrame,
 )
 from openseries.risk import (
@@ -157,12 +158,14 @@ class OpenFrame(BaseModel):
                 x.tsdf = x.tsdf.loc[self.tsdf.index]
         return self
 
-    def all_properties(self: TOpenFrame, properties: list | None = None) -> DataFrame:
+    def all_properties(
+        self: TOpenFrame, properties: OpenFramePropertiesList | None = None
+    ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
         ----------
-        properties: list, optional
+        properties: OpenFramePropertiesList, optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -172,31 +175,8 @@ class OpenFrame(BaseModel):
         """
 
         if not properties:
-            properties = [
-                "value_ret",
-                "geo_ret",
-                "arithmetic_ret",
-                "vol",
-                "downside_deviation",
-                "ret_vol_ratio",
-                "sortino_ratio",
-                "z_score",
-                "skew",
-                "kurtosis",
-                "positive_share",
-                "var_down",
-                "cvar_down",
-                "vol_from_var",
-                "worst",
-                "worst_month",
-                "max_drawdown",
-                "max_drawdown_date",
-                "max_drawdown_cal_year",
-                "first_indices",
-                "last_indices",
-                "lengths_of_items",
-                "span_of_days_all",
-            ]
+            properties = OpenFramePropertiesList.allowed_strings
+
         prop_list = [getattr(self, x) for x in properties]
         results = concat(prop_list, axis="columns").T
         return results

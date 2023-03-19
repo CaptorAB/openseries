@@ -808,6 +808,39 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertListEqual(are_log, should_log)
 
+    def test_opentimeseries_all_properties(self: TTestOpenTimeSeries):
+        prop_index = [
+            "vol",
+            "last_idx",
+            "geo_ret",
+            "first_idx",
+            "max_drawdown",
+            "periods_in_a_year",
+            "z_score",
+            "downside_deviation",
+            "worst",
+            "value_ret",
+            "ret_vol_ratio",
+            "worst_month",
+            "max_drawdown_date",
+            "arithmetic_ret",
+            "skew",
+            "cvar_down",
+            "sortino_ratio",
+            "positive_share",
+            "kurtosis",
+            "vol_from_var",
+            "max_drawdown_cal_year",
+            "yearfrac",
+            "var_down",
+            "length",
+            "span_of_days",
+        ]
+        apseries = self.randomseries.from_deepcopy()
+        apseries.to_cumret()
+        result_index = apseries.all_properties().index.tolist()
+        self.assertTrue(set(prop_index) == set(result_index))
+
     def test_opentimeseries_all_calc_properties(self: TTestOpenTimeSeries):
         checks = {
             "arithmetic_ret": f"{0.00953014509:.11f}",
