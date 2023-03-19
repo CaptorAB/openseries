@@ -28,7 +28,7 @@ from statsmodels.api import OLS
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import List, Tuple
+from typing import List, Tuple, TypeVar
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -45,7 +45,6 @@ from openseries.types import (
     Lit_bar_plot_mode,
     Lit_plotly_output,
     OpenFramePropertiesList,
-    TOpenFrame,
 )
 from openseries.risk import (
     drawdown_series,
@@ -53,6 +52,8 @@ from openseries.risk import (
     cvar_down,
     var_down,
 )
+
+TOpenFrame = TypeVar("TOpenFrame", bound="OpenFrame")
 
 
 class OpenFrame(BaseModel):

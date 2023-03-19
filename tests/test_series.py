@@ -10,11 +10,10 @@ from pydantic.error_wrappers import ValidationError as PydanticValidationError
 import pytest
 from stdnum.exceptions import InvalidChecksum
 import sys
-from typing import get_type_hints
+from typing import get_type_hints, TypeVar
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
-from openseries.types import TTestOpenTimeSeries
 from openseries.series import (
     compare_lists,
     OpenTimeSeries,
@@ -24,6 +23,8 @@ from openseries.series import (
 )
 from openseries.sim_price import ReturnSimulation
 from openseries.exceptions import FromFixedRateDatesInputError
+
+TTestOpenTimeSeries = TypeVar("TTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])

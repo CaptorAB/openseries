@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Literal, TypeVar
+from typing import Literal, List
 
 Lit_line_plot_mode = Literal[
     "lines",
@@ -21,18 +21,8 @@ Lit_capture_ratio = Literal["up", "down", "both"]
 Lit_bar_plot_mode = Literal["stack", "group", "overlay", "relative"]
 Lit_plotly_output = Literal["file", "div"]
 
-TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound="OpenTimeSeries")
-TTestOpenTimeSeries = TypeVar("TTestOpenTimeSeries", bound="TestOpenTimeSeries")
-TOpenFrame = TypeVar("TOpenFrame", bound="OpenFrame")
-TTestOpenFrame = TypeVar("TTestOpenFrame", bound="TestOpenFrame")
-TTestSimPrice = TypeVar("TTestSimPrice", bound="TestSimPrice")
-TReturnSimulation = TypeVar("TReturnSimulation", bound="ReturnSimulation")
-TTestStochProcesses = TypeVar("TTestStochProcesses", bound="TestStochProcesses")
-TTestDateFixer = TypeVar("TTestDateFixer", bound="TestDateFixer")
-TTestTypes = TypeVar("TTestTypes", bound="TestTypes")
 
-
-class OpenTimeSeriesPropertiesList(list):
+class OpenTimeSeriesPropertiesList(List[str]):
     allowed_strings = {
         "value_ret",
         "geo_ret",
@@ -61,23 +51,11 @@ class OpenTimeSeriesPropertiesList(list):
         "periods_in_a_year",
     }
 
-    def __init__(self, *args):
+    def __init__(self, *args: str) -> None:
         super().__init__(args)
         self._validate()
 
-    def __setitem__(self, index, value):
-        super().__setitem__(index, value)
-        self._validate()
-
-    def append(self, value):
-        super().append(value)
-        self._validate()
-
-    def extend(self, values):
-        super().extend(values)
-        self._validate()
-
-    def _validate(self):
+    def _validate(self) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
@@ -89,7 +67,7 @@ class OpenTimeSeriesPropertiesList(list):
             seen.add(item)
 
 
-class OpenFramePropertiesList(list):
+class OpenFramePropertiesList(List[str]):
     allowed_strings = {
         "value_ret",
         "geo_ret",
@@ -116,23 +94,11 @@ class OpenFramePropertiesList(list):
         "span_of_days_all",
     }
 
-    def __init__(self, *args):
+    def __init__(self, *args: str) -> None:
         super().__init__(args)
         self._validate()
 
-    def __setitem__(self, index, value):
-        super().__setitem__(index, value)
-        self._validate()
-
-    def append(self, value):
-        super().append(value)
-        self._validate()
-
-    def extend(self, values):
-        super().extend(values)
-        self._validate()
-
-    def _validate(self):
+    def _validate(self) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:

@@ -1,9 +1,9 @@
 import datetime as dt
 from numpy import datetime64
 from pandas import Timestamp
+from typing import TypeVar
 from unittest import TestCase
 
-from openseries.types import TTestDateFixer
 from openseries.datefixer import (
     date_fix,
     date_offset_foll,
@@ -11,6 +11,8 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
+
+TTestDateFixer = TypeVar("TTestDateFixer", bound="TestDateFixer")
 
 
 class TestDateFixer(TestCase):

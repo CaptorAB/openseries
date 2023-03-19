@@ -1,9 +1,10 @@
 from pandas import DataFrame
-from typing import get_type_hints
+from typing import get_type_hints, TypeVar
 from unittest import TestCase
 
 from openseries.sim_price import ReturnSimulation
-from openseries.types import TTestSimPrice
+
+TTestSimPrice = TypeVar("TTestSimPrice", bound="TestSimPrice")
 
 
 class TestSimPrice(TestCase):

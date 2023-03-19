@@ -4,7 +4,7 @@ https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
 from math import ceil
-from numpy import Inf, isnan, maximum, mean, nan_to_num, quantile, sort
+from numpy import Inf, isnan, maximum, mean, nan_to_num, ndarray, quantile, sort
 from pandas import DataFrame, Series
 from typing import List
 
@@ -40,7 +40,7 @@ def var_down(
     data: DataFrame | Series | List[float],
     level: float = 0.95,
     interpolation: Lit_quantile_interpolation = "lower",
-) -> float:
+) -> ndarray:
     """Downside Value At Risk, "VaR". The equivalent of
     percentile.inc([...], 1-level) over returns in MS Excel \n
     https://www.investopedia.com/terms/v/var.asp
@@ -147,7 +147,7 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
     mdate = max_drawdown_date(prices)
     md = float((prices / prices.expanding(min_periods=1).max()).min() - 1)
     dd = prices.copy()
-    drwdwn = drawdown_series(dd).loc[:mdate]
+    drwdwn = drawdown_series(dd).loc[:mdate]  # type: ignore
     drwdwn.sort_index(ascending=False, inplace=True)
     sdate = drwdwn[drwdwn == 0.0].idxmax().values[0].astype(dt.datetime)
     sdate = dt.datetime.fromtimestamp(sdate / 1e9).date()

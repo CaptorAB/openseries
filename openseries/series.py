@@ -15,7 +15,7 @@ from pydantic import BaseModel, constr, Field, root_validator
 from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
-from typing import List, Tuple
+from typing import List, Tuple, TypeVar
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.exceptions import FromFixedRateDatesInputError
@@ -30,7 +30,6 @@ from openseries.types import (
     Lit_bar_plot_mode,
     Lit_plotly_output,
     OpenTimeSeriesPropertiesList,
-    TOpenTimeSeries,
 )
 from openseries.risk import (
     cvar_down,
@@ -38,6 +37,8 @@ from openseries.risk import (
     drawdown_series,
     drawdown_details,
 )
+
+TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound="OpenTimeSeries")
 
 
 def check_if_none(item) -> bool:
@@ -1793,7 +1794,6 @@ class OpenTimeSeries(BaseModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        self.tsdf.columns: MultiIndex
         if not any(
             [
                 True if x == ValueType.RTRN else False
@@ -2191,7 +2191,6 @@ class OpenTimeSeries(BaseModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        self.tsdf.columns: MultiIndex
         if any(
             [
                 True if x == ValueType.RTRN else False

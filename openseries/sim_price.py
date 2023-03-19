@@ -1,14 +1,16 @@
 from numpy import insert, random, sqrt
 from pandas import DataFrame
 from pydantic import BaseModel
+from typing import TypeVar
 
-from openseries.types import TReturnSimulation
 from openseries.stoch_processes import (
     ModelParameters,
     geometric_brownian_motion_log_returns,
     geometric_brownian_motion_jump_diffusion_levels,
     heston_model_levels,
 )
+
+TReturnSimulation = TypeVar("TReturnSimulation", bound="ReturnSimulation")
 
 
 class ReturnSimulation(BaseModel):
