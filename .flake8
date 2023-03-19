@@ -24,7 +24,10 @@ tee = False
 exclude =
     .git,
     .github,
+    ./venv,
     venv,
+    .venv,
+    ./.venv,
     .pytest_cache,
 
 # Provide a comma-separate list of glob patterns to include for checks.
@@ -44,18 +47,15 @@ max-complexity = 10
 # incluences E131 and E133
 hang-closing = False
 
-# ERROR CODES
-#
-# E/W  - PEP8 errors/warnings (pycodestyle)
-# F    - linting errors (pyflakes)
-# C    - McCabe complexity error (mccabe)
-#
+# ERROR CODES EXCLUDED
+# C901 - Complexity
+# E203 - whitespace before ':'
+# F722 - syntax error in forward annotation
+# F821 - undefined name
 # W503 - line break before binary operator
+extend-ignore = C901, E203, F722, F821, W503
 
-# Specify a list of codes to ignore.
-extend-ignore = C901, E203, E501, W503, F722, F821
-
-# Specify the list of error codes you wish Flake8 to report.
+# List of error codes that Flake8 reports
 select = B, C, E, F, W, T4, B9
 
 # Enable PyFlakes syntax checking of doctests in docstrings.
