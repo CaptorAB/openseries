@@ -10,12 +10,14 @@ readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: BSD License",
     "Intended Audience :: Financial and Insurance Industry",
     "Topic :: Office/Business :: Financial :: Investment",
     "Natural Language :: English",
     "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
+    "Framework :: Pydantic",
 ]
 keywords = [
     "python",

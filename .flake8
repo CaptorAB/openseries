@@ -24,10 +24,8 @@ tee = False
 exclude =
     .git,
     .github,
-    ./venv,
-    venv,
     .venv,
-    ./.venv,
+    venv/,
     .pytest_cache,
 
 # Provide a comma-separate list of glob patterns to include for checks.
