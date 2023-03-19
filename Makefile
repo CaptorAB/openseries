@@ -5,7 +5,7 @@ venv:
 	poetry install --with dev
 
 test:
-	PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0 ./
+	PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --capture=no --durations=20 --durations-min=2.0 ./
 	PYTHONPATH=${PWD} poetry run coverage report -m
 
 .PHONY: test
