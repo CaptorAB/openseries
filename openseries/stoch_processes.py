@@ -28,7 +28,7 @@ def convert_to_prices(param: ModelParameters, log_returns: ndarray) -> ndarray:
     ----------
     param: ModelParameters
         Model input
-    log_returns:
+    log_returns: numpy.ndarray
         Log returns to exponentiate
 
     Returns
@@ -57,7 +57,7 @@ def brownian_motion_log_returns(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -80,7 +80,7 @@ def brownian_motion_levels(param: ModelParameters, seed: int | None = None) -> n
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -104,7 +104,7 @@ def geometric_brownian_motion_log_returns(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -129,7 +129,7 @@ def geometric_brownian_motion_levels(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -152,7 +152,7 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -193,7 +193,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -217,7 +217,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -245,7 +245,7 @@ def heston_construct_correlated_path(
         Model input
     brownian_motion_one: numpy.ndarray
         A first path to correlate against
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -281,7 +281,7 @@ def cox_ingersoll_ross_heston(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -325,7 +325,7 @@ def heston_model_levels(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -367,7 +367,7 @@ def cox_ingersoll_ross_levels(
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
@@ -396,7 +396,7 @@ def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -
     ----------
     param: ModelParameters
         Model input
-    seed: int | None, optional
+    seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
