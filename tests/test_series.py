@@ -264,7 +264,9 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_none.exception),
         )
 
-    def test_opentimeseries_annotations_and_typehints(self: "TestOpenTimeSeries") -> None:
+    def test_opentimeseries_annotations_and_typehints(
+        self: "TestOpenTimeSeries",
+    ) -> None:
         opentimeseries_annotations = dict(OpenTimeSeries.__annotations__)
         opentimeseries_typehints = get_type_hints(OpenTimeSeries)
         self.assertDictEqual(opentimeseries_annotations, opentimeseries_typehints)
@@ -354,7 +356,9 @@ class TestOpenTimeSeries(TestCase):
             member="instance of DataFrame expected", container=str(e_pdtype.exception)
         )
 
-    def test_opentimeseries_valid_values_tsdf_matched(self: "TestOpenTimeSeries") -> None:
+    def test_opentimeseries_valid_values_tsdf_matched(
+        self: "TestOpenTimeSeries",
+    ) -> None:
         df = DataFrame(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
             index=[
@@ -612,7 +616,9 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(121, rs_series.length)
         self.assertEqual(before, rs_series.value_ret)
 
-    def test_opentimeseries_resample_to_business_period_ends(self: "TestOpenTimeSeries") -> None:
+    def test_opentimeseries_resample_to_business_period_ends(
+        self: "TestOpenTimeSeries",
+    ) -> None:
         rsb_stubs_series = OpenTimeSeries.from_fixed_rate(
             rate=0.01, days=121, end_dt=dt.date(2023, 5, 15)
         )
@@ -1032,7 +1038,9 @@ class TestOpenTimeSeries(TestCase):
             "-0.000172687",
         )
 
-    def test_opentimeseries_align_index_to_local_cdays(self: "TestOpenTimeSeries") -> None:
+    def test_opentimeseries_align_index_to_local_cdays(
+        self: "TestOpenTimeSeries",
+    ) -> None:
         d_range = [d.date() for d in date_range(start="2020-06-15", end="2020-06-25")]
         asim = [1.0] * len(d_range)
         adf = DataFrame(
@@ -1524,7 +1532,9 @@ class TestOpenTimeSeries(TestCase):
         val_ret = f"{tms.value_ret:.5f}"
         self.assertEqual(val_ret, "0.00093")
 
-    def test_opentimeseries_geo_ret_value_ret_exceptions(self: "TestOpenTimeSeries") -> None:
+    def test_opentimeseries_geo_ret_value_ret_exceptions(
+        self: "TestOpenTimeSeries",
+    ) -> None:
         geoseries = OpenTimeSeries.parse_obj(
             OpenTimeSeries.parse_opentimeseries(
                 {
@@ -1670,7 +1680,7 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(AssertionError) as e_method:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanseries.value_nan_handle(method="other")
+            _ = nanseries.value_nan_handle(method="other")  # type: ignore
 
         self.assertEqual(
             e_method.exception.args[0],
@@ -1713,7 +1723,7 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(AssertionError) as e_method:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanseries.return_nan_handle(method="other")
+            _ = nanseries.return_nan_handle(method="other")  # type: ignore
 
         self.assertEqual(
             e_method.exception.args[0],
@@ -1741,7 +1751,9 @@ class TestOpenTimeSeries(TestCase):
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
         self.assertEqual(f"{impvoldrifted:.12f}", "0.102454621604")
 
-    def test_opentimeseries_value_ret_calendar_period(self: "TestOpenTimeSeries") -> None:
+    def test_opentimeseries_value_ret_calendar_period(
+        self: "TestOpenTimeSeries",
+    ) -> None:
         vrcseries = self.randomseries.from_deepcopy()
 
         vrfs_y = vrcseries.value_ret_func(
