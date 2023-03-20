@@ -17,7 +17,9 @@ from openseries.stoch_processes import (
 
 
 class TestStochProcesses(TestCase):
-    def test_stoch_processes_annotations_and_typehints(self: "TestStochProcesses") -> None:
+    def test_stoch_processes_annotations_and_typehints(
+        self: "TestStochProcesses",
+    ) -> None:
         stochprocess_annotations = dict(ModelParameters.__annotations__)
 
         self.assertDictEqual(
