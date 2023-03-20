@@ -13,7 +13,7 @@ from openseries.datefixer import (
 
 
 class TestDateFixer(TestCase):
-    def test_date_fix_arg_types(self: "TestDateFixer"):
+    def test_date_fix_arg_types(self: "TestDateFixer") -> None:
         formats = [
             "2022-07-15",
             dt.date(year=2022, month=7, day=15),
@@ -27,7 +27,7 @@ class TestDateFixer(TestCase):
         for fmt in formats:
             self.assertEqual(output, date_fix(fmt))
 
-    def test_date_fix_arg_type_error(self: "TestDateFixer"):
+    def test_date_fix_arg_type_error(self: "TestDateFixer") -> None:
         digit: int = 3
 
         with self.assertRaises(Exception) as e_type:
@@ -43,7 +43,7 @@ class TestDateFixer(TestCase):
 
         self.assertIsInstance(e_nonsense.exception, Exception)
 
-    def test_get_previous_business_day_before_today(self: "TestDateFixer"):
+    def test_get_previous_business_day_before_today(self: "TestDateFixer") -> None:
         day_after_se_nationalday = dt.date(2022, 6, 7)
         se_dte_swehol = get_previous_business_day_before_today(
             today=day_after_se_nationalday, countries="SE"
@@ -83,7 +83,7 @@ class TestDateFixer(TestCase):
             ),
         )
 
-    def test_date_offset_foll(self: "TestDateFixer"):
+    def test_date_offset_foll(self: "TestDateFixer") -> None:
         originals = [dt.date(2022, 6, 5), dt.date(2022, 7, 3)]
         country_sets = ["SE", "US", ["SE", "US"]]
         earliers = [
@@ -161,7 +161,7 @@ class TestDateFixer(TestCase):
             container=e_country.exception.args[0],
         )
 
-    def test_holiday_calendar(self: "TestDateFixer"):
+    def test_holiday_calendar(self: "TestDateFixer") -> None:
         twentytwentythreeholidays = [
             datetime64("2023-01-06"),
             datetime64("2023-04-07"),
@@ -180,7 +180,7 @@ class TestDateFixer(TestCase):
             )
             self.assertTrue(check)
 
-    def test_holiday_calendar_with_custom_days(self: "TestDateFixer"):
+    def test_holiday_calendar_with_custom_days(self: "TestDateFixer") -> None:
         twentytwentyoneholidays = [
             dt.date(2021, 1, 1),
             dt.date(2021, 1, 6),
@@ -212,7 +212,7 @@ class TestDateFixer(TestCase):
 
         self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)
 
-    def test_offset_business_days(self: "TestDateFixer"):
+    def test_offset_business_days(self: "TestDateFixer") -> None:
         se_nationalday = dt.date(2022, 6, 6)
         dates = [
             (dt.date(2022, 6, 2), dt.date(2022, 6, 3)),
@@ -230,7 +230,7 @@ class TestDateFixer(TestCase):
             )
             self.assertEqual(us_offsetdate, date[1])
 
-    def test_offset_business_days_calender_options(self: "TestDateFixer"):
+    def test_offset_business_days_calender_options(self: "TestDateFixer") -> None:
         day_after_se_nationalday = dt.date(2022, 6, 7)
         se_enddate = offset_business_days(
             ddate=day_after_se_nationalday, days=-2, countries="SE"
@@ -259,7 +259,7 @@ class TestDateFixer(TestCase):
         )
         self.assertEqual(dt.date(2022, 6, 30), se_us_nddate)
 
-    def test_offset_business_days_with_custom_days(self: "TestDateFixer"):
+    def test_offset_business_days_with_custom_days(self: "TestDateFixer") -> None:
         day_after_jacks_birthday = dt.date(2021, 2, 15)
 
         offsetdate_without = offset_business_days(

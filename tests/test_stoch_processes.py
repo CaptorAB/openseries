@@ -17,7 +17,7 @@ from openseries.stoch_processes import (
 
 
 class TestStochProcesses(TestCase):
-    def test_stoch_processes_annotations_and_typehints(self: "TestStochProcesses"):
+    def test_stoch_processes_annotations_and_typehints(self: "TestStochProcesses") -> None:
         stochprocess_annotations = dict(ModelParameters.__annotations__)
 
         self.assertDictEqual(
@@ -46,7 +46,7 @@ class TestStochProcesses(TestCase):
         stochprocess_typehints = get_type_hints(ModelParameters)
         self.assertDictEqual(stochprocess_annotations, stochprocess_typehints)
 
-    def test_stoch_processes_assets(self: "TestStochProcesses"):
+    def test_stoch_processes_assets(self: "TestStochProcesses") -> None:
         days = 2520
         target_returns = [
             "-0.031826675",
@@ -112,7 +112,7 @@ class TestStochProcesses(TestCase):
         self.assertListEqual(target_returns, means)
         self.assertListEqual(target_volatilities, deviations)
 
-    def test_stoch_processes_cir_and_ou(self: "TestStochProcesses"):
+    def test_stoch_processes_cir_and_ou(self: "TestStochProcesses") -> None:
         series = []
         days = 2520
         target_means = ["0.024184423", "0.019893950"]

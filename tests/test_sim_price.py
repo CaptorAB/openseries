@@ -6,7 +6,7 @@ from openseries.sim_price import ReturnSimulation
 
 
 class TestSimPrice(TestCase):
-    def test_return_simulations_annotations_and_typehints(self: "TestSimPrice"):
+    def test_return_simulations_annotations_and_typehints(self: "TestSimPrice") -> None:
         returnsimulation_annotations = dict(ReturnSimulation.__annotations__)
 
         self.assertDictEqual(
@@ -24,7 +24,7 @@ class TestSimPrice(TestCase):
         returnsimulation_typehints = get_type_hints(ReturnSimulation)
         self.assertDictEqual(returnsimulation_annotations, returnsimulation_typehints)
 
-    def test_return_simulation_processes(self: "TestSimPrice"):
+    def test_return_simulation_processes(self: "TestSimPrice") -> None:
         args = {
             "number_of_sims": 1,
             "trading_days": 2520,
@@ -76,7 +76,7 @@ class TestSimPrice(TestCase):
         self.assertListEqual(target_returns, returns)
         self.assertListEqual(target_volatilities, volatilities)
 
-    def test_return_simulation_properties(self: "TestSimPrice"):
+    def test_return_simulation_properties(self: "TestSimPrice") -> None:
         days = 1200
         psim = ReturnSimulation.from_normal(
             number_of_sims=1,

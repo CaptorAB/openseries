@@ -2772,7 +2772,7 @@ class OpenFrame(BaseModel):
         covariance = cov(y, x, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
 
-        return beta
+        return float(beta)
 
     def ord_least_squares_fit(
         self: "OpenFrame",
