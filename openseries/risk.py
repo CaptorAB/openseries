@@ -10,7 +10,6 @@ from numpy import (
     maximum,
     mean,
     nan_to_num,
-    ndarray,
     quantile,
     sort,
 )
@@ -49,7 +48,7 @@ def var_down(
     data: DataFrame | Series | List[float],
     level: float = 0.95,
     interpolation: Lit_quantile_interpolation = "lower",
-) -> ndarray:
+) -> float:
     """Downside Value At Risk, "VaR". The equivalent of
     percentile.inc([...], 1-level) over returns in MS Excel \n
     https://www.investopedia.com/terms/v/var.asp
@@ -75,7 +74,7 @@ def var_down(
         clean = nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
     result = quantile(ret, 1 - level, method=interpolation)
-    return result
+    return float(result)
 
 
 def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:

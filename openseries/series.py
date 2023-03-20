@@ -15,7 +15,7 @@ from pydantic import BaseModel, constr, Field, root_validator
 from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.exceptions import FromFixedRateDatesInputError
@@ -39,10 +39,12 @@ from openseries.risk import (
 )
 
 
-def check_if_none(item) -> bool:
+def check_if_none(item: Any) -> bool:
     try:
         if isnan(item):
             return True
+        else:
+            return False
     except TypeError:
         if item is None:
             return True
@@ -52,7 +54,7 @@ def check_if_none(item) -> bool:
             return False
 
 
-def compare_lists(a: list, b: list) -> bool:
+def compare_lists(a: List[Any], b: List[Any]) -> bool:
     assert len(a) == len(b), "lists must be equal in length"
     for i in range(len(a)):
         if all([a[i] is None, b[i] is None]):
@@ -127,11 +129,15 @@ class OpenTimeSeries(BaseModel):
         unique_items=True,
         description="Dates of the individual timeseries items",
     )
-    domestic: constr(regex=r"^[A-Z]{3}$") = "SEK"
+    domestic: constr(
+        regex=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3
+    ) = "SEK"
     name: str
     isin: str = None
     label: str = None
-    countries: List[constr(regex=r"^[A-Z]{2}$")] | constr(regex=r"^[A-Z]{2}$") = "SE"
+    countries: List[
+        constr(regex=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2)
+    ] | constr(regex=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2) = "SE"
     valuetype: ValueType
     values: List[float] = Field(
         ...,
@@ -145,7 +151,7 @@ class OpenTimeSeries(BaseModel):
         arbitrary_types_allowed = True
 
     @root_validator(pre=True)
-    def dates_not_empty(cls, values):
+    def dates_not_empty(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         if not values.get("dates", None):
             raise ValueError("Dates list cannot be empty")
         dts = values.get("dates")
@@ -156,20 +162,20 @@ class OpenTimeSeries(BaseModel):
         return values
 
     @root_validator(pre=True)
-    def values_not_empty(cls, values):
+    def values_not_empty(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         if not values.get("values", None):
             raise ValueError("Values list cannot be empty")
         return values
 
     @root_validator
-    def check_dates_values_same_length(cls, values):
+    def check_dates_values_same_length(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         dats, vals = values.get("dates"), values.get("values")
         if dats is not None and vals is not None and len(dats) != len(vals):
             raise ValueError("Lengths of dates and values do not match")
         return values
 
     @root_validator
-    def check_values_match(cls, values):
+    def check_values_match(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         vals, df = values.get("values"), values.get("tsdf")
         if (
             vals is not None
@@ -180,7 +186,9 @@ class OpenTimeSeries(BaseModel):
         return values
 
     @classmethod
-    def setup_class(cls, domestic_ccy: str = "SEK", countries: List[str] | str = "SE"):
+    def setup_class(
+        cls, domestic_ccy: str = "SEK", countries: List[str] | str = "SE"
+    ) -> None:
         """Sets the domestic currency and calendar of the user.
 
         Parameters
@@ -227,7 +235,12 @@ class OpenTimeSeries(BaseModel):
         cls.countries = countries
 
     @classmethod
-    def parse_opentimeseries(cls, data: dict) -> dict:
+    def parse_opentimeseries(
+        cls,
+        data: Dict[
+            str, str | bool | ValueType | List[str] | List[float] | DataFrame | None
+        ],
+    ) -> Dict[str, str | bool | ValueType | List[str] | List[float] | DataFrame | None]:
         if data.get("isin", None):
             isincode.validate(data["isin"])
 
@@ -2189,6 +2202,7 @@ class OpenTimeSeries(BaseModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
+        values: List[float]
         if any(
             [
                 True if x == ValueType.RTRN else False
@@ -2196,17 +2210,17 @@ class OpenTimeSeries(BaseModel):
             ]
         ):
             ra_df = self.tsdf.copy()
-            values: list = [1.0]
+            values = [1.0]
             returns_input = True
         else:
-            values: list = [float(self.tsdf.iloc[0])]
+            values = [float(self.tsdf.iloc[0])]
             ra_df = self.tsdf.pct_change().copy()
             returns_input = False
         ra_df.dropna(inplace=True)
 
         prev = self.first_idx
         idx: dt.date
-        dates: list = [prev]
+        dates: List[dt.date] = [prev]
 
         for idx, row in ra_df.iterrows():
             dates.append(idx)
@@ -2428,7 +2442,7 @@ def timeseries_chain(
 
     Returns
     -------
-    "OpenTimeSeries"
+    OpenTimeSeries
         An OpenTimeSeries object
     """
     old = front.from_deepcopy()
@@ -2448,12 +2462,12 @@ def timeseries_chain(
         if first > olddf.index[-1]:
             raise Exception("Failed to find a matching date between series")
 
-    dates = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
+    dates: List[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
     values = array([float(x) for x in old.tsdf.values][: len(dates)])
     values = list(values * float(new.tsdf.loc[first]) / float(olddf.loc[first]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
-    values.extend([float(x) for x in new.tsdf.values])
+    values += [float(x) for x in new.tsdf.values]
 
     return OpenTimeSeries(
         timeseriesId=new.timeseriesId,
@@ -2463,7 +2477,7 @@ def timeseries_chain(
         name=new.name,
         label=new.name,
         valuetype=new.valuetype,
-        values=values,
+        values=list(values),
         local_ccy=new.local_ccy,
         tsdf=DataFrame(
             data=values,

@@ -20,7 +20,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel
+from pydantic import BaseModel, conlist, root_validator
 from random import choices
 from scipy.stats import kurtosis, norm, skew
 from statsmodels.api import OLS
@@ -28,7 +28,7 @@ from statsmodels.api import OLS
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -63,11 +63,6 @@ class OpenFrame(BaseModel):
         List of objects of Class OpenTimeSeries
     weights: List[float], optional
         List of weights in float64 format.
-    sort: bool, default: True
-        argument in Pandas df.concat added to fix issue when upgrading
-        Python & Pandas
-    tsdf: pandas.DataFrame
-        Pandas object holding dates and values that can be altered via methods
 
     Returns
     -------
@@ -75,22 +70,36 @@ class OpenFrame(BaseModel):
         Object of the class OpenFrame
     """
 
-    constituents: List[OpenTimeSeries]
-    tsdf: None | DataFrame
-    weights: None | List[float]
+    constituents: conlist(item_type=OpenTimeSeries)
+    tsdf: DataFrame = DataFrame()
+    weights: None | conlist(item_type=float)
 
     class Config:
         arbitrary_types_allowed = True
+
+    @root_validator
+    def check_nbrtimeseries_weights_same_length(
+        cls, values: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        tseries, wghts = values.get("constituents"), values.get("weights")
+        if tseries is not None and wghts is not None and len(tseries) != len(wghts):
+            raise ValueError("Number of TimeSeries must equal number of weights")
+        return values
+
+    @root_validator
+    def check_labels_unique(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        tseries = values.get("constituents")
+        labls = [x.label for x in tseries]
+        if len(set(labls)) != len(labls):
+            raise ValueError("TimeSeries names/labels must be unique")
+        return values
 
     def __init__(
         self: "OpenFrame",
         constituents: List[OpenTimeSeries],
         weights: List[float] | None = None,
-        sort: bool = True,
-        *args,
-        **kwargs,
     ) -> None:
-        super().__init__(constituents=constituents, weights=weights, *args, **kwargs)
+        super().__init__(constituents=constituents, weights=weights)
 
         self.constituents = constituents
         self.tsdf = DataFrame()
@@ -98,19 +107,11 @@ class OpenFrame(BaseModel):
 
         if constituents is not None and len(constituents) != 0:
             self.tsdf = reduce(
-                lambda left, right: concat([left, right], axis="columns", sort=sort),
+                lambda left, right: concat([left, right], axis="columns", sort=True),
                 [x.tsdf for x in self.constituents],
             )
         else:
             warning("OpenFrame() was passed an empty list.")
-
-        if self.weights is not None:
-            assert len(self.constituents) == len(
-                self.weights
-            ), "Number of TimeSeries must equal number of weights."
-
-        if len(set(self.columns_lvl_zero)) != len(self.columns_lvl_zero):
-            raise Exception("TimeSeries names/labels must be unique.")
 
     def from_deepcopy(self: "OpenFrame") -> "OpenFrame":
         """Creates a copy of an OpenFrame object
@@ -172,11 +173,12 @@ class OpenFrame(BaseModel):
         pandas.DataFrame
             Properties of the contituent OpenTimeSeries
         """
-
-        if not properties:
-            properties = OpenFramePropertiesList.allowed_strings
-
-        prop_list = [getattr(self, x) for x in properties]
+        if properties:
+            prop_list = [getattr(self, x) for x in properties]
+        else:
+            prop_list = [
+                getattr(self, x) for x in OpenFramePropertiesList.allowed_strings
+            ]
         results = concat(prop_list, axis="columns").T
         return results
 
@@ -185,7 +187,7 @@ class OpenFrame(BaseModel):
         months_offset: int | None = None,
         from_dt: dt.date | None = None,
         to_dt: dt.date | None = None,
-    ) -> Tuple[dt.date, dt.date]:
+    ) -> Tuple[dt.date | None, dt.date | None]:
         """Creates user defined date range
 
         Parameters
@@ -200,7 +202,7 @@ class OpenFrame(BaseModel):
 
         Returns
         -------
-        (datetime.date, datetime.date)
+        Tuple[datetime.date | None, datetime.date | None]
             Start and end date of the chosen date range
         """
         earlier, later = None, None
@@ -227,7 +229,7 @@ class OpenFrame(BaseModel):
                         to_dt <= self.last_idx
                     ), "Function calc_range returned later date > series end"
                     earlier, later = self.first_idx, to_dt
-                elif from_dt is not None or to_dt is not None:
+                elif from_dt is not None and to_dt is not None:
                     assert (
                         to_dt <= self.last_idx and from_dt >= self.first_idx
                     ), "Function calc_range returned dates outside series range"
@@ -244,14 +246,14 @@ class OpenFrame(BaseModel):
         return earlier, later
 
     def align_index_to_local_cdays(
-        self: "OpenFrame", countries: list | str = "SE"
+        self: "OpenFrame", countries: List[str] | str = "SE"
     ) -> "OpenFrame":
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
         local calendar business days
 
         Parameters
         ----------
-        countries: list | str, default: "SE"
+        countries: List[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
@@ -315,28 +317,28 @@ class OpenFrame(BaseModel):
         return len(self.constituents)
 
     @property
-    def columns_lvl_zero(self: "OpenFrame") -> list:
+    def columns_lvl_zero(self: "OpenFrame") -> List[str]:
         """
         Returns
         -------
-        list
+        List[str]
             Level 0 values of the Pandas.MultiIndex columns in the .tsdf
             Pandas.DataFrame
         """
 
-        return self.tsdf.columns.get_level_values(0).tolist()
+        return list(self.tsdf.columns.get_level_values(0))
 
     @property
-    def columns_lvl_one(self: "OpenFrame") -> list:
+    def columns_lvl_one(self: "OpenFrame") -> List[str]:
         """
         Returns
         -------
-        list
+        List[str]
             Level 1 values of the Pandas.MultiIndex columns in the .tsdf
             Pandas.DataFrame
         """
 
-        return self.tsdf.columns.get_level_values(1).tolist()
+        return list(self.tsdf.columns.get_level_values(1))
 
     @property
     def first_idx(self: "OpenFrame") -> dt.date:
@@ -541,7 +543,7 @@ class OpenFrame(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
             how_many = int(
@@ -689,7 +691,7 @@ class OpenFrame(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
             how_many = int(
@@ -796,7 +798,7 @@ class OpenFrame(BaseModel):
     def ret_vol_ratio_func(
         self: "OpenFrame",
         riskfree_rate: float | None = None,
-        riskfree_column: tuple | int = -1,
+        riskfree_column: Tuple[str, ValueType] | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -812,7 +814,7 @@ class OpenFrame(BaseModel):
         ----------
         riskfree_rate : float, optional
             The return of the zero volatility asset used to calculate Sharpe ratio
-        riskfree_column : int | None, default: -1
+        riskfree_column : Tuple[str, ValueType] | int, default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -853,7 +855,7 @@ class OpenFrame(BaseModel):
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
-                raise Exception("base_column should be a tuple or an integer.")
+                raise Exception("base_column should be a Tuple[str] or an integer.")
 
             for item in self.tsdf:
                 if item == riskfree_item:
@@ -887,8 +889,8 @@ class OpenFrame(BaseModel):
 
     def jensen_alpha(
         self: "OpenFrame",
-        asset: tuple | int,
-        market: tuple | int,
+        asset: Tuple[str] | int,
+        market: Tuple[str] | int,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
@@ -900,9 +902,9 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        asset: tuple | int
+        asset: Tuple[str] | int
             The column of the asset
-        market: tuple | int
+        market: Tuple[str] | int
             The column of the market against which Jensen's alpha is measured
         riskfree_rate : float, default: 0.0
             The return of the zero volatility riskfree asset
@@ -925,7 +927,7 @@ class OpenFrame(BaseModel):
                 asset_log = self.tsdf.iloc[:, asset]
                 asset_cagr = asset_log.mean()
             else:
-                raise Exception("asset should be a tuple or an integer.")
+                raise Exception("asset should be a Tuple[str] or an integer.")
             if isinstance(market, tuple):
                 market_log = self.tsdf.loc[:, market]
                 market_cagr = market_log.mean()
@@ -933,7 +935,7 @@ class OpenFrame(BaseModel):
                 market_log = self.tsdf.iloc[:, market]
                 market_cagr = market_log.mean()
             else:
-                raise Exception("market should be a tuple or an integer.")
+                raise Exception("market should be a Tuple[str] or an integer.")
         else:
             if isinstance(asset, tuple):
                 asset_log = log(
@@ -961,7 +963,7 @@ class OpenFrame(BaseModel):
                         self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
                     )
             else:
-                raise Exception("asset should be a tuple or an integer.")
+                raise Exception("asset should be a Tuple[str] or an integer.")
             if isinstance(market, tuple):
                 market_log = log(
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0]
@@ -988,7 +990,7 @@ class OpenFrame(BaseModel):
                         self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
                     )
             else:
-                raise Exception("market should be a tuple or an integer.")
+                raise Exception("market should be a Tuple[str] or an integer.")
 
         covariance = cov(asset_log, market_log, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -1015,7 +1017,7 @@ class OpenFrame(BaseModel):
     def sortino_ratio_func(
         self: "OpenFrame",
         riskfree_rate: float | None = None,
-        riskfree_column: tuple | int = -1,
+        riskfree_column: Tuple[str, ValueType] | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -1031,7 +1033,7 @@ class OpenFrame(BaseModel):
         ----------
         riskfree_rate : float, optional
             The return of the zero volatility asset
-        riskfree_column : int | None, default: -1
+        riskfree_column : Tuple[str, ValueType] | int, default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -1071,7 +1073,7 @@ class OpenFrame(BaseModel):
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
-                raise Exception("base_column should be a tuple or an integer.")
+                raise Exception("base_column should be a Tuple[str] or an integer.")
 
             for item in self.tsdf:
                 if item == riskfree_item:
@@ -1410,7 +1412,7 @@ class OpenFrame(BaseModel):
 
         return Series(
             data=skew(
-                a=self.tsdf.loc[earlier:later].pct_change(),
+                a=self.tsdf.loc[earlier:later].pct_change().values,
                 bias=True,
                 nan_policy="omit",
             ),
@@ -1696,7 +1698,7 @@ class OpenFrame(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
             how_many = int(
@@ -1888,7 +1890,7 @@ class OpenFrame(BaseModel):
     def resample_to_business_period_ends(
         self: "OpenFrame",
         freq: Lit_bizday_frequencies = "BM",
-        countries: list | str = "SE",
+        countries: List[str] | str = "SE",
         convention: Lit_pandas_resample_convention = "end",
         method: Lit_pandas_reindex_method = "nearest",
     ) -> "OpenFrame":
@@ -2121,7 +2123,7 @@ class OpenFrame(BaseModel):
         """
 
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
         vol_label = self.tsdf.iloc[:, column].name[0]
@@ -2396,7 +2398,7 @@ class OpenFrame(BaseModel):
         long_column: int = 0,
         short_column: int = 1,
         base_zero: bool = True,
-    ):
+    ) -> None:
         """Calculates cumulative relative return between two series.
         A new series is added to the frame.
 
@@ -2427,7 +2429,7 @@ class OpenFrame(BaseModel):
 
     def tracking_error_func(
         self: "OpenFrame",
-        base_column: tuple | int = -1,
+        base_column: Tuple[str, ValueType] | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -2439,7 +2441,7 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        base_column: int | None, default: -1
+        base_column: Tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -2470,7 +2472,7 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception("base_column should be a tuple or an integer.")
+            raise Exception("base_column should be a Tuple[str] or an integer.")
 
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -2496,7 +2498,7 @@ class OpenFrame(BaseModel):
 
     def info_ratio_func(
         self: "OpenFrame",
-        base_column: tuple | int = -1,
+        base_column: Tuple[str, ValueType] | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -2509,7 +2511,7 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        base_column: int | None, default: -1
+        base_column: Tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -2540,7 +2542,7 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception("base_column should be a tuple or an integer.")
+            raise Exception("base_column should be a Tuple[str] or an integer.")
 
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -2568,7 +2570,7 @@ class OpenFrame(BaseModel):
     def capture_ratio_func(
         self: "OpenFrame",
         ratio: Lit_capture_ratio,
-        base_column: tuple | int = -1,
+        base_column: Tuple[str, ValueType] | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -2587,7 +2589,7 @@ class OpenFrame(BaseModel):
         ----------
         ratio: Lit_capture_ratio
             The ratio to calculate
-        base_column: int | None, default: -1
+        base_column: Tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -2623,7 +2625,7 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception("base_column should be a tuple or an integer.")
+            raise Exception("base_column should be a Tuple[str] or an integer.")
 
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -2721,15 +2723,17 @@ class OpenFrame(BaseModel):
             dtype="float64",
         )
 
-    def beta(self: "OpenFrame", asset: tuple | int, market: tuple | int) -> float:
+    def beta(
+        self: "OpenFrame", asset: Tuple[str] | int, market: Tuple[str] | int
+    ) -> float:
         """https://www.investopedia.com/terms/b/beta.asp
         Calculates Beta as Co-variance of asset & market divided by Variance of market
 
         Parameters
         ----------
-        asset: tuple | int
+        asset: Tuple[str] | int
             The column of the asset
-        market: tuple | int
+        market: Tuple[str] | int
             The column of the market against which Beta is measured
 
         Returns
@@ -2748,26 +2752,26 @@ class OpenFrame(BaseModel):
             elif isinstance(asset, int):
                 y = self.tsdf.iloc[:, asset]
             else:
-                raise Exception("asset should be a tuple or an integer.")
+                raise Exception("asset should be a Tuple[str] or an integer.")
             if isinstance(market, tuple):
                 x = self.tsdf.loc[:, market]
             elif isinstance(market, int):
                 x = self.tsdf.iloc[:, market]
             else:
-                raise Exception("market should be a tuple or an integer.")
+                raise Exception("market should be a Tuple[str] or an integer.")
         else:
             if isinstance(asset, tuple):
                 y = log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
             elif isinstance(asset, int):
                 y = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
-                raise Exception("asset should be a tuple or an integer.")
+                raise Exception("asset should be a Tuple[str] or an integer.")
             if isinstance(market, tuple):
                 x = log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
             elif isinstance(market, int):
                 x = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
             else:
-                raise Exception("market should be a tuple or an integer.")
+                raise Exception("market should be a Tuple[str] or an integer.")
 
         covariance = cov(y, x, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -2776,8 +2780,8 @@ class OpenFrame(BaseModel):
 
     def ord_least_squares_fit(
         self: "OpenFrame",
-        y_column: tuple | int,
-        x_column: tuple | int,
+        y_column: Tuple[str] | int,
+        x_column: Tuple[str] | int,
         fitted_series: bool = True,
     ) -> RegressionResults:
         """https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
@@ -2786,9 +2790,9 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        y_column: tuple | int
+        y_column: Tuple[str] | int
             The column level values of the dependent variable y
-        x_column: tuple | int
+        x_column: Tuple[str] | int
             The column level values of the exogenous variable x
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
@@ -2806,7 +2810,7 @@ class OpenFrame(BaseModel):
             y = self.tsdf.iloc[:, y_column]
             y_label = self.tsdf.iloc[:, y_column].name[0]
         else:
-            raise Exception("y_column should be a tuple or an integer.")
+            raise Exception("y_column should be a Tuple[str] or an integer.")
 
         if isinstance(x_column, tuple):
             x = self.tsdf.loc[:, x_column]
@@ -2815,7 +2819,7 @@ class OpenFrame(BaseModel):
             x = self.tsdf.iloc[:, x_column]
             x_label = self.tsdf.iloc[:, x_column].name[0]
         else:
-            raise Exception("x_column should be a tuple or an integer.")
+            raise Exception("x_column should be a Tuple[str] or an integer.")
 
         results = OLS(y, x).fit()
         if fitted_series:
@@ -2888,7 +2892,7 @@ class OpenFrame(BaseModel):
             f" / {self.tsdf.iloc[:, short_column].name[0]}"
         )
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
 
@@ -2998,7 +3002,7 @@ class OpenFrame(BaseModel):
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: str | None = None,
-        labels: list | None = None,
+        labels: List[str] | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
@@ -3020,7 +3024,7 @@ class OpenFrame(BaseModel):
             Name of the Plotly html file
         directory: str, optional
             Directory where Plotly html file is saved
-        labels: list, optional
+        labels: List[str], optional
             A list of labels to manually override using the names of the input data
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
@@ -3102,7 +3106,7 @@ class OpenFrame(BaseModel):
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: str | None = None,
-        labels: list | None = None,
+        labels: List[str] | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
         output_type: Lit_plotly_output = "file",
@@ -3119,7 +3123,7 @@ class OpenFrame(BaseModel):
             Name of the Plotly html file
         directory: str, optional
             Directory where Plotly html file is saved
-        labels: list, optional
+        labels: List[str], optional
             A list of labels to manually override using the names of the input data
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot

@@ -83,6 +83,7 @@ class TestOpenFrame(TestCase):
                     currency="SEK",
                     dates=["2023-01-01", "2023-01-02"],
                     name="Asset_0",
+                    label="Asset_0",
                     valuetype=ValueType.PRICE,
                     values=[1.0, 1.1],
                     local_ccy=True,
@@ -99,6 +100,7 @@ class TestOpenFrame(TestCase):
                     currency="SEK",
                     dates=["2023-01-01", "2023-01-02"],
                     name="Asset_1",
+                    label="Asset_1",
                     valuetype=ValueType.PRICE,
                     values=[1.0, 1.1],
                     local_ccy=True,
@@ -714,6 +716,8 @@ class TestOpenFrame(TestCase):
         frame_unique = [
             "add_timeseries",
             "beta",
+            "check_nbrtimeseries_weights_same_length",
+            "check_labels_unique",
             "delete_timeseries",
             "ewma_risk",
             "rolling_info_ratio",
@@ -897,12 +901,12 @@ class TestOpenFrame(TestCase):
         tslist = list(wrongsims.constituents)
         wghts = [1.0 / wrongsims.item_count] * (wrongsims.item_count + 1)
 
-        with self.assertRaises(Exception) as e_weights:
+        with self.assertRaises(ValueError) as e_weights:
             OpenFrame(tslist, weights=wghts)
 
-        self.assertEqual(
-            "Number of TimeSeries must equal number of weights.",
-            e_weights.exception.args[0],
+        self.assertIn(
+            member="Number of TimeSeries must equal number of weights",
+            container=str(e_weights.exception),
         )
 
     def test_openframe_drawdown_details(self: "TestOpenFrame") -> None:
@@ -1324,11 +1328,11 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_retvolfunc:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.ret_vol_ratio_func(riskfree_column="string")
+            _ = frame.ret_vol_ratio_func(riskfree_column="string")  # type: ignore
 
         self.assertEqual(
             e_retvolfunc.exception.args[0],
-            "base_column should be a tuple or an integer.",
+            "base_column should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_sortino_ratio_func(self: "TestOpenFrame") -> None:
@@ -1355,11 +1359,11 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.sortino_ratio_func(riskfree_column="string")
+            _ = frame.sortino_ratio_func(riskfree_column="string")  # type: ignore
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a tuple or an integer.",
+            "base_column should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_tracking_error_func(self: "TestOpenFrame") -> None:
@@ -1384,11 +1388,11 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.tracking_error_func(base_column="string")
+            _ = frame.tracking_error_func(base_column="string")  # type: ignore
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a tuple or an integer.",
+            "base_column should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_info_ratio_func(self: "TestOpenFrame") -> None:
@@ -1409,11 +1413,11 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.info_ratio_func(base_column="string")
+            _ = frame.info_ratio_func(base_column="string")  # type: ignore
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a tuple or an integer.",
+            "base_column should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_rolling_corr(self: "TestOpenFrame") -> None:
@@ -1529,11 +1533,12 @@ class TestOpenFrame(TestCase):
         aseries = self.randomseries.from_deepcopy()
         bseries = self.randomseries.from_deepcopy()
 
-        with self.assertRaises(Exception) as e_unique:
+        with self.assertRaises(ValueError) as e_unique:
             OpenFrame([aseries, bseries])
 
-        self.assertEqual(
-            "TimeSeries names/labels must be unique.", e_unique.exception.args[0]
+        self.assertIn(
+            member="TimeSeries names/labels must be unique",
+            container=str(e_unique.exception),
         )
 
         bseries.set_new_label("other_name")
@@ -1705,11 +1710,13 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = cframe.capture_ratio_func(ratio="up", base_column="string")
+            _ = cframe.capture_ratio_func(
+                ratio="up", base_column="string"
+            )  # type: ignore
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a tuple or an integer.",
+            "base_column should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_georet_exceptions(self: "TestOpenFrame") -> None:
@@ -2223,23 +2230,23 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(Exception) as e_x:
             # noinspection PyTypeChecker,PydanticTypeChecker
             _ = oframe.ord_least_squares_fit(
-                y_column=0, x_column="string", fitted_series=False
+                y_column=0, x_column="string", fitted_series=False  # type: ignore
             )
 
         self.assertEqual(
             e_x.exception.args[0],
-            "x_column should be a tuple or an integer.",
+            "x_column should be a Tuple[str] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_y:
             # noinspection PyTypeChecker,PydanticTypeChecker
             _ = oframe.ord_least_squares_fit(
-                y_column="string", x_column=1, fitted_series=False
+                y_column="string", x_column=1, fitted_series=False  # type: ignore
             )
 
         self.assertEqual(
             e_y.exception.args[0],
-            "y_column should be a tuple or an integer.",
+            "y_column should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_beta(self: "TestOpenFrame") -> None:
@@ -2290,20 +2297,20 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset="string", market=1)
+            _ = bframe.beta(asset="string", market=1)  # type: ignore
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a tuple or an integer.",
+            "asset should be a Tuple[str] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset=0, market="string")
+            _ = bframe.beta(asset=0, market="string")  # type: ignore
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a tuple or an integer.",
+            "market should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_beta_returns_input(self: "TestOpenFrame") -> None:
@@ -2353,20 +2360,20 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset="string", market=1)
+            _ = bframe.beta(asset="string", market=1)  # type: ignore
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a tuple or an integer.",
+            "asset should be a Tuple[str] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset=0, market="string")
+            _ = bframe.beta(asset=0, market="string")  # type: ignore
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a tuple or an integer.",
+            "market should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_jensen_alpha(self: "TestOpenFrame") -> None:
@@ -2416,20 +2423,20 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset="string", market=1)
+            _ = jframe.jensen_alpha(asset="string", market=1)  # type: ignore
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a tuple or an integer.",
+            "asset should be a Tuple[str] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset=0, market="string")
+            _ = jframe.jensen_alpha(asset=0, market="string")  # type: ignore
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a tuple or an integer.",
+            "market should be a Tuple[str] or an integer.",
         )
         from openseries.datefixer import date_offset_foll
 
@@ -2527,20 +2534,20 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset="string", market=1)
+            _ = jframe.jensen_alpha(asset="string", market=1)  # type: ignore
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a tuple or an integer.",
+            "asset should be a Tuple[str] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset=0, market="string")
+            _ = jframe.jensen_alpha(asset=0, market="string")  # type: ignore
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a tuple or an integer.",
+            "market should be a Tuple[str] or an integer.",
         )
 
     def test_openframe_ewma_risk(self: "TestOpenFrame") -> None:

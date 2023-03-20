@@ -10,7 +10,7 @@ from pydantic.error_wrappers import ValidationError as PydanticValidationError
 import pytest
 from stdnum.exceptions import InvalidChecksum
 import sys
-from typing import get_type_hints
+from typing import Any, Dict, get_type_hints, List
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
@@ -101,7 +101,7 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
         (["2023-01-bb", "2023-01-02"], [1.0, 1.1]),
     ],
 )
-def test_opentimeseries_invalid_dates(dates: list, values: list) -> None:
+def test_opentimeseries_invalid_dates(dates: List[str], values: List[float]) -> None:
     with pytest.raises(PydanticValidationError):
         OpenTimeSeries(
             timeseriesId="",
@@ -131,7 +131,7 @@ def test_opentimeseries_invalid_dates(dates: list, values: list) -> None:
         (["2023-01-01", "2023-01-02"], [1.0, "bb"]),
     ],
 )
-def test_opentimeseries_invalid_values(dates: list, values: list) -> None:
+def test_opentimeseries_invalid_values(dates: List[str], values: List[float]) -> None:
     with pytest.raises(PydanticValidationError):
         OpenTimeSeries(
             timeseriesId="",
@@ -171,14 +171,14 @@ def test_opentimeseries_invalid_values(dates: list, values: list) -> None:
         ([1, None], [1, None], True),
     ],
 )
-def test_opentimeseries_compare_lists(a: list, b: list, result: bool) -> None:
+def test_opentimeseries_compare_lists(a: List[Any], b: List[Any], result: bool) -> None:
     assert compare_lists(a=a, b=b) == result
 
 
 class TestOpenTimeSeries(TestCase):
     sim: ReturnSimulation
     randomseries: OpenTimeSeries
-    random_properties: dict
+    random_properties: Dict[str, dt.date | int | float]
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -227,7 +227,7 @@ class TestOpenTimeSeries(TestCase):
         )
         with self.assertRaises(ValueError) as e_domestic:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            OpenTimeSeries.setup_class(domestic_ccy=12)
+            OpenTimeSeries.setup_class(domestic_ccy=12)  # type: ignore
         self.assertIn(
             member="domestic currency must be a code according to ISO 4217",
             container=str(e_domestic.exception),
@@ -239,7 +239,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_country.exception),
         )
         with self.assertRaises(ValueError) as e_ctries:
-            OpenTimeSeries.setup_class(countries=["SE", 12])
+            OpenTimeSeries.setup_class(countries=["SE", 12])  # type: ignore
         self.assertIn(
             member=(
                 "countries must be a list of country codes "
@@ -258,7 +258,7 @@ class TestOpenTimeSeries(TestCase):
         )
         with self.assertRaises(ValueError) as e_none:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            OpenTimeSeries.setup_class(countries=None)
+            OpenTimeSeries.setup_class(countries=None)  # type: ignore
         self.assertIn(
             member="according to ISO 3166-1 alpha-2",
             container=str(e_none.exception),

@@ -40,7 +40,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.12"
 holidays = "^0.18"
 numpy = "^1.24.1"
 pandas = "^1.5.2"
