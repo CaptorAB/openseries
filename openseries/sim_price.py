@@ -1,7 +1,6 @@
 from numpy import insert, random, sqrt
 from pandas import DataFrame
 from pydantic import BaseModel
-from typing import TypeVar
 
 from openseries.stoch_processes import (
     ModelParameters,
@@ -9,8 +8,6 @@ from openseries.stoch_processes import (
     geometric_brownian_motion_jump_diffusion_levels,
     heston_model_levels,
 )
-
-TReturnSimulation = TypeVar("TReturnSimulation", bound="ReturnSimulation")
 
 
 class ReturnSimulation(BaseModel):
@@ -43,7 +40,7 @@ class ReturnSimulation(BaseModel):
         arbitrary_types_allowed = True
 
     @property
-    def results(self: TReturnSimulation) -> DataFrame:
+    def results(self: "ReturnSimulation") -> DataFrame:
         """
         Returns
         -------
@@ -53,7 +50,7 @@ class ReturnSimulation(BaseModel):
         return self.df.add(1.0).cumprod(axis="columns").T
 
     @property
-    def realized_mean_return(self: TReturnSimulation) -> float:
+    def realized_mean_return(self: "ReturnSimulation") -> float:
         """
         Returns
         -------
@@ -64,7 +61,7 @@ class ReturnSimulation(BaseModel):
         return float(self.results.pct_change().mean() * self.trading_days_in_year)
 
     @property
-    def realized_vol(self: TReturnSimulation) -> float:
+    def realized_vol(self: "ReturnSimulation") -> float:
         """
         Returns
         -------
@@ -83,7 +80,7 @@ class ReturnSimulation(BaseModel):
         trading_days: int,
         trading_days_in_year: int = 252,
         seed: int | None = 71,
-    ) -> TReturnSimulation:
+    ) -> "ReturnSimulation":
         """Normal distribution simulation
 
         Parameters
@@ -132,7 +129,7 @@ class ReturnSimulation(BaseModel):
         trading_days: int,
         trading_days_in_year: int = 252,
         seed: int | None = 71,
-    ) -> TReturnSimulation:
+    ) -> "ReturnSimulation":
         """Lognormal distribution simulation
 
         Parameters
@@ -184,7 +181,7 @@ class ReturnSimulation(BaseModel):
         trading_days: int,
         trading_days_in_year: int = 252,
         seed: int | None = 71,
-    ) -> TReturnSimulation:
+    ) -> "ReturnSimulation":
         """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM)
 
@@ -242,7 +239,7 @@ class ReturnSimulation(BaseModel):
         heston_a: float,
         trading_days_in_year: int = 252,
         seed: int | None = 71,
-    ) -> TReturnSimulation:
+    ) -> "ReturnSimulation":
         """Heston model is the geometric brownian motion model
         with stochastic volatility
 
@@ -310,7 +307,7 @@ class ReturnSimulation(BaseModel):
         heston_a: float,
         trading_days_in_year: int = 252,
         seed: int | None = 71,
-    ) -> TReturnSimulation:
+    ) -> "ReturnSimulation":
         """Heston Vol model simulation
 
         Parameters
@@ -378,7 +375,7 @@ class ReturnSimulation(BaseModel):
         jumps_mu: float,
         trading_days_in_year: int = 252,
         seed: int | None = 71,
-    ) -> TReturnSimulation:
+    ) -> "ReturnSimulation":
         """Merton Jump-Diffusion model simulation
 
         Parameters

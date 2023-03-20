@@ -13,14 +13,27 @@ Processes that can be simulated in this module are:
 
 """
 from math import log, pow, sqrt
-from numpy import add, array, ndarray, exp
+from numpy import add, array, dtype, ndarray, exp, float64
 import numpy.random as nrand
-from typing import Tuple
+from typing import Any, List, Tuple
 
 from openseries.types import ModelParameters
 
+__all__ = [
+    "ModelParameters",
+    "geometric_brownian_motion_log_returns",
+    "geometric_brownian_motion_jump_diffusion_levels",
+    "heston_model_levels",
+    "cox_ingersoll_ross_levels",
+    "ornstein_uhlenbeck_levels",
+    "brownian_motion_levels",
+    "geometric_brownian_motion_levels",
+]
 
-def convert_to_prices(param: ModelParameters, log_returns: ndarray) -> ndarray:
+
+def convert_to_prices(
+    param: ModelParameters, log_returns: ndarray[Any, dtype[float64]]
+) -> ndarray[Any, dtype[float64]]:
     """Converts a sequence of log returns into normal returns (exponentiation)
     and then computes a price sequence given a starting price, param.all_s0.
 
@@ -28,18 +41,18 @@ def convert_to_prices(param: ModelParameters, log_returns: ndarray) -> ndarray:
     ----------
     param: ModelParameters
         Model input
-    log_returns: numpy.ndarray
+    log_returns: numpy.ndarray[Any, dtype[float64]]
         Log returns to exponentiate
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Price series
     """
 
     returns = exp(log_returns)
     # A sequence of prices starting with param.all_s0
-    price_sequence: list = [param.all_s0]
+    price_sequence: List[float] = [param.all_s0]
     for n in range(1, len(returns)):
         # Add the price at t-1 * return at t
         price_sequence.append(price_sequence[n - 1] * returns[n - 1])
@@ -48,7 +61,7 @@ def convert_to_prices(param: ModelParameters, log_returns: ndarray) -> ndarray:
 
 def brownian_motion_log_returns(
     param: ModelParameters, seed: int | None = None
-) -> ndarray:
+) -> ndarray[Any, dtype[float64]]:
     """This method returns a Wiener process. The Wiener process is also called
     Brownian motion. For more information about the Wiener process check out
     the Wikipedia page: http://en.wikipedia.org/wiki/Wiener_process
@@ -62,7 +75,7 @@ def brownian_motion_log_returns(
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Brownian Motion log returns
     """
 
@@ -73,7 +86,9 @@ def brownian_motion_log_returns(
     return nrand.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time)
 
 
-def brownian_motion_levels(param: ModelParameters, seed: int | None = None) -> ndarray:
+def brownian_motion_levels(
+    param: ModelParameters, seed: int | None = None
+) -> ndarray[Any, dtype[float64]]:
     """Delivers a price sequence whose returns evolve according to a brownian motion
 
     Parameters
@@ -85,7 +100,7 @@ def brownian_motion_levels(param: ModelParameters, seed: int | None = None) -> n
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Price sequence which follows a brownian motion
     """
 
@@ -94,7 +109,7 @@ def brownian_motion_levels(param: ModelParameters, seed: int | None = None) -> n
 
 def geometric_brownian_motion_log_returns(
     param: ModelParameters, seed: int | None = None
-) -> ndarray:
+) -> ndarray[Any, dtype[float64]]:
     """This method constructs a sequence of log returns which, when
     exponentiated, produce a random Geometric Brownian Motion (GBM).
     GBM is the stochastic process underlying the Black Scholes
@@ -109,7 +124,7 @@ def geometric_brownian_motion_log_returns(
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Log returns of a Geometric Brownian Motion process
     """
 
@@ -122,7 +137,7 @@ def geometric_brownian_motion_log_returns(
 
 def geometric_brownian_motion_levels(
     param: ModelParameters, seed: int | None = None
-) -> ndarray:
+) -> ndarray[Any, dtype[float64]]:
     """Prices for an asset which evolves according to a geometric brownian motion
 
     Parameters
@@ -134,7 +149,7 @@ def geometric_brownian_motion_levels(
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Price levels for the asset
     """
 
@@ -143,7 +158,9 @@ def geometric_brownian_motion_levels(
     )
 
 
-def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> list:
+def jump_diffusion_process(
+    param: ModelParameters, seed: int | None = None
+) -> ndarray[Any, dtype[float64]]:
     """This method produces a sequence of Jump Sizes which represent a jump
     diffusion process. These jumps are combined with a geometric brownian
     motion (log returns) to produce the Merton model
@@ -157,15 +174,16 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Jump sizes for each point in time (mostly zeroes if jumps are infrequent)
     """
 
     if seed is not None:
         nrand.seed(seed)
-    s_n = time = 0
+    s_n = 0.0
+    time = 0
     small_lamda = -(1.0 / param.jumps_lamda)
-    jump_sizes = []
+    jump_sizes: List[float] = []
     for k in range(0, param.all_time):
         jump_sizes.append(0.0)
     while s_n < param.all_time:
@@ -179,12 +197,12 @@ def jump_diffusion_process(param: ModelParameters, seed: int | None = None) -> l
                 jump_sizes[j] += nrand.normal(param.jumps_mu, param.jumps_sigma)
                 break
         time += 1
-    return jump_sizes
+    return array(jump_sizes)
 
 
 def geometric_brownian_motion_jump_diffusion_log_returns(
     param: ModelParameters, seed: int | None = None
-) -> ndarray:
+) -> ndarray[Any, dtype[float64]]:
     """This method constructs combines a geometric brownian motion process
     (log returns) with a jump diffusion process (log returns) to produce a
     sequence of gbm jump returns
@@ -198,7 +216,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Geometric Brownian Motion process with jumps in it
     """
 
@@ -209,7 +227,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 
 def geometric_brownian_motion_jump_diffusion_levels(
     param: ModelParameters, seed: int | None = None
-) -> ndarray:
+) -> ndarray[Any, dtype[float64]]:
     """Converts returns generated with a Geometric Brownian Motion process
     with jumps into prices
 
@@ -222,7 +240,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray[Any, dtype[float64]]
         Geometric Brownian Motion generated prices
     """
 
@@ -233,8 +251,10 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
 
 def heston_construct_correlated_path(
-    param: ModelParameters, brownian_motion_one: ndarray, seed: int | None = None
-) -> Tuple[ndarray, ndarray]:
+    param: ModelParameters,
+    brownian_motion_one: ndarray[Any, dtype[float64]],
+    seed: int | None = None,
+) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
     """This method is a simplified version of the Cholesky decomposition method for
     just two assets. It does not make use of matrix algebra and is therefore quite
     easy to implement
@@ -243,14 +263,14 @@ def heston_construct_correlated_path(
     ----------
     param: ModelParameters
         Model input
-    brownian_motion_one: numpy.ndarray
+    brownian_motion_one: numpy.ndarray[Any, dtype[float64]]
         A first path to correlate against
     seed: int, optional
         Random seed going into numpy.random.seed()
 
     Returns
     -------
-    (numpy.ndarray, numpy.ndarray)
+    Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]
         A correlated Brownian Motion path
     """
 
@@ -269,7 +289,7 @@ def heston_construct_correlated_path(
 
 def cox_ingersoll_ross_heston(
     param: ModelParameters, seed: int | None = None
-) -> Tuple[ndarray, ndarray]:
+) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
     """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
     volatility in the Heston model. Because the returns between the underlying
@@ -286,7 +306,7 @@ def cox_ingersoll_ross_heston(
 
     Returns
     -------
-    (numpy.ndarray, numpy.ndarray)
+    Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]
         The interest rate levels for the CIR process
     """
 
@@ -299,7 +319,7 @@ def cox_ingersoll_ross_heston(
         loc=0, scale=sqrt_delta_sigma, size=param.all_time
     )
     a, mu, zero = param.heston_a, param.heston_mu, param.heston_vol0
-    volatilities: list = [zero]
+    volatilities: List[float] = [zero]
     for h in range(1, param.all_time):
         drift = a * (mu - volatilities[-1]) * param.all_delta
         randomness = (
@@ -311,7 +331,7 @@ def cox_ingersoll_ross_heston(
 
 def heston_model_levels(
     param: ModelParameters, seed: int | None = None
-) -> Tuple[ndarray, ndarray]:
+) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
     """The Heston model is the geometric brownian motion model with stochastic
     volatility. This stochastic volatility is given by the Cox Ingersoll Ross
     process. Step one on this method is to construct two correlated
@@ -330,7 +350,7 @@ def heston_model_levels(
 
     Returns
     -------
-    (numpy.ndarray, numpy.ndarray)
+    Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]
         The prices for an asset following a Heston process
     """
 
@@ -339,7 +359,7 @@ def heston_model_levels(
         param, brownian, seed=seed
     )
 
-    heston_market_price_levels: list = [param.all_s0]
+    heston_market_price_levels: List[float] = [param.all_s0]
     for h in range(1, param.all_time):
         drift = param.gbm_mu * heston_market_price_levels[h - 1] * param.all_delta
         vol = (
@@ -355,7 +375,7 @@ def heston_model_levels(
 
 def cox_ingersoll_ross_levels(
     param: ModelParameters, seed: int | None = None
-) -> ndarray:
+) -> ndarray[Any, dtype[float64]]:
     """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
     volatility in the Heston model. Because the returns between the underlying
@@ -372,7 +392,7 @@ def cox_ingersoll_ross_levels(
 
     Returns
     -------
-    (numpy.ndarray, numpy.ndarray)
+    numpy.ndarray[Any, dtype[float64]]
         The interest rate levels for the CIR process
     """
 
@@ -380,7 +400,7 @@ def cox_ingersoll_ross_levels(
     # Set up the parameters for interest rates
     a, mu, zero = param.cir_a, param.cir_mu, param.all_r0
     # Assumes output is in levels
-    levels: list = [zero]
+    levels: List[float] = [zero]
     for h in range(1, param.all_time):
         drift = a * (mu - levels[h - 1]) * param.all_delta
         randomness = sqrt(levels[h - 1]) * brownian_motion[h - 1]
@@ -388,7 +408,9 @@ def cox_ingersoll_ross_levels(
     return array(levels)
 
 
-def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -> list:
+def ornstein_uhlenbeck_levels(
+    param: ModelParameters, seed: int | None = None
+) -> ndarray[Any, dtype[float64]]:
     """This method returns the rate levels of a mean-reverting
     Ornstein Uhlenbeck process
 
@@ -401,14 +423,14 @@ def ornstein_uhlenbeck_levels(param: ModelParameters, seed: int | None = None) -
 
     Returns
     -------
-    (numpy.ndarray, numpy.ndarray)
+    numpy.ndarray[Any, dtype[float64]]
         The interest rate levels for the Ornstein Uhlenbeck process
     """
 
-    ou_levels: list = [param.all_r0]
+    ou_levels: List[float] = [param.all_r0]
     brownian_motion_returns = brownian_motion_log_returns(param, seed=seed)
     for h in range(1, param.all_time):
         drift = param.ou_a * (param.ou_mu - ou_levels[h - 1]) * param.all_delta
         randomness = brownian_motion_returns[h - 1]
         ou_levels.append(ou_levels[h - 1] + drift + randomness)
-    return ou_levels
+    return array(ou_levels)

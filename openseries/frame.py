@@ -28,7 +28,7 @@ from statsmodels.api import OLS
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import List, Tuple, TypeVar
+from typing import List, Tuple
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -52,8 +52,6 @@ from openseries.risk import (
     cvar_down,
     var_down,
 )
-
-TOpenFrame = TypeVar("TOpenFrame", bound="OpenFrame")
 
 
 class OpenFrame(BaseModel):
@@ -85,7 +83,7 @@ class OpenFrame(BaseModel):
         arbitrary_types_allowed = True
 
     def __init__(
-        self: TOpenFrame,
+        self: "OpenFrame",
         constituents: List[OpenTimeSeries],
         weights: List[float] | None = None,
         sort: bool = True,
@@ -114,7 +112,7 @@ class OpenFrame(BaseModel):
         if len(set(self.columns_lvl_zero)) != len(self.columns_lvl_zero):
             raise Exception("TimeSeries names/labels must be unique.")
 
-    def from_deepcopy(self: TOpenFrame) -> TOpenFrame:
+    def from_deepcopy(self: "OpenFrame") -> "OpenFrame":
         """Creates a copy of an OpenFrame object
 
         Returns
@@ -125,7 +123,7 @@ class OpenFrame(BaseModel):
 
         return deepcopy(self)
 
-    def merge_series(self: TOpenFrame, how: Lit_how_merge = "outer") -> TOpenFrame:
+    def merge_series(self: "OpenFrame", how: Lit_how_merge = "outer") -> "OpenFrame":
         """Merges the Pandas Dataframes of the constituent OpenTimeSeries
 
         Parameters
@@ -160,7 +158,7 @@ class OpenFrame(BaseModel):
         return self
 
     def all_properties(
-        self: TOpenFrame, properties: OpenFramePropertiesList | None = None
+        self: "OpenFrame", properties: OpenFramePropertiesList | None = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
@@ -183,7 +181,7 @@ class OpenFrame(BaseModel):
         return results
 
     def calc_range(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_offset: int | None = None,
         from_dt: dt.date | None = None,
         to_dt: dt.date | None = None,
@@ -246,8 +244,8 @@ class OpenFrame(BaseModel):
         return earlier, later
 
     def align_index_to_local_cdays(
-        self: TOpenFrame, countries: list | str = "SE"
-    ) -> TOpenFrame:
+        self: "OpenFrame", countries: list | str = "SE"
+    ) -> "OpenFrame":
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
         local calendar business days
 
@@ -279,7 +277,7 @@ class OpenFrame(BaseModel):
         return self
 
     @property
-    def length(self: TOpenFrame) -> int:
+    def length(self: "OpenFrame") -> int:
         """
         Returns
         -------
@@ -290,7 +288,7 @@ class OpenFrame(BaseModel):
         return len(self.tsdf.index)
 
     @property
-    def lengths_of_items(self: TOpenFrame) -> Series:
+    def lengths_of_items(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -306,7 +304,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def item_count(self: TOpenFrame) -> int:
+    def item_count(self: "OpenFrame") -> int:
         """
         Returns
         -------
@@ -317,7 +315,7 @@ class OpenFrame(BaseModel):
         return len(self.constituents)
 
     @property
-    def columns_lvl_zero(self: TOpenFrame) -> list:
+    def columns_lvl_zero(self: "OpenFrame") -> list:
         """
         Returns
         -------
@@ -329,7 +327,7 @@ class OpenFrame(BaseModel):
         return self.tsdf.columns.get_level_values(0).tolist()
 
     @property
-    def columns_lvl_one(self: TOpenFrame) -> list:
+    def columns_lvl_one(self: "OpenFrame") -> list:
         """
         Returns
         -------
@@ -341,7 +339,7 @@ class OpenFrame(BaseModel):
         return self.tsdf.columns.get_level_values(1).tolist()
 
     @property
-    def first_idx(self: TOpenFrame) -> dt.date:
+    def first_idx(self: "OpenFrame") -> dt.date:
         """
         Returns
         -------
@@ -351,7 +349,7 @@ class OpenFrame(BaseModel):
         return self.tsdf.index[0]
 
     @property
-    def first_indices(self: TOpenFrame) -> Series:
+    def first_indices(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -366,7 +364,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def last_idx(self: TOpenFrame) -> dt.date:
+    def last_idx(self: "OpenFrame") -> dt.date:
         """
         Returns
         -------
@@ -376,7 +374,7 @@ class OpenFrame(BaseModel):
         return self.tsdf.index[-1]
 
     @property
-    def last_indices(self: TOpenFrame) -> Series:
+    def last_indices(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -391,7 +389,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def span_of_days(self: TOpenFrame) -> int:
+    def span_of_days(self: "OpenFrame") -> int:
         """
         Returns
         -------
@@ -403,7 +401,7 @@ class OpenFrame(BaseModel):
         return (self.last_idx - self.first_idx).days
 
     @property
-    def span_of_days_all(self: TOpenFrame) -> Series:
+    def span_of_days_all(self: "OpenFrame") -> Series:
         """
         Number of days from the first date to the last for all items in the frame.
         """
@@ -415,7 +413,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def yearfrac(self: TOpenFrame) -> float:
+    def yearfrac(self: "OpenFrame") -> float:
         """
         Returns
         -------
@@ -427,7 +425,7 @@ class OpenFrame(BaseModel):
         return self.span_of_days / 365.25
 
     @property
-    def periods_in_a_year(self: TOpenFrame) -> float:
+    def periods_in_a_year(self: "OpenFrame") -> float:
         """
         The number of businessdays in an average year for all days in the data.
         Be aware that this is not the same for all constituents.
@@ -435,7 +433,7 @@ class OpenFrame(BaseModel):
         return self.length / self.yearfrac
 
     @property
-    def geo_ret(self: TOpenFrame) -> Series:
+    def geo_ret(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/c/cagr.asp
 
         Returns
@@ -456,7 +454,7 @@ class OpenFrame(BaseModel):
         )
 
     def geo_ret_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -499,7 +497,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def arithmetic_ret(self: TOpenFrame) -> Series:
+    def arithmetic_ret(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
         Returns
@@ -515,7 +513,7 @@ class OpenFrame(BaseModel):
         )
 
     def arithmetic_ret_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -557,7 +555,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def value_ret(self: TOpenFrame) -> Series:
+    def value_ret(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -578,7 +576,7 @@ class OpenFrame(BaseModel):
             )
 
     def value_ret_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -613,7 +611,7 @@ class OpenFrame(BaseModel):
         )
 
     def value_ret_calendar_period(
-        self: TOpenFrame, year: int, month: int | None = None
+        self: "OpenFrame", year: int, month: int | None = None
     ) -> Series:
         """
         Parameters
@@ -643,7 +641,7 @@ class OpenFrame(BaseModel):
         return rtn
 
     @property
-    def vol(self: TOpenFrame) -> Series:
+    def vol(self: "OpenFrame") -> Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
         in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
@@ -661,7 +659,7 @@ class OpenFrame(BaseModel):
         )
 
     def vol_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -705,7 +703,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def downside_deviation(self: TOpenFrame) -> Series:
+    def downside_deviation(self: "OpenFrame") -> Series:
         """The standard deviation of returns that are below a Minimum Accepted
         Return of zero.
         It is used to calculate the Sortino Ratio \n
@@ -727,7 +725,7 @@ class OpenFrame(BaseModel):
         )
 
     def downside_deviation_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         min_accepted_return: float = 0.0,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -781,7 +779,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def ret_vol_ratio(self: TOpenFrame) -> Series:
+    def ret_vol_ratio(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -796,7 +794,7 @@ class OpenFrame(BaseModel):
         return ratio
 
     def ret_vol_ratio_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
         months_from_last: int | None = None,
@@ -888,7 +886,7 @@ class OpenFrame(BaseModel):
             )
 
     def jensen_alpha(
-        self: TOpenFrame,
+        self: "OpenFrame",
         asset: tuple | int,
         market: tuple | int,
         riskfree_rate: float = 0.0,
@@ -998,7 +996,7 @@ class OpenFrame(BaseModel):
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     @property
-    def sortino_ratio(self: TOpenFrame) -> Series:
+    def sortino_ratio(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/s/sortinoratio.asp
 
         Returns
@@ -1015,7 +1013,7 @@ class OpenFrame(BaseModel):
         return sortino
 
     def sortino_ratio_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         riskfree_rate: float | None = None,
         riskfree_column: tuple | int = -1,
         months_from_last: int | None = None,
@@ -1114,7 +1112,7 @@ class OpenFrame(BaseModel):
             )
 
     @property
-    def z_score(self: TOpenFrame) -> Series:
+    def z_score(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
         Returns
@@ -1131,7 +1129,7 @@ class OpenFrame(BaseModel):
         )
 
     def z_score_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -1163,7 +1161,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def max_drawdown(self: TOpenFrame) -> Series:
+    def max_drawdown(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1179,7 +1177,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def max_drawdown_date(self: TOpenFrame) -> Series:
+    def max_drawdown_date(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1196,7 +1194,7 @@ class OpenFrame(BaseModel):
         )
 
     def max_drawdown_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -1231,7 +1229,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def max_drawdown_cal_year(self: TOpenFrame) -> Series:
+    def max_drawdown_cal_year(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1253,7 +1251,7 @@ class OpenFrame(BaseModel):
         return md
 
     @property
-    def worst(self: TOpenFrame) -> Series:
+    def worst(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -1264,7 +1262,7 @@ class OpenFrame(BaseModel):
         return Series(data=self.tsdf.pct_change().min(), name="Worst", dtype="float64")
 
     @property
-    def worst_month(self: TOpenFrame) -> Series:
+    def worst_month(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -1281,7 +1279,7 @@ class OpenFrame(BaseModel):
         )
 
     def worst_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         observations: int = 1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -1318,7 +1316,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def positive_share(self: TOpenFrame) -> Series:
+    def positive_share(self: "OpenFrame") -> Series:
         """
         Returns
         -------
@@ -1333,7 +1331,7 @@ class OpenFrame(BaseModel):
         return answer
 
     def positive_share_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -1368,7 +1366,7 @@ class OpenFrame(BaseModel):
         return answer
 
     @property
-    def skew(self: TOpenFrame) -> Series:
+    def skew(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/s/skewness.asp
 
         Returns
@@ -1385,7 +1383,7 @@ class OpenFrame(BaseModel):
         )
 
     def skew_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -1422,7 +1420,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def kurtosis(self: TOpenFrame) -> Series:
+    def kurtosis(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
         Returns
@@ -1441,7 +1439,7 @@ class OpenFrame(BaseModel):
         )
 
     def kurtosis_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -1479,7 +1477,7 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def cvar_down(self: TOpenFrame, level: float = 0.95) -> Series:
+    def cvar_down(self: "OpenFrame", level: float = 0.95) -> Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
         Parameters
@@ -1510,7 +1508,7 @@ class OpenFrame(BaseModel):
         )
 
     def cvar_down_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         level: float = 0.95,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -1555,7 +1553,7 @@ class OpenFrame(BaseModel):
 
     @property
     def var_down(
-        self: TOpenFrame,
+        self: "OpenFrame",
         level: float = 0.95,
         interpolation: Lit_quantile_interpolation = "lower",
     ) -> Series:
@@ -1586,7 +1584,7 @@ class OpenFrame(BaseModel):
         )
 
     def var_down_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         level: float = 0.95,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -1629,7 +1627,7 @@ class OpenFrame(BaseModel):
 
     @property
     def vol_from_var(
-        self: TOpenFrame,
+        self: "OpenFrame",
         level: float = 0.95,
         interpolation: Lit_quantile_interpolation = "lower",
     ) -> Series:
@@ -1659,7 +1657,7 @@ class OpenFrame(BaseModel):
         )
 
     def vol_from_var_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         level: float = 0.95,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -1726,7 +1724,7 @@ class OpenFrame(BaseModel):
         )
 
     def target_weight_from_var(
-        self: TOpenFrame,
+        self: "OpenFrame",
         target_vol: float = 0.175,
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
@@ -1789,7 +1787,7 @@ class OpenFrame(BaseModel):
             data=vfv, name=f"Weight from target vol {target_vol:.1%}", dtype="float64"
         )
 
-    def value_to_ret(self: TOpenFrame) -> TOpenFrame:
+    def value_to_ret(self: "OpenFrame") -> "OpenFrame":
         """
         Returns
         -------
@@ -1804,7 +1802,7 @@ class OpenFrame(BaseModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_diff(self: TOpenFrame, periods: int = 1) -> TOpenFrame:
+    def value_to_diff(self: "OpenFrame", periods: int = 1) -> "OpenFrame":
         """Converts valueseries to series of their period differences
 
         Parameters
@@ -1826,7 +1824,7 @@ class OpenFrame(BaseModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_log(self: TOpenFrame) -> TOpenFrame:
+    def value_to_log(self: "OpenFrame") -> "OpenFrame":
         """Converts a valueseries into logarithmic return series \n
         Equivalent to LN(value[t] / value[t=0]) in MS Excel
 
@@ -1839,7 +1837,7 @@ class OpenFrame(BaseModel):
         self.tsdf = log(self.tsdf / self.tsdf.iloc[0])
         return self
 
-    def to_cumret(self: TOpenFrame) -> TOpenFrame:
+    def to_cumret(self: "OpenFrame") -> "OpenFrame":
         """Converts returnseries into cumulative valueseries
 
         Returns
@@ -1862,7 +1860,7 @@ class OpenFrame(BaseModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def resample(self: TOpenFrame, freq: str = "BM") -> TOpenFrame:
+    def resample(self: "OpenFrame", freq: str = "BM") -> "OpenFrame":
         """Resamples the timeseries frequency
 
         Parameters
@@ -1888,12 +1886,12 @@ class OpenFrame(BaseModel):
         return self
 
     def resample_to_business_period_ends(
-        self: TOpenFrame,
+        self: "OpenFrame",
         freq: Lit_bizday_frequencies = "BM",
         countries: list | str = "SE",
         convention: Lit_pandas_resample_convention = "end",
         method: Lit_pandas_reindex_method = "nearest",
-    ) -> TOpenFrame:
+    ) -> "OpenFrame":
         """Resamples timeseries frequency to the business calendar
         month end dates of each period while leaving any stubs
         in place. Stubs will be aligned to the shortest stub
@@ -1955,7 +1953,7 @@ class OpenFrame(BaseModel):
             x.tsdf = x.tsdf.reindex([d.date() for d in dates], method=method)
         return self
 
-    def to_drawdown_series(self: TOpenFrame) -> TOpenFrame:
+    def to_drawdown_series(self: "OpenFrame") -> "OpenFrame":
         """Converts the timeseries into a drawdown series
 
         Returns
@@ -1968,7 +1966,7 @@ class OpenFrame(BaseModel):
             self.tsdf.loc[:, t] = drawdown_series(self.tsdf.loc[:, t])
         return self
 
-    def drawdown_details(self: TOpenFrame) -> DataFrame:
+    def drawdown_details(self: "OpenFrame") -> DataFrame:
         """
         Returns
         -------
@@ -1987,7 +1985,7 @@ class OpenFrame(BaseModel):
         return mddf
 
     def ewma_risk(
-        self: TOpenFrame,
+        self: "OpenFrame",
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
@@ -2100,7 +2098,7 @@ class OpenFrame(BaseModel):
         return ewma_df
 
     def rolling_vol(
-        self: TOpenFrame,
+        self: "OpenFrame",
         column: int,
         observations: int = 21,
         periods_in_a_year_fixed: int | None = None,
@@ -2137,7 +2135,7 @@ class OpenFrame(BaseModel):
         return voldf
 
     def rolling_return(
-        self: TOpenFrame, column: int, observations: int = 21
+        self: "OpenFrame", column: int, observations: int = 21
     ) -> DataFrame:
         """
         Parameters
@@ -2166,7 +2164,7 @@ class OpenFrame(BaseModel):
         return retdf
 
     def rolling_cvar_down(
-        self: TOpenFrame, column: int, level: float = 0.95, observations: int = 252
+        self: "OpenFrame", column: int, level: float = 0.95, observations: int = 252
     ) -> DataFrame:
         """
         Parameters
@@ -2196,7 +2194,7 @@ class OpenFrame(BaseModel):
         return cvardf
 
     def rolling_var_down(
-        self: TOpenFrame,
+        self: "OpenFrame",
         column: int,
         level: float = 0.95,
         interpolation: Lit_quantile_interpolation = "lower",
@@ -2232,8 +2230,8 @@ class OpenFrame(BaseModel):
         return vardf
 
     def value_nan_handle(
-        self: TOpenFrame, method: Lit_nan_method = "fill"
-    ) -> TOpenFrame:
+        self: "OpenFrame", method: Lit_nan_method = "fill"
+    ) -> "OpenFrame":
         """Handling of missing values in a valueseries
 
         Parameters
@@ -2258,8 +2256,8 @@ class OpenFrame(BaseModel):
         return self
 
     def return_nan_handle(
-        self: TOpenFrame, method: Lit_nan_method = "fill"
-    ) -> TOpenFrame:
+        self: "OpenFrame", method: Lit_nan_method = "fill"
+    ) -> "OpenFrame":
         """Handling of missing values in a returnseries
 
         Parameters
@@ -2284,7 +2282,7 @@ class OpenFrame(BaseModel):
         return self
 
     @property
-    def correl_matrix(self: TOpenFrame) -> DataFrame:
+    def correl_matrix(self: "OpenFrame") -> DataFrame:
         """
         Returns
         -------
@@ -2297,7 +2295,7 @@ class OpenFrame(BaseModel):
         corr_matrix.index.name = "Correlation"
         return corr_matrix
 
-    def add_timeseries(self: TOpenFrame, new_series: OpenTimeSeries) -> TOpenFrame:
+    def add_timeseries(self: "OpenFrame", new_series: OpenTimeSeries) -> "OpenFrame":
         """
         Parameters
         ----------
@@ -2314,7 +2312,7 @@ class OpenFrame(BaseModel):
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
-    def delete_timeseries(self: TOpenFrame, lvl_zero_item: str) -> TOpenFrame:
+    def delete_timeseries(self: "OpenFrame", lvl_zero_item: str) -> "OpenFrame":
         """
         Parameters
         ----------
@@ -2343,12 +2341,12 @@ class OpenFrame(BaseModel):
         return self
 
     def trunc_frame(
-        self: TOpenFrame,
+        self: "OpenFrame",
         start_cut: dt.date | None = None,
         end_cut: dt.date | None = None,
         before: bool = True,
         after: bool = True,
-    ) -> TOpenFrame:
+    ) -> "OpenFrame":
         """Truncates DataFrame such that all timeseries have the same time span
 
         Parameters
@@ -2394,7 +2392,7 @@ class OpenFrame(BaseModel):
         return self
 
     def relative(
-        self: TOpenFrame,
+        self: "OpenFrame",
         long_column: int = 0,
         short_column: int = 1,
         base_zero: bool = True,
@@ -2428,7 +2426,7 @@ class OpenFrame(BaseModel):
             )
 
     def tracking_error_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -2497,7 +2495,7 @@ class OpenFrame(BaseModel):
         )
 
     def info_ratio_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
@@ -2568,7 +2566,7 @@ class OpenFrame(BaseModel):
         )
 
     def capture_ratio_func(
-        self: TOpenFrame,
+        self: "OpenFrame",
         ratio: Lit_capture_ratio,
         base_column: tuple | int = -1,
         months_from_last: int | None = None,
@@ -2723,7 +2721,7 @@ class OpenFrame(BaseModel):
             dtype="float64",
         )
 
-    def beta(self: TOpenFrame, asset: tuple | int, market: tuple | int) -> float:
+    def beta(self: "OpenFrame", asset: tuple | int, market: tuple | int) -> float:
         """https://www.investopedia.com/terms/b/beta.asp
         Calculates Beta as Co-variance of asset & market divided by Variance of market
 
@@ -2777,7 +2775,7 @@ class OpenFrame(BaseModel):
         return beta
 
     def ord_least_squares_fit(
-        self: TOpenFrame,
+        self: "OpenFrame",
         y_column: tuple | int,
         x_column: tuple | int,
         fitted_series: bool = True,
@@ -2825,7 +2823,7 @@ class OpenFrame(BaseModel):
 
         return results
 
-    def make_portfolio(self: TOpenFrame, name: str) -> DataFrame:
+    def make_portfolio(self: "OpenFrame", name: str) -> DataFrame:
         """Calculates a basket timeseries based on the supplied weights
 
         Parameters
@@ -2858,7 +2856,7 @@ class OpenFrame(BaseModel):
         return portfolio
 
     def rolling_info_ratio(
-        self: TOpenFrame,
+        self: "OpenFrame",
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
@@ -2914,7 +2912,7 @@ class OpenFrame(BaseModel):
         return ratiodf
 
     def rolling_beta(
-        self: TOpenFrame,
+        self: "OpenFrame",
         asset_column: int = 0,
         market_column: int = 1,
         observations: int = 21,
@@ -2955,7 +2953,7 @@ class OpenFrame(BaseModel):
         return rollbeta
 
     def rolling_corr(
-        self: TOpenFrame,
+        self: "OpenFrame",
         first_column: int = 0,
         second_column: int = 1,
         observations: int = 21,
@@ -2995,7 +2993,7 @@ class OpenFrame(BaseModel):
         return corrdf
 
     def plot_series(
-        self: TOpenFrame,
+        self: "OpenFrame",
         mode: Lit_line_plot_mode = "lines",
         tick_fmt: str | None = None,
         filename: str | None = None,
@@ -3099,7 +3097,7 @@ class OpenFrame(BaseModel):
         return figure, plotfile
 
     def plot_bars(
-        self: TOpenFrame,
+        self: "OpenFrame",
         mode: Lit_bar_plot_mode = "group",
         tick_fmt: str | None = None,
         filename: str | None = None,

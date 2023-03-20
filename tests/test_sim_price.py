@@ -1,14 +1,12 @@
 from pandas import DataFrame
-from typing import get_type_hints, TypeVar
+from typing import get_type_hints
 from unittest import TestCase
 
 from openseries.sim_price import ReturnSimulation
 
-TTestSimPrice = TypeVar("TTestSimPrice", bound="TestSimPrice")
-
 
 class TestSimPrice(TestCase):
-    def test_return_simulations_annotations_and_typehints(self: TTestSimPrice):
+    def test_return_simulations_annotations_and_typehints(self: "TestSimPrice"):
         returnsimulation_annotations = dict(ReturnSimulation.__annotations__)
 
         self.assertDictEqual(
@@ -26,7 +24,7 @@ class TestSimPrice(TestCase):
         returnsimulation_typehints = get_type_hints(ReturnSimulation)
         self.assertDictEqual(returnsimulation_annotations, returnsimulation_typehints)
 
-    def test_return_simulation_processes(self: TTestSimPrice):
+    def test_return_simulation_processes(self: "TestSimPrice"):
         args = {
             "number_of_sims": 1,
             "trading_days": 2520,
@@ -78,7 +76,7 @@ class TestSimPrice(TestCase):
         self.assertListEqual(target_returns, returns)
         self.assertListEqual(target_volatilities, volatilities)
 
-    def test_return_simulation_properties(self: TTestSimPrice):
+    def test_return_simulation_properties(self: "TestSimPrice"):
         days = 1200
         psim = ReturnSimulation.from_normal(
             number_of_sims=1,

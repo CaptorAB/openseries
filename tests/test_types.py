@@ -1,4 +1,3 @@
-from typing import TypeVar
 from unittest import TestCase
 
 from openseries.types import (
@@ -6,11 +5,9 @@ from openseries.types import (
     OpenFramePropertiesList,
 )
 
-TTestTypes = TypeVar("TTestTypes", bound="TestTypes")
-
 
 class TestTypes(TestCase):
-    def test_types_opentimeseriesproplist_validate(self: TTestTypes) -> None:
+    def test_types_opentimeseriesproplist_validate(self: "TestTypes") -> None:
         lst = OpenTimeSeriesPropertiesList(
             "z_score",
             "kurtosis",
@@ -37,7 +34,7 @@ class TestTypes(TestCase):
         self.assertIsInstance(e_booo.exception, ValueError)
         self.assertIn(member="Duplicate string: skew", container=str(e_booo.exception))
 
-    def test_types_openframeproplist_validate(self: TTestTypes) -> None:
+    def test_types_openframeproplist_validate(self: "TestTypes") -> None:
         lst = OpenFramePropertiesList(
             "z_score",
             "kurtosis",

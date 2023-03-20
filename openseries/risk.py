@@ -4,7 +4,16 @@ https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
 from math import ceil
-from numpy import Inf, isnan, maximum, mean, nan_to_num, ndarray, quantile, sort
+from numpy import (
+    Inf,
+    isnan,
+    maximum,
+    mean,
+    nan_to_num,
+    ndarray,
+    quantile,
+    sort,
+)
 from pandas import DataFrame, Series
 from typing import List
 
