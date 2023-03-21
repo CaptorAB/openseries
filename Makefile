@@ -10,4 +10,7 @@ test:
 	PYTHONPATH=${PWD} poetry run coverage report -m
 	PYTHONPATH=${PWD} poetry run coverage-badge -o coverage.svg -f
 
+lint:
+	PYTHONPATH=${PWD} poetry run flake8 .
+
 .PHONY: test
