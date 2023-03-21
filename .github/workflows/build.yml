@@ -61,7 +61,7 @@ jobs:
 
       - name: Type check with Mypy
         shell: bash
-        run: mypy .
+        run: poetry run mypy .
 
       - name: Tests with Pytest
         shell: bash

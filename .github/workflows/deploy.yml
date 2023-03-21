@@ -55,7 +55,7 @@ jobs:
 
       - name: Type check with Mypy
         shell: bash
-        run: mypy .
+        run: poetry run mypy .
 
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
