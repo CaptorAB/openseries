@@ -946,9 +946,11 @@ class TestOpenTimeSeries(TestCase):
         front_series = OpenTimeSeries.from_df(full_series.tsdf.iloc[:126])
 
         back_series = OpenTimeSeries.from_df(
-            full_series.tsdf.loc[front_series.last_idx :]
+            full_series.tsdf.iloc[
+                full_series.tsdf.index.get_loc(front_series.last_idx) :
+            ]
         )
-
+        full_series.tsdf.index.get_loc(front_series.last_idx)
         chained_series = timeseries_chain(front_series, back_series)
         chained_values = [f"{nn:.10f}" for nn in chained_series.values]
 

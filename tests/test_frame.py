@@ -1711,8 +1711,8 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
             _ = cframe.capture_ratio_func(
-                ratio="up", base_column="string"
-            )  # type: ignore
+                ratio="up", base_column="string"  # type: ignore
+            )
 
         self.assertEqual(
             e_func.exception.args[0],
