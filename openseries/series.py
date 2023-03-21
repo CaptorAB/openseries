@@ -29,6 +29,7 @@ from openseries.types import (
     Lit_line_plot_mode,
     Lit_bar_plot_mode,
     Lit_plotly_output,
+    Lit_series_props,
     OpenTimeSeriesPropertiesList,
 )
 from openseries.risk import (
@@ -133,8 +134,8 @@ class OpenTimeSeries(BaseModel):
         regex=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3
     ) = "SEK"
     name: str
-    isin: str = None
-    label: str = None
+    isin: str | None = None
+    label: str | None = None
     countries: List[
         constr(regex=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2)
     ] | constr(regex=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2) = "SE"
@@ -427,11 +428,11 @@ class OpenTimeSeries(BaseModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        if d_range is None and all([days, end_dt]):
+        if not isinstance(d_range, DatetimeIndex) and all([days, end_dt]):
             d_range = DatetimeIndex(
                 [d.date() for d in date_range(periods=days, end=end_dt, freq="D")]
             )
-        elif d_range is None and not all([days, end_dt]):
+        elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
             raise FromFixedRateDatesInputError
         deltas = array([i.days for i in d_range[1:] - d_range[:-1]])
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
@@ -611,13 +612,13 @@ class OpenTimeSeries(BaseModel):
         return self
 
     def all_properties(
-        self: "OpenTimeSeries", properties: OpenTimeSeriesPropertiesList | None = None
+        self: "OpenTimeSeries", properties: List[Lit_series_props] | None = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
         ----------
-        properties: OpenTimeSeriesPropertiesList, optional
+        properties: List[Lit_series_props], optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -629,9 +630,8 @@ class OpenTimeSeries(BaseModel):
         if not properties:
             properties = OpenTimeSeriesPropertiesList.allowed_strings
 
-        pdf = DataFrame.from_dict(
-            {x: getattr(self, x) for x in properties}, orient="index"
-        )
+        props = OpenTimeSeriesPropertiesList(*properties)
+        pdf = DataFrame.from_dict({x: getattr(self, x) for x in props}, orient="index")
         pdf.columns = self.tsdf.columns
         return pdf
 

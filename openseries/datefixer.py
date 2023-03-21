@@ -1,8 +1,8 @@
 import datetime as dt
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
-from numpy import array, busdaycalendar, datetime64, is_busday, where
-from pandas import date_range, Timestamp, to_datetime
+from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
+from pandas import date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
 from typing import Dict, List, Union
 
@@ -28,7 +28,10 @@ def holiday_calendar(
         Last year in date range generated
     countries: List[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: List[str] | Dict[str, str] | None, default: None
+    custom_holidays: Union[
+        Dict[Union[dt.date, dt.datetime, str, float, int], str],
+        List[Union[dt.date, dt.datetime, str, float, int]],
+        Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
@@ -56,7 +59,7 @@ def holiday_calendar(
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:
                 staging.update(custom_holidays)
-            countryholidays.extend(staging.keys())
+            countryholidays += [i for i in staging]
         hols = array(sorted(list(set(countryholidays))), dtype="datetime64[D]")
     else:
         raise Exception(
@@ -86,7 +89,10 @@ def date_fix(d: str | dt.date | dt.datetime | datetime64 | Timestamp) -> dt.date
     elif isinstance(d, dt.date):
         return d
     elif isinstance(d, datetime64):
-        return to_datetime(str(d)).date()
+        unix_epoch = datetime64(0, "s")
+        one_second = timedelta64(1, "s")
+        seconds_since_epoch = (d - unix_epoch) / one_second
+        return dt.datetime.utcfromtimestamp(float(seconds_since_epoch)).date()
     elif isinstance(d, str):
         return dt.datetime.strptime(d, "%Y-%m-%d").date()
     else:
@@ -101,7 +107,12 @@ def date_offset_foll(
     adjust: bool = False,
     following: bool = True,
     countries: str | List[str] = "SE",
-    custom_holidays: List[str] | Dict[str, str] | None = None,
+    custom_holidays: Union[
+        Dict[Union[dt.date, dt.datetime, str, float, int], str],
+        List[Union[dt.date, dt.datetime, str, float, int]],
+        Union[dt.date, dt.datetime, str, float, int],
+    ]
+    | None = None,
 ) -> dt.date:
     """Function to offset dates according to a given calendar
 
@@ -118,7 +129,10 @@ def date_offset_foll(
         Determines if days should be offset forward (following) or backward
     countries: List[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: List[str] | Dict[str, str] | None, default: None
+    custom_holidays: Union[
+        Dict[Union[dt.date, dt.datetime, str, float, int], str],
+        List[Union[dt.date, dt.datetime, str, float, int]],
+        Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
@@ -156,7 +170,12 @@ def date_offset_foll(
 def get_previous_business_day_before_today(
     today: dt.date | None = None,
     countries: str | List[str] = "SE",
-    custom_holidays: List[str] | Dict[str, str] | None = None,
+    custom_holidays: Union[
+        Dict[Union[dt.date, dt.datetime, str, float, int], str],
+        List[Union[dt.date, dt.datetime, str, float, int]],
+        Union[dt.date, dt.datetime, str, float, int],
+    ]
+    | None = None,
 ) -> dt.date:
     """Function to bump backwards to find the previous business day before today
 
@@ -166,7 +185,10 @@ def get_previous_business_day_before_today(
         Manual input of the day from where the previous business day is found
     countries: List[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: List[str] | Dict[str, str] | None, default: None
+    custom_holidays: Union[
+        Dict[Union[dt.date, dt.datetime, str, float, int], str],
+        List[Union[dt.date, dt.datetime, str, float, int]],
+        Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
@@ -193,7 +215,12 @@ def offset_business_days(
     ddate: dt.date,
     days: int,
     countries: List[str] | str = "SE",
-    custom_holidays: List[str] | Dict[str, str] | None = None,
+    custom_holidays: Union[
+        Dict[Union[dt.date, dt.datetime, str, float, int], str],
+        List[Union[dt.date, dt.datetime, str, float, int]],
+        Union[dt.date, dt.datetime, str, float, int],
+    ]
+    | None = None,
 ) -> dt.date:
     """Function to bump a date by business days instead of calendar days.
     It first adjusts to a valid business day and then bumps with given
@@ -208,7 +235,10 @@ def offset_business_days(
         the closest preceding the day given
     countries: List[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
-    custom_holidays: List[str] | Dict[str, str] | None, default: None
+    custom_holidays: Union[
+        Dict[Union[dt.date, dt.datetime, str, float, int], str],
+        List[Union[dt.date, dt.datetime, str, float, int]],
+        Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
@@ -247,4 +277,4 @@ def offset_business_days(
 
     idx = where(local_bdays == ddate)[0]
 
-    return local_bdays[idx + days][0]
+    return date_fix(local_bdays[idx + days][0])

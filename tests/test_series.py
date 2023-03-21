@@ -546,6 +546,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertTrue(isinstance(df4series, OpenTimeSeries))
 
         self.assertTrue(check_if_none(None))
+        self.assertFalse(check_if_none(0.0))
 
     def test_opentimeseries_save_to_json(self: "TestOpenTimeSeries") -> None:
         seriesfile = path.join(path.dirname(path.abspath(__file__)), "seriessaved.json")
@@ -845,6 +846,14 @@ class TestOpenTimeSeries(TestCase):
         apseries.to_cumret()
         result_index = apseries.all_properties().index.tolist()
         self.assertTrue(set(prop_index) == set(result_index))
+
+        props = apseries.all_properties(properties=["geo_ret", "vol"])
+        self.assertIsInstance(props, DataFrame)
+
+        with self.assertRaises(ValueError) as e_boo:
+            # noinspection PyTypeChecker,PydanticTypeChecker
+            _ = apseries.all_properties(properties=["geo_ret", "boo"])  # type: ignore
+        self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_opentimeseries_all_calc_properties(self: "TestOpenTimeSeries") -> None:
         checks = {

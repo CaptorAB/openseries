@@ -1,6 +1,7 @@
 import datetime as dt
 from numpy import datetime64
 from pandas import Timestamp
+from typing import List, Dict
 from unittest import TestCase
 
 from openseries.datefixer import (
@@ -85,7 +86,7 @@ class TestDateFixer(TestCase):
 
     def test_date_offset_foll(self: "TestDateFixer") -> None:
         originals = [dt.date(2022, 6, 5), dt.date(2022, 7, 3)]
-        country_sets = ["SE", "US", ["SE", "US"]]
+        country_sets: List[str | List[str]] = ["SE", "US", ["SE", "US"]]
         earliers = [
             dt.date(2022, 6, 3),
             dt.date(2022, 7, 1),
@@ -197,7 +198,7 @@ class TestDateFixer(TestCase):
         ]
         self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_without)
 
-        jacks_birthday = {"2021-02-12": "Jack's birthday"}
+        jacks_birthday: Dict[str, str] = {"2021-02-12": "Jack's birthday"}
         cdr_with = holiday_calendar(
             startyear=2021, endyear=2021, countries="SE", custom_holidays=jacks_birthday
         )

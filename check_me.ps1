@@ -12,6 +12,7 @@ if ($task -eq "test") {
 } elseif ($task -eq "lint") {
     # run commands for lint task
     poetry run flake8 .
+    poetry run mypy .
 } else {
     # invalid task argument
     Write-Host "Only test or lint are allowed as tasks"

@@ -1234,6 +1234,14 @@ class TestOpenFrame(TestCase):
 
         self.assertTrue(set(prop_index) == set(result_index))
 
+        props = apframe.all_properties(properties=["geo_ret", "vol"])
+        self.assertIsInstance(props, DataFrame)
+
+        with self.assertRaises(ValueError) as e_boo:
+            # noinspection PyTypeChecker,PydanticTypeChecker
+            _ = apframe.all_properties(properties=["geo_ret", "boo"])  # type: ignore
+        self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
+
     def test_openframe_align_index_to_local_cdays(self: "TestOpenFrame") -> None:
         d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
         asim = [1.0] * len(d_range)

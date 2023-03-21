@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from typing import get_type_hints
+from typing import Dict, get_type_hints, List
 from unittest import TestCase
 
 from openseries.sim_price import ReturnSimulation
@@ -25,7 +25,7 @@ class TestSimPrice(TestCase):
         self.assertDictEqual(returnsimulation_annotations, returnsimulation_typehints)
 
     def test_return_simulation_processes(self: "TestSimPrice") -> None:
-        args = {
+        args: Dict[str, int | float] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
@@ -40,7 +40,7 @@ class TestSimPrice(TestCase):
             "from_heston_vol",
             "from_merton_jump_gbm",
         ]
-        added = [
+        added: List[Dict[str, int | float]] = [
             {},
             {},
             {},
@@ -68,7 +68,7 @@ class TestSimPrice(TestCase):
         returns = []
         volatilities = []
         for m, a in zip(methods, added):
-            arguments = {**args, **a}
+            arguments: Dict[str, int | float] = {**args, **a}
             onesim = getattr(ReturnSimulation, m)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")

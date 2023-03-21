@@ -20,6 +20,58 @@ Lit_nan_method = Literal["fill", "drop"]
 Lit_capture_ratio = Literal["up", "down", "both"]
 Lit_bar_plot_mode = Literal["stack", "group", "overlay", "relative"]
 Lit_plotly_output = Literal["file", "div"]
+Lit_series_props = Literal[
+    "value_ret",
+    "geo_ret",
+    "arithmetic_ret",
+    "vol",
+    "downside_deviation",
+    "ret_vol_ratio",
+    "sortino_ratio",
+    "z_score",
+    "skew",
+    "kurtosis",
+    "positive_share",
+    "var_down",
+    "cvar_down",
+    "vol_from_var",
+    "worst",
+    "worst_month",
+    "max_drawdown_cal_year",
+    "max_drawdown",
+    "max_drawdown_date",
+    "first_idx",
+    "last_idx",
+    "length",
+    "span_of_days",
+    "yearfrac",
+    "periods_in_a_year",
+]
+Lit_frame_props = Literal[
+    "value_ret",
+    "geo_ret",
+    "arithmetic_ret",
+    "vol",
+    "downside_deviation",
+    "ret_vol_ratio",
+    "sortino_ratio",
+    "z_score",
+    "skew",
+    "kurtosis",
+    "positive_share",
+    "var_down",
+    "cvar_down",
+    "vol_from_var",
+    "worst",
+    "worst_month",
+    "max_drawdown",
+    "max_drawdown_date",
+    "max_drawdown_cal_year",
+    "first_indices",
+    "last_indices",
+    "lengths_of_items",
+    "span_of_days_all",
+]
 
 
 class OpenTimeSeriesPropertiesList(List[str]):
@@ -51,7 +103,7 @@ class OpenTimeSeriesPropertiesList(List[str]):
         "periods_in_a_year",
     }
 
-    def __init__(self, *args: str) -> None:
+    def __init__(self, *args: Lit_series_props) -> None:
         super().__init__(args)
         self._validate()
 
@@ -94,7 +146,7 @@ class OpenFramePropertiesList(List[str]):
         "span_of_days_all",
     }
 
-    def __init__(self, *args: str) -> None:
+    def __init__(self, *args: Lit_frame_props) -> None:
         super().__init__(args)
         self._validate()
 

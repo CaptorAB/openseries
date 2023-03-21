@@ -44,6 +44,7 @@ from openseries.types import (
     Lit_line_plot_mode,
     Lit_bar_plot_mode,
     Lit_plotly_output,
+    Lit_frame_props,
     OpenFramePropertiesList,
 )
 from openseries.risk import (
@@ -159,13 +160,13 @@ class OpenFrame(BaseModel):
         return self
 
     def all_properties(
-        self: "OpenFrame", properties: OpenFramePropertiesList | None = None
+        self: "OpenFrame", properties: List[Lit_frame_props] | None = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
         ----------
-        properties: OpenFramePropertiesList, optional
+        properties: List[Lit_frame_props], optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -174,7 +175,8 @@ class OpenFrame(BaseModel):
             Properties of the contituent OpenTimeSeries
         """
         if properties:
-            prop_list = [getattr(self, x) for x in properties]
+            props = OpenFramePropertiesList(*properties)
+            prop_list = [getattr(self, x) for x in props]
         else:
             prop_list = [
                 getattr(self, x) for x in OpenFramePropertiesList.allowed_strings

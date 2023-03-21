@@ -60,6 +60,10 @@ jobs:
               echo "$lintresult"
           fi
 
+      - name: Type check with Mypy
+        shell: bash
+        run: mypy .
+
   run_tests:
     needs: stage_python
     runs-on: ubuntu-latest

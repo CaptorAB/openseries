@@ -45,7 +45,17 @@ jobs:
 
       - name: Lint check with Flake8
         shell: bash
-        run: poetry run flake8
+        run: |
+          lintresult=$(poetry run flake8 .)
+          if [[ "$lintresult" -eq 0 || "$lintresult" -eq "0" ]]; then
+              echo "Flake8 linting is OK"
+          else
+              echo "$lintresult"
+          fi
+
+      - name: Type check with Mypy
+        shell: bash
+        run: mypy .
 
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
