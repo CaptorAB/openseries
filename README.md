@@ -293,3 +293,14 @@ cd OpenSeries
 make
 source source_me
 ```
+
+### Linting / Type-checking:
+
+```
+poetry run flake8 .
+poetry run mypy .
+```
+The silenced error codes can be found  in the project's
+[.flak8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
+[pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
+files. Flake8 linting is embedded in the pre-commit hook but not mypy.
