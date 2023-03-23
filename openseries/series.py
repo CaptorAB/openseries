@@ -16,7 +16,7 @@ from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, TypeVar, Union
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.exceptions import FromFixedRateDatesInputError
@@ -2413,9 +2413,14 @@ class OpenTimeSeries(BaseModel):
         return figure, plotfile
 
 
+TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound=OpenTimeSeries)
+
+
 def timeseries_chain(
-    front: OpenTimeSeries, back: OpenTimeSeries, old_fee: float = 0.0
-) -> OpenTimeSeries:
+    front: Union[TOpenTimeSeries, type(OpenTimeSeries)],
+    back: Union[TOpenTimeSeries, type(OpenTimeSeries)],
+    old_fee: float = 0.0,
+) -> Union[TOpenTimeSeries, OpenTimeSeries]:
     """Chain two timeseries together
 
     Parameters
@@ -2456,20 +2461,39 @@ def timeseries_chain(
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
     values += [float(x) for x in new.tsdf.values]
 
-    return OpenTimeSeries(
-        timeseriesId=new.timeseriesId,
-        instrumentId=new.instrumentId,
-        currency=new.currency,
-        dates=dates,
-        name=new.name,
-        label=new.name,
-        valuetype=new.valuetype,
-        values=list(values),
-        local_ccy=new.local_ccy,
-        tsdf=DataFrame(
-            data=values,
-            index=[d.date() for d in DatetimeIndex(dates)],
-            columns=[[new.label], [new.valuetype]],
-            dtype="float64",
-        ),
-    )
+    if isinstance(back, OpenTimeSeries):
+        return OpenTimeSeries(
+            timeseriesId=new.timeseriesId,
+            instrumentId=new.instrumentId,
+            currency=new.currency,
+            dates=dates,
+            name=new.name,
+            label=new.name,
+            valuetype=new.valuetype,
+            values=list(values),
+            local_ccy=new.local_ccy,
+            tsdf=DataFrame(
+                data=values,
+                index=[d.date() for d in DatetimeIndex(dates)],
+                columns=[[new.label], [new.valuetype]],
+                dtype="float64",
+            ),
+        )
+    else:
+        return back(
+            timeseriesId=new.timeseriesId,
+            instrumentId=new.instrumentId,
+            currency=new.currency,
+            dates=dates,
+            name=new.name,
+            label=new.name,
+            valuetype=new.valuetype,
+            values=list(values),
+            local_ccy=new.local_ccy,
+            tsdf=DataFrame(
+                data=values,
+                index=[d.date() for d in DatetimeIndex(dates)],
+                columns=[[new.label], [new.valuetype]],
+                dtype="float64",
+            ),
+        )

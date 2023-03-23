@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.11.5] - 2023-03-22
+## Version [0.11.6] - 2023-03-23
 
 Aligned code to pass many of the type checks performed by `mypy`. A list of error
 codes are for now silenced in the project's
