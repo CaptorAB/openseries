@@ -8,7 +8,6 @@ from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pandas.tseries.offsets import CustomBusinessDay
 from pydantic.error_wrappers import ValidationError as PydanticValidationError
 import pytest
-from stdnum.exceptions import InvalidChecksum
 import sys
 from typing import Any, Dict, get_type_hints, List
 from unittest import TestCase
@@ -1179,43 +1178,71 @@ class TestOpenTimeSeries(TestCase):
         Source:
         https://www.investopedia.com/terms/d/downside-deviation.asp
         """
-
-        dd_asset = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "currency": "USD",
-                    "dates": [
-                        "2010-12-31",
-                        "2011-12-31",
-                        "2012-12-31",
-                        "2013-12-31",
-                        "2014-12-31",
-                        "2015-12-31",
-                        "2016-12-31",
-                        "2017-12-31",
-                        "2018-12-31",
-                        "2019-12-31",
-                    ],
-                    "instrumentId": "",
-                    "isin": "",
-                    "local_ccy": True,
-                    "name": "asset",
-                    "values": [
-                        0.0,
-                        -0.02,
-                        0.16,
-                        0.31,
-                        0.17,
-                        -0.11,
-                        0.21,
-                        0.26,
-                        -0.03,
-                        0.38,
-                    ],
-                    "valuetype": ValueType.RTRN,
-                }
-            )
+        dd_asset = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="USD",
+            dates=[
+                "2010-12-31",
+                "2011-12-31",
+                "2012-12-31",
+                "2013-12-31",
+                "2014-12-31",
+                "2015-12-31",
+                "2016-12-31",
+                "2017-12-31",
+                "2018-12-31",
+                "2019-12-31",
+            ],
+            name="asset",
+            label="asset",
+            valuetype=ValueType.RTRN,
+            values=[
+                0.0,
+                -0.02,
+                0.16,
+                0.31,
+                0.17,
+                -0.11,
+                0.21,
+                0.26,
+                -0.03,
+                0.38,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    0.0,
+                    -0.02,
+                    0.16,
+                    0.31,
+                    0.17,
+                    -0.11,
+                    0.21,
+                    0.26,
+                    -0.03,
+                    0.38,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2010-12-31",
+                            "2011-12-31",
+                            "2012-12-31",
+                            "2013-12-31",
+                            "2014-12-31",
+                            "2015-12-31",
+                            "2016-12-31",
+                            "2017-12-31",
+                            "2018-12-31",
+                            "2019-12-31",
+                        ]
+                    )
+                ],
+                columns=[["asset"], [ValueType.RTRN]],
+                dtype="float64",
+            ),
         ).to_cumret()
 
         mar = 0.01
@@ -1229,49 +1256,76 @@ class TestOpenTimeSeries(TestCase):
         valid_ccy = "SEK"
         invalid_ccy = "SE"
 
-        timeseries_with_valid_ccy = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "currency": valid_ccy,
-                    "dates": [
-                        "2017-05-29",
-                        "2017-05-30",
-                    ],
-                    "instrumentId": "",
-                    "isin": "",
-                    "local_ccy": True,
-                    "name": "asset",
-                    "values": [
-                        100.0,
-                        100.0978,
-                    ],
-                    "valuetype": ValueType.PRICE,
-                }
-            )
-        )
-        self.assertIsInstance(timeseries_with_valid_ccy, OpenTimeSeries)
-
-        data_with_invalid_ccy = {
-            "timeseriesId": "",
-            "currency": invalid_ccy,
-            "dates": [
+        timeseries_with_valid_ccy = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency=valid_ccy,
+            dates=[
                 "2017-05-29",
                 "2017-05-30",
             ],
-            "instrumentId": "",
-            "isin": "",
-            "local_ccy": True,
-            "name": "asset",
-            "values": [
+            name="asset",
+            label="asset",
+            valuetype=ValueType.PRICE,
+            values=[
                 100.0,
                 100.0978,
             ],
-            "valuetype": ValueType.PRICE,
-        }
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    100.0,
+                    100.0978,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2017-05-29",
+                            "2017-05-30",
+                        ]
+                    )
+                ],
+                columns=[["asset"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
+        )
+        self.assertIsInstance(timeseries_with_valid_ccy, OpenTimeSeries)
+
         with self.assertRaises(PydanticValidationError) as e_ccy:
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(data_with_invalid_ccy)
+            OpenTimeSeries(
+                timeseriesId="",
+                instrumentId="",
+                currency=invalid_ccy,
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                name="asset",
+                label="asset",
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-30",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
 
         self.assertIn(
@@ -1279,7 +1333,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_ccy.exception),
         )
 
-    def test_opentimeseries_identifier_validations(self: "TestOpenTimeSeries") -> None:
+    def test_opentimeseries_validations(self: "TestOpenTimeSeries") -> None:
         valid_isin = "SE0009807308"
         invalid_isin = "SE0009807307"
         valid_instrument_id = "58135911b239b413482758c9"
@@ -1289,99 +1343,157 @@ class TestOpenTimeSeries(TestCase):
         invalid_timeseries_id_one = "5813595971051506189ba41"
         invalid_timeseries_id_two = "5_13595971051506189ba416"
 
-        timeseries_with_valid_isin = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": valid_timeseries_id,
-                    "currency": "SEK",
-                    "dates": [
-                        "2017-05-29",
-                        "2017-05-30",
-                    ],
-                    "instrumentId": valid_instrument_id,
-                    "isin": valid_isin,
-                    "local_ccy": True,
-                    "name": "asset",
-                    "values": [
-                        100.0,
-                        100.0978,
-                    ],
-                    "valuetype": ValueType.PRICE,
-                }
-            )
+        timeseries_with_valid_isin = OpenTimeSeries(
+            timeseriesId=valid_timeseries_id,
+            instrumentId=valid_instrument_id,
+            isin=valid_isin,
+            currency="SEK",
+            dates=[
+                "2017-05-29",
+                "2017-05-30",
+            ],
+            name="asset",
+            label="asset",
+            valuetype=ValueType.PRICE,
+            values=[
+                100.0,
+                100.0978,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    100.0,
+                    100.0978,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2017-05-29",
+                            "2017-05-30",
+                        ]
+                    )
+                ],
+                columns=[["asset"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
         )
         self.assertIsInstance(timeseries_with_valid_isin, OpenTimeSeries)
 
-        new_dict = dict(timeseries_with_valid_isin.__dict__)
-        cleaner_list = [
-            "local_ccy",
-            "tsdf",
-        ]  # 'local_ccy' removed to trigger ValidationError
-        for item in cleaner_list:
-            new_dict.pop(item)
-
-        with self.assertRaises(PydanticValidationError) as e_ccy:
-            OpenTimeSeries.parse_obj(OpenTimeSeries.parse_opentimeseries(new_dict))
-
-        self.assertIn(member="local_ccy", container=str(e_ccy.exception))
-
-        new_dict.pop("label")
-        new_dict.update(
-            {"local_ccy": True, "dates": []}
-        )  # Set dates to empty array to trigger minItems ValidationError
-
         with self.assertRaises(PydanticValidationError) as e_min_items:
-            OpenTimeSeries.parse_obj(OpenTimeSeries.parse_opentimeseries(new_dict))
+            OpenTimeSeries(
+                timeseriesId=valid_timeseries_id,
+                instrumentId=valid_instrument_id,
+                isin=valid_isin,
+                currency="SEK",
+                name="asset",
+                label="asset",
+                dates=[],
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-30",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
+            )
 
         self.assertIn(
             member="Dates list cannot be empty", container=str(e_min_items.exception)
         )
 
-        with self.assertRaises(Exception) as e_one:
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": valid_timeseries_id,
-                        "currency": "SEK",
-                        "dates": [
-                            "2017-05-29",
-                            "2017-05-30",
-                        ],
-                        "instrumentId": valid_instrument_id,
-                        "isin": invalid_isin,
-                        "local_ccy": True,
-                        "name": "asset",
-                        "values": [
-                            100.0,
-                            100.0978,
-                        ],
-                        "valuetype": ValueType.PRICE,
-                    }
-                )
+        with self.assertRaises(ValueError) as e_one:
+            OpenTimeSeries(
+                timeseriesId=valid_timeseries_id,
+                instrumentId=valid_instrument_id,
+                isin=invalid_isin,
+                currency="SEK",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                name="asset",
+                label="asset",
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-30",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
-        self.assertIsInstance(e_one.exception, InvalidChecksum)
+        self.assertIn(
+            member="The ISIN code's checksum or check digit is invalid.",
+            container=str(e_one.exception),
+        )
 
         with self.assertRaises(PydanticValidationError) as e_three:
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": invalid_timeseries_id_one,
-                        "currency": "SEK",
-                        "dates": [
-                            "2017-05-29",
-                            "2017-05-30",
-                        ],
-                        "instrumentId": valid_instrument_id,
-                        "isin": valid_isin,
-                        "local_ccy": True,
-                        "name": "asset",
-                        "values": [
-                            100.0,
-                            100.0978,
-                        ],
-                        "valuetype": ValueType.PRICE,
-                    }
-                )
+            OpenTimeSeries(
+                timeseriesId=invalid_timeseries_id_one,
+                instrumentId=valid_instrument_id,
+                isin=valid_isin,
+                currency="SEK",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                name="asset",
+                label="asset",
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-30",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1389,26 +1501,40 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(PydanticValidationError) as e_four:
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": invalid_timeseries_id_two,
-                        "currency": "SEK",
-                        "dates": [
-                            "2017-05-29",
-                            "2017-05-30",
-                        ],
-                        "instrumentId": valid_instrument_id,
-                        "isin": valid_isin,
-                        "local_ccy": True,
-                        "name": "asset",
-                        "values": [
-                            100.0,
-                            100.0978,
-                        ],
-                        "valuetype": ValueType.PRICE,
-                    }
-                )
+            OpenTimeSeries(
+                timeseriesId=invalid_timeseries_id_two,
+                instrumentId=valid_instrument_id,
+                isin=valid_isin,
+                currency="SEK",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                name="asset",
+                label="asset",
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-30",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1416,26 +1542,40 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(PydanticValidationError) as e_five:
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": valid_timeseries_id,
-                        "currency": "SEK",
-                        "dates": [
-                            "2017-05-29",
-                            "2017-05-30",
-                        ],
-                        "instrumentId": invalid_instrument_id_one,
-                        "isin": valid_isin,
-                        "local_ccy": True,
-                        "name": "asset",
-                        "values": [
-                            100.0,
-                            100.0978,
-                        ],
-                        "valuetype": ValueType.PRICE,
-                    }
-                )
+            OpenTimeSeries(
+                timeseriesId=valid_timeseries_id,
+                instrumentId=invalid_instrument_id_one,
+                isin=valid_isin,
+                currency="SEK",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                name="asset",
+                label="asset",
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-30",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1443,26 +1583,40 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(PydanticValidationError) as e_six:
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": valid_timeseries_id,
-                        "currency": "SEK",
-                        "dates": [
-                            "2017-05-29",
-                            "2017-05-30",
-                        ],
-                        "instrumentId": invalid_instrument_id_two,
-                        "isin": valid_isin,
-                        "local_ccy": True,
-                        "name": "asset",
-                        "values": [
-                            100.0,
-                            100.0978,
-                        ],
-                        "valuetype": ValueType.PRICE,
-                    }
-                )
+            OpenTimeSeries(
+                timeseriesId=valid_timeseries_id,
+                instrumentId=invalid_instrument_id_two,
+                isin=valid_isin,
+                currency="SEK",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                name="asset",
+                label="asset",
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-30",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1470,26 +1624,40 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(PydanticValidationError) as e_seven:
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": valid_timeseries_id,
-                        "currency": "SEK",
-                        "dates": [
-                            "2017-05-29",
-                            "2017-05-29",
-                        ],
-                        "instrumentId": valid_instrument_id,
-                        "isin": valid_isin,
-                        "local_ccy": True,
-                        "name": "asset",
-                        "values": [
-                            100.0,
-                            100.0978,
-                        ],
-                        "valuetype": ValueType.PRICE,
-                    }
-                )
+            OpenTimeSeries(
+                timeseriesId=valid_timeseries_id,
+                instrumentId=valid_instrument_id,
+                isin=valid_isin,
+                currency="SEK",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-29",
+                ],
+                name="asset",
+                label="asset",
+                valuetype=ValueType.PRICE,
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[
+                        100.0,
+                        100.0978,
+                    ],
+                    index=[
+                        d.date()
+                        for d in DatetimeIndex(
+                            [
+                                "2017-05-29",
+                                "2017-05-29",
+                            ]
+                        )
+                    ],
+                    columns=[["asset"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
         self.assertIn(
             member="dates\n  the list has duplicated items",
@@ -1497,43 +1665,75 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_opentimeseries_from_1d_rate_to_cumret(self: "TestOpenTimeSeries") -> None:
-        tms = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "instrumentId": "",
-                    "currency": "SEK",
-                    "dates": [
-                        "2022-12-05",
-                        "2022-12-06",
-                        "2022-12-07",
-                        "2022-12-08",
-                        "2022-12-09",
-                        "2022-12-12",
-                        "2022-12-13",
-                        "2022-12-14",
-                        "2022-12-15",
-                        "2022-12-16",
-                        "2022-12-19",
-                    ],
-                    "local_ccy": True,
-                    "name": "asset",
-                    "values": [
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                        0.02434,
-                    ],
-                    "valuetype": ValueType.PRICE,
-                }
-            )
+        tms = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=[
+                "2022-12-05",
+                "2022-12-06",
+                "2022-12-07",
+                "2022-12-08",
+                "2022-12-09",
+                "2022-12-12",
+                "2022-12-13",
+                "2022-12-14",
+                "2022-12-15",
+                "2022-12-16",
+                "2022-12-19",
+            ],
+            name="asset",
+            label="asset",
+            valuetype=ValueType.RTRN,
+            values=[
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+                0.02434,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                    0.02434,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2022-12-05",
+                            "2022-12-06",
+                            "2022-12-07",
+                            "2022-12-08",
+                            "2022-12-09",
+                            "2022-12-12",
+                            "2022-12-13",
+                            "2022-12-14",
+                            "2022-12-15",
+                            "2022-12-16",
+                            "2022-12-19",
+                        ]
+                    )
+                ],
+                columns=[["asset"], [ValueType.RTRN]],
+                dtype="float64",
+            ),
         )
         ave_rate = f"{tms.tsdf.mean().iloc[0]:.5f}"
         self.assertEqual(ave_rate, "0.02434")
@@ -1546,36 +1746,54 @@ class TestOpenTimeSeries(TestCase):
     def test_opentimeseries_geo_ret_value_ret_exceptions(
         self: "TestOpenTimeSeries",
     ) -> None:
-        geoseries = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "name": "geoseries",
-                    "currency": "SEK",
-                    "instrumentId": "",
-                    "local_ccy": True,
-                    "valuetype": ValueType.PRICE,
-                    "dates": ["2022-07-01", "2023-07-01"],
-                    "values": [1.0, 1.1],
-                }
-            )
+        geoseries = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=["2022-07-01", "2023-07-01"],
+            name="asset",
+            label="asset",
+            valuetype=ValueType.PRICE,
+            values=[
+                1.0,
+                1.1,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    1.0,
+                    1.1,
+                ],
+                index=[d.date() for d in DatetimeIndex(["2022-07-01", "2023-07-01"])],
+                columns=[["asset"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
         )
         self.assertEqual(f"{geoseries.geo_ret:.7f}", "0.1000718")
         self.assertEqual(f"{geoseries.geo_ret_func():.7f}", "0.1000718")
 
-        zeroseries = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "name": "geoseries",
-                    "currency": "SEK",
-                    "instrumentId": "",
-                    "local_ccy": True,
-                    "valuetype": ValueType.PRICE,
-                    "dates": ["2022-07-01", "2023-07-01"],
-                    "values": [0.0, 1.1],
-                }
-            )
+        zeroseries = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=["2022-07-01", "2023-07-01"],
+            name="asset",
+            label="asset",
+            valuetype=ValueType.PRICE,
+            values=[
+                0.0,
+                1.1,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    0.0,
+                    1.1,
+                ],
+                index=[d.date() for d in DatetimeIndex(["2022-07-01", "2023-07-01"])],
+                columns=[["asset"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
         )
         with self.assertRaises(Exception) as e_gr_zero:
             _ = zeroseries.geo_ret
@@ -1620,19 +1838,28 @@ class TestOpenTimeSeries(TestCase):
             ),
         )
 
-        negseries = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "name": "negseries",
-                    "currency": "SEK",
-                    "instrumentId": "",
-                    "local_ccy": True,
-                    "valuetype": ValueType.PRICE,
-                    "dates": ["2022-07-01", "2023-07-01"],
-                    "values": [1.0, -0.1],
-                }
-            )
+        negseries = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=["2022-07-01", "2023-07-01"],
+            name="asset",
+            label="asset",
+            valuetype=ValueType.PRICE,
+            values=[
+                1.0,
+                -0.1,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    1.0,
+                    -0.1,
+                ],
+                index=[d.date() for d in DatetimeIndex(["2022-07-01", "2023-07-01"])],
+                columns=[["asset"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
         )
 
         with self.assertRaises(Exception) as e_gr_neg:
@@ -1658,25 +1885,39 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_opentimeseries_value_nan_handle(self: "TestOpenTimeSeries") -> None:
-        nanseries = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "name": "nanseries",
-                    "currency": "SEK",
-                    "instrumentId": "",
-                    "local_ccy": True,
-                    "valuetype": ValueType.PRICE,
-                    "dates": [
-                        "2022-07-11",
-                        "2022-07-12",
-                        "2022-07-13",
-                        "2022-07-14",
-                        "2022-07-15",
-                    ],
-                    "values": [1.1, 1.0, 0.8, 1.1, 1.0],
-                }
-            )
+        nanseries = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=[
+                "2022-07-11",
+                "2022-07-12",
+                "2022-07-13",
+                "2022-07-14",
+                "2022-07-15",
+            ],
+            name="nanseries",
+            label="nanseries",
+            valuetype=ValueType.PRICE,
+            values=[1.1, 1.0, 0.8, 1.1, 1.0],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[1.1, 1.0, 0.8, 1.1, 1.0],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ]
+                    )
+                ],
+                columns=[["nanseries"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
         )
         nanseries.tsdf.iloc[2, 0] = None
         dropseries = nanseries.from_deepcopy()
@@ -1699,25 +1940,39 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_opentimeseries_return_nan_handle(self: "TestOpenTimeSeries") -> None:
-        nanseries = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "name": "nanseries",
-                    "currency": "SEK",
-                    "instrumentId": "",
-                    "local_ccy": True,
-                    "valuetype": ValueType.RTRN,
-                    "dates": [
-                        "2022-07-11",
-                        "2022-07-12",
-                        "2022-07-13",
-                        "2022-07-14",
-                        "2022-07-15",
-                    ],
-                    "values": [0.1, 0.05, 0.03, 0.01, 0.04],
-                }
-            )
+        nanseries = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=[
+                "2022-07-11",
+                "2022-07-12",
+                "2022-07-13",
+                "2022-07-14",
+                "2022-07-15",
+            ],
+            name="nanseries",
+            label="nanseries",
+            valuetype=ValueType.RTRN,
+            values=[0.1, 0.05, 0.03, 0.01, 0.04],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[0.1, 0.05, 0.03, 0.01, 0.04],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2022-07-11",
+                            "2022-07-12",
+                            "2022-07-13",
+                            "2022-07-14",
+                            "2022-07-15",
+                        ]
+                    )
+                ],
+                columns=[["nanseries"], [ValueType.RTRN]],
+                dtype="float64",
+            ),
         )
         nanseries.tsdf.iloc[2, 0] = None
         dropseries = nanseries.from_deepcopy()

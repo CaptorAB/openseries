@@ -107,7 +107,6 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `from_frame`           | `OpenTimeSeries`              | Class method to create a new OpenTimeSeries object from a series within an OpenFrame.                    |
 | `from_fixed_rate`      | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date.       |
 | `parse_obj`            | `OpenTimeSeries`              | A method inherited from the Pydantic BaseModel to construct an object from a `dict`.                     |
-| `parse_opentimeseries` | `OpenTimeSeries`              | A helper method that adds the required DataFrame to a dict before constructing an OpenTimeSeries object. |
 | `from_deepcopy`        | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                              |
 
 ### Non-numeric or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
@@ -169,6 +168,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `values_not_empty`               | `OpenTimeSeries` | Pydantic root_validator method to validate that values are not emptys.                                                                         |
 | `check_dates_values_same_length` | `OpenTimeSeries` | Pydantic root_validator method to validate that date and value arrays are the same length.                                                     |
 | `check_values_match`             | `OpenTimeSeries` | Pydantic root_validator method to validate that the value array matches the values in the DataFrame when object is constructed.                |
+| `check_isincode`                 | `OpenTimeSeries` | Pydantic root_validator method to validate the ISIN code if provided.                                                                          |
 
 ### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
@@ -301,6 +301,6 @@ poetry run flake8 .
 poetry run mypy .
 ```
 The silenced error codes can be found  in the project's
-[.flak8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
+[.flake8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
 [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
 files. Flake8 linting is embedded in the pre-commit hook but not mypy.

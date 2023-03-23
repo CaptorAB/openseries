@@ -15,6 +15,7 @@ from pydantic import BaseModel, constr, Field, root_validator
 from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
+from stdnum.exceptions import InvalidChecksum
 from typing import Any, Dict, List, Tuple
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
@@ -153,7 +154,7 @@ class OpenTimeSeries(BaseModel):
 
     @root_validator(pre=True)
     def dates_not_empty(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not values.get("dates", None):
+        if not values.get("dates", None) or len(values.get("dates", None)) == 0:
             raise ValueError("Dates list cannot be empty")
         dts = values.get("dates")
         pattern = compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
@@ -184,6 +185,16 @@ class OpenTimeSeries(BaseModel):
             and not compare_lists(a=vals, b=df.iloc[:, 0].values.tolist())
         ):
             raise ValueError("Values and tsdf.values do not match")
+        return values
+
+    @root_validator
+    def check_isincode(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        isin_code = values.get("isin", None)
+        if isin_code:
+            try:
+                isincode.validate(isin_code)
+            except InvalidChecksum:
+                raise ValueError("The ISIN code's checksum or check digit is invalid.")
         return values
 
     @classmethod
@@ -234,30 +245,6 @@ class OpenTimeSeries(BaseModel):
 
         cls.domestic = domestic_ccy
         cls.countries = countries
-
-    @classmethod
-    def parse_opentimeseries(
-        cls,
-        data: Dict[
-            str, str | bool | ValueType | List[str] | List[float] | DataFrame | None
-        ],
-    ) -> Dict[str, str | bool | ValueType | List[str] | List[float] | DataFrame | None]:
-        if data.get("isin", None):
-            isincode.validate(data["isin"])
-
-        if data["name"] != "":
-            data.update({"label": data["name"]})
-
-        if not isinstance(data.get("tsdf", None), DataFrame):
-            df = DataFrame(
-                data=data["values"],
-                index=[d.date() for d in DatetimeIndex(data["dates"])],
-                columns=[[data["name"]], [data["valuetype"]]],
-                dtype="float64",
-            )
-            data.update({"tsdf": df})
-
-        return data
 
     @classmethod
     def from_df(

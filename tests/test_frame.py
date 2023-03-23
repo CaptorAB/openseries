@@ -1,6 +1,6 @@
 from datetime import date as dtdate
 from json import loads
-from pandas import DataFrame, date_range
+from pandas import DataFrame, date_range, DatetimeIndex
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
 from typing import get_type_hints
@@ -704,13 +704,13 @@ class TestOpenFrame(TestCase):
             "ewma_vol_func",
             "from_1d_rate_to_cumret",
             "pandas_df",
-            "parse_opentimeseries",
             "running_adjustment",
             "set_new_label",
             "to_json",
             "setup_class",
             "check_dates_values_same_length",
             "check_values_match",
+            "check_isincode",
         ]
 
         frame_unique = [
@@ -1088,89 +1088,145 @@ class TestOpenFrame(TestCase):
     def test_openframe_merge_series(self: "TestOpenFrame") -> None:
         aframe = OpenFrame(
             [
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "Asset_one",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-07-11",
-                                "2022-07-12",
-                                "2022-07-13",
-                                "2022-07-14",
-                                "2022-07-15",
-                            ],
-                            "values": [1.1, 1.0, 0.8, 1.1, 1.0],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-07-11",
+                        "2022-07-12",
+                        "2022-07-13",
+                        "2022-07-14",
+                        "2022-07-15",
+                    ],
+                    name="Asset_one",
+                    label="Asset_one",
+                    valuetype=ValueType.PRICE,
+                    values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[1.1, 1.0, 0.8, 1.1, 1.0],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-07-11",
+                                    "2022-07-12",
+                                    "2022-07-13",
+                                    "2022-07-14",
+                                    "2022-07-15",
+                                ]
+                            )
+                        ],
+                        columns=[["Asset_one"], [ValueType.PRICE]],
+                        dtype="float64",
+                    ),
                 ),
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "Asset_two",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-08-11",
-                                "2022-08-12",
-                                "2022-08-13",
-                                "2022-08-14",
-                                "2022-08-15",
-                            ],
-                            "values": [2.1, 2.0, 1.8, 2.1, 2.0],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-08-11",
+                        "2022-08-12",
+                        "2022-08-13",
+                        "2022-08-14",
+                        "2022-08-15",
+                    ],
+                    name="Asset_two",
+                    label="Asset_two",
+                    valuetype=ValueType.PRICE,
+                    values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[1.1, 1.0, 0.8, 1.1, 1.0],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-08-11",
+                                    "2022-08-12",
+                                    "2022-08-13",
+                                    "2022-08-14",
+                                    "2022-08-15",
+                                ]
+                            )
+                        ],
+                        columns=[["Asset_two"], [ValueType.PRICE]],
+                        dtype="float64",
+                    ),
                 ),
             ]
         )
         bframe = OpenFrame(
             [
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "Asset_one",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-07-11",
-                                "2022-07-12",
-                                "2022-07-13",
-                                "2022-07-14",
-                                "2022-07-15",
-                            ],
-                            "values": [1.1, 1.0, 0.8, 1.1, 1.0],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-07-11",
+                        "2022-07-12",
+                        "2022-07-13",
+                        "2022-07-14",
+                        "2022-07-15",
+                    ],
+                    name="Asset_one",
+                    label="Asset_one",
+                    valuetype=ValueType.PRICE,
+                    values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[1.1, 1.0, 0.8, 1.1, 1.0],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-07-11",
+                                    "2022-07-12",
+                                    "2022-07-13",
+                                    "2022-07-14",
+                                    "2022-07-15",
+                                ]
+                            )
+                        ],
+                        columns=[["Asset_one"], [ValueType.PRICE]],
+                        dtype="float64",
+                    ),
                 ),
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "Asset_two",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-07-11",
-                                "2022-07-12",
-                                "2022-07-13",
-                                "2022-07-14",
-                                "2022-07-16",
-                            ],
-                            "values": [2.1, 2.0, 1.8, 2.1, 1.9],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-07-11",
+                        "2022-07-12",
+                        "2022-07-13",
+                        "2022-07-14",
+                        "2022-07-16",
+                    ],
+                    name="Asset_two",
+                    label="Asset_two",
+                    valuetype=ValueType.PRICE,
+                    values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[1.1, 1.0, 0.8, 1.1, 1.0],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-07-11",
+                                    "2022-07-12",
+                                    "2022-07-13",
+                                    "2022-07-14",
+                                    "2022-07-16",
+                                ]
+                            )
+                        ],
+                        columns=[["Asset_two"], [ValueType.PRICE]],
+                        dtype="float64",
+                    ),
                 ),
             ]
         )
@@ -1561,138 +1617,257 @@ class TestOpenFrame(TestCase):
         Finance Education (Vol 2 Winter 2013).
         https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf
         """
-
-        asset = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "currency": "USD",
-                    "dates": [
-                        "2007-12-31",
-                        "2008-01-31",
-                        "2008-02-29",
-                        "2008-03-31",
-                        "2008-04-30",
-                        "2008-05-31",
-                        "2008-06-30",
-                        "2008-07-31",
-                        "2008-08-31",
-                        "2008-09-30",
-                        "2008-10-31",
-                        "2008-11-30",
-                        "2008-12-31",
-                        "2009-01-31",
-                        "2009-02-28",
-                        "2009-03-31",
-                        "2009-04-30",
-                        "2009-05-31",
-                        "2009-06-30",
-                        "2009-07-31",
-                        "2009-08-31",
-                        "2009-09-30",
-                        "2009-10-31",
-                        "2009-11-30",
-                        "2009-12-31",
-                    ],
-                    "instrumentId": "",
-                    "local_ccy": True,
-                    "name": "asset",
-                    "values": [
-                        0.0,
-                        -0.0436,
-                        -0.0217,
-                        -0.0036,
-                        0.0623,
-                        0.0255,
-                        -0.0555,
-                        -0.0124,
-                        -0.0088,
-                        -0.0643,
-                        -0.1897,
-                        -0.0781,
-                        0.0248,
-                        -0.0666,
-                        -0.0993,
-                        0.0853,
-                        0.1028,
-                        0.0634,
-                        -0.0125,
-                        0.0762,
-                        0.0398,
-                        0.048,
-                        -0.0052,
-                        0.0592,
-                        0.0195,
-                    ],
-                    "valuetype": ValueType.RTRN,
-                }
-            )
+        asset = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="USD",
+            dates=[
+                "2007-12-31",
+                "2008-01-31",
+                "2008-02-29",
+                "2008-03-31",
+                "2008-04-30",
+                "2008-05-31",
+                "2008-06-30",
+                "2008-07-31",
+                "2008-08-31",
+                "2008-09-30",
+                "2008-10-31",
+                "2008-11-30",
+                "2008-12-31",
+                "2009-01-31",
+                "2009-02-28",
+                "2009-03-31",
+                "2009-04-30",
+                "2009-05-31",
+                "2009-06-30",
+                "2009-07-31",
+                "2009-08-31",
+                "2009-09-30",
+                "2009-10-31",
+                "2009-11-30",
+                "2009-12-31",
+            ],
+            name="asset",
+            label="asset",
+            valuetype=ValueType.RTRN,
+            values=[
+                0.0,
+                -0.0436,
+                -0.0217,
+                -0.0036,
+                0.0623,
+                0.0255,
+                -0.0555,
+                -0.0124,
+                -0.0088,
+                -0.0643,
+                -0.1897,
+                -0.0781,
+                0.0248,
+                -0.0666,
+                -0.0993,
+                0.0853,
+                0.1028,
+                0.0634,
+                -0.0125,
+                0.0762,
+                0.0398,
+                0.048,
+                -0.0052,
+                0.0592,
+                0.0195,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    0.0,
+                    -0.0436,
+                    -0.0217,
+                    -0.0036,
+                    0.0623,
+                    0.0255,
+                    -0.0555,
+                    -0.0124,
+                    -0.0088,
+                    -0.0643,
+                    -0.1897,
+                    -0.0781,
+                    0.0248,
+                    -0.0666,
+                    -0.0993,
+                    0.0853,
+                    0.1028,
+                    0.0634,
+                    -0.0125,
+                    0.0762,
+                    0.0398,
+                    0.048,
+                    -0.0052,
+                    0.0592,
+                    0.0195,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2007-12-31",
+                            "2008-01-31",
+                            "2008-02-29",
+                            "2008-03-31",
+                            "2008-04-30",
+                            "2008-05-31",
+                            "2008-06-30",
+                            "2008-07-31",
+                            "2008-08-31",
+                            "2008-09-30",
+                            "2008-10-31",
+                            "2008-11-30",
+                            "2008-12-31",
+                            "2009-01-31",
+                            "2009-02-28",
+                            "2009-03-31",
+                            "2009-04-30",
+                            "2009-05-31",
+                            "2009-06-30",
+                            "2009-07-31",
+                            "2009-08-31",
+                            "2009-09-30",
+                            "2009-10-31",
+                            "2009-11-30",
+                            "2009-12-31",
+                        ]
+                    )
+                ],
+                columns=[["asset"], [ValueType.RTRN]],
+                dtype="float64",
+            ),
         )
-        indxx = OpenTimeSeries.parse_obj(
-            OpenTimeSeries.parse_opentimeseries(
-                {
-                    "timeseriesId": "",
-                    "currency": "USD",
-                    "dates": [
-                        "2007-12-31",
-                        "2008-01-31",
-                        "2008-02-29",
-                        "2008-03-31",
-                        "2008-04-30",
-                        "2008-05-31",
-                        "2008-06-30",
-                        "2008-07-31",
-                        "2008-08-31",
-                        "2008-09-30",
-                        "2008-10-31",
-                        "2008-11-30",
-                        "2008-12-31",
-                        "2009-01-31",
-                        "2009-02-28",
-                        "2009-03-31",
-                        "2009-04-30",
-                        "2009-05-31",
-                        "2009-06-30",
-                        "2009-07-31",
-                        "2009-08-31",
-                        "2009-09-30",
-                        "2009-10-31",
-                        "2009-11-30",
-                        "2009-12-31",
-                    ],
-                    "instrumentId": "",
-                    "local_ccy": True,
-                    "name": "indxx",
-                    "values": [
-                        0.0,
-                        -0.06,
-                        -0.0325,
-                        -0.0043,
-                        0.0487,
-                        0.013,
-                        -0.0843,
-                        -0.0084,
-                        0.0145,
-                        -0.0891,
-                        -0.168,
-                        -0.0718,
-                        0.0106,
-                        -0.0843,
-                        -0.1065,
-                        0.0876,
-                        0.0957,
-                        0.0559,
-                        0.002,
-                        0.0756,
-                        0.0361,
-                        0.0373,
-                        -0.0186,
-                        0.06,
-                        0.0193,
-                    ],
-                    "valuetype": ValueType.RTRN,
-                }
-            )
+        indxx = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="USD",
+            dates=[
+                "2007-12-31",
+                "2008-01-31",
+                "2008-02-29",
+                "2008-03-31",
+                "2008-04-30",
+                "2008-05-31",
+                "2008-06-30",
+                "2008-07-31",
+                "2008-08-31",
+                "2008-09-30",
+                "2008-10-31",
+                "2008-11-30",
+                "2008-12-31",
+                "2009-01-31",
+                "2009-02-28",
+                "2009-03-31",
+                "2009-04-30",
+                "2009-05-31",
+                "2009-06-30",
+                "2009-07-31",
+                "2009-08-31",
+                "2009-09-30",
+                "2009-10-31",
+                "2009-11-30",
+                "2009-12-31",
+            ],
+            name="indxx",
+            label="indxx",
+            valuetype=ValueType.RTRN,
+            values=[
+                0.0,
+                -0.06,
+                -0.0325,
+                -0.0043,
+                0.0487,
+                0.013,
+                -0.0843,
+                -0.0084,
+                0.0145,
+                -0.0891,
+                -0.168,
+                -0.0718,
+                0.0106,
+                -0.0843,
+                -0.1065,
+                0.0876,
+                0.0957,
+                0.0559,
+                0.002,
+                0.0756,
+                0.0361,
+                0.0373,
+                -0.0186,
+                0.06,
+                0.0193,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    0.0,
+                    -0.06,
+                    -0.0325,
+                    -0.0043,
+                    0.0487,
+                    0.013,
+                    -0.0843,
+                    -0.0084,
+                    0.0145,
+                    -0.0891,
+                    -0.168,
+                    -0.0718,
+                    0.0106,
+                    -0.0843,
+                    -0.1065,
+                    0.0876,
+                    0.0957,
+                    0.0559,
+                    0.002,
+                    0.0756,
+                    0.0361,
+                    0.0373,
+                    -0.0186,
+                    0.06,
+                    0.0193,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2007-12-31",
+                            "2008-01-31",
+                            "2008-02-29",
+                            "2008-03-31",
+                            "2008-04-30",
+                            "2008-05-31",
+                            "2008-06-30",
+                            "2008-07-31",
+                            "2008-08-31",
+                            "2008-09-30",
+                            "2008-10-31",
+                            "2008-11-30",
+                            "2008-12-31",
+                            "2009-01-31",
+                            "2009-02-28",
+                            "2009-03-31",
+                            "2009-04-30",
+                            "2009-05-31",
+                            "2009-06-30",
+                            "2009-07-31",
+                            "2009-08-31",
+                            "2009-09-30",
+                            "2009-10-31",
+                            "2009-11-30",
+                            "2009-12-31",
+                        ]
+                    )
+                ],
+                columns=[["indxx"], [ValueType.RTRN]],
+                dtype="float64",
+            ),
         )
         cframe = OpenFrame([asset, indxx]).to_cumret()
 
@@ -1730,33 +1905,45 @@ class TestOpenFrame(TestCase):
     def test_openframe_georet_exceptions(self: "TestOpenFrame") -> None:
         geoframe = OpenFrame(
             [
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "geoseries1",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": ["2022-07-01", "2023-07-01"],
-                            "values": [1.0, 1.1],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=["2022-07-01", "2023-07-01"],
+                    name="geoseries1",
+                    label="geoseries1",
+                    valuetype=ValueType.PRICE,
+                    values=[1.0, 1.1],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[1.0, 1.1],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(["2022-07-01", "2023-07-01"])
+                        ],
+                        columns=[["geoseries1"], [ValueType.RTRN]],
+                        dtype="float64",
+                    ),
                 ),
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "geoseries2",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": ["2022-07-01", "2023-07-01"],
-                            "values": [1.0, 1.2],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=["2022-07-01", "2023-07-01"],
+                    name="geoseries2",
+                    label="geoseries2",
+                    valuetype=ValueType.PRICE,
+                    values=[1.0, 1.2],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[1.0, 1.2],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(["2022-07-01", "2023-07-01"])
+                        ],
+                        columns=[["geoseries2"], [ValueType.RTRN]],
+                        dtype="float64",
+                    ),
                 ),
             ]
         )
@@ -1769,19 +1956,24 @@ class TestOpenFrame(TestCase):
         )
 
         geoframe.add_timeseries(
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": "",
-                        "name": "geoseries3",
-                        "currency": "SEK",
-                        "instrumentId": "",
-                        "local_ccy": True,
-                        "valuetype": ValueType.PRICE,
-                        "dates": ["2022-07-01", "2023-07-01"],
-                        "values": [0.0, 1.1],
-                    }
-                )
+            OpenTimeSeries(
+                timeseriesId="",
+                instrumentId="",
+                currency="SEK",
+                dates=["2022-07-01", "2023-07-01"],
+                name="geoseries3",
+                label="geoseries3",
+                valuetype=ValueType.PRICE,
+                values=[0.0, 1.1],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[0.0, 1.1],
+                    index=[
+                        d.date() for d in DatetimeIndex(["2022-07-01", "2023-07-01"])
+                    ],
+                    columns=[["geoseries3"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
         )
         with self.assertRaises(Exception) as e_gr_zero:
@@ -1813,19 +2005,24 @@ class TestOpenFrame(TestCase):
         )
 
         geoframe.add_timeseries(
-            OpenTimeSeries.parse_obj(
-                OpenTimeSeries.parse_opentimeseries(
-                    {
-                        "timeseriesId": "",
-                        "name": "geoseries4",
-                        "currency": "SEK",
-                        "instrumentId": "",
-                        "local_ccy": True,
-                        "valuetype": ValueType.PRICE,
-                        "dates": ["2022-07-01", "2023-07-01"],
-                        "values": [1.0, -1.1],
-                    }
-                )
+            OpenTimeSeries(
+                timeseriesId="",
+                instrumentId="",
+                currency="SEK",
+                dates=["2022-07-01", "2023-07-01"],
+                name="geoseries4",
+                label="geoseries4",
+                valuetype=ValueType.PRICE,
+                values=[1.0, -1.1],
+                local_ccy=True,
+                tsdf=DataFrame(
+                    data=[1.0, -1.1],
+                    index=[
+                        d.date() for d in DatetimeIndex(["2022-07-01", "2023-07-01"])
+                    ],
+                    columns=[["geoseries4"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
             )
         )
         with self.assertRaises(Exception) as e_gr_neg:
@@ -1853,45 +2050,73 @@ class TestOpenFrame(TestCase):
     def test_openframe_value_nan_handle(self: "TestOpenFrame") -> None:
         nanframe = OpenFrame(
             [
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "nanseries1",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-07-11",
-                                "2022-07-12",
-                                "2022-07-13",
-                                "2022-07-14",
-                                "2022-07-15",
-                            ],
-                            "values": [1.1, 1.0, 0.8, 1.1, 1.0],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-07-11",
+                        "2022-07-12",
+                        "2022-07-13",
+                        "2022-07-14",
+                        "2022-07-15",
+                    ],
+                    name="nanseries1",
+                    label="nanseries1",
+                    valuetype=ValueType.PRICE,
+                    values=[1.1, 1.0, 0.8, 1.1, 1.0],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[1.1, 1.0, 0.8, 1.1, 1.0],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-07-11",
+                                    "2022-07-12",
+                                    "2022-07-13",
+                                    "2022-07-14",
+                                    "2022-07-15",
+                                ]
+                            )
+                        ],
+                        columns=[["nanseries1"], [ValueType.PRICE]],
+                        dtype="float64",
+                    ),
                 ),
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "nanseries2",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-07-11",
-                                "2022-07-12",
-                                "2022-07-13",
-                                "2022-07-14",
-                                "2022-07-15",
-                            ],
-                            "values": [2.1, 2.0, 1.8, 2.1, 2.0],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-07-11",
+                        "2022-07-12",
+                        "2022-07-13",
+                        "2022-07-14",
+                        "2022-07-15",
+                    ],
+                    name="nanseries2",
+                    label="nanseries2",
+                    valuetype=ValueType.PRICE,
+                    values=[2.1, 2.0, 1.8, 2.1, 2.0],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[2.1, 2.0, 1.8, 2.1, 2.0],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-07-11",
+                                    "2022-07-12",
+                                    "2022-07-13",
+                                    "2022-07-14",
+                                    "2022-07-15",
+                                ]
+                            )
+                        ],
+                        columns=[["nanseries2"], [ValueType.PRICE]],
+                        dtype="float64",
+                    ),
                 ),
             ]
         )
@@ -1923,45 +2148,73 @@ class TestOpenFrame(TestCase):
     def test_openframe_return_nan_handle(self: "TestOpenFrame") -> None:
         nanframe = OpenFrame(
             [
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "nanseries1",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-07-11",
-                                "2022-07-12",
-                                "2022-07-13",
-                                "2022-07-14",
-                                "2022-07-15",
-                            ],
-                            "values": [0.1, 0.05, 0.03, 0.01, 0.04],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-07-11",
+                        "2022-07-12",
+                        "2022-07-13",
+                        "2022-07-14",
+                        "2022-07-15",
+                    ],
+                    name="nanseries1",
+                    label="nanseries1",
+                    valuetype=ValueType.RTRN,
+                    values=[0.1, 0.05, 0.03, 0.01, 0.04],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[0.1, 0.05, 0.03, 0.01, 0.04],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-07-11",
+                                    "2022-07-12",
+                                    "2022-07-13",
+                                    "2022-07-14",
+                                    "2022-07-15",
+                                ]
+                            )
+                        ],
+                        columns=[["nanseries1"], [ValueType.RTRN]],
+                        dtype="float64",
+                    ),
                 ),
-                OpenTimeSeries.parse_obj(
-                    OpenTimeSeries.parse_opentimeseries(
-                        {
-                            "timeseriesId": "",
-                            "name": "nanseries2",
-                            "currency": "SEK",
-                            "instrumentId": "",
-                            "local_ccy": True,
-                            "valuetype": ValueType.PRICE,
-                            "dates": [
-                                "2022-07-11",
-                                "2022-07-12",
-                                "2022-07-13",
-                                "2022-07-14",
-                                "2022-07-15",
-                            ],
-                            "values": [0.01, 0.04, 0.02, 0.11, 0.06],
-                        }
-                    )
+                OpenTimeSeries(
+                    timeseriesId="",
+                    instrumentId="",
+                    currency="SEK",
+                    dates=[
+                        "2022-07-11",
+                        "2022-07-12",
+                        "2022-07-13",
+                        "2022-07-14",
+                        "2022-07-15",
+                    ],
+                    name="nanseries2",
+                    label="nanseries2",
+                    valuetype=ValueType.RTRN,
+                    values=[0.01, 0.04, 0.02, 0.11, 0.06],
+                    local_ccy=True,
+                    tsdf=DataFrame(
+                        data=[0.01, 0.04, 0.02, 0.11, 0.06],
+                        index=[
+                            d.date()
+                            for d in DatetimeIndex(
+                                [
+                                    "2022-07-11",
+                                    "2022-07-12",
+                                    "2022-07-13",
+                                    "2022-07-14",
+                                    "2022-07-15",
+                                ]
+                            )
+                        ],
+                        columns=[["nanseries2"], [ValueType.RTRN]],
+                        dtype="float64",
+                    ),
                 ),
             ]
         )
