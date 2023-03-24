@@ -2425,17 +2425,17 @@ def timeseries_chain(
 
     Parameters
     ----------
-    front: "OpenTimeSeries"
+    front: Union[TOpenTimeSeries, type(OpenTimeSeries)]
         Earlier series to chain with
-    back: "OpenTimeSeries"
+    back: Union[TOpenTimeSeries, type(OpenTimeSeries)]
         Later series to chain with
     old_fee: bool, default: False
         Fee to apply to earlier series
 
     Returns
     -------
-    OpenTimeSeries
-        An OpenTimeSeries object
+    Union[TOpenTimeSeries, OpenTimeSeries]
+        An OpenTimeSeries object or a subclass thereof
     """
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)

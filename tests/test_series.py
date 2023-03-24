@@ -995,6 +995,7 @@ class TestOpenTimeSeries(TestCase):
         self: "TestOpenTimeSeries",
     ) -> None:
         base_series_one = self.randomseries.from_deepcopy()
+        base_series_one.to_cumret()
 
         class NewTimeSeries(OpenTimeSeries):
             extra_info: str = "cool"
@@ -1007,10 +1008,10 @@ class TestOpenTimeSeries(TestCase):
             name="sub_series_one",
             label="sub_series_one",
             valuetype=ValueType.PRICE,
-            values=base_series_one.values,
+            values=list(base_series_one.tsdf.iloc[:, 0].values),
             local_ccy=True,
             tsdf=DataFrame(
-                data=base_series_one.values,
+                data=list(base_series_one.tsdf.iloc[:, 0].values),
                 index=[d.date() for d in DatetimeIndex(base_series_one.dates)],
                 columns=[["sub_series_one"], [ValueType.PRICE]],
                 dtype="float64",
@@ -1099,8 +1100,8 @@ class TestOpenTimeSeries(TestCase):
         with self.assertRaises(AssertionError):
             assert isinstance(new_base, NewTimeSeries)
         self.assertIsInstance(new_base, OpenTimeSeries)
-        # self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
-        # self.assertListEqual(list1=new_base.values, list2=new_sub.values)
+        self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
+        self.assertListEqual(list1=new_base.values, list2=new_sub.values)
 
     def test_opentimeseries_plot_series(self: "TestOpenTimeSeries") -> None:
         plotseries = self.randomseries.from_deepcopy()
