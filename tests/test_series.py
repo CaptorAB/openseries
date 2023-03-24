@@ -1096,10 +1096,16 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(sub_series_one.extra_info, "cool")
         new_base = timeseries_chain(front=base_series_one, back=base_series_two)
         new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
+
+        self.assertIsInstance(new_base, OpenTimeSeries)
         self.assertIsInstance(new_sub, NewTimeSeries)
+
         with self.assertRaises(AssertionError):
             assert isinstance(new_base, NewTimeSeries)
-        self.assertIsInstance(new_base, OpenTimeSeries)
+
+        with self.assertRaises(AssertionError):
+            assert new_sub.__class__.__subclasscheck__(OpenTimeSeries)
+
         self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
         self.assertListEqual(list1=new_base.values, list2=new_sub.values)
 

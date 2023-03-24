@@ -2461,7 +2461,7 @@ def timeseries_chain(
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
     values += [float(x) for x in new.tsdf.values]
 
-    if back.__class__.__name__ == "OpenTimeSeries":
+    if back.__class__.__subclasscheck__(OpenTimeSeries):
         return OpenTimeSeries(
             timeseriesId=new.timeseriesId,
             instrumentId=new.instrumentId,

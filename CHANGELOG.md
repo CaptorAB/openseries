@@ -7,6 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.11.7] - 2023-03-25
+Working on a fix for timeseries_chain. I want the function to return a subclass of
+the OpenTimeSeries class if the `back` argument is also a subclass. If the argument
+is the baseclass the output should also align.
+
 ## Version [0.11.6] - 2023-03-23
 
 Aligned code to pass many of the type checks performed by `mypy`. A list of error
