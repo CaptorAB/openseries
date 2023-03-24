@@ -991,116 +991,116 @@ class TestOpenTimeSeries(TestCase):
             e_fail.exception.args[0], "Failed to find a matching date between series"
         )
 
-    # def test_opentimeseries_timeserieschain_newclass(
-    #     self: "TestOpenTimeSeries",
-    # ) -> None:
-    #     base_series_one = self.randomseries.from_deepcopy()
-    #
-    #     class NewTimeSeries(OpenTimeSeries):
-    #         extra_info: str = "cool"
-    #
-    #     sub_series_one = NewTimeSeries(
-    #         timeseriesId="",
-    #         instrumentId="",
-    #         currency="SEK",
-    #         dates=base_series_one.dates,
-    #         name="sub_series_one",
-    #         label="sub_series_one",
-    #         valuetype=ValueType.PRICE,
-    #         values=base_series_one.values,
-    #         local_ccy=True,
-    #         tsdf=DataFrame(
-    #             data=base_series_one.values,
-    #             index=[d.date() for d in DatetimeIndex(base_series_one.dates)],
-    #             columns=[["sub_series_one"], [ValueType.PRICE]],
-    #             dtype="float64",
-    #         ),
-    #     )
-    #     base_series_two = OpenTimeSeries(
-    #         timeseriesId="",
-    #         instrumentId="",
-    #         currency="SEK",
-    #         dates=[
-    #             "2019-06-28",
-    #             "2019-06-29",
-    #             "2019-06-30",
-    #         ],
-    #         name="base_series_two",
-    #         label="base_series_two",
-    #         valuetype=ValueType.PRICE,
-    #         values=[
-    #             1.0,
-    #             1.009,
-    #             1.011,
-    #         ],
-    #         local_ccy=True,
-    #         tsdf=DataFrame(
-    #             data=[
-    #                 1.0,
-    #                 1.009,
-    #                 1.011,
-    #             ],
-    #             index=[
-    #                 d.date()
-    #                 for d in DatetimeIndex(
-    #                     [
-    #                         "2019-06-28",
-    #                         "2019-06-29",
-    #                         "2019-06-30",
-    #                     ]
-    #                 )
-    #             ],
-    #             columns=[["base_series_two"], [ValueType.PRICE]],
-    #             dtype="float64",
-    #         ),
-    #     )
-    #     sub_series_two = NewTimeSeries(
-    #         timeseriesId="",
-    #         instrumentId="",
-    #         currency="SEK",
-    #         dates=[
-    #             "2019-06-28",
-    #             "2019-06-29",
-    #             "2019-06-30",
-    #         ],
-    #         name="sub_series_two",
-    #         label="sub_series_two",
-    #         valuetype=ValueType.PRICE,
-    #         values=[
-    #             1.0,
-    #             1.009,
-    #             1.011,
-    #         ],
-    #         local_ccy=True,
-    #         tsdf=DataFrame(
-    #             data=[
-    #                 1.0,
-    #                 1.009,
-    #                 1.011,
-    #             ],
-    #             index=[
-    #                 d.date()
-    #                 for d in DatetimeIndex(
-    #                     [
-    #                         "2019-06-28",
-    #                         "2019-06-29",
-    #                         "2019-06-30",
-    #                     ]
-    #                 )
-    #             ],
-    #             columns=[["sub_series_two"], [ValueType.PRICE]],
-    #             dtype="float64",
-    #         ),
-    #     )
-    #     self.assertEqual(sub_series_one.extra_info, "cool")
-    #     new_base = timeseries_chain(front=base_series_one, back=base_series_two)
-    #     new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
-    #     # self.assertIsInstance(new_sub, NewTimeSeries)
-    #     with self.assertRaises(AssertionError):
-    #         assert isinstance(new_base, NewTimeSeries)
-    #     self.assertIsInstance(new_base, OpenTimeSeries)
-    #     self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
-    #     self.assertListEqual(list1=new_base.values, list2=new_sub.values)
+    def test_opentimeseries_timeserieschain_newclass(
+        self: "TestOpenTimeSeries",
+    ) -> None:
+        base_series_one = self.randomseries.from_deepcopy()
+
+        class NewTimeSeries(OpenTimeSeries):
+            extra_info: str = "cool"
+
+        sub_series_one = NewTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=base_series_one.dates,
+            name="sub_series_one",
+            label="sub_series_one",
+            valuetype=ValueType.PRICE,
+            values=base_series_one.values,
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=base_series_one.values,
+                index=[d.date() for d in DatetimeIndex(base_series_one.dates)],
+                columns=[["sub_series_one"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
+        )
+        base_series_two = OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=[
+                "2019-06-28",
+                "2019-06-29",
+                "2019-06-30",
+            ],
+            name="base_series_two",
+            label="base_series_two",
+            valuetype=ValueType.PRICE,
+            values=[
+                1.0,
+                1.009,
+                1.011,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    1.0,
+                    1.009,
+                    1.011,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2019-06-28",
+                            "2019-06-29",
+                            "2019-06-30",
+                        ]
+                    )
+                ],
+                columns=[["base_series_two"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
+        )
+        sub_series_two = NewTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            dates=[
+                "2019-06-28",
+                "2019-06-29",
+                "2019-06-30",
+            ],
+            name="sub_series_two",
+            label="sub_series_two",
+            valuetype=ValueType.PRICE,
+            values=[
+                1.0,
+                1.009,
+                1.011,
+            ],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[
+                    1.0,
+                    1.009,
+                    1.011,
+                ],
+                index=[
+                    d.date()
+                    for d in DatetimeIndex(
+                        [
+                            "2019-06-28",
+                            "2019-06-29",
+                            "2019-06-30",
+                        ]
+                    )
+                ],
+                columns=[["sub_series_two"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
+        )
+        self.assertEqual(sub_series_one.extra_info, "cool")
+        new_base = timeseries_chain(front=base_series_one, back=base_series_two)
+        new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
+        self.assertIsInstance(new_sub, NewTimeSeries)
+        with self.assertRaises(AssertionError):
+            assert isinstance(new_base, NewTimeSeries)
+        self.assertIsInstance(new_base, OpenTimeSeries)
+        # self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
+        # self.assertListEqual(list1=new_base.values, list2=new_sub.values)
 
     def test_opentimeseries_plot_series(self: "TestOpenTimeSeries") -> None:
         plotseries = self.randomseries.from_deepcopy()
