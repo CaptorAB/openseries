@@ -12,6 +12,8 @@ repos:
     rev: v1.10.0
     hooks:
       - id: python-use-type-annotations
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
@@ -21,6 +23,7 @@ repos:
       - id: check-case-conflict
       - id: check-docstring-first
       - id: check-json
+      - id: check-toml
       - id: check-yaml
       - id: end-of-file-fixer
         exclude: '^.test_durations'
