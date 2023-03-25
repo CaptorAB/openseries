@@ -1295,7 +1295,9 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(ValueError) as e_boo:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = apframe.all_properties(properties=["geo_ret", "boo"])  # type: ignore
+            _ = apframe.all_properties(
+                properties=["geo_ret", "boo"]  # type: ignore[list-item]
+            )
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_openframe_align_index_to_local_cdays(self: "TestOpenFrame") -> None:
@@ -1392,7 +1394,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_retvolfunc:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.ret_vol_ratio_func(riskfree_column="string")  # type: ignore
+            _ = frame.ret_vol_ratio_func(riskfree_column="string")
 
         self.assertEqual(
             e_retvolfunc.exception.args[0],
@@ -1423,7 +1425,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.sortino_ratio_func(riskfree_column="string")  # type: ignore
+            _ = frame.sortino_ratio_func(riskfree_column="string")
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -1452,7 +1454,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.tracking_error_func(base_column="string")  # type: ignore
+            _ = frame.tracking_error_func(base_column="string")
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -1477,7 +1479,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.info_ratio_func(base_column="string")  # type: ignore
+            _ = frame.info_ratio_func(base_column="string")
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -1893,9 +1895,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_func:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = cframe.capture_ratio_func(
-                ratio="up", base_column="string"  # type: ignore
-            )
+            _ = cframe.capture_ratio_func(ratio="up", base_column="string")
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -2138,7 +2138,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(AssertionError) as e_methd:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanframe.value_nan_handle(method="other")  # type: ignore
+            _ = nanframe.value_nan_handle(method="other")
 
         self.assertEqual(
             e_methd.exception.args[0],
@@ -2236,7 +2236,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(AssertionError) as e_methd:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanframe.return_nan_handle(method="other")  # type: ignore
+            _ = nanframe.return_nan_handle(method="other")
 
         self.assertEqual(
             e_methd.exception.args[0],
@@ -2491,7 +2491,7 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(Exception) as e_x:
             # noinspection PyTypeChecker,PydanticTypeChecker
             _ = oframe.ord_least_squares_fit(
-                y_column=0, x_column="string", fitted_series=False  # type: ignore
+                y_column=0, x_column="string", fitted_series=False
             )
 
         self.assertEqual(
@@ -2502,7 +2502,7 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(Exception) as e_y:
             # noinspection PyTypeChecker,PydanticTypeChecker
             _ = oframe.ord_least_squares_fit(
-                y_column="string", x_column=1, fitted_series=False  # type: ignore
+                y_column="string", x_column=1, fitted_series=False
             )
 
         self.assertEqual(
@@ -2558,7 +2558,7 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset="string", market=1)  # type: ignore
+            _ = bframe.beta(asset="string", market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2567,7 +2567,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset=0, market="string")  # type: ignore
+            _ = bframe.beta(asset=0, market="string")
 
         self.assertEqual(
             e_market.exception.args[0],
@@ -2621,7 +2621,7 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset="string", market=1)  # type: ignore
+            _ = bframe.beta(asset="string", market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2630,7 +2630,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset=0, market="string")  # type: ignore
+            _ = bframe.beta(asset=0, market="string")
 
         self.assertEqual(
             e_market.exception.args[0],
@@ -2684,7 +2684,7 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset="string", market=1)  # type: ignore
+            _ = jframe.jensen_alpha(asset="string", market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2693,7 +2693,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset=0, market="string")  # type: ignore
+            _ = jframe.jensen_alpha(asset=0, market="string")
 
         self.assertEqual(
             e_market.exception.args[0],
@@ -2795,7 +2795,7 @@ class TestOpenFrame(TestCase):
         )
         with self.assertRaises(Exception) as e_asset:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset="string", market=1)  # type: ignore
+            _ = jframe.jensen_alpha(asset="string", market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2804,7 +2804,7 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(Exception) as e_market:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset=0, market="string")  # type: ignore
+            _ = jframe.jensen_alpha(asset=0, market="string")
 
         self.assertEqual(
             e_market.exception.args[0],

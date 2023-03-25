@@ -226,7 +226,7 @@ class TestOpenTimeSeries(TestCase):
         )
         with self.assertRaises(ValueError) as e_domestic:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            OpenTimeSeries.setup_class(domestic_ccy=12)  # type: ignore
+            OpenTimeSeries.setup_class(domestic_ccy=12)
         self.assertIn(
             member="domestic currency must be a code according to ISO 4217",
             container=str(e_domestic.exception),
@@ -238,7 +238,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_country.exception),
         )
         with self.assertRaises(ValueError) as e_ctries:
-            OpenTimeSeries.setup_class(countries=["SE", 12])  # type: ignore
+            OpenTimeSeries.setup_class(countries=["SE", 12])  # type: ignore[list-item]
         self.assertIn(
             member=(
                 "countries must be a list of country codes "
@@ -257,7 +257,7 @@ class TestOpenTimeSeries(TestCase):
         )
         with self.assertRaises(ValueError) as e_none:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            OpenTimeSeries.setup_class(countries=None)  # type: ignore
+            OpenTimeSeries.setup_class(countries=None)
         self.assertIn(
             member="according to ISO 3166-1 alpha-2",
             container=str(e_none.exception),
@@ -851,7 +851,9 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(ValueError) as e_boo:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = apseries.all_properties(properties=["geo_ret", "boo"])  # type: ignore
+            _ = apseries.all_properties(
+                properties=["geo_ret", "boo"]  # type: ignore[list-item]
+            )
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_opentimeseries_all_calc_properties(self: "TestOpenTimeSeries") -> None:
@@ -2050,7 +2052,7 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(AssertionError) as e_method:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanseries.value_nan_handle(method="other")  # type: ignore
+            _ = nanseries.value_nan_handle(method="other")
 
         self.assertEqual(
             e_method.exception.args[0],
@@ -2107,7 +2109,7 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(AssertionError) as e_method:
             # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanseries.return_nan_handle(method="other")  # type: ignore
+            _ = nanseries.return_nan_handle(method="other")
 
         self.assertEqual(
             e_method.exception.args[0],
