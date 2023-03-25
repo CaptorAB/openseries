@@ -8,9 +8,10 @@ if ($task -eq "active") {
     .\venv\Scripts\activate
 } elseif ($task -eq "make") {
     # make virtual environment
-    python3 -m venv ./venv
+    python -m venv ./venv
     $env:PYTHONPATH = "$env:PYTHONPATH;$pwd"
     .\venv\Scripts\activate
+    pip install --upgrade pip
     pip install poetry==1.4.0
     poetry install --with dev
     pre-commit install
