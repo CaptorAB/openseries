@@ -291,7 +291,6 @@ pre-commit install
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
 make
-source source_me
 ```
 
 ### Linting / Type-checking:
