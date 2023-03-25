@@ -1837,12 +1837,14 @@ class OpenTimeSeries(BaseModel):
 
         return self
 
-    def resample(self: "OpenTimeSeries", freq: str = "BM") -> "OpenTimeSeries":
+    def resample(
+        self: "OpenTimeSeries", freq: Union[Lit_bizday_frequencies, str] = "BM"
+    ) -> "OpenTimeSeries":
         """Resamples the timeseries frequency
 
         Parameters
         ----------
-        freq: str, default "BM"
+        freq: Union[Lit_bizday_frequencies, str], default "BM"
             The date offset string that sets the resampled frequency
             Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 

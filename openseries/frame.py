@@ -28,7 +28,7 @@ from statsmodels.api import OLS
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -1864,12 +1864,14 @@ class OpenFrame(BaseModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def resample(self: "OpenFrame", freq: str = "BM") -> "OpenFrame":
+    def resample(
+        self: "OpenFrame", freq: Union[Lit_bizday_frequencies, str] = "BM"
+    ) -> "OpenFrame":
         """Resamples the timeseries frequency
 
         Parameters
         ----------
-        freq: str, default "BM"
+        freq: Union[Lit_bizday_frequencies, str], default "BM"
             The date offset string that sets the resampled frequency
             Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 
