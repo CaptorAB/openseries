@@ -291,13 +291,15 @@ pre-commit install
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
 make
+source source_me
+make install
 ```
 
-### Linting / Type-checking:
+### Testing and Linting / Type-checking:
 
 ```
-poetry run flake8 .
-poetry run mypy .
+make test
+make lint
 ```
 The silenced error codes can be found  in the project's
 [.flake8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
