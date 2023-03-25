@@ -21,4 +21,8 @@ lint:
 	PYTHONPATH=${PWD} poetry run flake8 .
 	PYTHONPATH=${PWD} poetry run mypy .
 
+clean:
+    deactivate
+	rm -rf venv
+
 .PHONY: test

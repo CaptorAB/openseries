@@ -11,7 +11,7 @@ if ($task -eq "active") {
     python -m venv ./venv
     $env:PYTHONPATH = "$env:PYTHONPATH;$pwd"
     .\venv\Scripts\activate
-    pip install --upgrade pip
+    python -m pip install --upgrade pip
     pip install poetry==1.4.0
     poetry install --with dev
     pre-commit install
@@ -33,7 +33,11 @@ if ($task -eq "active") {
         Write-Host $lintresult
     }
     poetry run mypy .
+} elseif ($task -eq "clean") {
+    # remove virtual environment to start over
+    deactivate
+    Remove-Item -Path ".\venv" -Recurse -Force
 } else {
     # invalid task argument
-    Write-Host "Only active, make, test or lint are allowed as tasks"
+    Write-Host "Only active, make, test, clean or lint are allowed as tasks"
 }
