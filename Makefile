@@ -1,16 +1,12 @@
 venv:
-	python3 -m venv ./venv
+	python -m venv ./venv
 	venv/bin/python --version
-	venv/bin/pip install --upgrade pip
+	venv/bin/python -m pip install --upgrade pip
 	venv/bin/pip install poetry==1.4.0
-    export PYTHONPATH=$PYTHONPATH:${PWD}
-    source venv/bin/activate
+
+install:
 	poetry install --with dev
 	pre-commit install
-
-active:
-    export PYTHONPATH=$PYTHONPATH:${PWD}
-    source venv/bin/activate
 
 test:
 	PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --capture=no --durations=20 --durations-min=2.0
@@ -22,7 +18,5 @@ lint:
 	PYTHONPATH=${PWD} poetry run mypy .
 
 clean:
-	deactivate 2>/dev/null || true
+	deactivate
 	rm -rf venv
-
-.PHONY: test
