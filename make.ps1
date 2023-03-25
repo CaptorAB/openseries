@@ -35,7 +35,7 @@ if ($task -eq "active") {
     poetry run mypy .
 } elseif ($task -eq "clean") {
     # remove virtual environment to start over
-    deactivate
+    & $env:VIRTUAL_ENV\Scripts\deactivate.bat 2>$null
     Remove-Item -Path ".\venv" -Recurse -Force
 } else {
     # invalid task argument

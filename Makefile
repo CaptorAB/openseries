@@ -22,7 +22,7 @@ lint:
 	PYTHONPATH=${PWD} poetry run mypy .
 
 clean:
-    deactivate
+	deactivate 2>/dev/null || true
 	rm -rf venv
 
 .PHONY: test
