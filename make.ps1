@@ -36,7 +36,6 @@ elseif ($task -eq "lint") {
 }
 elseif ($task -eq "clean") {
     # remove virtual environment to start over
-    & $env:VIRTUAL_ENV\Scripts\deactivate.bat 2>$null
     Remove-Item -Path ".\venv" -Recurse -Force
 }
 else {

@@ -83,6 +83,7 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 - [Numeric properties for both classes](#numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe-)
 - [Numeric methods with period arguments for both classes](#methods-below-are-identical-to-the-numeric-properties-above)
 - [Development Instructions](#development-instructions)
+- [Testing and Linting / Type-checking](#testing-and-linting--type-checking)
 
 ### Files in the project
 
@@ -265,7 +266,7 @@ properties for subset periods._
 | `z_score_func`            | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Z-score](https://www.investopedia.com/terms/z/zscore.asp) as (last return - mean return) / standard deviation of returns.                                                                                                                                     |
 | `target_weight_from_var`  | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | A position target weight from the ratio between a VaR implied volatility and a given target volatility.                                                                                                                                                        |
 
-## Development instructions
+## Development Instructions
 
 These instructions assume that you
 have [Python 3.10](https://docs.python.org/3.10/) and
@@ -273,19 +274,15 @@ have [Python 3.10](https://docs.python.org/3.10/) and
 to install this project in a virtual environment. If not, feel free to do it your
 own way.
 
-### In Windows Powershell execute the below commands:
+### Windows Powershell
 
 ```
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
-python3 -m venv ./venv
-./source_me.ps1
-pip install poetry==1.4.0
-poetry install --with dev
-pre-commit install
+./make.ps1 -task make
 ```
 
-### In a Mac Terminal/Linux execute the below commands:
+### Mac Terminal/Linux
 
 ```
 git clone https://github.com/CaptorAB/OpenSeries.git
@@ -295,13 +292,23 @@ source source_me
 make install
 ```
 
-### Testing and Linting / Type-checking:
+## Testing and Linting / Type-checking
+
+The silenced error codes can be found  in the project's
+[.flake8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
+[pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
+files. Flake8 linting is embedded in the pre-commit hook but not mypy.
+
+### Windows Powershell
+
+```
+./make.ps1 -task test
+./make.ps1 -task lint
+```
+
+### Mac Terminal/Linux
 
 ```
 make test
 make lint
 ```
-The silenced error codes can be found  in the project's
-[.flake8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
-[pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
-files. Flake8 linting is embedded in the pre-commit hook but not mypy.
