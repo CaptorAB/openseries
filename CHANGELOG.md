@@ -7,7 +7,12 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.11.8] - 2023-03-27
+
+Fixed typing the inputs for OpenFrame methods
+
 ## Version [0.11.7] - 2023-03-25
+
 Aligned code to pass many of the type checks performed by `mypy`. A list of error
 codes are for now silenced in the project's
 [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)

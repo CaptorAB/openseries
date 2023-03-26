@@ -1398,7 +1398,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_retvolfunc.exception.args[0],
-            "base_column should be a Tuple[str] or an integer.",
+            "base_column should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_sortino_ratio_func(self: "TestOpenFrame") -> None:
@@ -1429,7 +1429,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str] or an integer.",
+            "base_column should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_tracking_error_func(self: "TestOpenFrame") -> None:
@@ -1458,7 +1458,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str] or an integer.",
+            "base_column should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_info_ratio_func(self: "TestOpenFrame") -> None:
@@ -1483,7 +1483,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str] or an integer.",
+            "base_column should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_rolling_corr(self: "TestOpenFrame") -> None:
@@ -1899,7 +1899,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str] or an integer.",
+            "base_column should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_georet_exceptions(self: "TestOpenFrame") -> None:
@@ -2496,7 +2496,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_x.exception.args[0],
-            "x_column should be a Tuple[str] or an integer.",
+            "x_column should be a Tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_y:
@@ -2507,7 +2507,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_y.exception.args[0],
-            "y_column should be a Tuple[str] or an integer.",
+            "y_column should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_beta(self: "TestOpenFrame") -> None:
@@ -2562,7 +2562,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str] or an integer.",
+            "asset should be a Tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
@@ -2571,7 +2571,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str] or an integer.",
+            "market should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_beta_returns_input(self: "TestOpenFrame") -> None:
@@ -2625,7 +2625,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str] or an integer.",
+            "asset should be a Tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
@@ -2634,7 +2634,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str] or an integer.",
+            "market should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_jensen_alpha(self: "TestOpenFrame") -> None:
@@ -2688,7 +2688,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str] or an integer.",
+            "asset should be a Tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
@@ -2697,7 +2697,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str] or an integer.",
+            "market should be a Tuple[str, ValueType] or an integer.",
         )
         from openseries.datefixer import date_offset_foll
 
@@ -2799,7 +2799,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str] or an integer.",
+            "asset should be a Tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
@@ -2808,7 +2808,7 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str] or an integer.",
+            "market should be a Tuple[str, ValueType] or an integer.",
         )
 
     def test_openframe_ewma_risk(self: "TestOpenFrame") -> None:

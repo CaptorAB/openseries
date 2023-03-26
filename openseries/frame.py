@@ -857,7 +857,9 @@ class OpenFrame(BaseModel):
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
-                raise Exception("base_column should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "base_column should be a Tuple[str, ValueType] or an integer."
+                )
 
             for item in self.tsdf:
                 if item == riskfree_item:
@@ -891,8 +893,8 @@ class OpenFrame(BaseModel):
 
     def jensen_alpha(
         self: "OpenFrame",
-        asset: Tuple[str] | int,
-        market: Tuple[str] | int,
+        asset: Tuple[str, ValueType] | int,
+        market: Tuple[str, ValueType] | int,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
@@ -904,9 +906,9 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        asset: Tuple[str] | int
+        asset: Tuple[str, ValueType] | int
             The column of the asset
-        market: Tuple[str] | int
+        market: Tuple[str, ValueType] | int
             The column of the market against which Jensen's alpha is measured
         riskfree_rate : float, default: 0.0
             The return of the zero volatility riskfree asset
@@ -929,7 +931,9 @@ class OpenFrame(BaseModel):
                 asset_log = self.tsdf.iloc[:, asset]
                 asset_cagr = asset_log.mean()
             else:
-                raise Exception("asset should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "asset should be a Tuple[str, ValueType] or an integer."
+                )
             if isinstance(market, tuple):
                 market_log = self.tsdf.loc[:, market]
                 market_cagr = market_log.mean()
@@ -937,7 +941,9 @@ class OpenFrame(BaseModel):
                 market_log = self.tsdf.iloc[:, market]
                 market_cagr = market_log.mean()
             else:
-                raise Exception("market should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "market should be a Tuple[str, ValueType] or an integer."
+                )
         else:
             if isinstance(asset, tuple):
                 asset_log = log(
@@ -965,7 +971,9 @@ class OpenFrame(BaseModel):
                         self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
                     )
             else:
-                raise Exception("asset should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "asset should be a Tuple[str, ValueType] or an integer."
+                )
             if isinstance(market, tuple):
                 market_log = log(
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0]
@@ -992,7 +1000,9 @@ class OpenFrame(BaseModel):
                         self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
                     )
             else:
-                raise Exception("market should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "market should be a Tuple[str, ValueType] or an integer."
+                )
 
         covariance = cov(asset_log, market_log, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -1075,7 +1085,9 @@ class OpenFrame(BaseModel):
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
-                raise Exception("base_column should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "base_column should be a Tuple[str, ValueType] or an integer."
+                )
 
             for item in self.tsdf:
                 if item == riskfree_item:
@@ -2476,7 +2488,9 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception("base_column should be a Tuple[str] or an integer.")
+            raise Exception(
+                "base_column should be a Tuple[str, ValueType] or an integer."
+            )
 
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -2546,7 +2560,9 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception("base_column should be a Tuple[str] or an integer.")
+            raise Exception(
+                "base_column should be a Tuple[str, ValueType] or an integer."
+            )
 
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -2629,7 +2645,9 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception("base_column should be a Tuple[str] or an integer.")
+            raise Exception(
+                "base_column should be a Tuple[str, ValueType] or an integer."
+            )
 
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
@@ -2728,16 +2746,18 @@ class OpenFrame(BaseModel):
         )
 
     def beta(
-        self: "OpenFrame", asset: Tuple[str] | int, market: Tuple[str] | int
+        self: "OpenFrame",
+        asset: Tuple[str, ValueType] | int,
+        market: Tuple[str, ValueType] | int,
     ) -> float:
         """https://www.investopedia.com/terms/b/beta.asp
         Calculates Beta as Co-variance of asset & market divided by Variance of market
 
         Parameters
         ----------
-        asset: Tuple[str] | int
+        asset: Tuple[str, ValueType] | int
             The column of the asset
-        market: Tuple[str] | int
+        market: Tuple[str, ValueType] | int
             The column of the market against which Beta is measured
 
         Returns
@@ -2756,26 +2776,34 @@ class OpenFrame(BaseModel):
             elif isinstance(asset, int):
                 y = self.tsdf.iloc[:, asset]
             else:
-                raise Exception("asset should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "asset should be a Tuple[str, ValueType] or an integer."
+                )
             if isinstance(market, tuple):
                 x = self.tsdf.loc[:, market]
             elif isinstance(market, int):
                 x = self.tsdf.iloc[:, market]
             else:
-                raise Exception("market should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "market should be a Tuple[str, ValueType] or an integer."
+                )
         else:
             if isinstance(asset, tuple):
                 y = log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
             elif isinstance(asset, int):
                 y = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
-                raise Exception("asset should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "asset should be a Tuple[str, ValueType] or an integer."
+                )
             if isinstance(market, tuple):
                 x = log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
             elif isinstance(market, int):
                 x = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
             else:
-                raise Exception("market should be a Tuple[str] or an integer.")
+                raise Exception(
+                    "market should be a Tuple[str, ValueType] or an integer."
+                )
 
         covariance = cov(y, x, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -2784,8 +2812,8 @@ class OpenFrame(BaseModel):
 
     def ord_least_squares_fit(
         self: "OpenFrame",
-        y_column: Tuple[str] | int,
-        x_column: Tuple[str] | int,
+        y_column: Tuple[str, ValueType] | int,
+        x_column: Tuple[str, ValueType] | int,
         fitted_series: bool = True,
     ) -> RegressionResults:
         """https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
@@ -2794,9 +2822,9 @@ class OpenFrame(BaseModel):
 
         Parameters
         ----------
-        y_column: Tuple[str] | int
+        y_column: Tuple[str, ValueType] | int
             The column level values of the dependent variable y
-        x_column: Tuple[str] | int
+        x_column: Tuple[str, ValueType] | int
             The column level values of the exogenous variable x
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
@@ -2814,7 +2842,7 @@ class OpenFrame(BaseModel):
             y = self.tsdf.iloc[:, y_column]
             y_label = self.tsdf.iloc[:, y_column].name[0]
         else:
-            raise Exception("y_column should be a Tuple[str] or an integer.")
+            raise Exception("y_column should be a Tuple[str, ValueType] or an integer.")
 
         if isinstance(x_column, tuple):
             x = self.tsdf.loc[:, x_column]
@@ -2823,7 +2851,7 @@ class OpenFrame(BaseModel):
             x = self.tsdf.iloc[:, x_column]
             x_label = self.tsdf.iloc[:, x_column].name[0]
         else:
-            raise Exception("x_column should be a Tuple[str] or an integer.")
+            raise Exception("x_column should be a Tuple[str, ValueType] or an integer.")
 
         results = OLS(y, x).fit()
         if fitted_series:
