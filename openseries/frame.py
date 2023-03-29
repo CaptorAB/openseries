@@ -55,6 +55,7 @@ from openseries.risk import (
 )
 
 
+# noinspection PyMethodParameters
 class OpenFrame(BaseModel):
     """Object of the class OpenFrame. Subclass of the Pydantic BaseModel
 

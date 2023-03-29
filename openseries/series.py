@@ -87,6 +87,7 @@ class ValueType(str, Enum):
     ROLLVOL = "Rolling volatility"
 
 
+# noinspection PyMethodParameters
 class OpenTimeSeries(BaseModel):
     """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
 
