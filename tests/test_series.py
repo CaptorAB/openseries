@@ -292,7 +292,23 @@ class TestOpenTimeSeries(TestCase):
         output.update({"dates": dates, "values": values})
 
         with self.assertRaises(PydanticValidationError) as e_dup:
-            OpenTimeSeries.parse_obj(output)
+            _ = OpenTimeSeries(
+                timeseriesId="",
+                instrumentId="",
+                name="Bond Fund",
+                label="Bond Fund",
+                currency="SEK",
+                local_ccy=True,
+                valuetype=ValueType.PRICE,
+                dates=dates,
+                values=values,
+                tsdf=DataFrame(
+                    data=values,
+                    index=[d.date() for d in DatetimeIndex(dates)],
+                    columns=[["Bond Fund"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
+            )
 
         self.assertIn(
             member="the list has duplicated items", container=str(e_dup.exception)
