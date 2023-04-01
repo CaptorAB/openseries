@@ -99,7 +99,6 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | [sim_price.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/sim_price.py)                       | Simulates OpenTimeSeries from different stochastic processes.                                                                                                                                       |
 | [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/stoch_processes.py)           | Generates stochastic processes used in the `sim_price.py` module.                                                                                                                                   |
 | [types.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/types.py)                               | Contains all bespoke typing.                                                                                                                                                                        |
-| [exceptions.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/exceptions.py)                     | Sub-classed exceptions to provide better user feedback on errors.                                                                                                                                   |
 
 ### Class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
 

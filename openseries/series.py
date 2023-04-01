@@ -19,7 +19,6 @@ from stdnum.exceptions import InvalidChecksum
 from typing import Any, Dict, List, Tuple, TypeVar, Union
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
-from openseries.exceptions import FromFixedRateDatesInputError
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
     Lit_quantile_interpolation,
@@ -421,7 +420,7 @@ class OpenTimeSeries(BaseModel):
                 [d.date() for d in date_range(periods=days, end=end_dt, freq="D")]
             )
         elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
-            raise FromFixedRateDatesInputError
+            raise ValueError("If d_range is not provided both days and end_dt must be.")
         deltas = array([i.days for i in d_range[1:] - d_range[:-1]])
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
         d_range = [d.strftime("%Y-%m-%d") for d in d_range]

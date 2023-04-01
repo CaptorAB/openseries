@@ -21,7 +21,6 @@ from openseries.series import (
     check_if_none,
 )
 from openseries.sim_price import ReturnSimulation
-from openseries.exceptions import FromFixedRateDatesInputError
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
@@ -587,18 +586,17 @@ class TestOpenTimeSeries(TestCase):
         )
         self.assertTrue(isinstance(fixseries_two, OpenTimeSeries))
 
-        with self.assertRaises(FromFixedRateDatesInputError) as only_rate_arg:
+        with self.assertRaises(ValueError) as only_rate_arg:
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03)
-        self.assertIsInstance(only_rate_arg.exception, FromFixedRateDatesInputError)
 
         self.assertEqual(
             str(only_rate_arg.exception),
             "If d_range is not provided both days and end_dt must be.",
         )
 
-        with self.assertRaises(FromFixedRateDatesInputError) as only_days_noend:
+        with self.assertRaises(ValueError) as only_days_noend:
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03, days=30)
-        self.assertIsInstance(only_days_noend.exception, FromFixedRateDatesInputError)
+        self.assertIsInstance(only_days_noend.exception, ValueError)
 
     def test_opentimeseries_periods_in_a_year(self: "TestOpenTimeSeries") -> None:
         calc = len(self.randomseries.dates) / (
