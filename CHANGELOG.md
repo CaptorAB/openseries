@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.11.9] - 2023-04-02
+
+Removed the from_frame() constructor and fixed most of the silenced mypy warnings.
+
 ## Version [0.11.8] - 2023-03-27
 
 Fixed typing the inputs for OpenFrame methods

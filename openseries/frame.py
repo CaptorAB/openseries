@@ -23,12 +23,12 @@ from plotly.offline import plot
 from pydantic import BaseModel, root_validator
 from random import choices
 from scipy.stats import kurtosis, norm, skew
-from statsmodels.api import OLS
+import statsmodels.api as sm
 
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, cast, Dict, List, Tuple, Union
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -90,7 +90,7 @@ class OpenFrame(BaseModel):
 
     @root_validator
     def check_labels_unique(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        tseries = values.get("constituents")
+        tseries = cast(List[OpenTimeSeries], values.get("constituents"))
         labls = [x.label for x in tseries]
         if len(set(labls)) != len(labls):
             raise ValueError("TimeSeries names/labels must be unique")
@@ -208,8 +208,7 @@ class OpenFrame(BaseModel):
         Tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
         """
-        earlier: dt.date
-        later: dt.date
+        earlier, later = self.first_idx, self.last_idx
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
@@ -238,14 +237,10 @@ class OpenFrame(BaseModel):
                         to_dt <= self.last_idx and from_dt >= self.first_idx
                     ), "Function calc_range returned dates outside series range"
                     earlier, later = from_dt, to_dt
-            if earlier is not None:
-                while not self.tsdf.index.isin([earlier]).any():
-                    earlier -= dt.timedelta(days=1)
-            if later is not None:
-                while not self.tsdf.index.isin([later]).any():
-                    later += dt.timedelta(days=1)
-        else:
-            earlier, later = self.first_idx, self.last_idx
+            while not self.tsdf.index.isin([earlier]).any():
+                earlier -= dt.timedelta(days=1)
+            while not self.tsdf.index.isin([later]).any():
+                later += dt.timedelta(days=1)
 
         return earlier, later
 
@@ -352,7 +347,7 @@ class OpenFrame(BaseModel):
         datetime.date
             The first date in the index of the .tsdf Pandas.DataFrame
         """
-        return self.tsdf.index[0]
+        return cast(dt.date, self.tsdf.index[0])
 
     @property
     def first_indices(self: "OpenFrame") -> Series:
@@ -377,7 +372,7 @@ class OpenFrame(BaseModel):
         datetime.date
             The last date in the index of the .tsdf Pandas.DataFrame
         """
-        return self.tsdf.index[-1]
+        return cast(dt.date, self.tsdf.index[-1])
 
     @property
     def last_indices(self: "OpenFrame") -> Series:
@@ -551,11 +546,16 @@ class OpenFrame(BaseModel):
         else:
             fraction = (later - earlier).days / 365.25
             how_many = int(
-                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .count(numeric_only=True)
+                .iloc[0]
             )
             time_factor = how_many / fraction
         return Series(
-            data=self.tsdf.loc[earlier:later].pct_change().mean() * time_factor,
+            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .mean()
+            * time_factor,
             name="Subset Arithmetic return",
             dtype="float64",
         )
@@ -699,11 +699,14 @@ class OpenFrame(BaseModel):
         else:
             fraction = (later - earlier).days / 365.25
             how_many = int(
-                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .count(numeric_only=True)
+                .iloc[0]
             )
             time_factor = how_many / fraction
         return Series(
-            data=self.tsdf.loc[earlier:later].pct_change().std() * sqrt(time_factor),
+            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().std()
+            * sqrt(time_factor),
             name="Subset Volatility",
             dtype="float64",
         )
@@ -765,7 +768,11 @@ class OpenFrame(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = self.tsdf.loc[earlier:later].pct_change().count(numeric_only=True)
+        how_many = (
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .count(numeric_only=True)
+        )
         if periods_in_a_year_fixed:
             time_factor = periods_in_a_year_fixed
         else:
@@ -773,7 +780,7 @@ class OpenFrame(BaseModel):
             time_factor = how_many / fraction
 
         dddf = (
-            self.tsdf.loc[earlier:later]
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
             .pct_change()
             .sub(min_accepted_return / time_factor)
         )
@@ -840,7 +847,9 @@ class OpenFrame(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = self.tsdf.loc[earlier:later].iloc[:, 0].count()
+        how_many = (
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[:, 0].count()
+        )
         fraction = (later - earlier).days / 365.25
 
         if periods_in_a_year_fixed:
@@ -851,11 +860,15 @@ class OpenFrame(BaseModel):
         ratios = []
         if riskfree_rate is None:
             if isinstance(riskfree_column, tuple):
-                riskfree = self.tsdf.loc[earlier:later].loc[:, riskfree_column]
+                riskfree = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                    :, riskfree_column
+                ]
                 riskfree_item = riskfree_column
                 riskfree_label = self.tsdf.loc[:, riskfree_column].name[0]
             elif isinstance(riskfree_column, int):
-                riskfree = self.tsdf.loc[earlier:later].iloc[:, riskfree_column]
+                riskfree = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
+                    :, riskfree_column
+                ]
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
@@ -867,7 +880,9 @@ class OpenFrame(BaseModel):
                 if item == riskfree_item:
                     ratios.append(0.0)
                 else:
-                    longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                    longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                        :, item
+                    ]
                     ret = float(longdf.pct_change().mean() * time_factor)
                     riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
                     vol = float(longdf.pct_change().std() * sqrt(time_factor))
@@ -881,7 +896,9 @@ class OpenFrame(BaseModel):
             )
         else:
             for item in self.tsdf:
-                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                    :, item
+                ]
                 ret = float(longdf.pct_change().mean() * time_factor)
                 vol = float(longdf.pct_change().std() * sqrt(time_factor))
                 ratios.append((ret - riskfree_rate) / vol)
@@ -1068,7 +1085,9 @@ class OpenFrame(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = self.tsdf.loc[earlier:later].iloc[:, 0].count()
+        how_many = (
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[:, 0].count()
+        )
         fraction = (later - earlier).days / 365.25
 
         if periods_in_a_year_fixed:
@@ -1079,11 +1098,15 @@ class OpenFrame(BaseModel):
         ratios = []
         if riskfree_rate is None:
             if isinstance(riskfree_column, tuple):
-                riskfree = self.tsdf.loc[earlier:later].loc[:, riskfree_column]
+                riskfree = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                    :, riskfree_column
+                ]
                 riskfree_item = riskfree_column
                 riskfree_label = self.tsdf.loc[:, riskfree_column].name[0]
             elif isinstance(riskfree_column, int):
-                riskfree = self.tsdf.loc[earlier:later].iloc[:, riskfree_column]
+                riskfree = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
+                    :, riskfree_column
+                ]
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
@@ -1095,7 +1118,9 @@ class OpenFrame(BaseModel):
                 if item == riskfree_item:
                     ratios.append(0.0)
                 else:
-                    longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                    longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                        :, item
+                    ]
                     ret = float(longdf.pct_change().mean() * time_factor)
                     riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
                     dddf = longdf.pct_change()
@@ -1113,7 +1138,9 @@ class OpenFrame(BaseModel):
             )
         else:
             for item in self.tsdf:
-                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                    :, item
+                ]
                 ret = float(longdf.pct_change().mean() * time_factor)
                 dddf = longdf.pct_change()
                 downdev = float(
@@ -1171,7 +1198,7 @@ class OpenFrame(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        zd = self.tsdf.loc[earlier:later].pct_change()
+        zd = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()
         return Series(
             data=(zd.iloc[-1] - zd.mean()) / zd.std(),
             name="Subset Z-score",
@@ -1238,8 +1265,10 @@ class OpenFrame(BaseModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return Series(
             data=(
-                self.tsdf.loc[earlier:later]
-                / self.tsdf.loc[earlier:later].expanding(min_periods=1).max()
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .expanding(min_periods=1)
+                .max()
             ).min()
             - 1,
             name="Subset Max drawdown",
@@ -1324,7 +1353,7 @@ class OpenFrame(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return Series(
-            data=self.tsdf.loc[earlier:later]
+            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
             .pct_change()
             .rolling(observations, min_periods=observations)
             .sum()
@@ -1373,11 +1402,18 @@ class OpenFrame(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         pos = (
-            self.tsdf.loc[earlier:later]
-            .pct_change()[1:][self.tsdf.loc[earlier:later].pct_change()[1:] > 0.0]
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()[1:][
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()[1:]
+                > 0.0
+            ]
             .count()
         )
-        tot = self.tsdf.loc[earlier:later].pct_change()[1:].count()
+        tot = (
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()[1:]
+            .count()
+        )
         answer = pos / tot
         answer.name = "Positive share"
         answer = answer.astype("float64")
@@ -1428,7 +1464,9 @@ class OpenFrame(BaseModel):
 
         return Series(
             data=skew(
-                a=self.tsdf.loc[earlier:later].pct_change().values,
+                a=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change()
+                .values,
                 bias=True,
                 nan_policy="omit",
             ),
@@ -1484,7 +1522,7 @@ class OpenFrame(BaseModel):
 
         return Series(
             data=kurtosis(
-                self.tsdf.loc[earlier:later].pct_change(),
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
                 fisher=True,
                 bias=True,
                 nan_policy="omit",
@@ -1553,7 +1591,7 @@ class OpenFrame(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        cvar_df = self.tsdf.loc[earlier:later].copy(deep=True)
+        cvar_df = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy(deep=True)
         var_list = [
             cvar_df.loc[:, x]
             .pct_change()
@@ -1636,7 +1674,7 @@ class OpenFrame(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return Series(
-            data=self.tsdf.loc[earlier:later]
+            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
             .pct_change()
             .quantile(1 - level, interpolation=interpolation),
             name=f"VaR {level:.1%}",
@@ -1718,21 +1756,25 @@ class OpenFrame(BaseModel):
         else:
             fraction = (later - earlier).days / 365.25
             how_many = int(
-                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .count(numeric_only=True)
+                .iloc[0]
             )
             time_factor = how_many / fraction
         if drift_adjust:
             imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
-                self.tsdf.loc[earlier:later]
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
-                - self.tsdf.loc[earlier:later].pct_change().sum()
-                / len(self.tsdf.loc[earlier:later].pct_change())
+                - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change()
+                .sum()
+                / len(self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change())
             )
         else:
             imp_vol = (
                 -sqrt(time_factor)
-                * self.tsdf.loc[earlier:later]
+                * self.tsdf.loc[cast(int, earlier) : cast(int, later)]
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
                 / norm.ppf(level)
@@ -2053,7 +2095,9 @@ class OpenFrame(BaseModel):
         if periods_in_a_year_fixed is None:
             fraction = (later - earlier).days / 365.25
             how_many = int(
-                self.tsdf.loc[earlier:later].count(numeric_only=True).iloc[0]
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .count(numeric_only=True)
+                .iloc[0]
             )
             time_factor = how_many / fraction
         else:
@@ -2070,7 +2114,7 @@ class OpenFrame(BaseModel):
             self.tsdf.iloc[:, second_column].name[0],
         ]
 
-        data = self.tsdf.loc[earlier:later].copy()
+        data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         for rtn in cols:
             data[rtn, "Returns"] = log(data.loc[:, (rtn, ValueType.PRICE)]).diff()
@@ -2482,11 +2526,15 @@ class OpenFrame(BaseModel):
         fraction = (later - earlier).days / 365.25
 
         if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                :, base_column
+            ]
             short_item = base_column
             short_label = self.tsdf.loc[:, base_column].name[0]
         elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[earlier:later].iloc[:, base_column]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
+                :, base_column
+            ]
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
@@ -2504,7 +2552,9 @@ class OpenFrame(BaseModel):
             if item == short_item:
                 terrors.append(0.0)
             else:
-                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                    :, item
+                ]
                 relative = 1.0 + longdf - shortdf
                 vol = float(relative.pct_change().std() * sqrt(time_factor))
                 terrors.append(vol)
@@ -2554,11 +2604,15 @@ class OpenFrame(BaseModel):
         fraction = (later - earlier).days / 365.25
 
         if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                :, base_column
+            ]
             short_item = base_column
             short_label = self.tsdf.loc[:, base_column].name[0]
         elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[earlier:later].iloc[:, base_column]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
+                :, base_column
+            ]
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
@@ -2576,7 +2630,9 @@ class OpenFrame(BaseModel):
             if item == short_item:
                 ratios.append(0.0)
             else:
-                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                    :, item
+                ]
                 relative = 1.0 + longdf - shortdf
                 ret = float(relative.pct_change().mean() * time_factor)
                 vol = float(relative.pct_change().std() * sqrt(time_factor))
@@ -2639,11 +2695,15 @@ class OpenFrame(BaseModel):
         fraction = (later - earlier).days / 365.25
 
         if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[earlier:later].loc[:, base_column]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                :, base_column
+            ]
             short_item = base_column
             short_label = self.tsdf.loc[:, base_column].name[0]
         elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[earlier:later].iloc[:, base_column]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
+                :, base_column
+            ]
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
@@ -2661,7 +2721,9 @@ class OpenFrame(BaseModel):
             if item == short_item:
                 ratios.append(0.0)
             else:
-                longdf = self.tsdf.loc[earlier:later].loc[:, item]
+                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
+                    :, item
+                ]
                 if ratio == "up":
                     uparray = (
                         longdf.pct_change()[shortdf.pct_change().values > 0.0]
@@ -2855,7 +2917,7 @@ class OpenFrame(BaseModel):
         else:
             raise Exception("x_column should be a Tuple[str, ValueType] or an integer.")
 
-        results = OLS(y, x).fit()
+        results = sm.OLS(y, x).fit()
         if fitted_series:
             self.tsdf[y_label, x_label] = results.predict(x)
 

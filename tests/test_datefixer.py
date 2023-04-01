@@ -1,7 +1,7 @@
 import datetime as dt
 from numpy import datetime64
 from pandas import Timestamp
-from typing import List, Dict
+from typing import cast, Dict, List, Union
 from unittest import TestCase
 
 from openseries.datefixer import (
@@ -198,7 +198,16 @@ class TestDateFixer(TestCase):
         ]
         self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_without)
 
-        jacks_birthday: Dict[str, str] = {"2021-02-12": "Jack's birthday"}
+        jacks_birthday: Union[
+            Dict[Union[dt.date, dt.datetime, str, float, int], str],
+            List[Union[dt.date, dt.datetime, str, float, int]],
+            dt.date,
+            dt.datetime,
+            str,
+            float,
+            int,
+            None,
+        ] = {"2021-02-12": "Jack's birthday"}
         cdr_with = holiday_calendar(
             startyear=2021, endyear=2021, countries="SE", custom_holidays=jacks_birthday
         )
@@ -208,7 +217,8 @@ class TestDateFixer(TestCase):
             self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)
         self.assertIsInstance(e_jack.exception, AssertionError)
 
-        twentytwentyoneholidays.append(date_fix(list(jacks_birthday.keys())[0]))
+        jb = cast(Dict[str, str], jacks_birthday)
+        twentytwentyoneholidays.append(date_fix(list(jb.keys())[0]))
         twentytwentyoneholidays.sort()
 
         self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)

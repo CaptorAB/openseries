@@ -4,23 +4,45 @@ from dateutil.relativedelta import relativedelta
 from enum import Enum
 from json import dump
 from math import ceil
-from numpy import array, cumprod, insert, isnan, log, sqrt, square, zeros
+from numpy import (
+    array,
+    cumprod,
+    dtype,
+    insert,
+    isnan,
+    log,
+    ndarray,
+    sqrt,
+    square,
+    zeros,
+)
 from os import path
-from pandas import concat, DataFrame, DatetimeIndex, date_range, MultiIndex, Series
+from pandas import (
+    concat,
+    DataFrame,
+    DatetimeIndex,
+    date_range,
+    MultiIndex,
+    Series,
+)
 from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
 from pydantic import BaseModel, constr, Field, root_validator
-from re import compile
+from re import compile, match
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
-from typing import Any, Dict, List, Tuple, TypeVar, Union
+from typing import Any, cast, Dict, List, Tuple, TypeVar, Union
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
+    CountryPattern,
+    CurrencyPattern,
+    DataBaseIDPattern,
+    DatePattern,
     Lit_quantile_interpolation,
     Lit_bizday_frequencies,
     Lit_pandas_resample_convention,
@@ -122,24 +144,24 @@ class OpenTimeSeries(BaseModel):
         Pandas object holding dates and values that can be altered via methods
     """
 
-    timeseriesId: constr(regex=r"^([0-9a-f]{24})?$")
-    instrumentId: constr(regex=r"^([0-9a-f]{24})?$")
-    currency: constr(regex=r"^[A-Z]{3}$")
-    dates: List[constr(regex=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")] = Field(
+    timeseriesId: constr(regex=DataBaseIDPattern)
+    instrumentId: constr(regex=DataBaseIDPattern)
+    currency: constr(regex=CurrencyPattern, to_upper=True, min_length=3, max_length=3)
+    dates: List[constr(regex=DatePattern)] = Field(
         ...,
         min_length=1,
         unique_items=True,
         description="Dates of the individual timeseries items",
     )
     domestic: constr(
-        regex=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3
+        regex=CurrencyPattern, to_upper=True, min_length=3, max_length=3
     ) = "SEK"
     name: str
     isin: str | None = None
     label: str | None = None
     countries: List[
-        constr(regex=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2)
-    ] | constr(regex=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2) = "SE"
+        constr(regex=CountryPattern, to_upper=True, min_length=2, max_length=2)
+    ] | constr(regex=CountryPattern, to_upper=True, min_length=2, max_length=2) = "SE"
     valuetype: ValueType
     values: List[float] = Field(
         ...,
@@ -156,8 +178,8 @@ class OpenTimeSeries(BaseModel):
     def dates_not_empty(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         if not values.get("dates", None) or len(values.get("dates", None)) == 0:
             raise ValueError("Dates list cannot be empty")
-        dts = values.get("dates")
-        pattern = compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
+        dts = cast(List[str], values.get("dates"))
+        pattern = compile(DatePattern)
         for dte in dts:
             if not pattern.match(dte):
                 raise ValueError("Dates contain an invalid date")
@@ -197,6 +219,42 @@ class OpenTimeSeries(BaseModel):
                 raise ValueError("The ISIN code's checksum or check digit is invalid.")
         return values
 
+    @root_validator
+    def check_currency(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        currency = values.get("currency", None)
+        if currency and isinstance(currency, str):
+            ccycheck = bool(match(CurrencyPattern, currency))
+        else:
+            ccycheck = False
+        if ccycheck is False:
+            raise ValueError("Currency must be an upper-case 3 letter string")
+        return values
+
+    @root_validator
+    def check_domestic(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        domestic = values.get("domestic", None)
+        if domestic and isinstance(domestic, str):
+            domcheck = bool(match(CurrencyPattern, domestic))
+        else:
+            domcheck = False
+        if domcheck is False:
+            raise ValueError("Domestic must be an upper-case 3 letter string")
+        return values
+
+    @root_validator
+    def check_countries(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        countries = values.get("countries", None)
+        if countries:
+            ctrycheck = bool(match(CountryPattern, countries))
+        else:
+            ctrycheck = False
+        if ctrycheck is False:
+            raise ValueError(
+                "Countries must be an upper-case 2 letter string or a "
+                "list of such strings"
+            )
+        return values
+
     @classmethod
     def setup_class(
         cls, domestic_ccy: str = "SEK", countries: List[str] | str = "SE"
@@ -210,8 +268,8 @@ class OpenTimeSeries(BaseModel):
         countries: List[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
-        ccy_pattern = compile(r"^[A-Z]{3}$")
-        ctry_pattern = compile(r"^[A-Z]{2}$")
+        ccy_pattern = compile(CurrencyPattern)
+        ctry_pattern = compile(CountryPattern)
         try:
             ccy_ok = ccy_pattern.match(domestic_ccy)
         except TypeError:
@@ -322,57 +380,6 @@ class OpenTimeSeries(BaseModel):
         )
 
     @classmethod
-    def from_frame(
-        cls,
-        frame,
-        label: str,
-        valuetype: ValueType = ValueType.PRICE,
-        baseccy: str = "SEK",
-        local_ccy: bool = True,
-    ) -> "OpenTimeSeries":
-        """Creates a timeseries from an openseries.frame.OpenFrame
-
-        Parameters
-        ----------
-        frame: OpenFrame
-            openseries.frame.OpenFrame
-        label : str
-            Placeholder for a name of the timeseries
-        valuetype : ValueType, default: ValueType.PRICE
-            Identifies if the series is a series of values or returns
-        baseccy : str, default: "SEK"
-            The currency of the timeseries
-        local_ccy: bool, default: True
-            Boolean flag indicating if timeseries is in local currency
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-
-        df = frame.tsdf.loc[:, (label, valuetype)]
-        dates = [d.strftime("%Y-%m-%d") for d in df.index]
-
-        return cls(
-            timeseriesId="",
-            instrumentId="",
-            currency=baseccy,
-            dates=dates,
-            name=df.name[0],
-            label=df.name[0],
-            valuetype=valuetype,
-            values=df.values.tolist(),
-            local_ccy=local_ccy,
-            tsdf=DataFrame(
-                data=df.values,
-                index=[d.date() for d in DatetimeIndex(df.index)],
-                columns=[[df.name[0]], [valuetype]],
-                dtype="float64",
-            ),
-        )
-
-    @classmethod
     def from_fixed_rate(
         cls,
         rate: float,
@@ -421,9 +428,16 @@ class OpenTimeSeries(BaseModel):
             )
         elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
             raise ValueError("If d_range is not provided both days and end_dt must be.")
-        deltas = array([i.days for i in d_range[1:] - d_range[:-1]])
+
+        deltas = array(
+            [
+                i.days
+                for i in cast(DatetimeIndex, d_range)[1:]
+                - cast(DatetimeIndex, d_range)[:-1]
+            ]
+        )
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
-        d_range = [d.strftime("%Y-%m-%d") for d in d_range]
+        d_range = [d.strftime("%Y-%m-%d") for d in cast(DatetimeIndex, d_range)]
 
         return cls(
             timeseriesId="",
@@ -456,7 +470,7 @@ class OpenTimeSeries(BaseModel):
 
     def to_json(
         self: "OpenTimeSeries", filename: str, directory: str | None = None
-    ) -> dict:
+    ) -> Dict[str, str | bool | ValueType | List[str] | List[float]]:
         """Dumps timeseries data into a json file
 
         The label and tsdf parameters are deleted before the json file is saved
@@ -531,7 +545,7 @@ class OpenTimeSeries(BaseModel):
         (datetime.date, datetime.date)
             Start and end date of the chosen date range
         """
-        earlier, later = None, None
+        earlier, later = self.first_idx, self.last_idx
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
@@ -557,17 +571,16 @@ class OpenTimeSeries(BaseModel):
                     earlier, later = self.first_idx, to_dt
                 elif from_dt is not None or to_dt is not None:
                     assert (
-                        to_dt <= self.last_idx and from_dt >= self.first_idx
+                        cast(dt.date, to_dt) <= self.last_idx
+                        and cast(dt.date, from_dt) >= self.first_idx
                     ), "Function calc_range returned dates outside series range"
-                    earlier, later = from_dt, to_dt
+                    earlier, later = cast(dt.date, from_dt), cast(dt.date, to_dt)
             if earlier is not None:
                 while not self.tsdf.index.isin([earlier]).any():
                     earlier -= dt.timedelta(days=1)
             if later is not None:
                 while not self.tsdf.index.isin([later]).any():
                     later += dt.timedelta(days=1)
-        else:
-            earlier, later = self.first_idx, self.last_idx
 
         return earlier, later
 
@@ -615,7 +628,9 @@ class OpenTimeSeries(BaseModel):
         """
 
         if not properties:
-            properties = OpenTimeSeriesPropertiesList.allowed_strings
+            properties = cast(
+                List[Lit_series_props], OpenTimeSeriesPropertiesList.allowed_strings
+            )
 
         props = OpenTimeSeriesPropertiesList(*properties)
         pdf = DataFrame.from_dict({x: getattr(self, x) for x in props}, orient="index")
@@ -642,7 +657,7 @@ class OpenTimeSeries(BaseModel):
             The first date in the timeseries
         """
 
-        return self.tsdf.index[0]
+        return cast(dt.date, self.tsdf.index[0])
 
     @property
     def last_idx(self: "OpenTimeSeries") -> dt.date:
@@ -653,7 +668,7 @@ class OpenTimeSeries(BaseModel):
             The last date in the timeseries
         """
 
-        return self.tsdf.index[-1]
+        return cast(dt.date, self.tsdf.index[-1])
 
     @property
     def span_of_days(self: "OpenTimeSeries") -> int:
@@ -742,7 +757,7 @@ class OpenTimeSeries(BaseModel):
 
         if (
             float(self.tsdf.loc[earlier]) == 0.0
-            or self.tsdf.loc[earlier:later].lt(0.0).values.any()
+            or self.tsdf.loc[cast(int, earlier) : cast(int, later)].lt(0.0).values.any()
         ):
             raise Exception(
                 "Geometric return cannot be calculated due to an initial "
@@ -795,12 +810,19 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
+            how_many = int(
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
+                    numeric_only=True
+                )
+            )
             time_factor = how_many / fraction
-        return float(self.tsdf.loc[earlier:later].pct_change().mean() * time_factor)
+        return float(
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().mean()
+            * time_factor
+        )
 
     @property
     def value_ret(self: "OpenTimeSeries") -> float:
@@ -922,14 +944,19 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
+            how_many = int(
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
+                    numeric_only=True
+                )
+            )
             time_factor = how_many / fraction
 
         return float(
-            self.tsdf.loc[earlier:later].pct_change().std() * sqrt(time_factor)
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().std()
+            * sqrt(time_factor)
         )
 
     @property
@@ -988,16 +1015,18 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         how_many = float(
-            self.tsdf.loc[earlier:later].pct_change().count(numeric_only=True)
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .count(numeric_only=True)
         )
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
 
         dddf = (
-            self.tsdf.loc[earlier:later]
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
             .pct_change()
             .sub(min_accepted_return / time_factor)
         )
@@ -1153,7 +1182,7 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        part = self.tsdf.loc[earlier:later].pct_change().copy()
+        part = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().copy()
         return float((part.iloc[-1] - part.mean()) / part.std())
 
     @property
@@ -1215,8 +1244,10 @@ class OpenTimeSeries(BaseModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return float(
             (
-                self.tsdf.loc[earlier:later]
-                / self.tsdf.loc[earlier:later].expanding(min_periods=1).max()
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .expanding(min_periods=1)
+                .max()
             ).min()
             - 1
         )
@@ -1290,7 +1321,7 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return float(
-            self.tsdf.loc[earlier:later]
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
             .pct_change()
             .rolling(observations, min_periods=observations)
             .sum()
@@ -1335,7 +1366,7 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        period = self.tsdf.loc[earlier:later].copy()
+        period = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
         return float(
             period[period.pct_change().ge(0.0)].count(numeric_only=True)
             / period.pct_change().count(numeric_only=True)
@@ -1382,7 +1413,7 @@ class OpenTimeSeries(BaseModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return float(
             skew(
-                self.tsdf.loc[earlier:later].pct_change(),
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
                 bias=True,
                 nan_policy="omit",
             )
@@ -1434,7 +1465,7 @@ class OpenTimeSeries(BaseModel):
 
         return float(
             kurtosis(
-                self.tsdf.loc[earlier:later].pct_change(),
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
                 fisher=True,
                 bias=True,
                 nan_policy="omit",
@@ -1457,7 +1488,7 @@ class OpenTimeSeries(BaseModel):
         """
 
         items = self.tsdf.iloc[:, 0].pct_change().count()
-        return (
+        return float(
             self.tsdf.iloc[:, 0]
             .pct_change()
             .sort_values()
@@ -1494,12 +1525,16 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         how_many = (
-            self.tsdf.loc[earlier:later, self.tsdf.columns.values[0]]
+            self.tsdf.loc[
+                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+            ]
             .pct_change()
             .count()
         )
-        return (
-            self.tsdf.loc[earlier:later, self.tsdf.columns.values[0]]
+        return float(
+            self.tsdf.loc[
+                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+            ]
             .pct_change()
             .sort_values()
             .iloc[: int(ceil((1 - level) * how_many))]
@@ -1569,7 +1604,7 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         return float(
-            self.tsdf.loc[earlier:later]
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
             .pct_change()
             .quantile(q=1 - level, interpolation=interpolation)
         )
@@ -1642,10 +1677,14 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
+            how_many = int(
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
+                    numeric_only=True
+                )
+            )
             time_factor = how_many / fraction
         if drift_adjust:
             return float(
@@ -1658,8 +1697,14 @@ class OpenTimeSeries(BaseModel):
                         to_date,
                         interpolation,
                     )
-                    - self.tsdf.loc[earlier:later].pct_change().sum()
-                    / len(self.tsdf.loc[earlier:later].pct_change())
+                    - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                    .pct_change()
+                    .sum()
+                    / len(
+                        self.tsdf.loc[
+                            cast(int, earlier) : cast(int, later)
+                        ].pct_change()
+                    )
                 )
             )
         else:
@@ -1987,14 +2032,18 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
             how_many = int(self.length)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(self.tsdf.loc[earlier:later].count(numeric_only=True))
+            how_many = int(
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
+                    numeric_only=True
+                )
+            )
             time_factor = how_many / fraction
 
-        data = self.tsdf.loc[earlier:later].copy()
+        data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         data[self.label, "Returns"] = log(
             data.loc[:, (self.label, ValueType.PRICE)]
@@ -2034,7 +2083,7 @@ class OpenTimeSeries(BaseModel):
         """
 
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
         df = self.tsdf.pct_change().copy()
@@ -2251,18 +2300,17 @@ class OpenTimeSeries(BaseModel):
         """
 
         if lvl_zero is None and lvl_one is None:
-            self.tsdf.columns = [[self.label], [self.valuetype]]
+            self.tsdf.columns = MultiIndex.from_arrays([[self.label], [self.valuetype]])
         elif lvl_zero is not None and lvl_one is None:
-            self.tsdf.columns = [[lvl_zero], [self.valuetype]]
+            self.tsdf.columns = MultiIndex.from_arrays([[lvl_zero], [self.valuetype]])
             self.label = lvl_zero
         elif lvl_zero is None and lvl_one is not None:
-            self.tsdf.columns = [[self.label], [lvl_one]]
+            self.tsdf.columns = MultiIndex.from_arrays([[self.label], [lvl_one]])
             self.valuetype = lvl_one
         else:
-            self.tsdf.columns = [[lvl_zero], [lvl_one]]
-            self.label, self.valuetype = lvl_zero, lvl_one
+            self.tsdf.columns = MultiIndex.from_arrays([[lvl_zero], [lvl_one]])
+            self.label, self.valuetype = lvl_zero, cast(ValueType, lvl_one)
         if delete_lvl_one:
-            # noinspection PyUnresolvedReferences
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
         return self
 
@@ -2303,7 +2351,13 @@ class OpenTimeSeries(BaseModel):
 
         if not directory:
             directory = path.join(str(Path.home()), "Documents")
-        filename = self.label.replace("/", "").replace("#", "").replace(" ", "").upper()
+        filename = (
+            cast(str, self.label)
+            .replace("/", "")
+            .replace("#", "")
+            .replace(" ", "")
+            .upper()
+        )
         plotfile = path.join(path.abspath(directory), "{}.html".format(filename))
 
         values = [float(x) for x in self.tsdf.iloc[:, 0].tolist()]
@@ -2386,7 +2440,13 @@ class OpenTimeSeries(BaseModel):
         """
         if not directory:
             directory = path.join(str(Path.home()), "Documents")
-        filename = self.label.replace("/", "").replace("#", "").replace(" ", "").upper()
+        filename = (
+            cast(str, self.label)
+            .replace("/", "")
+            .replace("#", "")
+            .replace(" ", "")
+            .upper()
+        )
         plotfile = path.join(path.abspath(directory), "{}.html".format(filename))
 
         fig, logo = load_plotly_dict()
@@ -2458,7 +2518,10 @@ def timeseries_chain(
 
     dates: List[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
     values = array([float(x) for x in old.tsdf.values][: len(dates)])
-    values = list(values * float(new.tsdf.loc[first]) / float(olddf.loc[first]))
+    values = cast(
+        ndarray[Any, dtype[Any]],
+        list(values * float(new.tsdf.loc[first]) / float(olddf.loc[first])),
+    )
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
     values += [float(x) for x in new.tsdf.values]

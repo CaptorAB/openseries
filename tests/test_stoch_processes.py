@@ -1,6 +1,6 @@
 from datetime import date as dtdate
 from pandas import DataFrame, date_range
-from typing import get_type_hints
+from typing import cast, get_type_hints, List
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
@@ -91,7 +91,7 @@ class TestStochProcesses(TestCase):
 
         series = []
         for i, process, residx in zip(range(len(processes)), processes, res_indices):
-            modelresult = process(param=mp, seed=71)
+            modelresult = cast(List[float], process(param=mp, seed=71))
             if isinstance(modelresult, tuple):
                 modelresult = modelresult[residx]
             d_range = [

@@ -3,7 +3,7 @@ from json import loads
 from pandas import DataFrame, date_range, DatetimeIndex
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
-from typing import get_type_hints
+from typing import cast, get_type_hints, Tuple, Union
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
@@ -11,6 +11,7 @@ from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.sim_price import ReturnSimulation
+from openseries.types import Lit_nan_method
 
 
 class TestOpenFrame(TestCase):
@@ -66,13 +67,6 @@ class TestOpenFrame(TestCase):
         annotations = dict(OpenFrame.__annotations__)
         typehints = get_type_hints(OpenFrame)
         self.assertDictEqual(annotations, typehints)
-
-    def test_openframe_series_from_frame(self: "TestOpenFrame") -> None:
-        frame_f = self.randomframe.from_deepcopy()
-        frame_f.to_cumret()
-        fseries = OpenTimeSeries.from_frame(frame_f, label="Asset_1")
-
-        self.assertTrue(isinstance(fseries, OpenTimeSeries))
 
     def test_openframe_valid_tsdf(self: "TestOpenFrame") -> None:
         frame_df = OpenFrame(
@@ -696,7 +690,6 @@ class TestOpenFrame(TestCase):
 
         series_createmethods = [
             "from_df",
-            "from_frame",
             "from_fixed_rate",
         ]
 
@@ -711,6 +704,9 @@ class TestOpenFrame(TestCase):
             "check_dates_values_same_length",
             "check_values_match",
             "check_isincode",
+            "check_countries",
+            "check_currency",
+            "check_domestic",
         ]
 
         frame_unique = [
@@ -923,7 +919,8 @@ class TestOpenFrame(TestCase):
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                dtdate(2017, 6, 27) : dtdate(2018, 6, 27), ("Asset", ValueType.PRICE)
+                cast(int, dtdate(2017, 6, 27)) : cast(int, dtdate(2018, 6, 27)),
+                ("Asset", ValueType.PRICE),
             ]
         )
         series_short.set_new_label("Short")
@@ -1393,8 +1390,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
 
         with self.assertRaises(Exception) as e_retvolfunc:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.ret_vol_ratio_func(riskfree_column="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = frame.ret_vol_ratio_func(riskfree_column=str_col)
 
         self.assertEqual(
             e_retvolfunc.exception.args[0],
@@ -1424,8 +1421,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdatac[0]:.10f}", "0.2009532877")
 
         with self.assertRaises(Exception) as e_func:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.sortino_ratio_func(riskfree_column="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = frame.sortino_ratio_func(riskfree_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -1453,8 +1450,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
 
         with self.assertRaises(Exception) as e_func:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.tracking_error_func(base_column="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = frame.tracking_error_func(base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -1478,8 +1475,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdatac[0]:.10f}", "0.2063067697")
 
         with self.assertRaises(Exception) as e_func:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = frame.info_ratio_func(base_column="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = frame.info_ratio_func(base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -1894,8 +1891,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{up.iloc[0]:.12f}", f"{uptuple.iloc[0]:.12f}")
 
         with self.assertRaises(Exception) as e_func:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = cframe.capture_ratio_func(ratio="up", base_column="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = cframe.capture_ratio_func(ratio="up", base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
@@ -2137,8 +2134,8 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_methd:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanframe.value_nan_handle(method="other")
+            wrong_method = cast(Lit_nan_method, "other")
+            _ = nanframe.value_nan_handle(method=wrong_method)
 
         self.assertEqual(
             e_methd.exception.args[0],
@@ -2235,8 +2232,8 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_methd:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanframe.return_nan_handle(method="other")
+            wrong_method = cast(Lit_nan_method, "other")
+            _ = nanframe.return_nan_handle(method=wrong_method)
 
         self.assertEqual(
             e_methd.exception.args[0],
@@ -2489,9 +2486,9 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_x:
-            # noinspection PyTypeChecker,PydanticTypeChecker
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
-                y_column=0, x_column="string", fitted_series=False
+                y_column=0, x_column=str_col, fitted_series=False
             )
 
         self.assertEqual(
@@ -2500,9 +2497,9 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(Exception) as e_y:
-            # noinspection PyTypeChecker,PydanticTypeChecker
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
-                y_column="string", x_column=1, fitted_series=False
+                y_column=str_col, x_column=1, fitted_series=False
             )
 
         self.assertEqual(
@@ -2557,8 +2554,8 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset="string", market=1)
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = bframe.beta(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2566,8 +2563,8 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(Exception) as e_market:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset=0, market="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = bframe.beta(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
@@ -2620,8 +2617,8 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset="string", market=1)
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = bframe.beta(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2629,8 +2626,8 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(Exception) as e_market:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = bframe.beta(asset=0, market="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = bframe.beta(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
@@ -2683,8 +2680,8 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset="string", market=1)
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = jframe.jensen_alpha(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2692,8 +2689,8 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(Exception) as e_market:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset=0, market="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = jframe.jensen_alpha(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
@@ -2794,8 +2791,8 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset="string", market=1)
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = jframe.jensen_alpha(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
@@ -2803,8 +2800,8 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(Exception) as e_market:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = jframe.jensen_alpha(asset=0, market="string")
+            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            _ = jframe.jensen_alpha(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],

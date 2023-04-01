@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 from typing import Literal, List
 
+CountryPattern = r"^[A-Z]{2}$"
+CurrencyPattern = r"^[A-Z]{3}$"
+DatePattern = r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"
+DataBaseIDPattern = r"^([0-9a-f]{24})?$"
+
 Lit_line_plot_mode = Literal[
     "lines",
     "markers",

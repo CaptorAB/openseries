@@ -14,7 +14,7 @@ from numpy import (
     sort,
 )
 from pandas import DataFrame, Series
-from typing import List
+from typing import cast, List
 
 from openseries.types import Lit_quantile_interpolation
 
@@ -155,7 +155,7 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
     mdate = max_drawdown_date(prices)
     md = float((prices / prices.expanding(min_periods=1).max()).min() - 1)
     dd = prices.copy()
-    drwdwn = drawdown_series(dd).loc[:mdate]
+    drwdwn = drawdown_series(dd).loc[: cast(int, mdate)]
     drwdwn.sort_index(ascending=False, inplace=True)
     sdate = drwdwn[drwdwn == 0.0].idxmax().values[0].astype(dt.datetime)
     sdate = dt.datetime.fromtimestamp(sdate / 1e9).date()

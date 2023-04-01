@@ -75,13 +75,13 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 - [Files / Modules in the project](#files-in-the-project)
 - [Class methods used to construct an OpenTimeSeries](#class-methods-used-to-construct-an-opentimeseries-object)
-- [OpenTimeSeries non-numeric properties](#non-numeric-or--helper--properties-that-apply-only-to-the-opentimeseries-class)
-- [OpenFrame non-numeric properties](#non-numeric-or--helper--properties-that-apply-only-to-the-openframe-class)
-- [Non-numeric properties for both classes](#non-numeric-or--helper--properties-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
+- [OpenTimeSeries non-numeric properties](#non-numeric-or-helper-properties-that-apply-only-to-the-opentimeseries-class)
+- [OpenFrame non-numeric properties](#non-numeric-or-helper-properties-that-apply-only-to-the-openframe-class)
+- [Non-numeric properties for both classes](#non-numeric-or-helper-properties-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
 - [OpenTimeSeries only methods](#methods-that-apply-only-to-the-opentimeseries-class)
 - [OpenFrame only methods](#methods-that-apply-only-to-the-openframe-class)
 - [Methods for both classes](#methods-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
-- [Numeric properties for both classes](#numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe-)
+- [Numeric properties for both classes](#numeric-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
 - [Numeric methods with period arguments for both classes](#methods-below-are-identical-to-the-numeric-properties-above)
 - [Development Instructions](#development-instructions)
 - [Testing and Linting / Type-checking](#testing-and-linting--type-checking)
@@ -105,7 +105,6 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | Method                 | Applies to                    | Description                                                                                              |
 |:-----------------------|:------------------------------|:---------------------------------------------------------------------------------------------------------|
 | `from_df`              | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame column.                          |
-| `from_frame`           | `OpenTimeSeries`              | Class method to create a new OpenTimeSeries object from a series within an OpenFrame.                    |
 | `from_fixed_rate`      | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date.       |
 | `parse_obj`            | `OpenTimeSeries`              | A method inherited from the Pydantic BaseModel to construct an object from a `dict`.                     |
 | `from_deepcopy`        | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                              |
@@ -170,6 +169,9 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `check_dates_values_same_length` | `OpenTimeSeries` | Pydantic root_validator method to validate that date and value arrays are the same length.                                                     |
 | `check_values_match`             | `OpenTimeSeries` | Pydantic root_validator method to validate that the value array matches the values in the DataFrame when object is constructed.                |
 | `check_isincode`                 | `OpenTimeSeries` | Pydantic root_validator method to validate the ISIN code if provided.                                                                          |
+| `check_countries`                | `OpenTimeSeries` | Pydantic root_validator method to validate the countries.                                                                                      |
+| `check_currency`                 | `OpenTimeSeries` | Pydantic root_validator method to validate the currency.                                                                                       |
+| `check_domestic`                 | `OpenTimeSeries` | Pydantic root_validator method to validate the domestic (home) currency.                                                                       |
 
 ### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 

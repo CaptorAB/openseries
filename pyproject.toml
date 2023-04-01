@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "0.11.8"
+version = "0.11.9"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 homepage = "https://github.com/CaptorAB/OpenSeries"
@@ -71,9 +71,8 @@ line-length = 88
 [tool.mypy]
 strict = true
 ignore_missing_imports = true
-disable_error_code = ["misc", "valid-type", "arg-type", "union-attr",
-    "no-untyped-def", "index", "type-arg", "operator", "assignment", "return-value",
-    "no-any-return", "attr-defined"]
+warn_redundant_casts = true
+disable_error_code = ["valid-type"]
 exclude = ["venv/*", ".venv"]
 
 [tool.coverage.run]

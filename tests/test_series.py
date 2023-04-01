@@ -9,7 +9,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pydantic.error_wrappers import ValidationError as PydanticValidationError
 import pytest
 import sys
-from typing import Any, Dict, get_type_hints, List
+from typing import Any, cast, Dict, get_type_hints, List, Union
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
@@ -21,6 +21,7 @@ from openseries.series import (
     check_if_none,
 )
 from openseries.sim_price import ReturnSimulation
+from openseries.types import Lit_nan_method, Lit_series_props
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
@@ -49,7 +50,6 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
 @pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     with pytest.raises(PydanticValidationError):
-        # noinspection PyTypeChecker
         OpenTimeSeries(
             timeseriesId="",
             instrumentId="",
@@ -70,7 +70,7 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
 
 @pytest.mark.parametrize("currency", ["SE", True, "12", 1, None])
 def test_opentimeseries_invalid_currency(currency: str) -> None:
-    with pytest.raises(PydanticValidationError):
+    with pytest.raises(ValueError) as e_ccy:
         OpenTimeSeries(
             timeseriesId="",
             instrumentId="",
@@ -87,6 +87,58 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
                 dtype="float64",
             ),
         )
+    assert "Currency must be an upper-case 3 letter string" in str(e_ccy.value.args)
+
+
+@pytest.mark.parametrize("domestic", ["SE", True, "12", 1, None])
+def test_opentimeseries_invalid_domestic(domestic: str) -> None:
+    with pytest.raises(ValueError) as e_dom:
+        OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            domestic=domestic,
+            dates=["2023-01-01"],
+            name="Asset",
+            valuetype=ValueType.PRICE,
+            values=[1.0],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[1.0],
+                index=["2023-01-01"],
+                columns=[["Asset"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
+        )
+    assert "Domestic must be an upper-case 3 letter string" in str(e_dom.value.args)
+
+
+@pytest.mark.parametrize(
+    "countries", ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []]
+)
+def test_opentimeseries_invalid_countries(countries: str | List[str]) -> None:
+    with pytest.raises(ValueError) as e_ctries:
+        OpenTimeSeries(
+            timeseriesId="",
+            instrumentId="",
+            currency="SEK",
+            countries=countries,
+            dates=["2023-01-01"],
+            name="Asset",
+            valuetype=ValueType.PRICE,
+            values=[1.0],
+            local_ccy=True,
+            tsdf=DataFrame(
+                data=[1.0],
+                index=["2023-01-01"],
+                columns=[["Asset"], [ValueType.PRICE]],
+                dtype="float64",
+            ),
+        )
+    assert (
+        "Countries must be an upper-case 2 letter string or a list of such strings"
+        in str(e_ctries.value.args)
+    )
 
 
 @pytest.mark.parametrize(
@@ -224,8 +276,8 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_dom.exception),
         )
         with self.assertRaises(ValueError) as e_domestic:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            OpenTimeSeries.setup_class(domestic_ccy=12)
+            faulty_ccy = cast(str, 12)
+            OpenTimeSeries.setup_class(domestic_ccy=faulty_ccy)
         self.assertIn(
             member="domestic currency must be a code according to ISO 4217",
             container=str(e_domestic.exception),
@@ -237,7 +289,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_country.exception),
         )
         with self.assertRaises(ValueError) as e_ctries:
-            OpenTimeSeries.setup_class(countries=["SE", 12])  # type: ignore[list-item]
+            OpenTimeSeries.setup_class(countries=["SE", cast(str, 12)])
         self.assertIn(
             member=(
                 "countries must be a list of country codes "
@@ -255,8 +307,8 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_countries.exception),
         )
         with self.assertRaises(ValueError) as e_none:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            OpenTimeSeries.setup_class(countries=None)
+            no_countries = cast(Union[List[str], str], None)
+            OpenTimeSeries.setup_class(countries=no_countries)
         self.assertIn(
             member="according to ISO 3166-1 alpha-2",
             container=str(e_none.exception),
@@ -864,10 +916,8 @@ class TestOpenTimeSeries(TestCase):
         self.assertIsInstance(props, DataFrame)
 
         with self.assertRaises(ValueError) as e_boo:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = apseries.all_properties(
-                properties=["geo_ret", "boo"]  # type: ignore[list-item]
-            )
+            faulty_props = cast(List[Lit_series_props], ["geo_ret", "boo"])
+            _ = apseries.all_properties(faulty_props)
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_opentimeseries_all_calc_properties(self: "TestOpenTimeSeries") -> None:
@@ -982,7 +1032,9 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(full_values, chained_values)
 
         pushed_date = front_series.last_idx + dt.timedelta(days=10)
-        no_overlap_series = OpenTimeSeries.from_df(full_series.tsdf.loc[pushed_date:])
+        no_overlap_series = OpenTimeSeries.from_df(
+            full_series.tsdf.loc[cast(int, pushed_date) :]
+        )
         with self.assertRaises(Exception) as e_chain:
             _ = timeseries_chain(front_series, no_overlap_series)
 
@@ -1385,87 +1437,6 @@ class TestOpenTimeSeries(TestCase):
         )
 
         self.assertEqual(f"{downdev:.12f}", "0.043333333333")
-
-    def test_opentimeseries_currency_validation(self: "TestOpenTimeSeries") -> None:
-        valid_ccy = "SEK"
-        invalid_ccy = "SE"
-
-        timeseries_with_valid_ccy = OpenTimeSeries(
-            timeseriesId="",
-            instrumentId="",
-            currency=valid_ccy,
-            dates=[
-                "2017-05-29",
-                "2017-05-30",
-            ],
-            name="asset",
-            label="asset",
-            valuetype=ValueType.PRICE,
-            values=[
-                100.0,
-                100.0978,
-            ],
-            local_ccy=True,
-            tsdf=DataFrame(
-                data=[
-                    100.0,
-                    100.0978,
-                ],
-                index=[
-                    d.date()
-                    for d in DatetimeIndex(
-                        [
-                            "2017-05-29",
-                            "2017-05-30",
-                        ]
-                    )
-                ],
-                columns=[["asset"], [ValueType.PRICE]],
-                dtype="float64",
-            ),
-        )
-        self.assertIsInstance(timeseries_with_valid_ccy, OpenTimeSeries)
-
-        with self.assertRaises(PydanticValidationError) as e_ccy:
-            OpenTimeSeries(
-                timeseriesId="",
-                instrumentId="",
-                currency=invalid_ccy,
-                dates=[
-                    "2017-05-29",
-                    "2017-05-30",
-                ],
-                name="asset",
-                label="asset",
-                valuetype=ValueType.PRICE,
-                values=[
-                    100.0,
-                    100.0978,
-                ],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[
-                        100.0,
-                        100.0978,
-                    ],
-                    index=[
-                        d.date()
-                        for d in DatetimeIndex(
-                            [
-                                "2017-05-29",
-                                "2017-05-30",
-                            ]
-                        )
-                    ],
-                    columns=[["asset"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
-            )
-
-        self.assertIn(
-            member="type=value_error.str.regex; pattern=^[A-Z]{3}$)",
-            container=str(e_ccy.exception),
-        )
 
     def test_opentimeseries_validations(self: "TestOpenTimeSeries") -> None:
         valid_isin = "SE0009807308"
@@ -2065,8 +2036,8 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanseries.value_nan_handle(method="other")
+            wrong_method = cast(Lit_nan_method, "other")
+            _ = nanseries.value_nan_handle(method=wrong_method)
 
         self.assertEqual(
             e_method.exception.args[0],
@@ -2122,8 +2093,8 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = nanseries.return_nan_handle(method="other")
+            wrong_method = cast(Lit_nan_method, "other")
+            _ = nanseries.return_nan_handle(method=wrong_method)
 
         self.assertEqual(
             e_method.exception.args[0],
