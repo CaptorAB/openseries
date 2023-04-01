@@ -20,7 +20,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, conlist, root_validator
+from pydantic import BaseModel, root_validator
 from random import choices
 from scipy.stats import kurtosis, norm, skew
 from statsmodels.api import OLS
@@ -72,9 +72,9 @@ class OpenFrame(BaseModel):
         Object of the class OpenFrame
     """
 
-    constituents: conlist(item_type=OpenTimeSeries)
+    constituents: List[OpenTimeSeries]
     tsdf: DataFrame = DataFrame()
-    weights: None | conlist(item_type=float)
+    weights: None | List[float]
 
     class Config:
         arbitrary_types_allowed = True
