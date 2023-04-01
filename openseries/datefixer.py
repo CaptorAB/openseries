@@ -96,7 +96,7 @@ def date_fix(d: str | dt.date | dt.datetime | datetime64 | Timestamp) -> dt.date
     elif isinstance(d, str):
         return dt.datetime.strptime(d, "%Y-%m-%d").date()
     else:
-        raise Exception(
+        raise TypeError(
             f"Unknown date format {str(d)} of type {str(type(d))} encountered"
         )
 

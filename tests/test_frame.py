@@ -3,7 +3,7 @@ from json import loads
 from pandas import DataFrame, date_range, DatetimeIndex
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
-from typing import cast, get_type_hints, Tuple, Union
+from typing import cast, get_type_hints, List, Tuple, Union
 from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
@@ -11,7 +11,7 @@ from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.sim_price import ReturnSimulation
-from openseries.types import Lit_nan_method
+from openseries.types import Lit_nan_method, Lit_frame_props
 
 
 class TestOpenFrame(TestCase):
@@ -1291,10 +1291,8 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(props, DataFrame)
 
         with self.assertRaises(ValueError) as e_boo:
-            # noinspection PyTypeChecker,PydanticTypeChecker
-            _ = apframe.all_properties(
-                properties=["geo_ret", "boo"]  # type: ignore[list-item]
-            )
+            faulty_props = cast(List[Lit_frame_props], ["geo_ret", "boo"])
+            _ = apframe.all_properties(properties=faulty_props)
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_openframe_align_index_to_local_cdays(self: "TestOpenFrame") -> None:

@@ -29,20 +29,17 @@ class TestDateFixer(TestCase):
             self.assertEqual(output, date_fix(fmt))
 
     def test_date_fix_arg_type_error(self: "TestDateFixer") -> None:
-        digit: int = 3
-
-        with self.assertRaises(Exception) as e_type:
-            # noinspection PyTypeChecker,PydanticTypeChecker
+        with self.assertRaises(TypeError) as e_type:
+            digit = cast(str, 3)
             _ = date_fix(digit)
 
-        self.assertIsInstance(e_type.exception, Exception)
+        self.assertIsInstance(e_type.exception, TypeError)
 
-        nonsense = "abcdef"
-
-        with self.assertRaises(Exception) as e_nonsense:
+        with self.assertRaises(ValueError) as e_nonsense:
+            nonsense = "abcdef"
             _ = date_fix(nonsense)
 
-        self.assertIsInstance(e_nonsense.exception, Exception)
+        self.assertIsInstance(e_nonsense.exception, ValueError)
 
     def test_get_previous_business_day_before_today(self: "TestDateFixer") -> None:
         day_after_se_nationalday = dt.date(2022, 6, 7)
