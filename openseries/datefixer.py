@@ -54,7 +54,7 @@ def holiday_calendar(
     elif isinstance(countries, list) and all(
         country in list_supported_countries() for country in countries
     ):
-        countryholidays: List[str] = []
+        countryholidays: List[dt.date | str] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:

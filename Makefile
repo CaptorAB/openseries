@@ -14,8 +14,8 @@ test:
 	PYTHONPATH=${PWD} poetry run coverage-badge -o coverage.svg -f
 
 lint:
-	PYTHONPATH=${PWD} poetry run flake8 .
-	PYTHONPATH=${PWD} poetry run mypy .
+	chmod +x lint.sh
+	./lint.sh
 
 clean:
 	deactivate

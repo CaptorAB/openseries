@@ -190,7 +190,7 @@ class OpenFrame(BaseModel):
         months_offset: int | None = None,
         from_dt: dt.date | None = None,
         to_dt: dt.date | None = None,
-    ) -> Tuple[dt.date | None, dt.date | None]:
+    ) -> Tuple[dt.date, dt.date]:
         """Creates user defined date range
 
         Parameters
@@ -205,10 +205,11 @@ class OpenFrame(BaseModel):
 
         Returns
         -------
-        Tuple[datetime.date | None, datetime.date | None]
+        Tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
         """
-        earlier, later = None, None
+        earlier: dt.date
+        later: dt.date
         if months_offset is not None or from_dt is not None or to_dt is not None:
             if months_offset is not None:
                 earlier = date_offset_foll(
