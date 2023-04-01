@@ -271,8 +271,7 @@ properties for subset periods._
 ## Development Instructions
 
 These instructions assume that you
-have [Python 3.10](https://docs.python.org/3.10/) and
-[Poetry](https://python-poetry.org/) installed on your machine and that you are OK
+have a compatible Python version installed on your machine and that you are OK
 to install this project in a virtual environment. If not, feel free to do it your
 own way.
 
