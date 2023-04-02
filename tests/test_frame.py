@@ -297,6 +297,7 @@ class TestOpenFrame(TestCase):
     def test_openframe_add_timeseries(self: "TestOpenFrame") -> None:
         frameas = self.randomframe.from_deepcopy()
         items = int(frameas.item_count)
+        frameas.weights = [1 / items] * items
         cols = list(frameas.columns_lvl_zero)
         nbr_cols = int(len(frameas.columns_lvl_zero))
         seriesas = self.randomseries.from_deepcopy()

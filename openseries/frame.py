@@ -2372,9 +2372,10 @@ class OpenFrame(BaseModel):
         OpenFrame
             An OpenFrame object
         """
-
+        self.Config.validate_assignment = False
         self.constituents += [new_series]
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
+        self.Config.validate_assignment = True
         return self
 
     def delete_timeseries(self: "OpenFrame", lvl_zero_item: str) -> "OpenFrame":
