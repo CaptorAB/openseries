@@ -7,6 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.11.10] - 2023-04-04
+
+Introduced `validate_assignment = True` which allowed the removal of several separate
+validators.
+
 ## Version [0.11.9] - 2023-04-02
 
 Removed the from_frame() constructor and fixed most of the silenced mypy warnings.

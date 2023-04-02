@@ -639,10 +639,7 @@ class TestOpenFrame(TestCase):
             "json",
             "validate",
         ]
-        series_basemodelmethods = frame_basemodelmethods + [
-            "dates_not_empty",
-            "values_not_empty",
-        ]
+        series_basemodelmethods = frame_basemodelmethods
 
         common_calc_methods = [
             "arithmetic_ret_func",
@@ -702,11 +699,7 @@ class TestOpenFrame(TestCase):
             "to_json",
             "setup_class",
             "check_dates_values_same_length",
-            "check_values_match",
             "check_isincode",
-            "check_countries",
-            "check_currency",
-            "check_domestic",
         ]
 
         frame_unique = [

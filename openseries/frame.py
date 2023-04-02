@@ -78,6 +78,7 @@ class OpenFrame(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+        validate_assignment = True
 
     @root_validator
     def check_nbrtimeseries_weights_same_length(
@@ -2388,7 +2389,7 @@ class OpenFrame(BaseModel):
         OpenFrame
             An OpenFrame object
         """
-
+        self.Config.validate_assignment = False
         if self.weights:
             new_c, new_w = [], []
             for cc, ww in zip(self.constituents, self.weights):
@@ -2402,6 +2403,7 @@ class OpenFrame(BaseModel):
                 ff for ff in self.constituents if ff.label != lvl_zero_item
             ]
         self.tsdf.drop(lvl_zero_item, axis="columns", level=0, inplace=True)
+        self.Config.validate_assignment = True
         return self
 
     def trunc_frame(

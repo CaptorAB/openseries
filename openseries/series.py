@@ -29,8 +29,8 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, constr, Field, root_validator
-from re import compile, match
+from pydantic import BaseModel, constr, conlist, root_validator
+from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
@@ -75,23 +75,6 @@ def check_if_none(item: Any) -> bool:
             return True
         else:
             return False
-
-
-def compare_lists(a: List[Any], b: List[Any]) -> bool:
-    assert len(a) == len(b), "lists must be equal in length"
-    for i in range(len(a)):
-        if all([a[i] is None, b[i] is None]):
-            continue
-        elif any([a[i] is None, b[i] is None]):
-            return False
-        elif any([isinstance(a[i], str), isinstance(b[i], str)]):
-            if a[i] != b[i]:
-                return False
-        elif isnan(a[i]) and isnan(b[i]):
-            continue
-        elif a[i] != b[i]:
-            return False
-    return True
 
 
 class ValueType(str, Enum):
@@ -147,11 +130,10 @@ class OpenTimeSeries(BaseModel):
     timeseriesId: constr(regex=DataBaseIDPattern)
     instrumentId: constr(regex=DataBaseIDPattern)
     currency: constr(regex=CurrencyPattern, to_upper=True, min_length=3, max_length=3)
-    dates: List[constr(regex=DatePattern)] = Field(
-        ...,
-        min_length=1,
+    dates: conlist(
+        item_type=constr(regex=DatePattern),
+        min_items=1,
         unique_items=True,
-        description="Dates of the individual timeseries items",
     )
     domestic: constr(
         regex=CurrencyPattern, to_upper=True, min_length=3, max_length=3
@@ -159,54 +141,27 @@ class OpenTimeSeries(BaseModel):
     name: str
     isin: str | None = None
     label: str | None = None
-    countries: List[
-        constr(regex=CountryPattern, to_upper=True, min_length=2, max_length=2)
-    ] | constr(regex=CountryPattern, to_upper=True, min_length=2, max_length=2) = "SE"
+    countries: conlist(
+        item_type=constr(
+            regex=CountryPattern, to_upper=True, min_length=2, max_length=2
+        ),
+        min_items=1,
+        unique_items=True,
+    ) | constr(regex=CountryPattern, to_upper=True, min_length=2, max_length=2) = "SE"
     valuetype: ValueType
-    values: List[float] = Field(
-        ...,
-        unique_items=False,
-        description="The value or return values of the timeseries items",
-    )
+    values: conlist(item_type=float, min_items=1)
     local_ccy: bool
     tsdf: DataFrame
 
     class Config:
         arbitrary_types_allowed = True
-
-    @root_validator(pre=True)
-    def dates_not_empty(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not values.get("dates", None) or len(values.get("dates", None)) == 0:
-            raise ValueError("Dates list cannot be empty")
-        dts = cast(List[str], values.get("dates"))
-        pattern = compile(DatePattern)
-        for dte in dts:
-            if not pattern.match(dte):
-                raise ValueError("Dates contain an invalid date")
-        return values
-
-    @root_validator(pre=True)
-    def values_not_empty(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not values.get("values", None):
-            raise ValueError("Values list cannot be empty")
-        return values
+        validate_assignment = True
 
     @root_validator
     def check_dates_values_same_length(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         dats, vals = values.get("dates"), values.get("values")
         if dats is not None and vals is not None and len(dats) != len(vals):
             raise ValueError("Lengths of dates and values do not match")
-        return values
-
-    @root_validator
-    def check_values_match(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        vals, df = values.get("values"), values.get("tsdf")
-        if (
-            vals is not None
-            and df is not None
-            and not compare_lists(a=vals, b=df.iloc[:, 0].values.tolist())
-        ):
-            raise ValueError("Values and tsdf.values do not match")
         return values
 
     @root_validator
@@ -217,42 +172,6 @@ class OpenTimeSeries(BaseModel):
                 isincode.validate(isin_code)
             except InvalidChecksum:
                 raise ValueError("The ISIN code's checksum or check digit is invalid.")
-        return values
-
-    @root_validator
-    def check_currency(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        currency = values.get("currency", None)
-        if currency and isinstance(currency, str):
-            ccycheck = bool(match(CurrencyPattern, currency))
-        else:
-            ccycheck = False
-        if ccycheck is False:
-            raise ValueError("Currency must be an upper-case 3 letter string")
-        return values
-
-    @root_validator
-    def check_domestic(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        domestic = values.get("domestic", None)
-        if domestic and isinstance(domestic, str):
-            domcheck = bool(match(CurrencyPattern, domestic))
-        else:
-            domcheck = False
-        if domcheck is False:
-            raise ValueError("Domestic must be an upper-case 3 letter string")
-        return values
-
-    @root_validator
-    def check_countries(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        countries = values.get("countries", None)
-        if countries:
-            ctrycheck = bool(match(CountryPattern, countries))
-        else:
-            ctrycheck = False
-        if ctrycheck is False:
-            raise ValueError(
-                "Countries must be an upper-case 2 letter string or a "
-                "list of such strings"
-            )
         return values
 
     @classmethod

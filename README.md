@@ -164,35 +164,31 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 | `running_adjustment`             | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
 | `ewma_vol_func`                  | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 | `from_1d_rate_to_cumret`         | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
-| `dates_not_empty`                | `OpenTimeSeries` | Pydantic root_validator method to validate that dates are not empty.                                                                           |
-| `values_not_empty`               | `OpenTimeSeries` | Pydantic root_validator method to validate that values are not emptys.                                                                         |
 | `check_dates_values_same_length` | `OpenTimeSeries` | Pydantic root_validator method to validate that date and value arrays are the same length.                                                     |
-| `check_values_match`             | `OpenTimeSeries` | Pydantic root_validator method to validate that the value array matches the values in the DataFrame when object is constructed.                |
 | `check_isincode`                 | `OpenTimeSeries` | Pydantic root_validator method to validate the ISIN code if provided.                                                                          |
-| `check_countries`                | `OpenTimeSeries` | Pydantic root_validator method to validate the countries.                                                                                      |
-| `check_currency`                 | `OpenTimeSeries` | Pydantic root_validator method to validate the currency.                                                                                       |
-| `check_domestic`                 | `OpenTimeSeries` | Pydantic root_validator method to validate the domestic (home) currency.                                                                       |
 
 ### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
-| Method                  | Applies to  | Description                                                                                                                                                       |
-|:------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `merge_series`          | `OpenFrame` | Merges the Pandas Dataframes of the constituent OpenTimeSeries.                                                                                                   |
-| `trunc_frame`           | `OpenFrame` | Truncates the OpenFrame to a common period.                                                                                                                       |
-| `add_timeseries`        | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                                                                                                     |
-| `delete_timeseries`     | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                                                                                                     |
-| `relative`              | `OpenFrame` | Calculates a new series that is the relative performance of two others.                                                                                           |
-| `make_portfolio`        | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                                                                                                        |
-| `ord_least_squares_fit` | `OpenFrame` | Performs a regression and an [Ordinary Least Squares](https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html) fit.                              |
-| `beta`                  | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                                   |
-| `jensen_alpha`          | `OpenFrame` | Calculates [Jensen's Alpha](https://www.investopedia.com/terms/j/jensensmeasure.asp) of an asset relative a market.                                               |
-| `tracking_error_func`   | `OpenFrame` | Calculates the [tracking errors](https://www.investopedia.com/terms/t/trackingerror.asp) relative to a selected series in the OpenFrame.                          |
-| `info_ratio_func`       | `OpenFrame` | Calculates the [information ratios](https://www.investopedia.com/terms/i/informationratio.asp) relative to a selected series in the OpenFrame.                    |
-| `capture_ratio_func`    | `OpenFrame` | Calculates up, down and up/down [capture ratios](https://www.investopedia.com/terms/d/down-market-capture-ratio.asp) relative to a selected series.               |
-| `rolling_info_ratio`    | `OpenFrame` | Returns a pandas.DataFrame with the rolling [information ratio](https://www.investopedia.com/terms/i/informationratio.asp) between two series.                    |
-| `rolling_beta`          | `OpenFrame` | Returns a pandas.DataFrame with the rolling [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                  |
-| `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.                            |
-| `ewma_risk`             | `OpenFrame` | Returns a `pandas.DataFrame` with volatility and correlation based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
+| Method                                    | Applies to  | Description                                                                                                                                                       |
+|:------------------------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `merge_series`                            | `OpenFrame` | Merges the Pandas Dataframes of the constituent OpenTimeSeries.                                                                                                   |
+| `trunc_frame`                             | `OpenFrame` | Truncates the OpenFrame to a common period.                                                                                                                       |
+| `add_timeseries`                          | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                                                                                                     |
+| `delete_timeseries`                       | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                                                                                                     |
+| `relative`                                | `OpenFrame` | Calculates a new series that is the relative performance of two others.                                                                                           |
+| `make_portfolio`                          | `OpenFrame` | Calculates a portfolio timeseries from series and weights.                                                                                                        |
+| `ord_least_squares_fit`                   | `OpenFrame` | Performs a regression and an [Ordinary Least Squares](https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html) fit.                              |
+| `beta`                                    | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                                   |
+| `jensen_alpha`                            | `OpenFrame` | Calculates [Jensen's Alpha](https://www.investopedia.com/terms/j/jensensmeasure.asp) of an asset relative a market.                                               |
+| `tracking_error_func`                     | `OpenFrame` | Calculates the [tracking errors](https://www.investopedia.com/terms/t/trackingerror.asp) relative to a selected series in the OpenFrame.                          |
+| `info_ratio_func`                         | `OpenFrame` | Calculates the [information ratios](https://www.investopedia.com/terms/i/informationratio.asp) relative to a selected series in the OpenFrame.                    |
+| `capture_ratio_func`                      | `OpenFrame` | Calculates up, down and up/down [capture ratios](https://www.investopedia.com/terms/d/down-market-capture-ratio.asp) relative to a selected series.               |
+| `rolling_info_ratio`                      | `OpenFrame` | Returns a pandas.DataFrame with the rolling [information ratio](https://www.investopedia.com/terms/i/informationratio.asp) between two series.                    |
+| `rolling_beta`                            | `OpenFrame` | Returns a pandas.DataFrame with the rolling [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                  |
+| `rolling_corr`                            | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.                            |
+| `ewma_risk`                               | `OpenFrame` | Returns a `pandas.DataFrame` with volatility and correlation based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
+| `check_labels_unique`                     | `OpenFrame` | Pydantic root_validator method to validate that each of the passed timeseries must have unique labels.                                                            |
+| `check_nbrtimeseries_weights_same_length` | `OpenFrame` | Pydantic root_validator method to validate that the number of weights, if passed, are the same as the number of timeseries.                                       |
 
 ### Methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
