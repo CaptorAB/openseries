@@ -2362,10 +2362,8 @@ class OpenFrame(BaseModel):
         OpenFrame
             An OpenFrame object
         """
-        self.Config.validate_assignment = False
         self.constituents += [new_series]
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
-        self.Config.validate_assignment = True
         return self
 
     def delete_timeseries(self: "OpenFrame", lvl_zero_item: str) -> "OpenFrame":
@@ -2380,7 +2378,6 @@ class OpenFrame(BaseModel):
         OpenFrame
             An OpenFrame object
         """
-        self.Config.validate_assignment = False
         if self.weights:
             new_c, new_w = [], []
             for cc, ww in zip(self.constituents, self.weights):
@@ -2394,7 +2391,6 @@ class OpenFrame(BaseModel):
                 ff for ff in self.constituents if ff.label != lvl_zero_item
             ]
         self.tsdf.drop(lvl_zero_item, axis="columns", level=0, inplace=True)
-        self.Config.validate_assignment = True
         return self
 
     def trunc_frame(
