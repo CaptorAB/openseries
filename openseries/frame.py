@@ -20,7 +20,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, validator
 from random import choices
 from scipy.stats import kurtosis, norm, skew
 import statsmodels.api as sm
@@ -28,7 +28,7 @@ import statsmodels.api as sm
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 from string import ascii_letters
-from typing import Any, cast, Dict, List, Tuple, Union
+from typing import cast, List, Tuple, Union
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -80,22 +80,12 @@ class OpenFrame(BaseModel):
         arbitrary_types_allowed = True
         validate_assignment = True
 
-    @root_validator
-    def check_nbrtimeseries_weights_same_length(
-        cls, values: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        tseries, wghts = values.get("constituents"), values.get("weights")
-        if tseries is not None and wghts is not None and len(tseries) != len(wghts):
-            raise ValueError("Number of TimeSeries must equal number of weights")
-        return values
-
-    @root_validator
-    def check_labels_unique(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        tseries = cast(List[OpenTimeSeries], values.get("constituents"))
+    @validator("constituents")
+    def check_labels_unique(cls, tseries: List[OpenTimeSeries]) -> List[OpenTimeSeries]:
         labls = [x.label for x in tseries]
         if len(set(labls)) != len(labls):
             raise ValueError("TimeSeries names/labels must be unique")
-        return values
+        return tseries
 
     def __init__(
         self: "OpenFrame",

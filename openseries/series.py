@@ -29,7 +29,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, constr, conlist, root_validator
+from pydantic import BaseModel, constr, conlist, validator
 from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
@@ -157,22 +157,14 @@ class OpenTimeSeries(BaseModel):
         arbitrary_types_allowed = True
         validate_assignment = True
 
-    @root_validator
-    def check_dates_values_same_length(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        dats, vals = values.get("dates"), values.get("values")
-        if dats is not None and vals is not None and len(dats) != len(vals):
-            raise ValueError("Lengths of dates and values do not match")
-        return values
-
-    @root_validator
-    def check_isincode(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        isin_code = values.get("isin", None)
+    @validator("isin")
+    def check_isincode(cls, isin_code: str) -> str:
         if isin_code:
             try:
                 isincode.validate(isin_code)
             except InvalidChecksum:
                 raise ValueError("The ISIN code's checksum or check digit is invalid.")
-        return values
+        return isin_code
 
     @classmethod
     def setup_class(

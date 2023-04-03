@@ -699,14 +699,12 @@ class TestOpenFrame(TestCase):
             "set_new_label",
             "to_json",
             "setup_class",
-            "check_dates_values_same_length",
             "check_isincode",
         ]
 
         frame_unique = [
             "add_timeseries",
             "beta",
-            "check_nbrtimeseries_weights_same_length",
             "check_labels_unique",
             "delete_timeseries",
             "ewma_risk",
@@ -884,19 +882,6 @@ class TestOpenFrame(TestCase):
             OpenFrame([])
         self.assertListEqual(
             cm.output, ["WARNING:root:OpenFrame() was passed an empty list."]
-        )
-
-    def test_openframe_wrong_number_of_weights_passed(self: "TestOpenFrame") -> None:
-        wrongsims = self.randomframe.from_deepcopy()
-        tslist = list(wrongsims.constituents)
-        wghts = [1.0 / wrongsims.item_count] * (wrongsims.item_count + 1)
-
-        with self.assertRaises(ValueError) as e_weights:
-            OpenFrame(tslist, weights=wghts)
-
-        self.assertIn(
-            member="Number of TimeSeries must equal number of weights",
-            container=str(e_weights.exception),
         )
 
     def test_openframe_drawdown_details(self: "TestOpenFrame") -> None:

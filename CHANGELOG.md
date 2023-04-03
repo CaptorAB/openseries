@@ -7,10 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.12.0] - 2023-04-04
+## Version [0.12.1] - 2023-04-03
 
 Introduced `validate_assignment = True` which allowed the removal of several separate
-validators.
+validators. Unfortunately this implies that interdependent argument validations have
+been removed and will be difficult to implement without significant user impact.
 
 ## Version [0.11.9] - 2023-04-02
 
