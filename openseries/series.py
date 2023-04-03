@@ -1,9 +1,12 @@
 from copy import deepcopy
 import datetime as dt
-from dateutil.relativedelta import relativedelta
 from enum import Enum
 from json import dump
 from math import ceil
+from os import path
+from pathlib import Path
+from re import compile as re_compile
+from typing import Any, cast, Dict, List, Tuple, TypeVar, Union
 from numpy import (
     array,
     cumprod,
@@ -16,7 +19,7 @@ from numpy import (
     square,
     zeros,
 )
-from os import path
+from dateutil.relativedelta import relativedelta
 from pandas import (
     concat,
     DataFrame,
@@ -26,15 +29,12 @@ from pandas import (
     Series,
 )
 from pandas.tseries.offsets import CustomBusinessDay
-from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
 from pydantic import BaseModel, constr, conlist, validator
-from re import compile
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
-from typing import Any, cast, Dict, List, Tuple, TypeVar, Union
 
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
@@ -63,18 +63,24 @@ from openseries.risk import (
 
 
 def check_if_none(item: Any) -> bool:
+    """Function to check if a variable is None or equivalent
+
+    Parameters
+    ----------
+    item : Any
+        variable to be checked
+
+    Returns
+    -------
+    bool
+        Answer to whether the variable is None or equivalent
+    """
     try:
-        if isnan(item):
-            return True
-        else:
-            return False
+        return cast(bool, isnan(item))
     except TypeError:
         if item is None:
             return True
-        elif len(str(item)) == 0:
-            return True
-        else:
-            return False
+        return len(str(item)) == 0
 
 
 class ValueType(str, Enum):
@@ -162,8 +168,10 @@ class OpenTimeSeries(BaseModel):
         if isin_code:
             try:
                 isincode.validate(isin_code)
-            except InvalidChecksum:
-                raise ValueError("The ISIN code's checksum or check digit is invalid.")
+            except InvalidChecksum as exc:
+                raise ValueError(
+                    "The ISIN code's checksum or check digit is invalid."
+                ) from exc
         return isin_code
 
     @classmethod
@@ -179,12 +187,14 @@ class OpenTimeSeries(BaseModel):
         countries: List[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
-        ccy_pattern = compile(CurrencyPattern)
-        ctry_pattern = compile(CountryPattern)
+        ccy_pattern = re_compile(CurrencyPattern)
+        ctry_pattern = re_compile(CountryPattern)
         try:
             ccy_ok = ccy_pattern.match(domestic_ccy)
-        except TypeError:
-            raise ValueError("domestic currency must be a code according to ISO 4217")
+        except TypeError as exc:
+            raise ValueError(
+                "domestic currency must be a code according to " "ISO 4217"
+            ) from exc
         if not ccy_ok:
             raise ValueError("domestic currency must be a code according to ISO 4217")
         if isinstance(countries, str):
@@ -195,12 +205,12 @@ class OpenTimeSeries(BaseModel):
                 )
         elif isinstance(countries, list):
             try:
-                all_ctries = all([ctry_pattern.match(ctry) for ctry in countries])
-            except TypeError:
+                all_ctries = all(ctry_pattern.match(ctry) for ctry in countries)
+            except TypeError as exc:
                 raise ValueError(
                     "countries must be a list of country codes "
                     "according to ISO 3166-1 alpha-2"
-                )
+                ) from exc
             if not all_ctries:
                 raise ValueError(
                     "countries must be a list of country codes "
@@ -406,8 +416,8 @@ class OpenTimeSeries(BaseModel):
         for item in cleaner_list:
             data.pop(item)
 
-        with open(path.join(directory, filename), "w") as ff:
-            dump(data, ff, indent=2, sort_keys=False)
+        with open(path.join(directory, filename), "w", encoding="utf-8") as jsonfile:
+            dump(data, jsonfile, indent=2, sort_keys=False)
 
         return data
 
@@ -629,7 +639,7 @@ class OpenTimeSeries(BaseModel):
             float(self.tsdf.loc[self.first_idx]) == 0.0
             or self.tsdf.lt(0.0).values.any()
         ):
-            raise Exception(
+            raise ValueError(
                 "Geometric return cannot be calculated due to an initial "
                 "value being zero or a negative value."
             )
@@ -670,7 +680,7 @@ class OpenTimeSeries(BaseModel):
             float(self.tsdf.loc[earlier]) == 0.0
             or self.tsdf.loc[cast(int, earlier) : cast(int, later)].lt(0.0).values.any()
         ):
-            raise Exception(
+            raise ValueError(
                 "Geometric return cannot be calculated due to an initial "
                 "value being zero or a negative value."
             )
@@ -745,7 +755,7 @@ class OpenTimeSeries(BaseModel):
         """
 
         if float(self.tsdf.iloc[0]) == 0.0:
-            raise Exception(
+            raise ValueError(
                 "Simple Return cannot be calculated due to an initial value being "
                 "zero."
             )
@@ -776,7 +786,7 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if float(self.tsdf.loc[earlier]) == 0.0:
-            raise Exception(
+            raise ValueError(
                 "Simple Return cannot be calculated due to an initial value being "
                 "zero."
             )
@@ -1172,9 +1182,9 @@ class OpenTimeSeries(BaseModel):
         float
             Maximum drawdown in a single calendar year.
         """
-
+        years = [d.year for d in self.tsdf.index]
         return float(
-            self.tsdf.groupby([DatetimeIndex(self.tsdf.index).year])
+            self.tsdf.groupby(years)
             .apply(lambda x: (x / x.expanding(min_periods=1).max()).min() - 1)
             .min()
         )
@@ -1384,20 +1394,15 @@ class OpenTimeSeries(BaseModel):
         )
 
     @property
-    def cvar_down(self: "OpenTimeSeries", level: float = 0.95) -> float:
+    def cvar_down(self: "OpenTimeSeries") -> float:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
-
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought CVaR level
 
         Returns
         -------
         float
-            Downside Conditional Value At Risk "CVaR"
+            Downside Conditional 95% Value At Risk "CVaR"
         """
-
+        level: float = 0.95
         items = self.tsdf.iloc[:, 0].pct_change().count()
         return float(
             self.tsdf.iloc[:, 0]
@@ -1453,29 +1458,18 @@ class OpenTimeSeries(BaseModel):
         )
 
     @property
-    def var_down(
-        self: "OpenTimeSeries",
-        level: float = 0.95,
-        interpolation: Lit_quantile_interpolation = "lower",
-    ) -> float:
-        """Downside Value At Risk, "VaR". The equivalent of
+    def var_down(self: "OpenTimeSeries") -> float:
+        """Downside 95% Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
         https://www.investopedia.com/terms/v/var.asp
-
-        Parameters
-        ----------
-
-        level: float, default: 0.95
-            The sought VaR level
-        interpolation: Lit_quantile_interpolation, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
         -------
         float
-            Downside Value At Risk
+            Downside 95% Value At Risk
         """
-
+        level: float = 0.95
+        interpolation: Lit_quantile_interpolation = "lower"
         return float(
             self.tsdf.pct_change().quantile(1 - level, interpolation=interpolation)
         )
@@ -1521,27 +1515,16 @@ class OpenTimeSeries(BaseModel):
         )
 
     @property
-    def vol_from_var(
-        self: "OpenTimeSeries",
-        level: float = 0.95,
-        interpolation: Lit_quantile_interpolation = "lower",
-    ) -> float:
+    def vol_from_var(self: "OpenTimeSeries") -> float:
         """
-        Parameters
-        ----------
-
-        level: float, default: 0.95
-            The sought VaR level
-        interpolation: Lit_quantile_interpolation, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-
         Returns
         -------
         float
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
         """
-
+        level: float = 0.95
+        interpolation: Lit_quantile_interpolation = "lower"
         return float(
             -sqrt(self.periods_in_a_year)
             * self.var_down_func(level, interpolation=interpolation)
@@ -1618,14 +1601,13 @@ class OpenTimeSeries(BaseModel):
                     )
                 )
             )
-        else:
-            return float(
-                -sqrt(time_factor)
-                * self.var_down_func(
-                    level, months_from_last, from_date, to_date, interpolation
-                )
-                / norm.ppf(level)
+        return float(
+            -sqrt(time_factor)
+            * self.var_down_func(
+                level, months_from_last, from_date, to_date, interpolation
             )
+            / norm.ppf(level)
+        )
 
     def target_weight_from_var(
         self: "OpenTimeSeries",
@@ -1749,10 +1731,7 @@ class OpenTimeSeries(BaseModel):
             An OpenTimeSeries object
         """
         if not any(
-            [
-                True if x == ValueType.RTRN else False
-                for x in self.tsdf.columns.get_level_values(1).values
-            ]
+            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
         ):
             self.value_to_ret()
 
@@ -2153,10 +2132,7 @@ class OpenTimeSeries(BaseModel):
         """
         values: List[float]
         if any(
-            [
-                True if x == ValueType.RTRN else False
-                for x in self.tsdf.columns.get_level_values(1).values
-            ]
+            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
         ):
             ra_df = self.tsdf.copy()
             values = [1.0]
@@ -2269,7 +2245,7 @@ class OpenTimeSeries(BaseModel):
             .replace(" ", "")
             .upper()
         )
-        plotfile = path.join(path.abspath(directory), "{}.html".format(filename))
+        plotfile = path.join(path.abspath(directory), f"{filename}.html")
 
         values = [float(x) for x in self.tsdf.iloc[:, 0].tolist()]
 
@@ -2279,11 +2255,11 @@ class OpenTimeSeries(BaseModel):
             x=self.tsdf.index,
             y=values,
             hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-            line=dict(width=2.5, dash="solid"),
+            line={"width": 2.5, "dash": "solid"},
             mode=mode,
             name=self.label,
         )
-        figure.update_layout(yaxis=dict(tickformat=tick_fmt))
+        figure.update_layout(yaxis={"tickformat": tick_fmt})
 
         if add_logo:
             figure.add_layout_image(logo)
@@ -2358,7 +2334,7 @@ class OpenTimeSeries(BaseModel):
             .replace(" ", "")
             .upper()
         )
-        plotfile = path.join(path.abspath(directory), "{}.html".format(filename))
+        plotfile = path.join(path.abspath(directory), f"{filename}.html")
 
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
@@ -2368,7 +2344,7 @@ class OpenTimeSeries(BaseModel):
             hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
             name=self.label,
         )
-        figure.update_layout(barmode=mode, yaxis=dict(tickformat=tick_fmt))
+        figure.update_layout(barmode=mode, yaxis={"tickformat": tick_fmt})
 
         if add_logo:
             figure.add_layout_image(logo)
@@ -2425,7 +2401,7 @@ def timeseries_chain(
         idx += 1
         first = new.tsdf.index[idx]
         if first > olddf.index[-1]:
-            raise Exception("Failed to find a matching date between series")
+            raise ValueError("Failed to find a matching date between series")
 
     dates: List[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
     values = array([float(x) for x in old.tsdf.values][: len(dates)])
@@ -2455,21 +2431,20 @@ def timeseries_chain(
                 dtype="float64",
             ),
         )
-    else:
-        return back.__class__(
-            timeseriesId=new.timeseriesId,
-            instrumentId=new.instrumentId,
-            currency=new.currency,
-            dates=dates,
-            name=new.name,
-            label=new.name,
-            valuetype=new.valuetype,
-            values=list(values),
-            local_ccy=new.local_ccy,
-            tsdf=DataFrame(
-                data=values,
-                index=[d.date() for d in DatetimeIndex(dates)],
-                columns=[[new.label], [new.valuetype]],
-                dtype="float64",
-            ),
-        )
+    return back.__class__(
+        timeseriesId=new.timeseriesId,
+        instrumentId=new.instrumentId,
+        currency=new.currency,
+        dates=dates,
+        name=new.name,
+        label=new.name,
+        valuetype=new.valuetype,
+        values=list(values),
+        local_ccy=new.local_ccy,
+        tsdf=DataFrame(
+            data=values,
+            index=[d.date() for d in DatetimeIndex(dates)],
+            columns=[[new.label], [new.valuetype]],
+            dtype="float64",
+        ),
+    )
