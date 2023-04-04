@@ -1,10 +1,10 @@
 import datetime as dt
+from typing import Dict, List, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
 from pandas import date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
-from typing import Dict, List, Union
 
 
 def holiday_calendar(
@@ -44,7 +44,7 @@ def holiday_calendar(
     endyear += 1
     if startyear == endyear:
         endyear += 1
-    years = [y for y in range(startyear, endyear)]
+    years = list(range(startyear, endyear))
 
     if isinstance(countries, str) and countries in list_supported_countries():
         staging = country_holidays(country=countries, years=years)
@@ -59,10 +59,10 @@ def holiday_calendar(
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:
                 staging.update(custom_holidays)
-            countryholidays += [i for i in staging]
+            countryholidays += list(staging)
         hols = array(sorted(list(set(countryholidays))), dtype="datetime64[D]")
     else:
-        raise Exception(
+        raise ValueError(
             "Argument countries must be a string country code or a list "
             "of string country codes according to ISO 3166-1 alpha-2."
         )
@@ -70,12 +70,15 @@ def holiday_calendar(
     return busdaycalendar(holidays=hols)
 
 
-def date_fix(d: str | dt.date | dt.datetime | datetime64 | Timestamp) -> dt.date:
+def date_fix(
+    fixerdate: str | dt.date | dt.datetime | datetime64 | Timestamp,
+) -> dt.date:
     """Function to parse from different date formats into datetime.date
 
     Parameters
     ----------
-    d: str | datetime.date | datetime.datetime | numpy.datetime64 | pandas.Timestamp
+    fixerdate: str | datetime.date | datetime.datetime |
+    numpy.datetime64 | pandas.Timestamp
         The data item to parse
 
     Returns
@@ -84,21 +87,21 @@ def date_fix(d: str | dt.date | dt.datetime | datetime64 | Timestamp) -> dt.date
         Parsed date
     """
 
-    if isinstance(d, dt.datetime) or isinstance(d, Timestamp):
-        return d.date()
-    elif isinstance(d, dt.date):
-        return d
-    elif isinstance(d, datetime64):
+    if isinstance(fixerdate, (Timestamp, dt.datetime)):
+        return fixerdate.date()
+    if isinstance(fixerdate, dt.date):
+        return fixerdate
+    if isinstance(fixerdate, datetime64):
         unix_epoch = datetime64(0, "s")
         one_second = timedelta64(1, "s")
-        seconds_since_epoch = (d - unix_epoch) / one_second
+        seconds_since_epoch = (fixerdate - unix_epoch) / one_second
         return dt.datetime.utcfromtimestamp(float(seconds_since_epoch)).date()
-    elif isinstance(d, str):
-        return dt.datetime.strptime(d, "%Y-%m-%d").date()
-    else:
-        raise TypeError(
-            f"Unknown date format {str(d)} of type {str(type(d))} encountered"
-        )
+    if isinstance(fixerdate, str):
+        return dt.datetime.strptime(fixerdate, "%Y-%m-%d").date()
+    raise TypeError(
+        f"Unknown date format {str(fixerdate)} of "
+        f"type {str(type(fixerdate))} encountered"
+    )
 
 
 def date_offset_foll(
@@ -255,9 +258,14 @@ def offset_business_days(
             countries=countries,
             custom_holidays=custom_holidays,
         )
-        local_bdays = date_range(
-            periods=abs(days + 10), end=ddate, freq=CustomBusinessDay(calendar=calendar)
-        ).date
+        local_bdays: List[dt.date] = [
+            bday.date()
+            for bday in date_range(
+                periods=abs(days + 10),
+                end=ddate,
+                freq=CustomBusinessDay(calendar=calendar),
+            )
+        ]
     else:
         calendar = holiday_calendar(
             startyear=ddate.year,
@@ -265,9 +273,14 @@ def offset_business_days(
             countries=countries,
             custom_holidays=custom_holidays,
         )
-        local_bdays = date_range(
-            start=ddate, periods=days + 10, freq=CustomBusinessDay(calendar=calendar)
-        ).date
+        local_bdays = [
+            bday.date()
+            for bday in date_range(
+                start=ddate,
+                periods=days + 10,
+                freq=CustomBusinessDay(calendar=calendar),
+            )
+        ]
 
     while ddate not in local_bdays:
         if days <= 0:
@@ -275,6 +288,6 @@ def offset_business_days(
         else:
             ddate += dt.timedelta(days=1)
 
-    idx = where(local_bdays == ddate)[0]
+    idx = where(array(local_bdays) == ddate)[0]
 
-    return date_fix(local_bdays[idx + days][0])
+    return date_fix(local_bdays[idx[0] + days])

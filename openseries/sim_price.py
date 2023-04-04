@@ -37,7 +37,10 @@ class ReturnSimulation(BaseModel):
     df: DataFrame
 
     class Config:
+        """Configurations for the ReturnSimulation class"""
+
         arbitrary_types_allowed = True
+        validate_assignment = True
 
     @property
     def results(self: "ReturnSimulation") -> DataFrame:
@@ -209,7 +212,7 @@ class ReturnSimulation(BaseModel):
         if seed:
             random.seed(seed)
 
-        mp = ModelParameters(
+        model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
             all_delta=1.0 / trading_days_in_year,
@@ -217,8 +220,8 @@ class ReturnSimulation(BaseModel):
             gbm_mu=mean_annual_return,
         )
         daily_returns = []
-        for i in range(number_of_sims):
-            daily_returns.append(geometric_brownian_motion_log_returns(mp))
+        for _ in range(number_of_sims):
+            daily_returns.append(geometric_brownian_motion_log_returns(model_params))
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -271,7 +274,7 @@ class ReturnSimulation(BaseModel):
         if seed:
             random.seed(seed)
 
-        mp = ModelParameters(
+        model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
             all_delta=1.0 / trading_days_in_year,
@@ -282,11 +285,11 @@ class ReturnSimulation(BaseModel):
             heston_a=heston_a,
         )
         daily_returns = []
-        for i in range(number_of_sims):
-            aray = heston_model_levels(mp)[0]
-            r = aray[1:] / aray[:-1] - 1
-            r = insert(r, 0, 0.0)
-            daily_returns.append(r)
+        for _ in range(number_of_sims):
+            aray = heston_model_levels(model_params)[0]
+            return_array = aray[1:] / aray[:-1] - 1
+            return_array = insert(return_array, 0, 0.0)
+            daily_returns.append(return_array)
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -338,7 +341,7 @@ class ReturnSimulation(BaseModel):
         if seed:
             random.seed(seed)
 
-        mp = ModelParameters(
+        model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
             all_delta=1.0 / trading_days_in_year,
@@ -349,11 +352,11 @@ class ReturnSimulation(BaseModel):
             heston_a=heston_a,
         )
         daily_returns = []
-        for i in range(number_of_sims):
-            aray = heston_model_levels(mp)[1]
-            r = aray[1:] / aray[:-1] - 1
-            r = insert(r, 0, 0.0)
-            daily_returns.append(r)
+        for _ in range(number_of_sims):
+            aray = heston_model_levels(model_params)[1]
+            return_array = aray[1:] / aray[:-1] - 1
+            return_array = insert(return_array, 0, 0.0)
+            daily_returns.append(return_array)
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -408,7 +411,7 @@ class ReturnSimulation(BaseModel):
         if seed:
             random.seed(seed)
 
-        mp = ModelParameters(
+        model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
             all_delta=1.0 / trading_days_in_year,
@@ -419,11 +422,11 @@ class ReturnSimulation(BaseModel):
             jumps_mu=jumps_mu,
         )
         daily_returns = []
-        for i in range(number_of_sims):
-            aray = geometric_brownian_motion_jump_diffusion_levels(mp)
-            r = aray[1:] / aray[:-1] - 1
-            r = insert(r, 0, 0.0)
-            daily_returns.append(r)
+        for _ in range(number_of_sims):
+            aray = geometric_brownian_motion_jump_diffusion_levels(model_params)
+            return_array = aray[1:] / aray[:-1] - 1
+            return_array = insert(return_array, 0, 0.0)
+            daily_returns.append(return_array)
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,

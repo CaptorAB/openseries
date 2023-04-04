@@ -18,7 +18,7 @@ from openseries.series import (
     check_if_none,
 )
 from openseries.sim_price import ReturnSimulation
-from openseries.types import Lit_nan_method, Lit_series_props
+from openseries.types import LiteralNanMethod, LiteralSeriesProps
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
@@ -807,7 +807,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertIsInstance(props, DataFrame)
 
         with self.assertRaises(ValueError) as e_boo:
-            faulty_props = cast(List[Lit_series_props], ["geo_ret", "boo"])
+            faulty_props = cast(List[LiteralSeriesProps], ["geo_ret", "boo"])
             _ = apseries.all_properties(faulty_props)
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
@@ -1928,7 +1928,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
-            wrong_method = cast(Lit_nan_method, "other")
+            wrong_method = cast(LiteralNanMethod, "other")
             _ = nanseries.value_nan_handle(method=wrong_method)
 
         self.assertEqual(
@@ -1985,7 +1985,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_method:
-            wrong_method = cast(Lit_nan_method, "other")
+            wrong_method = cast(LiteralNanMethod, "other")
             _ = nanseries.return_nan_handle(method=wrong_method)
 
         self.assertEqual(

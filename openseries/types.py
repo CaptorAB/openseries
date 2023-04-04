@@ -1,12 +1,12 @@
-from pydantic import BaseModel
 from typing import Literal, List
+from pydantic import BaseModel
 
-CountryPattern = r"^[A-Z]{2}$"
-CurrencyPattern = r"^[A-Z]{3}$"
-DatePattern = r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"
-DataBaseIDPattern = r"^([0-9a-f]{24})?$"
+COUNTRYPATTERN = r"^[A-Z]{2}$"
+CURRENCYPATTERN = r"^[A-Z]{3}$"
+DATEPATTERN = r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"
+DATABASEIDPATTERN = r"^([0-9a-f]{24})?$"
 
-Lit_line_plot_mode = Literal[
+LiteralLinePlotMode = Literal[
     "lines",
     "markers",
     "lines+markers",
@@ -14,18 +14,18 @@ Lit_line_plot_mode = Literal[
     "markers+text",
     "lines+markers+text",
 ]
-Lit_how_merge = Literal["outer", "inner"]
-Lit_quantile_interpolation = Literal["linear", "lower", "higher", "midpoint", "nearest"]
-Lit_bizday_frequencies = Literal["BM", "BQ", "BA"]
-Lit_pandas_resample_convention = Literal["start", "s", "end", "e"]
-Lit_pandas_reindex_method = Literal[
+LiteralHowMerge = Literal["outer", "inner"]
+LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "nearest"]
+LiteralBizDayFreq = Literal["BM", "BQ", "BA"]
+LiteralPandasResampleConvention = Literal["start", "s", "end", "e"]
+LiteralPandasReindexMethod = Literal[
     None, "pad", "ffill", "backfill", "bfill", "nearest"
 ]
-Lit_nan_method = Literal["fill", "drop"]
-Lit_capture_ratio = Literal["up", "down", "both"]
-Lit_bar_plot_mode = Literal["stack", "group", "overlay", "relative"]
-Lit_plotly_output = Literal["file", "div"]
-Lit_series_props = Literal[
+LiteralNanMethod = Literal["fill", "drop"]
+LiteralCaptureRatio = Literal["up", "down", "both"]
+LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]
+LiteralPlotlyOutput = Literal["file", "div"]
+LiteralSeriesProps = Literal[
     "value_ret",
     "geo_ret",
     "arithmetic_ret",
@@ -52,7 +52,7 @@ Lit_series_props = Literal[
     "yearfrac",
     "periods_in_a_year",
 ]
-Lit_frame_props = Literal[
+LiteralFrameProps = Literal[
     "value_ret",
     "geo_ret",
     "arithmetic_ret",
@@ -80,6 +80,8 @@ Lit_frame_props = Literal[
 
 
 class OpenTimeSeriesPropertiesList(List[str]):
+    """Allowed property arguments for the OpenTimeSeries class"""
+
     allowed_strings = {
         "value_ret",
         "geo_ret",
@@ -108,7 +110,7 @@ class OpenTimeSeriesPropertiesList(List[str]):
         "periods_in_a_year",
     }
 
-    def __init__(self, *args: Lit_series_props) -> None:
+    def __init__(self, *args: LiteralSeriesProps) -> None:
         super().__init__(args)
         self._validate()
 
@@ -125,6 +127,8 @@ class OpenTimeSeriesPropertiesList(List[str]):
 
 
 class OpenFramePropertiesList(List[str]):
+    """Allowed property arguments for the OpenFrame class"""
+
     allowed_strings = {
         "value_ret",
         "geo_ret",
@@ -151,7 +155,7 @@ class OpenFramePropertiesList(List[str]):
         "span_of_days_all",
     }
 
-    def __init__(self, *args: Lit_frame_props) -> None:
+    def __init__(self, *args: LiteralFrameProps) -> None:
         super().__init__(args)
         self._validate()
 

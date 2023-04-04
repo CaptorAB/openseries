@@ -52,6 +52,7 @@ requests = "^2.28.1"
 scipy = "^1.9.3"
 statsmodels = "^0.13.5"
 types-python-dateutil = "^2.8.19.11"
+pylint = "^2.17.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "23.1.0"
@@ -82,3 +83,12 @@ include = ["openseries/*"]
 [tool.coverage.report]
 skip_empty = true
 fail_under = 99
+
+[tool.pylint]
+disable = "C0114, R0913, R0903, R0904, C2801"
+ignore = ["venv/*", ".venv"]
+max-line-length = 88
+output-format = "colorized"
+
+[tool.pylint.'MESSAGES CONTROL']
+extension-pkg-whitelist = "pydantic"

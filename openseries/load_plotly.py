@@ -17,14 +17,24 @@ def load_plotly_dict(
     ],
     Dict[str, str | float],
 ]:
+    """Function to load the plotly defaults
+
+    Parameters
+    ----------
+    responsive : bool
+
+    Returns
+    -------
+    A dictionary with the Plotly config and layout template
+    """
     project_root = dirname(dirname(abspath(__file__)))
     layoutfile = join(abspath(project_root), "openseries", "plotly_layouts.json")
     logofile = join(abspath(project_root), "openseries", "plotly_captor_logo.json")
 
-    with open(layoutfile, "r", encoding="utf-8") as f:
-        fig = load(f)
-    with open(logofile, "r", encoding="utf-8") as ff:
-        logo = load(ff)
+    with open(layoutfile, "r", encoding="utf-8") as layout_file:
+        fig = load(layout_file)
+    with open(logofile, "r", encoding="utf-8") as logo_file:
+        logo = load(logo_file)
 
     fig["config"].update({"responsive": responsive})
 

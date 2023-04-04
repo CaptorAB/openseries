@@ -11,7 +11,7 @@ from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.sim_price import ReturnSimulation
-from openseries.types import Lit_nan_method, Lit_frame_props
+from openseries.types import LiteralNanMethod, LiteralFrameProps
 
 
 class TestOpenFrame(TestCase):
@@ -1270,7 +1270,7 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(props, DataFrame)
 
         with self.assertRaises(ValueError) as e_boo:
-            faulty_props = cast(List[Lit_frame_props], ["geo_ret", "boo"])
+            faulty_props = cast(List[LiteralFrameProps], ["geo_ret", "boo"])
             _ = apframe.all_properties(properties=faulty_props)
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
@@ -2111,7 +2111,7 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_methd:
-            wrong_method = cast(Lit_nan_method, "other")
+            wrong_method = cast(LiteralNanMethod, "other")
             _ = nanframe.value_nan_handle(method=wrong_method)
 
         self.assertEqual(
@@ -2209,7 +2209,7 @@ class TestOpenFrame(TestCase):
         )
 
         with self.assertRaises(AssertionError) as e_methd:
-            wrong_method = cast(Lit_nan_method, "other")
+            wrong_method = cast(LiteralNanMethod, "other")
             _ = nanframe.return_nan_handle(method=wrong_method)
 
         self.assertEqual(

@@ -39,19 +39,19 @@ from stdnum.exceptions import InvalidChecksum
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
-    CountryPattern,
-    CurrencyPattern,
-    DataBaseIDPattern,
-    DatePattern,
-    Lit_quantile_interpolation,
-    Lit_bizday_frequencies,
-    Lit_pandas_resample_convention,
-    Lit_pandas_reindex_method,
-    Lit_nan_method,
-    Lit_line_plot_mode,
-    Lit_bar_plot_mode,
-    Lit_plotly_output,
-    Lit_series_props,
+    COUNTRYPATTERN,
+    CURRENCYPATTERN,
+    DATABASEIDPATTERN,
+    DATEPATTERN,
+    LiteralQuantileInterp,
+    LiteralBizDayFreq,
+    LiteralPandasResampleConvention,
+    LiteralPandasReindexMethod,
+    LiteralNanMethod,
+    LiteralLinePlotMode,
+    LiteralBarPlotMode,
+    LiteralPlotlyOutput,
+    LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
 )
 from openseries.risk import (
@@ -133,33 +133,35 @@ class OpenTimeSeries(BaseModel):
         Pandas object holding dates and values that can be altered via methods
     """
 
-    timeseriesId: constr(regex=DataBaseIDPattern)
-    instrumentId: constr(regex=DataBaseIDPattern)
-    currency: constr(regex=CurrencyPattern, to_upper=True, min_length=3, max_length=3)
+    timeseriesId: constr(regex=DATABASEIDPATTERN)
+    instrumentId: constr(regex=DATABASEIDPATTERN)
+    currency: constr(regex=CURRENCYPATTERN, to_upper=True, min_length=3, max_length=3)
     dates: conlist(
-        item_type=constr(regex=DatePattern),
+        item_type=constr(regex=DATEPATTERN),
         min_items=1,
         unique_items=True,
     )
     domestic: constr(
-        regex=CurrencyPattern, to_upper=True, min_length=3, max_length=3
+        regex=CURRENCYPATTERN, to_upper=True, min_length=3, max_length=3
     ) = "SEK"
     name: str
     isin: str | None = None
     label: str | None = None
     countries: conlist(
         item_type=constr(
-            regex=CountryPattern, to_upper=True, min_length=2, max_length=2
+            regex=COUNTRYPATTERN, to_upper=True, min_length=2, max_length=2
         ),
         min_items=1,
         unique_items=True,
-    ) | constr(regex=CountryPattern, to_upper=True, min_length=2, max_length=2) = "SE"
+    ) | constr(regex=COUNTRYPATTERN, to_upper=True, min_length=2, max_length=2) = "SE"
     valuetype: ValueType
     values: conlist(item_type=float, min_items=1)
     local_ccy: bool
     tsdf: DataFrame
 
     class Config:
+        """Configurations for the OpenTimeSeries class"""
+
         arbitrary_types_allowed = True
         validate_assignment = True
 
@@ -187,8 +189,8 @@ class OpenTimeSeries(BaseModel):
         countries: List[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
-        ccy_pattern = re_compile(CurrencyPattern)
-        ctry_pattern = re_compile(CountryPattern)
+        ccy_pattern = re_compile(CURRENCYPATTERN)
+        ctry_pattern = re_compile(COUNTRYPATTERN)
         try:
             ccy_ok = ccy_pattern.match(domestic_ccy)
         except TypeError as exc:
@@ -533,13 +535,13 @@ class OpenTimeSeries(BaseModel):
         return self
 
     def all_properties(
-        self: "OpenTimeSeries", properties: List[Lit_series_props] | None = None
+        self: "OpenTimeSeries", properties: List[LiteralSeriesProps] | None = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
         ----------
-        properties: List[Lit_series_props], optional
+        properties: List[LiteralSeriesProps], optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -550,7 +552,7 @@ class OpenTimeSeries(BaseModel):
 
         if not properties:
             properties = cast(
-                List[Lit_series_props], OpenTimeSeriesPropertiesList.allowed_strings
+                List[LiteralSeriesProps], OpenTimeSeriesPropertiesList.allowed_strings
             )
 
         props = OpenTimeSeriesPropertiesList(*properties)
@@ -1469,7 +1471,7 @@ class OpenTimeSeries(BaseModel):
             Downside 95% Value At Risk
         """
         level: float = 0.95
-        interpolation: Lit_quantile_interpolation = "lower"
+        interpolation: LiteralQuantileInterp = "lower"
         return float(
             self.tsdf.pct_change().quantile(1 - level, interpolation=interpolation)
         )
@@ -1480,7 +1482,7 @@ class OpenTimeSeries(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Lit_quantile_interpolation = "lower",
+        interpolation: LiteralQuantileInterp = "lower",
     ) -> float:
         """https://www.investopedia.com/terms/v/var.asp
         Downside Value At Risk, "VaR". The equivalent of
@@ -1498,7 +1500,7 @@ class OpenTimeSeries(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Lit_quantile_interpolation, default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -1524,7 +1526,7 @@ class OpenTimeSeries(BaseModel):
             assumption that returns are normally distributed.
         """
         level: float = 0.95
-        interpolation: Lit_quantile_interpolation = "lower"
+        interpolation: LiteralQuantileInterp = "lower"
         return float(
             -sqrt(self.periods_in_a_year)
             * self.var_down_func(level, interpolation=interpolation)
@@ -1537,7 +1539,7 @@ class OpenTimeSeries(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Lit_quantile_interpolation = "lower",
+        interpolation: LiteralQuantileInterp = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
@@ -1554,7 +1556,7 @@ class OpenTimeSeries(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Lit_quantile_interpolation, default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
@@ -1618,7 +1620,7 @@ class OpenTimeSeries(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Lit_quantile_interpolation = "lower",
+        interpolation: LiteralQuantileInterp = "lower",
         drift_adjust: bool = False,
         periods_in_a_year_fixed: int | None = None,
     ) -> float:
@@ -1642,7 +1644,7 @@ class OpenTimeSeries(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Lit_quantile_interpolation, default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
@@ -1773,13 +1775,13 @@ class OpenTimeSeries(BaseModel):
         return self
 
     def resample(
-        self: "OpenTimeSeries", freq: Union[Lit_bizday_frequencies, str] = "BM"
+        self: "OpenTimeSeries", freq: Union[LiteralBizDayFreq, str] = "BM"
     ) -> "OpenTimeSeries":
         """Resamples the timeseries frequency
 
         Parameters
         ----------
-        freq: Union[Lit_bizday_frequencies, str], default "BM"
+        freq: Union[LiteralBizDayFreq, str], default "BM"
             The date offset string that sets the resampled frequency
             Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 
@@ -1796,9 +1798,9 @@ class OpenTimeSeries(BaseModel):
 
     def resample_to_business_period_ends(
         self: "OpenTimeSeries",
-        freq: Lit_bizday_frequencies = "BM",
-        convention: Lit_pandas_resample_convention = "end",
-        method: Lit_pandas_reindex_method = "nearest",
+        freq: LiteralBizDayFreq = "BM",
+        convention: LiteralPandasResampleConvention = "end",
+        method: LiteralPandasReindexMethod = "nearest",
     ) -> "OpenTimeSeries":
         """Resamples timeseries frequency to the business calendar
         month end dates of each period while leaving any stubs
@@ -1806,11 +1808,11 @@ class OpenTimeSeries(BaseModel):
 
         Parameters
         ----------
-        freq: Lit_bizday_frequencies, default BM
+        freq: LiteralBizDayFreq, default BM
             The date offset string that sets the resampled frequency
-        convention: Lit_pandas_resample_convention, default; end
+        convention: LiteralPandasResampleConvention, default; end
             Controls whether to use the start or end of `rule`.
-        method: Lit_pandas_reindex_method, default: nearest
+        method: LiteralPandasReindexMethod, default: nearest
             Controls the method used to align values across columns
 
         Returns
@@ -2034,7 +2036,7 @@ class OpenTimeSeries(BaseModel):
         self: "OpenTimeSeries",
         level: float = 0.95,
         observations: int = 252,
-        interpolation: Lit_quantile_interpolation = "lower",
+        interpolation: LiteralQuantileInterp = "lower",
     ) -> DataFrame:
         """
         Parameters
@@ -2043,7 +2045,7 @@ class OpenTimeSeries(BaseModel):
             The sought Value At Risk level
         observations: int, default: 252
             Number of observations in the overlapping window.
-        interpolation: Lit_quantile_interpolation, default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -2061,13 +2063,13 @@ class OpenTimeSeries(BaseModel):
         return vardf
 
     def value_nan_handle(
-        self: "OpenTimeSeries", method: Lit_nan_method = "fill"
+        self: "OpenTimeSeries", method: LiteralNanMethod = "fill"
     ) -> "OpenTimeSeries":
         """Handling of missing values in a valueseries
 
         Parameters
         ----------
-        method: Lit_nan_method, default: "fill"
+        method: LiteralNanMethod, default: "fill"
             Method used to handle NaN. Either fill with last known or drop
 
         Returns
@@ -2087,13 +2089,13 @@ class OpenTimeSeries(BaseModel):
         return self
 
     def return_nan_handle(
-        self: "OpenTimeSeries", method: Lit_nan_method = "fill"
+        self: "OpenTimeSeries", method: LiteralNanMethod = "fill"
     ) -> "OpenTimeSeries":
         """Handling of missing values in a returnseries
 
         Parameters
         ----------
-        method: Lit_nan_method, default: "fill"
+        method: LiteralNanMethod, default: "fill"
             Method used to handle NaN. Either fill with zero or drop
 
         Returns
@@ -2203,19 +2205,19 @@ class OpenTimeSeries(BaseModel):
 
     def plot_series(
         self: "OpenTimeSeries",
-        mode: Lit_line_plot_mode = "lines",
+        mode: LiteralLinePlotMode = "lines",
         tick_fmt: str | None = None,
         directory: str | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
-        output_type: Lit_plotly_output = "file",
+        output_type: LiteralPlotlyOutput = "file",
     ) -> Tuple[Figure, str]:
         """Creates a Plotly Figure
 
         Parameters
         ----------
-        mode: Lit_line_plot_mode, default: "lines"
+        mode: LiteralLinePlotMode, default: "lines"
             The type of scatter to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
@@ -2227,7 +2229,7 @@ class OpenTimeSeries(BaseModel):
             If True a Captor logo is added to the plot
         show_last: bool, default: False
             If True the last data point is highlighted as red dot with a label
-        output_type: Lit_plotly_output, default: "file"
+        output_type: LiteralPlotlyOutput, default: "file"
             Determines output type
 
         Returns
@@ -2296,18 +2298,18 @@ class OpenTimeSeries(BaseModel):
 
     def plot_bars(
         self: "OpenTimeSeries",
-        mode: Lit_bar_plot_mode = "group",
+        mode: LiteralBarPlotMode = "group",
         tick_fmt: str | None = None,
         directory: str | None = None,
         auto_open: bool = True,
         add_logo: bool = True,
-        output_type: Lit_plotly_output = "file",
+        output_type: LiteralPlotlyOutput = "file",
     ) -> Tuple[Figure, str]:
         """Creates a Plotly Bar Figure
 
         Parameters
         ----------
-        mode: Lit_bar_plot_mode, default: "group"
+        mode: LiteralBarPlotMode, default: "group"
             The type of bar to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
@@ -2317,7 +2319,7 @@ class OpenTimeSeries(BaseModel):
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
-        output_type: Lit_plotly_output, default: "file"
+        output_type: LiteralPlotlyOutput, default: "file"
             Determines output type
 
         Returns

@@ -12,10 +12,11 @@ Processes that can be simulated in this module are:
 - Ornstein Uhlenbeck
 
 """
-from math import log, pow, sqrt
+from math import log, sqrt
+from math import pow as mathpow
+from typing import Any, List, Tuple
 from numpy import add, array, dtype, ndarray, exp, float64
 import numpy.random as nrand
-from typing import Any, List, Tuple
 
 from openseries.types import ModelParameters
 
@@ -53,9 +54,9 @@ def convert_to_prices(
     returns = exp(log_returns)
     # A sequence of prices starting with param.all_s0
     price_sequence: List[float] = [param.all_s0]
-    for n in range(1, len(returns)):
+    for rtn in range(1, len(returns)):
         # Add the price at t-1 * return at t
-        price_sequence.append(price_sequence[n - 1] * returns[n - 1])
+        price_sequence.append(price_sequence[rtn - 1] * returns[rtn - 1])
     return array(price_sequence)
 
 
@@ -130,7 +131,7 @@ def geometric_brownian_motion_log_returns(
 
     wiener_process = array(brownian_motion_log_returns(param, seed=seed))
     sigma_pow_mu_delta = (
-        param.gbm_mu - 0.5 * pow(param.all_sigma, 2.0)
+        param.gbm_mu - 0.5 * mathpow(param.all_sigma, 2.0)
     ) * param.all_delta
     return wiener_process + sigma_pow_mu_delta
 
@@ -184,7 +185,7 @@ def jump_diffusion_process(
     time = 0
     small_lamda = -(1.0 / param.jumps_lamda)
     jump_sizes: List[float] = []
-    for k in range(0, param.all_time):
+    for _ in range(0, param.all_time):
         jump_sizes.append(0.0)
     while s_n < param.all_time:
         s_n += small_lamda * log(nrand.uniform(0, 1))
@@ -280,9 +281,9 @@ def heston_construct_correlated_path(
     sqrt_delta = sqrt(param.all_delta)
     # Construct a path correlated to the first path
     brownian_motion_two = []
-    for n in range(param.all_time - 1):
-        term_one = param.cir_rho * brownian_motion_one[n]
-        term_two = sqrt(1 - pow(param.cir_rho, 2.0)) * nrand.normal(0, sqrt_delta)
+    for npath in range(param.all_time - 1):
+        term_one = param.cir_rho * brownian_motion_one[npath]
+        term_two = sqrt(1 - mathpow(param.cir_rho, 2.0)) * nrand.normal(0, sqrt_delta)
         brownian_motion_two.append(term_one + term_two)
     return array(brownian_motion_one), array(brownian_motion_two)
 
@@ -318,12 +319,13 @@ def cox_ingersoll_ross_heston(
     brownian_motion_volatility = nrand.normal(
         loc=0, scale=sqrt_delta_sigma, size=param.all_time
     )
-    a, mu, zero = param.heston_a, param.heston_mu, param.heston_vol0
-    volatilities: List[float] = [zero]
-    for h in range(1, param.all_time):
-        drift = a * (mu - volatilities[-1]) * param.all_delta
+    meanrev_vol, avg_vol, start_vol = param.heston_a, param.heston_mu, param.heston_vol0
+    volatilities: List[float] = [start_vol]
+    for hpath in range(1, param.all_time):
+        drift = meanrev_vol * (avg_vol - volatilities[-1]) * param.all_delta
         randomness = (
-            sqrt(max(volatilities[h - 1], 0.05)) * brownian_motion_volatility[h - 1]
+            sqrt(max(volatilities[hpath - 1], 0.05))
+            * brownian_motion_volatility[hpath - 1]
         )
         volatilities.append(max(volatilities[-1], 0.05) + drift + randomness)
     return array(brownian_motion_volatility), array(volatilities)
@@ -360,15 +362,15 @@ def heston_model_levels(
     )
 
     heston_market_price_levels: List[float] = [param.all_s0]
-    for h in range(1, param.all_time):
-        drift = param.gbm_mu * heston_market_price_levels[h - 1] * param.all_delta
+    for hpath in range(1, param.all_time):
+        drift = param.gbm_mu * heston_market_price_levels[hpath - 1] * param.all_delta
         vol = (
-            cir_process[h - 1]
-            * heston_market_price_levels[h - 1]
-            * brownian_motion_market[h - 1]
+            cir_process[hpath - 1]
+            * heston_market_price_levels[hpath - 1]
+            * brownian_motion_market[hpath - 1]
         )
         heston_market_price_levels.append(
-            heston_market_price_levels[h - 1] + drift + vol
+            heston_market_price_levels[hpath - 1] + drift + vol
         )
     return array(heston_market_price_levels), array(cir_process)
 
@@ -398,13 +400,13 @@ def cox_ingersoll_ross_levels(
 
     brownian_motion = brownian_motion_log_returns(param, seed=seed)
     # Set up the parameters for interest rates
-    a, mu, zero = param.cir_a, param.cir_mu, param.all_r0
+    cir_mean_rev, cir_avg_ir, start_ir = param.cir_a, param.cir_mu, param.all_r0
     # Assumes output is in levels
-    levels: List[float] = [zero]
-    for h in range(1, param.all_time):
-        drift = a * (mu - levels[h - 1]) * param.all_delta
-        randomness = sqrt(levels[h - 1]) * brownian_motion[h - 1]
-        levels.append(levels[h - 1] + drift + randomness)
+    levels: List[float] = [start_ir]
+    for hpath in range(1, param.all_time):
+        drift = cir_mean_rev * (cir_avg_ir - levels[hpath - 1]) * param.all_delta
+        randomness = sqrt(levels[hpath - 1]) * brownian_motion[hpath - 1]
+        levels.append(levels[hpath - 1] + drift + randomness)
     return array(levels)
 
 
@@ -429,8 +431,8 @@ def ornstein_uhlenbeck_levels(
 
     ou_levels: List[float] = [param.all_r0]
     brownian_motion_returns = brownian_motion_log_returns(param, seed=seed)
-    for h in range(1, param.all_time):
-        drift = param.ou_a * (param.ou_mu - ou_levels[h - 1]) * param.all_delta
-        randomness = brownian_motion_returns[h - 1]
-        ou_levels.append(ou_levels[h - 1] + drift + randomness)
+    for hpath in range(1, param.all_time):
+        drift = param.ou_a * (param.ou_mu - ou_levels[hpath - 1]) * param.all_delta
+        randomness = brownian_motion_returns[hpath - 1]
+        ou_levels.append(ou_levels[hpath - 1] + drift + randomness)
     return array(ou_levels)

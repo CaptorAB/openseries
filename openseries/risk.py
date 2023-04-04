@@ -4,6 +4,7 @@ https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
 from math import ceil
+from typing import cast, List
 from numpy import (
     Inf,
     isnan,
@@ -14,9 +15,8 @@ from numpy import (
     sort,
 )
 from pandas import DataFrame, Series
-from typing import cast, List
 
-from openseries.types import Lit_quantile_interpolation
+from openseries.types import LiteralQuantileInterp
 
 
 def cvar_down(data: DataFrame | Series | List[float], level: float = 0.95) -> float:
@@ -47,7 +47,7 @@ def cvar_down(data: DataFrame | Series | List[float], level: float = 0.95) -> fl
 def var_down(
     data: DataFrame | Series | List[float],
     level: float = 0.95,
-    interpolation: Lit_quantile_interpolation = "lower",
+    interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
     """Downside Value At Risk, "VaR". The equivalent of
     percentile.inc([...], 1-level) over returns in MS Excel \n
@@ -59,7 +59,7 @@ def var_down(
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
-    interpolation: Lit_quantile_interpolation, default: "lower"
+    interpolation: LiteralQuantileInterp, default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
 
     Returns
