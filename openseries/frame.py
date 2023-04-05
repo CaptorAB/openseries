@@ -1,11 +1,15 @@
 from copy import deepcopy
 import datetime as dt
-from dateutil.relativedelta import relativedelta
 from functools import reduce
 from logging import warning
 from math import ceil
-from numpy import cov, cumprod, log, sqrt, square, zeros
 from os import path
+from pathlib import Path
+from random import choices
+from string import ascii_letters
+from typing import cast, List, Tuple, Union
+from dateutil.relativedelta import relativedelta
+from numpy import cov, cumprod, log, sqrt, square, zeros
 from pandas import (
     concat,
     DataFrame,
@@ -17,18 +21,14 @@ from pandas import (
     Series,
 )
 from pandas.tseries.offsets import CustomBusinessDay
-from pathlib import Path
 from plotly.graph_objs import Figure
 from plotly.offline import plot
 from pydantic import BaseModel, validator
-from random import choices
 from scipy.stats import kurtosis, norm, skew
 import statsmodels.api as sm
 
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
-from string import ascii_letters
-from typing import cast, List, Tuple, Union
 
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -84,6 +84,7 @@ class OpenFrame(BaseModel):
 
     @validator("constituents")
     def check_labels_unique(cls, tseries: List[OpenTimeSeries]) -> List[OpenTimeSeries]:
+        """Pydantic validator ensuring that OpenFrame labels are unique"""
         labls = [x.label for x in tseries]
         if len(set(labls)) != len(labls):
             raise ValueError("TimeSeries names/labels must be unique")
@@ -144,11 +145,11 @@ class OpenFrame(BaseModel):
             [x.tsdf for x in self.constituents],
         )
         if self.tsdf.empty:
-            raise Exception(
+            raise ValueError(
                 f"Merging OpenTimeSeries DataFrames with "
                 f"argument how={how} produced an empty DataFrame."
             )
-        elif how == "inner":
+        if how == "inner":
             for x in self.constituents:
                 x.tsdf = x.tsdf.loc[self.tsdf.index]
         return self
@@ -437,7 +438,7 @@ class OpenFrame(BaseModel):
         """
 
         if self.tsdf.iloc[0].isin([0.0]).any() or self.tsdf.lt(0.0).any().any():
-            raise Exception(
+            raise ValueError(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
             )
@@ -477,7 +478,7 @@ class OpenFrame(BaseModel):
             self.tsdf.loc[earlier].isin([0.0]).any()
             or self.tsdf.loc[[earlier, later]].lt(0.0).any().any()
         ):
-            raise Exception(
+            raise ValueError(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
             )
@@ -563,16 +564,15 @@ class OpenFrame(BaseModel):
         """
 
         if self.tsdf.iloc[0].isin([0.0]).any():
-            raise Exception(
+            raise ValueError(
                 f"Error in function value_ret due to an initial value "
                 f"being zero. ({self.tsdf.head(3)})"
             )
-        else:
-            return Series(
-                data=self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1,
-                name="Total return",
-                dtype="float64",
-            )
+        return Series(
+            data=self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1,
+            name="Total return",
+            dtype="float64",
+        )
 
     def value_ret_func(
         self: "OpenFrame",
@@ -599,7 +599,7 @@ class OpenFrame(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if self.tsdf.iloc[0].isin([0.0]).any():
-            raise Exception(
+            raise ValueError(
                 f"Error in function value_ret due to an initial value "
                 f"being zero. ({self.tsdf.head(3)})"
             )
@@ -865,7 +865,7 @@ class OpenFrame(BaseModel):
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
-                raise Exception(
+                raise ValueError(
                     "base_column should be a Tuple[str, ValueType] or an integer."
                 )
 
@@ -887,21 +887,18 @@ class OpenFrame(BaseModel):
                 name=f"Sharpe Ratios vs {riskfree_label}",
                 dtype="float64",
             )
-        else:
-            for item in self.tsdf:
-                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                    :, item
-                ]
-                ret = float(longdf.pct_change().mean() * time_factor)
-                vol = float(longdf.pct_change().std() * sqrt(time_factor))
-                ratios.append((ret - riskfree_rate) / vol)
+        for item in self.tsdf:
+            longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[:, item]
+            ret = float(longdf.pct_change().mean() * time_factor)
+            vol = float(longdf.pct_change().std() * sqrt(time_factor))
+            ratios.append((ret - riskfree_rate) / vol)
 
-            return Series(
-                data=ratios,
-                index=self.tsdf.columns,
-                name=f"Sharpe Ratios (rf={riskfree_rate:.2%})",
-                dtype="float64",
-            )
+        return Series(
+            data=ratios,
+            index=self.tsdf.columns,
+            name=f"Sharpe Ratios (rf={riskfree_rate:.2%})",
+            dtype="float64",
+        )
 
     def jensen_alpha(
         self: "OpenFrame",
@@ -931,10 +928,7 @@ class OpenFrame(BaseModel):
             Jensen's alpha
         """
         if all(
-            [
-                True if x == ValueType.RTRN else False
-                for x in self.tsdf.columns.get_level_values(1).values
-            ]
+            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
         ):
             if isinstance(asset, tuple):
                 asset_log = self.tsdf.loc[:, asset]
@@ -943,7 +937,7 @@ class OpenFrame(BaseModel):
                 asset_log = self.tsdf.iloc[:, asset]
                 asset_cagr = asset_log.mean()
             else:
-                raise Exception(
+                raise ValueError(
                     "asset should be a Tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
@@ -953,7 +947,7 @@ class OpenFrame(BaseModel):
                 market_log = self.tsdf.iloc[:, market]
                 market_cagr = market_log.mean()
             else:
-                raise Exception(
+                raise ValueError(
                     "market should be a Tuple[str, ValueType] or an integer."
                 )
         else:
@@ -983,7 +977,7 @@ class OpenFrame(BaseModel):
                         self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
                     )
             else:
-                raise Exception(
+                raise ValueError(
                     "asset should be a Tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
@@ -1012,7 +1006,7 @@ class OpenFrame(BaseModel):
                         self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
                     )
             else:
-                raise Exception(
+                raise ValueError(
                     "market should be a Tuple[str, ValueType] or an integer."
                 )
 
@@ -1103,7 +1097,7 @@ class OpenFrame(BaseModel):
                 riskfree_item = self.tsdf.iloc[:, riskfree_column].name
                 riskfree_label = self.tsdf.iloc[:, riskfree_column].name[0]
             else:
-                raise Exception(
+                raise ValueError(
                     "base_column should be a Tuple[str, ValueType] or an integer."
                 )
 
@@ -1129,25 +1123,22 @@ class OpenFrame(BaseModel):
                 name=f"Sortino Ratios vs {riskfree_label}",
                 dtype="float64",
             )
-        else:
-            for item in self.tsdf:
-                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                    :, item
-                ]
-                ret = float(longdf.pct_change().mean() * time_factor)
-                dddf = longdf.pct_change()
-                downdev = float(
-                    sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-                    * sqrt(time_factor)
-                )
-                ratios.append((ret - riskfree_rate) / downdev)
-
-            return Series(
-                data=ratios,
-                index=self.tsdf.columns,
-                name=f"Sortino Ratios (rf={riskfree_rate:.2%},mar=0.0%)",
-                dtype="float64",
+        for item in self.tsdf:
+            longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[:, item]
+            ret = float(longdf.pct_change().mean() * time_factor)
+            dddf = longdf.pct_change()
+            downdev = float(
+                sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
+                * sqrt(time_factor)
             )
+            ratios.append((ret - riskfree_rate) / downdev)
+
+        return Series(
+            data=ratios,
+            index=self.tsdf.columns,
+            name=f"Sortino Ratios (rf={riskfree_rate:.2%},mar=0.0%)",
+            dtype="float64",
+        )
 
     @property
     def z_score(self: "OpenFrame") -> Series:
@@ -1277,9 +1268,9 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Maximum drawdown in a single calendar year.
         """
-
+        years = [d.year for d in self.tsdf.index]
         md = (
-            self.tsdf.groupby([DatetimeIndex(self.tsdf.index).year])
+            self.tsdf.groupby(years)
             .apply(
                 lambda prices: (prices / prices.expanding(min_periods=1).max()).min()
                 - 1
@@ -1526,20 +1517,15 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def cvar_down(self: "OpenFrame", level: float = 0.95) -> Series:
+    def cvar_down(self: "OpenFrame") -> Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
-
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought CVaR level
 
         Returns
         -------
         Pandas.Series
-            Downside Conditional Value At Risk "CVaR"
+            Downside 95% Conditional Value At Risk "CVaR"
         """
-
+        level: float = 0.95
         cvar_df = self.tsdf.copy(deep=True)
         var_list = [
             cvar_df.loc[:, x]
@@ -1601,29 +1587,18 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def var_down(
-        self: "OpenFrame",
-        level: float = 0.95,
-        interpolation: LiteralQuantileInterp = "lower",
-    ) -> Series:
-        """Downside Value At Risk, "VaR". The equivalent of
+    def var_down(self: "OpenFrame") -> Series:
+        """Downside 95% Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
         https://www.investopedia.com/terms/v/var.asp
-
-        Parameters
-        ----------
-
-        level: float, default: 0.95
-            The sought VaR level
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
         -------
         Pandas.Series
-            Downside Value At Risk
+            Downside 95% Value At Risk
         """
-
+        level: float = 0.95
+        interpolation: LiteralQuantileInterp = "lower"
         return Series(
             data=self.tsdf.pct_change().quantile(
                 1 - level, interpolation=interpolation
@@ -1675,27 +1650,16 @@ class OpenFrame(BaseModel):
         )
 
     @property
-    def vol_from_var(
-        self: "OpenFrame",
-        level: float = 0.95,
-        interpolation: LiteralQuantileInterp = "lower",
-    ) -> Series:
+    def vol_from_var(self: "OpenFrame") -> Series:
         """
-        Parameters
-        ----------
-
-        level: float, default: 0.95
-            The sought VaR level
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-
         Returns
         -------
         Pandas.Series
-            Implied annualized volatility from the Downside VaR using the
+            Implied annualized volatility from the Downside 95% VaR using the
             assumption that returns are normally distributed.
         """
-
+        level: float = 0.95
+        interpolation: LiteralQuantileInterp = "lower"
         imp_vol = (
             -sqrt(self.periods_in_a_year)
             * self.var_down_func(interpolation=interpolation)
@@ -1899,10 +1863,7 @@ class OpenFrame(BaseModel):
             An OpenFrame object
         """
         if any(
-            [
-                True if x == ValueType.PRICE else False
-                for x in self.tsdf.columns.get_level_values(1).values
-            ]
+            x == ValueType.PRICE for x in self.tsdf.columns.get_level_values(1).values
         ):
             self.value_to_ret()
 
@@ -2529,7 +2490,7 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception(
+            raise ValueError(
                 "base_column should be a Tuple[str, ValueType] or an integer."
             )
 
@@ -2607,7 +2568,7 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception(
+            raise ValueError(
                 "base_column should be a Tuple[str, ValueType] or an integer."
             )
 
@@ -2698,7 +2659,7 @@ class OpenFrame(BaseModel):
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise Exception(
+            raise ValueError(
                 "base_column should be a Tuple[str, ValueType] or an integer."
             )
 
@@ -2821,17 +2782,14 @@ class OpenFrame(BaseModel):
             Beta as Co-variance of x & y divided by Variance of x
         """
         if all(
-            [
-                True if x == ValueType.RTRN else False
-                for x in self.tsdf.columns.get_level_values(1).values
-            ]
+            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
         ):
             if isinstance(asset, tuple):
                 y = self.tsdf.loc[:, asset]
             elif isinstance(asset, int):
                 y = self.tsdf.iloc[:, asset]
             else:
-                raise Exception(
+                raise ValueError(
                     "asset should be a Tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
@@ -2839,7 +2797,7 @@ class OpenFrame(BaseModel):
             elif isinstance(market, int):
                 x = self.tsdf.iloc[:, market]
             else:
-                raise Exception(
+                raise ValueError(
                     "market should be a Tuple[str, ValueType] or an integer."
                 )
         else:
@@ -2848,7 +2806,7 @@ class OpenFrame(BaseModel):
             elif isinstance(asset, int):
                 y = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
-                raise Exception(
+                raise ValueError(
                     "asset should be a Tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
@@ -2856,7 +2814,7 @@ class OpenFrame(BaseModel):
             elif isinstance(market, int):
                 x = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
             else:
-                raise Exception(
+                raise ValueError(
                     "market should be a Tuple[str, ValueType] or an integer."
                 )
 
@@ -2897,7 +2855,9 @@ class OpenFrame(BaseModel):
             y = self.tsdf.iloc[:, y_column]
             y_label = self.tsdf.iloc[:, y_column].name[0]
         else:
-            raise Exception("y_column should be a Tuple[str, ValueType] or an integer.")
+            raise ValueError(
+                "y_column should be a Tuple[str, ValueType] or an integer."
+            )
 
         if isinstance(x_column, tuple):
             x = self.tsdf.loc[:, x_column]
@@ -2906,7 +2866,9 @@ class OpenFrame(BaseModel):
             x = self.tsdf.iloc[:, x_column]
             x_label = self.tsdf.iloc[:, x_column].name[0]
         else:
-            raise Exception("x_column should be a Tuple[str, ValueType] or an integer.")
+            raise ValueError(
+                "x_column should be a Tuple[str, ValueType] or an integer."
+            )
 
         results = sm.OLS(y, x).fit()
         if fitted_series:
@@ -2928,16 +2890,13 @@ class OpenFrame(BaseModel):
             A basket timeseries
         """
         if self.weights is None:
-            raise Exception(
+            raise ValueError(
                 "OpenFrame weights property must be provided to run the "
                 "make_portfolio method."
             )
         df = self.tsdf.copy()
         if not any(
-            [
-                True if x == ValueType.RTRN else False
-                for x in self.tsdf.columns.get_level_values(1).values
-            ]
+            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
         ):
             df = df.pct_change()
             df.iloc[0] = 0
@@ -3147,11 +3106,11 @@ class OpenFrame(BaseModel):
                 x=self.tsdf.index,
                 y=self.tsdf.iloc[:, item],
                 hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-                line=dict(width=2.5, dash="solid"),
+                line={"width": 2.5, "dash": "solid"},
                 mode=mode,
                 name=labels[item],
             )
-        figure.update_layout(yaxis=dict(tickformat=tick_fmt))
+        figure.update_layout(yaxis={"tickformat": tick_fmt})
 
         if add_logo:
             figure.add_layout_image(logo)
@@ -3251,7 +3210,7 @@ class OpenFrame(BaseModel):
                 name=labels[item],
                 opacity=opacity,
             )
-        figure.update_layout(barmode=mode, yaxis=dict(tickformat=tick_fmt))
+        figure.update_layout(barmode=mode, yaxis={"tickformat": tick_fmt})
 
         if add_logo:
             figure.add_layout_image(logo)

@@ -84,6 +84,8 @@ def check_if_none(item: Any) -> bool:
 
 
 class ValueType(str, Enum):
+    """Class defining the different timeseries types within the project"""
+
     EWMA = "EWMA"
     PRICE = "Price(Close)"
     RTRN = "Return(Total)"
@@ -167,6 +169,7 @@ class OpenTimeSeries(BaseModel):
 
     @validator("isin")
     def check_isincode(cls, isin_code: str) -> str:
+        """Pydantic validator to ensure that the ISIN code is valid if provided"""
         if isin_code:
             try:
                 isincode.validate(isin_code)
@@ -195,7 +198,7 @@ class OpenTimeSeries(BaseModel):
             ccy_ok = ccy_pattern.match(domestic_ccy)
         except TypeError as exc:
             raise ValueError(
-                "domestic currency must be a code according to " "ISO 4217"
+                "domestic currency must be a code according to ISO 4217"
             ) from exc
         if not ccy_ok:
             raise ValueError("domestic currency must be a code according to ISO 4217")
@@ -1522,7 +1525,7 @@ class OpenTimeSeries(BaseModel):
         Returns
         -------
         float
-            Implied annualized volatility from the Downside VaR using the
+            Implied annualized volatility from the Downside 95% VaR using the
             assumption that returns are normally distributed.
         """
         level: float = 0.95

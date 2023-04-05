@@ -85,8 +85,8 @@ skip_empty = true
 fail_under = 99
 
 [tool.pylint]
-disable = "C0114, R0913, R0903, R0904, C2801"
-ignore = ["venv/*", ".venv"]
+disable = "C0114, C0302, C2801, R0801, R0903, R0904, R0912, R0913, R0914, R0915"
+ignore = ["venv", "tests"]
 max-line-length = 88
 output-format = "colorized"
 
