@@ -2071,7 +2071,7 @@ class OpenFrame(BaseModel):
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         for rtn in cols:
-            data[rtn, "Returns"] = log(data.loc[:, (rtn, ValueType.PRICE)]).diff()
+            data[rtn, "Returns"] = data.loc[:, (rtn, ValueType.PRICE)].apply(log).diff()
             data[rtn, ValueType.EWMA] = zeros(how_many)
             data.loc[:, (rtn, ValueType.EWMA)].iloc[0] = data.loc[
                 :, (rtn, "Returns")

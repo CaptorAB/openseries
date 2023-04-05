@@ -1,8 +1,8 @@
 import datetime as dt
-from numpy import datetime64
-from pandas import Timestamp
 from typing import cast, Dict, List, Union
 from unittest import TestCase
+from numpy import datetime64
+from pandas import Timestamp
 
 from openseries.datefixer import (
     date_fix,
@@ -174,7 +174,7 @@ class TestDateFixer(TestCase):
         for st, en in zip([2023, 2024], [2023, 2022]):
             cdr = holiday_calendar(startyear=st, endyear=en, countries="SE")
             check = all(
-                date_str in cdr.holidays for date_str in twentytwentythreeholidays
+                date_str in list(cdr.holidays) for date_str in twentytwentythreeholidays
             )
             self.assertTrue(check)
 
@@ -191,7 +191,7 @@ class TestDateFixer(TestCase):
         ]
         cdr_without = holiday_calendar(startyear=2021, endyear=2021, countries="SE")
         hols_without = [
-            date_fix(d) for d in cdr_without.holidays if date_fix(d).year == 2021
+            date_fix(d) for d in list(cdr_without.holidays) if date_fix(d).year == 2021
         ]
         self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_without)
 
@@ -208,7 +208,9 @@ class TestDateFixer(TestCase):
         cdr_with = holiday_calendar(
             startyear=2021, endyear=2021, countries="SE", custom_holidays=jacks_birthday
         )
-        hols_with = [date_fix(d) for d in cdr_with.holidays if date_fix(d).year == 2021]
+        hols_with = [
+            date_fix(d) for d in list(cdr_with.holidays) if date_fix(d).year == 2021
+        ]
 
         with self.assertRaises(AssertionError) as e_jack:
             self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)

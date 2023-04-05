@@ -1940,9 +1940,9 @@ class OpenTimeSeries(BaseModel):
 
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
-        data[self.label, "Returns"] = log(
-            data.loc[:, (self.label, ValueType.PRICE)]
-        ).diff()
+        data[self.label, "Returns"] = (
+            data.loc[:, (self.label, ValueType.PRICE)].apply(log).diff()
+        )
         data[self.label, ValueType.EWMA] = zeros(how_many)
         data.loc[:, (self.label, ValueType.EWMA)].iloc[0] = data.loc[
             :, (self.label, "Returns")

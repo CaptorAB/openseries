@@ -2,13 +2,13 @@ import datetime as dt
 from io import StringIO
 from json import load, loads
 from os import path, remove
+import sys
+from typing import cast, Dict, get_type_hints, List, Union
+from unittest import TestCase
 from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pandas.tseries.offsets import CustomBusinessDay
 from pydantic.error_wrappers import ValidationError as PydanticValidationError
 import pytest
-import sys
-from typing import cast, Dict, get_type_hints, List, Union
-from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
 from openseries.series import (
@@ -292,7 +292,7 @@ class TestOpenTimeSeries(TestCase):
 
     def test_opentimeseries_duplicates_handling(self: "TestOpenTimeSeries") -> None:
         json_file = path.join(path.dirname(path.abspath(__file__)), "series.json")
-        with open(json_file, "r") as ff:
+        with open(json_file, "r", encoding="utf-8") as ff:
             output = load(ff)
 
         dates = (
@@ -376,8 +376,8 @@ class TestOpenTimeSeries(TestCase):
             "values": [1.0, 1.01, 0.99, 1.015, 1.003],
             "valuetype": ValueType.PRICE,
         }
-        df_data = dict(**data, tsdf=df)
-        serie_data = dict(**data, tsdf=serie)
+        df_data = {"tsdf": df, **data}
+        serie_data = {"tsdf": serie, **data}
 
         df_obj = OpenTimeSeries.parse_obj(df_data)
         self.assertListEqual(list(df_obj.tsdf.values), df_obj.values)

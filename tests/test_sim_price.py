@@ -1,6 +1,6 @@
-from pandas import DataFrame
 from typing import Dict, get_type_hints, List
 from unittest import TestCase
+from pandas import DataFrame
 
 from openseries.sim_price import ReturnSimulation
 

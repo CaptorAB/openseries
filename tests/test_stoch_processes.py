@@ -1,7 +1,7 @@
 from datetime import date as dtdate
-from pandas import DataFrame, date_range
 from typing import cast, get_type_hints, List
 from unittest import TestCase
+from pandas import DataFrame, date_range
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries, ValueType

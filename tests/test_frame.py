@@ -1,10 +1,10 @@
 from datetime import date as dtdate
 from json import loads
+from typing import cast, get_type_hints, List, Tuple, Union
+from unittest import TestCase
 from pandas import DataFrame, date_range, DatetimeIndex
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
-from typing import cast, get_type_hints, List, Tuple, Union
-from unittest import TestCase
 
 from openseries.datefixer import holiday_calendar
 from openseries.frame import OpenFrame
