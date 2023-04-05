@@ -33,6 +33,7 @@ elseif ($task -eq "lint") {
         Write-Host $lintresult
     }
     poetry run mypy .
+    poetry run pylint ./*
 }
 elseif ($task -eq "clean") {
     # remove virtual environment to start over
