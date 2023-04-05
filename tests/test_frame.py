@@ -6,7 +6,7 @@ from pandas import DataFrame, date_range, DatetimeIndex
 from pandas.testing import assert_frame_equal
 from pandas.tseries.offsets import CustomBusinessDay
 
-from openseries.datefixer import holiday_calendar
+from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
@@ -2673,7 +2673,6 @@ class TestOpenFrame(TestCase):
             e_market.exception.args[0],
             "market should be a Tuple[str, ValueType] or an integer.",
         )
-        from openseries.datefixer import date_offset_foll
 
         ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
         shortframe = jframe.trunc_frame(start_cut=ninemth)

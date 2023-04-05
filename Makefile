@@ -16,7 +16,7 @@ test:
 lint:
 	PYTHONPATH=${PWD} poetry run flake8 .
 	PYTHONPATH=${PWD} poetry run mypy .
-	PYTHONPATH=${PWD} poetry run pylint ./*
+	PYTHONPATH=${PWD} poetry run pylint . --recursive=y
 
 clean:
 	deactivate
