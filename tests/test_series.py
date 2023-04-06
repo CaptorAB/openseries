@@ -195,6 +195,8 @@ def test_opentimeseries_invalid_values(dates: List[str], values: List[float]) ->
 
 
 class TestOpenTimeSeries(TestCase):
+    """class to run unittests on the module series.py"""
+
     sim: ReturnSimulation
     randomseries: OpenTimeSeries
     random_properties: Dict[str, dt.date | int | float]
@@ -957,6 +959,8 @@ class TestOpenTimeSeries(TestCase):
         base_series_one.to_cumret()
 
         class NewTimeSeries(OpenTimeSeries):
+            """class to test correct pass-through of classes"""
+
             extra_info: str = "cool"
 
         sub_series_one = NewTimeSeries(

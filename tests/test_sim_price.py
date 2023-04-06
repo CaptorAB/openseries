@@ -6,6 +6,8 @@ from openseries.sim_price import ReturnSimulation
 
 
 class TestSimPrice(TestCase):
+    """class to run unittests on the module sim_price.py"""
+
     def test_return_simulations_annotations_and_typehints(self: "TestSimPrice") -> None:
         returnsimulation_annotations = dict(ReturnSimulation.__annotations__)
 

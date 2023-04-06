@@ -85,7 +85,7 @@ disable_error_code = ["valid-type"]
 exclude = ["venv/*", ".venv"]
 
 [tool.pylint]
-disable = ["C0103", "C0114", "C0115", "C0116", "C0302", "C2801", "E0213",
+disable = ["C0103", "C0114", "C0116", "C0302", "C2801", "E0213",
     "R0801", "R0903", "R0904", "R0912", "R0913", "R0914", "R0915"]
 ignore = ["venv", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "coverage.svg",
     "LICENSE.md", "make.ps1", "Makefile", "pyproject.toml", "README.md",

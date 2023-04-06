@@ -15,6 +15,8 @@ from openseries.types import LiteralNanMethod, LiteralFrameProps
 
 
 class TestOpenFrame(TestCase):
+    """class to run unittests on the module frame.py"""
+
     sim: ReturnSimulation
     randomframe: OpenFrame
     randomseries: OpenTimeSeries

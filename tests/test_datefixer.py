@@ -14,6 +14,8 @@ from openseries.datefixer import (
 
 
 class TestDateFixer(TestCase):
+    """class to run unittests on the module datefixer.py"""
+
     def test_date_fix_arg_types(self: "TestDateFixer") -> None:
         formats = [
             "2022-07-15",

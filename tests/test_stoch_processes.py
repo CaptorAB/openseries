@@ -17,6 +17,8 @@ from openseries.stoch_processes import (
 
 
 class TestStochProcesses(TestCase):
+    """class to run unittests on the module stoch_processes.py"""
+
     def test_stoch_processes_annotations_and_typehints(
         self: "TestStochProcesses",
     ) -> None:

@@ -10,6 +10,8 @@ from openseries.types import (
 
 
 class TestTypes(TestCase):
+    """class to run unittests on the module types.py"""
+
     def test_types_opentimeseriesproplist_validate(self: "TestTypes") -> None:
         subset = cast(LiteralSeriesProps, ["z_score", "kurtosis", "positive_share"])
         lst = OpenTimeSeriesPropertiesList(*subset)
