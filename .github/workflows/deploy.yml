@@ -59,7 +59,7 @@ jobs:
 
       - name: Lint check with Pylint
         shell: bash
-        run: poetry run pylint . --recursive=y
+        run: poetry run pylint ./openseries/* ./tests/*
 
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0

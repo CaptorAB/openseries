@@ -65,7 +65,7 @@ jobs:
 
       - name: Lint check with Pylint
         shell: bash
-        run: poetry run pylint . --recursive=y
+        run: poetry run pylint ./openseries/* ./tests/*
 
       - name: Tests with Pytest
         shell: bash

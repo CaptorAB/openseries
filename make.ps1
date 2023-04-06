@@ -33,7 +33,7 @@ elseif ($task -eq "lint") {
         Write-Host $lintresult
     }
     poetry run mypy .
-    poetry run pylint . --recursive=y
+    poetry run pylint ./openseries/* ./tests/*
 }
 elseif ($task -eq "clean") {
     # remove virtual environment to start over
