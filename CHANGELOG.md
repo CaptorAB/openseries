@@ -7,6 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.12.2] - 2023-04-06
+
+Added pylint as a code checker. Several docstring and some other checks silenced
+in `pyproject.toml`.
+
 ## Version [0.12.1] - 2023-04-03
 
 Introduced `validate_assignment = True` which allowed the removal of several separate

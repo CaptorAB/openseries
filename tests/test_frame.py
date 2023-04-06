@@ -448,26 +448,20 @@ class TestOpenFrame(TestCase):
         samef = self.randomframe.from_deepcopy()
         samef.to_cumret()
 
+        smf_vrf = float(
+            samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
+        )
         self.assertEqual(
             f"{sames.ret_vol_ratio_func(months_from_last=12):.11f}",
-            "{:.11f}".format(
-                float(
-                    samef.ret_vol_ratio_func(
-                        riskfree_rate=0.0, months_from_last=12
-                    ).iloc[0]
-                )
-            ),
+            f"{smf_vrf:.11f}",
         )
 
+        smf_srf = float(
+            samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
+        )
         self.assertEqual(
             f"{sames.sortino_ratio_func(months_from_last=12):.11f}",
-            "{:.11f}".format(
-                float(
-                    samef.sortino_ratio_func(
-                        riskfree_rate=0.0, months_from_last=12
-                    ).iloc[0]
-                )
-            ),
+            f"{smf_srf:.11f}",
         )
 
     def test_openframe_measures_same_as_opentimeseries(self: "TestOpenFrame") -> None:
@@ -2267,11 +2261,11 @@ class TestOpenFrame(TestCase):
         frame_0 = self.randomframe.from_deepcopy()
         frame_0.to_cumret()
         frame_0.value_to_ret()
-        frame_0.tsdf = frame_0.tsdf.applymap(lambda x: fmt.format(x))
+        frame_0.tsdf = frame_0.tsdf.applymap(fmt.format)
         dict_toframe_0 = frame_0.tsdf.to_dict()
 
         frame_1 = self.randomframe.from_deepcopy()
-        frame_1.tsdf = frame_1.tsdf.applymap(lambda x: fmt.format(x))
+        frame_1.tsdf = frame_1.tsdf.applymap(fmt.format)
         dict_toframe_1 = frame_1.tsdf.to_dict()
 
         self.assertDictEqual(dict_toframe_0, dict_toframe_1)

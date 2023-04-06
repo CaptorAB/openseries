@@ -30,6 +30,13 @@ repos:
       - id: trailing-whitespace
       - id: mixed-line-ending
         exclude: '^.test_durations'
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
   - repo: https://github.com/python-poetry/poetry
     rev: 1.4.0
     hooks:

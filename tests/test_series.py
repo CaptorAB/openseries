@@ -832,16 +832,16 @@ class TestOpenTimeSeries(TestCase):
             "worst_month": f"{-0.19165644070:.11f}",
             "z_score": f"{1.21195350537:.11f}",
         }
-        for c in checks:
+        for c_key, c_value in checks.items():
             self.assertEqual(
-                checks[c],
-                f"{getattr(self.randomseries, c):.11f}",
-                msg=f"Difference in: {c}",
+                c_value,
+                f"{getattr(self.randomseries, c_key):.11f}",
+                msg=f"Difference in: {c_key}",
             )
             self.assertEqual(
-                f"{self.random_properties[c]:.11f}",
-                f"{getattr(self.randomseries, c):.11f}",
-                msg=f"Difference in: {c}",
+                f"{self.random_properties[c_key]:.11f}",
+                f"{getattr(self.randomseries, c_key):.11f}",
+                msg=f"Difference in: {c_key}",
             )
 
     def test_opentimeseries_all_calc_functions(self: "TestOpenTimeSeries") -> None:
@@ -863,11 +863,11 @@ class TestOpenTimeSeries(TestCase):
             "worst_func": f"{-0.02063487245:.11f}",
             "z_score_func": f"{1.36825335773:.11f}",
         }
-        for c in checks:
+        for c_key, c_value in checks.items():
             self.assertEqual(
-                checks[c],
-                f"{getattr(self.randomseries, c)(months_from_last=48):.11f}",
-                msg=f"Difference in {c}",
+                c_value,
+                f"{getattr(self.randomseries, c_key)(months_from_last=48):.11f}",
+                msg=f"Difference in {c_key}",
             )
 
         func = "value_ret_calendar_period"
@@ -1106,7 +1106,7 @@ class TestOpenTimeSeries(TestCase):
     def test_opentimeseries_drawdown_details(self: "TestOpenTimeSeries") -> None:
         details = self.randomseries.drawdown_details()
         self.assertEqual(
-            "{:7f}".format(details.loc["Max Drawdown", "Drawdown details"]),
+            f"{details.loc['Max Drawdown', 'Drawdown details']:7f}",
             "-0.400116",
         )
         self.assertEqual(
@@ -1121,7 +1121,7 @@ class TestOpenTimeSeries(TestCase):
             details.loc["Days from start to bottom", "Drawdown details"], 2317
         )
         self.assertEqual(
-            "{:.9f}".format(details.loc["Average fall per day", "Drawdown details"]),
+            f"{details.loc['Average fall per day', 'Drawdown details']:.9f}",
             "-0.000172687",
         )
 
