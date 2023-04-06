@@ -153,8 +153,8 @@ class OpenFrame(BaseModel):
                 f"argument how={how} produced an empty DataFrame."
             )
         if how == "inner":
-            for x in self.constituents:
-                x.tsdf = x.tsdf.loc[self.tsdf.index]
+            for xerie in self.constituents:
+                xerie.tsdf = xerie.tsdf.loc[self.tsdf.index]
         return self
 
     def all_properties(
@@ -1153,9 +1153,9 @@ class OpenFrame(BaseModel):
             Z-score as (last return - mean return) / standard deviation of returns.
         """
 
-        zd = self.tsdf.pct_change()
+        zscframe = self.tsdf.pct_change()
         return Series(
-            data=(zd.iloc[-1] - zd.mean()) / zd.std(),
+            data=(zscframe.iloc[-1] - zscframe.mean()) / zscframe.std(),
             name="Z-score",
             dtype="float64",
         )
@@ -1185,9 +1185,9 @@ class OpenFrame(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        zd = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()
+        zscframe = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()
         return Series(
-            data=(zd.iloc[-1] - zd.mean()) / zd.std(),
+            data=(zscframe.iloc[-1] - zscframe.mean()) / zscframe.std(),
             name="Subset Z-score",
             dtype="float64",
         )
@@ -1272,7 +1272,7 @@ class OpenFrame(BaseModel):
             Maximum drawdown in a single calendar year.
         """
         years = [d.year for d in self.tsdf.index]
-        md = (
+        mxdwn = (
             self.tsdf.groupby(years)
             .apply(
                 lambda prices: (prices / prices.expanding(min_periods=1).max()).min()
@@ -1280,9 +1280,9 @@ class OpenFrame(BaseModel):
             )
             .min()
         )
-        md.name = "Max drawdown in cal yr"
-        md = md.astype("float64")
-        return md
+        mxdwn.name = "Max drawdown in cal yr"
+        mxdwn = mxdwn.astype("float64")
+        return mxdwn
 
     @property
     def worst(self: "OpenFrame") -> Series:
@@ -1897,10 +1897,10 @@ class OpenFrame(BaseModel):
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
         self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
-        for x in self.constituents:
-            x.tsdf.index = DatetimeIndex(x.tsdf.index)
-            x.tsdf = x.tsdf.resample(freq).last()
-            x.tsdf.index = [d.date() for d in DatetimeIndex(x.tsdf.index)]
+        for xerie in self.constituents:
+            xerie.tsdf.index = DatetimeIndex(xerie.tsdf.index)
+            xerie.tsdf = xerie.tsdf.resample(freq).last()
+            xerie.tsdf.index = [dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)]
 
         return self
 
@@ -1968,8 +1968,10 @@ class OpenFrame(BaseModel):
         )
         dates = dates.drop_duplicates()
         self.tsdf = self.tsdf.reindex([d.date() for d in dates], method=method)
-        for x in self.constituents:
-            x.tsdf = x.tsdf.reindex([d.date() for d in dates], method=method)
+        for xerie in self.constituents:
+            xerie.tsdf = xerie.tsdf.reindex(
+                [dejt.date() for dejt in dates], method=method
+            )
         return self
 
     def to_drawdown_series(self: "OpenFrame") -> "OpenFrame":
@@ -1981,8 +1983,8 @@ class OpenFrame(BaseModel):
             An OpenFrame object
         """
 
-        for t in self.tsdf:
-            self.tsdf.loc[:, t] = drawdown_series(self.tsdf.loc[:, t])
+        for serie in self.tsdf:
+            self.tsdf.loc[:, serie] = drawdown_series(self.tsdf.loc[:, serie])
         return self
 
     def drawdown_details(self: "OpenFrame") -> DataFrame:
@@ -1994,14 +1996,14 @@ class OpenFrame(BaseModel):
             'Days from start to bottom', & 'Average fall per day'
         """
 
-        mddf = DataFrame()
+        mxdwndf = DataFrame()
         for i in self.constituents:
             tmpdf = i.tsdf.copy()
             tmpdf.index = DatetimeIndex(tmpdf.index)
-            dd = drawdown_details(tmpdf)
-            dd.name = i.label
-            mddf = concat([mddf, dd], axis="columns")
-        return mddf
+            ddown = drawdown_details(tmpdf)
+            ddown.name = i.label
+            mxdwndf = concat([mxdwndf, ddown], axis="columns")
+        return mxdwndf
 
     def ewma_risk(
         self: "OpenFrame",
@@ -2146,8 +2148,8 @@ class OpenFrame(BaseModel):
         else:
             time_factor = self.periods_in_a_year
         vol_label = self.tsdf.iloc[:, column].name[0]
-        df = self.tsdf.iloc[:, column].pct_change()
-        voldf = df.rolling(observations, min_periods=observations).std() * sqrt(
+        dframe = self.tsdf.iloc[:, column].pct_change()
+        voldf = dframe.rolling(observations, min_periods=observations).std() * sqrt(
             time_factor
         )
         voldf = voldf.dropna().to_frame()
@@ -2346,15 +2348,15 @@ class OpenFrame(BaseModel):
         """
         if self.weights:
             new_c, new_w = [], []
-            for cc, ww in zip(self.constituents, self.weights):
-                if cc.label != lvl_zero_item:
-                    new_c.append(cc)
-                    new_w.append(ww)
+            for serie, weight in zip(self.constituents, self.weights):
+                if serie.label != lvl_zero_item:
+                    new_c.append(serie)
+                    new_w.append(weight)
             self.constituents = new_c
             self.weights = new_w
         else:
             self.constituents = [
-                ff for ff in self.constituents if ff.label != lvl_zero_item
+                item for item in self.constituents if item.label != lvl_zero_item
             ]
         self.tsdf.drop(lvl_zero_item, axis="columns", level=0, inplace=True)
         return self
@@ -2394,8 +2396,10 @@ class OpenFrame(BaseModel):
         self.tsdf.sort_index(inplace=True)
         self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
 
-        for x in self.constituents:
-            x.tsdf = x.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
+        for xerie in self.constituents:
+            xerie.tsdf = xerie.tsdf.truncate(
+                before=start_cut, after=end_cut, copy=False
+            )
         if len(set(self.first_indices)) != 1:
             warning(
                 f"One or more constituents still not truncated to same "
@@ -2785,43 +2789,46 @@ class OpenFrame(BaseModel):
             Beta as Co-variance of x & y divided by Variance of x
         """
         if all(
-            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
+            x_value == ValueType.RTRN
+            for x_value in self.tsdf.columns.get_level_values(1).values
         ):
             if isinstance(asset, tuple):
-                y = self.tsdf.loc[:, asset]
+                y_value = self.tsdf.loc[:, asset]
             elif isinstance(asset, int):
-                y = self.tsdf.iloc[:, asset]
+                y_value = self.tsdf.iloc[:, asset]
             else:
                 raise ValueError(
                     "asset should be a Tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
-                x = self.tsdf.loc[:, market]
+                x_value = self.tsdf.loc[:, market]
             elif isinstance(market, int):
-                x = self.tsdf.iloc[:, market]
+                x_value = self.tsdf.iloc[:, market]
             else:
                 raise ValueError(
                     "market should be a Tuple[str, ValueType] or an integer."
                 )
         else:
             if isinstance(asset, tuple):
-                y = log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
+                y_value = log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
             elif isinstance(asset, int):
-                y = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                y_value = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
                 raise ValueError(
                     "asset should be a Tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
-                x = log(self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0])
+                x_value = log(
+                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0]
+                )
             elif isinstance(market, int):
-                x = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                x_value = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
             else:
                 raise ValueError(
                     "market should be a Tuple[str, ValueType] or an integer."
                 )
 
-        covariance = cov(y, x, ddof=1)
+        covariance = cov(y_value, x_value, ddof=1)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(beta)
@@ -2852,10 +2859,10 @@ class OpenFrame(BaseModel):
         """
 
         if isinstance(y_column, tuple):
-            y = self.tsdf.loc[:, y_column]
+            y_value = self.tsdf.loc[:, y_column]
             y_label = self.tsdf.loc[:, y_column].name[0]
         elif isinstance(y_column, int):
-            y = self.tsdf.iloc[:, y_column]
+            y_value = self.tsdf.iloc[:, y_column]
             y_label = self.tsdf.iloc[:, y_column].name[0]
         else:
             raise ValueError(
@@ -2863,19 +2870,19 @@ class OpenFrame(BaseModel):
             )
 
         if isinstance(x_column, tuple):
-            x = self.tsdf.loc[:, x_column]
+            x_value = self.tsdf.loc[:, x_column]
             x_label = self.tsdf.loc[:, x_column].name[0]
         elif isinstance(x_column, int):
-            x = self.tsdf.iloc[:, x_column]
+            x_value = self.tsdf.iloc[:, x_column]
             x_label = self.tsdf.iloc[:, x_column].name[0]
         else:
             raise ValueError(
                 "x_column should be a Tuple[str, ValueType] or an integer."
             )
 
-        results = sm.OLS(y, x).fit()
+        results = sm.OLS(y_value, x_value).fit()
         if fitted_series:
-            self.tsdf[y_label, x_label] = results.predict(x)
+            self.tsdf[y_label, x_label] = results.predict(x_value)
 
         return results
 
@@ -2897,13 +2904,13 @@ class OpenFrame(BaseModel):
                 "OpenFrame weights property must be provided to run the "
                 "make_portfolio method."
             )
-        df = self.tsdf.copy()
+        dframe = self.tsdf.copy()
         if not any(
             x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
         ):
-            df = df.pct_change()
-            df.iloc[0] = 0
-        portfolio = df.dot(self.weights)
+            dframe = dframe.pct_change()
+            dframe.iloc[0] = 0
+        portfolio = dframe.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
         portfolio.columns = [[name], [ValueType.PRICE]]
         return portfolio

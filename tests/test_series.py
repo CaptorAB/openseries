@@ -239,7 +239,7 @@ class TestOpenTimeSeries(TestCase):
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
-        sdf = sim.df.iloc[0].T.to_frame()
+        sdf = sim.dframe.iloc[0].T.to_frame()
         sdf.index = d_range
         sdf.columns = [["Asset"], [ValueType.RTRN]]
 
@@ -489,10 +489,10 @@ class TestOpenTimeSeries(TestCase):
             dtype="float64",
         )
 
-        seseries = OpenTimeSeries.from_df(df=serie)
-        senseries = OpenTimeSeries.from_df(df=sen)
-        df1series = OpenTimeSeries.from_df(df=df1, column_nmbr=1)
-        df2series = OpenTimeSeries.from_df(df=df2, column_nmbr=0)
+        seseries = OpenTimeSeries.from_df(dframe=serie)
+        senseries = OpenTimeSeries.from_df(dframe=sen)
+        df1series = OpenTimeSeries.from_df(dframe=df1, column_nmbr=1)
+        df2series = OpenTimeSeries.from_df(dframe=df2, column_nmbr=0)
 
         self.assertTrue(isinstance(seseries, OpenTimeSeries))
         self.assertTrue(isinstance(senseries, OpenTimeSeries))
@@ -506,9 +506,9 @@ class TestOpenTimeSeries(TestCase):
         new_stdout = StringIO()
         sys.stdout = new_stdout
 
-        df3series = OpenTimeSeries.from_df(df=df3, column_nmbr=0)
+        df3series = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
         df3_output = new_stdout.getvalue()
-        df4series = OpenTimeSeries.from_df(df=df4, column_nmbr=0)
+        df4series = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
         df4_output = new_stdout.getvalue()
 
         sys.stdout = old_stdout

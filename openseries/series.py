@@ -236,7 +236,7 @@ class OpenTimeSeries(BaseModel):
     @classmethod
     def from_df(
         cls,
-        df: DataFrame | Series,
+        dframe: DataFrame | Series,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: str = "SEK",
@@ -246,7 +246,7 @@ class OpenTimeSeries(BaseModel):
 
         Parameters
         ----------
-        df: DataFrame | Series
+        dframe: DataFrame | Series
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
@@ -263,32 +263,36 @@ class OpenTimeSeries(BaseModel):
             An OpenTimeSeries object
         """
 
-        if isinstance(df, Series):
-            if isinstance(df.name, tuple):
-                label, _ = df.name
+        if isinstance(dframe, Series):
+            if isinstance(dframe.name, tuple):
+                label, _ = dframe.name
             else:
-                label = df.name
-            values = df.values.tolist()
+                label = dframe.name
+            values = dframe.values.tolist()
         else:
-            values = df.iloc[:, column_nmbr].tolist()
-            if isinstance(df.columns, MultiIndex):
-                if check_if_none(df.columns.get_level_values(0).values[column_nmbr]):
+            values = dframe.iloc[:, column_nmbr].tolist()
+            if isinstance(dframe.columns, MultiIndex):
+                if check_if_none(
+                    dframe.columns.get_level_values(0).values[column_nmbr]
+                ):
                     print(
                         "checked item",
-                        df.columns.get_level_values(0).values[column_nmbr],
+                        dframe.columns.get_level_values(0).values[column_nmbr],
                     )
                     label = "Series"
                     print(f"label missing. Adding '{label}' as label")
                 else:
-                    label = df.columns.get_level_values(0).values[column_nmbr]
-                if check_if_none(df.columns.get_level_values(1).values[column_nmbr]):
+                    label = dframe.columns.get_level_values(0).values[column_nmbr]
+                if check_if_none(
+                    dframe.columns.get_level_values(1).values[column_nmbr]
+                ):
                     valuetype = ValueType.PRICE
                     print(f"valuetype missing. Adding '{valuetype.value}' as valuetype")
                 else:
-                    valuetype = df.columns.get_level_values(1).values[column_nmbr]
+                    valuetype = dframe.columns.get_level_values(1).values[column_nmbr]
             else:
-                label = df.columns.values[column_nmbr]
-        dates = [date_fix(d).strftime("%Y-%m-%d") for d in df.index]
+                label = dframe.columns.values[column_nmbr]
+        dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
 
         return cls(
             timeseriesId="",
@@ -302,7 +306,7 @@ class OpenTimeSeries(BaseModel):
             local_ccy=local_ccy,
             tsdf=DataFrame(
                 data=values,
-                index=[d.date() for d in DatetimeIndex(dates)],
+                index=[dejt.date() for dejt in DatetimeIndex(dates)],
                 columns=[[label], [valuetype]],
                 dtype="float64",
             ),
@@ -2368,28 +2372,28 @@ class OpenTimeSeries(BaseModel):
         return figure, plotfile
 
 
-TOpenTimeSeries = TypeVar("TOpenTimeSeries", bound=OpenTimeSeries)
+TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound=OpenTimeSeries)
 
 
 def timeseries_chain(
-    front: Union[TOpenTimeSeries, type(OpenTimeSeries)],
-    back: Union[TOpenTimeSeries, type(OpenTimeSeries)],
+    front: Union[TypeOpenTimeSeries, type(OpenTimeSeries)],
+    back: Union[TypeOpenTimeSeries, type(OpenTimeSeries)],
     old_fee: float = 0.0,
-) -> Union[TOpenTimeSeries, OpenTimeSeries]:
+) -> Union[TypeOpenTimeSeries, OpenTimeSeries]:
     """Chain two timeseries together
 
     Parameters
     ----------
-    front: Union[TOpenTimeSeries, type(OpenTimeSeries)]
+    front: Union[TypeOpenTimeSeries, type(OpenTimeSeries)]
         Earlier series to chain with
-    back: Union[TOpenTimeSeries, type(OpenTimeSeries)]
+    back: Union[TypeOpenTimeSeries, type(OpenTimeSeries)]
         Later series to chain with
     old_fee: bool, default: False
         Fee to apply to earlier series
 
     Returns
     -------
-    Union[TOpenTimeSeries, OpenTimeSeries]
+    Union[TypeOpenTimeSeries, OpenTimeSeries]
         An OpenTimeSeries object or a subclass thereof
     """
     old = front.from_deepcopy()

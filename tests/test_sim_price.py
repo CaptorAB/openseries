@@ -23,7 +23,7 @@ class TestSimPrice(TestCase):
                 "trading_days_in_year": int,
                 "mean_annual_return": float,
                 "mean_annual_vol": float,
-                "df": DataFrame,
+                "dframe": DataFrame,
             },
         )
 

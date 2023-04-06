@@ -45,14 +45,14 @@ class TestOpenFrame(TestCase):
             startyear=startyear, endyear=end.year, countries=OpenTimeSeries.countries
         )
         d_range = [
-            d.date()
-            for d in date_range(
+            dejt.date()
+            for dejt in date_range(
                 periods=sim.trading_days,
                 end=end,
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
-        sdf = sim.df.iloc[0].T.to_frame()
+        sdf = sim.dframe.iloc[0].T.to_frame()
         sdf.index = d_range
         sdf.columns = [["Asset"], [ValueType.RTRN]]
 
@@ -62,7 +62,7 @@ class TestOpenFrame(TestCase):
 
         tslist = []
         for item in range(sim.number_of_sims):
-            sdf = sim.df.iloc[item].T.to_frame()
+            sdf = sim.dframe.iloc[item].T.to_frame()
             sdf.index = d_range
             sdf.columns = [[f"Asset_{item}"], [ValueType.RTRN]]
             tslist.append(OpenTimeSeries.from_df(sdf, valuetype=ValueType.RTRN))
@@ -120,13 +120,13 @@ class TestOpenFrame(TestCase):
     def test_openframe_calc_range(self: "TestOpenFrame") -> None:
         """Test calc_range method"""
         crframe = self.randomframe.from_deepcopy()
-        st, en = crframe.first_idx.strftime("%Y-%m-%d"), crframe.last_idx.strftime(
+        start, end = crframe.first_idx.strftime("%Y-%m-%d"), crframe.last_idx.strftime(
             "%Y-%m-%d"
         )
         rst, ren = crframe.calc_range()
 
         self.assertListEqual(
-            [st, en], [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]
+            [start, end], [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]
         )
 
         with self.assertRaises(AssertionError) as too_far:
@@ -292,8 +292,8 @@ class TestOpenFrame(TestCase):
 
         try:
             assert_frame_equal(false_tail, mptail, check_exact=True)
-        except AssertionError as e:
-            self.assertTrue(isinstance(e, AssertionError))
+        except AssertionError as e_false:
+            self.assertTrue(isinstance(e_false, AssertionError))
 
         mpframe.weights = None
         with self.assertRaises(Exception) as e_make:
@@ -451,10 +451,10 @@ class TestOpenFrame(TestCase):
             "worst_func",
             "z_score_func",
         ]
-        for m in methods_to_compare:
+        for method in methods_to_compare:
             self.assertEqual(
-                f"{getattr(sames, m)(months_from_last=12):.11f}",
-                f"{float(getattr(samef, m)(months_from_last=12).iloc[0]):.11f}",
+                f"{getattr(sames, method)(months_from_last=12):.11f}",
+                f"{float(getattr(samef, method)(months_from_last=12).iloc[0]):.11f}",
             )
 
     def test_openframe_ratio_methods_same_as_opentimeseries(
@@ -486,8 +486,8 @@ class TestOpenFrame(TestCase):
     def test_openframe_measures_same_as_opentimeseries(self: "TestOpenFrame") -> None:
         """Test that measure results align between OpenFrame and OpenTimeSeries"""
         frame_0 = self.randomframe.from_deepcopy()
-        for s in frame_0.constituents:
-            s.to_cumret()
+        for zerie in frame_0.constituents:
+            zerie.to_cumret()
         frame_0.to_cumret()
 
         common_calc_props = [
@@ -513,12 +513,14 @@ class TestOpenFrame(TestCase):
         series_measures = []
         frame_measures = []
 
-        for p in common_calc_props:
-            fr = getattr(frame_0, p).tolist()
-            fr = [f"{ff:.10f}" for ff in fr]
-            frame_measures.append(fr)
-            se = [f"{getattr(s, p):.10f}" for s in frame_0.constituents]
-            series_measures.append(se)
+        for prop in common_calc_props:
+            result = getattr(frame_0, prop).tolist()
+            rounded = [f"{item:.10f}" for item in result]
+            frame_measures.append(rounded)
+            roundmeasure = [
+                f"{getattr(serie, prop):.10f}" for serie in frame_0.constituents
+            ]
+            series_measures.append(roundmeasure)
 
         self.assertListEqual(series_measures, frame_measures)
 
@@ -530,8 +532,10 @@ class TestOpenFrame(TestCase):
         sameframe.to_cumret()
 
         common_props_to_compare = ["periods_in_a_year", "yearfrac"]
-        for c in common_props_to_compare:
-            self.assertEqual(getattr(sameseries, c), getattr(sameframe, c))
+        for comnprop in common_props_to_compare:
+            self.assertEqual(
+                getattr(sameseries, comnprop), getattr(sameframe, comnprop)
+            )
 
     def test_openframe_keeping_attributes_aligned_vs_opentimeseries(
         self: "TestOpenFrame",
@@ -779,15 +783,15 @@ class TestOpenFrame(TestCase):
         logframe = self.randomframe.from_deepcopy()
         logframe.to_cumret()
 
-        aa = logframe.tsdf.applymap(lambda nn: f"{nn:.12f}")
-        bb = aa.to_dict(orient="list")
-        b4_log = [bb[k] for k in bb]
+        aaframe = logframe.tsdf.applymap(lambda item: f"{item:.12f}")
+        bbdict = aaframe.to_dict(orient="list")
+        b4_log = [bbdict[key] for key in bbdict]
 
         logframe.value_to_log()
 
-        aa = logframe.tsdf.applymap(lambda nn: f"{nn:.12f}")
-        bb = aa.to_dict(orient="list")
-        middle_log = [bb[k] for k in bb]
+        ccframe = logframe.tsdf.applymap(lambda item: f"{item:.12f}")
+        eedict = ccframe.to_dict(orient="list")
+        middle_log = [eedict[key] for key in eedict]
 
         self.assertNotEqual(b4_log, middle_log)
 
@@ -900,17 +904,17 @@ class TestOpenFrame(TestCase):
 
     def test_openframe_passed_empty_list(self: "TestOpenFrame") -> None:
         """Test warning on object construct with empty list"""
-        with self.assertLogs() as cm:
+        with self.assertLogs() as contextmgr:
             OpenFrame([])
         self.assertListEqual(
-            cm.output, ["WARNING:root:OpenFrame() was passed an empty list."]
+            contextmgr.output, ["WARNING:root:OpenFrame() was passed an empty list."]
         )
 
     def test_openframe_drawdown_details(self: "TestOpenFrame") -> None:
         """Test drawdown_details method"""
         ddframe = self.randomframe.from_deepcopy()
-        for s in ddframe.constituents:
-            s.to_cumret()
+        for serie in ddframe.constituents:
+            serie.to_cumret()
         ddframe.to_cumret()
         dds = ddframe.drawdown_details().loc["Days from start to bottom"].tolist()
         self.assertListEqual([2317, 1797, 2439, 1024, 1278], dds)
@@ -957,7 +961,7 @@ class TestOpenFrame(TestCase):
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["a"],
                         data=[1, 2, 3, 4, 5],
                         index=[
@@ -970,7 +974,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["b"],
                         data=[6, 7, 8, 9, 10],
                         index=[
@@ -983,7 +987,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["c"],
                         data=[11, 12, 13, 14, 15],
                         index=[
@@ -996,7 +1000,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["d"],
                         data=[16, 17, 18, 19, 20],
                         index=[
@@ -1025,7 +1029,7 @@ class TestOpenFrame(TestCase):
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["a"],
                         data=[1, 2, 3, 4, 5],
                         index=[
@@ -1038,7 +1042,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["b"],
                         data=[6, 7, 8, 9],
                         index=[
@@ -1050,7 +1054,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["c"],
                         data=[10, 11, 12, 13, 14],
                         index=[
@@ -1063,7 +1067,7 @@ class TestOpenFrame(TestCase):
                     )
                 ),
                 OpenTimeSeries.from_df(
-                    df=DataFrame(
+                    dframe=DataFrame(
                         columns=["d"],
                         data=[15, 16, 17, 18, 19],
                         index=[
@@ -1888,25 +1892,25 @@ class TestOpenFrame(TestCase):
         )
         cframe = OpenFrame([asset, indxx]).to_cumret()
 
-        up = cframe.capture_ratio_func(ratio="up")
+        upp = cframe.capture_ratio_func(ratio="up")
         down = cframe.capture_ratio_func(ratio="down")
         both = cframe.capture_ratio_func(ratio="both")
 
-        self.assertEqual(f"{up.iloc[0]:.12f}", "1.063842457805")
+        self.assertEqual(f"{upp.iloc[0]:.12f}", "1.063842457805")
         self.assertEqual(f"{down.iloc[0]:.12f}", "0.922188852957")
         self.assertEqual(f"{both.iloc[0]:.12f}", "1.153605852417")
 
         upfixed = cframe.capture_ratio_func(ratio="up", periods_in_a_year_fixed=12)
 
         self.assertEqual(f"{upfixed.iloc[0]:.12f}", "1.063217236138")
-        self.assertAlmostEqual(up.iloc[0], upfixed.iloc[0], places=2)
+        self.assertAlmostEqual(upp.iloc[0], upfixed.iloc[0], places=2)
 
         uptuple = cframe.capture_ratio_func(
             ratio="up", base_column=("indxx", ValueType.PRICE)
         )
 
         self.assertEqual(f"{uptuple.iloc[0]:.12f}", "1.063842457805")
-        self.assertEqual(f"{up.iloc[0]:.12f}", f"{uptuple.iloc[0]:.12f}")
+        self.assertEqual(f"{upp.iloc[0]:.12f}", f"{uptuple.iloc[0]:.12f}")
 
         with self.assertRaises(Exception) as e_func:
             str_col = cast(Union[Tuple[str, ValueType], int], "string")
@@ -2274,10 +2278,10 @@ class TestOpenFrame(TestCase):
 
         sframe.relative(base_zero=False)
 
-        rf = [f"{rr:.11f}" for rr in rframe.tsdf.iloc[:, -1]]
-        sf = [f"{rr:.11f}" for rr in sframe.tsdf.iloc[:, -1]]
+        rflist = [f"{rret:.11f}" for rret in rframe.tsdf.iloc[:, -1]]
+        sflist = [f"{rret:.11f}" for rret in sframe.tsdf.iloc[:, -1]]
 
-        self.assertListEqual(rf, sf)
+        self.assertListEqual(rflist, sflist)
 
     def test_openframe_to_cumret(self: "TestOpenFrame") -> None:
         """Test to_cumret method"""
@@ -2343,9 +2347,9 @@ class TestOpenFrame(TestCase):
         for methd in methods:
             no_fixed = getattr(mframe, methd)()
             fixed = getattr(mframe, methd)(periods_in_a_year_fixed=252)
-            for nf, f in zip(no_fixed, fixed):
-                self.assertAlmostEqual(nf, f, places=2)
-                self.assertNotAlmostEqual(nf, f, places=6)
+            for nofix, fix in zip(no_fixed, fixed):
+                self.assertAlmostEqual(nofix, fix, places=2)
+                self.assertNotAlmostEqual(nofix, fix, places=6)
         for methd in methods:
             dated = getattr(mframe, methd)(
                 from_date=mframe.first_idx, to_date=mframe.last_idx
@@ -2354,8 +2358,8 @@ class TestOpenFrame(TestCase):
                 from_date=mframe.first_idx,
                 to_date=mframe.last_idx,
             )
-            for dd, ud in zip(dated, undated):
-                self.assertEqual(f"{dd:.10f}", f"{ud:.10f}")
+            for ddat, undat in zip(dated, undated):
+                self.assertEqual(f"{ddat:.10f}", f"{undat:.10f}")
 
         ret = [f"{rr:.9f}" for rr in mframe.value_ret_func()]
         self.assertListEqual(
@@ -2454,10 +2458,10 @@ class TestOpenFrame(TestCase):
         """Test to_drawdown_series method"""
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
-        dd = [f"{dmax:.11f}" for dmax in mframe.max_drawdown]
+        ddown = [f"{dmax:.11f}" for dmax in mframe.max_drawdown]
         mframe.to_drawdown_series()
-        dds = [f"{dmax:.11f}" for dmax in mframe.tsdf.min()]
-        self.assertListEqual(dd, dds)
+        ddownserie = [f"{dmax:.11f}" for dmax in mframe.tsdf.min()]
+        self.assertListEqual(ddown, ddownserie)
 
     def test_openframe_ord_least_squares_fit(self: "TestOpenFrame") -> None:
         """Test ord_least_squares_fit method"""

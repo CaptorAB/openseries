@@ -29,7 +29,7 @@ class ReturnSimulation(BaseModel):
         Mean annual return of the distribution
     mean_annual_vol : str
         Mean annual standard deviation of the distribution
-    df: pandas.DataFrame
+    dframe: pandas.DataFrame
         Pandas DataFrame object holding the resulting values
     """
 
@@ -38,7 +38,7 @@ class ReturnSimulation(BaseModel):
     trading_days_in_year: int
     mean_annual_return: float
     mean_annual_vol: float
-    df: DataFrame
+    dframe: DataFrame
 
     class Config:
         """Configurations for the ReturnSimulation class"""
@@ -54,7 +54,7 @@ class ReturnSimulation(BaseModel):
         pandas.DataFrame
             Simulation data
         """
-        return self.df.add(1.0).cumprod(axis="columns").T
+        return self.dframe.add(1.0).cumprod(axis="columns").T
 
     @property
     def realized_mean_return(self: "ReturnSimulation") -> float:
@@ -124,7 +124,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            df=DataFrame(data=daily_returns),
+            dframe=DataFrame(data=daily_returns),
         )
 
     @classmethod
@@ -176,7 +176,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            df=DataFrame(data=daily_returns),
+            dframe=DataFrame(data=daily_returns),
         )
 
     @classmethod
@@ -232,7 +232,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            df=DataFrame(data=daily_returns),
+            dframe=DataFrame(data=daily_returns),
         )
 
     @classmethod
@@ -300,7 +300,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            df=DataFrame(data=daily_returns),
+            dframe=DataFrame(data=daily_returns),
         )
 
     @classmethod
@@ -367,7 +367,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            df=DataFrame(data=daily_returns),
+            dframe=DataFrame(data=daily_returns),
         )
 
     @classmethod
@@ -437,5 +437,5 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            df=DataFrame(data=daily_returns),
+            dframe=DataFrame(data=daily_returns),
         )
