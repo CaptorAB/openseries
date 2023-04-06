@@ -2252,13 +2252,11 @@ class OpenTimeSeries(BaseModel):
         )
         plotfile = path.join(path.abspath(directory), f"{filename}.html")
 
-        values = [float(x) for x in self.tsdf.iloc[:, 0].tolist()]
-
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
         figure.add_scatter(
             x=self.tsdf.index,
-            y=values,
+            y=self.tsdf.iloc[:, 0],
             hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
             line={"width": 2.5, "dash": "solid"},
             mode=mode,
