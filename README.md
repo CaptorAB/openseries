@@ -289,10 +289,13 @@ make install
 
 ## Testing and Linting / Type-checking
 
-The silenced error codes can be found  in the project's
+Flake8 and pylint checking is embedded in the pre-commit hook but not mypy. All
+three packages are used in the project's GitHub workflows and are run when the
+`lint` alternative is chosen in the below commands.
+The silenced error codes can be found in
 [.flake8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
 [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
-files. Flake8 linting is embedded in the pre-commit hook but not mypy.
+files.
 
 ### Windows Powershell
 
