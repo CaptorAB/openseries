@@ -50,24 +50,6 @@ jobs:
           poetry config virtualenvs.prefer-active-python true
           poetry install --no-root --with dev
 
-      - name: Check with Flake8
-        shell: bash
-        run: |
-          lintresult=$(poetry run flake8 .)
-          if [[ "$lintresult" -eq 0 || "$lintresult" -eq "0" ]]; then
-              echo "Flake8 linting is OK"
-          else
-              echo "$lintresult"
-          fi
-
-      - name: Type check with Mypy
-        shell: bash
-        run: poetry run mypy .
-
-      - name: Lint check with Pylint
-        shell: bash
-        run: poetry run pylint ./openseries/* ./tests/*
-
   run_tests:
     needs: stage_python
     runs-on: ubuntu-latest

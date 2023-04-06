@@ -1,0 +1,68 @@
+name: pylint
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "*" # matches every branch that doesn't contain a '/'
+      - "*/*" # matches every branch containing a single '/'
+      - "**" # matches every branch
+
+env:
+  POETRY_VER: 1.4.0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out GitHub repository ${{ github.repository }}
+        uses: actions/checkout@v3
+
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v4
+        id: setup_python
+        with:
+          python-version-file: '.python-version'
+
+      - name: Load cached $HOME/.local
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pylint.yml') }}
+
+      - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VER }}
+
+      - name: Load cached venv
+        id: cached_venv
+        uses: actions/cache@v3
+        with:
+          path: ./.venv
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pylint.yml') }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
+        shell: bash
+        if: steps.cached_venv.outputs.cache-hit != 'true'
+        run: |
+          poetry config virtualenvs.prefer-active-python true
+          poetry install --no-root --with dev
+
+      - name: Check with Flake8
+        shell: bash
+        run: |
+          lintresult=$(poetry run flake8 .)
+          if [[ "$lintresult" -eq 0 || "$lintresult" -eq "0" ]]; then
+              echo "Flake8 linting is OK"
+          else
+              echo "$lintresult"
+          fi
+
+      - name: Type check with Mypy
+        shell: bash
+        run: poetry run mypy .
+
+      - name: Lint check with Pylint
+        shell: bash
+        run: poetry run pylint ./openseries/* ./tests/*
