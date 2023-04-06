@@ -12,7 +12,7 @@ env:
   POETRY_VER: 1.4.0
 
 jobs:
-  deploy:
+  codecheck:
     runs-on: ubuntu-latest
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
