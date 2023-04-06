@@ -1,4 +1,6 @@
 """
+Functions to generate stochastic processes
+
 Source:
 http://www.turingfinance.com/random-walks-down-wall-street-stochastic-processes-in-python/
 https://github.com/StuartGordonReid/Python-Notebooks/blob/master/Stochastic%20Process%20Algorithms.ipynb

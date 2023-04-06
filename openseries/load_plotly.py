@@ -1,3 +1,6 @@
+"""
+Function to load plotly layout and configuration from local json file
+"""
 from json import load
 from os.path import abspath, dirname, join
 from typing import Dict, List, Tuple

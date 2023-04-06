@@ -1,3 +1,6 @@
+"""
+Defining the OpenTimeSeries class
+"""
 from copy import deepcopy
 import datetime as dt
 from enum import Enum
@@ -435,16 +438,16 @@ class OpenTimeSeries(BaseModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        df = DataFrame(
+        dframe = DataFrame(
             data=self.values,
             index=self.dates,
             columns=[[self.label], [self.valuetype]],
             dtype="float64",
         )
-        df.index = [d.date() for d in DatetimeIndex(df.index)]
+        dframe.index = [d.date() for d in DatetimeIndex(dframe.index)]
 
-        df.sort_index(inplace=True)
-        self.tsdf = df
+        dframe.sort_index(inplace=True)
+        self.tsdf = dframe
 
         return self
 
@@ -1981,8 +1984,8 @@ class OpenTimeSeries(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
-        df = self.tsdf.pct_change().copy()
-        voldf = df.rolling(observations, min_periods=observations).std() * sqrt(
+        dframe = self.tsdf.pct_change().copy()
+        voldf = dframe.rolling(observations, min_periods=observations).std() * sqrt(
             time_factor
         )
         voldf.dropna(inplace=True)

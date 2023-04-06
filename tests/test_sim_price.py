@@ -1,3 +1,6 @@
+"""
+Test suite for the openseries/sim_price.py module
+"""
 from typing import Dict, get_type_hints, List
 from unittest import TestCase
 from pandas import DataFrame
@@ -9,6 +12,7 @@ class TestSimPrice(TestCase):
     """class to run unittests on the module sim_price.py"""
 
     def test_return_simulations_annotations_and_typehints(self: "TestSimPrice") -> None:
+        """Test ReturnSimulation annotations and typehints"""
         returnsimulation_annotations = dict(ReturnSimulation.__annotations__)
 
         self.assertDictEqual(
@@ -27,6 +31,7 @@ class TestSimPrice(TestCase):
         self.assertDictEqual(returnsimulation_annotations, returnsimulation_typehints)
 
     def test_return_simulation_processes(self: "TestSimPrice") -> None:
+        """Test ReturnSimulation based on different stochastic processes"""
         args: Dict[str, int | float] = {
             "number_of_sims": 1,
             "trading_days": 2520,
@@ -69,9 +74,9 @@ class TestSimPrice(TestCase):
 
         returns = []
         volatilities = []
-        for m, a in zip(methods, added):
-            arguments: Dict[str, int | float] = {**args, **a}
-            onesim = getattr(ReturnSimulation, m)(**arguments)
+        for method, adding in zip(methods, added):
+            arguments: Dict[str, int | float] = {**args, **adding}
+            onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")
 
@@ -79,6 +84,7 @@ class TestSimPrice(TestCase):
         self.assertListEqual(target_volatilities, volatilities)
 
     def test_return_simulation_properties(self: "TestSimPrice") -> None:
+        """Test ReturnSimulation properties output"""
         days = 1200
         psim = ReturnSimulation.from_normal(
             number_of_sims=1,

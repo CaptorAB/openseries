@@ -1,3 +1,6 @@
+"""
+Declaring types used througout the project
+"""
 from typing import Literal, List
 from pydantic import BaseModel
 

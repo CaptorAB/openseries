@@ -1,4 +1,6 @@
 """
+Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
+
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
@@ -153,16 +155,17 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
     """
 
     mdate = max_drawdown_date(prices)
-    md = float((prices / prices.expanding(min_periods=1).max()).min() - 1)
-    dd = prices.copy()
-    drwdwn = drawdown_series(dd).loc[: cast(int, mdate)]
+    maxdown = float((prices / prices.expanding(min_periods=1).max()).min() - 1)
+    ddata = prices.copy()
+    drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn.sort_index(ascending=False, inplace=True)
     sdate = drwdwn[drwdwn == 0.0].idxmax().values[0].astype(dt.datetime)
     sdate = dt.datetime.fromtimestamp(sdate / 1e9).date()
     duration = (mdate - sdate).days
-    ret_per_day = md / duration
-    df = Series(
-        data=[md, sdate, mdate, duration, ret_per_day],
+    ret_per_day = maxdown / duration
+
+    return Series(
+        data=[maxdown, sdate, mdate, duration, ret_per_day],
         index=[
             "Max Drawdown",
             "Start of drawdown",
@@ -172,4 +175,3 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
         ],
         name="Drawdown details",
     )
-    return df

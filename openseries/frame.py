@@ -1,3 +1,6 @@
+"""
+Defining the OpenFrame class
+"""
 from copy import deepcopy
 import datetime as dt
 from functools import reduce

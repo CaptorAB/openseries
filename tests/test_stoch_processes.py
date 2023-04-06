@@ -1,3 +1,6 @@
+"""
+Test suite for the openseries/stoch_processes.py module
+"""
 from datetime import date as dtdate
 from typing import cast, get_type_hints, List
 from unittest import TestCase
@@ -22,6 +25,7 @@ class TestStochProcesses(TestCase):
     def test_stoch_processes_annotations_and_typehints(
         self: "TestStochProcesses",
     ) -> None:
+        """Test ModelParameters annotations and typehints"""
         stochprocess_annotations = dict(ModelParameters.__annotations__)
 
         self.assertDictEqual(
@@ -51,6 +55,7 @@ class TestStochProcesses(TestCase):
         self.assertDictEqual(stochprocess_annotations, stochprocess_typehints)
 
     def test_stoch_processes_assets(self: "TestStochProcesses") -> None:
+        """Test stoch processes output"""
         days = 2520
         target_returns = [
             "-0.031826675",
@@ -67,7 +72,7 @@ class TestStochProcesses(TestCase):
             "0.600404476",
         ]
 
-        mp = ModelParameters(
+        modelparams = ModelParameters(
             all_s0=1.0,
             all_r0=0.05,
             all_time=days,
@@ -93,7 +98,7 @@ class TestStochProcesses(TestCase):
 
         series = []
         for i, process, residx in zip(range(len(processes)), processes, res_indices):
-            modelresult = cast(List[float], process(param=mp, seed=71))
+            modelresult = cast(List[float], process(param=modelparams, seed=71))
             if isinstance(modelresult, tuple):
                 modelresult = modelresult[residx]
             d_range = [
@@ -117,12 +122,13 @@ class TestStochProcesses(TestCase):
         self.assertListEqual(target_volatilities, deviations)
 
     def test_stoch_processes_cir_and_ou(self: "TestStochProcesses") -> None:
+        """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels"""
         series = []
         days = 2520
         target_means = ["0.024184423", "0.019893950"]
         target_deviations = ["0.003590473", "0.023333692"]
 
-        mp = ModelParameters(
+        modelparams = ModelParameters(
             all_s0=1.0,
             all_r0=0.025,
             all_time=days,
@@ -144,7 +150,7 @@ class TestStochProcesses(TestCase):
 
         processes = [cox_ingersoll_ross_levels, ornstein_uhlenbeck_levels]
         for process in processes:
-            onesim = process(mp, seed=71)
+            onesim = process(modelparams, seed=71)
             name = process.__name__
             d_range = [
                 d.date()

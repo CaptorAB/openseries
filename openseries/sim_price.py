@@ -1,3 +1,7 @@
+"""
+Defining the ReturnSimulation class which simulates returns based on
+stochastic processes generated using the stoch_process.py module.
+"""
 from numpy import insert, random, sqrt
 from pandas import DataFrame
 from pydantic import BaseModel
