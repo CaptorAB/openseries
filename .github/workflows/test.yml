@@ -9,7 +9,7 @@ on:
       - "**" # matches every branch
 
 env:
-  POETRY_VER: 1.4.0
+  POETRY_VER: 1.4.2
 
 jobs:
   stage_python:
