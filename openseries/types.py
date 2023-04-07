@@ -28,6 +28,20 @@ LiteralNanMethod = Literal["fill", "drop"]
 LiteralCaptureRatio = Literal["up", "down", "both"]
 LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]
 LiteralPlotlyOutput = Literal["file", "div"]
+LiteralOlsFitMethod = Literal["pinv", "qr"]
+LiteralOlsFitCovType = Literal[
+    "nonrobust",
+    "fixed scale",
+    "HC0",
+    "HC1",
+    "HC2",
+    "HC3",
+    "HAC",
+    "hac-panel",
+    "hac-groupsum",
+    "cluster",
+]
+
 LiteralSeriesProps = Literal[
     "value_ret",
     "geo_ret",

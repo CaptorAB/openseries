@@ -48,6 +48,8 @@ from openseries.types import (
     LiteralBarPlotMode,
     LiteralPlotlyOutput,
     LiteralFrameProps,
+    LiteralOlsFitMethod,
+    LiteralOlsFitCovType,
     OpenFramePropertiesList,
 )
 from openseries.risk import (
@@ -2838,6 +2840,8 @@ class OpenFrame(BaseModel):
         y_column: Tuple[str, ValueType] | int,
         x_column: Tuple[str, ValueType] | int,
         fitted_series: bool = True,
+        method: LiteralOlsFitMethod = "pinv",
+        cov_type: LiteralOlsFitCovType = "nonrobust",
     ) -> RegressionResults:
         """https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
         Performs a linear regression and adds a new column with a fitted line
@@ -2851,6 +2855,10 @@ class OpenFrame(BaseModel):
             The column level values of the exogenous variable x
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
+        method: LiteralOlsFitMethod, default: pinv
+            Method to solve least squares problem
+        cov_type: LiteralOlsFitCovType, default: nonrobust
+            Covariance estimator
 
         Returns
         -------
@@ -2880,7 +2888,7 @@ class OpenFrame(BaseModel):
                 "x_column should be a Tuple[str, ValueType] or an integer."
             )
 
-        results = sm.OLS(y_value, x_value).fit()
+        results = sm.OLS(y_value, x_value).fit(method=method, cov_type=cov_type)
         if fitted_series:
             self.tsdf[y_label, x_label] = results.predict(x_value)
 
