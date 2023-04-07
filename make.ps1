@@ -14,6 +14,7 @@ elseif ($task -eq "make") {
     .\venv\Scripts\activate
     python -m pip install --upgrade pip
     pip install poetry==1.4.2
+    Remove-Item -Path 'poetry.lock' -Force -ErrorAction SilentlyContinue
     poetry install --with dev
     pre-commit install
 }

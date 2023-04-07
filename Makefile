@@ -5,6 +5,7 @@ venv:
 	venv/bin/pip install poetry==1.4.2
 
 install:
+	rm -f poetry.lock
 	poetry install --with dev
 	pre-commit install
 
