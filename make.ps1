@@ -25,6 +25,7 @@ elseif ($task -eq "test") {
 }
 elseif ($task -eq "lint") {
     # run lint and typing checks
+    poetry run black ./openseries/*.py ./tests/*.py
     $lintresult = poetry run flake8 .
     if ($LASTEXITCODE -eq 0) {
         Write-Host -ForegroundColor Green "Flake8 linting is OK"

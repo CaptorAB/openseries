@@ -58,19 +58,20 @@ coverage = {extras = ["toml"], version = "^7.2.2"}
 coverage-badge = "^1.1.0"
 flake8 = "6.0.0"
 flake8-black = "^0.3.6"
+flake8-pyproject = "^1.2.3"
 mypy = "^1.1.1"
 poetry = "1.4.2"
 pre-commit = "^3.2.0"
+pylint = "^2.17.2"
 pytest = "^7.2.2"
 pytest-split = "^0.8.0"
-pylint = "^2.17.2"
 types-python-dateutil = "^2.8.19.12"
 
 [tool.black]
 line-length = 88
 
 [tool.coverage.run]
-omit = ["venv/*", ".venv"]
+omit = ["venv/*"]
 include = ["openseries/*"]
 
 [tool.coverage.report]
@@ -82,7 +83,7 @@ strict = true
 ignore_missing_imports = true
 warn_redundant_casts = true
 disable_error_code = ["valid-type"]
-exclude = ["venv/*", ".venv"]
+exclude = ["venv/*"]
 
 [tool.pylint]
 disable = ["C2801", "E0213", "R0801"]
@@ -102,3 +103,13 @@ ignore-patterns= "\\w+\\.json$"
 
 [tool.pylint."MESSAGES CONTROL"]
 extension-pkg-whitelist = "pydantic"
+
+[tool.flake8]
+max-line-length = 88
+exclude = ["venv/"]
+extend-ignore = ["C901", "E203", "F722", "F821", "W503"]
+disable-noqa = false
+hang-closing = false
+doctests = true
+count = true
+show-source = true

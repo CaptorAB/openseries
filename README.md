@@ -290,13 +290,12 @@ make install
 
 ## Testing and Linting / Type-checking
 
-Flake8 and pylint checking is embedded in the pre-commit hook but not mypy. All
-three packages are used in the project's GitHub workflows and are run when the
+Flake8, Black and Pylint checking is embedded in the pre-commit hook but not mypy. All
+packages except Black are used in the project's GitHub workflows and are run when the
 `lint` alternative is chosen in the below commands.
-The silenced error codes can be found in
-[.flake8](https://github.com/CaptorAB/OpenSeries/blob/master/.flake8) and
+The silenced error codes can be found in the
 [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
-files.
+files
 
 ### Windows Powershell
 

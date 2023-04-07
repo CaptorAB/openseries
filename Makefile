@@ -14,6 +14,7 @@ test:
 	PYTHONPATH=${PWD} poetry run coverage-badge -o coverage.svg -f
 
 lint:
+	PYTHONPATH=${PWD} poetry run black ./openseries/*.py ./tests/*.py
 	PYTHONPATH=${PWD} poetry run flake8 .
 	PYTHONPATH=${PWD} poetry run mypy .
 	PYTHONPATH=${PWD} poetry run pylint ./openseries/* ./tests/*

@@ -689,6 +689,24 @@ tomli = {version = "*", markers = "python_version < \"3.11\""}
 develop = ["build", "twine"]
 
 [[package]]
+name = "flake8-pyproject"
+version = "1.2.3"
+description = "Flake8 plug-in loading the configuration from pyproject.toml"
+category = "dev"
+optional = false
+python-versions = ">= 3.6"
+files = [
+    {file = "flake8_pyproject-1.2.3-py3-none-any.whl", hash = "sha256:6249fe53545205af5e76837644dc80b4c10037e73a0e5db87ff562d75fb5bd4a"},
+]
+
+[package.dependencies]
+Flake8 = ">=5"
+TOMLi = {version = "*", markers = "python_version < \"3.11\""}
+
+[package.extras]
+dev = ["pyTest", "pyTest-cov"]
+
+[[package]]
 name = "hijri-converter"
 version = "2.2.4"
 description = "Accurate Hijri-Gregorian dates converter based on the Umm al-Qura calendar"
@@ -2382,4 +2400,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "e22b88c41aa8c545a3a717931f8a445476261f2ee4e2ba8a0d7aff3bd8587f18"
+content-hash = "df6f948eb6c4db9f1a28d4905ead525f365c27ad2601418cdabaf3e4969890d8"
