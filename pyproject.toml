@@ -106,10 +106,13 @@ extension-pkg-whitelist = "pydantic"
 
 [tool.flake8]
 max-line-length = 88
-exclude = ["venv/"]
+filename = "/openseries/*.py,/tests/*.py"
+exclude = "venv,github,git"
 extend-ignore = ["C901", "E203", "F722", "F821", "W503"]
+format = "pylint"
 disable-noqa = false
 hang-closing = false
 doctests = true
 count = true
 show-source = true
+color = "auto"
