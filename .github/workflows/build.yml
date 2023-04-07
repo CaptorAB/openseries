@@ -52,7 +52,7 @@ jobs:
       - name: Check with Flake8
         shell: bash
         run: |
-          lintresult=$(poetry run flake8 ./openseries/* ./tests/*)
+          lintresult=$(poetry run flake8)
           if [[ "$lintresult" -eq 0 || "$lintresult" -eq "0" ]]; then
               echo "Flake8 linting is OK"
           else
