@@ -25,6 +25,11 @@ To install:
 pip install openseries
 ```
 
+## Usage example on Jupyter Nbviewer and Mybinder.org
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/karrmagadgeteer2/NoteBook.git/master?labpath=openseriesnotebook.ipynb)
+[![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
+
 An overview of an OpenTimeSeries object is shown in the below example. Most of the
 time an object will be constructed from the constructing class methods. The
 OpenTimeSeries and OpenFrame classes are both subclasses of
