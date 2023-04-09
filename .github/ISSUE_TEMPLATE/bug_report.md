@@ -1,33 +1,33 @@
-# Bug Report
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
 
-## Description
+---
 
+**Describe the bug**
 A clear and concise description of the issue
 
-## Steps to Reproduce
-
+**To Reproduce**
 Please describe the steps necessary to reproduce the issue
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
-## Expected behavior
-
+**Expected behavior**
 A clear and concise description of what you expected to happen
 
-## Actual behavior
-
+**Actual behavior**
 A clear and concise description of what actually happens
 
-## Screenshots
-
+**Screenshots**
 If applicable, add screenshots to help explain your problem
 
-## Environment
-
+**Environment**
 Please provide details about your environment, such as your operating system, browser, or application version
 
-## Additional Information
-
+**Additional Information**
 Any additional information that may be helpful in solving the issue
