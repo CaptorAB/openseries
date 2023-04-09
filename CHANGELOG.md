@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.12.4] - 2023-04-09
+
+Improved project description with links to mybinder.org and Jupyter Nbviewer.
+
 ## Version [0.12.3] - 2023-04-06
 
 Added pylint as a code checker. Some checks silenced in `pyproject.toml`.

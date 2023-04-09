@@ -6,7 +6,7 @@ Given the almost non-existent audience for this project I typically only maintai
 
 | Version  | Supported          |
 |----------|--------------------|
-| 0.12.3   | :white_check_mark: |
+| 0.12.4   | :white_check_mark: |
 | < 0.11.0 | :x:                |
 
 ## Reporting a Vulnerability
