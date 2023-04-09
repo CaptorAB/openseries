@@ -35,6 +35,12 @@ time an object will be constructed from the constructing class methods. The
 OpenTimeSeries and OpenFrame classes are both subclasses of
 the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/).
 
+To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library
+the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)
+and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)
+classes have an attribute `tsdf`
+which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
+
 ```
 from pandas import DataFrame, DatetimeIndex
 from openseries.series import OpenTimeSeries, ValueType
@@ -71,11 +77,84 @@ series = OpenTimeSeries(
 )
 ```
 
-To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library
-the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)
-and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)
-classes have an attribute `tsdf`
-which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
+### Sample output using the OpenFrame.all_properties() method:
+```
+                       Scilla Global Equity C (simulation+fund) Global Low Volatility index, SEK
+                                                ValueType.PRICE                  ValueType.PRICE
+observations                                               4309                             4309
+Max drawdown in cal yr                                -0.309849                        -0.348681
+Total return                                           3.641282                         1.946319
+last indices                                         2023-04-05                       2023-04-05
+Worst                                                 -0.071616                        -0.089415
+first indices                                        2006-01-03                       2006-01-03
+Downside deviation                                     0.085956                         0.086723
+Sortino ratio                                          1.119993                         0.802975
+VaR 95.0%                                             -0.011365                        -0.010807
+Imp vol from VaR 95%                                   0.109204                         0.103834
+Arithmetic return                                      0.096271                         0.069636
+Kurtosis                                               8.511166                        17.527367
+Volatility                                             0.120279                         0.117866
+Max drawdown                                          -0.309849                        -0.435444
+Max drawdown dates                                   2020-03-23                       2009-03-09
+span of days                                               6301                             6301
+Geometric return                                       0.093057                          0.06464
+Positive share                                         0.541783                         0.551996
+CVaR 95.0%                                             -0.01793                        -0.018429
+Worst month                                           -0.122503                        -0.154485
+Z-score                                                0.587905                         0.103241
+Return vol ratio                                       0.800396                          0.59081
+Skew                                                  -0.650782                        -0.888109
+```
+
+
+## Development Instructions
+
+These instructions assume that you
+have a compatible Python version installed on your machine and that you are OK
+to install this project in a virtual environment. If not, feel free to do it your
+own way.
+
+### Windows Powershell
+
+```
+git clone https://github.com/CaptorAB/OpenSeries.git
+cd OpenSeries
+./make.ps1 -task make
+```
+
+### Mac Terminal/Linux
+
+```
+git clone https://github.com/CaptorAB/OpenSeries.git
+cd OpenSeries
+make
+source source_me
+make install
+```
+
+## Testing and Linting / Type-checking
+
+Flake8, Black and Pylint checking is embedded in the pre-commit hook but not mypy. All
+packages except Black are used in the project's GitHub workflows and are run when the
+`lint` alternative is chosen in the below commands.
+The silenced error codes can be found in the
+[pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
+files
+
+### Windows Powershell
+
+```
+./make.ps1 -task test
+./make.ps1 -task lint
+```
+
+### Mac Terminal/Linux
+
+```
+make test
+make lint
+```
+
 
 ## Table of Contents
 
@@ -267,51 +346,3 @@ properties for subset periods._
 | `kurtosis_func`           | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Kurtosis](https://www.investopedia.com/terms/k/kurtosis.asp) of the return distribution.                                                                                                                                                                      |
 | `z_score_func`            | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Z-score](https://www.investopedia.com/terms/z/zscore.asp) as (last return - mean return) / standard deviation of returns.                                                                                                                                     |
 | `target_weight_from_var`  | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | A position target weight from the ratio between a VaR implied volatility and a given target volatility.                                                                                                                                                        |
-
-## Development Instructions
-
-These instructions assume that you
-have a compatible Python version installed on your machine and that you are OK
-to install this project in a virtual environment. If not, feel free to do it your
-own way.
-
-### Windows Powershell
-
-```
-git clone https://github.com/CaptorAB/OpenSeries.git
-cd OpenSeries
-./make.ps1 -task make
-```
-
-### Mac Terminal/Linux
-
-```
-git clone https://github.com/CaptorAB/OpenSeries.git
-cd OpenSeries
-make
-source source_me
-make install
-```
-
-## Testing and Linting / Type-checking
-
-Flake8, Black and Pylint checking is embedded in the pre-commit hook but not mypy. All
-packages except Black are used in the project's GitHub workflows and are run when the
-`lint` alternative is chosen in the below commands.
-The silenced error codes can be found in the
-[pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
-files
-
-### Windows Powershell
-
-```
-./make.ps1 -task test
-./make.ps1 -task lint
-```
-
-### Mac Terminal/Linux
-
-```
-make test
-make lint
-```
