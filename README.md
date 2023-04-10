@@ -19,16 +19,14 @@ asset or a group of assets. It is solely made for daily or less frequent data.
 
 <span style="font-size:2em;">[Changelog](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
 
+
+## Basic Usage
+
 To install:
 
 ```
 pip install openseries
 ```
-
-## Usage example on Jupyter Nbviewer and Mybinder.org
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/karrmagadgeteer2/NoteBook.git/master?labpath=openseriesnotebook.ipynb)
-[![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
 
 An overview of an OpenTimeSeries object is shown in the below example. Most of the
 time an object will be constructed from the constructing class methods. The
@@ -105,6 +103,11 @@ Z-score                                                0.587905                 
 Return vol ratio                                       0.800396                          0.59081
 Skew                                                  -0.650782                        -0.888109
 ```
+
+### Usage example on Jupyter Nbviewer and Mybinder.org
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/karrmagadgeteer2/NoteBook.git/master?labpath=openseriesnotebook.ipynb)
+[![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
 
 
 ## Development Instructions
