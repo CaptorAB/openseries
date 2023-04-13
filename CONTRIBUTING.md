@@ -39,7 +39,7 @@ If possible, try to isolate the issue to a specific code block or function.
 I use four tools for styling and linting and their configurations are kept in the project's [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml) file. They are:
 
 * Black code styling
-* Flake8 
+* Flake8
 * Mypy
 * Pylint
 
