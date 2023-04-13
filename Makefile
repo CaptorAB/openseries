@@ -10,16 +10,17 @@ install:
 	pre-commit install
 
 test:
-	PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --capture=no --durations=20 --durations-min=2.0
-	PYTHONPATH=${PWD} poetry run coverage report -m
-	PYTHONPATH=${PWD} poetry run coverage-badge -o coverage.svg -f
+	poetry run coverage run -m pytest --verbose --capture=no --durations=20 --durations-min=2.0
+	poetry run coverage report -m
+	poetry run coverage-badge -o coverage.svg -f
 
 lint:
-	PYTHONPATH=${PWD} poetry run black ./openseries/*.py ./tests/*.py
-	PYTHONPATH=${PWD} poetry run flake8
-	PYTHONPATH=${PWD} poetry run mypy .
-	PYTHONPATH=${PWD} poetry run pylint ./openseries/* ./tests/*
+	poetry run black ./openseries/*.py ./tests/*.py
+	poetry run flake8
+	poetry run mypy .
+	poetry run pylint ./openseries/* ./tests/*
 
 clean:
 	deactivate
 	rm -rf venv
+	rm -f poetry.lock

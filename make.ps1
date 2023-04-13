@@ -27,19 +27,14 @@ elseif ($task -eq "test") {
 elseif ($task -eq "lint") {
     # run lint and typing checks
     poetry run black ./openseries/*.py ./tests/*.py
-    $lintresult = poetry run flake8
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host -ForegroundColor Green "Flake8 linting is OK"
-    }
-    else {
-        Write-Host $lintresult
-    }
+    poetry run flake8
     poetry run mypy .
     poetry run pylint ./openseries/* ./tests/*
 }
 elseif ($task -eq "clean") {
-    # remove virtual environment to start over
-    Remove-Item -Path ".\venv" -Recurse -Force
+    # remove virtual environment and lock file to start over
+    Remove-Item -Path ".\venv" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path 'poetry.lock' -Force -ErrorAction SilentlyContinue
 }
 else {
     # invalid task argument

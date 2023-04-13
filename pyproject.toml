@@ -111,6 +111,6 @@ extend-ignore = ["C901", "E203", "F722", "F821", "W503"]
 format = "pylint"
 hang-closing = false
 doctests = true
-count = true
+verbose = true
 show-source = true
 color = "auto"
