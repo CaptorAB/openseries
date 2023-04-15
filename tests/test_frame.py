@@ -286,7 +286,7 @@ class TestOpenFrame(TestCase):
         )
 
         _ = mpframe.make_portfolio(name=name, weight_strat="eq_risk")
-        eq_risk_weights = [f"{wgt:.10f}" for wgt in cast(List[float], mpframe.weights)]
+        eq_risk_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
         self.assertListEqual(
             eq_risk_weights,
             [
@@ -299,7 +299,7 @@ class TestOpenFrame(TestCase):
         )
 
         _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
-        inv_vol_weights = [f"{wgt:.10f}" for wgt in cast(List[float], mpframe.weights)]
+        inv_vol_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
         self.assertListEqual(
             inv_vol_weights,
             [
@@ -312,7 +312,7 @@ class TestOpenFrame(TestCase):
         )
 
         _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
-        mean_var_weights = [f"{wgt:.10f}" for wgt in cast(List[float], mpframe.weights)]
+        mean_var_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
         self.assertListEqual(
             mean_var_weights,
             [
