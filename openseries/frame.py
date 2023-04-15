@@ -10,8 +10,9 @@ from os import path
 from pathlib import Path
 from random import choices
 from string import ascii_letters
-from typing import cast, List, Tuple, Union
+from typing import cast, Dict, List, Tuple, Union
 from dateutil.relativedelta import relativedelta
+from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt, square, zeros
 from pandas import (
     concat,
@@ -50,6 +51,9 @@ from openseries.types import (
     LiteralFrameProps,
     LiteralOlsFitMethod,
     LiteralOlsFitCovType,
+    LiteralPortfolioWeightings,
+    LiteralCovMethod,
+    LiteralRiskParityMethod,
     OpenFramePropertiesList,
 )
 from openseries.risk import (
@@ -2894,20 +2898,53 @@ class OpenFrame(BaseModel):
 
         return results
 
-    def make_portfolio(self: "OpenFrame", name: str) -> DataFrame:
+    def make_portfolio(
+        self: "OpenFrame",
+        name: str,
+        weight_strat: LiteralPortfolioWeightings | None = None,
+        initial_weights: List[float] | None = None,
+        risk_weights: List[float] | None = None,
+        risk_parity_method: LiteralRiskParityMethod = "ccd",
+        maximum_iterations: int = 100,
+        tolerance: float = 1e-8,
+        weight_bounds: Tuple[float, float] = (0.0, 1.0),
+        riskfree: float = 0.0,
+        covar_method: LiteralCovMethod = "ledoit-wolf",
+        options: Dict[str, int] | None = None,
+    ) -> DataFrame:
         """Calculates a basket timeseries based on the supplied weights
 
         Parameters
         ----------
         name: str
             Name of the basket timeseries
+        weight_strat: LiteralPortfolioWeightings, optional
+            weight calculation from https://github.com/pmorissette/ffn
+        initial_weights: List[float], optional
+            Starting asset weights, default inverse volatility
+        risk_weights: List[float], optional
+            Risk target weights, default equal weight
+        risk_parity_method: LiteralRiskParityMethod, default: ccd
+            Risk parity estimation method
+        maximum_iterations: int, default: 100
+            Maximum iterations in iterative solutions
+        tolerance: float, default: 1e-8
+            Tolerance level in iterative solutions
+        weight_bounds: Tuple[float, float], default: (0.0, 1.0)
+            Weigh limits for optimization
+        riskfree: float, default: 0.0
+            Risk-free rate used in utility calculation
+        covar_method: LiteralCovMethod, default: ledoit-wolf
+            Covariance matrix estimation method
+        options: dict, optional
+            options for minimizing, e.g. {'maxiter': 10000 }
 
         Returns
         -------
         Pandas.DataFrame
             A basket timeseries
         """
-        if self.weights is None:
+        if self.weights is None and weight_strat is None:
             raise ValueError(
                 "OpenFrame weights property must be provided to run the "
                 "make_portfolio method."
@@ -2918,6 +2955,39 @@ class OpenFrame(BaseModel):
         ):
             dframe = dframe.pct_change()
             dframe.iloc[0] = 0
+        if weight_strat:
+            if weight_strat == "eq_weights":
+                self.weights = [1.0 / self.item_count] * self.item_count
+            elif weight_strat == "eq_risk":
+                weight_calc = cast(
+                    Series,
+                    calc_erc_weights(
+                        returns=dframe,
+                        initial_weights=initial_weights,
+                        risk_weights=risk_weights,
+                        risk_parity_method=risk_parity_method,
+                        maximum_iterations=maximum_iterations,
+                        tolerance=tolerance,
+                    ),
+                )
+                self.weights = weight_calc.tolist()
+            elif weight_strat == "inv_vol":
+                weight_calc = cast(Series, calc_inv_vol_weights(returns=dframe))
+                self.weights = weight_calc.tolist()
+            elif weight_strat == "mean_var":
+                weight_calc = cast(
+                    Series,
+                    calc_mean_var_weights(
+                        returns=dframe,
+                        weight_bounds=weight_bounds,
+                        rf=riskfree,
+                        covar_method=covar_method,
+                        options=options,
+                    ),
+                )
+                self.weights = weight_calc.tolist()
+            else:
+                raise NotImplementedError("Weight strategy not implemented")
         portfolio = dframe.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
         portfolio.columns = [[name], [ValueType.PRICE]]

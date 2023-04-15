@@ -5,16 +5,23 @@ from datetime import date as dtdate
 from json import loads
 from typing import cast, get_type_hints, List, Tuple, Union
 from unittest import TestCase
+from warnings import filterwarnings
 from pandas import DataFrame, date_range, DatetimeIndex
 from pandas.testing import assert_frame_equal
-from pandas.tseries.offsets import CustomBusinessDay
 
-from openseries.datefixer import date_offset_foll, holiday_calendar
+from tests.simulate import make_simulated_data_from_merton_jump_gbm
+from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.sim_price import ReturnSimulation
-from openseries.types import LiteralNanMethod, LiteralFrameProps
+from openseries.types import (
+    LiteralNanMethod,
+    LiteralFrameProps,
+    LiteralPortfolioWeightings,
+)
+
+filterwarnings("ignore", category=DeprecationWarning)
 
 
 class TestOpenFrame(TestCase):
@@ -27,47 +34,7 @@ class TestOpenFrame(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         """setUpClass for the TestOpenFrame class"""
-        OpenTimeSeries.setup_class()
-
-        sim = ReturnSimulation.from_merton_jump_gbm(
-            number_of_sims=5,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            seed=71,
-        )
-        end = dtdate(2019, 6, 30)
-        startyear = 2009
-        calendar = holiday_calendar(
-            startyear=startyear, endyear=end.year, countries=OpenTimeSeries.countries
-        )
-        d_range = [
-            dejt.date()
-            for dejt in date_range(
-                periods=sim.trading_days,
-                end=end,
-                freq=CustomBusinessDay(calendar=calendar),
-            )
-        ]
-        sdf = sim.dframe.iloc[0].T.to_frame()
-        sdf.index = d_range
-        sdf.columns = [["Asset"], [ValueType.RTRN]]
-
-        cls.randomseries = OpenTimeSeries.from_df(
-            sdf, valuetype=ValueType.RTRN
-        ).to_cumret()
-
-        tslist = []
-        for item in range(sim.number_of_sims):
-            sdf = sim.dframe.iloc[item].T.to_frame()
-            sdf.index = d_range
-            sdf.columns = [[f"Asset_{item}"], [ValueType.RTRN]]
-            tslist.append(OpenTimeSeries.from_df(sdf, valuetype=ValueType.RTRN))
-
-        cls.randomframe = OpenFrame(tslist)
+        cls.randomseries, cls.randomframe = make_simulated_data_from_merton_jump_gbm()
 
     def test_openframe_annotations_and_typehints(self: "TestOpenFrame") -> None:
         """Test OpenFrame annotations and typehints"""
@@ -306,6 +273,41 @@ class TestOpenFrame(TestCase):
                 "make_portfolio method."
             ),
         )
+
+    def test_openframe_make_portfolio_weight_strat(self: "TestOpenFrame") -> None:
+        """Test make_portfolio method with weight_strat"""
+        mpframe = self.randomframe.from_deepcopy()
+        mpframe.to_cumret()
+        name = "portfolio"
+
+        _ = mpframe.make_portfolio(name=name, weight_strat="eq_weights")
+        self.assertListEqual(
+            cast(List[float], mpframe.weights), [0.2, 0.2, 0.2, 0.2, 0.2]
+        )
+
+        _ = mpframe.make_portfolio(name=name, weight_strat="eq_risk")
+        eq_risk_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
+        self.assertListEqual(
+            eq_risk_weights,
+            ["0.20699949", "0.19341611", "0.19802411", "0.20610613", "0.19545416"],
+        )
+
+        _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
+        inv_vol_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
+        self.assertListEqual(
+            inv_vol_weights,
+            ["0.25228025", "0.16372122", "0.18177982", "0.23079188", "0.17142683"],
+        )
+
+        _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
+        mean_var_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
+        self.assertListEqual(
+            mean_var_weights,
+            ["0.24410045", "0.00000000", "0.00000000", "0.75589955", "0.00000000"],
+        )
+        with self.assertRaises(NotImplementedError):
+            bogus = cast(LiteralPortfolioWeightings, "bogus")
+            _ = mpframe.make_portfolio(name=name, weight_strat=bogus)
 
     def test_openframe_add_timeseries(self: "TestOpenFrame") -> None:
         """Test add_timeseries method"""
