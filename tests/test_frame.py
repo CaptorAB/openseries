@@ -289,39 +289,21 @@ class TestOpenFrame(TestCase):
         eq_risk_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
         self.assertListEqual(
             eq_risk_weights,
-            [
-                "0.2069994915",
-                "0.1934161057",
-                "0.1980241110",
-                "0.2061061315",
-                "0.1954541603",
-            ],
+            ["0.20699949", "0.19341611", "0.19802411", "0.20610613", "0.19545416"],
         )
 
         _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
         inv_vol_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
         self.assertListEqual(
             inv_vol_weights,
-            [
-                "0.2522802508",
-                "0.1637212205",
-                "0.1817798186",
-                "0.2307918839",
-                "0.1714268262",
-            ],
+            ["0.25228025", "0.16372122", "0.18177982", "0.23079188", "0.17142683"],
         )
 
         _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
         mean_var_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
         self.assertListEqual(
             mean_var_weights,
-            [
-                "0.2441004518",
-                "0.0000000000",
-                "0.0000000000",
-                "0.7558995482",
-                "0.0000000000",
-            ],
+            ["0.24410045", "0.00000000", "0.00000000", "0.75589955", "0.00000000"],
         )
         with self.assertRaises(NotImplementedError):
             bogus = cast(LiteralPortfolioWeightings, "bogus")
