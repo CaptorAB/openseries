@@ -29,6 +29,9 @@ LiteralCaptureRatio = Literal["up", "down", "both"]
 LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]
 LiteralPlotlyOutput = Literal["file", "div"]
 LiteralOlsFitMethod = Literal["pinv", "qr"]
+LiteralPortfolioWeightings = Literal["eq_weights", "eq_risk", "inv_vol", "mean_var"]
+LiteralCovMethod = Literal["ledoit-wolf", "standard"]
+LiteralRiskParityMethod = Literal["ccd", "slsqp"]
 LiteralOlsFitCovType = Literal[
     "nonrobust",
     "fixed scale",

@@ -7,6 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.12.5] - 2023-04-16
+
+Added weight setting strategies to the OpenFrame.make_portfolio() method. Using
+the [ffn](https://github.com/pmorissette/ffn) package.
+
 ## Version [0.12.4] - 2023-04-09
 
 Improved project description with links to mybinder.org and Jupyter Nbviewer.

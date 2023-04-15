@@ -9,19 +9,17 @@ import sys
 from typing import cast, Dict, get_type_hints, List, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range, DatetimeIndex, Series
-from pandas.tseries.offsets import CustomBusinessDay
 from pydantic.error_wrappers import ValidationError as PydanticValidationError
 import pytest
 
-from openseries.datefixer import holiday_calendar
+from tests.simulate import make_simulated_data_from_merton_jump_gbm
+from openseries.types import LiteralNanMethod, LiteralSeriesProps
 from openseries.series import (
     OpenTimeSeries,
     timeseries_chain,
     ValueType,
     check_if_none,
 )
-from openseries.sim_price import ReturnSimulation
-from openseries.types import LiteralNanMethod, LiteralSeriesProps
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
@@ -207,45 +205,13 @@ def test_opentimeseries_invalid_values(dates: List[str], values: List[float]) ->
 class TestOpenTimeSeries(TestCase):
     """class to run unittests on the module series.py"""
 
-    sim: ReturnSimulation
     randomseries: OpenTimeSeries
     random_properties: Dict[str, dt.date | int | float]
 
     @classmethod
     def setUpClass(cls) -> None:
         """setUpClass for the TestOpenTimeSeries class"""
-        OpenTimeSeries.setup_class()
-
-        sim = ReturnSimulation.from_merton_jump_gbm(
-            number_of_sims=1,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            seed=71,
-        )
-        end = dt.date(2019, 6, 30)
-        startyear = 2009
-        calendar = holiday_calendar(
-            startyear=startyear, endyear=end.year, countries=OpenTimeSeries.countries
-        )
-        d_range = [
-            d.date()
-            for d in date_range(
-                periods=sim.trading_days,
-                end=end,
-                freq=CustomBusinessDay(calendar=calendar),
-            )
-        ]
-        sdf = sim.dframe.iloc[0].T.to_frame()
-        sdf.index = d_range
-        sdf.columns = [["Asset"], [ValueType.RTRN]]
-
-        cls.randomseries = OpenTimeSeries.from_df(
-            sdf, valuetype=ValueType.RTRN
-        ).to_cumret()
+        cls.randomseries, _ = make_simulated_data_from_merton_jump_gbm()
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
             ("Asset", ValueType.PRICE)
         ]

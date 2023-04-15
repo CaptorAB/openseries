@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "0.12.4"
+version = "0.12.5"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 homepage = "https://github.com/CaptorAB/OpenSeries"
@@ -51,6 +51,7 @@ python-stdnum = "^1.18"
 requests = "^2.28.1"
 scipy = "^1.9.3"
 statsmodels = "^0.13.5"
+ffn = "^0.3.6"
 
 [tool.poetry.group.dev.dependencies]
 black = "23.1.0"
@@ -65,6 +66,13 @@ pylint = "^2.17.2"
 pytest = "^7.2.2"
 pytest-split = "^0.8.0"
 types-python-dateutil = "^2.8.19.12"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:ffn.*:",
+    "ignore::DeprecationWarning:pandas_datareader.*:"
+]
 
 [tool.black]
 line-length = 88
@@ -90,13 +98,13 @@ ignore = ["venv", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "coverage.svg",
     "LICENSE.md", "make.ps1", "Makefile", "pyproject.toml", "README.md",
     "SECURITY.md", "source_me"]
 max-line-length = 88
-max-module-lines=3250
+max-module-lines=3350
 min-public-methods=0
 max-public-methods=88
 max-statements=51
 max-branches=22
 max-locals=26
-max-args=11
+max-args=12
 output-format = "colorized"
 ignore-patterns= "\\w+\\.json$"
 
