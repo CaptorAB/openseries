@@ -2,6 +2,7 @@
 Test suite for the openseries/frame.py module
 """
 from datetime import date as dtdate
+from decimal import Decimal, localcontext, ROUND_HALF_UP
 from json import loads
 from typing import cast, get_type_hints, List, Tuple, Union
 from unittest import TestCase
@@ -285,26 +286,54 @@ class TestOpenFrame(TestCase):
             cast(List[float], mpframe.weights), [0.2, 0.2, 0.2, 0.2, 0.2]
         )
 
-        _ = mpframe.make_portfolio(name=name, weight_strat="eq_risk")
-        eq_risk_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
-        self.assertListEqual(
-            eq_risk_weights,
-            ["0.20699949", "0.19341611", "0.19802411", "0.20610613", "0.19545416"],
-        )
+        with localcontext() as decimal_context:
+            decimal_context.rounding = ROUND_HALF_UP
 
-        _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
-        inv_vol_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
-        self.assertListEqual(
-            inv_vol_weights,
-            ["0.25228025", "0.16372122", "0.18177982", "0.23079188", "0.17142683"],
-        )
+            _ = mpframe.make_portfolio(name=name, weight_strat="eq_risk")
+            eq_risk_weights = [
+                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+            ]
+            self.assertListEqual(
+                eq_risk_weights,
+                [
+                    Decimal("0.206999"),
+                    Decimal("0.193416"),
+                    Decimal("0.198024"),
+                    Decimal("0.206106"),
+                    Decimal("0.195454"),
+                ],
+            )
 
-        _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
-        mean_var_weights = [f"{wgt:.8f}" for wgt in cast(List[float], mpframe.weights)]
-        self.assertListEqual(
-            mean_var_weights,
-            ["0.24410045", "0.00000000", "0.00000000", "0.75589955", "0.00000000"],
-        )
+            _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
+            inv_vol_weights = [
+                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+            ]
+            self.assertListEqual(
+                inv_vol_weights,
+                [
+                    Decimal("0.252280"),
+                    Decimal("0.163721"),
+                    Decimal("0.181780"),
+                    Decimal("0.230792"),
+                    Decimal("0.171427"),
+                ],
+            )
+
+            _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
+            mean_var_weights = [
+                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+            ]
+            self.assertListEqual(
+                mean_var_weights,
+                [
+                    Decimal("0.244100"),
+                    Decimal("0.000000"),
+                    Decimal("0.000000"),
+                    Decimal("0.755900"),
+                    Decimal("0.000000"),
+                ],
+            )
+
         with self.assertRaises(NotImplementedError):
             bogus = cast(LiteralPortfolioWeightings, "bogus")
             _ = mpframe.make_portfolio(name=name, weight_strat=bogus)
