@@ -300,3 +300,25 @@ class TestDateFixer(TestCase):
             custom_holidays={"2021-02-12": "Jack's birthday"},
         )
         self.assertEqual(dt.date(2021, 2, 9), offsetdate_with)
+
+    def test_offset_business_days_many_days(self: "TestDateFixer") -> None:
+        """Test offset_business_days function with many days"""
+        startdate = dt.date(2023, 4, 13)
+        forward = 2421
+        forwarddate = dt.date(2033, 4, 13)
+        backward = -forward
+        backwarddate = dt.date(2013, 4, 23)
+
+        offsetdate_forward = offset_business_days(
+            ddate=startdate,
+            days=forward,
+            countries=["SE", "US"],
+        )
+        self.assertEqual(offsetdate_forward, forwarddate)
+
+        offsetdate_backward = offset_business_days(
+            ddate=startdate,
+            days=backward,
+            countries=["SE", "US"],
+        )
+        self.assertEqual(offsetdate_backward, backwarddate)

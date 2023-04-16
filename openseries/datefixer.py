@@ -253,8 +253,9 @@ def offset_business_days(
     datetime.date
         The new offset business day
     """
-    ndate = ddate + dt.timedelta(days=days)
     if days <= 0:
+        scaledtoyeardays = int((days * 372 / 250) // 1) - 365
+        ndate = ddate + dt.timedelta(days=scaledtoyeardays)
         calendar = holiday_calendar(
             startyear=ndate.year,
             endyear=ddate.year,
@@ -264,12 +265,14 @@ def offset_business_days(
         local_bdays: List[dt.date] = [
             bday.date()
             for bday in date_range(
-                periods=abs(days + 10),
+                periods=abs(scaledtoyeardays),
                 end=ddate,
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
     else:
+        scaledtoyeardays = int((days * 372 / 250) // 1) + 365
+        ndate = ddate + dt.timedelta(days=scaledtoyeardays)
         calendar = holiday_calendar(
             startyear=ddate.year,
             endyear=ndate.year,
@@ -280,7 +283,7 @@ def offset_business_days(
             bday.date()
             for bday in date_range(
                 start=ddate,
-                periods=days + 10,
+                periods=scaledtoyeardays,
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
