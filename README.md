@@ -104,7 +104,7 @@ Return vol ratio                                       0.800396                 
 Skew                                                  -0.650782                        -0.888109
 ```
 
-### Usage example on Jupyter Nbviewer and Mybinder.org
+### Usage example on Mybinder.org and Jupyter Nbviewer
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/karrmagadgeteer2/NoteBook.git/master?labpath=openseriesnotebook.ipynb)
 [![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
@@ -138,8 +138,8 @@ make install
 ## Testing and Linting / Type-checking
 
 Flake8, Black and Pylint checking is embedded in the pre-commit hook but not mypy. All
-packages except Black are used in the project's GitHub workflows and are run when the
-`lint` alternative is chosen in the below commands.
+packages are used in the project's GitHub workflows and are run when the `lint`
+alternative is chosen in the below commands.
 The silenced error codes can be found in the
 [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
 files
