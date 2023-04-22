@@ -463,6 +463,8 @@ class TestOpenFrame(TestCase):
         sames.to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
         samef = self.randomframe.from_deepcopy()
+        for serie in samef.constituents:
+            serie.to_cumret()
         samef.to_cumret()
 
         methods_to_compare = [
@@ -2512,7 +2514,7 @@ class TestOpenFrame(TestCase):
                 tmp = oframe.ord_least_squares_fit(
                     y_column=i, x_column=j, fitted_series=False
                 )
-                results.append(f"{float(tmp.params):.11f}")
+                results.append(f"{float(tmp.params.iloc[0]):.11f}")
 
         results_tuple = []
         for i in oframe.tsdf:
@@ -2520,7 +2522,7 @@ class TestOpenFrame(TestCase):
                 tmp = oframe.ord_least_squares_fit(
                     y_column=i, x_column=j, fitted_series=False
                 )
-                results_tuple.append(f"{float(tmp.params):.11f}")
+                results_tuple.append(f"{float(tmp.params.iloc[0]):.11f}")
 
         self.assertListEqual(results, results_tuple)
         self.assertListEqual(

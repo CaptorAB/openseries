@@ -65,7 +65,9 @@ class ReturnSimulation(BaseModel):
             Annualized arithmetic mean of returns
         """
 
-        return float(self.results.pct_change().mean() * self.trading_days_in_year)
+        return float(
+            (self.results.pct_change().mean() * self.trading_days_in_year).iloc[0]
+        )
 
     @property
     def realized_vol(self: "ReturnSimulation") -> float:
@@ -76,7 +78,9 @@ class ReturnSimulation(BaseModel):
             Annualized volatility
         """
 
-        return float(self.results.pct_change().std() * sqrt(self.trading_days_in_year))
+        return float(
+            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[0]
+        )
 
     @classmethod
     def from_normal(

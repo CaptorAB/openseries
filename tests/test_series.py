@@ -887,7 +887,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(
             f"{1.689055852583:.12f}",
-            f"{float(adjustedseries.tsdf.iloc[-1]):.12f}",
+            f"{float(adjustedseries.tsdf.iloc[-1, 0]):.12f}",
         )
         adjustedseries_returns = self.randomseries.from_deepcopy()
         adjustedseries_returns.value_to_ret()
@@ -895,13 +895,13 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(
             f"{0.009114963334:.12f}",
-            f"{float(adjustedseries_returns.tsdf.iloc[-1]):.12f}",
+            f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.12f}",
         )
 
         adjustedseries_returns.to_cumret()
         self.assertEqual(
-            f"{float(adjustedseries.tsdf.iloc[-1]):.12f}",
-            f"{float(adjustedseries_returns.tsdf.iloc[-1]):.12f}",
+            f"{float(adjustedseries.tsdf.iloc[-1, 0]):.12f}",
+            f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.12f}",
         )
 
     def test_opentimeseries_timeseries_chain(self: "TestOpenTimeSeries") -> None:
@@ -2061,7 +2061,7 @@ class TestOpenTimeSeries(TestCase):
         mseries = self.randomseries.from_deepcopy()
         ddvalue = mseries.max_drawdown
         mseries.to_drawdown_series()
-        ddserievalue = float(mseries.tsdf.min())
+        ddserievalue = float((mseries.tsdf.min()).iloc[0])
         self.assertEqual(f"{ddvalue:.11f}", f"{ddserievalue:.11f}")
 
     def test_opentimeseries_set_new_label(self: "TestOpenTimeSeries") -> None:

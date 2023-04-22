@@ -155,7 +155,9 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
     """
 
     mdate = max_drawdown_date(prices)
-    maxdown = float((prices / prices.expanding(min_periods=1).max()).min() - 1)
+    maxdown = float(
+        ((prices / prices.expanding(min_periods=1).max()).min() - 1).iloc[0]
+    )
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn.sort_index(ascending=False, inplace=True)
