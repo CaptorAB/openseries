@@ -161,6 +161,9 @@ make lint
 
 ## Table of Contents
 
+- [Basic Usage](#basic-usage)
+- [Development Instructions](#development-instructions)
+- [Testing and Linting / Type-checking](#testing-and-linting--type-checking)
 - [Files / Modules in the project](#files-in-the-project)
 - [Class methods used to construct an OpenTimeSeries](#class-methods-used-to-construct-an-opentimeseries-object)
 - [OpenTimeSeries non-numerical properties](#non-numerical-or-helper-properties-that-apply-only-to-the-opentimeseries-class)
@@ -171,8 +174,6 @@ make lint
 - [Methods for both classes](#methods-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
 - [Numerical properties for both classes](#numerical-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
 - [Numerical methods with period arguments for both classes](#methods-below-are-identical-to-the-numerical-properties-above)
-- [Development Instructions](#development-instructions)
-- [Testing and Linting / Type-checking](#testing-and-linting--type-checking)
 
 ### Files in the project
 
@@ -181,9 +182,10 @@ make lint
 | [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
 | [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
 | [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/datefixer.py)                       | Date utilities. Please read the docstring of each function for its description.                                                                                                                     |
+| [load_plotly.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/load_plotly.py)                   | Functions to load [Plotly](https://plotly.com/python/) default layout and configuration from local json file.                                                                                       |
 | [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_layouts.json)         | [Plotly](https://plotly.com/python/) defaults used in the `plot_bars` and `plot_series` methods.                                                                                                    |
 | [plotly_captor_logo.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_captor_logo.json) | JSON with a link to the Captor logo used in the `plot_bars` and `plot_series` methods.                                                                                                              |
-| [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/risk.py)                                 | Methods used to calculate VaR, CVaR and drawdowns.                                                                                                                                                  |
+| [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/risk.py)                                 | Functions used to calculate VaR, CVaR and drawdowns.                                                                                                                                                |
 | [sim_price.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/sim_price.py)                       | Simulates OpenTimeSeries from different stochastic processes.                                                                                                                                       |
 | [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/stoch_processes.py)           | Generates stochastic processes used in the `sim_price.py` module.                                                                                                                                   |
 | [types.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/types.py)                               | Contains all bespoke typing.                                                                                                                                                                        |
