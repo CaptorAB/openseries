@@ -2,6 +2,7 @@
 Defining the ReturnSimulation class which simulates returns based on
 stochastic processes generated using the stoch_process.py module.
 """
+from typing import cast
 from numpy import insert, random, sqrt
 from pandas import DataFrame
 from pydantic import BaseModel
@@ -65,7 +66,10 @@ class ReturnSimulation(BaseModel):
             Annualized arithmetic mean of returns
         """
 
-        return float(self.results.pct_change().mean() * self.trading_days_in_year)
+        return cast(
+            float,
+            (self.results.pct_change().mean() * self.trading_days_in_year).iloc[0],
+        )
 
     @property
     def realized_vol(self: "ReturnSimulation") -> float:
@@ -76,7 +80,10 @@ class ReturnSimulation(BaseModel):
             Annualized volatility
         """
 
-        return float(self.results.pct_change().std() * sqrt(self.trading_days_in_year))
+        return cast(
+            float,
+            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[0],
+        )
 
     @classmethod
     def from_normal(

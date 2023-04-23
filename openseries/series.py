@@ -648,17 +648,21 @@ class OpenTimeSeries(BaseModel):
         """
 
         if (
-            float(self.tsdf.loc[self.first_idx]) == 0.0
+            self.tsdf.loc[self.first_idx, self.tsdf.columns.values[0]] == 0.0
             or self.tsdf.lt(0.0).values.any()
         ):
             raise ValueError(
                 "Geometric return cannot be calculated due to an initial "
                 "value being zero or a negative value."
             )
-        return float(
-            (self.tsdf.loc[self.last_idx] / self.tsdf.loc[self.first_idx])
+        return cast(
+            float,
+            (
+                self.tsdf.loc[self.last_idx, self.tsdf.columns.values[0]]
+                / self.tsdf.loc[self.first_idx, self.tsdf.columns.values[0]]
+            )
             ** (1 / self.yearfrac)
-            - 1
+            - 1,
         )
 
     def geo_ret_func(
@@ -689,7 +693,7 @@ class OpenTimeSeries(BaseModel):
         fraction = (later - earlier).days / 365.25
 
         if (
-            float(self.tsdf.loc[earlier]) == 0.0
+            self.tsdf.loc[earlier, self.tsdf.columns.values[0]] == 0.0
             or self.tsdf.loc[cast(int, earlier) : cast(int, later)].lt(0.0).values.any()
         ):
             raise ValueError(
@@ -697,8 +701,14 @@ class OpenTimeSeries(BaseModel):
                 "value being zero or a negative value."
             )
 
-        return float(
-            (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
+        return cast(
+            float,
+            (
+                self.tsdf.loc[later, self.tsdf.columns.values[0]]
+                / self.tsdf.loc[earlier, self.tsdf.columns.values[0]]
+            )
+            ** (1 / fraction)
+            - 1,
         )
 
     @property
@@ -711,7 +721,7 @@ class OpenTimeSeries(BaseModel):
             Annualized arithmetic mean of returns
         """
 
-        return float(self.tsdf.pct_change().mean() * self.periods_in_a_year)
+        return float((self.tsdf.pct_change().mean() * self.periods_in_a_year).iloc[0])
 
     def arithmetic_ret_func(
         self: "OpenTimeSeries",
@@ -746,15 +756,16 @@ class OpenTimeSeries(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
-                    numeric_only=True
-                )
-            )
+            how_many = self.tsdf.loc[
+                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+            ].count()
             time_factor = how_many / fraction
-        return float(
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().mean()
-            * time_factor
+        return cast(
+            float,
+            (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().mean()
+                * time_factor
+            ).iloc[0],
         )
 
     @property
@@ -766,12 +777,12 @@ class OpenTimeSeries(BaseModel):
             Simple return
         """
 
-        if float(self.tsdf.iloc[0]) == 0.0:
+        if self.tsdf.iloc[0, 0] == 0.0:
             raise ValueError(
                 "Simple Return cannot be calculated due to an initial value being "
                 "zero."
             )
-        return float(self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1)
+        return float((self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1).iloc[0])
 
     def value_ret_func(
         self: "OpenTimeSeries",
@@ -797,12 +808,12 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if float(self.tsdf.loc[earlier]) == 0.0:
+        if self.tsdf.loc[earlier, self.tsdf.columns.values[0]] == 0.0:
             raise ValueError(
                 "Simple Return cannot be calculated due to an initial value being "
                 "zero."
             )
-        return float(self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1)
+        return float((self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1).iloc[0])
 
     def value_ret_calendar_period(
         self: "OpenTimeSeries", year: int, month: int | None = None
@@ -829,7 +840,7 @@ class OpenTimeSeries(BaseModel):
             period = "-".join([str(year), str(month).zfill(2)])
         rtn = caldf.copy().pct_change()
         rtn = rtn.loc[period] + 1
-        return float(rtn.apply(cumprod, axis="index").iloc[-1] - 1)
+        return float((rtn.apply(cumprod, axis="index").iloc[-1] - 1).iloc[0])
 
     @property
     def vol(self: "OpenTimeSeries") -> float:
@@ -843,7 +854,9 @@ class OpenTimeSeries(BaseModel):
             Annualized volatility
         """
 
-        return float(self.tsdf.pct_change().std() * sqrt(self.periods_in_a_year))
+        return cast(
+            float, (self.tsdf.pct_change().std() * sqrt(self.periods_in_a_year)).iloc[0]
+        )
 
     def vol_func(
         self: "OpenTimeSeries",
@@ -880,16 +893,16 @@ class OpenTimeSeries(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
-                    numeric_only=True
-                )
-            )
+            how_many = self.tsdf.loc[
+                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+            ].count()
             time_factor = how_many / fraction
-
-        return float(
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().std()
-            * sqrt(time_factor)
+        return cast(
+            float,
+            (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().std()
+                * sqrt(time_factor)
+            ).iloc[0],
         )
 
     @property
@@ -907,9 +920,10 @@ class OpenTimeSeries(BaseModel):
 
         dddf = self.tsdf.pct_change()
 
-        return float(
+        return cast(
+            float,
             sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / self.length)
-            * sqrt(self.periods_in_a_year)
+            * sqrt(self.periods_in_a_year),
         )
 
     def downside_deviation_func(
@@ -947,10 +961,12 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = float(
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+        how_many = (
+            self.tsdf.loc[
+                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+            ]
             .pct_change()
-            .count(numeric_only=True)
+            .count()
         )
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -964,9 +980,10 @@ class OpenTimeSeries(BaseModel):
             .sub(min_accepted_return / time_factor)
         )
 
-        return float(
+        return cast(
+            float,
             sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-            * sqrt(time_factor)
+            * sqrt(time_factor),
         )
 
     @property
@@ -1085,9 +1102,12 @@ class OpenTimeSeries(BaseModel):
             Z-score as (last return - mean return) / standard deviation of returns.
         """
 
-        return float(
-            (self.tsdf.pct_change().iloc[-1] - self.tsdf.pct_change().mean())
-            / self.tsdf.pct_change().std()
+        return cast(
+            float,
+            (
+                (self.tsdf.pct_change().iloc[-1] - self.tsdf.pct_change().mean())
+                / self.tsdf.pct_change().std()
+            ).iloc[0],
         )
 
     def z_score_func(
@@ -1116,7 +1136,7 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         part = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().copy()
-        return float((part.iloc[-1] - part.mean()) / part.std())
+        return float(((part.iloc[-1] - part.mean()) / part.std()).iloc[0])
 
     @property
     def max_drawdown(self: "OpenTimeSeries") -> float:
@@ -1128,7 +1148,10 @@ class OpenTimeSeries(BaseModel):
             Maximum drawdown without any limit on date range
         """
 
-        return float((self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1)
+        return cast(
+            float,
+            ((self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1).iloc[0],
+        )
 
     @property
     def max_drawdown_date(self: "OpenTimeSeries") -> dt.date:
@@ -1175,14 +1198,17 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return float(
+        return cast(
+            float,
             (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .expanding(min_periods=1)
-                .max()
-            ).min()
-            - 1
+                (
+                    self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                    / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                    .expanding(min_periods=1)
+                    .max()
+                ).min()
+                - 1
+            ).iloc[0],
         )
 
     @property
@@ -1195,10 +1221,13 @@ class OpenTimeSeries(BaseModel):
             Maximum drawdown in a single calendar year.
         """
         years = [d.year for d in self.tsdf.index]
-        return float(
-            self.tsdf.groupby(years)
-            .apply(lambda x: (x / x.expanding(min_periods=1).max()).min() - 1)
-            .min()
+        return cast(
+            float,
+            (
+                self.tsdf.groupby(years)
+                .apply(lambda x: (x / x.expanding(min_periods=1).max()).min() - 1)
+                .min()
+            ).iloc[0],
         )
 
     @property
@@ -1210,7 +1239,7 @@ class OpenTimeSeries(BaseModel):
             Most negative percentage change
         """
 
-        return float(self.tsdf.pct_change().min())
+        return float((self.tsdf.pct_change().min()).iloc[0])
 
     @property
     def worst_month(self: "OpenTimeSeries") -> float:
@@ -1223,7 +1252,7 @@ class OpenTimeSeries(BaseModel):
 
         resdf = self.tsdf.copy()
         resdf.index = DatetimeIndex(resdf.index)
-        return float(resdf.resample("BM").last().pct_change().min())
+        return float((resdf.resample("BM").last().pct_change().min()).iloc[0])
 
     def worst_func(
         self: "OpenTimeSeries",
@@ -1253,12 +1282,15 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return float(
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .rolling(observations, min_periods=observations)
-            .sum()
-            .min()
+        return cast(
+            float,
+            (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change()
+                .rolling(observations, min_periods=observations)
+                .sum()
+                .min()
+            ).iloc[0],
         )
 
     @property
@@ -1273,7 +1305,7 @@ class OpenTimeSeries(BaseModel):
             self.tsdf.pct_change()[1:].values >= 0.0
         ].count()
         tot = self.tsdf.pct_change()[1:].count()
-        return float(pos / tot)
+        return float((pos / tot).iloc[0])
 
     def positive_share_func(
         self: "OpenTimeSeries",
@@ -1300,9 +1332,12 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         period = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
-        return float(
-            period[period.pct_change().ge(0.0)].count(numeric_only=True)
-            / period.pct_change().count(numeric_only=True)
+        return cast(
+            float,
+            (
+                period[period.pct_change().ge(0.0)].count()
+                / period.pct_change().count()
+            ).iloc[0],
         )
 
     @property
@@ -1349,7 +1384,7 @@ class OpenTimeSeries(BaseModel):
                 self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
                 bias=True,
                 nan_policy="omit",
-            )
+            ),
         )
 
     @property
@@ -1416,12 +1451,15 @@ class OpenTimeSeries(BaseModel):
         """
         level: float = 0.95
         items = self.tsdf.iloc[:, 0].pct_change().count()
-        return float(
-            self.tsdf.iloc[:, 0]
-            .pct_change()
-            .sort_values()
-            .iloc[: int(ceil((1 - level) * items))]
-            .mean()
+        return cast(
+            float,
+            (
+                self.tsdf.iloc[:, 0]
+                .pct_change()
+                .sort_values()
+                .iloc[: int(ceil((1 - level) * items))]
+                .mean()
+            ),
         )
 
     def cvar_down_func(
@@ -1459,14 +1497,17 @@ class OpenTimeSeries(BaseModel):
             .pct_change()
             .count()
         )
-        return float(
-            self.tsdf.loc[
-                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
-            ]
-            .pct_change()
-            .sort_values()
-            .iloc[: int(ceil((1 - level) * how_many))]
-            .mean()
+        return cast(
+            float,
+            (
+                self.tsdf.loc[
+                    cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+                ]
+                .pct_change()
+                .sort_values()
+                .iloc[: int(ceil((1 - level) * how_many))]
+                .mean()
+            ),
         )
 
     @property
@@ -1482,8 +1523,13 @@ class OpenTimeSeries(BaseModel):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        return float(
-            self.tsdf.pct_change().quantile(1 - level, interpolation=interpolation)
+        return cast(
+            float,
+            (
+                self.tsdf.pct_change()
+                .quantile(1 - level, interpolation=interpolation)
+                .iloc[0]
+            ),
         )
 
     def var_down_func(
@@ -1520,10 +1566,13 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return float(
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .quantile(q=1 - level, interpolation=interpolation)
+        return cast(
+            float,
+            (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change()
+                .quantile(q=1 - level, interpolation=interpolation)
+            ).iloc[0],
         )
 
     @property
@@ -1537,10 +1586,13 @@ class OpenTimeSeries(BaseModel):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        return float(
-            -sqrt(self.periods_in_a_year)
-            * self.var_down_func(level, interpolation=interpolation)
-            / norm.ppf(level)
+        return cast(
+            float,
+            (
+                -sqrt(self.periods_in_a_year)
+                * self.var_down_func(level, interpolation=interpolation)
+                / norm.ppf(level)
+            ),
         )
 
     def vol_from_var_func(
@@ -1586,39 +1638,44 @@ class OpenTimeSeries(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
-                    numeric_only=True
-                )
-            )
+            how_many = self.tsdf.loc[
+                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+            ].count()
             time_factor = how_many / fraction
         if drift_adjust:
-            return float(
-                (-sqrt(time_factor) / norm.ppf(level))
-                * (
-                    self.var_down_func(
-                        level,
-                        months_from_last,
-                        from_date,
-                        to_date,
-                        interpolation,
+            return cast(
+                float,
+                (
+                    (-sqrt(time_factor) / norm.ppf(level))
+                    * (
+                        self.var_down_func(
+                            level,
+                            months_from_last,
+                            from_date,
+                            to_date,
+                            interpolation,
+                        )
+                        - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                        .pct_change()
+                        .sum()
+                        / len(
+                            self.tsdf.loc[
+                                cast(int, earlier) : cast(int, later)
+                            ].pct_change()
+                        )
                     )
-                    - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                    .pct_change()
-                    .sum()
-                    / len(
-                        self.tsdf.loc[
-                            cast(int, earlier) : cast(int, later)
-                        ].pct_change()
-                    )
+                ).iloc[0],
+            )
+
+        return cast(
+            float,
+            (
+                -sqrt(time_factor)
+                * self.var_down_func(
+                    level, months_from_last, from_date, to_date, interpolation
                 )
-            )
-        return float(
-            -sqrt(time_factor)
-            * self.var_down_func(
-                level, months_from_last, from_date, to_date, interpolation
-            )
-            / norm.ppf(level)
+                / norm.ppf(level)
+            ),
         )
 
     def target_weight_from_var(
@@ -1935,32 +1992,32 @@ class OpenTimeSeries(BaseModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
-            how_many = int(self.length)
         else:
+            how_many = self.tsdf.loc[
+                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+            ].count()
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count(
-                    numeric_only=True
-                )
-            )
             time_factor = how_many / fraction
 
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         data[self.label, "Returns"] = (
-            data.loc[:, (self.label, ValueType.PRICE)].apply(log).diff()
+            data.loc[:, self.tsdf.columns.values[0]].apply(log).diff()
         )
-        data[self.label, ValueType.EWMA] = zeros(how_many)
+        data[self.label, ValueType.EWMA] = zeros(data.iloc[:, 0].count())
         data.loc[:, (self.label, ValueType.EWMA)].iloc[0] = data.loc[
             :, (self.label, "Returns")
         ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
         prev = data.loc[self.first_idx]
-        for _, row in data.iloc[1:].iterrows():
+        for indx, row in data.iloc[1:].iterrows():
             row.loc[self.label, ValueType.EWMA] = sqrt(
                 square(row.loc[self.label, "Returns"]) * time_factor * (1 - lmbda)
                 + square(prev.loc[self.label, ValueType.EWMA]) * lmbda
             )
+            data.loc[indx, (self.label, ValueType.EWMA)] = row.loc[
+                self.label, ValueType.EWMA
+            ]
             prev = row.copy()
 
         return data.loc[:, (self.label, ValueType.EWMA)]
@@ -2150,7 +2207,7 @@ class OpenTimeSeries(BaseModel):
             values = [1.0]
             returns_input = True
         else:
-            values = [float(self.tsdf.iloc[0])]
+            values = [self.tsdf.iloc[0, 0]]
             ra_df = self.tsdf.pct_change().copy()
             returns_input = False
         ra_df.dropna(inplace=True)
@@ -2163,7 +2220,7 @@ class OpenTimeSeries(BaseModel):
             dates.append(idx)
             values.append(
                 values[-1]
-                * (1 + float(row) + adjustment * (idx - prev).days / days_in_year)
+                * (1 + row.iloc[0] + adjustment * (idx - prev).days / days_in_year)
             )
             prev = idx
         self.tsdf = DataFrame(data=values, index=dates)
@@ -2417,7 +2474,7 @@ def timeseries_chain(
     values = array([float(x) for x in old.tsdf.values][: len(dates)])
     values = cast(
         ndarray[Any, dtype[Any]],
-        list(values * float(new.tsdf.loc[first]) / float(olddf.loc[first])),
+        list(values * new.tsdf.iloc[:, 0].loc[first] / olddf.iloc[:, 0].loc[first]),
     )
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])

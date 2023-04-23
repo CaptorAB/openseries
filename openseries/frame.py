@@ -548,10 +548,8 @@ class OpenFrame(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .count(numeric_only=True)
-                .iloc[0]
+            how_many = (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
             )
             time_factor = how_many / fraction
         return Series(
@@ -700,10 +698,8 @@ class OpenFrame(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .count(numeric_only=True)
-                .iloc[0]
+            how_many = (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
             )
             time_factor = how_many / fraction
         return Series(
@@ -1721,10 +1717,8 @@ class OpenFrame(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .count(numeric_only=True)
-                .iloc[0]
+            how_many = (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
             )
             time_factor = how_many / fraction
         if drift_adjust:
@@ -2059,15 +2053,15 @@ class OpenFrame(BaseModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed is None:
             fraction = (later - earlier).days / 365.25
-            how_many = int(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .count(numeric_only=True)
-                .iloc[0]
+            how_many = (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
             )
             time_factor = how_many / fraction
         else:
             time_factor = periods_in_a_year_fixed
-            how_many = int(self.length)
+            how_many = (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
+            )
 
         corr_label = (
             self.tsdf.iloc[:, first_column].name[0]
@@ -2104,11 +2098,12 @@ class OpenFrame(BaseModel):
         )
 
         prev = data.loc[self.first_idx]
-        for _, row in data.iloc[1:].iterrows():
+        for indx, row in data.iloc[1:].iterrows():
             row.loc[cols, ValueType.EWMA] = sqrt(
                 square(row.loc[cols, "Returns"].to_numpy()) * time_factor * (1 - lmbda)
                 + square(prev.loc[cols, ValueType.EWMA].to_numpy()) * lmbda
             )
+            data.loc[indx, (cols, ValueType.EWMA)] = row.loc[cols, ValueType.EWMA]
             row.loc["Cov", ValueType.EWMA] = (
                 row.loc[cols[0], "Returns"]
                 * row.loc[cols[1], "Returns"]
@@ -2116,9 +2111,13 @@ class OpenFrame(BaseModel):
                 * (1 - lmbda)
                 + prev.loc["Cov", ValueType.EWMA] * lmbda
             )
+            data.loc[indx, ("Cov", ValueType.EWMA)] = row.loc["Cov", ValueType.EWMA]
             row.loc[corr_label, ValueType.EWMA] = row.loc["Cov", ValueType.EWMA] / (
                 2 * row.loc[cols[0], ValueType.EWMA] * row.loc[cols[1], ValueType.EWMA]
             )
+            data.loc[indx, (corr_label, ValueType.EWMA)] = row.loc[
+                corr_label, ValueType.EWMA
+            ]
             prev = row.copy()
 
         ewma_df = data.loc[:, (cols + [corr_label], ValueType.EWMA)]

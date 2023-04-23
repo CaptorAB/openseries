@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.12.6] - 2023-04-23
+
+Changes made to ensure compatability with Pandas 2.0.0.
+
 ## Version [0.12.5] - 2023-04-16
 
 Added weight setting strategies to the OpenFrame.make_portfolio() method. Using

@@ -43,7 +43,7 @@ def cvar_down(data: DataFrame | Series | List[float], level: float = 0.95) -> fl
         clean = nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
     array = sort(ret)
-    return float(mean(array[: int(ceil(len(array) * (1 - level)))]))
+    return cast(float, mean(array[: int(ceil(len(array) * (1 - level)))]))
 
 
 def var_down(
@@ -75,8 +75,7 @@ def var_down(
     else:
         clean = nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
-    result = quantile(ret, 1 - level, method=interpolation)
-    return float(result)
+    return cast(float, quantile(ret, 1 - level, method=interpolation))
 
 
 def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
@@ -155,7 +154,7 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
     """
 
     mdate = max_drawdown_date(prices)
-    maxdown = float((prices / prices.expanding(min_periods=1).max()).min() - 1)
+    maxdown = ((prices / prices.expanding(min_periods=1).max()).min() - 1).iloc[0]
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn.sort_index(ascending=False, inplace=True)
