@@ -94,9 +94,6 @@ exclude = ["venv/*"]
 
 [tool.pylint]
 disable = ["C2801", "E0213", "R0801"]
-ignore = ["venv", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "coverage.svg",
-    "LICENSE.md", "make.ps1", "Makefile", "pyproject.toml", "README.md",
-    "SECURITY.md", "source_me"]
 max-line-length = 88
 max-module-lines=3350
 min-public-methods=0
