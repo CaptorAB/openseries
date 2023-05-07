@@ -3,12 +3,13 @@ param (
 )
 
 if ($task -eq "active") {
-    # run commands to activate virtual environment
     $env:PYTHONPATH = "$env:PYTHONPATH;$pwd"
     .\venv\Scripts\activate
 }
 elseif ($task -eq "make") {
-    # make virtual environment
+    # remove old environment if present and create new environment
+    deactivate
+    Remove-Item -Path ".\venv" -Recurse -Force -ErrorAction SilentlyContinue
     python -m venv ./venv
     $env:PYTHONPATH = "$env:PYTHONPATH;$pwd"
     .\venv\Scripts\activate

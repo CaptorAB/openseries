@@ -2092,6 +2092,34 @@ class OpenFrame(BaseModel):
                 :, (rtn, "Returns")
             ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
+        # raw_one = [
+        #     data.loc[:, (cols[0], "Returns")]
+        #     .iloc[1:day_chunk]
+        #     .std(ddof=dlta_degr_freedms)
+        #     * sqrt(time_factor)
+        # ]
+        # raw_two = [
+        #     data.loc[:, (cols[0], "Returns")]
+        #     .iloc[1:day_chunk]
+        #     .std(ddof=dlta_degr_freedms)
+        #     * sqrt(time_factor)
+        # ]
+        # raw_cov = [
+        #     cov(
+        #         m=data.loc[:, (cols[0], "Returns")].iloc[1:day_chunk].to_numpy(),
+        #         y=data.loc[:, (cols[1], "Returns")].iloc[1:day_chunk].to_numpy(),
+        #         ddof=dlta_degr_freedms,
+        #     )[0][1]
+        # ]
+        # raw_corr = [
+        #     data.loc[:, ("Cov", ValueType.EWMA)].iloc[0]
+        #     / (
+        #         2
+        #         * data.loc[:, (cols[0], ValueType.EWMA)].iloc[0]
+        #         * data.loc[:, (cols[1], ValueType.EWMA)].iloc[0]
+        #     )
+        # ]
+
         data["Cov", ValueType.EWMA] = zeros(how_many)
         data[corr_label, ValueType.EWMA] = zeros(how_many)
         data.loc[:, ("Cov", ValueType.EWMA)].iloc[0] = cov(

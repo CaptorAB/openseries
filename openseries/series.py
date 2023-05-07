@@ -85,6 +85,33 @@ def check_if_none(item: Any) -> bool:
         return len(str(item)) == 0
 
 
+def ewma_calc(
+    reeturn: float, prev_ewma: float, time_factor: float, lmbda: float = 0.94
+) -> float:
+    """Helper function for EWMA calculation
+
+    Parameters
+    ----------
+    reeturn : float
+        Return value
+    prev_ewma : float
+        Previous EWMA volatility value
+    time_factor : float
+        Scaling factor to annualize
+    lmbda: float, default: 0.94
+        Scaling factor to determine weighting.
+
+    Returns
+    -------
+    float
+        EWMA volatility value
+    """
+    return cast(
+        float,
+        sqrt(square(reeturn) * time_factor * (1 - lmbda) + square(prev_ewma) * lmbda),
+    )
+
+
 class ValueType(str, Enum):
     """Class defining the different timeseries types within the project"""
 
@@ -2020,18 +2047,16 @@ class OpenTimeSeries(BaseModel):
             * sqrt(time_factor)
         ]
 
-        def ewma_calc(reeturn: float, prev_ewma: float) -> float:
-            return cast(
-                float,
-                sqrt(
-                    square(reeturn) * time_factor * (1 - lmbda)
-                    + square(prev_ewma) * lmbda
-                ),
-            )
-
         for item in data.loc[:, (self.label, "Returns")].iloc[1:]:
             previous = rawdata[-1]
-            rawdata.append(ewma_calc(reeturn=item, prev_ewma=previous))
+            rawdata.append(
+                ewma_calc(
+                    reeturn=item,
+                    prev_ewma=previous,
+                    time_factor=time_factor,
+                    lmbda=lmbda,
+                )
+            )
 
         data.loc[:, (self.label, ValueType.EWMA)] = rawdata
 
