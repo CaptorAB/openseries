@@ -287,7 +287,9 @@ class OpenTimeSeries(BaseModel):
                     dframe.columns.get_level_values(1).values[column_nmbr]
                 ):
                     valuetype = ValueType.PRICE
-                    print(f"valuetype missing. Adding '{valuetype.value}' as valuetype")
+                    print(
+                        f"valuetype missing. Adding '{valuetype.value}' as valuetype"
+                    )
                 else:
                     valuetype = dframe.columns.get_level_values(1).values[column_nmbr]
             else:
@@ -324,7 +326,7 @@ class OpenTimeSeries(BaseModel):
         baseccy: str = "SEK",
         local_ccy: bool = True,
     ) -> "OpenTimeSeries":
-        """Creates a timeseries from a series of values accruing with a given fixed rate
+        """Creates a timeseries from values accruing with a given fixed rate return
 
         Providing a date_range of type Pandas DatetimeIndex takes priority over
         providing a combination of days and an end date.
@@ -360,7 +362,9 @@ class OpenTimeSeries(BaseModel):
                 [d.date() for d in date_range(periods=days, end=end_dt, freq="D")]
             )
         elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
-            raise ValueError("If d_range is not provided both days and end_dt must be.")
+            raise ValueError(
+                "If d_range is not provided both days and end_dt must be."
+            )
 
         deltas = array(
             [
@@ -694,7 +698,9 @@ class OpenTimeSeries(BaseModel):
 
         if (
             self.tsdf.loc[earlier, self.tsdf.columns.values[0]] == 0.0
-            or self.tsdf.loc[cast(int, earlier) : cast(int, later)].lt(0.0).values.any()
+            or self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .lt(0.0)
+            .values.any()
         ):
             raise ValueError(
                 "Geometric return cannot be calculated due to an initial "
@@ -763,7 +769,9 @@ class OpenTimeSeries(BaseModel):
         return cast(
             float,
             (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().mean()
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change()
+                .mean()
                 * time_factor
             ).iloc[0],
         )
@@ -855,7 +863,8 @@ class OpenTimeSeries(BaseModel):
         """
 
         return cast(
-            float, (self.tsdf.pct_change().std() * sqrt(self.periods_in_a_year)).iloc[0]
+            float,
+            (self.tsdf.pct_change().std() * sqrt(self.periods_in_a_year)).iloc[0],
         )
 
     def vol_func(
@@ -2068,7 +2077,9 @@ class OpenTimeSeries(BaseModel):
         """
 
         retdf = (
-            self.tsdf.pct_change().rolling(observations, min_periods=observations).sum()
+            self.tsdf.pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
         )
         retdf.columns = [[self.label], ["Rolling returns"]]
 
@@ -2256,7 +2267,9 @@ class OpenTimeSeries(BaseModel):
         """
 
         if lvl_zero is None and lvl_one is None:
-            self.tsdf.columns = MultiIndex.from_arrays([[self.label], [self.valuetype]])
+            self.tsdf.columns = MultiIndex.from_arrays(
+                [[self.label], [self.valuetype]]
+            )
         elif lvl_zero is not None and lvl_one is None:
             self.tsdf.columns = MultiIndex.from_arrays([[lvl_zero], [self.valuetype]])
             self.label = lvl_zero

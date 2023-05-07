@@ -144,7 +144,8 @@ class TestDateFixer(TestCase):
             adjust=False,
         )
         self.assertEqual(
-            dt.date(originals[0].year, originals[0].month + 1, originals[0].day), offset
+            dt.date(originals[0].year, originals[0].month + 1, originals[0].day),
+            offset,
         )
 
         nonsense = "abcdef"
@@ -184,7 +185,8 @@ class TestDateFixer(TestCase):
         for start, end in zip([2023, 2024], [2023, 2022]):
             cdr = holiday_calendar(startyear=start, endyear=end, countries="SE")
             check = all(
-                date_str in list(cdr.holidays) for date_str in twentytwentythreeholidays
+                date_str in list(cdr.holidays)
+                for date_str in twentytwentythreeholidays
             )
             self.assertTrue(check)
 
@@ -217,7 +219,10 @@ class TestDateFixer(TestCase):
             None,
         ] = {"2021-02-12": "Jack's birthday"}
         cdr_with = holiday_calendar(
-            startyear=2021, endyear=2021, countries="SE", custom_holidays=jacks_birthday
+            startyear=2021,
+            endyear=2021,
+            countries="SE",
+            custom_holidays=jacks_birthday,
         )
         hols_with = [
             date_fix(d) for d in list(cdr_with.holidays) if date_fix(d).year == 2021

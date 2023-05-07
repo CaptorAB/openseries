@@ -557,7 +557,9 @@ class TestOpenFrame(TestCase):
 
         self.assertListEqual(series_measures, frame_measures)
 
-    def test_openframe_properties_same_as_opentimeseries(self: "TestOpenFrame") -> None:
+    def test_openframe_properties_same_as_opentimeseries(
+        self: "TestOpenFrame",
+    ) -> None:
         """Test that property results align between OpenFrame and OpenTimeSeries"""
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
@@ -646,7 +648,10 @@ class TestOpenFrame(TestCase):
         ]
         series_compared = set(series_props).symmetric_difference(
             set(
-                common_calc_props + common_props + common_attributes + series_attributes
+                common_calc_props
+                + common_props
+                + common_attributes
+                + series_attributes
             )
         )
         self.assertTrue(
@@ -2333,7 +2338,9 @@ class TestOpenFrame(TestCase):
         rframe = OpenFrame([rseries, rrseries])
 
         self.assertListEqual([ValueType.RTRN, ValueType.PRICE], mframe.columns_lvl_one)
-        self.assertListEqual([ValueType.PRICE, ValueType.PRICE], cframe.columns_lvl_one)
+        self.assertListEqual(
+            [ValueType.PRICE, ValueType.PRICE], cframe.columns_lvl_one
+        )
         cframe_lvl_one = list(cframe.columns_lvl_one)
         self.assertListEqual([ValueType.RTRN, ValueType.RTRN], rframe.columns_lvl_one)
 
@@ -2341,9 +2348,13 @@ class TestOpenFrame(TestCase):
         cframe.to_cumret()
         rframe.to_cumret()
 
-        self.assertListEqual([ValueType.PRICE, ValueType.PRICE], mframe.columns_lvl_one)
+        self.assertListEqual(
+            [ValueType.PRICE, ValueType.PRICE], mframe.columns_lvl_one
+        )
         self.assertListEqual(cframe_lvl_one, cframe.columns_lvl_one)
-        self.assertListEqual([ValueType.PRICE, ValueType.PRICE], rframe.columns_lvl_one)
+        self.assertListEqual(
+            [ValueType.PRICE, ValueType.PRICE], rframe.columns_lvl_one
+        )
 
         fmt = "{:.12f}"
 

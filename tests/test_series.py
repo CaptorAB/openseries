@@ -489,7 +489,9 @@ class TestOpenTimeSeries(TestCase):
 
     def test_opentimeseries_save_to_json(self: "TestOpenTimeSeries") -> None:
         """Test to_json method"""
-        seriesfile = path.join(path.dirname(path.abspath(__file__)), "seriessaved.json")
+        seriesfile = path.join(
+            path.dirname(path.abspath(__file__)), "seriessaved.json"
+        )
 
         jseries = self.randomseries.from_deepcopy()
         jseries.to_json(filename=seriesfile)

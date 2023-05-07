@@ -75,7 +75,7 @@ filterwarnings = [
 ]
 
 [tool.black]
-line-length = 88
+line-length = 87
 
 [tool.coverage.run]
 omit = ["venv/*"]
@@ -94,7 +94,7 @@ exclude = ["venv/*"]
 
 [tool.pylint]
 disable = ["C2801", "E0213", "R0801"]
-max-line-length = 88
+max-line-length = 87
 max-module-lines=3350
 min-public-methods=0
 max-public-methods=88
@@ -109,7 +109,7 @@ ignore-patterns= "\\w+\\.json$"
 extension-pkg-whitelist = "pydantic"
 
 [tool.flake8]
-max-line-length = 88
+max-line-length = 87
 filename = "/openseries/*.py,/tests/*.py"
 exclude = "venv,github,git"
 extend-ignore = ["C901", "E203", "F722", "F821", "W503"]

@@ -82,7 +82,9 @@ class ReturnSimulation(BaseModel):
 
         return cast(
             float,
-            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[0],
+            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[
+                0
+            ],
         )
 
     @classmethod

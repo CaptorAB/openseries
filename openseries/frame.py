@@ -92,7 +92,9 @@ class OpenFrame(BaseModel):
         validate_assignment = True
 
     @validator("constituents")
-    def check_labels_unique(cls, tseries: List[OpenTimeSeries]) -> List[OpenTimeSeries]:
+    def check_labels_unique(
+        cls, tseries: List[OpenTimeSeries]
+    ) -> List[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique"""
         labls = [x.label for x in tseries]
         if len(set(labls)) != len(labls):
@@ -703,7 +705,9 @@ class OpenFrame(BaseModel):
             )
             time_factor = how_many / fraction
         return Series(
-            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().std()
+            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .std()
             * sqrt(time_factor),
             name="Subset Volatility",
             dtype="float64",
@@ -1729,7 +1733,9 @@ class OpenFrame(BaseModel):
                 - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
                 .pct_change()
                 .sum()
-                / len(self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change())
+                / len(
+                    self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()
+                )
             )
         else:
             imp_vol = (
@@ -1900,7 +1906,9 @@ class OpenFrame(BaseModel):
         for xerie in self.constituents:
             xerie.tsdf.index = DatetimeIndex(xerie.tsdf.index)
             xerie.tsdf = xerie.tsdf.resample(freq).last()
-            xerie.tsdf.index = [dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)]
+            xerie.tsdf.index = [
+                dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)
+            ]
 
         return self
 
@@ -2076,7 +2084,9 @@ class OpenFrame(BaseModel):
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         for rtn in cols:
-            data[rtn, "Returns"] = data.loc[:, (rtn, ValueType.PRICE)].apply(log).diff()
+            data[rtn, "Returns"] = (
+                data.loc[:, (rtn, ValueType.PRICE)].apply(log).diff()
+            )
             data[rtn, ValueType.EWMA] = zeros(how_many)
             data.loc[:, (rtn, ValueType.EWMA)].iloc[0] = data.loc[
                 :, (rtn, "Returns")
@@ -2694,7 +2704,9 @@ class OpenFrame(BaseModel):
                         .add(1)
                         .values
                     )
-                    up_return = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
+                    up_return = (
+                        uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
+                    )
                     upidxarray = (
                         shortdf.pct_change()[shortdf.pct_change().values > 0.0]
                         .add(1)
@@ -2729,7 +2741,9 @@ class OpenFrame(BaseModel):
                         .add(1)
                         .values
                     )
-                    up_return = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
+                    up_return = (
+                        uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
+                    )
                     upidxarray = (
                         shortdf.pct_change()[shortdf.pct_change().values > 0.0]
                         .add(1)
@@ -2815,7 +2829,9 @@ class OpenFrame(BaseModel):
                 )
         else:
             if isinstance(asset, tuple):
-                y_value = log(self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0])
+                y_value = log(
+                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0]
+                )
             elif isinstance(asset, int):
                 y_value = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
@@ -2999,8 +3015,8 @@ class OpenFrame(BaseModel):
         observations: int = 21,
         periods_in_a_year_fixed: int | None = None,
     ) -> DataFrame:
-        """The Information Ratio equals ( fund return less index return ) divided by the
-        Tracking Error. And the Tracking Error is the standard deviation of the
+        """The Information Ratio equals ( fund return less index return ) divided by
+        the Tracking Error. And the Tracking Error is the standard deviation of the
         difference between the fund and its index returns.
 
         Parameters

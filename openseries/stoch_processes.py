@@ -321,7 +321,11 @@ def cox_ingersoll_ross_heston(
     brownian_motion_volatility = nrand.normal(
         loc=0, scale=sqrt_delta_sigma, size=param.all_time
     )
-    meanrev_vol, avg_vol, start_vol = param.heston_a, param.heston_mu, param.heston_vol0
+    meanrev_vol, avg_vol, start_vol = (
+        param.heston_a,
+        param.heston_mu,
+        param.heston_vol0,
+    )
     volatilities: List[float] = [start_vol]
     for hpath in range(1, param.all_time):
         drift = meanrev_vol * (avg_vol - volatilities[-1]) * param.all_delta
