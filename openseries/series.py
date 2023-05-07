@@ -20,7 +20,6 @@ from numpy import (
     ndarray,
     sqrt,
     square,
-    zeros,
 )
 from dateutil.relativedelta import relativedelta
 from pandas import (
@@ -2013,21 +2012,28 @@ class OpenTimeSeries(BaseModel):
         data[self.label, "Returns"] = (
             data.loc[:, self.tsdf.columns.values[0]].apply(log).diff()
         )
-        data[self.label, ValueType.EWMA] = zeros(data.iloc[:, 0].count())
-        data.loc[:, (self.label, ValueType.EWMA)].iloc[0] = data.loc[
-            :, (self.label, "Returns")
-        ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
-        prev = data.loc[self.first_idx]
-        for indx, row in data.iloc[1:].iterrows():
-            row.loc[self.label, ValueType.EWMA] = sqrt(
-                square(row.loc[self.label, "Returns"]) * time_factor * (1 - lmbda)
-                + square(prev.loc[self.label, ValueType.EWMA]) * lmbda
+        rawdata = [
+            data.loc[:, (self.label, "Returns")]
+            .iloc[1:day_chunk]
+            .std(ddof=dlta_degr_freedms)
+            * sqrt(time_factor)
+        ]
+
+        def ewma_calc(reeturn: float, prev_ewma: float) -> float:
+            return cast(
+                float,
+                sqrt(
+                    square(reeturn) * time_factor * (1 - lmbda)
+                    + square(prev_ewma) * lmbda
+                ),
             )
-            data.loc[indx, (self.label, ValueType.EWMA)] = row.loc[
-                self.label, ValueType.EWMA
-            ]
-            prev = row.copy()
+
+        for item in data.loc[:, (self.label, "Returns")].iloc[1:]:
+            previous = rawdata[-1]
+            rawdata.append(ewma_calc(reeturn=item, prev_ewma=previous))
+
+        data.loc[:, (self.label, ValueType.EWMA)] = rawdata
 
         return data.loc[:, (self.label, ValueType.EWMA)]
 
