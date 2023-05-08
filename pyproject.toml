@@ -95,7 +95,7 @@ exclude = ["venv/*"]
 [tool.pylint]
 disable = ["C2801", "E0213", "R0801"]
 max-line-length = 87
-max-module-lines=3375
+max-module-lines=3500
 min-public-methods=0
 max-public-methods=88
 max-statements=51
