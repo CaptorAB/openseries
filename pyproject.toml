@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "0.12.6"
+version = "0.12.7"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 homepage = "https://github.com/CaptorAB/OpenSeries"
@@ -95,12 +95,12 @@ exclude = ["venv/*"]
 [tool.pylint]
 disable = ["C2801", "E0213", "R0801"]
 max-line-length = 87
-max-module-lines=3500
+max-module-lines=3350
 min-public-methods=0
 max-public-methods=88
 max-statements=51
 max-branches=22
-max-locals=26
+max-locals=29
 max-args=12
 output-format = "colorized"
 ignore-patterns= "\\w+\\.json$"
