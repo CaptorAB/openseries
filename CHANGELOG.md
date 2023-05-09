@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.12.7] - 2023-05-09
+## Version [0.12.8] - 2023-05-09
 
 Improved speed of EWMA risk functions.
 
