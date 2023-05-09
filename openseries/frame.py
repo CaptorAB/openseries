@@ -13,7 +13,7 @@ from string import ascii_letters
 from typing import cast, Dict, List, Tuple, Union
 from dateutil.relativedelta import relativedelta
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
-from numpy import cov, cumprod, log, sqrt, square, zeros
+from numpy import cov, cumprod, log, sqrt
 from pandas import (
     concat,
     DataFrame,
@@ -34,7 +34,7 @@ import statsmodels.api as sm
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 
-from openseries.series import OpenTimeSeries, ValueType
+from openseries.series import OpenTimeSeries, ValueType, ewma_calc
 from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
@@ -2067,9 +2067,6 @@ class OpenFrame(BaseModel):
             time_factor = how_many / fraction
         else:
             time_factor = periods_in_a_year_fixed
-            how_many = (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
-            )
 
         corr_label = (
             self.tsdf.iloc[:, first_column].name[0]
@@ -2087,53 +2084,59 @@ class OpenFrame(BaseModel):
             data[rtn, "Returns"] = (
                 data.loc[:, (rtn, ValueType.PRICE)].apply(log).diff()
             )
-            data[rtn, ValueType.EWMA] = zeros(how_many)
-            data.loc[:, (rtn, ValueType.EWMA)].iloc[0] = data.loc[
-                :, (rtn, "Returns")
-            ].iloc[1:day_chunk].std(ddof=dlta_degr_freedms) * sqrt(time_factor)
 
-        data["Cov", ValueType.EWMA] = zeros(how_many)
-        data[corr_label, ValueType.EWMA] = zeros(how_many)
-        data.loc[:, ("Cov", ValueType.EWMA)].iloc[0] = cov(
-            m=data.loc[:, (cols[0], "Returns")].iloc[1:day_chunk].to_numpy(),
-            y=data.loc[:, (cols[1], "Returns")].iloc[1:day_chunk].to_numpy(),
-            ddof=dlta_degr_freedms,
-        )[0][1]
-        data.loc[:, (corr_label, ValueType.EWMA)].iloc[0] = data.loc[
-            :, ("Cov", ValueType.EWMA)
-        ].iloc[0] / (
-            2
-            * data.loc[:, (cols[0], ValueType.EWMA)].iloc[0]
-            * data.loc[:, (cols[1], ValueType.EWMA)].iloc[0]
-        )
+        raw_one = [
+            data.loc[:, (cols[0], "Returns")]
+            .iloc[1:day_chunk]
+            .std(ddof=dlta_degr_freedms)
+            * sqrt(time_factor)
+        ]
+        raw_two = [
+            data.loc[:, (cols[1], "Returns")]
+            .iloc[1:day_chunk]
+            .std(ddof=dlta_degr_freedms)
+            * sqrt(time_factor)
+        ]
+        raw_cov = [
+            cov(
+                m=data.loc[:, (cols[0], "Returns")].iloc[1:day_chunk].to_numpy(),
+                y=data.loc[:, (cols[1], "Returns")].iloc[1:day_chunk].to_numpy(),
+                ddof=dlta_degr_freedms,
+            )[0][1]
+        ]
+        raw_corr = [raw_cov[0] / (2 * raw_one[0] * raw_two[0])]
 
-        prev = data.loc[self.first_idx]
-        for indx, row in data.iloc[1:].iterrows():
-            row.loc[cols, ValueType.EWMA] = sqrt(
-                square(row.loc[cols, "Returns"].to_numpy()) * time_factor * (1 - lmbda)
-                + square(prev.loc[cols, ValueType.EWMA].to_numpy()) * lmbda
+        for _, row in data.iloc[1:].iterrows():
+            tmp_raw_one = ewma_calc(
+                reeturn=row.loc[cols[0], "Returns"],
+                prev_ewma=raw_one[-1],
+                time_factor=time_factor,
+                lmbda=lmbda,
             )
-            data.loc[indx, (cols, ValueType.EWMA)] = row.loc[cols, ValueType.EWMA]
-            row.loc["Cov", ValueType.EWMA] = (
+            tmp_raw_two = ewma_calc(
+                reeturn=row.loc[cols[1], "Returns"],
+                prev_ewma=raw_two[-1],
+                time_factor=time_factor,
+                lmbda=lmbda,
+            )
+            tmp_raw_cov = (
                 row.loc[cols[0], "Returns"]
                 * row.loc[cols[1], "Returns"]
                 * time_factor
                 * (1 - lmbda)
-                + prev.loc["Cov", ValueType.EWMA] * lmbda
+                + raw_cov[-1] * lmbda
             )
-            data.loc[indx, ("Cov", ValueType.EWMA)] = row.loc["Cov", ValueType.EWMA]
-            row.loc[corr_label, ValueType.EWMA] = row.loc["Cov", ValueType.EWMA] / (
-                2 * row.loc[cols[0], ValueType.EWMA] * row.loc[cols[1], ValueType.EWMA]
-            )
-            data.loc[indx, (corr_label, ValueType.EWMA)] = row.loc[
-                corr_label, ValueType.EWMA
-            ]
-            prev = row.copy()
+            tmp_raw_corr = tmp_raw_cov / (2 * tmp_raw_one * tmp_raw_two)
+            raw_one.append(tmp_raw_one)
+            raw_two.append(tmp_raw_two)
+            raw_cov.append(tmp_raw_cov)
+            raw_corr.append(tmp_raw_corr)
 
-        ewma_df = data.loc[:, (cols + [corr_label], ValueType.EWMA)]
-        ewma_df.columns = ewma_df.columns.droplevel(level=1)
-
-        return ewma_df
+        return DataFrame(
+            index=cols + [corr_label],
+            columns=data.index,
+            data=[raw_one, raw_two, raw_corr],
+        ).T
 
     def rolling_vol(
         self: "OpenFrame",
