@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.local
-          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pytest.yml') }}
+          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
         uses: snok/install-poetry@v1
@@ -41,7 +41,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pytest.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
@@ -72,7 +72,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.local
-          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pytest.yml') }}
+          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
         uses: snok/install-poetry@v1
@@ -84,7 +84,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pytest.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
@@ -121,7 +121,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.local
-          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pytest.yml') }}
+          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
         uses: snok/install-poetry@v1
@@ -133,7 +133,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pytest.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         shell: bash
