@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.12.9] - 2023-05-13
+
+Added a new OpenTimeSeries constructor method .from_arrays().
+
 ## Version [0.12.8] - 2023-05-09
 
 Improved speed of EWMA risk functions.

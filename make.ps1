@@ -8,7 +8,6 @@ if ($task -eq "active") {
 }
 elseif ($task -eq "make") {
     # remove old environment if present and create new environment
-    deactivate
     Remove-Item -Path ".\venv" -Recurse -Force -ErrorAction SilentlyContinue
     python -m venv ./venv
     $env:PYTHONPATH = "$env:PYTHONPATH;$pwd"

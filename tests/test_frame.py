@@ -746,6 +746,7 @@ class TestOpenFrame(TestCase):
         ]
 
         series_createmethods = [
+            "from_arrays",
             "from_df",
             "from_fixed_rate",
         ]

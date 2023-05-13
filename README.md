@@ -165,7 +165,7 @@ make lint
 - [Development Instructions](#development-instructions)
 - [Testing and Linting / Type-checking](#testing-and-linting--type-checking)
 - [Files / Modules in the project](#files-in-the-project)
-- [Class methods used to construct an OpenTimeSeries](#class-methods-used-to-construct-an-opentimeseries-object)
+- [Class methods used to construct an OpenTimeSeries](#class-methods-used-to-construct-objects)
 - [OpenTimeSeries non-numerical properties](#non-numerical-or-helper-properties-that-apply-only-to-the-opentimeseries-class)
 - [OpenFrame non-numerical properties](#non-numerical-or-helper-properties-that-apply-only-to-the-openframe-class)
 - [Non-numerical properties for both classes](#non-numerical-or-helper-properties-that-apply-to-both-the-opentimeseries-and-the-openframe-class)
@@ -190,14 +190,15 @@ make lint
 | [stoch_processes.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/stoch_processes.py)           | Generates stochastic processes used in the `sim_price.py` module.                                                                                                                                   |
 | [types.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/types.py)                               | Contains all bespoke typing.                                                                                                                                                                        |
 
-### Class methods used to construct an [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) object.
+### Class methods used to construct objects.
 
-| Method                 | Applies to                    | Description                                                                                              |
-|:-----------------------|:------------------------------|:---------------------------------------------------------------------------------------------------------|
-| `from_df`              | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame column.                          |
-| `from_fixed_rate`      | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date.       |
-| `parse_obj`            | `OpenTimeSeries`              | A method inherited from the Pydantic BaseModel to construct an object from a `dict`.                     |
-| `from_deepcopy`        | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                              |
+| Method            | Applies to                    | Description                                                                                        |
+|:------------------|:------------------------------|:---------------------------------------------------------------------------------------------------|
+| `from_arrays`     | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a list of date strings and a list of values.  |
+| `from_df`         | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame or pandas.Series.          |
+| `from_fixed_rate` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
+| `parse_obj`       | `OpenTimeSeries`              | A method inherited from the Pydantic BaseModel to construct an object from a `dict`.               |
+| `from_deepcopy`   | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
 
 ### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 

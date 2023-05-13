@@ -260,6 +260,63 @@ class OpenTimeSeries(BaseModel):
         cls.countries = countries
 
     @classmethod
+    def from_arrays(
+        cls,
+        name: str,
+        dates: List[str],
+        values: List[float],
+        valuetype: ValueType = ValueType.PRICE,
+        timeseries_id: str = "",
+        instrument_id: str = "",
+        baseccy: str = "SEK",
+        local_ccy: bool = True,
+    ) -> "OpenTimeSeries":
+        """Creates a timeseries from a Pandas DataFrame or Series
+
+        Parameters
+        ----------
+        name: str
+            string identifier of the timeseries and/or instrument
+        dates: List[str]
+            Array of date strings as ISO 8601
+        values: List[float]
+            Array of values
+        valuetype : ValueType, default: ValueType.PRICE
+            Identifies if the series is a series of values or returns
+        timeseries_id : str
+            Database identifier of the timeseries
+        instrument_id: str
+            Database identifier of the instrument associated with the timeseries
+        baseccy : str, default: "SEK"
+            The currency of the timeseries
+        local_ccy: bool, default: True
+            Boolean flag indicating if timeseries is in local currency
+
+        Returns
+        -------
+        OpenTimeSeries
+            An OpenTimeSeries object
+        """
+
+        return cls(
+            name=name,
+            label=name,
+            dates=dates,
+            values=values,
+            valuetype=valuetype,
+            timeseriesId=timeseries_id,
+            instrumentId=instrument_id,
+            currency=baseccy,
+            local_ccy=local_ccy,
+            tsdf=DataFrame(
+                data=values,
+                index=[dejt.date() for dejt in DatetimeIndex(dates)],
+                columns=[[name], [valuetype]],
+                dtype="float64",
+            ),
+        )
+
+    @classmethod
     def from_df(
         cls,
         dframe: DataFrame | Series,

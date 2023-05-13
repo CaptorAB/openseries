@@ -374,6 +374,21 @@ class TestOpenTimeSeries(TestCase):
             member="instance of DataFrame expected", container=str(e_pdtype.exception)
         )
 
+    def test_opentimeseries_create_from_arrays(self: "TestOpenTimeSeries") -> None:
+        """Test from_arrays construct method"""
+        arrseries = OpenTimeSeries.from_arrays(
+            name="arrseries",
+            dates=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            values=[1.0, 1.01, 0.99, 1.015, 1.003],
+        )
+        self.assertTrue(isinstance(arrseries, OpenTimeSeries))
+
     def test_opentimeseries_create_from_pandas_df(self: "TestOpenTimeSeries") -> None:
         """Test construct from pandas.DataFrame"""
         serie = Series(
