@@ -28,9 +28,9 @@ To install:
 pip install openseries
 ```
 
-An overview of an OpenTimeSeries object is shown in the below example. Most of the
-time an object will be constructed from the constructing class methods. The
-OpenTimeSeries and OpenFrame classes are both subclasses of
+An overview of an OpenTimeSeries object is shown in the below example. My preference
+is to instantiate an object from a constructing class methods such as this.
+The OpenTimeSeries and OpenFrame classes are both subclasses of
 the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/).
 
 To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library
@@ -40,38 +40,14 @@ classes have an attribute `tsdf`
 which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
 ```
-from pandas import DataFrame, DatetimeIndex
-from openseries.series import OpenTimeSeries, ValueType
+from openseries.series import OpenTimeSeries
 ```
 
 ```
-series = OpenTimeSeries(
-    timeseriesId="",
-    instrumentId="",
-    currency="SEK",
-    dates=["2020-09-03", "2020-09-04", "2020-09-07", "2020-09-08", "2020-09-09"],
+series = OpenTimeSeries.from_arrays(
     name="Timeseries",
-    label="Timeseries",
-    valuetype=ValueType.PRICE,
-    values=[114.9965, 114.8355, 114.8694, 115.1131, 114.8643],
-    local_ccy=True,
-    tsdf=DataFrame(
-        data=[114.9965, 114.8355, 114.8694, 115.1131, 114.8643],
-        index=[
-            d.date()
-            for d in DatetimeIndex(
-                [
-                    "2020-09-03",
-                    "2020-09-04",
-                    "2020-09-07",
-                    "2020-09-08",
-                    "2020-09-09",
-                ]
-            )
-        ],
-        columns=[["Timeseries"], [ValueType.PRICE]],
-        dtype="float64",
-    ),
+    dates=["2023-05-08", "2023-05-09", "2023-05-10", "2023-05-11", "2023-05-12"],
+    values=[90.2533, 89.9977, 90.1052, 90.9142, 90.5574],
 )
 ```
 
@@ -79,29 +55,29 @@ series = OpenTimeSeries(
 ```
                        Scilla Global Equity C (simulation+fund) Global Low Volatility index, SEK
                                                 ValueType.PRICE                  ValueType.PRICE
-observations                                               4309                             4309
-Max drawdown in cal yr                                -0.309849                        -0.348681
 Total return                                           3.641282                         1.946319
-last indices                                         2023-04-05                       2023-04-05
-Worst                                                 -0.071616                        -0.089415
-first indices                                        2006-01-03                       2006-01-03
+Arithmetic return                                      0.096271                         0.069636
+Geometric return                                       0.093057                          0.06464
+Volatility                                             0.120279                         0.117866
+Return vol ratio                                       0.800396                          0.59081
 Downside deviation                                     0.085956                         0.086723
 Sortino ratio                                          1.119993                         0.802975
+Positive share                                         0.541783                         0.551996
+Worst                                                 -0.071616                        -0.089415
+Worst month                                           -0.122503                        -0.154485
+Max drawdown                                          -0.309849                        -0.435444
+Max drawdown in cal yr                                -0.309849                        -0.348681
+Max drawdown dates                                   2020-03-23                       2009-03-09
+CVaR 95.0%                                             -0.01793                        -0.018429
 VaR 95.0%                                             -0.011365                        -0.010807
 Imp vol from VaR 95%                                   0.109204                         0.103834
-Arithmetic return                                      0.096271                         0.069636
-Kurtosis                                               8.511166                        17.527367
-Volatility                                             0.120279                         0.117866
-Max drawdown                                          -0.309849                        -0.435444
-Max drawdown dates                                   2020-03-23                       2009-03-09
-span of days                                               6301                             6301
-Geometric return                                       0.093057                          0.06464
-Positive share                                         0.541783                         0.551996
-CVaR 95.0%                                             -0.01793                        -0.018429
-Worst month                                           -0.122503                        -0.154485
 Z-score                                                0.587905                         0.103241
-Return vol ratio                                       0.800396                          0.59081
 Skew                                                  -0.650782                        -0.888109
+Kurtosis                                               8.511166                        17.527367
+observations                                               4309                             4309
+span of days                                               6301                             6301
+first indices                                        2006-01-03                       2006-01-03
+last indices                                         2023-04-05                       2023-04-05
 ```
 
 ### Usage example on Mybinder.org and Jupyter Nbviewer
