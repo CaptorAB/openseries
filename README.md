@@ -80,9 +80,8 @@ first indices                                        2006-01-03                 
 last indices                                         2023-04-05                       2023-04-05
 ```
 
-### Usage example on Mybinder.org and Jupyter Nbviewer
+### Usage example on Jupyter Nbviewer
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/karrmagadgeteer2/NoteBook.git/master?labpath=openseriesnotebook.ipynb)
 [![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
 
 
