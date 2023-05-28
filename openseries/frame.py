@@ -109,7 +109,7 @@ class OpenFrame(BaseModel):
         super().__init__(constituents=constituents, weights=weights)
 
         self.constituents = constituents
-        self.tsdf = DataFrame()
+        self.tsdf = DataFrame(dtype="float64")
         self.weights = weights
 
         if constituents is not None and len(constituents) != 0:
