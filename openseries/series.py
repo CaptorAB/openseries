@@ -2422,9 +2422,10 @@ class OpenTimeSeries(BaseModel):
         figure.add_scatter(
             x=self.tsdf.index,
             y=self.tsdf.iloc[:, 0],
-            hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-            line={"width": 2.5, "dash": "solid"},
             mode=mode,
+            line={"width": 2.5, "dash": "solid"},
+            hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+            showlegend=False,
             name=self.label,
         )
         figure.update_layout(yaxis={"tickformat": tick_fmt})

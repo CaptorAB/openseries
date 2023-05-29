@@ -9,7 +9,7 @@ on:
       - "**" # matches every branch
 
 env:
-  POETRY_VER: 1.4.2
+  POETRY_VER: 1.5.1
 
 jobs:
   codecheck:

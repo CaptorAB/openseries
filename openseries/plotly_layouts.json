@@ -64,9 +64,12 @@
     "plot_bgcolor": "rgba(0, 0, 0, 0)",
     "showlegend": true,
     "legend": {
+      "x": 0.98,
+      "y": -0.15,
+      "xanchor": "right",
+      "yanchor": "bottom",
       "bgcolor": "rgba(0, 0, 0, 0)",
-      "x": 0.02,
-      "y": 0.02
+      "orientation": "h"
     }
   }
 }
