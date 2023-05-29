@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [0.13.0] - 2023-05-29
+## Version [0.13.1] - 2023-05-30
 
 Changed default plot legend layout.
 

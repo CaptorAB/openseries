@@ -2425,7 +2425,7 @@ class OpenTimeSeries(BaseModel):
             mode=mode,
             line={"width": 2.5, "dash": "solid"},
             hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-            showlegend=False,
+            showlegend=True,
             name=self.label,
         )
         figure.update_layout(yaxis={"tickformat": tick_fmt})
