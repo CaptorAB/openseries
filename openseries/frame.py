@@ -14,6 +14,8 @@ from typing import cast, Dict, List, Tuple, Union
 from dateutil.relativedelta import relativedelta
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
 from pandas import (
     concat,
     DataFrame,
@@ -130,6 +132,49 @@ class OpenFrame(BaseModel):
         """
 
         return deepcopy(self)
+
+    def to_xlsx(
+        self: "OpenFrame",
+        filename: str,
+        sheet_title: str | None = None,
+        directory: str | None = None,
+    ) -> str:
+        """Saves the data in the .tsdf DataFrame to an Excel spreadsheet file
+
+        Parameters
+        ----------
+        filename: str
+            Filename that should include .xlsx
+        sheet_title: str, optional
+            Name of the sheet in the Excel file
+        directory: str, optional
+            The file directory where the Excel file is saved.
+        Returns
+        -------
+        str
+            The Excel file path
+        """
+
+        if filename[-5:].lower() != ".xlsx":
+            raise NameError("Filename must end with .xlsx")
+        if directory:
+            sheetfile = path.join(directory, filename)
+        else:
+            script_path = path.abspath(__file__)
+            sheetfile = path.join(path.dirname(script_path), filename)
+
+        wrkbook = Workbook()
+        wrksheet = wrkbook.active
+
+        if sheet_title:
+            wrksheet.title = sheet_title
+
+        for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
+            wrksheet.append(row)
+
+        wrkbook.save(sheetfile)
+
+        return sheetfile
 
     def merge_series(self: "OpenFrame", how: LiteralHowMerge = "outer") -> "OpenFrame":
         """Merges the Pandas Dataframes of the constituent OpenTimeSeries

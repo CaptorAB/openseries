@@ -517,6 +517,30 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertFalse(path.exists(seriesfile))
 
+    def test_opentimeseries_save_to_xlsx(self: "TestOpenTimeSeries") -> None:
+        """Test to_xlsx method"""
+        xseries = self.randomseries.from_deepcopy()
+        seriesfile = xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo")
+
+        self.assertTrue(path.exists(seriesfile))
+        remove(seriesfile)
+
+        directory = path.dirname(path.abspath(__file__))
+        seriesfile = xseries.to_xlsx(filename="trial.xlsx", directory=directory)
+
+        self.assertTrue(path.exists(seriesfile))
+        remove(seriesfile)
+
+        self.assertFalse(path.exists(seriesfile))
+
+        with self.assertRaises(NameError) as wrong_end:
+            _ = xseries.to_xlsx(filename="trial.pdf")
+
+        self.assertEqual(
+            str(wrong_end.exception),
+            "Filename must end with .xlsx",
+        )
+
     def test_opentimeseries_create_from_fixed_rate(self: "TestOpenTimeSeries") -> None:
         """Test from_fixed_rate construct method"""
         fixseries_one = OpenTimeSeries.from_fixed_rate(
