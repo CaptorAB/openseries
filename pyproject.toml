@@ -41,7 +41,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
 holidays = "^0.18"
-numpy = "^1.24.1"
+numpy = "^1.24.1,<1.25.0"
 pandas = "^1.5.2"
 plotly = "^5.11.0"
 pydantic = "^1.10.8"
@@ -71,6 +71,7 @@ types-python-dateutil = "^2.8.19.13"
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning:ffn.*:",
+    "ignore::DeprecationWarning:numpy.*:",
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]
 
