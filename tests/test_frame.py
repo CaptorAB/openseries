@@ -4,6 +4,7 @@ Test suite for the openseries/frame.py module
 from datetime import date as dtdate
 from decimal import Decimal, localcontext, ROUND_HALF_UP
 from json import loads
+from os import path, remove
 from typing import cast, get_type_hints, List, Tuple, Union
 from unittest import TestCase
 from warnings import filterwarnings
@@ -84,6 +85,30 @@ class TestOpenFrame(TestCase):
             ]
         )
         self.assertIsInstance(frame_df.tsdf, DataFrame)
+
+    def test_openframe_save_to_xlsx(self: "TestOpenFrame") -> None:
+        """Test to_xlsx method"""
+        xseries = self.randomframe.from_deepcopy()
+        seriesfile = xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo")
+
+        self.assertTrue(path.exists(seriesfile))
+        remove(seriesfile)
+
+        directory = path.dirname(path.abspath(__file__))
+        seriesfile = xseries.to_xlsx(filename="trial.xlsx", directory=directory)
+
+        self.assertTrue(path.exists(seriesfile))
+        remove(seriesfile)
+
+        self.assertFalse(path.exists(seriesfile))
+
+        with self.assertRaises(NameError) as wrong_end:
+            _ = xseries.to_xlsx(filename="trial.pdf")
+
+        self.assertEqual(
+            str(wrong_end.exception),
+            "Filename must end with .xlsx",
+        )
 
     def test_openframe_calc_range(self: "TestOpenFrame") -> None:
         """Test calc_range method"""
@@ -738,6 +763,7 @@ class TestOpenFrame(TestCase):
             "rolling_var_down",
             "to_cumret",
             "to_drawdown_series",
+            "to_xlsx",
             "value_nan_handle",
             "value_ret_calendar_period",
             "value_to_diff",
