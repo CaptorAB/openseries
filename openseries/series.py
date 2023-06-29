@@ -641,10 +641,10 @@ class OpenTimeSeries(BaseModel):
                     ), "Function calc_range returned dates outside series range"
                     earlier, later = cast(dt.date, from_dt), cast(dt.date, to_dt)
             if earlier is not None:
-                while not self.tsdf.index.isin([earlier]).any():
+                while earlier not in self.tsdf.index.tolist():
                     earlier -= dt.timedelta(days=1)
             if later is not None:
-                while not self.tsdf.index.isin([later]).any():
+                while later not in self.tsdf.index.tolist():
                     later += dt.timedelta(days=1)
 
         return earlier, later
@@ -1487,8 +1487,9 @@ class OpenTimeSeries(BaseModel):
             Skew of the return distribution
         """
 
-        return float(
-            skew(a=self.tsdf.pct_change().values, bias=True, nan_policy="omit")
+        return cast(
+            float,
+            skew(a=self.tsdf.pct_change().values, bias=True, nan_policy="omit")[0],
         )
 
     def skew_func(
@@ -1516,12 +1517,13 @@ class OpenTimeSeries(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return float(
+        return cast(
+            float,
             skew(
                 self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
                 bias=True,
                 nan_policy="omit",
-            ),
+            )[0],
         )
 
     @property
@@ -1533,13 +1535,14 @@ class OpenTimeSeries(BaseModel):
         float
             Kurtosis of the return distribution
         """
-        return float(
+        return cast(
+            float,
             kurtosis(
                 self.tsdf.pct_change(),
                 fisher=True,
                 bias=True,
                 nan_policy="omit",
-            )
+            )[0],
         )
 
     def kurtosis_func(
@@ -1568,13 +1571,14 @@ class OpenTimeSeries(BaseModel):
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
-        return float(
+        return cast(
+            float,
             kurtosis(
                 self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
                 fisher=True,
                 bias=True,
                 nan_policy="omit",
-            )
+            )[0],
         )
 
     @property
@@ -2618,14 +2622,14 @@ def timeseries_chain(
             raise ValueError("Failed to find a matching date between series")
 
     dates: List[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
-    values = array([float(x) for x in old.tsdf.values][: len(dates)])
+    values = array([x[0] for x in old.tsdf.values][: len(dates)])
     values = cast(
         ndarray[Any, dtype[Any]],
         list(values * new.tsdf.iloc[:, 0].loc[first] / olddf.iloc[:, 0].loc[first]),
     )
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
-    values += [float(x) for x in new.tsdf.values]
+    values += [x[0] for x in new.tsdf.values]
 
     if back.__class__.__subclasscheck__(OpenTimeSeries):
         return OpenTimeSeries(

@@ -7,7 +7,6 @@ from json import loads
 from os import path, remove
 from typing import cast, get_type_hints, List, Tuple, Union
 from unittest import TestCase
-from warnings import filterwarnings
 from pandas import DataFrame, date_range, DatetimeIndex
 from pandas.testing import assert_frame_equal
 
@@ -22,8 +21,6 @@ from openseries.types import (
     LiteralFrameProps,
     LiteralPortfolioWeightings,
 )
-
-filterwarnings("ignore", category=DeprecationWarning)
 
 
 class TestOpenFrame(TestCase):
@@ -1990,45 +1987,15 @@ class TestOpenFrame(TestCase):
         """Test georet property raising exceptions on bad input data"""
         geoframe = OpenFrame(
             [
-                OpenTimeSeries(
-                    timeseriesId="",
-                    instrumentId="",
-                    currency="SEK",
-                    dates=["2022-07-01", "2023-07-01"],
+                OpenTimeSeries.from_arrays(
                     name="geoseries1",
-                    label="geoseries1",
-                    valuetype=ValueType.PRICE,
-                    values=[1.0, 1.1],
-                    local_ccy=True,
-                    tsdf=DataFrame(
-                        data=[1.0, 1.1],
-                        index=[
-                            d.date()
-                            for d in DatetimeIndex(["2022-07-01", "2023-07-01"])
-                        ],
-                        columns=[["geoseries1"], [ValueType.RTRN]],
-                        dtype="float64",
-                    ),
-                ),
-                OpenTimeSeries(
-                    timeseriesId="",
-                    instrumentId="",
-                    currency="SEK",
                     dates=["2022-07-01", "2023-07-01"],
+                    values=[1.0, 1.1],
+                ),
+                OpenTimeSeries.from_arrays(
                     name="geoseries2",
-                    label="geoseries2",
-                    valuetype=ValueType.PRICE,
+                    dates=["2022-07-01", "2023-07-01"],
                     values=[1.0, 1.2],
-                    local_ccy=True,
-                    tsdf=DataFrame(
-                        data=[1.0, 1.2],
-                        index=[
-                            d.date()
-                            for d in DatetimeIndex(["2022-07-01", "2023-07-01"])
-                        ],
-                        columns=[["geoseries2"], [ValueType.RTRN]],
-                        dtype="float64",
-                    ),
                 ),
             ]
         )
@@ -2041,24 +2008,10 @@ class TestOpenFrame(TestCase):
         )
 
         geoframe.add_timeseries(
-            OpenTimeSeries(
-                timeseriesId="",
-                instrumentId="",
-                currency="SEK",
-                dates=["2022-07-01", "2023-07-01"],
+            OpenTimeSeries.from_arrays(
                 name="geoseries3",
-                label="geoseries3",
-                valuetype=ValueType.PRICE,
+                dates=["2022-07-01", "2023-07-01"],
                 values=[0.0, 1.1],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[0.0, 1.1],
-                    index=[
-                        d.date() for d in DatetimeIndex(["2022-07-01", "2023-07-01"])
-                    ],
-                    columns=[["geoseries3"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
             )
         )
         with self.assertRaises(Exception) as e_gr_zero:

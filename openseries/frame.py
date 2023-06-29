@@ -287,9 +287,9 @@ class OpenFrame(BaseModel):
                         to_dt <= self.last_idx and from_dt >= self.first_idx
                     ), "Function calc_range returned dates outside series range"
                     earlier, later = from_dt, to_dt
-            while not self.tsdf.index.isin([earlier]).any():
+            while earlier not in self.tsdf.index.tolist():
                 earlier -= dt.timedelta(days=1)
-            while not self.tsdf.index.isin([later]).any():
+            while later not in self.tsdf.index.tolist():
                 later += dt.timedelta(days=1)
 
         return earlier, later
@@ -492,8 +492,7 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Compounded Annual Growth Rate (CAGR)
         """
-
-        if self.tsdf.iloc[0].isin([0.0]).any() or self.tsdf.lt(0.0).any().any():
+        if 0.0 in self.tsdf.iloc[0].tolist() or self.tsdf.lt(0.0).any().any():
             raise ValueError(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -531,7 +530,7 @@ class OpenFrame(BaseModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
 
         if (
-            self.tsdf.loc[earlier].isin([0.0]).any()
+            0.0 in self.tsdf.loc[earlier].tolist()
             or self.tsdf.loc[[earlier, later]].lt(0.0).any().any()
         ):
             raise ValueError(
@@ -617,7 +616,7 @@ class OpenFrame(BaseModel):
             Simple return
         """
 
-        if self.tsdf.iloc[0].isin([0.0]).any():
+        if 0.0 in self.tsdf.iloc[0].tolist():
             raise ValueError(
                 f"Error in function value_ret due to an initial value "
                 f"being zero. ({self.tsdf.head(3)})"
@@ -652,7 +651,7 @@ class OpenFrame(BaseModel):
         """
 
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if self.tsdf.iloc[0].isin([0.0]).any():
+        if 0.0 in self.tsdf.iloc[0].tolist():
             raise ValueError(
                 f"Error in function value_ret due to an initial value "
                 f"being zero. ({self.tsdf.head(3)})"
