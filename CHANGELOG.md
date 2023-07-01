@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.13.3] - 2023-07-01
+
+Improved flexibility on dependencies.
+
 ## Version [0.13.2] - 2023-06-19
 
 Added a .to_xlsx() method to both OpenTimeSeries and OpenFrame.

@@ -1,5 +1,5 @@
 # Contributing to OpenSeries
-I would love to get your input! And I want to make contributing to this project as easy and transparent as possible, whether it's:
+Any input is welcome, such as:
 
 - Reporting a bug
 - Discussing the current state of the code
@@ -7,11 +7,11 @@ I would love to get your input! And I want to make contributing to this project 
 - Proposing new features
 - Becoming a maintainer
 
-## I Develop with Github
-I use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+## Developed with Github
+Code is hosted on GitHub to track issues and feature requests, as well as accept pull requests.
 
 ## Please contribute through Pull Requests
-Pull requests are the best way to propose changes to the codebase and I actively welcome them from you:
+Pull requests are the best way to propose changes to the codebase and are welcome:
 
 1. Fork the repo and create your branch from `master`.
 2. If you've added code that should be tested, add tests.
@@ -24,7 +24,7 @@ Pull requests are the best way to propose changes to the codebase and I actively
 In short, when you submit code changes, your submissions are understood to be under the same [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause/) that covers the project. Feel free to contact the maintainers if that's a concern.
 
 ## Report bugs using Github's issues
-I use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/CaptorAB/OpenSeries/issues/new/choose); it's that easy!
+GitHub issues are used to track public bugs. Report a bug by [opening a new issue](https://github.com/CaptorAB/OpenSeries/issues/new/choose).
 
 ## Write bug reports with detail, background, and sample code
 Use a clear and descriptive title.
@@ -36,7 +36,7 @@ Provide information about your environment, such as your operating system or app
 If possible, try to isolate the issue to a specific code block or function.
 
 ## Use a Consistent Coding Style
-I use four tools for styling and linting and their configurations are kept in the project's [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml) file. They are:
+Four tools are used for styling and linting and their configurations are kept in the project's [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml) file. They are:
 
 * Black code styling
 * Flake8
