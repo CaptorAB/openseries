@@ -52,7 +52,7 @@ python-stdnum = "^1.18"
 requests = "^2.28.1"
 scipy = "^1.9.3"
 statsmodels = "^0.13.5"
-urllib3 = "^1.26.9"
+urllib3 = "^1.26.8"
 
 [tool.poetry.group.dev.dependencies]
 black = "23.3.0"
