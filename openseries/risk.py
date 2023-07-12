@@ -112,24 +112,6 @@ def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
     return drawdown
 
 
-def max_drawdown_date(prices: DataFrame | Series) -> dt.date:
-    """Date when maximum drawdown occurred
-
-    Parameters
-    ----------
-    prices: DataFrame | Series
-        A timeserie of dates and values
-
-    Returns
-    -------
-    datetime.date
-        Maximum drawdown date
-    """
-
-    mdd_date = (prices / prices.expanding(min_periods=1).max()).idxmin().values[0]
-    return dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
-
-
 def drawdown_details(prices: DataFrame | Series) -> Series:
     """Details of the maximum drawdown
 
@@ -148,7 +130,8 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
         Average fall per day
     """
 
-    mdate = max_drawdown_date(prices)
+    mdd_date = (prices / prices.expanding(min_periods=1).max()).idxmin().values[0]
+    mdate = dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
     maxdown = ((prices / prices.expanding(min_periods=1).max()).min() - 1).iloc[0]
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
