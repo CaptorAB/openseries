@@ -126,13 +126,8 @@ def max_drawdown_date(prices: DataFrame | Series) -> dt.date:
         Maximum drawdown date
     """
 
-    mdd_date = (
-        (prices / prices.expanding(min_periods=1).max())
-        .idxmin()
-        .values[0]
-        .astype(dt.datetime)
-    )
-    return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
+    mdd_date = (prices / prices.expanding(min_periods=1).max()).idxmin().values[0]
+    return dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
 
 
 def drawdown_details(prices: DataFrame | Series) -> Series:
@@ -158,8 +153,8 @@ def drawdown_details(prices: DataFrame | Series) -> Series:
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn.sort_index(ascending=False, inplace=True)
-    sdate = drwdwn[drwdwn == 0.0].idxmax().values[0].astype(dt.datetime)
-    sdate = dt.datetime.fromtimestamp(sdate / 1e9).date()
+    sdate = drwdwn[drwdwn == 0.0].idxmax().values[0]
+    sdate = dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d").date()
     duration = (mdate - sdate).days
     ret_per_day = maxdown / duration
 

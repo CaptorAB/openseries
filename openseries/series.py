@@ -1302,13 +1302,8 @@ class OpenTimeSeries(BaseModel):
 
         mdddf = self.tsdf.copy()
         mdddf.index = DatetimeIndex(mdddf.index)
-        mdd_date = (
-            (mdddf / mdddf.expanding(min_periods=1).max())
-            .idxmin()
-            .values[0]
-            .astype(dt.datetime)
-        )
-        return dt.datetime.fromtimestamp(mdd_date / 1e9).date()
+        mdd_date = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().values[0]
+        return dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
 
     def max_drawdown_func(
         self: "OpenTimeSeries",
