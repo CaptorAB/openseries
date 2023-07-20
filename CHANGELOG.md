@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.13.4] - 2023-07-19
+
+Cleaned up dependencies and fixed methods that would not work across time zones.
+
 ## Version [0.13.3] - 2023-07-01
 
 Improved flexibility on dependencies.
