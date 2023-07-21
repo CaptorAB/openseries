@@ -6,9 +6,9 @@ Given the almost non-existent audience for this project I typically only maintai
 
 | Version  | Supported          |
 |----------|--------------------|
+| 0.14.0   | :white_check_mark: |
 | 0.13.4   | :white_check_mark: |
 | 0.13.3   | :white_check_mark: |
-| 0.13.2   | :white_check_mark: |
 | < 0.11.0 | :x:                |
 
 ## Reporting a Vulnerability

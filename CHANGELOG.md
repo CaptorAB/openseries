@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [0.14.0] - 2023-07-21
+
+Moved to Pandas version ^2.0.3
+
 ## Version [0.13.4] - 2023-07-19
 
 Cleaned up dependencies and fixed methods that would not work across time zones.
