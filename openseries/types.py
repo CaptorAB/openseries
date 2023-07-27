@@ -1,5 +1,5 @@
 """
-Declaring types used througout the project
+Declaring types used throughout the project
 """
 from typing import Literal, List
 from pydantic import BaseModel
