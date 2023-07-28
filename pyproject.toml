@@ -71,8 +71,6 @@ types-python-dateutil = "^2.8.19.13"
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    "ignore::DeprecationWarning:ffn.*:",
-    "ignore:.*np.find_common_type is deprecated.*:DeprecationWarning",
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]
 
