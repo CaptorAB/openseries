@@ -1,7 +1,0 @@
-[virtualenvs]
-in-project = true
-path = "venv"
-
-[virtualenvs.options]
-no-pip = true
-no-setuptools = true

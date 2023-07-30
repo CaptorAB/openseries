@@ -38,6 +38,14 @@ keywords = [
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[poetry.virtualenvs]
+in-project = true
+path = "venv"
+
+[poetry.virtualenvs.options]
+no-pip = true
+no-setuptools = true
+
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
 ffn = "^0.3.7"
@@ -54,7 +62,7 @@ scipy = "^1.11.1"
 statsmodels = "^0.13.5"
 urllib3 = "^1.26.9"
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 black = "23.3.0"
 coverage = {extras = ["toml"], version = "^7.2.7"}
 coverage-badge = "^1.1.0"
