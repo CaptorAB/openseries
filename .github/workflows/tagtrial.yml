@@ -25,4 +25,8 @@ jobs:
         run: |
           version=$(python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
-          echo "::set-output name=tag_version::$version"
+          echo "tag_version=$version" >> $GITHUB_ENV
+
+      - name: Use tag version
+        run: |
+          echo "Tag: ${{ needs.get_tag_version.outputs.tag_version }}"
