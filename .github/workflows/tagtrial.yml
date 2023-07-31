@@ -23,6 +23,6 @@ jobs:
       - name: Determine tag version from pyproject.toml
         id: get_tag_version
         run: |
-          version=$(python -c "import toml; print(toml.load('pyproject.toml')['tool.poetry']['version'])")
+          version=$(python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
           echo "::set-output name=tag_version::$version"
