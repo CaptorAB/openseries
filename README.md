@@ -50,8 +50,7 @@ import yfinance as yf
 msft=yf.Ticker("MSFT")
 history=msft.history(period="max")
 series=OpenTimeSeries.from_df(history.loc[:, "Close"])
-series.value_to_log()
-series.set_new_label("Microsoft Log Returns of Close Prices")
+_=series.value_to_log().set_new_label("Microsoft Log Returns of Close Prices")
 _,_=series.plot_series()
 
 ```
