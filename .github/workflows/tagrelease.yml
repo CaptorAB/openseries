@@ -24,14 +24,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip toml
 
-      - name: Determine tag version from pyproject.toml
-        id: get_tag_version
+      - name: Create Git Tag with version from pyproject.toml
         run: |
           version=$(python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
+          git tag "$version"
+          git push origin "$version"
           echo "Version: $version"
-          echo "::set-output name=tag_version::$version"
+          echo "tag_version=$version" >> "$GITHUB_ENV"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.get_tag_version.outputs.tag_version }}
+          tag_name: ${{ env.tag_version }}
