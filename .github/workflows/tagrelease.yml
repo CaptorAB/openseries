@@ -28,8 +28,6 @@ jobs:
         id: get_tag_version
         run: |
           version=$(python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
-          git tag "$version"
-          git push origin "$version"
           echo "Version: $version"
           echo "::set-output name=tag_version::$version"
 
