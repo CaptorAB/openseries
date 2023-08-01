@@ -74,6 +74,7 @@ pre-commit = "^3.3.3"
 pylint = "^2.17.4"
 pytest = "^7.4.0"
 pytest-split = "^0.8.1"
+toml = "^0.10.2"
 types-python-dateutil = "^2.8.19.13"
 
 [tool.pytest.ini_options]

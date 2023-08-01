@@ -65,6 +65,19 @@ jobs:
       - name: Report coverage
         run: poetry run coverage report
 
+      - name: Create Git Tag with version from pyproject.toml
+        run: |
+          version=$(python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
+          echo "Version: $version"
+          git tag "$version"
+          git push origin "$version"
+          echo "tag_version=$version" >> "$GITHUB_ENV"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.tag_version }}
+
       - name: Build and Publish to Test PyPI
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
