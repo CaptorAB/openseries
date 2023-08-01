@@ -67,7 +67,7 @@ jobs:
 
       - name: Create Git Tag with version from pyproject.toml
         run: |
-          version=$(python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
+          version=$(poetry run python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
           git tag "$version"
           git push origin "$version"
