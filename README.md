@@ -45,12 +45,14 @@ which is a DataFrame constructed from the raw data in the lists `dates` and `val
 
 ```python
 from openseries.series import OpenTimeSeries
+import yfinance as yf
 
-series = OpenTimeSeries.from_arrays(
-    name="Timeseries",
-    dates=["2023-05-08", "2023-05-09", "2023-05-10", "2023-05-11", "2023-05-12"],
-    values=[90.2533, 89.9977, 90.1052, 90.9142, 90.5574],
-)
+msft=yf.Ticker("MSFT")
+history=msft.history(period="max")
+series=OpenTimeSeries.from_df(history.loc[:, "Close"])
+series.value_to_log()
+series.set_new_label("Microsoft Log Returns of Close Prices")
+_,_=series.plot_series()
 
 ```
 
