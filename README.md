@@ -14,7 +14,7 @@ width="81" height="100" align="left" float="right"/><br/>
 ![pylint](https://github.com/CaptorAB/OpenSeries/actions/workflows/pylint.yml/badge.svg)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-**OpenSeries** is a project with tools to perform timeseries analysis on a single
+**OpenSeries** is a project with tools to analyse financial timeseries of a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
 <span style="font-size:2em;">[Changelog](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
@@ -28,8 +28,12 @@ To install:
 pip install openseries
 ```
 
-An overview of an OpenTimeSeries object is shown in the below example. My preference
-is to instantiate an object from a constructing class methods such as this.
+An overview of an OpenTimeSeries object is shown in the below example. It shows how to
+create an object from a constructing classmethod. The design aligns with how we within
+our fund company's code base have a subclass of OpenTimeSeries with class methods
+for our different data sources. Combined with some additional tools it allows us to
+efficiently present investment cases to clients.
+
 The OpenTimeSeries and OpenFrame classes are both subclasses of
 the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/).
 
@@ -39,16 +43,15 @@ and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/fr
 classes have an attribute `tsdf`
 which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
 
-```
+```python
 from openseries.series import OpenTimeSeries
-```
 
-```
 series = OpenTimeSeries.from_arrays(
     name="Timeseries",
     dates=["2023-05-08", "2023-05-09", "2023-05-10", "2023-05-11", "2023-05-12"],
     values=[90.2533, 89.9977, 90.1052, 90.9142, 90.5574],
 )
+
 ```
 
 ### Sample output using the OpenFrame.all_properties() method:
@@ -94,7 +97,7 @@ own way.
 
 ### Windows Powershell
 
-```
+```powershell
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
 ./make.ps1 -task make
@@ -102,12 +105,13 @@ cd OpenSeries
 
 ### Mac Terminal/Linux
 
-```
+```bash
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
 make
 source source_me
 make install
+
 ```
 
 ## Testing and Linting / Type-checking
@@ -121,16 +125,18 @@ file.
 
 ### Windows Powershell
 
-```
+```powershell
 ./make.ps1 -task test
 ./make.ps1 -task lint
+
 ```
 
 ### Mac Terminal/Linux
 
-```
+```bash
 make test
 make lint
+
 ```
 
 
