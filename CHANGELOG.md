@@ -7,9 +7,16 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [1.0.1] - 2023-08-02
+
+Removed requests and urllib3 as dependencies as they are no longer directly required.
+
 ## Version [1.0.0] - 2023-08-01
 
-After successfully deploying with Pandas 2.0 dependency in use at our company I decided that it is more appropriate to now deploy a 1.0.0 version. I also intend to start deploying with simultaneous creation of a Git tag and GitHub release that will match the version number published on Pypi.
+After successfully deploying with Pandas 2.0 dependency in use at our company I decided that
+it is more appropriate to now deploy a 1.0.0 version. I also intend to start deploying with
+simultaneous creation of a Git tag and GitHub release that will match the version number
+published on Pypi.
 
 ## Version [0.14.0] - 2023-07-21
 
