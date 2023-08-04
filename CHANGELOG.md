@@ -7,6 +7,12 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [1.1.0] - 2023-08-04
+
+Relatively significant adaptations made to allow update of dependency to Pydantic 2.0.
+Dependency to statsmodels also updated to 0.14.0. Made a few improvements to pytest
+based tests in the test suite and cleaned up the unittest based ones.
+
 ## Version [1.0.1] - 2023-08-02
 
 Removed requests and urllib3 as dependencies as they are no longer directly required.
