@@ -5,7 +5,7 @@ stochastic processes generated using the stoch_process.py module.
 from typing import cast
 from numpy import insert, random, sqrt
 from pandas import DataFrame
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 
 from openseries.stoch_processes import (
     ModelParameters,
@@ -40,12 +40,7 @@ class ReturnSimulation(BaseModel):
     mean_annual_return: float
     mean_annual_vol: float
     dframe: DataFrame
-
-    class Config:
-        """Configurations for the ReturnSimulation class"""
-
-        arbitrary_types_allowed = True
-        validate_assignment = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True)
 
     @property
     def results(self: "ReturnSimulation") -> DataFrame:

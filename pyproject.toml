@@ -54,11 +54,11 @@ numpy = "^1.25.1"
 openpyxl = "^3.1.2"
 pandas = "^2.0.3"
 plotly = "^5.15.0"
-pydantic = "^1.10.11"
+pydantic = "2.1.1"
 python-dateutil = "^2.8.2"
 python-stdnum = "^1.18"
 scipy = "^1.11.1"
-statsmodels = "0.13.5"
+statsmodels = "0.14.0"
 
 [tool.poetry.dev-dependencies]
 black = "23.3.0"
@@ -100,12 +100,13 @@ disable_error_code = ["valid-type"]
 exclude = ["venv/*"]
 
 [tool.pylint]
-disable = ["C2801", "E0213", "R0801"]
+disable = ["C0103", "C2801", "E0213", "R0801"]
 max-line-length = 87
 max-module-lines=3380
 min-public-methods=0
 max-public-methods=89
 max-statements=51
+max-attributes=13
 max-branches=22
 max-locals=29
 max-args=12
