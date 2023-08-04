@@ -7,7 +7,7 @@ from json import loads
 from os import path, remove
 from typing import cast, get_type_hints, List, Tuple, Union
 from unittest import TestCase
-from pandas import DataFrame, date_range, DatetimeIndex
+from pandas import DataFrame, date_range
 from pandas.testing import assert_frame_equal
 
 from tests.simulate import make_simulated_data_from_merton_jump_gbm
@@ -625,7 +625,7 @@ class TestOpenFrame(TestCase):
             "countries",
         ]
 
-        frame_basemodelattributes = [
+        pydantic_basemodel_attributes = [
             "model_extra",
             "model_fields",
             "model_config",
@@ -657,6 +657,7 @@ class TestOpenFrame(TestCase):
                 common_calc_props
                 + common_props
                 + common_attributes
+                + pydantic_basemodel_attributes
                 + series_attributes
             )
         )
@@ -673,7 +674,7 @@ class TestOpenFrame(TestCase):
                 common_calc_props
                 + common_props
                 + common_attributes
-                + frame_basemodelattributes
+                + pydantic_basemodel_attributes
                 + frame_attributes
                 + frame_calc_props
             )
@@ -691,7 +692,7 @@ class TestOpenFrame(TestCase):
         sameframe = self.randomframe.from_deepcopy()
         sameframe.to_cumret()
 
-        frame_basemodelmethods = [
+        pydantic_basemodel_methods = [
             "dict",
             "copy",
             "model_post_init",
@@ -806,7 +807,8 @@ class TestOpenFrame(TestCase):
         ]
         series_compared = set(series_methods).symmetric_difference(
             set(
-                common_calc_methods
+                pydantic_basemodel_methods
+                + common_calc_methods
                 + common_methods
                 + series_createmethods
                 + series_unique
@@ -823,7 +825,7 @@ class TestOpenFrame(TestCase):
         ]
         frame_compared = set(frame_methods).symmetric_difference(
             set(
-                frame_basemodelmethods
+                pydantic_basemodel_methods
                 + common_calc_methods
                 + common_methods
                 + frame_unique

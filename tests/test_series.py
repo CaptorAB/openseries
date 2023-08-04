@@ -6,10 +6,9 @@ from io import StringIO
 from json import load, loads
 from os import path, remove
 import sys
-from typing import cast, Dict, get_type_hints, List, Union
+from typing import Any, cast, Dict, get_type_hints, List, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range, DatetimeIndex, Series
-from pandas._libs.tslibs.parsing import DateParseError
 from pydantic import ValidationError as PydanticValidationError
 import pytest
 
@@ -21,6 +20,12 @@ from openseries.series import (
     ValueType,
     check_if_none,
 )
+
+
+class NewTimeSeries(OpenTimeSeries):
+    """class to test correct pass-through of classes"""
+
+    extra_info: str = "cool"
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
@@ -47,9 +52,9 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
             valuetype=valuetype,
             values=[1.0, 1.1],
         )
-    assert "type=enum" or "type=string_type" in str(
+    assert "type=enum" in str(
         e_invalid_valuetype.getrepr(style="short")
-    )
+    ) or "type=string_type" in str(e_invalid_valuetype.getrepr(style="short"))
 
 
 @pytest.mark.parametrize("currency", ["SE", True, "12", 1, None])
@@ -63,9 +68,9 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
             valuetype=ValueType.PRICE,
             values=[1.0, 1.1],
         )
-    assert "type=string_too_short" or "type=string_type" in str(
+    assert "type=string_too_short" in str(
         e_invalid_currency.getrepr(style="short")
-    )
+    ) or "type=string_type" in str(e_invalid_currency.getrepr(style="short"))
 
 
 @pytest.mark.parametrize("domestic", ["SE", True, "12", 1, None])
@@ -78,9 +83,9 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
             values=[1.0, 1.1],
         )
         serie.domestic = domestic
-    assert "type=string_too_short" or "type=string_type" in str(
+    assert "type=string_too_short" in str(
         e_dom.getrepr(style="short")
-    )
+    ) or "type=string_type" in str(e_dom.getrepr(style="short"))
 
 
 @pytest.mark.parametrize(
@@ -95,9 +100,9 @@ def test_opentimeseries_invalid_countries(countries: str | List[str]) -> None:
             values=[1.0, 1.1],
         )
         serie.countries = countries
-    assert "type=list_type" or "type=string_type" in str(
+    assert "type=list_type" in str(
         e_ctries.getrepr(style="short")
-    )
+    ) or "type=string_type" in str(e_ctries.getrepr(style="short"))
 
 
 @pytest.mark.parametrize(
@@ -106,12 +111,10 @@ def test_opentimeseries_invalid_countries(countries: str | List[str]) -> None:
         (["2023-01-01", None], pytest.raises(PydanticValidationError)),
         (None, pytest.raises(TypeError)),
         ("2023-01-01", pytest.raises(TypeError)),
-        (["2023-01-bb", "2023-01-02"], pytest.raises(DateParseError)),
+        (["2023-01-bb", "2023-01-02"], pytest.raises(ValueError)),
     ],
 )
-def test_opentimeseries_invalid_dates(
-    dates: List[str], expectation: Exception
-) -> None:
+def test_opentimeseries_invalid_dates(dates: List[str], expectation: Any) -> None:
     """Pytest on invalid dates as input"""
     with expectation:
         OpenTimeSeries.from_arrays(
@@ -131,9 +134,7 @@ def test_opentimeseries_invalid_dates(
         ([1.0, "bb"], pytest.raises(ValueError)),
     ],
 )
-def test_opentimeseries_invalid_values(
-    values: List[float], expectation: Exception
-) -> None:
+def test_opentimeseries_invalid_values(values: List[float], expectation: Any) -> None:
     """Pytest on invalid values as input"""
     with expectation:
         OpenTimeSeries.from_arrays(
@@ -208,10 +209,9 @@ class TestOpenTimeSeries(TestCase):
         self: "TestOpenTimeSeries",
     ) -> None:
         """Test OpenTimeSeries annotations and typehints"""
-        opentimeseries_annotations = dict(OpenTimeSeries.__annotations__)
-        print(opentimeseries_annotations)
-        opentimeseries_typehints = get_type_hints(OpenTimeSeries)
-        self.assertDictEqual(opentimeseries_annotations, opentimeseries_typehints)
+        opentimeseries_annotations = list(OpenTimeSeries.__annotations__.keys())
+        opentimeseries_typehints = list(get_type_hints(OpenTimeSeries).keys())
+        self.assertListEqual(opentimeseries_annotations, opentimeseries_typehints)
 
     def test_opentimeseries_duplicates_handling(self: "TestOpenTimeSeries") -> None:
         """Test duplicate handling"""
@@ -646,10 +646,10 @@ class TestOpenTimeSeries(TestCase):
 
         gr_0 = cseries.vol_func(months_from_last=48)
 
-        cseries.Config.validate_assignment = False
-        cseries.dates = cseries.dates[-1008:]
-        cseries.values = cseries.values[-1008:]
-        cseries.Config.validate_assignment = True
+        cseries.model_config.update({"validate_assignment": False})
+        cseries.dates = cast(List[str], cseries.dates)[-1008:]
+        cseries.values = cast(List[str], cseries.values)[-1008:]
+        cseries.model_config.update({"validate_assignment": True})
         cseries.pandas_df()
         cseries.set_new_label(lvl_one=ValueType.RTRN)
         cseries.to_cumret()
@@ -928,11 +928,6 @@ class TestOpenTimeSeries(TestCase):
         base_series_one = self.randomseries.from_deepcopy()
         base_series_one.to_cumret()
 
-        class NewTimeSeries(OpenTimeSeries):
-            """class to test correct pass-through of classes"""
-
-            extra_info: str = "cool"
-
         sub_series_one = NewTimeSeries.from_arrays(
             name="sub_series_one",
             dates=base_series_one.dates,
@@ -964,7 +959,7 @@ class TestOpenTimeSeries(TestCase):
                 1.011,
             ],
         )
-        self.assertEqual(sub_series_one.extra_info, "cool")
+        self.assertEqual(cast(NewTimeSeries, sub_series_one).extra_info, "cool")
         new_base = timeseries_chain(front=base_series_one, back=base_series_two)
         new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
 

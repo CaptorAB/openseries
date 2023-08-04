@@ -100,13 +100,12 @@ disable_error_code = ["valid-type"]
 exclude = ["venv/*"]
 
 [tool.pylint]
-disable = ["C0103", "C2801", "E0213", "R0801"]
+disable = ["C2801", "E0213", "R0801"]
 max-line-length = 87
 max-module-lines=3380
 min-public-methods=0
 max-public-methods=89
 max-statements=51
-max-attributes=13
 max-branches=22
 max-locals=29
 max-args=12

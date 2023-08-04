@@ -5,7 +5,7 @@ from typing import Literal, List
 from pydantic import BaseModel, conlist, constr
 
 
-COUNTRYPATTERN = conlist(
+CountryStringType = conlist(
     constr(
         pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
     ),
@@ -14,15 +14,15 @@ COUNTRYPATTERN = conlist(
     pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
 )
 
-CURRENCYPATTERN = constr(
+CurrencyStringType = constr(
     pattern=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3, strict=True
 )
 
-DATEPATTERN = conlist(
+DateListType = conlist(
     constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"), min_length=2
 )
 
-DATABASEIDPATTERN = constr(pattern=r"^([0-9a-f]{24})?$")
+DatabaseIdStringType = constr(pattern=r"^([0-9a-f]{24})?$")
 
 LiteralLinePlotMode = Literal[
     "lines",

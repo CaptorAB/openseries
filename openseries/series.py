@@ -35,8 +35,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import conlist, ConfigDict, field_validator, model_validator
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, conlist, field_validator, model_validator
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
@@ -44,10 +43,10 @@ from stdnum.exceptions import InvalidChecksum
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
-    COUNTRYPATTERN,
-    CURRENCYPATTERN,
-    DATABASEIDPATTERN,
-    DATEPATTERN,
+    CountryStringType,
+    CurrencyStringType,
+    DatabaseIdStringType,
+    DateListType,
     LiteralQuantileInterp,
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
@@ -131,14 +130,13 @@ class ValueType(str, Enum):
     ROLLVOL = "Rolling volatility"
 
 
-@dataclass(
-    config=ConfigDict(
-        arbitrary_types_allowed=True,
-        validate_assignment=True,
-        revalidate_instances="always",
-    )
-)
-class OpenTimeSeries:
+class OpenTimeSeries(
+    BaseModel,
+    arbitrary_types_allowed=True,
+    validate_assignment=True,
+    revalidate_instances="always",
+    extra="allow",
+):
     """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
 
     Parameters
@@ -173,17 +171,17 @@ class OpenTimeSeries:
         Placeholder for a name of the timeseries
     """
 
-    timeseriesId: DATABASEIDPATTERN
-    instrumentId: DATABASEIDPATTERN
+    timeseriesId: DatabaseIdStringType
+    instrumentId: DatabaseIdStringType
     name: str
     valuetype: ValueType
-    dates: DATEPATTERN
+    dates: DateListType
     values: conlist(float, min_length=2)
     local_ccy: bool
     tsdf: DataFrame
-    currency: CURRENCYPATTERN
-    domestic: CURRENCYPATTERN = "SEK"
-    countries: COUNTRYPATTERN = "SE"
+    currency: CurrencyStringType
+    domestic: CurrencyStringType = "SEK"
+    countries: CountryStringType = "SE"
     isin: Optional[str] = None
     label: Optional[str] = None
 
