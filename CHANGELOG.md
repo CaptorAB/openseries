@@ -7,6 +7,11 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [1.1.1] - 2023-08-05
+
+Tightening and cleaning up typing. Also removed pipe syntax for optional parameters and
+replaced with typing.Optional.
+
 ## Version [1.1.0] - 2023-08-04
 
 Relatively significant adaptations made to allow update of dependency to Pydantic 2.0.
