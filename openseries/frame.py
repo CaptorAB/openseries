@@ -29,7 +29,8 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, validator
+from pydantic import field_validator, ConfigDict, BaseModel
+
 from scipy.stats import kurtosis, norm, skew
 import statsmodels.api as sm
 
@@ -85,15 +86,11 @@ class OpenFrame(BaseModel):
 
     constituents: List[OpenTimeSeries]
     tsdf: DataFrame = DataFrame()
-    weights: None | List[float]
+    weights: None | List[float] = None
 
-    class Config:
-        """Configurations for the OpenFrame class"""
+    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True)
 
-        arbitrary_types_allowed = True
-        validate_assignment = True
-
-    @validator("constituents")
+    @field_validator("constituents")
     def check_labels_unique(
         cls, tseries: List[OpenTimeSeries]
     ) -> List[OpenTimeSeries]:

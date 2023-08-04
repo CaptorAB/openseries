@@ -2,12 +2,27 @@
 Declaring types used throughout the project
 """
 from typing import Literal, List
-from pydantic import BaseModel
+from pydantic import BaseModel, conlist, constr
 
-COUNTRYPATTERN = r"^[A-Z]{2}$"
-CURRENCYPATTERN = r"^[A-Z]{3}$"
-DATEPATTERN = r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"
-DATABASEIDPATTERN = r"^([0-9a-f]{24})?$"
+
+CountryStringType = conlist(
+    constr(
+        pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
+    ),
+    min_length=1,
+) | constr(
+    pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
+)
+
+CurrencyStringType = constr(
+    pattern=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3, strict=True
+)
+
+DateListType = conlist(
+    constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"), min_length=2
+)
+
+DatabaseIdStringType = constr(pattern=r"^([0-9a-f]{24})?$")
 
 LiteralLinePlotMode = Literal[
     "lines",

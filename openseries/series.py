@@ -9,7 +9,7 @@ from math import ceil
 from os import path
 from pathlib import Path
 from re import compile as re_compile
-from typing import Any, cast, Dict, List, Tuple, TypeVar, Union
+from typing import Any, cast, Dict, List, Optional, Tuple, TypeVar, Union
 from numpy import (
     array,
     cumprod,
@@ -35,7 +35,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, constr, conlist, validator
+from pydantic import BaseModel, conlist, field_validator, model_validator
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
@@ -43,10 +43,10 @@ from stdnum.exceptions import InvalidChecksum
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
-    COUNTRYPATTERN,
-    CURRENCYPATTERN,
-    DATABASEIDPATTERN,
-    DATEPATTERN,
+    CountryStringType,
+    CurrencyStringType,
+    DatabaseIdStringType,
+    DateListType,
     LiteralQuantileInterp,
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
@@ -130,8 +130,13 @@ class ValueType(str, Enum):
     ROLLVOL = "Rolling volatility"
 
 
-# noinspection PyMethodParameters
-class OpenTimeSeries(BaseModel):
+class OpenTimeSeries(
+    BaseModel,
+    arbitrary_types_allowed=True,
+    validate_assignment=True,
+    revalidate_instances="always",
+    extra="allow",
+):
     """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
 
     Parameters
@@ -140,23 +145,13 @@ class OpenTimeSeries(BaseModel):
         Database identifier of the timeseries
     instrumentId: str
         Database identifier of the instrument associated with the timeseries
-    currency : str
-        ISO 4217 currency code of the timeseries
+    name : str
+        string identifier of the timeseries and/or instrument
+    valuetype : ValueType
+        Identifies if the series is a series of values or returns
     dates : List[str]
         Dates of the individual timeseries items
         These dates will not be altered by methods
-    domestic : str
-        ISO 4217 currency code of the user's home currency
-    name : str
-        string identifier of the timeseries and/or instrument
-    isin : str
-        ISO 6166 identifier code of the associated instrument
-    label : str
-        Placeholder for a name of the timeseries
-    countries: list | str, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    valuetype : ValueType
-        Identifies if the series is a series of values or returns
     values : List[float]
         The value or return values of the timeseries items
         These values will not be altered by methods
@@ -164,41 +159,34 @@ class OpenTimeSeries(BaseModel):
         Boolean flag indicating if timeseries is in local currency
     tsdf: pandas.DataFrame
         Pandas object holding dates and values that can be altered via methods
+    currency : str
+        ISO 4217 currency code of the timeseries
+    domestic : str, default: "SEK"
+        ISO 4217 currency code of the user's home currency
+    countries: str, default: "SE"
+        (List of) country code(s) according to ISO 3166-1 alpha-2
+    isin : str, optional
+        ISO 6166 identifier code of the associated instrument
+    label : str, optional
+        Placeholder for a name of the timeseries
     """
 
-    timeseriesId: constr(regex=DATABASEIDPATTERN)
-    instrumentId: constr(regex=DATABASEIDPATTERN)
-    currency: constr(regex=CURRENCYPATTERN, to_upper=True, min_length=3, max_length=3)
-    dates: conlist(
-        item_type=constr(regex=DATEPATTERN),
-        min_items=1,
-        unique_items=True,
-    )
-    domestic: constr(
-        regex=CURRENCYPATTERN, to_upper=True, min_length=3, max_length=3
-    ) = "SEK"
+    timeseriesId: DatabaseIdStringType
+    instrumentId: DatabaseIdStringType
     name: str
-    isin: str | None = None
-    label: str | None = None
-    countries: conlist(
-        item_type=constr(
-            regex=COUNTRYPATTERN, to_upper=True, min_length=2, max_length=2
-        ),
-        min_items=1,
-        unique_items=True,
-    ) | constr(regex=COUNTRYPATTERN, to_upper=True, min_length=2, max_length=2) = "SE"
     valuetype: ValueType
-    values: conlist(item_type=float, min_items=1)
+    dates: DateListType
+    values: conlist(float, min_length=2)
     local_ccy: bool
     tsdf: DataFrame
+    currency: CurrencyStringType
+    domestic: CurrencyStringType = "SEK"
+    countries: CountryStringType = "SE"
+    isin: Optional[str] = None
+    label: Optional[str] = None
 
-    class Config:
-        """Configurations for the OpenTimeSeries class"""
-
-        arbitrary_types_allowed = True
-        validate_assignment = True
-
-    @validator("isin")
+    @field_validator("isin")
+    @classmethod
     def check_isincode(cls, isin_code: str) -> str:
         """Pydantic validator to ensure that the ISIN code is valid if provided"""
         if isin_code:
@@ -209,6 +197,15 @@ class OpenTimeSeries(BaseModel):
                     "The ISIN code's checksum or check digit is invalid."
                 ) from exc
         return isin_code
+
+    @model_validator(mode="after")
+    def check_dates_unique(self) -> "OpenTimeSeries":
+        """Pydantic validator to ensure that the dates are unique"""
+        dates_list_length = len(self.dates)
+        dates_set_length = len(set(self.dates))
+        if dates_list_length != dates_set_length:
+            raise ValueError("Dates are not unique")
+        return self
 
     @classmethod
     def setup_class(
@@ -223,8 +220,8 @@ class OpenTimeSeries(BaseModel):
         countries: List[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
-        ccy_pattern = re_compile(CURRENCYPATTERN)
-        ctry_pattern = re_compile(COUNTRYPATTERN)
+        ccy_pattern = re_compile(r"^[A-Z]{3}$")
+        ctry_pattern = re_compile(r"^[A-Z]{2}$")
         try:
             ccy_ok = ccy_pattern.match(domestic_ccy)
         except TypeError as exc:
