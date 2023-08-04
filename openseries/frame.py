@@ -230,9 +230,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def calc_range(
         self: "OpenFrame",
-        months_offset: int | None = None,
-        from_dt: dt.date | None = None,
-        to_dt: dt.date | None = None,
+        months_offset: Optional[int] = None,
+        from_dt: Optional[dt.date] = None,
+        to_dt: Optional[dt.date] = None,
     ) -> Tuple[dt.date, dt.date]:
         """Creates user defined date range
 
@@ -498,9 +498,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def geo_ret_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """https://www.investopedia.com/terms/c/cagr.asp
 
@@ -557,10 +557,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def arithmetic_ret_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
@@ -622,9 +622,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def value_ret_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """
         Parameters
@@ -656,7 +656,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def value_ret_calendar_period(
-        self: "OpenFrame", year: int, month: int | None = None
+        self: "OpenFrame", year: int, month: Optional[int] = None
     ) -> Series:
         """
         Parameters
@@ -705,10 +705,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def vol_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
         in MS Excel \n
@@ -775,10 +775,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def downside_deviation_func(
         self: "OpenFrame",
         min_accepted_return: float = 0.0,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """The standard deviation of returns that are below a Minimum Accepted
         Return of zero.
@@ -847,12 +847,12 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def ret_vol_ratio_func(
         self: "OpenFrame",
-        riskfree_rate: float | None = None,
+        riskfree_rate: Optional[float] = None,
         riskfree_column: Tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """The ratio of annualized arithmetic mean of returns and annualized
         volatility or, if riskfree return provided, Sharpe ratio calculated
@@ -1080,12 +1080,12 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def sortino_ratio_func(
         self: "OpenFrame",
-        riskfree_rate: float | None = None,
+        riskfree_rate: Optional[float] = None,
         riskfree_column: Tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """The Sortino ratio calculated as ( return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has zero
@@ -1205,9 +1205,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def z_score_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
@@ -1270,9 +1270,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def max_drawdown_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1358,9 +1358,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def worst_func(
         self: "OpenFrame",
         observations: int = 1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """
         Parameters
@@ -1409,9 +1409,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def positive_share_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """
         Parameters
@@ -1468,9 +1468,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def skew_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """https://www.investopedia.com/terms/s/skewness.asp
 
@@ -1526,9 +1526,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def kurtosis_func(
         self: "OpenFrame",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
@@ -1591,9 +1591,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def cvar_down_func(
         self: "OpenFrame",
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
@@ -1656,9 +1656,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def var_down_func(
         self: "OpenFrame",
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> Series:
         """https://www.investopedia.com/terms/v/var.asp
@@ -1718,12 +1718,12 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def vol_from_var_func(
         self: "OpenFrame",
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """
         Parameters
@@ -1792,12 +1792,12 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """A position weight multiplier from the ratio between a VaR implied
         volatility and a given target volatility. Multiplier = 1.0 -> target met
@@ -2057,10 +2057,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         dlta_degr_freedms: int = 0,
         first_column: int = 0,
         second_column: int = 1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
         """Exponentially Weighted Moving Average Model for Volatilities and
         Correlation.
@@ -2179,7 +2179,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         self: "OpenFrame",
         column: int,
         observations: int = 21,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
         """
         Parameters
@@ -2418,8 +2418,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def trunc_frame(
         self: "OpenFrame",
-        start_cut: dt.date | None = None,
-        end_cut: dt.date | None = None,
+        start_cut: Optional[dt.date] = None,
+        end_cut: Optional[dt.date] = None,
         before: bool = True,
         after: bool = True,
     ) -> "OpenFrame":
@@ -2506,10 +2506,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def tracking_error_func(
         self: "OpenFrame",
         base_column: Tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """Calculates the Tracking Error which is the standard deviation of the
         difference between the fund and its index returns. \n
@@ -2583,10 +2583,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def info_ratio_func(
         self: "OpenFrame",
         base_column: Tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """The Information Ratio equals ( fund return less index return ) divided
         by the Tracking Error. And the Tracking Error is the standard deviation of
@@ -2663,10 +2663,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         self: "OpenFrame",
         ratio: LiteralCaptureRatio,
         base_column: Tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """The Up (Down) Capture Ratio is calculated by dividing the CAGR
         of the asset during periods that the benchmark returns are positive (negative)
@@ -2956,16 +2956,16 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def make_portfolio(
         self: "OpenFrame",
         name: str,
-        weight_strat: LiteralPortfolioWeightings | None = None,
-        initial_weights: List[float] | None = None,
-        risk_weights: List[float] | None = None,
+        weight_strat: Optional[LiteralPortfolioWeightings] = None,
+        initial_weights: Optional[List[float]] = None,
+        risk_weights: Optional[List[float]] = None,
         risk_parity_method: LiteralRiskParityMethod = "ccd",
         maximum_iterations: int = 100,
         tolerance: float = 1e-8,
         weight_bounds: Tuple[float, float] = (0.0, 1.0),
         riskfree: float = 0.0,
         covar_method: LiteralCovMethod = "ledoit-wolf",
-        options: Dict[str, int] | None = None,
+        options: Optional[Dict[str, int]] = None,
     ) -> DataFrame:
         """Calculates a basket timeseries based on the supplied weights
 
@@ -3053,7 +3053,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
         """The Information Ratio equals ( fund return less index return ) divided by
         the Tracking Error. And the Tracking Error is the standard deviation of the
@@ -3188,10 +3188,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def plot_series(
         self: "OpenFrame",
         mode: LiteralLinePlotMode = "lines",
-        tick_fmt: str | None = None,
-        filename: str | None = None,
-        directory: str | None = None,
-        labels: List[str] | None = None,
+        tick_fmt: Optional[str] = None,
+        filename: Optional[str] = None,
+        directory: Optional[str] = None,
+        labels: Optional[List[str]] = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
@@ -3292,10 +3292,10 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def plot_bars(
         self: "OpenFrame",
         mode: LiteralBarPlotMode = "group",
-        tick_fmt: str | None = None,
-        filename: str | None = None,
-        directory: str | None = None,
-        labels: List[str] | None = None,
+        tick_fmt: Optional[str] = None,
+        filename: Optional[str] = None,
+        directory: Optional[str] = None,
+        labels: Optional[List[str]] = None,
         auto_open: bool = True,
         add_logo: bool = True,
         output_type: LiteralPlotlyOutput = "file",

@@ -2,11 +2,16 @@
 Defining the ReturnSimulation class which simulates returns based on
 stochastic processes generated using the stoch_process.py module.
 """
-from typing import cast
+import datetime as dt
+from typing import cast, Tuple
 from numpy import insert, random, sqrt
-from pandas import DataFrame
+from pandas import DataFrame, date_range
+from pandas.tseries.offsets import CustomBusinessDay
 from pydantic import ConfigDict, BaseModel
 
+from openseries.datefixer import holiday_calendar
+from openseries.frame import OpenFrame
+from openseries.series import OpenTimeSeries, ValueType
 from openseries.stoch_processes import (
     ModelParameters,
     geometric_brownian_motion_log_returns,
@@ -443,3 +448,50 @@ class ReturnSimulation(BaseModel):
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=daily_returns),
         )
+
+
+def make_simulated_data_from_merton_jump_gbm() -> Tuple[OpenTimeSeries, OpenFrame]:
+    """Creates OpenTimeSeries and OpenFrame based on a
+    Merton Jump-Diffusion model simulation
+
+    Returns
+    -------
+    Tuple[OpenTimeSeries, OpenFrame]
+        Objects based on a simulation
+    """
+    OpenTimeSeries.setup_class()
+
+    sim = ReturnSimulation.from_merton_jump_gbm(
+        number_of_sims=5,
+        trading_days=2512,
+        mean_annual_return=0.05,
+        mean_annual_vol=0.1,
+        jumps_lamda=0.00125,
+        jumps_sigma=0.001,
+        jumps_mu=-0.2,
+        seed=71,
+    )
+    end = dt.date(2019, 6, 30)
+    startyear = 2009
+    calendar = holiday_calendar(
+        startyear=startyear, endyear=end.year, countries=OpenTimeSeries.countries
+    )
+    d_range = [
+        d.date()
+        for d in date_range(
+            periods=sim.trading_days,
+            end=end,
+            freq=CustomBusinessDay(calendar=calendar),
+        )
+    ]
+    sdf = sim.dframe.iloc[0].T.to_frame()
+    sdf.index = d_range
+    sdf.columns = [["Asset"], [ValueType.RTRN]]
+    series = OpenTimeSeries.from_df(sdf, valuetype=ValueType.RTRN).to_cumret()
+    tslist = []
+    for item in range(sim.number_of_sims):
+        sdf = sim.dframe.iloc[item].T.to_frame()
+        sdf.index = d_range
+        sdf.columns = [[f"Asset_{item}"], [ValueType.RTRN]]
+        tslist.append(OpenTimeSeries.from_df(sdf, valuetype=ValueType.RTRN))
+    return series, OpenFrame(tslist)

@@ -96,17 +96,9 @@ def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
     DataFrame | Series
         A drawdown timeserie
     """
-
-    # make a copy so that we don't modify original data
     drawdown = prices.copy()
-
-    # Fill NaN's with previous values
     drawdown = drawdown.fillna(method="ffill")
-
-    # Ignore problems with NaN's in the beginning
     drawdown[isnan(drawdown)] = -Inf
-
-    # Rolling maximum
     roll_max = maximum.accumulate(drawdown)
     drawdown = drawdown / roll_max - 1.0
     return drawdown

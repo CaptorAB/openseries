@@ -12,7 +12,7 @@ from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pydantic import ValidationError as PydanticValidationError
 import pytest
 
-from tests.simulate import make_simulated_data_from_merton_jump_gbm
+from openseries.sim_price import make_simulated_data_from_merton_jump_gbm
 from openseries.types import LiteralNanMethod, LiteralSeriesProps
 from openseries.series import (
     OpenTimeSeries,

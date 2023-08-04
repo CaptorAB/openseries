@@ -400,9 +400,9 @@ class OpenTimeSeries(
     def from_fixed_rate(
         cls,
         rate: float,
-        d_range: DatetimeIndex | None = None,
-        days: int | None = None,
-        end_dt: dt.date | None = None,
+        d_range: Optional[DatetimeIndex] = None,
+        days: Optional[int] = None,
+        end_dt: Optional[dt.date] = None,
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -490,8 +490,8 @@ class OpenTimeSeries(
     def to_xlsx(
         self: "OpenTimeSeries",
         filename: str,
-        sheet_title: str | None = None,
-        directory: str | None = None,
+        sheet_title: Optional[str] = None,
+        directory: Optional[str] = None,
     ) -> str:
         """Saves the data in the .tsdf DataFrame to an Excel spreadsheet file
 
@@ -531,7 +531,7 @@ class OpenTimeSeries(
         return sheetfile
 
     def to_json(
-        self: "OpenTimeSeries", filename: str, directory: str | None = None
+        self: "OpenTimeSeries", filename: str, directory: Optional[str] = None
     ) -> Dict[str, str | bool | ValueType | List[str] | List[float]]:
         """Dumps timeseries data into a json file
 
@@ -586,9 +586,9 @@ class OpenTimeSeries(
 
     def calc_range(
         self: "OpenTimeSeries",
-        months_offset: int | None = None,
-        from_dt: dt.date | None = None,
-        to_dt: dt.date | None = None,
+        months_offset: Optional[int] = None,
+        from_dt: Optional[dt.date] = None,
+        to_dt: Optional[dt.date] = None,
     ) -> Tuple[dt.date, dt.date]:
         """Creates user defined date range
 
@@ -674,7 +674,7 @@ class OpenTimeSeries(
         return self
 
     def all_properties(
-        self: "OpenTimeSeries", properties: List[LiteralSeriesProps] | None = None
+        self: "OpenTimeSeries", properties: Optional[List[LiteralSeriesProps]] = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
@@ -796,9 +796,9 @@ class OpenTimeSeries(
 
     def geo_ret_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/cagr.asp
 
@@ -856,10 +856,10 @@ class OpenTimeSeries(
 
     def arithmetic_ret_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> float:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
@@ -919,9 +919,9 @@ class OpenTimeSeries(
 
     def value_ret_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """
         Parameters
@@ -949,7 +949,7 @@ class OpenTimeSeries(
         return float((self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1).iloc[0])
 
     def value_ret_calendar_period(
-        self: "OpenTimeSeries", year: int, month: int | None = None
+        self: "OpenTimeSeries", year: int, month: Optional[int] = None
     ) -> float:
         """
         Parameters
@@ -994,10 +994,10 @@ class OpenTimeSeries(
 
     def vol_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> float:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
         in MS Excel \n
@@ -1063,10 +1063,10 @@ class OpenTimeSeries(
     def downside_deviation_func(
         self: "OpenTimeSeries",
         min_accepted_return: float = 0.0,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> float:
         """The standard deviation of returns that are below a Minimum Accepted
         Return of zero.
@@ -1133,9 +1133,9 @@ class OpenTimeSeries(
 
     def ret_vol_ratio_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The ratio of annualized arithmetic mean of returns and annualized
@@ -1186,9 +1186,9 @@ class OpenTimeSeries(
 
     def sortino_ratio_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Sortino ratio calculated as ( asset return - risk free return )
@@ -1246,9 +1246,9 @@ class OpenTimeSeries(
 
     def z_score_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """https://www.investopedia.com/terms/z/zscore.asp
 
@@ -1304,9 +1304,9 @@ class OpenTimeSeries(
 
     def max_drawdown_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1386,9 +1386,9 @@ class OpenTimeSeries(
     def worst_func(
         self: "OpenTimeSeries",
         observations: int = 1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """
         Parameters
@@ -1438,9 +1438,9 @@ class OpenTimeSeries(
 
     def positive_share_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """
         Parameters
@@ -1486,9 +1486,9 @@ class OpenTimeSeries(
 
     def skew_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """https://www.investopedia.com/terms/s/skewness.asp
 
@@ -1539,9 +1539,9 @@ class OpenTimeSeries(
 
     def kurtosis_func(
         self: "OpenTimeSeries",
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
@@ -1598,9 +1598,9 @@ class OpenTimeSeries(
     def cvar_down_func(
         self: "OpenTimeSeries",
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
     ) -> float:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
@@ -1668,9 +1668,9 @@ class OpenTimeSeries(
     def var_down_func(
         self: "OpenTimeSeries",
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> float:
         """https://www.investopedia.com/terms/v/var.asp
@@ -1731,12 +1731,12 @@ class OpenTimeSeries(
     def vol_from_var_func(
         self: "OpenTimeSeries",
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> float:
         """
         Parameters
@@ -1817,12 +1817,12 @@ class OpenTimeSeries(
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
         level: float = 0.95,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
         drift_adjust: bool = False,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> float:
         """A position weight multiplier from the ratio between a VaR implied
         volatility and a given target volatility. Multiplier = 1.0 -> target met
@@ -2090,10 +2090,10 @@ class OpenTimeSeries(
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """Exponentially Weighted Moving Average Model for Volatility.
         https://www.investopedia.com/articles/07/ewma.asp
@@ -2163,7 +2163,7 @@ class OpenTimeSeries(
     def rolling_vol(
         self: "OpenTimeSeries",
         observations: int = 21,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
         """
         Parameters
@@ -2373,8 +2373,8 @@ class OpenTimeSeries(
 
     def set_new_label(
         self: "OpenTimeSeries",
-        lvl_zero: str | None = None,
-        lvl_one: ValueType | None = None,
+        lvl_zero: Optional[str] = None,
+        lvl_one: Optional[ValueType] = None,
         delete_lvl_one: bool = False,
     ) -> "OpenTimeSeries":
         """Sets the column labels of the .tsdf Pandas Dataframe associated
@@ -2415,8 +2415,8 @@ class OpenTimeSeries(
     def plot_series(
         self: "OpenTimeSeries",
         mode: LiteralLinePlotMode = "lines",
-        tick_fmt: str | None = None,
-        directory: str | None = None,
+        tick_fmt: Optional[str] = None,
+        directory: Optional[str] = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
@@ -2507,8 +2507,8 @@ class OpenTimeSeries(
     def plot_bars(
         self: "OpenTimeSeries",
         mode: LiteralBarPlotMode = "group",
-        tick_fmt: str | None = None,
-        directory: str | None = None,
+        tick_fmt: Optional[str] = None,
+        directory: Optional[str] = None,
         auto_open: bool = True,
         add_logo: bool = True,
         output_type: LiteralPlotlyOutput = "file",

@@ -16,7 +16,7 @@ Processes that can be simulated in this module are:
 """
 from math import log, sqrt
 from math import pow as mathpow
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple
 from numpy import add, array, dtype, ndarray, exp, float64
 import numpy.random as nrand
 
@@ -63,7 +63,7 @@ def convert_to_prices(
 
 
 def brownian_motion_log_returns(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """This method returns a Wiener process. The Wiener process is also called
     Brownian motion. For more information about the Wiener process check out
@@ -90,7 +90,7 @@ def brownian_motion_log_returns(
 
 
 def brownian_motion_levels(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """Delivers a price sequence whose returns evolve according to a brownian motion
 
@@ -111,7 +111,7 @@ def brownian_motion_levels(
 
 
 def geometric_brownian_motion_log_returns(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """This method constructs a sequence of log returns which, when
     exponentiated, produce a random Geometric Brownian Motion (GBM).
@@ -139,7 +139,7 @@ def geometric_brownian_motion_log_returns(
 
 
 def geometric_brownian_motion_levels(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """Prices for an asset which evolves according to a geometric brownian motion
 
@@ -162,7 +162,7 @@ def geometric_brownian_motion_levels(
 
 
 def jump_diffusion_process(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """This method produces a sequence of Jump Sizes which represent a jump
     diffusion process. These jumps are combined with a geometric brownian
@@ -204,7 +204,7 @@ def jump_diffusion_process(
 
 
 def geometric_brownian_motion_jump_diffusion_log_returns(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """This method constructs combines a geometric brownian motion process
     (log returns) with a jump diffusion process (log returns) to produce a
@@ -229,7 +229,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 
 
 def geometric_brownian_motion_jump_diffusion_levels(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """Converts returns generated with a Geometric Brownian Motion process
     with jumps into prices
@@ -256,7 +256,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
 def heston_construct_correlated_path(
     param: ModelParameters,
     brownian_motion_one: ndarray[Any, dtype[float64]],
-    seed: int | None = None,
+    seed: Optional[int] = None,
 ) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
     """This method is a simplified version of the Cholesky decomposition method for
     just two assets. It does not make use of matrix algebra and is therefore quite
@@ -291,7 +291,7 @@ def heston_construct_correlated_path(
 
 
 def cox_ingersoll_ross_heston(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
     """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
@@ -338,7 +338,7 @@ def cox_ingersoll_ross_heston(
 
 
 def heston_model_levels(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
     """The Heston model is the geometric brownian motion model with stochastic
     volatility. This stochastic volatility is given by the Cox Ingersoll Ross
@@ -382,7 +382,7 @@ def heston_model_levels(
 
 
 def cox_ingersoll_ross_levels(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
     process. It is used to model interest rates as well as stochastic
@@ -417,7 +417,7 @@ def cox_ingersoll_ross_levels(
 
 
 def ornstein_uhlenbeck_levels(
-    param: ModelParameters, seed: int | None = None
+    param: ModelParameters, seed: Optional[int] = None
 ) -> ndarray[Any, dtype[float64]]:
     """This method returns the rate levels of a mean-reverting
     Ornstein Uhlenbeck process

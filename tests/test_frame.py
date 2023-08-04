@@ -10,12 +10,14 @@ from unittest import TestCase
 from pandas import DataFrame, date_range
 from pandas.testing import assert_frame_equal
 
-from tests.simulate import make_simulated_data_from_merton_jump_gbm
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
-from openseries.sim_price import ReturnSimulation
+from openseries.sim_price import (
+    ReturnSimulation,
+    make_simulated_data_from_merton_jump_gbm,
+)
 from openseries.types import (
     LiteralNanMethod,
     LiteralFrameProps,

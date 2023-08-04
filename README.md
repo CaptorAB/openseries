@@ -34,10 +34,7 @@ our fund company's code base have a subclass of OpenTimeSeries with class method
 for our different data sources. Combined with some additional tools it allows us to
 efficiently present investment cases to clients.
 
-The OpenTimeSeries and OpenFrame classes are both subclasses of
-the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/).
-
-To make use of some tools available in the [Pandas](https://pandas.pydata.org/) library
+To make use of the tools available in the [Pandas](https://pandas.pydata.org/) library
 the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)
 and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)
 classes have an attribute `tsdf`
@@ -91,10 +88,14 @@ last indices                                         2023-04-05                 
 
 ## Development Instructions
 
-These instructions assume that you
-have a compatible Python version installed on your machine and that you are OK
-to install this project in a virtual environment. If not, feel free to do it your
-own way.
+These instructions assume that you have a compatible Python version installed on
+your machine and that you are OK to install this project in a virtual environment.
+If not, feel free to do it your own way.
+
+The OpenTimeSeries and OpenFrame classes are both subclasses of
+the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/). Please refer to its documentation for information
+on any attributes or methods inherited from this model.
+
 
 ### Windows Powershell
 
@@ -179,7 +180,6 @@ make lint
 | `from_arrays`     | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a list of date strings and a list of values.  |
 | `from_df`         | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a pandas.DataFrame or pandas.Series.          |
 | `from_fixed_rate` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
-| `parse_obj`       | `OpenTimeSeries`              | A method inherited from the Pydantic BaseModel to construct an object from a `dict`.               |
 | `from_deepcopy`   | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
 
 ### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.

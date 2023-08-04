@@ -2,7 +2,7 @@
 Date related utilities
 """
 import datetime as dt
-from typing import cast, Dict, List, Union
+from typing import cast, Dict, List, Optional, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
@@ -16,12 +16,13 @@ def holiday_calendar(
     startyear: int,
     endyear: int,
     countries: CountriesType = "SE",
-    custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
-        Union[dt.date, dt.datetime, str, float, int],
-    ]
-    | None = None,
+    custom_holidays: Optional[
+        Union[
+            Dict[Union[dt.date, dt.datetime, str, float, int], str],
+            List[Union[dt.date, dt.datetime, str, float, int]],
+            Union[dt.date, dt.datetime, str, float, int],
+        ]
+    ] = None,
 ) -> busdaycalendar:
     """Function to generate a business calendar
 
@@ -60,7 +61,7 @@ def holiday_calendar(
         country in list_supported_countries() for country in cast(List[str], countries)
     ):
         country: CountryStringType
-        countryholidays: List[dt.date | str] = []
+        countryholidays: List[Union[dt.date, str]] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:
@@ -77,7 +78,7 @@ def holiday_calendar(
 
 
 def date_fix(
-    fixerdate: str | dt.date | dt.datetime | datetime64 | Timestamp,
+    fixerdate: Union[str, dt.date, dt.datetime, datetime64, Timestamp],
 ) -> dt.date:
     """Function to parse from different date formats into datetime.date
 
@@ -111,17 +112,18 @@ def date_fix(
 
 
 def date_offset_foll(
-    raw_date: str | dt.date | dt.datetime | datetime64 | Timestamp,
+    raw_date: Union[str, dt.date, dt.datetime, datetime64, Timestamp],
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
     countries: CountriesType = "SE",
-    custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
-        Union[dt.date, dt.datetime, str, float, int],
-    ]
-    | None = None,
+    custom_holidays: Optional[
+        Union[
+            Dict[Union[dt.date, dt.datetime, str, float, int], str],
+            List[Union[dt.date, dt.datetime, str, float, int]],
+            Union[dt.date, dt.datetime, str, float, int],
+        ]
+    ] = None,
 ) -> dt.date:
     """Function to offset dates according to a given calendar
 
@@ -177,14 +179,15 @@ def date_offset_foll(
 
 
 def get_previous_business_day_before_today(
-    today: dt.date | None = None,
+    today: Optional[dt.date] = None,
     countries: CountriesType = "SE",
-    custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
-        Union[dt.date, dt.datetime, str, float, int],
-    ]
-    | None = None,
+    custom_holidays: Optional[
+        Union[
+            Dict[Union[dt.date, dt.datetime, str, float, int], str],
+            List[Union[dt.date, dt.datetime, str, float, int]],
+            Union[dt.date, dt.datetime, str, float, int],
+        ]
+    ] = None,
 ) -> dt.date:
     """Function to bump backwards to find the previous business day before today
 
@@ -224,12 +227,13 @@ def offset_business_days(
     ddate: dt.date,
     days: int,
     countries: CountriesType = "SE",
-    custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
-        Union[dt.date, dt.datetime, str, float, int],
-    ]
-    | None = None,
+    custom_holidays: Optional[
+        Union[
+            Dict[Union[dt.date, dt.datetime, str, float, int], str],
+            List[Union[dt.date, dt.datetime, str, float, int]],
+            Union[dt.date, dt.datetime, str, float, int],
+        ]
+    ] = None,
 ) -> dt.date:
     """Function to bump a date by business days instead of calendar days.
     It first adjusts to a valid business day and then bumps with given
