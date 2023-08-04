@@ -10,7 +10,7 @@ from os import path
 from pathlib import Path
 from random import choices
 from string import ascii_letters
-from typing import cast, Dict, List, Tuple, Union
+from typing import cast, Dict, List, Optional, Tuple, Union
 from dateutil.relativedelta import relativedelta
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt
@@ -29,18 +29,16 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import field_validator, ConfigDict, BaseModel
-
+from pydantic import BaseModel, field_validator
 from scipy.stats import kurtosis, norm, skew
 import statsmodels.api as sm
-
-# noinspection PyProtectedMember
-from statsmodels.regression.linear_model import RegressionResults
+from statsmodels.base.model import LikelihoodModelResults
 
 from openseries.series import OpenTimeSeries, ValueType, ewma_calc
 from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
+    CountriesType,
     LiteralHowMerge,
     LiteralQuantileInterp,
     LiteralBizDayFreq,
@@ -67,8 +65,7 @@ from openseries.risk import (
 )
 
 
-# noinspection PyMethodParameters
-class OpenFrame(BaseModel):
+class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=True):
     """Object of the class OpenFrame. Subclass of the Pydantic BaseModel
 
     Parameters
@@ -86,11 +83,10 @@ class OpenFrame(BaseModel):
 
     constituents: List[OpenTimeSeries]
     tsdf: DataFrame = DataFrame()
-    weights: None | List[float] = None
-
-    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True)
+    weights: Optional[List[float]] = None
 
     @field_validator("constituents")
+    @classmethod
     def check_labels_unique(
         cls, tseries: List[OpenTimeSeries]
     ) -> List[OpenTimeSeries]:
@@ -103,7 +99,7 @@ class OpenFrame(BaseModel):
     def __init__(
         self: "OpenFrame",
         constituents: List[OpenTimeSeries],
-        weights: List[float] | None = None,
+        weights: Optional[List[float]] = None,
     ) -> None:
         super().__init__(constituents=constituents, weights=weights)
 
@@ -133,8 +129,8 @@ class OpenFrame(BaseModel):
     def to_xlsx(
         self: "OpenFrame",
         filename: str,
-        sheet_title: str | None = None,
-        directory: str | None = None,
+        sheet_title: Optional[str] = None,
+        directory: Optional[str] = None,
     ) -> str:
         """Saves the data in the .tsdf DataFrame to an Excel spreadsheet file
 
@@ -208,7 +204,7 @@ class OpenFrame(BaseModel):
         return self
 
     def all_properties(
-        self: "OpenFrame", properties: List[LiteralFrameProps] | None = None
+        self: "OpenFrame", properties: Optional[List[LiteralFrameProps]] = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
@@ -292,7 +288,7 @@ class OpenFrame(BaseModel):
         return earlier, later
 
     def align_index_to_local_cdays(
-        self: "OpenFrame", countries: List[str] | str = "SE"
+        self: "OpenFrame", countries: CountriesType = "SE"
     ) -> "OpenFrame":
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
         local calendar business days
@@ -1956,7 +1952,7 @@ class OpenFrame(BaseModel):
     def resample_to_business_period_ends(
         self: "OpenFrame",
         freq: LiteralBizDayFreq = "BM",
-        countries: List[str] | str = "SE",
+        countries: CountriesType = "SE",
         convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> "OpenFrame":
@@ -2905,7 +2901,7 @@ class OpenFrame(BaseModel):
         fitted_series: bool = True,
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
-    ) -> RegressionResults:
+    ) -> LikelihoodModelResults:
         """https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
         Performs a linear regression and adds a new column with a fitted line
         using Ordinary Least Squares fit

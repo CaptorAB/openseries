@@ -2,18 +2,20 @@
 Date related utilities
 """
 import datetime as dt
-from typing import Dict, List, Union
+from typing import cast, Dict, List, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
 from pandas import date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
 
+from openseries.types import CountryStringType, CountriesType
+
 
 def holiday_calendar(
     startyear: int,
     endyear: int,
-    countries: List[str] | str = "SE",
+    countries: CountriesType = "SE",
     custom_holidays: Union[
         Dict[Union[dt.date, dt.datetime, str, float, int], str],
         List[Union[dt.date, dt.datetime, str, float, int]],
@@ -55,8 +57,9 @@ def holiday_calendar(
             staging.update(custom_holidays)
         hols = array(sorted(staging.keys()), dtype="datetime64[D]")
     elif isinstance(countries, list) and all(
-        country in list_supported_countries() for country in countries
+        country in list_supported_countries() for country in cast(List[str], countries)
     ):
+        country: CountryStringType
         countryholidays: List[dt.date | str] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)
@@ -112,7 +115,7 @@ def date_offset_foll(
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
-    countries: str | List[str] = "SE",
+    countries: CountriesType = "SE",
     custom_holidays: Union[
         Dict[Union[dt.date, dt.datetime, str, float, int], str],
         List[Union[dt.date, dt.datetime, str, float, int]],
@@ -175,7 +178,7 @@ def date_offset_foll(
 
 def get_previous_business_day_before_today(
     today: dt.date | None = None,
-    countries: str | List[str] = "SE",
+    countries: CountriesType = "SE",
     custom_holidays: Union[
         Dict[Union[dt.date, dt.datetime, str, float, int], str],
         List[Union[dt.date, dt.datetime, str, float, int]],
@@ -220,7 +223,7 @@ def get_previous_business_day_before_today(
 def offset_business_days(
     ddate: dt.date,
     days: int,
-    countries: List[str] | str = "SE",
+    countries: CountriesType = "SE",
     custom_holidays: Union[
         Dict[Union[dt.date, dt.datetime, str, float, int], str],
         List[Union[dt.date, dt.datetime, str, float, int]],

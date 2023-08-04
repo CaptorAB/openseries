@@ -1,18 +1,14 @@
 """
 Declaring types used throughout the project
 """
-from typing import Literal, List
+from typing import Literal, List, TypeAlias, Union
 from pydantic import BaseModel, conlist, constr
 
 
-CountryStringType = conlist(
-    constr(
-        pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
-    ),
-    min_length=1,
-) | constr(
+CountryStringType = constr(
     pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
 )
+CountriesType = Union[conlist(CountryStringType, min_length=1), CountryStringType]
 
 CurrencyStringType = constr(
     pattern=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3, strict=True
@@ -32,22 +28,26 @@ LiteralLinePlotMode = Literal[
     "markers+text",
     "lines+markers+text",
 ]
-LiteralHowMerge = Literal["outer", "inner"]
-LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "nearest"]
-LiteralBizDayFreq = Literal["BM", "BQ", "BA"]
-LiteralPandasResampleConvention = Literal["start", "s", "end", "e"]
-LiteralPandasReindexMethod = Literal[
+LiteralHowMerge: TypeAlias = Literal["outer", "inner"]
+LiteralQuantileInterp: TypeAlias = Literal[
+    "linear", "lower", "higher", "midpoint", "nearest"
+]
+LiteralBizDayFreq: TypeAlias = Literal["BM", "BQ", "BA"]
+LiteralPandasResampleConvention: TypeAlias = Literal["start", "s", "end", "e"]
+LiteralPandasReindexMethod: TypeAlias = Literal[
     None, "pad", "ffill", "backfill", "bfill", "nearest"
 ]
-LiteralNanMethod = Literal["fill", "drop"]
-LiteralCaptureRatio = Literal["up", "down", "both"]
-LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]
-LiteralPlotlyOutput = Literal["file", "div"]
-LiteralOlsFitMethod = Literal["pinv", "qr"]
-LiteralPortfolioWeightings = Literal["eq_weights", "eq_risk", "inv_vol", "mean_var"]
-LiteralCovMethod = Literal["ledoit-wolf", "standard"]
-LiteralRiskParityMethod = Literal["ccd", "slsqp"]
-LiteralOlsFitCovType = Literal[
+LiteralNanMethod: TypeAlias = Literal["fill", "drop"]
+LiteralCaptureRatio: TypeAlias = Literal["up", "down", "both"]
+LiteralBarPlotMode: TypeAlias = Literal["stack", "group", "overlay", "relative"]
+LiteralPlotlyOutput: TypeAlias = Literal["file", "div"]
+LiteralOlsFitMethod: TypeAlias = Literal["pinv", "qr"]
+LiteralPortfolioWeightings: TypeAlias = Literal[
+    "eq_weights", "eq_risk", "inv_vol", "mean_var"
+]
+LiteralCovMethod: TypeAlias = Literal["ledoit-wolf", "standard"]
+LiteralRiskParityMethod: TypeAlias = Literal["ccd", "slsqp"]
+LiteralOlsFitCovType: TypeAlias = Literal[
     "nonrobust",
     "fixed scale",
     "HC0",
@@ -60,7 +60,7 @@ LiteralOlsFitCovType = Literal[
     "cluster",
 ]
 
-LiteralSeriesProps = Literal[
+LiteralSeriesProps: TypeAlias = Literal[
     "value_ret",
     "geo_ret",
     "arithmetic_ret",
@@ -87,7 +87,7 @@ LiteralSeriesProps = Literal[
     "yearfrac",
     "periods_in_a_year",
 ]
-LiteralFrameProps = Literal[
+LiteralFrameProps: TypeAlias = Literal[
     "value_ret",
     "geo_ret",
     "arithmetic_ret",

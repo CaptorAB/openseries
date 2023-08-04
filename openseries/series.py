@@ -43,7 +43,7 @@ from stdnum.exceptions import InvalidChecksum
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
-    CountryStringType,
+    CountriesType,
     CurrencyStringType,
     DatabaseIdStringType,
     DateListType,
@@ -181,7 +181,7 @@ class OpenTimeSeries(
     tsdf: DataFrame
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
-    countries: CountryStringType = "SE"
+    countries: CountriesType = "SE"
     isin: Optional[str] = None
     label: Optional[str] = None
 
@@ -209,7 +209,7 @@ class OpenTimeSeries(
 
     @classmethod
     def setup_class(
-        cls, domestic_ccy: str = "SEK", countries: List[str] | str = "SE"
+        cls, domestic_ccy: CurrencyStringType = "SEK", countries: CountriesType = "SE"
     ) -> None:
         """Sets the domestic currency and calendar of the user.
 
@@ -267,7 +267,7 @@ class OpenTimeSeries(
         valuetype: ValueType = ValueType.PRICE,
         timeseries_id: str = "",
         instrument_id: str = "",
-        baseccy: str = "SEK",
+        baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> "OpenTimeSeries":
         """Creates a timeseries from a Pandas DataFrame or Series
@@ -321,7 +321,7 @@ class OpenTimeSeries(
         dframe: DataFrame | Series,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
-        baseccy: str = "SEK",
+        baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> "OpenTimeSeries":
         """Creates a timeseries from a Pandas DataFrame or Series
@@ -405,7 +405,7 @@ class OpenTimeSeries(
         end_dt: dt.date | None = None,
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
-        baseccy: str = "SEK",
+        baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> "OpenTimeSeries":
         """Creates a timeseries from values accruing with a given fixed rate return
