@@ -37,9 +37,10 @@ jobs:
           version: ${{ env.POETRY_VER }}
           virtualenvs-in-project: true
           virtualenvs-path: ./.venv
-          cache-dir: ~/.local
-          virtualenvs-options-no-pip: true
-          virtualenvs-options-no-setuptools: true
+        run: |
+          poetry config cache-dir ~/.local
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -92,9 +93,10 @@ jobs:
           version: ${{ env.POETRY_VER }}
           virtualenvs-in-project: true
           virtualenvs-path: ./.venv
-          cache-dir: ~/.local
-          virtualenvs-options-no-pip: true
-          virtualenvs-options-no-setuptools: true
+        run: |
+          poetry config cache-dir ~/.local
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -152,9 +154,10 @@ jobs:
           version: ${{ env.POETRY_VER }}
           virtualenvs-in-project: true
           virtualenvs-path: ./.venv
-          cache-dir: ~/.local
-          virtualenvs-options-no-pip: true
-          virtualenvs-options-no-setuptools: true
+        run: |
+          poetry config cache-dir ~/.local
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
