@@ -38,14 +38,16 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-path: ./.venv
 
-      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
+      - name: Configure Poetry ${{ env.POETRY_VER }}
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
           poetry config virtualenvs.options.no-setuptools true
           poetry config --list
-          poetry install --no-root --with dev
+
+      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        run: poetry install --no-root --with dev
 
       - name: Save cache
         uses: actions/cache/save@v3
@@ -92,14 +94,16 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-path: ./.venv
 
-      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
+      - name: Configure Poetry ${{ env.POETRY_VER }}
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
           poetry config virtualenvs.options.no-setuptools true
           poetry config --list
-          poetry install --no-root --with dev
+
+      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        run: poetry install --no-root --with dev
 
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
@@ -151,14 +155,16 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-path: ./.venv
 
-      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
+      - name: Configure Poetry ${{ env.POETRY_VER }}
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
           poetry config virtualenvs.options.no-setuptools true
           poetry config --list
-          poetry install --no-root --with dev
+
+      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        run: poetry install --no-root --with dev
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
