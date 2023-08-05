@@ -1,7 +1,7 @@
 """
 Test suite for the openseries/sim_price.py module
 """
-from typing import Dict, get_type_hints, List
+from typing import Dict, get_type_hints, List, Union
 from unittest import TestCase
 from pandas import DataFrame
 
@@ -34,7 +34,7 @@ class TestSimPrice(TestCase):
 
     def test_return_simulation_processes(self: "TestSimPrice") -> None:
         """Test ReturnSimulation based on different stochastic processes"""
-        args: Dict[str, int | float] = {
+        args: Dict[str, Union[int, float]] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
@@ -49,7 +49,7 @@ class TestSimPrice(TestCase):
             "from_heston_vol",
             "from_merton_jump_gbm",
         ]
-        added: List[Dict[str, int | float]] = [
+        added: List[Dict[str, Union[int, float]]] = [
             {},
             {},
             {},
@@ -77,7 +77,7 @@ class TestSimPrice(TestCase):
         returns = []
         volatilities = []
         for method, adding in zip(methods, added):
-            arguments: Dict[str, int | float] = {**args, **adding}
+            arguments: Dict[str, Union[int, float]] = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")

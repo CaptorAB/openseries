@@ -3,7 +3,7 @@ Function to load plotly layout and configuration from local json file
 """
 from json import load
 from os.path import abspath, dirname, join
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 
 def load_plotly_dict(
@@ -11,14 +11,16 @@ def load_plotly_dict(
 ) -> Tuple[
     Dict[
         str,
-        str
-        | int
-        | float
-        | bool
-        | List[str]
-        | Dict[str, str | int | float | bool | List[str]],
+        Union[
+            str,
+            int,
+            float,
+            bool,
+            List[str],
+            Dict[str, str | int | float | bool | List[str]],
+        ],
     ],
-    Dict[str, str | float],
+    Dict[str, Union[str, float]],
 ]:
     """Function to load the plotly defaults
 
