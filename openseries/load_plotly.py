@@ -17,7 +17,7 @@ def load_plotly_dict(
             float,
             bool,
             List[str],
-            Dict[str, str | int | float | bool | List[str]],
+            Dict[str, Union[str, int, float, bool, List[str]]],
         ],
     ],
     Dict[str, Union[str, float]],
