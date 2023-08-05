@@ -13,7 +13,7 @@ from pydantic import ValidationError as PydanticValidationError
 import pytest
 
 from openseries.sim_price import make_simulated_data_from_merton_jump_gbm
-from openseries.types import LiteralNanMethod, LiteralSeriesProps
+from openseries.types import CountriesType, LiteralNanMethod, LiteralSeriesProps
 from openseries.series import (
     OpenTimeSeries,
     timeseries_chain,
@@ -91,7 +91,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
 @pytest.mark.parametrize(
     "countries", ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []]
 )
-def test_opentimeseries_invalid_countries(countries: str | List[str]) -> None:
+def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     """Pytest on invalid country codes as input"""
     with pytest.raises(PydanticValidationError) as e_ctries:
         serie = OpenTimeSeries.from_arrays(
@@ -148,7 +148,7 @@ class TestOpenTimeSeries(TestCase):
     """class to run unittests on the module series.py"""
 
     randomseries: OpenTimeSeries
-    random_properties: Dict[str, dt.date | int | float]
+    random_properties: Dict[str, Union[dt.date, int, float]]
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -773,8 +773,8 @@ class TestOpenTimeSeries(TestCase):
         self.assertIsInstance(props, DataFrame)
 
         with self.assertRaises(ValueError) as e_boo:
-            faulty_props = cast(List[LiteralSeriesProps], ["geo_ret", "boo"])
-            _ = apseries.all_properties(faulty_props)
+            faulty_props = ["geo_ret", "boo"]
+            _ = apseries.all_properties(cast(List[LiteralSeriesProps], faulty_props))
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_opentimeseries_all_calc_properties(self: "TestOpenTimeSeries") -> None:
@@ -888,7 +888,9 @@ class TestOpenTimeSeries(TestCase):
         )
         full_series.tsdf.index.get_loc(front_series.last_idx)
         chained_series = timeseries_chain(front_series, back_series)
-        chained_values = [f"{nn:.10f}" for nn in chained_series.values]
+        chained_values = [
+            f"{nn:.10f}" for nn in cast(List[float], chained_series.values)
+        ]
 
         self.assertListEqual(full_series.dates, chained_series.dates)
         self.assertListEqual(full_values, chained_values)

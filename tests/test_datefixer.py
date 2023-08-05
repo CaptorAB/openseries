@@ -92,7 +92,7 @@ class TestDateFixer(TestCase):
     def test_date_offset_foll(self: "TestDateFixer") -> None:
         """Test date_offset_foll function"""
         originals = [dt.date(2022, 6, 5), dt.date(2022, 7, 3)]
-        country_sets: List[str | List[str]] = ["SE", "US", ["SE", "US"]]
+        country_sets: List[Union[str, List[str]]] = ["SE", "US", ["SE", "US"]]
         earliers = [
             dt.date(2022, 6, 3),
             dt.date(2022, 7, 1),

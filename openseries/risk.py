@@ -6,7 +6,7 @@ https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
 import datetime as dt
 from math import ceil
-from typing import cast, List
+from typing import cast, List, Union
 from numpy import (
     Inf,
     isnan,
@@ -21,7 +21,9 @@ from pandas import DataFrame, Series
 from openseries.types import LiteralQuantileInterp
 
 
-def cvar_down(data: DataFrame | Series | List[float], level: float = 0.95) -> float:
+def cvar_down(
+    data: Union[DataFrame, Series, List[float]], level: float = 0.95
+) -> float:
     """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
     Parameters
@@ -47,7 +49,7 @@ def cvar_down(data: DataFrame | Series | List[float], level: float = 0.95) -> fl
 
 
 def var_down(
-    data: DataFrame | Series | List[float],
+    data: Union[DataFrame, Series, List[float]],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
@@ -78,7 +80,7 @@ def var_down(
     return cast(float, quantile(ret, 1 - level, method=interpolation))
 
 
-def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
+def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series]:
     """Calculates https://www.investopedia.com/terms/d/drawdown.asp
     This returns a series representing a drawdown. When the price is at all-time
     highs, the drawdown is 0. However, when prices are below high watermarks,
@@ -104,7 +106,7 @@ def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
     return drawdown
 
 
-def drawdown_details(prices: DataFrame | Series) -> Series:
+def drawdown_details(prices: Union[DataFrame, Series]) -> Series:
     """Details of the maximum drawdown
 
     Parameters

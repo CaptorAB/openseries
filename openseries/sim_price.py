@@ -3,7 +3,7 @@ Defining the ReturnSimulation class which simulates returns based on
 stochastic processes generated using the stoch_process.py module.
 """
 import datetime as dt
-from typing import cast, Tuple
+from typing import cast, Optional, Tuple
 from numpy import insert, random, sqrt
 from pandas import DataFrame, date_range
 from pandas.tseries.offsets import CustomBusinessDay
@@ -95,7 +95,7 @@ class ReturnSimulation(BaseModel):
         mean_annual_vol: float,
         trading_days: int,
         trading_days_in_year: int = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> "ReturnSimulation":
         """Normal distribution simulation
 
@@ -111,7 +111,7 @@ class ReturnSimulation(BaseModel):
             Mean standard deviation
         trading_days_in_year: int, default: 252
             Number of trading days used to annualize
-        seed: int | None, default 71
+        seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
 
         Returns
@@ -144,7 +144,7 @@ class ReturnSimulation(BaseModel):
         mean_annual_vol: float,
         trading_days: int,
         trading_days_in_year: int = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> "ReturnSimulation":
         """Lognormal distribution simulation
 
@@ -160,7 +160,7 @@ class ReturnSimulation(BaseModel):
             Mean standard deviation
         trading_days_in_year: int, default: 252
             Number of trading days used to annualize
-        seed: int | None, default 71
+        seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
 
         Returns
@@ -196,7 +196,7 @@ class ReturnSimulation(BaseModel):
         mean_annual_vol: float,
         trading_days: int,
         trading_days_in_year: int = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> "ReturnSimulation":
         """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM)
@@ -213,7 +213,7 @@ class ReturnSimulation(BaseModel):
             Mean standard deviation
         trading_days_in_year: int, default: 252
             Number of trading days used to annualize
-        seed: int | None, default 71
+        seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
 
         Returns
@@ -254,7 +254,7 @@ class ReturnSimulation(BaseModel):
         heston_mu: float,
         heston_a: float,
         trading_days_in_year: int = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> "ReturnSimulation":
         """Heston model is the geometric brownian motion model
         with stochastic volatility
@@ -275,7 +275,7 @@ class ReturnSimulation(BaseModel):
             This is the rate of mean reversion for volatility in the Heston model
         trading_days_in_year: int, default: 252
             Number of trading days used to annualize
-        seed: int | None, default 71
+        seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
 
         Returns
@@ -322,7 +322,7 @@ class ReturnSimulation(BaseModel):
         heston_mu: float,
         heston_a: float,
         trading_days_in_year: int = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> "ReturnSimulation":
         """Heston Vol model simulation
 
@@ -342,7 +342,7 @@ class ReturnSimulation(BaseModel):
             This is the rate of mean reversion for volatility in the Heston model
         trading_days_in_year: int, default: 252
             Number of trading days used to annualize
-        seed: int | None, default 71
+        seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
 
         Returns
@@ -390,7 +390,7 @@ class ReturnSimulation(BaseModel):
         jumps_sigma: float,
         jumps_mu: float,
         trading_days_in_year: int = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> "ReturnSimulation":
         """Merton Jump-Diffusion model simulation
 
@@ -412,7 +412,7 @@ class ReturnSimulation(BaseModel):
             This is the volatility of the jump size
         jumps_mu: float
             This is the average jump size
-        seed: int | None, default 71
+        seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
 
         Returns

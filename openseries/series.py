@@ -35,7 +35,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, conlist, field_validator, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
@@ -47,6 +47,7 @@ from openseries.types import (
     CurrencyStringType,
     DatabaseIdStringType,
     DateListType,
+    ValueListType,
     LiteralQuantileInterp,
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
@@ -176,7 +177,7 @@ class OpenTimeSeries(
     name: str
     valuetype: ValueType
     dates: DateListType
-    values: conlist(float, min_length=2)
+    values: ValueListType
     local_ccy: bool
     tsdf: DataFrame
     currency: CurrencyStringType
@@ -262,11 +263,11 @@ class OpenTimeSeries(
     def from_arrays(
         cls,
         name: str,
-        dates: List[str],
-        values: List[float],
+        dates: DateListType,
+        values: ValueListType,
         valuetype: ValueType = ValueType.PRICE,
-        timeseries_id: str = "",
-        instrument_id: str = "",
+        timeseries_id: DatabaseIdStringType = "",
+        instrument_id: DatabaseIdStringType = "",
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> "OpenTimeSeries":
@@ -318,7 +319,7 @@ class OpenTimeSeries(
     @classmethod
     def from_df(
         cls,
-        dframe: DataFrame | Series,
+        dframe: Union[DataFrame, Series],
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -532,7 +533,7 @@ class OpenTimeSeries(
 
     def to_json(
         self: "OpenTimeSeries", filename: str, directory: Optional[str] = None
-    ) -> Dict[str, str | bool | ValueType | List[str] | List[float]]:
+    ) -> Dict[str, Union[str, bool, ValueType, List[str], List[float]]]:
         """Dumps timeseries data into a json file
 
         The label and tsdf parameters are deleted before the json file is saved

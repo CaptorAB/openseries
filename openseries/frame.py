@@ -848,7 +848,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def ret_vol_ratio_func(
         self: "OpenFrame",
         riskfree_rate: Optional[float] = None,
-        riskfree_column: Tuple[str, ValueType] | int = -1,
+        riskfree_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -864,7 +864,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         ----------
         riskfree_rate : float, optional
             The return of the zero volatility asset used to calculate Sharpe ratio
-        riskfree_column : Tuple[str, ValueType] | int, default: -1
+        riskfree_column : Union[Tuple[str, ValueType], int], default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -948,8 +948,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def jensen_alpha(
         self: "OpenFrame",
-        asset: Tuple[str, ValueType] | int,
-        market: Tuple[str, ValueType] | int,
+        asset: Union[Tuple[str, ValueType], int],
+        market: Union[Tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
@@ -961,9 +961,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
         Parameters
         ----------
-        asset: Tuple[str, ValueType] | int
+        asset: Union[Tuple[str, ValueType], int]
             The column of the asset
-        market: Tuple[str, ValueType] | int
+        market: Union[Tuple[str, ValueType], int]
             The column of the market against which Jensen's alpha is measured
         riskfree_rate : float, default: 0.0
             The return of the zero volatility riskfree asset
@@ -1081,7 +1081,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def sortino_ratio_func(
         self: "OpenFrame",
         riskfree_rate: Optional[float] = None,
-        riskfree_column: Tuple[str, ValueType] | int = -1,
+        riskfree_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1097,7 +1097,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         ----------
         riskfree_rate : float, optional
             The return of the zero volatility asset
-        riskfree_column : Tuple[str, ValueType] | int, default: -1
+        riskfree_column : Union[Tuple[str, ValueType], int], default: -1
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -2505,7 +2505,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def tracking_error_func(
         self: "OpenFrame",
-        base_column: Tuple[str, ValueType] | int = -1,
+        base_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -2517,7 +2517,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
         Parameters
         ----------
-        base_column: Tuple[str, ValueType] | int, default: -1
+        base_column: Union[Tuple[str, ValueType], int], default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -2582,7 +2582,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def info_ratio_func(
         self: "OpenFrame",
-        base_column: Tuple[str, ValueType] | int = -1,
+        base_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -2595,7 +2595,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
         Parameters
         ----------
-        base_column: Tuple[str, ValueType] | int, default: -1
+        base_column: Union[Tuple[str, ValueType], int], default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -2662,7 +2662,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     def capture_ratio_func(
         self: "OpenFrame",
         ratio: LiteralCaptureRatio,
-        base_column: Tuple[str, ValueType] | int = -1,
+        base_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -2681,7 +2681,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         ----------
         ratio: LiteralCaptureRatio
             The ratio to calculate
-        base_column: Tuple[str, ValueType] | int, default: -1
+        base_column: Union[Tuple[str, ValueType], int], default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -2829,17 +2829,17 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def beta(
         self: "OpenFrame",
-        asset: Tuple[str, ValueType] | int,
-        market: Tuple[str, ValueType] | int,
+        asset: Union[Tuple[str, ValueType], int],
+        market: Union[Tuple[str, ValueType], int],
     ) -> float:
         """https://www.investopedia.com/terms/b/beta.asp
         Calculates Beta as Co-variance of asset & market divided by Variance of market
 
         Parameters
         ----------
-        asset: Tuple[str, ValueType] | int
+        asset: Union[Tuple[str, ValueType], int]
             The column of the asset
-        market: Tuple[str, ValueType] | int
+        market: Union[Tuple[str, ValueType], int]
             The column of the market against which Beta is measured
 
         Returns
@@ -2896,8 +2896,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
     def ord_least_squares_fit(
         self: "OpenFrame",
-        y_column: Tuple[str, ValueType] | int,
-        x_column: Tuple[str, ValueType] | int,
+        y_column: Union[Tuple[str, ValueType], int],
+        x_column: Union[Tuple[str, ValueType], int],
         fitted_series: bool = True,
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
@@ -2908,9 +2908,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
         Parameters
         ----------
-        y_column: Tuple[str, ValueType] | int
+        y_column: Union[Tuple[str, ValueType], int]
             The column level values of the dependent variable y
-        x_column: Tuple[str, ValueType] | int
+        x_column: Union[Tuple[str, ValueType], int]
             The column level values of the exogenous variable x
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame

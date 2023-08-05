@@ -1269,8 +1269,10 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(props, DataFrame)
 
         with self.assertRaises(ValueError) as e_boo:
-            faulty_props = cast(List[LiteralFrameProps], ["geo_ret", "boo"])
-            _ = apframe.all_properties(properties=faulty_props)
+            faulty_props = ["geo_ret", "boo"]
+            _ = apframe.all_properties(
+                properties=cast(List[LiteralFrameProps], faulty_props)
+            )
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_openframe_align_index_to_local_cdays(self: "TestOpenFrame") -> None:

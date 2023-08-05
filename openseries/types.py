@@ -1,7 +1,7 @@
 """
 Declaring types used throughout the project
 """
-from typing import Literal, List, TypeAlias, Union
+from typing import Literal, List, Union
 from pydantic import BaseModel, conlist, constr
 
 
@@ -18,6 +18,8 @@ DateListType = conlist(
     constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"), min_length=2
 )
 
+ValueListType = conlist(float, min_length=2)
+
 DatabaseIdStringType = constr(pattern=r"^([0-9a-f]{24})?$")
 
 LiteralLinePlotMode = Literal[
@@ -28,26 +30,22 @@ LiteralLinePlotMode = Literal[
     "markers+text",
     "lines+markers+text",
 ]
-LiteralHowMerge: TypeAlias = Literal["outer", "inner"]
-LiteralQuantileInterp: TypeAlias = Literal[
-    "linear", "lower", "higher", "midpoint", "nearest"
-]
-LiteralBizDayFreq: TypeAlias = Literal["BM", "BQ", "BA"]
-LiteralPandasResampleConvention: TypeAlias = Literal["start", "s", "end", "e"]
-LiteralPandasReindexMethod: TypeAlias = Literal[
+LiteralHowMerge = Literal["outer", "inner"]
+LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "nearest"]
+LiteralBizDayFreq = Literal["BM", "BQ", "BA"]
+LiteralPandasResampleConvention = Literal["start", "s", "end", "e"]
+LiteralPandasReindexMethod = Literal[
     None, "pad", "ffill", "backfill", "bfill", "nearest"
 ]
-LiteralNanMethod: TypeAlias = Literal["fill", "drop"]
-LiteralCaptureRatio: TypeAlias = Literal["up", "down", "both"]
-LiteralBarPlotMode: TypeAlias = Literal["stack", "group", "overlay", "relative"]
-LiteralPlotlyOutput: TypeAlias = Literal["file", "div"]
-LiteralOlsFitMethod: TypeAlias = Literal["pinv", "qr"]
-LiteralPortfolioWeightings: TypeAlias = Literal[
-    "eq_weights", "eq_risk", "inv_vol", "mean_var"
-]
-LiteralCovMethod: TypeAlias = Literal["ledoit-wolf", "standard"]
-LiteralRiskParityMethod: TypeAlias = Literal["ccd", "slsqp"]
-LiteralOlsFitCovType: TypeAlias = Literal[
+LiteralNanMethod = Literal["fill", "drop"]
+LiteralCaptureRatio = Literal["up", "down", "both"]
+LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]
+LiteralPlotlyOutput = Literal["file", "div"]
+LiteralOlsFitMethod = Literal["pinv", "qr"]
+LiteralPortfolioWeightings = Literal["eq_weights", "eq_risk", "inv_vol", "mean_var"]
+LiteralCovMethod = Literal["ledoit-wolf", "standard"]
+LiteralRiskParityMethod = Literal["ccd", "slsqp"]
+LiteralOlsFitCovType = Literal[
     "nonrobust",
     "fixed scale",
     "HC0",
@@ -60,7 +58,7 @@ LiteralOlsFitCovType: TypeAlias = Literal[
     "cluster",
 ]
 
-LiteralSeriesProps: TypeAlias = Literal[
+LiteralSeriesProps = Literal[
     "value_ret",
     "geo_ret",
     "arithmetic_ret",
@@ -87,7 +85,7 @@ LiteralSeriesProps: TypeAlias = Literal[
     "yearfrac",
     "periods_in_a_year",
 ]
-LiteralFrameProps: TypeAlias = Literal[
+LiteralFrameProps = Literal[
     "value_ret",
     "geo_ret",
     "arithmetic_ret",
