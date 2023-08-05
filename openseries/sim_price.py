@@ -7,7 +7,7 @@ from typing import cast, Optional, Tuple
 from numpy import insert, random, sqrt
 from pandas import DataFrame, date_range
 from pandas.tseries.offsets import CustomBusinessDay
-from pydantic import ConfigDict, BaseModel
+from pydantic import BaseModel
 
 from openseries.datefixer import holiday_calendar
 from openseries.frame import OpenFrame
@@ -20,7 +20,9 @@ from openseries.stoch_processes import (
 )
 
 
-class ReturnSimulation(BaseModel):
+class ReturnSimulation(
+    BaseModel, arbitrary_types_allowed=True, validate_assignment=True
+):
     """Object of the class ReturnSimulation. Subclass of the Pydantic BaseModel
 
     Parameters
@@ -45,7 +47,6 @@ class ReturnSimulation(BaseModel):
     mean_annual_return: float
     mean_annual_vol: float
     dframe: DataFrame
-    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True)
 
     @property
     def results(self: "ReturnSimulation") -> DataFrame:
@@ -450,9 +451,46 @@ class ReturnSimulation(BaseModel):
         )
 
 
-def make_simulated_data_from_merton_jump_gbm() -> Tuple[OpenTimeSeries, OpenFrame]:
+def make_simulated_data_from_merton_jump_gbm(
+    end: dt.date = dt.date(2019, 6, 30),
+    startyear: int = 2009,
+    number_of_sims: int = 5,
+    trading_days: int = 2512,
+    mean_annual_return: float = 0.05,
+    mean_annual_vol: float = 0.1,
+    jumps_lamda: float = 0.00125,
+    jumps_sigma: float = 0.001,
+    jumps_mu: float = -0.2,
+    trading_days_in_year: int = 252,
+    seed: Optional[int] = 71,
+) -> Tuple[OpenTimeSeries, OpenFrame]:
     """Creates OpenTimeSeries and OpenFrame based on a
     Merton Jump-Diffusion model simulation
+
+        Parameters
+        ----------
+        end: datetime.date, default: dt.date(2019, 6, 30)
+            Date when the simulation ends
+        startyear: int, default: 2009
+            Year when the simulation starts. Day & month infered from end
+        number_of_sims: int, default: 5
+            Number of simulations to generate
+        trading_days: int, default: 2512
+            Number of trading days to simulate
+        mean_annual_return: float, default: 0.05
+            Mean return
+        mean_annual_vol: float, default: 0.1
+            Mean standard deviation
+        trading_days_in_year: int, default: 252
+            Number of trading days used to annualize
+        jumps_lamda: float, default: 0.00125
+            This is the probability of a jump happening at each point in time
+        jumps_sigma: float, default: 0.001
+            This is the volatility of the jump size
+        jumps_mu: float, default: -0.2
+            This is the average jump size
+        seed: Optional[int], default 71
+            Random seed going into numpy.random.seed()
 
     Returns
     -------
@@ -462,17 +500,16 @@ def make_simulated_data_from_merton_jump_gbm() -> Tuple[OpenTimeSeries, OpenFram
     OpenTimeSeries.setup_class()
 
     sim = ReturnSimulation.from_merton_jump_gbm(
-        number_of_sims=5,
-        trading_days=2512,
-        mean_annual_return=0.05,
-        mean_annual_vol=0.1,
-        jumps_lamda=0.00125,
-        jumps_sigma=0.001,
-        jumps_mu=-0.2,
-        seed=71,
+        number_of_sims=number_of_sims,
+        trading_days=trading_days,
+        mean_annual_return=mean_annual_return,
+        mean_annual_vol=mean_annual_vol,
+        jumps_lamda=jumps_lamda,
+        jumps_sigma=jumps_sigma,
+        jumps_mu=jumps_mu,
+        trading_days_in_year=trading_days_in_year,
+        seed=seed,
     )
-    end = dt.date(2019, 6, 30)
-    startyear = 2009
     calendar = holiday_calendar(
         startyear=startyear, endyear=end.year, countries=OpenTimeSeries.countries
     )

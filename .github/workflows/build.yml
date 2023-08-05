@@ -67,7 +67,7 @@ jobs:
 
       - name: Tests with Pytest
         shell: bash
-        run: poetry run coverage run -m pytest --verbose --durations=20 --durations-min=2.0
+        run: poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
         shell: bash
