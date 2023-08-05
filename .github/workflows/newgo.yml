@@ -114,14 +114,6 @@ jobs:
           name: coverage${{ matrix.group }}
           path: .coverage
 
-      - name: Save cache
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
-
   report_coverage:
     needs: run_tests
     runs-on: ubuntu-latest
@@ -173,11 +165,3 @@ jobs:
         run: |
           poetry run coverage combine coverage*/.coverage*
           poetry run coverage report
-
-      - name: Save cache
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
