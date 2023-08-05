@@ -7,6 +7,10 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [1.1.2] - 2023-08-05
+
+All pipe syntax removed on typing which allows the project to work on Python 3.9.
+
 ## Version [1.1.1] - 2023-08-05
 
 Tightening and cleaning up typing. Also removed pipe syntax for optional parameters and
