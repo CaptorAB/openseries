@@ -7,7 +7,7 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
-## Version [1.1.3] - 2023-08-06
+## Version [1.1.3] - 2023-08-07
 
 Consolidated sim_price.py and stoch_processes.py into a single simulation.py with the
 class ReturnSimulation to hold all steps. Still no optimization of any kind and I

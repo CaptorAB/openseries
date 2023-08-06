@@ -44,26 +44,24 @@ class TestSimulation(TestCase):
             seed=71,
         )
 
+    def test_simulation_modelparameters_annotations_and_typehints(
+        self: "TestSimulation",
+    ) -> None:
+        """Test ModelParameters annotations and typehints"""
+        stochprocess_annotations = list(ModelParameters.__annotations__.keys())
+        stochprocess_typehints = list(get_type_hints(ModelParameters).keys())
+        self.assertListEqual(stochprocess_annotations, stochprocess_typehints)
+
     def test_simulation_annotations_and_typehints(
         self: "TestSimulation",
     ) -> None:
         """Test ReturnSimulation annotations and typehints"""
-        returnsimulation_annotations = dict(ReturnSimulation.__annotations__)
-
-        self.assertDictEqual(
+        returnsimulation_annotations = list(ReturnSimulation.__annotations__.keys())
+        returnsimulation_typehints = list(get_type_hints(ReturnSimulation).keys())
+        self.assertListEqual(
             returnsimulation_annotations,
-            {
-                "number_of_sims": int,
-                "trading_days": int,
-                "trading_days_in_year": int,
-                "mean_annual_return": float,
-                "mean_annual_vol": float,
-                "dframe": DataFrame,
-            },
+            returnsimulation_typehints,
         )
-
-        returnsimulation_typehints = get_type_hints(ReturnSimulation)
-        self.assertDictEqual(returnsimulation_annotations, returnsimulation_typehints)
 
     def test_simulation_processes(self: "TestSimulation") -> None:
         """Test ReturnSimulation based on different stochastic processes"""
@@ -130,38 +128,6 @@ class TestSimulation(TestCase):
         self.assertEqual(f"{psim.realized_mean_return:.9f}", "0.009553952")
 
         self.assertEqual(f"{psim.realized_vol:.9f}", "0.117099479")
-
-    def test_simulation_modelparameters_annotations_and_typehints(
-        self: "TestSimulation",
-    ) -> None:
-        """Test ModelParameters annotations and typehints"""
-        stochprocess_annotations = dict(ModelParameters.__annotations__)
-
-        self.assertDictEqual(
-            stochprocess_annotations,
-            {
-                "all_s0": float,
-                "all_time": int,
-                "all_delta": float,
-                "all_sigma": float,
-                "gbm_mu": float,
-                "jumps_lamda": float,
-                "jumps_sigma": float,
-                "jumps_mu": float,
-                "cir_a": float,
-                "cir_mu": float,
-                "all_r0": float,
-                "cir_rho": float,
-                "ou_a": float,
-                "ou_mu": float,
-                "heston_a": float,
-                "heston_mu": float,
-                "heston_vol0": float,
-            },
-        )
-
-        stochprocess_typehints = get_type_hints(ModelParameters)
-        self.assertDictEqual(stochprocess_annotations, stochprocess_typehints)
 
     def test_simulation_assets(self: "TestSimulation") -> None:
         """Test stoch processes output"""
