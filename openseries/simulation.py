@@ -219,7 +219,9 @@ class ReturnSimulation(
             nprandom.seed(seed)
 
         sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
-        return nprandom.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time)
+        return nprandom.normal(  # type: ignore[no-any-return]
+            loc=0, scale=sqrt_delta_sigma, size=param.all_time
+        )
 
     @classmethod
     def brownian_motion_levels(
