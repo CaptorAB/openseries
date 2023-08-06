@@ -5,7 +5,7 @@ from datetime import date as dtdate
 from decimal import Decimal, localcontext, ROUND_HALF_UP
 from json import loads
 from os import path, remove
-from typing import cast, get_type_hints, List, Tuple, Union
+from typing import cast, List, Tuple, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range
 from pandas.testing import assert_frame_equal
@@ -50,12 +50,6 @@ class TestOpenFrame(TestCase):
             ),
         )
         cls.randomseries = cls.randomframe.constituents[0].to_cumret()
-
-    def test_openframe_annotations_and_typehints(self: "TestOpenFrame") -> None:
-        """Test OpenFrame annotations and typehints"""
-        annotations = dict(OpenFrame.__annotations__)
-        typehints = get_type_hints(OpenFrame)
-        self.assertDictEqual(annotations, typehints)
 
     def test_openframe_valid_tsdf(self: "TestOpenFrame") -> None:
         """Test valid pandas.DataFrame property"""

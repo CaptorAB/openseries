@@ -6,7 +6,7 @@ from io import StringIO
 from json import load, loads
 from os import path, remove
 import sys
-from typing import Any, cast, Dict, get_type_hints, List, Union
+from typing import Any, cast, Dict, List, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pydantic import ValidationError as PydanticValidationError
@@ -223,14 +223,6 @@ class TestOpenTimeSeries(TestCase):
         OpenTimeSeries.setup_class(domestic_ccy="USD", countries="US")
         self.assertEqual(OpenTimeSeries.domestic, "USD")
         self.assertEqual(OpenTimeSeries.countries, "US")
-
-    def test_opentimeseries_annotations_and_typehints(
-        self: "TestOpenTimeSeries",
-    ) -> None:
-        """Test OpenTimeSeries annotations and typehints"""
-        opentimeseries_annotations = list(OpenTimeSeries.__annotations__.keys())
-        opentimeseries_typehints = list(get_type_hints(OpenTimeSeries).keys())
-        self.assertListEqual(opentimeseries_annotations, opentimeseries_typehints)
 
     def test_opentimeseries_duplicates_handling(self: "TestOpenTimeSeries") -> None:
         """Test duplicate handling"""

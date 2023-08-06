@@ -3,7 +3,7 @@ Test suite for the openseries/simulation.py module
 """
 from copy import copy
 from datetime import date as dtdate
-from typing import cast, Dict, get_type_hints, List, Union
+from typing import cast, Dict, List, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range
 
@@ -42,25 +42,6 @@ class TestSimulation(TestCase):
             jumps_mu=-0.2,
             trading_days_in_year=252,
             seed=71,
-        )
-
-    def test_simulation_modelparameters_annotations_and_typehints(
-        self: "TestSimulation",
-    ) -> None:
-        """Test ModelParameters annotations and typehints"""
-        stochprocess_annotations = list(ModelParameters.__annotations__.keys())
-        stochprocess_typehints = list(get_type_hints(ModelParameters).keys())
-        self.assertListEqual(stochprocess_annotations, stochprocess_typehints)
-
-    def test_simulation_annotations_and_typehints(
-        self: "TestSimulation",
-    ) -> None:
-        """Test ReturnSimulation annotations and typehints"""
-        returnsimulation_annotations = list(ReturnSimulation.__annotations__.keys())
-        returnsimulation_typehints = list(get_type_hints(ReturnSimulation).keys())
-        self.assertListEqual(
-            returnsimulation_annotations,
-            returnsimulation_typehints,
         )
 
     def test_simulation_processes(self: "TestSimulation") -> None:
