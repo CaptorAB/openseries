@@ -106,13 +106,15 @@ def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series
     return drawdown
 
 
-def drawdown_details(prices: Union[DataFrame, Series]) -> Series:
+def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> Series:
     """Details of the maximum drawdown
 
     Parameters
     ----------
     prices: DataFrame | Series
         A timeserie of dates and values
+    min_periods: int, default: 1
+        Smallest number of observations to use to find the maximum drawdown
 
     Returns
     -------
@@ -124,9 +126,13 @@ def drawdown_details(prices: Union[DataFrame, Series]) -> Series:
         Average fall per day
     """
 
-    mdd_date = (prices / prices.expanding(min_periods=1).max()).idxmin().values[0]
+    mdd_date = (
+        (prices / prices.expanding(min_periods=min_periods).max()).idxmin().values[0]
+    )
     mdate = dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
-    maxdown = ((prices / prices.expanding(min_periods=1).max()).min() - 1).iloc[0]
+    maxdown = (
+        (prices / prices.expanding(min_periods=min_periods).max()).min() - 1
+    ).iloc[0]
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn.sort_index(ascending=False, inplace=True)

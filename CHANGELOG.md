@@ -7,6 +7,12 @@ the resources to issue any form
 of guarantee that this log will cover all changes, and I will not attempt to go back
 very far in history.
 
+## Version [1.1.3] - 2023-08-07
+
+Consolidated sim_price.py and stoch_processes.py into a single simulation.py with the
+class ReturnSimulation to hold all steps. Still no optimization of any kind and I
+still need a second opinion on the models.
+
 ## Version [1.1.2] - 2023-08-05
 
 All pipe syntax removed on typing which allows the project to work on Python 3.9.
