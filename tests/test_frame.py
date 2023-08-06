@@ -14,10 +14,7 @@ from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
 from openseries.series import OpenTimeSeries, ValueType
-from openseries.sim_price import (
-    ReturnSimulation,
-    make_simulated_data_from_merton_jump_gbm,
-)
+from openseries.simulation import ReturnSimulation
 from openseries.types import (
     LiteralNanMethod,
     LiteralFrameProps,
@@ -35,7 +32,24 @@ class TestOpenFrame(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         """setUpClass for the TestOpenFrame class"""
-        cls.randomseries, cls.randomframe = make_simulated_data_from_merton_jump_gbm()
+        sim = ReturnSimulation.from_merton_jump_gbm(
+            number_of_sims=5,
+            trading_days=2512,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            trading_days_in_year=252,
+            seed=71,
+        )
+        cls.randomframe = cast(
+            OpenFrame,
+            sim.to_opentimeseries_openframe(
+                name="Asset", end=dtdate(2019, 6, 30), valuetype=ValueType.RTRN
+            ),
+        )
+        cls.randomseries = cls.randomframe.constituents[0].to_cumret()
 
     def test_openframe_annotations_and_typehints(self: "TestOpenFrame") -> None:
         """Test OpenFrame annotations and typehints"""
@@ -210,9 +224,10 @@ class TestOpenFrame(TestCase):
         """Test max_drawdown_date method"""
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
+
         self.assertListEqual(
             [
-                dtdate(2009, 7, 1),
+                dtdate(2018, 11, 8),
                 dtdate(2009, 7, 1),
                 dtdate(2012, 4, 17),
                 dtdate(2013, 7, 29),
@@ -411,7 +426,6 @@ class TestOpenFrame(TestCase):
     def test_openframe_methods_same_as_opentimeseries(self: "TestOpenFrame") -> None:
         """Test that method results align between OpenFrame and OpenTimeSeries"""
         sameseries = self.randomseries.from_deepcopy()
-        sameseries.set_new_label(lvl_zero="Asset_0")
         sameseries.value_to_ret()
         sameframe = self.randomframe.from_deepcopy()
         assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
@@ -986,7 +1000,7 @@ class TestOpenFrame(TestCase):
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
                 cast(int, dtdate(2017, 6, 27)) : cast(int, dtdate(2018, 6, 27)),
-                ("Asset", ValueType.PRICE),
+                ("Asset_0", ValueType.PRICE),
             ]
         )
         series_short.set_new_label("Short")

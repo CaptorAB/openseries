@@ -288,7 +288,7 @@ class OpenTimeSeries(
         instrument_id: str
             Database identifier of the instrument associated with the timeseries
         baseccy : str, default: "SEK"
-            The currency of the timeseries
+            ISO 4217 currency code of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
 
@@ -336,7 +336,7 @@ class OpenTimeSeries(
         valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
         baseccy : str, default: "SEK"
-            The currency of the timeseries
+            ISO 4217 currency code of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
 
@@ -1308,6 +1308,7 @@ class OpenTimeSeries(
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
+        min_periods: int = 1,
     ) -> float:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1320,6 +1321,7 @@ class OpenTimeSeries(
             Specific from date
         to_date : datetime.date, optional
             Specific to date
+        min_periods: int, default: 1
 
         Returns
         -------
@@ -1334,7 +1336,7 @@ class OpenTimeSeries(
                 (
                     self.tsdf.loc[cast(int, earlier) : cast(int, later)]
                     / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                    .expanding(min_periods=1)
+                    .expanding(min_periods=min_periods)
                     .max()
                 ).min()
                 - 1

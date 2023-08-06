@@ -12,7 +12,7 @@ from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pydantic import ValidationError as PydanticValidationError
 import pytest
 
-from openseries.sim_price import make_simulated_data_from_merton_jump_gbm
+from openseries.simulation import ReturnSimulation
 from openseries.types import CountriesType, LiteralNanMethod, LiteralSeriesProps
 from openseries.series import (
     OpenTimeSeries,
@@ -153,7 +153,22 @@ class TestOpenTimeSeries(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         """setUpClass for the TestOpenTimeSeries class"""
-        cls.randomseries, _ = make_simulated_data_from_merton_jump_gbm()
+        sim = ReturnSimulation.from_merton_jump_gbm(
+            number_of_sims=1,
+            trading_days=2512,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            trading_days_in_year=252,
+            seed=71,
+        )
+        cls.randomseries = cast(
+            OpenTimeSeries,
+            sim.to_opentimeseries_openframe(name="Asset", end=dt.date(2019, 6, 30)),
+        )
+
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
             ("Asset", ValueType.PRICE)
         ]
@@ -204,6 +219,10 @@ class TestOpenTimeSeries(TestCase):
             member="according to ISO 3166-1 alpha-2",
             container=str(e_none.exception),
         )
+
+        OpenTimeSeries.setup_class(domestic_ccy="USD", countries="US")
+        self.assertEqual(OpenTimeSeries.domestic, "USD")
+        self.assertEqual(OpenTimeSeries.countries, "US")
 
     def test_opentimeseries_annotations_and_typehints(
         self: "TestOpenTimeSeries",

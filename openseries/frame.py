@@ -1273,6 +1273,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
+        min_periods: int = 1,
     ) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -1285,6 +1286,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
             Specific from date
         to_date : datetime.date, optional
             Specific to date
+        min_periods: int, default: 1
+            Smallest number of observations to use to find the maximum drawdown
 
         Returns
         -------
@@ -1297,7 +1300,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
             data=(
                 self.tsdf.loc[cast(int, earlier) : cast(int, later)]
                 / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .expanding(min_periods=1)
+                .expanding(min_periods=min_periods)
                 .max()
             ).min()
             - 1,
@@ -2032,20 +2035,26 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
             self.tsdf.loc[:, serie] = drawdown_series(self.tsdf.loc[:, serie])
         return self
 
-    def drawdown_details(self: "OpenFrame") -> DataFrame:
-        """
+    def drawdown_details(self: "OpenFrame", min_periods: int = 1) -> DataFrame:
+        """Calculates 'Max Drawdown', 'Start of drawdown', 'Date of bottom',
+        'Days from start to bottom', & 'Average fall per day'
+
+        Parameters
+        ----------
+        min_periods: int, default: 1
+            Smallest number of observations to use to find the maximum drawdown
+
         Returns
         -------
         Pandas.DataFrame
-            Calculates 'Max Drawdown', 'Start of drawdown', 'Date of bottom',
-            'Days from start to bottom', & 'Average fall per day'
+            Drawdown details
         """
 
         mxdwndf = DataFrame()
         for i in self.constituents:
             tmpdf = i.tsdf.copy()
             tmpdf.index = DatetimeIndex(tmpdf.index)
-            ddown = drawdown_details(tmpdf)
+            ddown = drawdown_details(prices=tmpdf, min_periods=min_periods)
             ddown.name = i.label
             mxdwndf = concat([mxdwndf, ddown], axis="columns")
         return mxdwndf
