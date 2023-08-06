@@ -8,6 +8,10 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v3
@@ -18,45 +22,43 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Load cached $HOME/.local
-        uses: actions/cache@v3
+      - name: Restore cache
+        uses: actions/cache/restore@v3
+        id: restore_cache
         with:
-          path: ~/.local
-          key: dotlocal-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}
+          path: |
+            ~/.local
+            ./.venv
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
+          virtualenvs-in-project: true
+          virtualenvs-path: ./.venv
 
-      - name: Load cached venv
-        id: cached_venv
-        uses: actions/cache@v3
-        with:
-          path: ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Configure Poetry ${{ env.POETRY_VER }}
+        run: |
+          poetry config cache-dir ~/.local
+          poetry config virtualenvs.options.no-pip true
+          poetry config virtualenvs.options.no-setuptools true
+          poetry config --list
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        shell: bash
-        if: steps.cached_venv.outputs.cache-hit != 'true'
-        run: |
-          poetry config virtualenvs.prefer-active-python true
-          poetry install --no-root --with dev
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        run: poetry install --no-root --with dev
 
       - name: Format with Black
-        shell: bash
         run: poetry run black ./openseries/*.py ./tests/*.py
 
       - name: Check with Flake8
-        shell: bash
         run: poetry run flake8
 
       - name: Type check with Mypy
-        shell: bash
         run: poetry run mypy .
 
       - name: Lint check with Pylint
-        shell: bash
         run: poetry run pylint ./openseries/* ./tests/*
 
       - name: Tests with Pytest
@@ -92,3 +94,11 @@ jobs:
           poetry build --format=wheel
           poetry check
           poetry publish
+
+      - name: Save cache
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            ~/.local
+            ./.venv
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('**/poetry.lock') }}
