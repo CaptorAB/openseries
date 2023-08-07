@@ -661,8 +661,8 @@ class TestOpenTimeSeries(TestCase):
         gr_0 = cseries.vol_func(months_from_last=48)
 
         cseries.model_config.update({"validate_assignment": False})
-        cseries.dates = cast(List[str], cseries.dates)[-1008:]
-        cseries.values = cast(List[str], cseries.values)[-1008:]
+        cseries.dates = cseries.dates[-1008:]
+        cseries.values = cseries.values[-1008:]
         cseries.model_config.update({"validate_assignment": True})
         cseries.pandas_df()
         cseries.set_new_label(lvl_one=ValueType.RTRN)
@@ -902,9 +902,7 @@ class TestOpenTimeSeries(TestCase):
         )
         full_series.tsdf.index.get_loc(front_series.last_idx)
         chained_series = timeseries_chain(front_series, back_series)
-        chained_values = [
-            f"{nn:.10f}" for nn in cast(List[float], chained_series.values)
-        ]
+        chained_values = [f"{nn:.10f}" for nn in chained_series.values]
 
         self.assertListEqual(full_series.dates, chained_series.dates)
         self.assertListEqual(full_values, chained_values)

@@ -1,26 +1,35 @@
 """
 Declaring types used throughout the project
 """
-from typing import Literal, List, Union
-from pydantic import conlist, constr
+from typing import Annotated, Literal, List, Union
+from pydantic import conlist, constr, StringConstraints
 
+CountryStringType = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
+    ),
+]
+CountryListType = Annotated[List[str], conlist(CountryStringType, min_length=1)]
+CountriesType = Union[CountryListType, CountryStringType]
 
-CountryStringType = constr(
-    pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
-)
-CountriesType = Union[conlist(CountryStringType, min_length=1), CountryStringType]
+CurrencyStringType = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3, strict=True
+    ),
+]
 
-CurrencyStringType = constr(
-    pattern=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3, strict=True
-)
+DateListType = Annotated[
+    List[str],
+    conlist(
+        constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"), min_length=2
+    ),
+]
 
-DateListType = conlist(
-    constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"), min_length=2
-)
+ValueListType = Annotated[List[float], conlist(float, min_length=2)]
 
-ValueListType = conlist(float, min_length=2)
-
-DatabaseIdStringType = constr(pattern=r"^([0-9a-f]{24})?$")
+DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
 
 LiteralLinePlotMode = Literal[
     "lines",

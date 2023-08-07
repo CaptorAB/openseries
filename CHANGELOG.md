@@ -1,32 +1,21 @@
 # Changelog
 
-For a long time I have not kept a log of the changes implemented in the different
-versions of the openseries package. In
-this file I am attempting to rectify this somewhat. However, unfortunately I do not have
-the resources to issue any form
-of guarantee that this log will cover all changes, and I will not attempt to go back
-very far in history.
+For a long time I have not kept a log of the changes implemented in the different versions
+of the openseries package. In this file I am attempting to rectify this somewhat.
+However, unfortunately I do not have the resources to issue any form of guarantee that
+this log will cover all changes, and I will not attempt to go back very far in history.
+At some point I will also start documenting changes in release documentation instead.
 
-## Version [1.1.4] - 2023-08-07
+## Version [1.1.4] - 2023-08-08
 
 Consolidated sim_price.py and stoch_processes.py into a single simulation.py with the
-class ReturnSimulation to hold all steps. Still no optimization of any kind and I
-still need a second opinion on the models.
-
-## Version [1.1.2] - 2023-08-05
-
-All pipe syntax removed on typing which allows the project to work on Python 3.9.
-
-## Version [1.1.1] - 2023-08-05
-
+class ReturnSimulation to hold all steps. Still no optimization of any kind and I still
+need a second opinion on the models.
 Tightening and cleaning up typing. Also removed pipe syntax for optional parameters and
-replaced with typing.Optional.
-
-## Version [1.1.0] - 2023-08-04
-
+replaced with typing.Optional which allows the project to work on Python 3.9.
 Relatively significant adaptations made to allow update of dependency to Pydantic 2.0.
-Dependency to statsmodels also updated to 0.14.0. Made a few improvements to pytest
-based tests in the test suite and cleaned up the unittest based ones.
+Dependency to statsmodels also updated to 0.14.0. Made a few improvements to pytest based
+tests in the test suite and cleaned up the unittest based ones.
 
 ## Version [1.0.1] - 2023-08-02
 

@@ -2,7 +2,7 @@
 Date related utilities
 """
 import datetime as dt
-from typing import cast, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
@@ -58,7 +58,7 @@ def holiday_calendar(
             staging.update(custom_holidays)
         hols = array(sorted(staging.keys()), dtype="datetime64[D]")
     elif isinstance(countries, list) and all(
-        country in list_supported_countries() for country in cast(List[str], countries)
+        country in list_supported_countries() for country in countries
     ):
         country: CountryStringType
         countryholidays: List[Union[dt.date, str]] = []
