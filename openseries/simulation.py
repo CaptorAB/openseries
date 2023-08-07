@@ -16,18 +16,17 @@ Processes that can be simulated in this module are:
 """
 import datetime as dt
 from math import log, pow as mathpow
-from typing import cast, Optional, Union, Any, List, Tuple
+from typing import cast, Optional, Union, List, Tuple
 from numpy import (
     add,
     array,
-    dtype,
     exp,
     float64,
     insert,
-    ndarray,
     random as nprandom,
     sqrt,
 )
+from numpy.typing import NDArray
 from pandas import DataFrame, date_range
 from pandas.tseries.offsets import CustomBusinessDay
 from pydantic import BaseModel, conint, confloat
@@ -168,8 +167,8 @@ class ReturnSimulation(
 
     @classmethod
     def convert_to_prices(
-        cls, param: ModelParameters, log_returns: ndarray[Any, dtype[float64]]
-    ) -> ndarray[Any, dtype[float64]]:
+        cls, param: ModelParameters, log_returns: NDArray[float64]
+    ) -> NDArray[float64]:
         """Converts a sequence of log returns into normal returns (exponentiation)
         and then computes a price sequence given a starting price, param.all_s0.
 
@@ -177,12 +176,12 @@ class ReturnSimulation(
         ----------
         param: ModelParameters
             Model input
-        log_returns: numpy.ndarray[Any, dtype[float64]]
+        log_returns: numpy.NDArray[float64]
             Log returns to exponentiate
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Price series
         """
 
@@ -197,7 +196,7 @@ class ReturnSimulation(
     @classmethod
     def brownian_motion_log_returns(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """This method returns a Wiener process. The Wiener process is also called
         Brownian motion. For more information about the Wiener process check out
         the Wikipedia page: http://en.wikipedia.org/wiki/Wiener_process
@@ -211,7 +210,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Brownian Motion log returns
         """
 
@@ -219,14 +218,14 @@ class ReturnSimulation(
             nprandom.seed(seed)
 
         sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
-        return nprandom.normal(  # type: ignore[no-any-return]
-            loc=0, scale=sqrt_delta_sigma, size=param.all_time
+        return array(
+            nprandom.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time)
         )
 
     @classmethod
     def brownian_motion_levels(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """Delivers a price sequence whose returns evolve as to a brownian motion
 
         Parameters
@@ -238,7 +237,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Price sequence which follows a brownian motion
         """
 
@@ -249,7 +248,7 @@ class ReturnSimulation(
     @classmethod
     def geometric_brownian_motion_log_returns(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM).
         GBM is the stochastic process underlying the Black Scholes
@@ -264,7 +263,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Log returns of a Geometric Brownian Motion process
         """
 
@@ -277,7 +276,7 @@ class ReturnSimulation(
     @classmethod
     def geometric_brownian_motion_levels(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """Prices for an asset which evolves according to a geometric brownian motion
 
         Parameters
@@ -289,7 +288,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Price levels for the asset
         """
 
@@ -300,7 +299,7 @@ class ReturnSimulation(
     @classmethod
     def jump_diffusion_process(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """This method produces a sequence of Jump Sizes which represent a jump
         diffusion process. These jumps are combined with a geometric brownian
         motion (log returns) to produce the Merton model
@@ -314,7 +313,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Jump sizes for each point in time (mostly zeroes if jumps are infrequent)
         """
 
@@ -342,7 +341,7 @@ class ReturnSimulation(
     @classmethod
     def geometric_brownian_motion_jump_diffusion_log_returns(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """This method constructs combines a geometric brownian motion process
         (log returns) with a jump diffusion process (log returns) to produce a
         sequence of gbm jump returns
@@ -356,7 +355,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Geometric Brownian Motion process with jumps in it
         """
 
@@ -369,7 +368,7 @@ class ReturnSimulation(
     @classmethod
     def geometric_brownian_motion_jump_diffusion_levels(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """Converts returns generated with a Geometric Brownian Motion process
         with jumps into prices
 
@@ -382,7 +381,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             Geometric Brownian Motion generated prices
         """
 
@@ -395,9 +394,9 @@ class ReturnSimulation(
     def heston_construct_correlated_path(
         cls,
         param: ModelParameters,
-        brownian_motion_one: ndarray[Any, dtype[float64]],
+        brownian_motion_one: NDArray[float64],
         seed: Optional[int] = None,
-    ) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
+    ) -> Tuple[NDArray[float64], NDArray[float64]]:
         """This method is a simplified version of the Cholesky decomposition method for
         just two assets. It does not make use of matrix algebra and is therefore quite
         easy to implement
@@ -406,14 +405,14 @@ class ReturnSimulation(
         ----------
         param: ModelParameters
             Model input
-        brownian_motion_one: numpy.ndarray[Any, dtype[float64]]
+        brownian_motion_one: numpy.NDArray[float64]
             A first path to correlate against
         seed: int, optional
             Random seed going into numpy.random.seed()
 
         Returns
         -------
-        Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]
+        Tuple[NDArray[float64], NDArray[float64]]
             A correlated Brownian Motion path
         """
 
@@ -434,7 +433,7 @@ class ReturnSimulation(
     @classmethod
     def cox_ingersoll_ross_heston(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
+    ) -> Tuple[NDArray[float64], NDArray[float64]]:
         """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
         volatility in the Heston model. Because the returns between the underlying
@@ -451,7 +450,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]
+        Tuple[NDArray[float64], NDArray[float64]]
             The interest rate levels for the CIR process
         """
 
@@ -481,7 +480,7 @@ class ReturnSimulation(
     @classmethod
     def heston_model_levels(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]:
+    ) -> Tuple[NDArray[float64], NDArray[float64]]:
         """The Heston model is the geometric brownian motion model with stochastic
         volatility. This stochastic volatility is given by the Cox Ingersoll Ross
         process. Step one on this method is to construct two correlated
@@ -500,7 +499,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        Tuple[ndarray[Any, dtype[float64]], ndarray[Any, dtype[float64]]]
+        Tuple[NDArray[float64], NDArray[float64]]
             The prices for an asset following a Heston process
         """
 
@@ -527,7 +526,7 @@ class ReturnSimulation(
     @classmethod
     def cox_ingersoll_ross_levels(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
         volatility in the Heston model. Because the returns between the underlying
@@ -544,7 +543,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             The interest rate levels for the CIR process
         """
 
@@ -560,7 +559,7 @@ class ReturnSimulation(
     @classmethod
     def ornstein_uhlenbeck_levels(
         cls, param: ModelParameters, seed: Optional[int] = None
-    ) -> ndarray[Any, dtype[float64]]:
+    ) -> NDArray[float64]:
         """This method returns the rate levels of a mean-reverting
         Ornstein Uhlenbeck process
 
@@ -573,7 +572,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        numpy.ndarray[Any, dtype[float64]]
+        numpy.NDArray[float64]
             The interest rate levels for the Ornstein Uhlenbeck process
         """
 
