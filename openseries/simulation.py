@@ -16,7 +16,7 @@ Processes that can be simulated in this module are:
 """
 import datetime as dt
 from math import log, pow as mathpow
-from typing import cast, Optional, Union, List, Tuple
+from typing import cast, Optional, Union, List, Tuple, Type, TypeVar
 from numpy import (
     add,
     array,
@@ -35,6 +35,9 @@ from openseries.datefixer import holiday_calendar
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.types import CountriesType, CurrencyStringType
+
+TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
+TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
 class ModelParameters(BaseModel):
@@ -126,7 +129,7 @@ class ReturnSimulation(
     dframe: DataFrame
 
     @property
-    def results(self: "ReturnSimulation") -> DataFrame:
+    def results(self: TypeReturnSimulation) -> DataFrame:
         """
         Returns
         -------
@@ -136,7 +139,7 @@ class ReturnSimulation(
         return self.dframe.add(1.0).cumprod(axis="columns").T
 
     @property
-    def realized_mean_return(self: "ReturnSimulation") -> float:
+    def realized_mean_return(self: TypeReturnSimulation) -> float:
         """
         Returns
         -------
@@ -150,7 +153,7 @@ class ReturnSimulation(
         )
 
     @property
-    def realized_vol(self: "ReturnSimulation") -> float:
+    def realized_vol(self: TypeReturnSimulation) -> float:
         """
         Returns
         -------
@@ -167,14 +170,16 @@ class ReturnSimulation(
 
     @classmethod
     def convert_to_prices(
-        cls, param: ModelParameters, log_returns: NDArray[float64]
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        log_returns: NDArray[float64],
     ) -> NDArray[float64]:
         """Converts a sequence of log returns into normal returns (exponentiation)
         and then computes a price sequence given a starting price, param.all_s0.
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         log_returns: numpy.NDArray[float64]
             Log returns to exponentiate
@@ -195,7 +200,9 @@ class ReturnSimulation(
 
     @classmethod
     def brownian_motion_log_returns(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method returns a Wiener process. The Wiener process is also called
         Brownian motion. For more information about the Wiener process check out
@@ -203,7 +210,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -224,13 +231,15 @@ class ReturnSimulation(
 
     @classmethod
     def brownian_motion_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """Delivers a price sequence whose returns evolve as to a brownian motion
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -247,7 +256,9 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_log_returns(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM).
@@ -256,7 +267,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -275,13 +286,15 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """Prices for an asset which evolves according to a geometric brownian motion
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -298,7 +311,9 @@ class ReturnSimulation(
 
     @classmethod
     def jump_diffusion_process(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method produces a sequence of Jump Sizes which represent a jump
         diffusion process. These jumps are combined with a geometric brownian
@@ -306,7 +321,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -340,7 +355,9 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_log_returns(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method constructs combines a geometric brownian motion process
         (log returns) with a jump diffusion process (log returns) to produce a
@@ -348,7 +365,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -367,14 +384,16 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """Converts returns generated with a Geometric Brownian Motion process
         with jumps into prices
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -392,8 +411,8 @@ class ReturnSimulation(
 
     @classmethod
     def heston_construct_correlated_path(
-        cls,
-        param: ModelParameters,
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
         brownian_motion_one: NDArray[float64],
         seed: Optional[int] = None,
     ) -> Tuple[NDArray[float64], NDArray[float64]]:
@@ -403,7 +422,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         brownian_motion_one: numpy.NDArray[float64]
             A first path to correlate against
@@ -432,7 +451,9 @@ class ReturnSimulation(
 
     @classmethod
     def cox_ingersoll_ross_heston(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> Tuple[NDArray[float64], NDArray[float64]]:
         """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
@@ -443,7 +464,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -479,7 +500,9 @@ class ReturnSimulation(
 
     @classmethod
     def heston_model_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> Tuple[NDArray[float64], NDArray[float64]]:
         """The Heston model is the geometric brownian motion model with stochastic
         volatility. This stochastic volatility is given by the Cox Ingersoll Ross
@@ -492,7 +515,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -525,7 +548,9 @@ class ReturnSimulation(
 
     @classmethod
     def cox_ingersoll_ross_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
@@ -536,7 +561,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -558,14 +583,16 @@ class ReturnSimulation(
 
     @classmethod
     def ornstein_uhlenbeck_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method returns the rate levels of a mean-reverting
         Ornstein Uhlenbeck process
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -586,14 +613,14 @@ class ReturnSimulation(
 
     @classmethod
     def from_normal(
-        cls,
+        cls: Type[TypeReturnSimulation],
         number_of_sims: conint(strict=True, ge=1),
         mean_annual_return: float,
         mean_annual_vol: confloat(strict=True, gt=0.0),
         trading_days: conint(strict=True, ge=1),
         trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Normal distribution simulation
 
         Parameters
@@ -635,14 +662,14 @@ class ReturnSimulation(
 
     @classmethod
     def from_lognormal(
-        cls,
+        cls: Type[TypeReturnSimulation],
         number_of_sims: conint(strict=True, ge=1),
         mean_annual_return: float,
         mean_annual_vol: confloat(strict=True, gt=0.0),
         trading_days: conint(strict=True, ge=1),
         trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Lognormal distribution simulation
 
         Parameters
@@ -687,14 +714,14 @@ class ReturnSimulation(
 
     @classmethod
     def from_gbm(
-        cls,
+        cls: Type[TypeReturnSimulation],
         number_of_sims: conint(strict=True, ge=1),
         mean_annual_return: float,
         mean_annual_vol: confloat(strict=True, gt=0.0),
         trading_days: conint(strict=True, ge=1),
         trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM)
 
@@ -745,7 +772,7 @@ class ReturnSimulation(
 
     @classmethod
     def from_heston(
-        cls,
+        cls: Type[TypeReturnSimulation],
         number_of_sims: conint(strict=True, ge=1),
         trading_days: conint(strict=True, ge=1),
         mean_annual_return: float,
@@ -754,7 +781,7 @@ class ReturnSimulation(
         heston_a: float,
         trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Heston model is the geometric brownian motion model
         with stochastic volatility
 
@@ -813,7 +840,7 @@ class ReturnSimulation(
 
     @classmethod
     def from_heston_vol(
-        cls,
+        cls: Type[TypeReturnSimulation],
         number_of_sims: conint(strict=True, ge=1),
         trading_days: conint(strict=True, ge=1),
         mean_annual_return: float,
@@ -822,7 +849,7 @@ class ReturnSimulation(
         heston_a: float,
         trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Heston Vol model simulation
 
         Parameters
@@ -880,7 +907,7 @@ class ReturnSimulation(
 
     @classmethod
     def from_merton_jump_gbm(
-        cls,
+        cls: Type[TypeReturnSimulation],
         number_of_sims: conint(strict=True, ge=1),
         trading_days: conint(strict=True, ge=1),
         mean_annual_return: float,
@@ -890,7 +917,7 @@ class ReturnSimulation(
         jumps_mu: float,
         trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Merton Jump-Diffusion model simulation
 
         Parameters
@@ -949,7 +976,7 @@ class ReturnSimulation(
         )
 
     def to_opentimeseries_openframe(
-        self: "ReturnSimulation",
+        self: TypeReturnSimulation,
         name: str,
         start: Optional[dt.date] = None,
         end: Optional[dt.date] = None,

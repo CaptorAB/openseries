@@ -1,6 +1,7 @@
 """
 Test suite for the openseries/types.py module
 """
+from __future__ import annotations
 from typing import cast
 from unittest import TestCase
 
@@ -15,7 +16,7 @@ from openseries.types import (
 class TestTypes(TestCase):
     """class to run unittests on the module types.py"""
 
-    def test_types_opentimeseriesproplist_validate(self: "TestTypes") -> None:
+    def test_types_opentimeseriesproplist_validate(self: TestTypes) -> None:
         """Test that the OpenTimeSeries property input is correctly checked"""
         subset = cast(LiteralSeriesProps, ["z_score", "kurtosis", "positive_share"])
         lst = OpenTimeSeriesPropertiesList(*subset)
@@ -35,7 +36,7 @@ class TestTypes(TestCase):
         self.assertIsInstance(e_booo.exception, ValueError)
         self.assertIn(member="Duplicate string: skew", container=str(e_booo.exception))
 
-    def test_types_openframeproplist_validate(self: "TestTypes") -> None:
+    def test_types_openframeproplist_validate(self: TestTypes) -> None:
         """Test that the OpenFrame property input is correctly checked"""
         subset = cast(LiteralFrameProps, ["z_score", "kurtosis", "positive_share"])
         lst = OpenFramePropertiesList(*subset)

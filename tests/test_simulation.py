@@ -1,15 +1,18 @@
 """
 Test suite for the openseries/simulation.py module
 """
+from __future__ import annotations
 from copy import copy
 from datetime import date as dtdate
-from typing import cast, Dict, List, Union
+from typing import cast, Dict, List, Type, TypeVar, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries, ValueType
 from openseries.simulation import ReturnSimulation, ModelParameters
+
+TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")
 
 
 class TestSimulation(TestCase):
@@ -19,7 +22,7 @@ class TestSimulation(TestCase):
     framesim: ReturnSimulation
 
     @classmethod
-    def setUpClass(cls) -> None:
+    def setUpClass(cls: Type[TypeTestSimulation]) -> None:
         """setUpClass for the TestSimulation class"""
         cls.seriesim = ReturnSimulation.from_merton_jump_gbm(
             number_of_sims=1,
@@ -44,7 +47,7 @@ class TestSimulation(TestCase):
             seed=71,
         )
 
-    def test_simulation_processes(self: "TestSimulation") -> None:
+    def test_simulation_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes"""
         args: Dict[str, Union[int, float]] = {
             "number_of_sims": 1,
@@ -97,7 +100,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_returns, returns)
         self.assertListEqual(target_volatilities, volatilities)
 
-    def test_simulation_properties(self: "TestSimulation") -> None:
+    def test_simulation_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output"""
         days = 2512
         psim = copy(self.seriesim)
@@ -110,7 +113,7 @@ class TestSimulation(TestCase):
 
         self.assertEqual(f"{psim.realized_vol:.9f}", "0.117099479")
 
-    def test_simulation_assets(self: "TestSimulation") -> None:
+    def test_simulation_assets(self: TestSimulation) -> None:
         """Test stoch processes output"""
         days = 2520
         target_returns = [
@@ -144,19 +147,19 @@ class TestSimulation(TestCase):
         )
 
         processes = [
-            ReturnSimulation.brownian_motion_levels,
-            ReturnSimulation.geometric_brownian_motion_levels,
-            ReturnSimulation.geometric_brownian_motion_jump_diffusion_levels,
-            ReturnSimulation.heston_model_levels,
-            ReturnSimulation.heston_model_levels,
+            "brownian_motion_levels",
+            "geometric_brownian_motion_levels",
+            "geometric_brownian_motion_jump_diffusion_levels",
+            "heston_model_levels",
+            "heston_model_levels",
         ]
         res_indices = [None, None, None, 0, 1]
 
         series = []
         for i, process, residx in zip(range(len(processes)), processes, res_indices):
-            modelresult = cast(List[float], process(param=modelparams, seed=71))
+            modelresult = getattr(ReturnSimulation, process)(modelparams, seed=71)
             if isinstance(modelresult, tuple):
-                modelresult = modelresult[residx]
+                modelresult = modelresult[cast(int, residx)]
             d_range = [
                 d.date()
                 for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
@@ -177,7 +180,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_returns, means)
         self.assertListEqual(target_volatilities, deviations)
 
-    def test_simulation_cir_and_ou(self: "TestSimulation") -> None:
+    def test_simulation_cir_and_ou(self: TestSimulation) -> None:
         """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels"""
         series = []
         days = 2520
@@ -225,7 +228,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_means, means)
         self.assertListEqual(target_deviations, deviations)
 
-    def test_simulation_to_opentimeseries(self: "TestSimulation") -> None:
+    def test_simulation_to_opentimeseries(self: TestSimulation) -> None:
         """Test method to_opentimeseries_openframe into OpenTimeSeries"""
         seriesim = copy(self.seriesim)
 
@@ -265,7 +268,7 @@ class TestSimulation(TestCase):
             container=str(e_none.exception),
         )
 
-    def test_simulation_to_openframe(self: "TestSimulation") -> None:
+    def test_simulation_to_openframe(self: TestSimulation) -> None:
         """Test method to_opentimeseries_openframe into OpenFrame"""
         framesim = copy(self.framesim)
 

@@ -1,6 +1,7 @@
 """
 Defining the OpenFrame class
 """
+from __future__ import annotations
 from copy import deepcopy
 import datetime as dt
 from functools import reduce
@@ -10,7 +11,7 @@ from os import path
 from pathlib import Path
 from random import choices
 from string import ascii_letters
-from typing import cast, Dict, List, Optional, Tuple, Union
+from typing import cast, Dict, List, Optional, Tuple, Type, TypeVar, Union
 from dateutil.relativedelta import relativedelta
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt
@@ -66,13 +67,15 @@ from openseries.risk import (
     var_down,
 )
 
+TypeOpenFrame = TypeVar("TypeOpenFrame", bound="OpenFrame")
+
 
 class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=True):
     """Object of the class OpenFrame. Subclass of the Pydantic BaseModel
 
     Parameters
     ----------
-    constituents: List[OpenTimeSeries]
+    constituents: List[TypeOpenTimeSeries]
         List of objects of Class OpenTimeSeries
     weights: List[float], optional
         List of weights in float64 format.
@@ -90,7 +93,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     @field_validator("constituents")
     @classmethod
     def check_labels_unique(
-        cls, tseries: List[OpenTimeSeries]
+        cls: Type[TypeOpenFrame], tseries: List[OpenTimeSeries]
     ) -> List[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique"""
         labls = [x.label for x in tseries]
@@ -99,7 +102,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return tseries
 
     def __init__(
-        self: "OpenFrame",
+        self: OpenFrame,
         constituents: List[OpenTimeSeries],
         weights: Optional[List[float]] = None,
     ) -> None:
@@ -117,7 +120,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         else:
             warning("OpenFrame() was passed an empty list.")
 
-    def from_deepcopy(self: "OpenFrame") -> "OpenFrame":
+    def from_deepcopy(self: TypeOpenFrame) -> TypeOpenFrame:
         """Creates a copy of an OpenFrame object
 
         Returns
@@ -129,7 +132,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return deepcopy(self)
 
     def to_xlsx(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         filename: str,
         sheet_title: Optional[str] = None,
         directory: Optional[str] = None,
@@ -171,7 +174,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
 
         return sheetfile
 
-    def merge_series(self: "OpenFrame", how: LiteralHowMerge = "outer") -> "OpenFrame":
+    def merge_series(
+        self: TypeOpenFrame, how: LiteralHowMerge = "outer"
+    ) -> TypeOpenFrame:
         """Merges the Pandas Dataframes of the constituent OpenTimeSeries
 
         Parameters
@@ -206,7 +211,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     def all_properties(
-        self: "OpenFrame", properties: Optional[List[LiteralFrameProps]] = None
+        self: TypeOpenFrame, properties: Optional[List[LiteralFrameProps]] = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
@@ -231,7 +236,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return results
 
     def calc_range(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_offset: Optional[int] = None,
         from_dt: Optional[dt.date] = None,
         to_dt: Optional[dt.date] = None,
@@ -290,8 +295,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return earlier, later
 
     def align_index_to_local_cdays(
-        self: "OpenFrame", countries: CountriesType = "SE"
-    ) -> "OpenFrame":
+        self: TypeOpenFrame, countries: CountriesType = "SE"
+    ) -> TypeOpenFrame:
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
         local calendar business days
 
@@ -323,7 +328,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     @property
-    def length(self: "OpenFrame") -> int:
+    def length(self: TypeOpenFrame) -> int:
         """
         Returns
         -------
@@ -334,7 +339,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return len(self.tsdf.index)
 
     @property
-    def lengths_of_items(self: "OpenFrame") -> Series:
+    def lengths_of_items(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -350,7 +355,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def item_count(self: "OpenFrame") -> int:
+    def item_count(self: TypeOpenFrame) -> int:
         """
         Returns
         -------
@@ -361,7 +366,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return len(self.constituents)
 
     @property
-    def columns_lvl_zero(self: "OpenFrame") -> List[str]:
+    def columns_lvl_zero(self: TypeOpenFrame) -> List[str]:
         """
         Returns
         -------
@@ -373,7 +378,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return list(self.tsdf.columns.get_level_values(0))
 
     @property
-    def columns_lvl_one(self: "OpenFrame") -> List[str]:
+    def columns_lvl_one(self: TypeOpenFrame) -> List[str]:
         """
         Returns
         -------
@@ -385,7 +390,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return list(self.tsdf.columns.get_level_values(1))
 
     @property
-    def first_idx(self: "OpenFrame") -> dt.date:
+    def first_idx(self: TypeOpenFrame) -> dt.date:
         """
         Returns
         -------
@@ -395,7 +400,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return cast(dt.date, self.tsdf.index[0])
 
     @property
-    def first_indices(self: "OpenFrame") -> Series:
+    def first_indices(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -410,7 +415,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def last_idx(self: "OpenFrame") -> dt.date:
+    def last_idx(self: TypeOpenFrame) -> dt.date:
         """
         Returns
         -------
@@ -420,7 +425,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return cast(dt.date, self.tsdf.index[-1])
 
     @property
-    def last_indices(self: "OpenFrame") -> Series:
+    def last_indices(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -435,7 +440,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def span_of_days(self: "OpenFrame") -> int:
+    def span_of_days(self: TypeOpenFrame) -> int:
         """
         Returns
         -------
@@ -447,7 +452,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return (self.last_idx - self.first_idx).days
 
     @property
-    def span_of_days_all(self: "OpenFrame") -> Series:
+    def span_of_days_all(self: TypeOpenFrame) -> Series:
         """
         Number of days from the first date to the last for all items in the frame.
         """
@@ -459,7 +464,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def yearfrac(self: "OpenFrame") -> float:
+    def yearfrac(self: TypeOpenFrame) -> float:
         """
         Returns
         -------
@@ -471,7 +476,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self.span_of_days / 365.25
 
     @property
-    def periods_in_a_year(self: "OpenFrame") -> float:
+    def periods_in_a_year(self: TypeOpenFrame) -> float:
         """
         The number of businessdays in an average year for all days in the data.
         Be aware that this is not the same for all constituents.
@@ -479,7 +484,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self.length / self.yearfrac
 
     @property
-    def geo_ret(self: "OpenFrame") -> Series:
+    def geo_ret(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/c/cagr.asp
 
         Returns
@@ -499,7 +504,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def geo_ret_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -542,7 +547,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def arithmetic_ret(self: "OpenFrame") -> Series:
+    def arithmetic_ret(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
         Returns
@@ -558,7 +563,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def arithmetic_ret_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -603,7 +608,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def value_ret(self: "OpenFrame") -> Series:
+    def value_ret(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -623,7 +628,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def value_ret_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -658,7 +663,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def value_ret_calendar_period(
-        self: "OpenFrame", year: int, month: Optional[int] = None
+        self: TypeOpenFrame, year: int, month: Optional[int] = None
     ) -> Series:
         """
         Parameters
@@ -688,7 +693,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return rtn
 
     @property
-    def vol(self: "OpenFrame") -> Series:
+    def vol(self: TypeOpenFrame) -> Series:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
         in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
@@ -706,7 +711,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def vol_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -753,7 +758,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def downside_deviation(self: "OpenFrame") -> Series:
+    def downside_deviation(self: TypeOpenFrame) -> Series:
         """The standard deviation of returns that are below a Minimum Accepted
         Return of zero.
         It is used to calculate the Sortino Ratio \n
@@ -775,7 +780,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def downside_deviation_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         min_accepted_return: float = 0.0,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -833,7 +838,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def ret_vol_ratio(self: "OpenFrame") -> Series:
+    def ret_vol_ratio(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -848,7 +853,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return ratio
 
     def ret_vol_ratio_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         riskfree_rate: Optional[float] = None,
         riskfree_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
@@ -949,7 +954,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def jensen_alpha(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         asset: Union[Tuple[str, ValueType], int],
         market: Union[Tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
@@ -1064,7 +1069,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     @property
-    def sortino_ratio(self: "OpenFrame") -> Series:
+    def sortino_ratio(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/s/sortinoratio.asp
 
         Returns
@@ -1081,7 +1086,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return sortino
 
     def sortino_ratio_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         riskfree_rate: Optional[float] = None,
         riskfree_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
@@ -1189,7 +1194,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def z_score(self: "OpenFrame") -> Series:
+    def z_score(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/z/zscore.asp
 
         Returns
@@ -1206,7 +1211,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def z_score_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1238,7 +1243,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def max_drawdown(self: "OpenFrame") -> Series:
+    def max_drawdown(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1254,7 +1259,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def max_drawdown_date(self: "OpenFrame") -> Series:
+    def max_drawdown_date(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1271,7 +1276,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def max_drawdown_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1311,7 +1316,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def max_drawdown_cal_year(self: "OpenFrame") -> Series:
+    def max_drawdown_cal_year(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -1333,7 +1338,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return mxdwn
 
     @property
-    def worst(self: "OpenFrame") -> Series:
+    def worst(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -1344,7 +1349,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return Series(data=self.tsdf.pct_change().min(), name="Worst", dtype="float64")
 
     @property
-    def worst_month(self: "OpenFrame") -> Series:
+    def worst_month(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -1361,7 +1366,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def worst_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         observations: int = 1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1398,7 +1403,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def positive_share(self: "OpenFrame") -> Series:
+    def positive_share(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -1413,7 +1418,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return answer
 
     def positive_share_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1455,7 +1460,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return answer
 
     @property
-    def skew(self: "OpenFrame") -> Series:
+    def skew(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/s/skewness.asp
 
         Returns
@@ -1472,7 +1477,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def skew_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1511,7 +1516,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def kurtosis(self: "OpenFrame") -> Series:
+    def kurtosis(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
         Returns
@@ -1530,7 +1535,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def kurtosis_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1568,7 +1573,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def cvar_down(self: "OpenFrame") -> Series:
+    def cvar_down(self: TypeOpenFrame) -> Series:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
         Returns
@@ -1594,7 +1599,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def cvar_down_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1638,7 +1643,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def var_down(self: "OpenFrame") -> Series:
+    def var_down(self: TypeOpenFrame) -> Series:
         """Downside 95% Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
         https://www.investopedia.com/terms/v/var.asp
@@ -1659,7 +1664,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def var_down_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1701,7 +1706,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     @property
-    def vol_from_var(self: "OpenFrame") -> Series:
+    def vol_from_var(self: TypeOpenFrame) -> Series:
         """
         Returns
         -------
@@ -1721,7 +1726,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def vol_from_var_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1792,7 +1797,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def target_weight_from_var(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         target_vol: float = 0.175,
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
@@ -1855,7 +1860,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
             data=vfv, name=f"Weight from target vol {target_vol:.1%}", dtype="float64"
         )
 
-    def value_to_ret(self: "OpenFrame") -> "OpenFrame":
+    def value_to_ret(self: TypeOpenFrame) -> TypeOpenFrame:
         """
         Returns
         -------
@@ -1870,7 +1875,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_diff(self: "OpenFrame", periods: int = 1) -> "OpenFrame":
+    def value_to_diff(self: TypeOpenFrame, periods: int = 1) -> TypeOpenFrame:
         """Converts valueseries to series of their period differences
 
         Parameters
@@ -1892,7 +1897,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_log(self: "OpenFrame") -> "OpenFrame":
+    def value_to_log(self: TypeOpenFrame) -> TypeOpenFrame:
         """Converts a valueseries into logarithmic return series \n
         Equivalent to LN(value[t] / value[t=0]) in MS Excel
 
@@ -1905,7 +1910,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         self.tsdf = log(self.tsdf / self.tsdf.iloc[0])
         return self
 
-    def to_cumret(self: "OpenFrame") -> "OpenFrame":
+    def to_cumret(self: TypeOpenFrame) -> TypeOpenFrame:
         """Converts returnseries into cumulative valueseries
 
         Returns
@@ -1926,8 +1931,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     def resample(
-        self: "OpenFrame", freq: Union[LiteralBizDayFreq, str] = "BM"
-    ) -> "OpenFrame":
+        self: TypeOpenFrame, freq: Union[LiteralBizDayFreq, str] = "BM"
+    ) -> TypeOpenFrame:
         """Resamples the timeseries frequency
 
         Parameters
@@ -1955,12 +1960,12 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     def resample_to_business_period_ends(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         freq: LiteralBizDayFreq = "BM",
         countries: CountriesType = "SE",
         convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
-    ) -> "OpenFrame":
+    ) -> TypeOpenFrame:
         """Resamples timeseries frequency to the business calendar
         month end dates of each period while leaving any stubs
         in place. Stubs will be aligned to the shortest stub
@@ -2024,7 +2029,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
             )
         return self
 
-    def to_drawdown_series(self: "OpenFrame") -> "OpenFrame":
+    def to_drawdown_series(self: TypeOpenFrame) -> TypeOpenFrame:
         """Converts the timeseries into a drawdown series
 
         Returns
@@ -2037,7 +2042,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
             self.tsdf.loc[:, serie] = drawdown_series(self.tsdf.loc[:, serie])
         return self
 
-    def drawdown_details(self: "OpenFrame", min_periods: int = 1) -> DataFrame:
+    def drawdown_details(self: TypeOpenFrame, min_periods: int = 1) -> DataFrame:
         """Calculates 'Max Drawdown', 'Start of drawdown', 'Date of bottom',
         'Days from start to bottom', & 'Average fall per day'
 
@@ -2062,7 +2067,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return mxdwndf
 
     def ewma_risk(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
@@ -2187,7 +2192,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         ).T
 
     def rolling_vol(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         column: int,
         observations: int = 21,
         periods_in_a_year_fixed: Optional[int] = None,
@@ -2224,7 +2229,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return voldf
 
     def rolling_return(
-        self: "OpenFrame", column: int, observations: int = 21
+        self: TypeOpenFrame, column: int, observations: int = 21
     ) -> DataFrame:
         """
         Parameters
@@ -2253,7 +2258,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return retdf
 
     def rolling_cvar_down(
-        self: "OpenFrame", column: int, level: float = 0.95, observations: int = 252
+        self: TypeOpenFrame, column: int, level: float = 0.95, observations: int = 252
     ) -> DataFrame:
         """
         Parameters
@@ -2283,7 +2288,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return cvardf
 
     def rolling_var_down(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         column: int,
         level: float = 0.95,
         interpolation: LiteralQuantileInterp = "lower",
@@ -2319,8 +2324,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return vardf
 
     def value_nan_handle(
-        self: "OpenFrame", method: LiteralNanMethod = "fill"
-    ) -> "OpenFrame":
+        self: TypeOpenFrame, method: LiteralNanMethod = "fill"
+    ) -> TypeOpenFrame:
         """Handling of missing values in a valueseries
 
         Parameters
@@ -2345,8 +2350,8 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     def return_nan_handle(
-        self: "OpenFrame", method: LiteralNanMethod = "fill"
-    ) -> "OpenFrame":
+        self: TypeOpenFrame, method: LiteralNanMethod = "fill"
+    ) -> TypeOpenFrame:
         """Handling of missing values in a returnseries
 
         Parameters
@@ -2371,7 +2376,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     @property
-    def correl_matrix(self: "OpenFrame") -> DataFrame:
+    def correl_matrix(self: TypeOpenFrame) -> DataFrame:
         """
         Returns
         -------
@@ -2384,7 +2389,9 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         corr_matrix.index.name = "Correlation"
         return corr_matrix
 
-    def add_timeseries(self: "OpenFrame", new_series: OpenTimeSeries) -> "OpenFrame":
+    def add_timeseries(
+        self: TypeOpenFrame, new_series: OpenTimeSeries
+    ) -> TypeOpenFrame:
         """
         Parameters
         ----------
@@ -2400,7 +2407,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
-    def delete_timeseries(self: "OpenFrame", lvl_zero_item: str) -> "OpenFrame":
+    def delete_timeseries(self: TypeOpenFrame, lvl_zero_item: str) -> TypeOpenFrame:
         """
         Parameters
         ----------
@@ -2428,12 +2435,12 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     def trunc_frame(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         start_cut: Optional[dt.date] = None,
         end_cut: Optional[dt.date] = None,
         before: bool = True,
         after: bool = True,
-    ) -> "OpenFrame":
+    ) -> TypeOpenFrame:
         """Truncates DataFrame such that all timeseries have the same time span
 
         Parameters
@@ -2481,7 +2488,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return self
 
     def relative(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         long_column: int = 0,
         short_column: int = 1,
         base_zero: bool = True,
@@ -2515,7 +2522,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
             )
 
     def tracking_error_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         base_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -2592,7 +2599,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def info_ratio_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         base_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -2671,7 +2678,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def capture_ratio_func(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         ratio: LiteralCaptureRatio,
         base_column: Union[Tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
@@ -2839,7 +2846,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         )
 
     def beta(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         asset: Union[Tuple[str, ValueType], int],
         market: Union[Tuple[str, ValueType], int],
     ) -> float:
@@ -2906,7 +2913,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return float(beta)
 
     def ord_least_squares_fit(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         y_column: Union[Tuple[str, ValueType], int],
         x_column: Union[Tuple[str, ValueType], int],
         fitted_series: bool = True,
@@ -2965,7 +2972,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return results
 
     def make_portfolio(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         name: str,
         weight_strat: Optional[LiteralPortfolioWeightings] = None,
         initial_weights: Optional[List[float]] = None,
@@ -3060,7 +3067,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return portfolio
 
     def rolling_info_ratio(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
@@ -3116,7 +3123,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return ratiodf
 
     def rolling_beta(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         asset_column: int = 0,
         market_column: int = 1,
         observations: int = 21,
@@ -3157,7 +3164,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return rollbeta
 
     def rolling_corr(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         first_column: int = 0,
         second_column: int = 1,
         observations: int = 21,
@@ -3197,7 +3204,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return corrdf
 
     def plot_series(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         mode: LiteralLinePlotMode = "lines",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
@@ -3301,7 +3308,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         return figure, plotfile
 
     def plot_bars(
-        self: "OpenFrame",
+        self: TypeOpenFrame,
         mode: LiteralBarPlotMode = "group",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
