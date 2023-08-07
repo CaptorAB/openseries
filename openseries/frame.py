@@ -32,7 +32,9 @@ from plotly.offline import plot
 from pydantic import BaseModel, field_validator
 from scipy.stats import kurtosis, norm, skew
 import statsmodels.api as sm
-from statsmodels.base.model import LikelihoodModelResults
+
+# noinspection PyProtectedMember
+from statsmodels.regression.linear_model import RegressionResults
 
 from openseries.series import OpenTimeSeries, ValueType, ewma_calc
 from openseries.datefixer import date_offset_foll, holiday_calendar
@@ -2910,7 +2912,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
         fitted_series: bool = True,
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
-    ) -> LikelihoodModelResults:
+    ) -> RegressionResults:
         """https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
         Performs a linear regression and adds a new column with a fitted line
         using Ordinary Least Squares fit
