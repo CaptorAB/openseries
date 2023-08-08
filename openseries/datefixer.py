@@ -2,14 +2,14 @@
 Date related utilities
 """
 import datetime as dt
-from typing import cast, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
 from pandas import date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
 
-from openseries.types import CountryStringType, CountriesType
+from openseries.types import CountriesType
 
 
 def holiday_calendar(
@@ -58,9 +58,9 @@ def holiday_calendar(
             staging.update(custom_holidays)
         hols = array(sorted(staging.keys()), dtype="datetime64[D]")
     elif isinstance(countries, list) and all(
-        country in list_supported_countries() for country in cast(List[str], countries)
+        country in list_supported_countries() for country in countries
     ):
-        country: CountryStringType
+        country: str
         countryholidays: List[Union[dt.date, str]] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)

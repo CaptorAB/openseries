@@ -16,7 +16,16 @@ Processes that can be simulated in this module are:
 """
 import datetime as dt
 from math import log, pow as mathpow
-from typing import cast, Optional, Union, List, Tuple
+from typing import (
+    cast,
+    Optional,
+    Union,
+    List,
+    Literal,
+    Tuple,
+    Type,
+    TypeVar,
+)
 from numpy import (
     add,
     array,
@@ -29,12 +38,22 @@ from numpy import (
 from numpy.typing import NDArray
 from pandas import DataFrame, date_range
 from pandas.tseries.offsets import CustomBusinessDay
-from pydantic import BaseModel, conint, confloat
+from pydantic import BaseModel
 
 from openseries.datefixer import holiday_calendar
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries, ValueType
-from openseries.types import CountriesType, CurrencyStringType
+from openseries.types import (
+    CountriesType,
+    CurrencyStringType,
+    DaysInYearType,
+    SimCountType,
+    TradingDaysType,
+    VolatilityType,
+)
+
+TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
+TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
 class ModelParameters(BaseModel):
@@ -44,11 +63,11 @@ class ModelParameters(BaseModel):
     ----------
     all_s0: float
         Starting asset value
-    all_time: float
+    all_time: TradingDaysType
         Amount of time to simulate for
     all_delta: float
         Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
-    all_sigma: confloat(strict=True, gt=0.0)
+    all_sigma: VolatilityType
         Volatility of the stochastic processes
     all_r0: float, default: 0.0
         Starting interest rate value
@@ -56,7 +75,7 @@ class ModelParameters(BaseModel):
         Annual drift factor for geometric brownian motion
     jumps_lamda: float, default: 0.0
         Probability of a jump happening at each point in time
-    jumps_sigma: confloat(ge=0.0), default: 0.0
+    jumps_sigma: VolatilityType, default: 0.0
         Volatility of the jump size
     jumps_mu: float, default: 0.0
         Average jump size
@@ -72,19 +91,19 @@ class ModelParameters(BaseModel):
         Long run average interest rate for Ornstein Uhlenbeck
     heston_a: float, default: 0.0
         Rate of mean reversion for volatility in the Heston model
-    heston_mu: confloat(strict=True, gt=0.0), default: 0.0
+    heston_mu: VolatilityType, default: 0.0
         Long run average volatility for the Heston model
-    heston_vol0: confloat(strict=True, gt=0.0), default: 0.0
+    heston_vol0: VolatilityType, default: 0.0
         Starting volatility value for the Heston vol model
     """
 
     all_s0: float
-    all_time: conint(strict=True, ge=1)
+    all_time: TradingDaysType
     all_delta: float
-    all_sigma: confloat(strict=True, gt=0.0)
+    all_sigma: VolatilityType
     gbm_mu: float
     jumps_lamda: float = 0.0
-    jumps_sigma: confloat(ge=0.0) = 0.0
+    jumps_sigma: VolatilityType = 0.0
     jumps_mu: float = 0.0
     cir_a: float = 0.0
     cir_mu: float = 0.0
@@ -93,8 +112,8 @@ class ModelParameters(BaseModel):
     ou_a: float = 0.0
     ou_mu: float = 0.0
     heston_a: float = 0.0
-    heston_mu: confloat(ge=0.0) = 0.0
-    heston_vol0: confloat(ge=0.0) = 0.0
+    heston_mu: VolatilityType = 0.0
+    heston_vol0: VolatilityType = 0.0
 
 
 class ReturnSimulation(
@@ -104,29 +123,29 @@ class ReturnSimulation(
 
     Parameters
     ----------
-    number_of_sims : int
+    number_of_sims : SimCountType
         Number of simulations to generate
-    trading_days: conint(strict=True, ge=1)
+    trading_days: TradingDaysType
         Total number of days to simulate
-    trading_days_in_year : str
+    trading_days_in_year : DaysInYearType
         Number of trading days used to annualize
-    mean_annual_return : List[str]
+    mean_annual_return : float
         Mean annual return of the distribution
-    mean_annual_vol : str
+    mean_annual_vol : VolatilityType
         Mean annual standard deviation of the distribution
     dframe: pandas.DataFrame
         Pandas DataFrame object holding the resulting values
     """
 
-    number_of_sims: conint(strict=True, ge=1)
-    trading_days: conint(strict=True, ge=1)
-    trading_days_in_year: conint(strict=True, ge=1, le=366)
+    number_of_sims: SimCountType
+    trading_days: TradingDaysType
+    trading_days_in_year: DaysInYearType
     mean_annual_return: float
-    mean_annual_vol: confloat(strict=True, gt=0.0)
+    mean_annual_vol: VolatilityType
     dframe: DataFrame
 
     @property
-    def results(self: "ReturnSimulation") -> DataFrame:
+    def results(self: TypeReturnSimulation) -> DataFrame:
         """
         Returns
         -------
@@ -136,7 +155,7 @@ class ReturnSimulation(
         return self.dframe.add(1.0).cumprod(axis="columns").T
 
     @property
-    def realized_mean_return(self: "ReturnSimulation") -> float:
+    def realized_mean_return(self: TypeReturnSimulation) -> float:
         """
         Returns
         -------
@@ -150,7 +169,7 @@ class ReturnSimulation(
         )
 
     @property
-    def realized_vol(self: "ReturnSimulation") -> float:
+    def realized_vol(self: TypeReturnSimulation) -> float:
         """
         Returns
         -------
@@ -167,14 +186,16 @@ class ReturnSimulation(
 
     @classmethod
     def convert_to_prices(
-        cls, param: ModelParameters, log_returns: NDArray[float64]
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        log_returns: NDArray[float64],
     ) -> NDArray[float64]:
         """Converts a sequence of log returns into normal returns (exponentiation)
         and then computes a price sequence given a starting price, param.all_s0.
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         log_returns: numpy.NDArray[float64]
             Log returns to exponentiate
@@ -195,7 +216,9 @@ class ReturnSimulation(
 
     @classmethod
     def brownian_motion_log_returns(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method returns a Wiener process. The Wiener process is also called
         Brownian motion. For more information about the Wiener process check out
@@ -203,7 +226,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -224,13 +247,15 @@ class ReturnSimulation(
 
     @classmethod
     def brownian_motion_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """Delivers a price sequence whose returns evolve as to a brownian motion
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -247,7 +272,9 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_log_returns(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM).
@@ -256,7 +283,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -275,13 +302,15 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """Prices for an asset which evolves according to a geometric brownian motion
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -298,7 +327,9 @@ class ReturnSimulation(
 
     @classmethod
     def jump_diffusion_process(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method produces a sequence of Jump Sizes which represent a jump
         diffusion process. These jumps are combined with a geometric brownian
@@ -306,7 +337,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -340,7 +371,9 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_log_returns(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method constructs combines a geometric brownian motion process
         (log returns) with a jump diffusion process (log returns) to produce a
@@ -348,7 +381,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -367,14 +400,16 @@ class ReturnSimulation(
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """Converts returns generated with a Geometric Brownian Motion process
         with jumps into prices
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -392,8 +427,8 @@ class ReturnSimulation(
 
     @classmethod
     def heston_construct_correlated_path(
-        cls,
-        param: ModelParameters,
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
         brownian_motion_one: NDArray[float64],
         seed: Optional[int] = None,
     ) -> Tuple[NDArray[float64], NDArray[float64]]:
@@ -403,7 +438,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         brownian_motion_one: numpy.NDArray[float64]
             A first path to correlate against
@@ -432,7 +467,9 @@ class ReturnSimulation(
 
     @classmethod
     def cox_ingersoll_ross_heston(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> Tuple[NDArray[float64], NDArray[float64]]:
         """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
@@ -443,7 +480,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -479,7 +516,9 @@ class ReturnSimulation(
 
     @classmethod
     def heston_model_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> Tuple[NDArray[float64], NDArray[float64]]:
         """The Heston model is the geometric brownian motion model with stochastic
         volatility. This stochastic volatility is given by the Cox Ingersoll Ross
@@ -492,7 +531,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -525,7 +564,9 @@ class ReturnSimulation(
 
     @classmethod
     def cox_ingersoll_ross_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
@@ -536,7 +577,7 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -558,14 +599,16 @@ class ReturnSimulation(
 
     @classmethod
     def ornstein_uhlenbeck_levels(
-        cls, param: ModelParameters, seed: Optional[int] = None
+        cls: Type[TypeReturnSimulation],
+        param: TypeModelParameters,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """This method returns the rate levels of a mean-reverting
         Ornstein Uhlenbeck process
 
         Parameters
         ----------
-        param: ModelParameters
+        param: TypeModelParameters
             Model input
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -586,27 +629,28 @@ class ReturnSimulation(
 
     @classmethod
     def from_normal(
-        cls,
-        number_of_sims: conint(strict=True, ge=1),
+        cls: Type[TypeReturnSimulation],
+        number_of_sims: SimCountType,
         mean_annual_return: float,
-        mean_annual_vol: confloat(strict=True, gt=0.0),
-        trading_days: conint(strict=True, ge=1),
-        trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
+        mean_annual_vol: VolatilityType,
+        trading_days: TradingDaysType,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Normal distribution simulation
 
         Parameters
         ----------
-        number_of_sims: conint(strict=True, ge=1)
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: conint(strict=True, ge=1)
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: confloat(strict=True, gt=0.0)
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: conint(strict=True, ge=1, le=366), default: 252
+        trading_days_in_year: DaysInYearType,
+            default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
@@ -635,27 +679,28 @@ class ReturnSimulation(
 
     @classmethod
     def from_lognormal(
-        cls,
-        number_of_sims: conint(strict=True, ge=1),
+        cls: Type[TypeReturnSimulation],
+        number_of_sims: SimCountType,
         mean_annual_return: float,
-        mean_annual_vol: confloat(strict=True, gt=0.0),
-        trading_days: conint(strict=True, ge=1),
-        trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
+        mean_annual_vol: VolatilityType,
+        trading_days: TradingDaysType,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Lognormal distribution simulation
 
         Parameters
         ----------
-        number_of_sims: conint(strict=True, ge=1)
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: conint(strict=True, ge=1)
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: confloat(strict=True, gt=0.0)
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: conint(strict=True, ge=1, le=366), default: 252
+        trading_days_in_year: DaysInYearType,
+            default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
@@ -687,28 +732,29 @@ class ReturnSimulation(
 
     @classmethod
     def from_gbm(
-        cls,
-        number_of_sims: conint(strict=True, ge=1),
+        cls: Type[TypeReturnSimulation],
+        number_of_sims: SimCountType,
         mean_annual_return: float,
-        mean_annual_vol: confloat(strict=True, gt=0.0),
-        trading_days: conint(strict=True, ge=1),
-        trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
+        mean_annual_vol: VolatilityType,
+        trading_days: TradingDaysType,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """This method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM)
 
         Parameters
         ----------
-        number_of_sims: conint(strict=True, ge=1)
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: conint(strict=True, ge=1)
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: confloat(strict=True, gt=0.0)
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: conint(strict=True, ge=1, le=366), default: 252
+        trading_days_in_year: DaysInYearType,
+            default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
@@ -745,34 +791,35 @@ class ReturnSimulation(
 
     @classmethod
     def from_heston(
-        cls,
-        number_of_sims: conint(strict=True, ge=1),
-        trading_days: conint(strict=True, ge=1),
+        cls: Type[TypeReturnSimulation],
+        number_of_sims: SimCountType,
+        trading_days: TradingDaysType,
         mean_annual_return: float,
-        mean_annual_vol: confloat(strict=True, gt=0.0),
-        heston_mu: float,
+        mean_annual_vol: VolatilityType,
+        heston_mu: VolatilityType,
         heston_a: float,
-        trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Heston model is the geometric brownian motion model
         with stochastic volatility
 
         Parameters
         ----------
-        number_of_sims: conint(strict=True, ge=1)
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: conint(strict=True, ge=1)
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: confloat(strict=True, gt=0.0)
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        heston_mu: float
+        heston_mu: VolatilityType
             This is the long run average volatility for the Heston model
         heston_a: float
             This is the rate of mean reversion for volatility in the Heston model
-        trading_days_in_year: conint(strict=True, ge=1, le=366), default: 252
+        trading_days_in_year: DaysInYearType,
+            default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
@@ -813,33 +860,34 @@ class ReturnSimulation(
 
     @classmethod
     def from_heston_vol(
-        cls,
-        number_of_sims: conint(strict=True, ge=1),
-        trading_days: conint(strict=True, ge=1),
+        cls: Type[TypeReturnSimulation],
+        number_of_sims: SimCountType,
+        trading_days: TradingDaysType,
         mean_annual_return: float,
-        mean_annual_vol: confloat(strict=True, gt=0.0),
-        heston_mu: float,
+        mean_annual_vol: VolatilityType,
+        heston_mu: VolatilityType,
         heston_a: float,
-        trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Heston Vol model simulation
 
         Parameters
         ----------
-        number_of_sims: conint(strict=True, ge=1)
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: conint(strict=True, ge=1)
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: confloat(strict=True, gt=0.0)
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        heston_mu: float
+        heston_mu: VolatilityType
             This is the long run average volatility for the Heston model
         heston_a: float
             This is the rate of mean reversion for volatility in the Heston model
-        trading_days_in_year: conint(strict=True, ge=1, le=366), default: 252
+        trading_days_in_year: DaysInYearType,
+            default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
             Random seed going into numpy.random.seed()
@@ -880,34 +928,35 @@ class ReturnSimulation(
 
     @classmethod
     def from_merton_jump_gbm(
-        cls,
-        number_of_sims: conint(strict=True, ge=1),
-        trading_days: conint(strict=True, ge=1),
+        cls: Type[TypeReturnSimulation],
+        number_of_sims: SimCountType,
+        trading_days: TradingDaysType,
         mean_annual_return: float,
-        mean_annual_vol: confloat(strict=True, gt=0.0),
+        mean_annual_vol: VolatilityType,
         jumps_lamda: float,
-        jumps_sigma: float,
+        jumps_sigma: VolatilityType,
         jumps_mu: float,
-        trading_days_in_year: conint(strict=True, ge=1, le=366) = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
-    ) -> "ReturnSimulation":
+    ) -> TypeReturnSimulation:
         """Merton Jump-Diffusion model simulation
 
         Parameters
         ----------
-        number_of_sims: conint(strict=True, ge=1)
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: conint(strict=True, ge=1)
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: confloat(strict=True, gt=0.0)
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: conint(strict=True, ge=1, le=366), default: 252
+        trading_days_in_year: DaysInYearType,
+            default: 252
             Number of trading days used to annualize
         jumps_lamda: float
             This is the probability of a jump happening at each point in time
-        jumps_sigma: float
+        jumps_sigma: VolatilityType
             This is the volatility of the jump size
         jumps_mu: float
             This is the average jump size
@@ -949,11 +998,11 @@ class ReturnSimulation(
         )
 
     def to_opentimeseries_openframe(
-        self: "ReturnSimulation",
+        self: TypeReturnSimulation,
         name: str,
         start: Optional[dt.date] = None,
         end: Optional[dt.date] = None,
-        valuetype: Union[ValueType.PRICE, ValueType.RTRN] = ValueType.PRICE,
+        valuetype: Literal[ValueType.PRICE, ValueType.RTRN] = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         countries: CountriesType = "SE",
     ) -> Union[OpenTimeSeries, OpenFrame]:
@@ -971,7 +1020,7 @@ class ReturnSimulation(
                 Identifies if the series is a series of values or returns
             baseccy : str, default: "SEK"
                 ISO 4217 currency code of the timeseries
-            countries: Union[List[str], str], default: "SE"
+            countries: CountriesType, default: "SE"
                 (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
