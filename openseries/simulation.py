@@ -19,9 +19,7 @@ from math import log, pow as mathpow
 from typing import (
     cast,
     Optional,
-    Union,
     List,
-    Literal,
     Tuple,
     Type,
     TypeVar,
@@ -36,16 +34,13 @@ from numpy import (
     sqrt,
 )
 from numpy.typing import NDArray
-from pandas import DataFrame, date_range
-from pandas.tseries.offsets import CustomBusinessDay
+from pandas import concat, DataFrame
 from pydantic import BaseModel
 
-from openseries.datefixer import holiday_calendar
-from openseries.frame import OpenFrame
-from openseries.series import OpenTimeSeries, ValueType
+from openseries.datefixer import generate_calender_date_range
+from openseries.series import ValueType
 from openseries.types import (
     CountriesType,
-    CurrencyStringType,
     DaysInYearType,
     SimCountType,
     TradingDaysType,
@@ -997,16 +992,14 @@ class ReturnSimulation(
             dframe=DataFrame(data=daily_returns),
         )
 
-    def to_opentimeseries_openframe(
+    def to_dataframe(
         self: TypeReturnSimulation,
         name: str,
         start: Optional[dt.date] = None,
         end: Optional[dt.date] = None,
-        valuetype: Literal[ValueType.PRICE, ValueType.RTRN] = ValueType.PRICE,
-        baseccy: CurrencyStringType = "SEK",
         countries: CountriesType = "SE",
-    ) -> Union[OpenTimeSeries, OpenFrame]:
-        """Creates OpenTimeSeries or OpenFrame from the simulation(s)
+    ) -> DataFrame:
+        """Creates pandas.DataFrame from the simulation(s)
 
             Parameters
             ----------
@@ -1016,79 +1009,27 @@ class ReturnSimulation(
                 Date when the simulation starts
             end: datetime.date, optional
                 Date when the simulation ends
-            valuetype : Union[ValueType.PRICE, ValueType.RTRN, default: ValueType.PRICE
-                Identifies if the series is a series of values or returns
-            baseccy : str, default: "SEK"
-                ISO 4217 currency code of the timeseries
             countries: CountriesType, default: "SE"
                 (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
         -------
-        Union[OpenTimeSeries, OpenFrame]
+        pandas.DataFrame
             Object based on the simulation(s)
         """
-        if start and not end:
-            tmp_range = date_range(
-                start=start, periods=self.trading_days * 365 // 252, freq="D"
-            )
-            calendar = holiday_calendar(
-                startyear=start.year, endyear=tmp_range[-1].year, countries=countries
-            )
-            d_range = [
-                d.date()
-                for d in date_range(
-                    start=start,
-                    periods=self.trading_days,
-                    freq=CustomBusinessDay(calendar=calendar),
-                )
-            ]
-
-        elif end and not start:
-            tmp_range = date_range(
-                end=end, periods=self.trading_days * 365 // 252, freq="D"
-            )
-            calendar = holiday_calendar(
-                startyear=tmp_range[0].year, endyear=end.year, countries=countries
-            )
-            d_range = [
-                d.date()
-                for d in date_range(
-                    end=end,
-                    periods=self.trading_days,
-                    freq=CustomBusinessDay(calendar=calendar),
-                )
-            ]
-        else:
-            raise ValueError(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
-            )
+        d_range = generate_calender_date_range(
+            trading_days=self.trading_days, start=start, end=end, countries=countries
+        )
 
         if self.number_of_sims == 1:
             sdf = self.dframe.iloc[0].T.to_frame()
             sdf.index = d_range
             sdf.columns = [[name], [ValueType.RTRN]]
-            if valuetype == ValueType.PRICE:
-                return OpenTimeSeries.from_df(
-                    dframe=sdf,
-                    valuetype=ValueType.RTRN,
-                    baseccy=baseccy,
-                ).to_cumret()
-            return OpenTimeSeries.from_df(
-                dframe=sdf,
-                valuetype=ValueType.RTRN,
-                baseccy=baseccy,
-            )
-        tslist = []
+            return sdf
+        fdf = DataFrame()
         for item in range(self.number_of_sims):
             sdf = self.dframe.iloc[item].T.to_frame()
             sdf.index = d_range
             sdf.columns = [[f"Asset_{item}"], [ValueType.RTRN]]
-            if valuetype == ValueType.PRICE:
-                tslist.append(
-                    OpenTimeSeries.from_df(sdf, valuetype=ValueType.RTRN).to_cumret()
-                )
-            else:
-                tslist.append(OpenTimeSeries.from_df(sdf, valuetype=ValueType.RTRN))
-        return OpenFrame(tslist)
+            fdf = concat([fdf, sdf], axis="columns", sort=True)
+        return fdf

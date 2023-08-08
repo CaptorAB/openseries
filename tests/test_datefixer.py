@@ -14,6 +14,7 @@ from openseries.datefixer import (
     get_previous_business_day_before_today,
     holiday_calendar,
     offset_business_days,
+    generate_calender_date_range,
 )
 
 
@@ -328,3 +329,36 @@ class TestDateFixer(TestCase):
             countries=["SE", "US"],
         )
         self.assertEqual(offsetdate_backward, backwarddate)
+
+    def test_generate_calender_date_range(self: TestDateFixer) -> None:
+        """Test generate_calender_date_range function with wrong date input"""
+        start = dt.date(2009, 6, 30)
+        trd_days = 506
+        end = dt.date(2011, 6, 30)
+
+        d_range = generate_calender_date_range(trading_days=trd_days, start=start)
+
+        self.assertEqual(len(d_range), 506)
+        self.assertEqual(d_range[-1], end)
+
+        with self.assertRaises(ValueError) as e_both:
+            _ = generate_calender_date_range(
+                trading_days=trd_days, start=start, end=end
+            )
+        self.assertIn(
+            member=(
+                "Provide one of start or end date, but not both. "
+                "Date range is inferred from number of trading days."
+            ),
+            container=str(e_both.exception),
+        )
+
+        with self.assertRaises(ValueError) as e_none:
+            _ = generate_calender_date_range(trading_days=trd_days)
+        self.assertIn(
+            member=(
+                "Provide one of start or end date, but not both. "
+                "Date range is inferred from number of trading days."
+            ),
+            container=str(e_none.exception),
+        )

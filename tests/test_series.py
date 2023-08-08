@@ -167,10 +167,9 @@ class TestOpenTimeSeries(TestCase):
             trading_days_in_year=252,
             seed=71,
         )
-        cls.randomseries = cast(
-            OpenTimeSeries,
-            sim.to_opentimeseries_openframe(name="Asset", end=dt.date(2019, 6, 30)),
-        )
+        cls.randomseries = OpenTimeSeries.from_df(
+            sim.to_dataframe(name="Asset", end=dt.date(2019, 6, 30))
+        ).to_cumret()
 
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
             ("Asset", ValueType.PRICE)

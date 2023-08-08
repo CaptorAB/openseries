@@ -228,60 +228,18 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_means, means)
         self.assertListEqual(target_deviations, deviations)
 
-    def test_simulation_to_opentimeseries(self: TestSimulation) -> None:
-        """Test method to_opentimeseries_openframe into OpenTimeSeries"""
+    def test_simulation_to_dataframe(self: TestSimulation) -> None:
+        """Test method to_dataframe"""
         seriesim = copy(self.seriesim)
 
         start = dtdate(2009, 6, 30)
-        end = dtdate(2019, 6, 28)
 
-        startseries = seriesim.to_opentimeseries_openframe(name="Asset", start=start)
-        endseries = seriesim.to_opentimeseries_openframe(name="Asset", end=end)
-        returnseries = seriesim.to_opentimeseries_openframe(
-            name="Asset", start=start, valuetype=ValueType.RTRN
+        startseries = OpenTimeSeries.from_df(
+            seriesim.to_dataframe(name="Asset", start=start)
+        ).to_cumret()
+        returnseries = OpenTimeSeries.from_df(
+            seriesim.to_dataframe(name="Asset", start=start)
         )
 
-        self.assertEqual(start, startseries.first_idx)
-        self.assertEqual(end, endseries.last_idx)
-        self.assertEqual(ValueType.PRICE, cast(OpenTimeSeries, startseries).valuetype)
-        self.assertEqual(ValueType.RTRN, cast(OpenTimeSeries, returnseries).valuetype)
-
-        with self.assertRaises(ValueError) as e_both:
-            _ = seriesim.to_opentimeseries_openframe(
-                name="Asset", start=start, end=end
-            )
-        self.assertIn(
-            member=(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
-            ),
-            container=str(e_both.exception),
-        )
-
-        with self.assertRaises(ValueError) as e_none:
-            _ = seriesim.to_opentimeseries_openframe(name="Asset")
-        self.assertIn(
-            member=(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
-            ),
-            container=str(e_none.exception),
-        )
-
-    def test_simulation_to_openframe(self: TestSimulation) -> None:
-        """Test method to_opentimeseries_openframe into OpenFrame"""
-        framesim = copy(self.framesim)
-
-        end = dtdate(2019, 6, 30)
-
-        endframe = framesim.to_opentimeseries_openframe(name="Asset", end=end)
-        returnframe = framesim.to_opentimeseries_openframe(
-            name="Asset", end=end, valuetype=ValueType.RTRN
-        )
-
-        self.assertEqual(
-            ValueType.PRICE, cast(OpenFrame, endframe).constituents[0].valuetype
-        )
-        self.assertEqual(
-            ValueType.RTRN, cast(OpenFrame, returnframe).constituents[0].valuetype
-        )
+        self.assertEqual(ValueType.PRICE, startseries.valuetype)
+        self.assertEqual(ValueType.RTRN, returnseries.valuetype)

@@ -6,6 +6,11 @@ However, unfortunately I do not have the resources to issue any form of guarante
 this log will cover all changes, and I will not attempt to go back very far in history.
 At some point I will also start documenting changes in release documentation instead.
 
+
+## Version [1.1.6] - 2023-08-08
+
+Replaced to_opentimeseries_openframe method on ReturnSimulation with to_dataframe.
+
 ## Version [1.1.5] - 2023-08-08
 
 Consolidated sim_price.py and stoch_processes.py into a single simulation.py with the

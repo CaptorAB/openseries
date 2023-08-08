@@ -9,7 +9,7 @@ from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta
 from pandas import date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
 
-from openseries.types import CountriesType
+from openseries.types import CountriesType, TradingDaysType
 
 
 def holiday_calendar(
@@ -304,3 +304,63 @@ def offset_business_days(
     idx = where(array(local_bdays) == ddate)[0]
 
     return date_fix(local_bdays[idx[0] + days])
+
+
+def generate_calender_date_range(
+    trading_days: TradingDaysType,
+    start: Optional[dt.date] = None,
+    end: Optional[dt.date] = None,
+    countries: CountriesType = "SE",
+) -> List[dt.date]:
+    """Generates a list of business day calender dates
+
+        Parameters
+        ----------
+        trading_days: TradingDaysType
+            Number of days to generate
+        start: datetime.date, optional
+            Date when the range starts
+        end: datetime.date, optional
+            Date when the range ends
+        countries: CountriesType, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
+
+    Returns
+    -------
+    List[dt.date]
+        List of business day calender dates
+    """
+    if start and not end:
+        tmp_range = date_range(
+            start=start, periods=trading_days * 365 // 252, freq="D"
+        )
+        calendar = holiday_calendar(
+            startyear=start.year, endyear=tmp_range[-1].year, countries=countries
+        )
+        return [
+            d.date()
+            for d in date_range(
+                start=start,
+                periods=trading_days,
+                freq=CustomBusinessDay(calendar=calendar),
+            )
+        ]
+
+    if end and not start:
+        tmp_range = date_range(end=end, periods=trading_days * 365 // 252, freq="D")
+        calendar = holiday_calendar(
+            startyear=tmp_range[0].year, endyear=end.year, countries=countries
+        )
+        return [
+            d.date()
+            for d in date_range(
+                end=end,
+                periods=trading_days,
+                freq=CustomBusinessDay(calendar=calendar),
+            )
+        ]
+
+    raise ValueError(
+        "Provide one of start or end date, but not both. "
+        "Date range is inferred from number of trading days."
+    )

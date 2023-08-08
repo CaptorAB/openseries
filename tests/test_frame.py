@@ -46,13 +46,18 @@ class TestOpenFrame(TestCase):
             trading_days_in_year=252,
             seed=71,
         )
-        cls.randomframe = cast(
-            OpenFrame,
-            sim.to_opentimeseries_openframe(
-                name="Asset", end=dtdate(2019, 6, 30), valuetype=ValueType.RTRN
-            ),
+        cls.randomseries = OpenTimeSeries.from_df(
+            sim.to_dataframe(name="Asset", end=dtdate(2019, 6, 30))
+        ).to_cumret()
+        cls.randomframe = OpenFrame(
+            [
+                OpenTimeSeries.from_df(
+                    sim.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
+                    column_nmbr=serie,
+                )
+                for serie in range(sim.number_of_sims)
+            ]
         )
-        cls.randomseries = cls.randomframe.constituents[0].to_cumret()
 
     def test_openframe_valid_tsdf(self: TestOpenFrame) -> None:
         """Test valid pandas.DataFrame property"""
@@ -224,7 +229,7 @@ class TestOpenFrame(TestCase):
 
         self.assertListEqual(
             [
-                dtdate(2018, 11, 8),
+                dtdate(2009, 7, 1),
                 dtdate(2009, 7, 1),
                 dtdate(2012, 4, 17),
                 dtdate(2013, 7, 29),
