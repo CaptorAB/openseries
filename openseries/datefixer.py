@@ -9,7 +9,7 @@ from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta
 from pandas import date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
 
-from openseries.types import CountryStringType, CountriesType
+from openseries.types import CountriesType
 
 
 def holiday_calendar(
@@ -60,7 +60,7 @@ def holiday_calendar(
     elif isinstance(countries, list) and all(
         country in list_supported_countries() for country in countries
     ):
-        country: CountryStringType
+        country: str
         countryholidays: List[Union[dt.date, str]] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)

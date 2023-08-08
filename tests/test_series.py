@@ -216,7 +216,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_countries.exception),
         )
         with self.assertRaises(ValueError) as e_none:
-            no_countries = cast(Union[List[str], str], None)
+            no_countries = cast(CountriesType, None)
             OpenTimeSeries.setup_class(countries=no_countries)
         self.assertIn(
             member="according to ISO 3166-1 alpha-2",
@@ -1269,42 +1269,21 @@ class TestOpenTimeSeries(TestCase):
         )
         self.assertIsInstance(timeseries_with_valid_isin, OpenTimeSeries)
 
-        with self.assertRaises(PydanticValidationError) as e_min_items:
-            OpenTimeSeries(
-                timeseriesId=valid_timeseries_id,
-                instrumentId=valid_instrument_id,
-                isin=valid_isin,
-                currency="SEK",
+        with self.assertRaises(ValueError) as e_min_items:
+            OpenTimeSeries.from_arrays(
                 name="asset",
-                label="asset",
+                timeseries_id=valid_timeseries_id,
+                instrument_id=valid_instrument_id,
+                isin=valid_isin,
                 dates=[],
-                valuetype=ValueType.PRICE,
                 values=[
                     100.0,
                     100.0978,
                 ],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[
-                        100.0,
-                        100.0978,
-                    ],
-                    index=[
-                        d.date()
-                        for d in DatetimeIndex(
-                            [
-                                "2017-05-29",
-                                "2017-05-30",
-                            ]
-                        )
-                    ],
-                    columns=[["asset"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
             )
 
         self.assertIn(
-            member="List should have at least 2 items",
+            member="Shape of passed values is (2, 1), indices imply (0, 1)",
             container=str(e_min_items.exception),
         )
 

@@ -2,7 +2,7 @@
 Declaring types used throughout the project
 """
 from typing import Annotated, Literal, List, Union
-from pydantic import conlist, constr, StringConstraints
+from pydantic import confloat, conint, conlist, constr, StringConstraints
 
 CountryStringType = Annotated[
     str,
@@ -10,8 +10,13 @@ CountryStringType = Annotated[
         pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
     ),
 ]
-CountryListType = Annotated[List[str], conlist(CountryStringType, min_length=1)]
-CountriesType = Union[CountryListType, CountryStringType]
+CountryListType = conlist(
+    constr(
+        pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
+    ),
+    min_length=1,
+)
+CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]
 
 CurrencyStringType = Annotated[
     str,
@@ -30,6 +35,14 @@ DateListType = Annotated[
 ValueListType = Annotated[List[float], conlist(float, min_length=2)]
 
 DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
+
+DaysInYearType = Annotated[int, conint(strict=True, ge=1, le=366)]
+
+TradingDaysType = Annotated[int, conint(strict=True, gt=1)]
+
+SimCountType = Annotated[int, conint(strict=True, ge=1)]
+
+VolatilityType = Annotated[float, confloat(strict=True, gt=0.0)]
 
 LiteralLinePlotMode = Literal[
     "lines",

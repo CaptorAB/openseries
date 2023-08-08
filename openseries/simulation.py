@@ -17,7 +17,6 @@ Processes that can be simulated in this module are:
 import datetime as dt
 from math import log, pow as mathpow
 from typing import (
-    Annotated,
     cast,
     Optional,
     Union,
@@ -39,12 +38,19 @@ from numpy import (
 from numpy.typing import NDArray
 from pandas import DataFrame, date_range
 from pandas.tseries.offsets import CustomBusinessDay
-from pydantic import BaseModel, conint, confloat
+from pydantic import BaseModel
 
 from openseries.datefixer import holiday_calendar
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries, ValueType
-from openseries.types import CountriesType, CurrencyStringType
+from openseries.types import (
+    CountriesType,
+    CurrencyStringType,
+    DaysInYearType,
+    SimCountType,
+    TradingDaysType,
+    VolatilityType,
+)
 
 TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
@@ -57,11 +63,11 @@ class ModelParameters(BaseModel):
     ----------
     all_s0: float
         Starting asset value
-    all_time: float
+    all_time: TradingDaysType
         Amount of time to simulate for
     all_delta: float
         Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
-    all_sigma: Annotated[float, confloat(strict=True, gt=0.0)]
+    all_sigma: VolatilityType
         Volatility of the stochastic processes
     all_r0: float, default: 0.0
         Starting interest rate value
@@ -69,7 +75,7 @@ class ModelParameters(BaseModel):
         Annual drift factor for geometric brownian motion
     jumps_lamda: float, default: 0.0
         Probability of a jump happening at each point in time
-    jumps_sigma: Annotated[float, confloat(strict=True, ge=0.0)], default: 0.0
+    jumps_sigma: VolatilityType, default: 0.0
         Volatility of the jump size
     jumps_mu: float, default: 0.0
         Average jump size
@@ -85,19 +91,19 @@ class ModelParameters(BaseModel):
         Long run average interest rate for Ornstein Uhlenbeck
     heston_a: float, default: 0.0
         Rate of mean reversion for volatility in the Heston model
-    heston_mu: Annotated[float, confloat(strict=True, gt=0.0)], default: 0.0
+    heston_mu: VolatilityType, default: 0.0
         Long run average volatility for the Heston model
-    heston_vol0: Annotated[float, confloat(strict=True, gt=0.0)], default: 0.0
+    heston_vol0: VolatilityType, default: 0.0
         Starting volatility value for the Heston vol model
     """
 
     all_s0: float
-    all_time: Annotated[int, conint(strict=True, ge=1)]
+    all_time: TradingDaysType
     all_delta: float
-    all_sigma: Annotated[float, confloat(strict=True, gt=0.0)]
+    all_sigma: VolatilityType
     gbm_mu: float
     jumps_lamda: float = 0.0
-    jumps_sigma: Annotated[float, confloat(strict=True, ge=0.0)] = 0.0
+    jumps_sigma: VolatilityType = 0.0
     jumps_mu: float = 0.0
     cir_a: float = 0.0
     cir_mu: float = 0.0
@@ -106,8 +112,8 @@ class ModelParameters(BaseModel):
     ou_a: float = 0.0
     ou_mu: float = 0.0
     heston_a: float = 0.0
-    heston_mu: Annotated[float, confloat(strict=True, ge=0.0)] = 0.0
-    heston_vol0: Annotated[float, confloat(strict=True, ge=0.0)] = 0.0
+    heston_mu: VolatilityType = 0.0
+    heston_vol0: VolatilityType = 0.0
 
 
 class ReturnSimulation(
@@ -117,25 +123,25 @@ class ReturnSimulation(
 
     Parameters
     ----------
-    number_of_sims : int
+    number_of_sims : SimCountType
         Number of simulations to generate
-    trading_days: Annotated[int, conint(strict=True, ge=1)]
+    trading_days: TradingDaysType
         Total number of days to simulate
-    trading_days_in_year : str
+    trading_days_in_year : DaysInYearType
         Number of trading days used to annualize
-    mean_annual_return : List[str]
+    mean_annual_return : float
         Mean annual return of the distribution
-    mean_annual_vol : str
+    mean_annual_vol : VolatilityType
         Mean annual standard deviation of the distribution
     dframe: pandas.DataFrame
         Pandas DataFrame object holding the resulting values
     """
 
-    number_of_sims: Annotated[int, conint(strict=True, ge=1)]
-    trading_days: Annotated[int, conint(strict=True, ge=1)]
-    trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)]
+    number_of_sims: SimCountType
+    trading_days: TradingDaysType
+    trading_days_in_year: DaysInYearType
     mean_annual_return: float
-    mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)]
+    mean_annual_vol: VolatilityType
     dframe: DataFrame
 
     @property
@@ -624,26 +630,26 @@ class ReturnSimulation(
     @classmethod
     def from_normal(
         cls: Type[TypeReturnSimulation],
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)],
+        number_of_sims: SimCountType,
         mean_annual_return: float,
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)],
-        trading_days: Annotated[int, conint(strict=True, ge=1)],
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)] = 252,
+        mean_annual_vol: VolatilityType,
+        trading_days: TradingDaysType,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """Normal distribution simulation
 
         Parameters
         ----------
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)]
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: Annotated[int, conint(strict=True, ge=1)]
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)]
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)],
+        trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
@@ -674,26 +680,26 @@ class ReturnSimulation(
     @classmethod
     def from_lognormal(
         cls: Type[TypeReturnSimulation],
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)],
+        number_of_sims: SimCountType,
         mean_annual_return: float,
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)],
-        trading_days: Annotated[int, conint(strict=True, ge=1)],
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)] = 252,
+        mean_annual_vol: VolatilityType,
+        trading_days: TradingDaysType,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """Lognormal distribution simulation
 
         Parameters
         ----------
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)]
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: Annotated[int, conint(strict=True, ge=1)]
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)]
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)],
+        trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
@@ -727,11 +733,11 @@ class ReturnSimulation(
     @classmethod
     def from_gbm(
         cls: Type[TypeReturnSimulation],
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)],
+        number_of_sims: SimCountType,
         mean_annual_return: float,
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)],
-        trading_days: Annotated[int, conint(strict=True, ge=1)],
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)] = 252,
+        mean_annual_vol: VolatilityType,
+        trading_days: TradingDaysType,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """This method constructs a sequence of log returns which, when
@@ -739,15 +745,15 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)]
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: Annotated[int, conint(strict=True, ge=1)]
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)]
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)],
+        trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
@@ -786,13 +792,13 @@ class ReturnSimulation(
     @classmethod
     def from_heston(
         cls: Type[TypeReturnSimulation],
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)],
-        trading_days: Annotated[int, conint(strict=True, ge=1)],
+        number_of_sims: SimCountType,
+        trading_days: TradingDaysType,
         mean_annual_return: float,
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)],
-        heston_mu: float,
+        mean_annual_vol: VolatilityType,
+        heston_mu: VolatilityType,
         heston_a: float,
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)] = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """Heston model is the geometric brownian motion model
@@ -800,19 +806,19 @@ class ReturnSimulation(
 
         Parameters
         ----------
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)]
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: Annotated[int, conint(strict=True, ge=1)]
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)]
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        heston_mu: float
+        heston_mu: VolatilityType
             This is the long run average volatility for the Heston model
         heston_a: float
             This is the rate of mean reversion for volatility in the Heston model
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)],
+        trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
@@ -855,32 +861,32 @@ class ReturnSimulation(
     @classmethod
     def from_heston_vol(
         cls: Type[TypeReturnSimulation],
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)],
-        trading_days: Annotated[int, conint(strict=True, ge=1)],
+        number_of_sims: SimCountType,
+        trading_days: TradingDaysType,
         mean_annual_return: float,
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)],
-        heston_mu: float,
+        mean_annual_vol: VolatilityType,
+        heston_mu: VolatilityType,
         heston_a: float,
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)] = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """Heston Vol model simulation
 
         Parameters
         ----------
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)]
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: Annotated[int, conint(strict=True, ge=1)]
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)]
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        heston_mu: float
+        heston_mu: VolatilityType
             This is the long run average volatility for the Heston model
         heston_a: float
             This is the rate of mean reversion for volatility in the Heston model
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)],
+        trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
         seed: Optional[int], default 71
@@ -923,34 +929,34 @@ class ReturnSimulation(
     @classmethod
     def from_merton_jump_gbm(
         cls: Type[TypeReturnSimulation],
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)],
-        trading_days: Annotated[int, conint(strict=True, ge=1)],
+        number_of_sims: SimCountType,
+        trading_days: TradingDaysType,
         mean_annual_return: float,
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)],
+        mean_annual_vol: VolatilityType,
         jumps_lamda: float,
-        jumps_sigma: float,
+        jumps_sigma: VolatilityType,
         jumps_mu: float,
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)] = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """Merton Jump-Diffusion model simulation
 
         Parameters
         ----------
-        number_of_sims: Annotated[int, conint(strict=True, ge=1)]
+        number_of_sims: SimCountType
             Number of simulations to generate
-        trading_days: Annotated[int, conint(strict=True, ge=1)]
+        trading_days: TradingDaysType
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: Annotated[float, confloat(strict=True, gt=0.0)]
+        mean_annual_vol: VolatilityType
             Mean standard deviation
-        trading_days_in_year: Annotated[int, conint(strict=True, ge=1, le=366)],
+        trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
         jumps_lamda: float
             This is the probability of a jump happening at each point in time
-        jumps_sigma: float
+        jumps_sigma: VolatilityType
             This is the volatility of the jump size
         jumps_mu: float
             This is the average jump size
@@ -1014,7 +1020,7 @@ class ReturnSimulation(
                 Identifies if the series is a series of values or returns
             baseccy : str, default: "SEK"
                 ISO 4217 currency code of the timeseries
-            countries: Union[List[str], str], default: "SE"
+            countries: CountriesType, default: "SE"
                 (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
