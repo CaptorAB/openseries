@@ -952,10 +952,12 @@ class TestOpenFrame(TestCase):
         """Test plot_bars method"""
         plotframe = self.randomframe.from_deepcopy()
 
-        fig_keys = ["hovertemplate", "name", "x", "y", "type"]
+        fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = plotframe.plot_bars(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
-        self.assertListEqual(list(fig_json["data"][0].keys()), fig_keys)
+        made_fig_keys = list(fig_json["data"][0].keys())
+        made_fig_keys.sort()
+        self.assertListEqual(made_fig_keys, fig_keys)
 
         for i in range(plotframe.item_count):
             rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
