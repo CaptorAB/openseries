@@ -939,7 +939,6 @@ class TestOpenTimeSeries(TestCase):
     ) -> None:
         """Test correct pass-through of classes in timeseries_chain"""
         base_series_one = self.randomseries.from_deepcopy()
-        base_series_one.to_cumret()
 
         sub_series_one = NewTimeSeries.from_arrays(
             name="sub_series_one",
@@ -987,6 +986,23 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
         self.assertListEqual(list1=new_base.values, list2=new_sub.values)
+
+    def test_opentimeseries_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
+        """Test that chained methods on subclass returns subclass and not baseclass"""
+        cseries = self.randomseries.from_deepcopy()
+        self.assertIsInstance(cseries, OpenTimeSeries)
+
+        copyseries = NewTimeSeries.from_arrays(
+            name="moo",
+            dates=cseries.dates,
+            values=list(cseries.tsdf.iloc[:, 0].values),
+        )
+        self.assertIsInstance(copyseries, NewTimeSeries)
+
+        copyseries.set_new_label("boo").running_adjustment(0.001).resample(
+            "BM"
+        ).value_to_ret()
+        self.assertIsInstance(copyseries, NewTimeSeries)
 
     def test_opentimeseries_plot_series(self: TestOpenTimeSeries) -> None:
         """Test plot_series method"""
