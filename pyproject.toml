@@ -3,7 +3,6 @@ name = "openseries"
 version = "1.1.7"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
-homepage = "https://github.com/CaptorAB/OpenSeries"
 repository = "https://github.com/CaptorAB/OpenSeries"
 license = "BSD-3-Clause"
 readme = "README.md"
