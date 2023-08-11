@@ -7,6 +7,12 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.1.7] - 2023-08-11
+
+Changed the Pydantic configuration which will improve popup docs in e.g. Pycharm.
+Also resolved issue [#35](https://github.com/CaptorAB/OpenSeries/issues/35) with
+nested decorator warning.
+
 ## Version [1.1.6] - 2023-08-08
 
 Replaced to_opentimeseries_openframe method on ReturnSimulation with to_dataframe.

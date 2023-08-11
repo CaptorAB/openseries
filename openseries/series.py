@@ -36,7 +36,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
@@ -134,40 +134,34 @@ class ValueType(str, Enum):
     ROLLVOL = "Rolling volatility"
 
 
-class OpenTimeSeries(
-    BaseModel,
-    arbitrary_types_allowed=True,
-    validate_assignment=True,
-    revalidate_instances="always",
-    extra="allow",
-):
+class OpenTimeSeries(BaseModel):
     """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
 
     Parameters
     ----------
-    timeseriesId : str
+    timeseriesId : DatabaseIdStringType
         Database identifier of the timeseries
-    instrumentId: str
+    instrumentId: DatabaseIdStringType
         Database identifier of the instrument associated with the timeseries
     name : str
         string identifier of the timeseries and/or instrument
     valuetype : ValueType
         Identifies if the series is a series of values or returns
-    dates : List[str]
+    dates : DateListType
         Dates of the individual timeseries items
         These dates will not be altered by methods
-    values : List[float]
+    values : ValueListType
         The value or return values of the timeseries items
         These values will not be altered by methods
     local_ccy: bool
         Boolean flag indicating if timeseries is in local currency
     tsdf: pandas.DataFrame
         Pandas object holding dates and values that can be altered via methods
-    currency : str
+    currency : CurrencyStringType
         ISO 4217 currency code of the timeseries
-    domestic : str, default: "SEK"
+    domestic : CurrencyStringType, default: "SEK"
         ISO 4217 currency code of the user's home currency
-    countries: str, default: "SE"
+    countries: Union[CountryStringType, CountryListType], default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     isin : str, optional
         ISO 6166 identifier code of the associated instrument
@@ -189,9 +183,15 @@ class OpenTimeSeries(
     isin: Optional[str] = None
     label: Optional[str] = None
 
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
+        revalidate_instances="always",
+        extra="allow",
+    )
+
     @field_validator("isin")
-    @classmethod
-    def check_isincode(cls: Type[TypeOpenTimeSeries], isin_code: str) -> str:
+    def check_isincode(cls: TypeOpenTimeSeries, isin_code: str) -> str:
         """Pydantic validator to ensure that the ISIN code is valid if provided"""
         if isin_code:
             try:
@@ -283,19 +283,19 @@ class OpenTimeSeries(
         ----------
         name: str
             string identifier of the timeseries and/or instrument
-        dates: List[str]
-            Array of date strings as ISO 8601
-        values: List[float]
-            Array of values
+        dates: DateListType
+            List of date strings as ISO 8601 YYYY-MM-DD
+        values: ValueListType
+            Array of float values
         valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        timeseries_id : str
+        timeseries_id : DatabaseIdStringType, optional
             Database identifier of the timeseries
-        instrument_id: str
+        instrument_id: DatabaseIdStringType, optional
             Database identifier of the instrument associated with the timeseries
         isin : str, optional
             ISO 6166 identifier code of the associated instrument
-        baseccy : str, default: "SEK"
+        baseccy : CurrencyStringType, default: "SEK"
             ISO 4217 currency code of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
@@ -338,13 +338,13 @@ class OpenTimeSeries(
 
         Parameters
         ----------
-        dframe: DataFrame | Series
+        dframe: Union[DataFrame, Series]
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
         valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        baseccy : str, default: "SEK"
+        baseccy : CurrencyStringType, default: "SEK"
             ISO 4217 currency code of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
@@ -439,7 +439,7 @@ class OpenTimeSeries(
             Placeholder for a name of the timeseries
         valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        baseccy : str, default: "SEK"
+        baseccy : CurrencyStringType, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency

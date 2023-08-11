@@ -11,7 +11,7 @@ from os import path
 from pathlib import Path
 from random import choices
 from string import ascii_letters
-from typing import cast, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import cast, Dict, List, Optional, Tuple, TypeVar, Union
 from dateutil.relativedelta import relativedelta
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt
@@ -30,7 +30,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 from scipy.stats import kurtosis, norm, skew
 import statsmodels.api as sm
 
@@ -70,7 +70,7 @@ from openseries.risk import (
 TypeOpenFrame = TypeVar("TypeOpenFrame", bound="OpenFrame")
 
 
-class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=True):
+class OpenFrame(BaseModel):
     """Object of the class OpenFrame. Subclass of the Pydantic BaseModel
 
     Parameters
@@ -78,7 +78,7 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     constituents: List[TypeOpenTimeSeries]
         List of objects of Class OpenTimeSeries
     weights: List[float], optional
-        List of weights in float64 format.
+        List of weights in float format.
 
     Returns
     -------
@@ -90,10 +90,15 @@ class OpenFrame(BaseModel, arbitrary_types_allowed=True, validate_assignment=Tru
     tsdf: DataFrame = DataFrame()
     weights: Optional[List[float]] = None
 
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
+        revalidate_instances="always",
+    )
+
     @field_validator("constituents")
-    @classmethod
     def check_labels_unique(
-        cls: Type[TypeOpenFrame], tseries: List[OpenTimeSeries]
+        cls: TypeOpenFrame, tseries: List[OpenTimeSeries]
     ) -> List[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique"""
         labls = [x.label for x in tseries]

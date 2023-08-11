@@ -102,7 +102,7 @@ on any attributes or methods inherited from this model.
 ```powershell
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
-./make.ps1 -task make
+./make.ps1 make
 ```
 
 ### Mac Terminal/Linux
@@ -128,8 +128,8 @@ file.
 ### Windows Powershell
 
 ```powershell
-./make.ps1 -task test
-./make.ps1 -task lint
+./make.ps1 test
+./make.ps1 lint
 
 ```
 
