@@ -190,8 +190,11 @@ class OpenTimeSeries(BaseModel):
         extra="allow",
     )
 
+    # noinspection PyMethodParameters
     @field_validator("isin")
-    def check_isincode(cls: TypeOpenTimeSeries, isin_code: str) -> str:
+    def check_isincode(  # pylint: disable=no-self-argument
+        cls: TypeOpenTimeSeries, isin_code: str
+    ) -> str:
         """Pydantic validator to ensure that the ISIN code is valid if provided"""
         if isin_code:
             try:
@@ -2636,7 +2639,9 @@ def timeseries_chain(
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
     values += [x[0] for x in new.tsdf.values]
 
-    if back.__class__.__subclasscheck__(OpenTimeSeries):
+    if back.__class__.__subclasscheck__(  # pylint: disable=unnecessary-dunder-call
+        OpenTimeSeries
+    ):
         return OpenTimeSeries(
             timeseriesId=new.timeseriesId,
             instrumentId=new.instrumentId,

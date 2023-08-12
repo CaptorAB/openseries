@@ -76,6 +76,7 @@ no-pip = true
 no-setuptools = true
 
 [tool.pytest.ini_options]
+# https://github.com/pydata/pandas-datareader/issues/960
 filterwarnings = ["error", "ignore::DeprecationWarning:pandas_datareader.*:"]
 
 [tool.black]
@@ -96,7 +97,8 @@ warn_redundant_casts = true
 exclude = ["venv/*"]
 
 [tool.pylint]
-disable = ["C2801", "E0213", "R0801"]
+# Silenced below 'duplicate-code' error. Too big to fix currently
+disable = ["R0801"]
 max-line-length = 87
 max-module-lines=3400
 min-public-methods=0

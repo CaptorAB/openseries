@@ -96,8 +96,9 @@ class OpenFrame(BaseModel):
         revalidate_instances="always",
     )
 
+    # noinspection PyMethodParameters
     @field_validator("constituents")
-    def check_labels_unique(
+    def check_labels_unique(  # pylint: disable=no-self-argument
         cls: TypeOpenFrame, tseries: List[OpenTimeSeries]
     ) -> List[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique"""
