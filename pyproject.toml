@@ -38,7 +38,7 @@ keywords = [
 python = ">=3.9,<3.12"
 ffn = "^0.3.7"
 holidays = "^0.30"
-numpy = "^1.25.1"
+numpy = "^1.25.2"
 openpyxl = "^3.1.2"
 pandas = "^2.0.3"
 plotly = "^5.16.0"
@@ -76,10 +76,7 @@ no-pip = true
 no-setuptools = true
 
 [tool.pytest.ini_options]
-filterwarnings = [
-    "error",
-    "ignore::DeprecationWarning:pandas_datareader.*:"
-]
+filterwarnings = ["error", "ignore::DeprecationWarning:pandas_datareader.*:"]
 
 [tool.black]
 line-length = 87

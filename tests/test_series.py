@@ -175,7 +175,7 @@ class TestOpenTimeSeries(TestCase):
             ("Asset", ValueType.PRICE)
         ]
 
-    def test_opentimeseries_setup_class(self: TestOpenTimeSeries) -> None:
+    def test_setup_class(self: TestOpenTimeSeries) -> None:
         """Test setup_class method"""
         with self.assertRaises(ValueError) as e_dom:
             OpenTimeSeries.setup_class(domestic_ccy="12")
@@ -226,7 +226,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(OpenTimeSeries.domestic, "USD")
         self.assertEqual(OpenTimeSeries.countries, "US")
 
-    def test_opentimeseries_duplicates_handling(self: TestOpenTimeSeries) -> None:
+    def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
         """Test duplicate handling"""
         json_file = path.join(path.dirname(path.abspath(__file__)), "series.json")
         with open(json_file, "r", encoding="utf-8") as jsonfile:
@@ -257,7 +257,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertIn(member="Dates are not unique", container=str(e_dup.exception))
 
-    def test_opentimeseries_valid_tsdf(self: TestOpenTimeSeries) -> None:
+    def test_valid_tsdf(self: TestOpenTimeSeries) -> None:
         """Test valid pandas.DataFrame property"""
         dframe = DataFrame(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
@@ -316,7 +316,7 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_pdtype.exception),
         )
 
-    def test_opentimeseries_create_from_arrays(self: TestOpenTimeSeries) -> None:
+    def test_create_from_arrays(self: TestOpenTimeSeries) -> None:
         """Test from_arrays construct method"""
         arrseries = OpenTimeSeries.from_arrays(
             name="arrseries",
@@ -331,7 +331,7 @@ class TestOpenTimeSeries(TestCase):
         )
         self.assertTrue(isinstance(arrseries, OpenTimeSeries))
 
-    def test_opentimeseries_create_from_pandas_df(self: TestOpenTimeSeries) -> None:
+    def test_create_from_pandas_df(self: TestOpenTimeSeries) -> None:
         """Test construct from pandas.DataFrame"""
         serie = Series(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
@@ -444,7 +444,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertTrue(check_if_none(None))
         self.assertFalse(check_if_none(0.0))
 
-    def test_opentimeseries_save_to_json(self: TestOpenTimeSeries) -> None:
+    def test_save_to_json(self: TestOpenTimeSeries) -> None:
         """Test to_json method"""
         seriesfile = path.join(
             path.dirname(path.abspath(__file__)), "seriessaved.json"
@@ -459,7 +459,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertFalse(path.exists(seriesfile))
 
-    def test_opentimeseries_save_to_xlsx(self: TestOpenTimeSeries) -> None:
+    def test_save_to_xlsx(self: TestOpenTimeSeries) -> None:
         """Test to_xlsx method"""
         xseries = self.randomseries.from_deepcopy()
         seriesfile = xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo")
@@ -483,7 +483,7 @@ class TestOpenTimeSeries(TestCase):
             "Filename must end with .xlsx",
         )
 
-    def test_opentimeseries_create_from_fixed_rate(self: TestOpenTimeSeries) -> None:
+    def test_create_from_fixed_rate(self: TestOpenTimeSeries) -> None:
         """Test from_fixed_rate construct method"""
         fixseries_one = OpenTimeSeries.from_fixed_rate(
             rate=0.03, days=756, end_dt=dt.date(2019, 6, 30)
@@ -508,7 +508,7 @@ class TestOpenTimeSeries(TestCase):
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03, days=30)
         self.assertIsInstance(only_days_noend.exception, ValueError)
 
-    def test_opentimeseries_periods_in_a_year(self: TestOpenTimeSeries) -> None:
+    def test_periods_in_a_year(self: TestOpenTimeSeries) -> None:
         """Test periods_in_a_year property"""
         calc = len(self.randomseries.dates) / (
             (self.randomseries.last_idx - self.randomseries.first_idx).days / 365.25
@@ -524,7 +524,7 @@ class TestOpenTimeSeries(TestCase):
             f"{all_prop:.13f}", f"{self.randomseries.periods_in_a_year:.13f}"
         )
 
-    def test_opentimeseries_yearfrac(self: TestOpenTimeSeries) -> None:
+    def test_yearfrac(self: TestOpenTimeSeries) -> None:
         """Test yearfrac property"""
         self.assertEqual(
             f"{9.9931553730322:.13f}", f"{self.randomseries.yearfrac:.13f}"
@@ -532,7 +532,7 @@ class TestOpenTimeSeries(TestCase):
         all_prop = self.random_properties["yearfrac"]
         self.assertEqual(f"{all_prop:.13f}", f"{self.randomseries.yearfrac:.13f}")
 
-    def test_opentimeseries_resample(self: TestOpenTimeSeries) -> None:
+    def test_resample(self: TestOpenTimeSeries) -> None:
         """Test resample method"""
         rs_series = self.randomseries.from_deepcopy()
 
@@ -543,7 +543,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(121, rs_series.length)
         self.assertEqual(before, rs_series.value_ret)
 
-    def test_opentimeseries_resample_to_business_period_ends(
+    def test_resample_to_business_period_ends(
         self: TestOpenTimeSeries,
     ) -> None:
         """Test resample_to_business_period_ends method"""
@@ -583,7 +583,7 @@ class TestOpenTimeSeries(TestCase):
             ],
         )
 
-    def test_opentimeseries_calc_range(self: TestOpenTimeSeries) -> None:
+    def test_calc_range(self: TestOpenTimeSeries) -> None:
         """Test calc_range method"""
         cseries = self.randomseries.from_deepcopy()
         start, end = cseries.first_idx.strftime("%Y-%m-%d"), cseries.last_idx.strftime(
@@ -640,7 +640,7 @@ class TestOpenTimeSeries(TestCase):
         _, later_moved = cseries.calc_range(to_dt=dt.date(2009, 8, 20))
         self.assertEqual(later_moved, dt.date(2009, 8, 31))
 
-    def test_opentimeseries_calc_range_output(self: TestOpenTimeSeries) -> None:
+    def test_calc_range_output(self: TestOpenTimeSeries) -> None:
         """Test output consistency after calc_range applied"""
         cseries = self.randomseries.from_deepcopy()
 
@@ -671,7 +671,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(f"{gr_0:.13f}", f"{gr_1:.13f}")
 
-    def test_opentimeseries_value_to_diff(self: TestOpenTimeSeries) -> None:
+    def test_value_to_diff(self: TestOpenTimeSeries) -> None:
         """Test value_to_diff method"""
         diffseries = self.randomseries.from_deepcopy()
         diffseries.value_to_diff()
@@ -696,7 +696,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertListEqual(are_bes, should_bes)
 
-    def test_opentimeseries_value_to_ret(self: TestOpenTimeSeries) -> None:
+    def test_value_to_ret(self: TestOpenTimeSeries) -> None:
         """Test value_to_ret method"""
         retseries = self.randomseries.from_deepcopy()
         retseries.value_to_ret()
@@ -723,7 +723,7 @@ class TestOpenTimeSeries(TestCase):
 
         retseries.to_cumret()
 
-    def test_opentimeseries_valute_to_log(self: TestOpenTimeSeries) -> None:
+    def test_valute_to_log(self: TestOpenTimeSeries) -> None:
         """Test value_to_log method"""
         logseries = self.randomseries.from_deepcopy()
         logseries.value_to_log()
@@ -748,7 +748,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertListEqual(are_log, should_log)
 
-    def test_opentimeseries_all_properties(self: TestOpenTimeSeries) -> None:
+    def test_all_properties(self: TestOpenTimeSeries) -> None:
         """Test all_properties method"""
         prop_index = [
             "vol",
@@ -790,7 +790,7 @@ class TestOpenTimeSeries(TestCase):
             _ = apseries.all_properties(cast(List[LiteralSeriesProps], faulty_props))
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
-    def test_opentimeseries_all_calc_properties(self: TestOpenTimeSeries) -> None:
+    def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
         """Test all calculated properties"""
         checks = {
             "arithmetic_ret": f"{0.00953014509:.11f}",
@@ -824,7 +824,7 @@ class TestOpenTimeSeries(TestCase):
                 msg=f"Difference in: {c_key}",
             )
 
-    def test_opentimeseries_all_calc_functions(self: TestOpenTimeSeries) -> None:
+    def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods"""
         checks = {
             "arithmetic_ret_func": f"{0.00885255100:.11f}",
@@ -857,13 +857,13 @@ class TestOpenTimeSeries(TestCase):
             f"{getattr(self.randomseries, func)(year=2019):.12f}",
         )
 
-    def test_opentimeseries_max_drawdown_date(self: TestOpenTimeSeries) -> None:
+    def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
         """Test max_drawdown_date property"""
         self.assertEqual(dt.date(2018, 11, 8), self.randomseries.max_drawdown_date)
         all_prop = self.random_properties["max_drawdown_date"]
         self.assertEqual(all_prop, self.randomseries.max_drawdown_date)
 
-    def test_opentimeseries_running_adjustment(self: TestOpenTimeSeries) -> None:
+    def test_running_adjustment(self: TestOpenTimeSeries) -> None:
         """Test running_adjustment method"""
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
@@ -887,7 +887,7 @@ class TestOpenTimeSeries(TestCase):
             f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.12f}",
         )
 
-    def test_opentimeseries_timeseries_chain(self: TestOpenTimeSeries) -> None:
+    def test_timeseries_chain(self: TestOpenTimeSeries) -> None:
         """Test timeseries_chain function"""
         full_series = self.randomseries.from_deepcopy()
         full_values = [f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0].tolist()]
@@ -934,7 +934,7 @@ class TestOpenTimeSeries(TestCase):
             e_fail.exception.args[0], "Failed to find a matching date between series"
         )
 
-    def test_opentimeseries_timeserieschain_newclass(
+    def test_timeserieschain_newclass(
         self: TestOpenTimeSeries,
     ) -> None:
         """Test correct pass-through of classes in timeseries_chain"""
@@ -987,7 +987,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
         self.assertListEqual(list1=new_base.values, list2=new_sub.values)
 
-    def test_opentimeseries_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
+    def test_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
         """Test that chained methods on subclass returns subclass and not baseclass"""
         cseries = self.randomseries.from_deepcopy()
         self.assertIsInstance(cseries, OpenTimeSeries)
@@ -1004,7 +1004,7 @@ class TestOpenTimeSeries(TestCase):
         ).value_to_ret()
         self.assertIsInstance(copyseries, NewTimeSeries)
 
-    def test_opentimeseries_plot_series(self: TestOpenTimeSeries) -> None:
+    def test_plot_series(self: TestOpenTimeSeries) -> None:
         """Test plot_series method"""
         plotseries = self.randomseries.from_deepcopy()
         rawdata = [f"{x:.11f}" for x in plotseries.tsdf.iloc[1:5, 0]]
@@ -1029,7 +1029,7 @@ class TestOpenTimeSeries(TestCase):
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
         self.assertEqual(last_fmt, "Last 102.447%")
 
-    def test_opentimeseries_plot_bars(self: TestOpenTimeSeries) -> None:
+    def test_plot_bars(self: TestOpenTimeSeries) -> None:
         """Test plot_bars method"""
         barseries = self.randomseries.from_deepcopy()
         barseries.resample(freq="BM").value_to_ret()
@@ -1041,7 +1041,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertListEqual(rawdata, fig_data)
 
-    def test_opentimeseries_drawdown_details(self: TestOpenTimeSeries) -> None:
+    def test_drawdown_details(self: TestOpenTimeSeries) -> None:
         """Test drawdown_details method"""
         details = self.randomseries.drawdown_details()
         self.assertEqual(
@@ -1064,7 +1064,7 @@ class TestOpenTimeSeries(TestCase):
             "-0.000172687",
         )
 
-    def test_opentimeseries_align_index_to_local_cdays(
+    def test_align_index_to_local_cdays(
         self: TestOpenTimeSeries,
     ) -> None:
         """Test align_index_to_local_cdays method"""
@@ -1083,7 +1083,7 @@ class TestOpenTimeSeries(TestCase):
         aseries.align_index_to_local_cdays()
         self.assertFalse(midsummer in aseries.tsdf.index)
 
-    def test_opentimeseries_ewma_vol_func(self: TestOpenTimeSeries) -> None:
+    def test_ewma_vol_func(self: TestOpenTimeSeries) -> None:
         """Test ewma_vol_func method"""
         simdata = self.randomseries.ewma_vol_func()
         simseries = OpenTimeSeries.from_df(simdata, valuetype=ValueType.PRICE)
@@ -1113,7 +1113,7 @@ class TestOpenTimeSeries(TestCase):
         ]
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
-    def test_opentimeseries_rolling_vol(self: TestOpenTimeSeries) -> None:
+    def test_rolling_vol(self: TestOpenTimeSeries) -> None:
         """Test rolling_vol method"""
         simdata = self.randomseries.rolling_vol(observations=21)
         simseries = OpenTimeSeries.from_df(simdata)
@@ -1144,7 +1144,7 @@ class TestOpenTimeSeries(TestCase):
         ]
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
-    def test_opentimeseries_rolling_return(self: TestOpenTimeSeries) -> None:
+    def test_rolling_return(self: TestOpenTimeSeries) -> None:
         """Test rolling_return method"""
         simdata = self.randomseries.rolling_return(observations=21)
         simseries = OpenTimeSeries.from_df(simdata)
@@ -1161,7 +1161,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
 
-    def test_opentimeseries_rolling_cvar_down(self: TestOpenTimeSeries) -> None:
+    def test_rolling_cvar_down(self: TestOpenTimeSeries) -> None:
         """Test rolling_cvar_down method"""
         simdata = self.randomseries.rolling_cvar_down(observations=21)
         simseries = OpenTimeSeries.from_df(simdata)
@@ -1178,7 +1178,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
 
-    def test_opentimeseries_rolling_var_down(self: TestOpenTimeSeries) -> None:
+    def test_rolling_var_down(self: TestOpenTimeSeries) -> None:
         """Test rolling_var_down method"""
         simdata = self.randomseries.rolling_var_down(observations=21)
         simseries = OpenTimeSeries.from_df(simdata)
@@ -1195,7 +1195,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
 
-    def test_opentimeseries_downside_deviation(self: TestOpenTimeSeries) -> None:
+    def test_downside_deviation(self: TestOpenTimeSeries) -> None:
         """Test downside_deviation_func method
         Source: https://www.investopedia.com/terms/d/downside-deviation.asp
         """
@@ -1236,7 +1236,7 @@ class TestOpenTimeSeries(TestCase):
 
         self.assertEqual(f"{downdev:.12f}", "0.043333333333")
 
-    def test_opentimeseries_validations(self: TestOpenTimeSeries) -> None:
+    def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations"""
         valid_isin = "SE0009807308"
         invalid_isin = "SE0009807307"
@@ -1559,7 +1559,7 @@ class TestOpenTimeSeries(TestCase):
         #     container=str(e_eight.exception),
         # )
 
-    def test_opentimeseries_from_1d_rate_to_cumret(self: TestOpenTimeSeries) -> None:
+    def test_from_1d_rate_to_cumret(self: TestOpenTimeSeries) -> None:
         """Test from_1d_rate_to_cumret method"""
         tms = OpenTimeSeries.from_arrays(
             name="asset",
@@ -1599,7 +1599,7 @@ class TestOpenTimeSeries(TestCase):
         val_ret = f"{tms.value_ret:.5f}"
         self.assertEqual(val_ret, "0.00093")
 
-    def test_opentimeseries_geo_ret_value_ret_exceptions(
+    def test_geo_ret_value_ret_exceptions(
         self: TestOpenTimeSeries,
     ) -> None:
         """Test georet property raising exceptions on bad input data"""
@@ -1696,7 +1696,7 @@ class TestOpenTimeSeries(TestCase):
             ),
         )
 
-    def test_opentimeseries_value_nan_handle(self: TestOpenTimeSeries) -> None:
+    def test_value_nan_handle(self: TestOpenTimeSeries) -> None:
         """Test value_nan_handle method"""
         nanseries = OpenTimeSeries.from_arrays(
             name="nanseries",
@@ -1729,7 +1729,7 @@ class TestOpenTimeSeries(TestCase):
             "Method must be either fill or drop passed as string.",
         )
 
-    def test_opentimeseries_return_nan_handle(self: TestOpenTimeSeries) -> None:
+    def test_return_nan_handle(self: TestOpenTimeSeries) -> None:
         """Test return_nan_handle method"""
         nanseries = OpenTimeSeries.from_arrays(
             name="nanseries",
@@ -1765,7 +1765,7 @@ class TestOpenTimeSeries(TestCase):
             "Method must be either fill or drop passed as string.",
         )
 
-    def test_opentimeseries_miscellaneous(self: TestOpenTimeSeries) -> None:
+    def test_miscellaneous(self: TestOpenTimeSeries) -> None:
         """Test these methods:
         arithmetic_ret_func
         vol_func
@@ -1793,7 +1793,7 @@ class TestOpenTimeSeries(TestCase):
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
         self.assertEqual(f"{impvoldrifted:.12f}", "0.102454621604")
 
-    def test_opentimeseries_value_ret_calendar_period(
+    def test_value_ret_calendar_period(
         self: TestOpenTimeSeries,
     ) -> None:
         """Test value_ret_calendar_period method"""
@@ -1811,7 +1811,7 @@ class TestOpenTimeSeries(TestCase):
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
         self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")
 
-    def test_opentimeseries_to_drawdown_series(self: TestOpenTimeSeries) -> None:
+    def test_to_drawdown_series(self: TestOpenTimeSeries) -> None:
         """Test to_drawdown_series method"""
         mseries = self.randomseries.from_deepcopy()
         ddvalue = mseries.max_drawdown
@@ -1819,7 +1819,7 @@ class TestOpenTimeSeries(TestCase):
         ddserievalue = float((mseries.tsdf.min()).iloc[0])
         self.assertEqual(f"{ddvalue:.11f}", f"{ddserievalue:.11f}")
 
-    def test_opentimeseries_set_new_label(self: TestOpenTimeSeries) -> None:
+    def test_set_new_label(self: TestOpenTimeSeries) -> None:
         """Test set_new_label method"""
         lseries = self.randomseries.from_deepcopy()
 

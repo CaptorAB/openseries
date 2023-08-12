@@ -21,7 +21,7 @@ from openseries.datefixer import (
 class TestDateFixer(TestCase):
     """class to run unittests on the module datefixer.py"""
 
-    def test_date_fix_arg_types(self: TestDateFixer) -> None:
+    def test_arg_types(self: TestDateFixer) -> None:
         """Test date_fix argument types"""
         formats = [
             "2022-07-15",
@@ -36,7 +36,7 @@ class TestDateFixer(TestCase):
         for fmt in formats:
             self.assertEqual(output, date_fix(fmt))
 
-    def test_date_fix_arg_type_error(self: TestDateFixer) -> None:
+    def test_arg_type_error(self: TestDateFixer) -> None:
         """Test date_fix to raise TypeError when appropriate"""
         with self.assertRaises(TypeError) as e_type:
             digit = cast(str, 3)

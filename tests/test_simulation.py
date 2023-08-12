@@ -47,7 +47,7 @@ class TestSimulation(TestCase):
             seed=71,
         )
 
-    def test_simulation_processes(self: TestSimulation) -> None:
+    def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes"""
         args: Dict[str, Union[int, float]] = {
             "number_of_sims": 1,
@@ -100,7 +100,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_returns, returns)
         self.assertListEqual(target_volatilities, volatilities)
 
-    def test_simulation_properties(self: TestSimulation) -> None:
+    def test_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output"""
         days = 2512
         psim = copy(self.seriesim)
@@ -113,7 +113,7 @@ class TestSimulation(TestCase):
 
         self.assertEqual(f"{psim.realized_vol:.9f}", "0.117099479")
 
-    def test_simulation_assets(self: TestSimulation) -> None:
+    def test_assets(self: TestSimulation) -> None:
         """Test stoch processes output"""
         days = 2520
         target_returns = [
@@ -180,7 +180,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_returns, means)
         self.assertListEqual(target_volatilities, deviations)
 
-    def test_simulation_cir_and_ou(self: TestSimulation) -> None:
+    def test_cir_and_ou(self: TestSimulation) -> None:
         """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels"""
         series = []
         days = 2520
@@ -228,7 +228,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_means, means)
         self.assertListEqual(target_deviations, deviations)
 
-    def test_simulation_to_dataframe(self: TestSimulation) -> None:
+    def test_to_dataframe(self: TestSimulation) -> None:
         """Test method to_dataframe"""
         seriesim = copy(self.seriesim)
 
