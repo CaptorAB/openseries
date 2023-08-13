@@ -6,7 +6,6 @@ from copy import deepcopy
 import datetime as dt
 from enum import Enum
 from json import dump
-from math import ceil
 from os import path
 from pathlib import Path
 from re import compile as re_compile
@@ -22,32 +21,46 @@ from numpy import (
     square,
 )
 from numpy.typing import NDArray
-from dateutil.relativedelta import relativedelta
 from pandas import (
-    concat,
     DataFrame,
     DatetimeIndex,
     date_range,
     MultiIndex,
     Series,
 )
-from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure
 from plotly.offline import plot
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
-from scipy.stats import kurtosis, norm, skew
+from scipy.stats import norm
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
 
-from openseries.common import (
+from openseries.common_calc import (
     calc_arithmetic_ret,
+    calc_cvar_down,
+    calc_downside_deviation,
     calc_geo_ret,
+    calc_kurtosis,
+    calc_max_drawdown,
+    calc_max_drawdown_cal_year,
+    calc_positive_share,
+    calc_ret_vol_ratio,
+    calc_skew,
+    calc_sortino_ratio,
     calc_value_ret,
     calc_value_ret_calendar_period,
+)
+from openseries.common_props import CommonProps
+from openseries.common_tools import (
+    do_resample,
+    do_resample_to_business_period_ends,
     get_calc_range,
     save_to_xlsx,
 )
-from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
+from openseries.datefixer import (
+    date_fix,
+    align_dataframe_to_local_cdays,
+)
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
     CountriesType,
@@ -140,7 +153,7 @@ class ValueType(str, Enum):
     ROLLVOL = "Rolling volatility"
 
 
-class OpenTimeSeries(BaseModel):
+class OpenTimeSeries(BaseModel, CommonProps):
     """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
 
     Parameters
@@ -328,7 +341,7 @@ class OpenTimeSeries(BaseModel):
             local_ccy=local_ccy,
             tsdf=DataFrame(
                 data=values,
-                index=[dejt.date() for dejt in DatetimeIndex(dates)],
+                index=[deyt.date() for deyt in DatetimeIndex(dates)],
                 columns=[[name], [valuetype]],
                 dtype="float64",
             ),
@@ -409,7 +422,7 @@ class OpenTimeSeries(BaseModel):
             local_ccy=local_ccy,
             tsdf=DataFrame(
                 data=values,
-                index=[dejt.date() for dejt in DatetimeIndex(dates)],
+                index=[deyt.date() for deyt in DatetimeIndex(dates)],
                 columns=[[label], [valuetype]],
                 dtype="float64",
             ),
@@ -625,22 +638,9 @@ class OpenTimeSeries(BaseModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        startyear = self.first_idx.year
-        endyear = self.last_idx.year
-        calendar = holiday_calendar(
-            startyear=startyear, endyear=endyear, countries=self.countries
+        self.tsdf = align_dataframe_to_local_cdays(
+            data=self.tsdf, countries=self.countries
         )
-        d_range = [
-            d.date()
-            for d in date_range(
-                start=self.tsdf.first_valid_index(),
-                end=self.tsdf.last_valid_index(),
-                freq=CustomBusinessDay(calendar=calendar),
-            )
-        ]
-
-        self.tsdf = self.tsdf.reindex(d_range, method=None, copy=False)
-
         return self
 
     def all_properties(
@@ -668,73 +668,6 @@ class OpenTimeSeries(BaseModel):
         pdf = DataFrame.from_dict({x: getattr(self, x) for x in props}, orient="index")
         pdf.columns = self.tsdf.columns
         return pdf
-
-    @property
-    def length(self: TypeOpenTimeSeries) -> int:
-        """
-        Returns
-        -------
-        int
-            Number of observations
-        """
-
-        return len(self.tsdf.index)
-
-    @property
-    def first_idx(self: TypeOpenTimeSeries) -> dt.date:
-        """
-        Returns
-        -------
-        datetime.date
-            The first date in the timeseries
-        """
-
-        return cast(dt.date, self.tsdf.index[0])
-
-    @property
-    def last_idx(self: TypeOpenTimeSeries) -> dt.date:
-        """
-        Returns
-        -------
-        datetime.date
-            The last date in the timeseries
-        """
-
-        return cast(dt.date, self.tsdf.index[-1])
-
-    @property
-    def span_of_days(self: TypeOpenTimeSeries) -> int:
-        """
-        Returns
-        -------
-        int
-            Number of days from the first date to the last
-        """
-
-        return (self.last_idx - self.first_idx).days
-
-    @property
-    def yearfrac(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
-        -------
-        float
-            Length of the timeseries expressed in years assuming all years
-            have 365.25 days
-        """
-
-        return self.span_of_days / 365.25
-
-    @property
-    def periods_in_a_year(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
-        -------
-        float
-            The average number of observations per year
-        """
-
-        return self.length / self.yearfrac
 
     @property
     def geo_ret(self: TypeOpenTimeSeries) -> float:
@@ -958,13 +891,9 @@ class OpenTimeSeries(BaseModel):
         float
             Downside deviation
         """
-
-        dddf = self.tsdf.pct_change()
-
-        return cast(
-            float,
-            sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / self.length)
-            * sqrt(self.periods_in_a_year),
+        min_accepted_return: float = 0.0
+        return calc_downside_deviation(
+            data=self.tsdf, min_accepted_return=min_accepted_return
         )
 
     def downside_deviation_func(
@@ -1000,31 +929,13 @@ class OpenTimeSeries(BaseModel):
         float
             Downside deviation
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = (
-            self.tsdf.loc[
-                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
-            ]
-            .pct_change()
-            .count()
-        )
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
-
-        dddf = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .sub(min_accepted_return / time_factor)
-        )
-
-        return cast(
-            float,
-            sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-            * sqrt(time_factor),
+        return calc_downside_deviation(
+            data=self.tsdf,
+            min_accepted_return=min_accepted_return,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1036,7 +947,7 @@ class OpenTimeSeries(BaseModel):
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility.
         """
-        return self.arithmetic_ret / self.vol
+        return calc_ret_vol_ratio(data=self.tsdf, riskfree_rate=0.0)
 
     def ret_vol_ratio_func(
         self: TypeOpenTimeSeries,
@@ -1044,6 +955,7 @@ class OpenTimeSeries(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         riskfree_rate: float = 0.0,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> float:
         """The ratio of annualized arithmetic mean of returns and annualized
         volatility or, if risk-free return provided, Sharpe ratio calculated
@@ -1062,6 +974,9 @@ class OpenTimeSeries(BaseModel):
             Specific to date
         riskfree_rate : float, optional
             The return of the zero volatility asset used to calculate Sharpe ratio
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -1071,10 +986,14 @@ class OpenTimeSeries(BaseModel):
             if risk-free return provided, Sharpe ratio
         """
 
-        return (
-            self.arithmetic_ret_func(months_from_last, from_date, to_date)
-            - riskfree_rate
-        ) / self.vol_func(months_from_last, from_date, to_date)
+        return calc_ret_vol_ratio(
+            data=self.tsdf,
+            riskfree_rate=riskfree_rate,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
     @property
     def sortino_ratio(self: TypeOpenTimeSeries) -> float:
@@ -1089,7 +1008,7 @@ class OpenTimeSeries(BaseModel):
             volatility, and a minimum acceptable return of zero.
         """
 
-        return self.arithmetic_ret / self.downside_deviation
+        return calc_sortino_ratio(data=self.tsdf, riskfree_rate=0.0)
 
     def sortino_ratio_func(
         self: TypeOpenTimeSeries,
@@ -1097,6 +1016,7 @@ class OpenTimeSeries(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         riskfree_rate: float = 0.0,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> float:
         """The Sortino ratio calculated as ( asset return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has
@@ -1114,6 +1034,9 @@ class OpenTimeSeries(BaseModel):
             Specific to date
         riskfree_rate : float, optional
             The return of the zero volatility asset
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
 
         Returns
         -------
@@ -1122,15 +1045,13 @@ class OpenTimeSeries(BaseModel):
             Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation.
         """
-
-        return (
-            self.arithmetic_ret_func(months_from_last, from_date, to_date)
-            - riskfree_rate
-        ) / self.downside_deviation_func(
-            min_accepted_return=0.0,
+        return calc_sortino_ratio(
+            data=self.tsdf,
+            riskfree_rate=riskfree_rate,
             months_from_last=months_from_last,
             from_date=from_date,
             to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
     @property
@@ -1188,11 +1109,7 @@ class OpenTimeSeries(BaseModel):
         float
             Maximum drawdown without any limit on date range
         """
-
-        return cast(
-            float,
-            ((self.tsdf / self.tsdf.expanding(min_periods=1).max()).min() - 1).iloc[0],
-        )
+        return calc_max_drawdown(data=self.tsdf)
 
     @property
     def max_drawdown_date(self: TypeOpenTimeSeries) -> dt.date:
@@ -1234,19 +1151,12 @@ class OpenTimeSeries(BaseModel):
         float
             Maximum drawdown without any limit on date range
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return cast(
-            float,
-            (
-                (
-                    self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                    / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                    .expanding(min_periods=min_periods)
-                    .max()
-                ).min()
-                - 1
-            ).iloc[0],
+        return calc_max_drawdown(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            min_periods=min_periods,
         )
 
     @property
@@ -1258,15 +1168,7 @@ class OpenTimeSeries(BaseModel):
         float
             Maximum drawdown in a single calendar year.
         """
-        years = [d.year for d in self.tsdf.index]
-        return cast(
-            float,
-            (
-                self.tsdf.groupby(years)
-                .apply(lambda x: (x / x.expanding(min_periods=1).max()).min() - 1)
-                .min()
-            ).iloc[0],
-        )
+        return calc_max_drawdown_cal_year(data=self.tsdf)
 
     @property
     def worst(self: TypeOpenTimeSeries) -> float:
@@ -1339,11 +1241,7 @@ class OpenTimeSeries(BaseModel):
         float
             The share of percentage changes that are greater than zero
         """
-        pos = self.tsdf.pct_change()[1:][
-            self.tsdf.pct_change()[1:].values >= 0.0
-        ].count()
-        tot = self.tsdf.pct_change()[1:].count()
-        return float((pos / tot).iloc[0])
+        return calc_positive_share(data=self.tsdf)
 
     def positive_share_func(
         self: TypeOpenTimeSeries,
@@ -1367,15 +1265,11 @@ class OpenTimeSeries(BaseModel):
         float
             The share of percentage changes that are greater than zero
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        period = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
-        return cast(
-            float,
-            (
-                period[period.pct_change().ge(0.0)].count()
-                / period.pct_change().count()
-            ).iloc[0],
+        return calc_positive_share(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1387,11 +1281,7 @@ class OpenTimeSeries(BaseModel):
         float
             Skew of the return distribution
         """
-
-        return cast(
-            float,
-            skew(a=self.tsdf.pct_change().values, bias=True, nan_policy="omit")[0],
-        )
+        return calc_skew(data=self.tsdf)
 
     def skew_func(
         self: TypeOpenTimeSeries,
@@ -1416,15 +1306,11 @@ class OpenTimeSeries(BaseModel):
         float
             Skew of the return distribution
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return cast(
-            float,
-            skew(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
-                bias=True,
-                nan_policy="omit",
-            )[0],
+        return calc_skew(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1436,15 +1322,7 @@ class OpenTimeSeries(BaseModel):
         float
             Kurtosis of the return distribution
         """
-        return cast(
-            float,
-            kurtosis(
-                self.tsdf.pct_change(),
-                fisher=True,
-                bias=True,
-                nan_policy="omit",
-            )[0],
-        )
+        return calc_kurtosis(data=self.tsdf)
 
     def kurtosis_func(
         self: TypeOpenTimeSeries,
@@ -1469,17 +1347,11 @@ class OpenTimeSeries(BaseModel):
         float
             Kurtosis of the return distribution
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-
-        return cast(
-            float,
-            kurtosis(
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
-                fisher=True,
-                bias=True,
-                nan_policy="omit",
-            )[0],
+        return calc_kurtosis(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1492,17 +1364,7 @@ class OpenTimeSeries(BaseModel):
             Downside Conditional 95% Value At Risk "CVaR"
         """
         level: float = 0.95
-        items = self.tsdf.iloc[:, 0].pct_change().count()
-        return cast(
-            float,
-            (
-                self.tsdf.iloc[:, 0]
-                .pct_change()
-                .sort_values()
-                .iloc[: int(ceil((1 - level) * items))]
-                .mean()
-            ),
-        )
+        return calc_cvar_down(data=self.tsdf, level=level)
 
     def cvar_down_func(
         self: TypeOpenTimeSeries,
@@ -1530,26 +1392,12 @@ class OpenTimeSeries(BaseModel):
         float
             Downside Conditional Value At Risk "CVaR"
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        how_many = (
-            self.tsdf.loc[
-                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
-            ]
-            .pct_change()
-            .count()
-        )
-        return cast(
-            float,
-            (
-                self.tsdf.loc[
-                    cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
-                ]
-                .pct_change()
-                .sort_values()
-                .iloc[: int(ceil((1 - level) * how_many))]
-                .mean()
-            ),
+        return calc_cvar_down(
+            data=self.tsdf,
+            level=level,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1903,9 +1751,7 @@ class OpenTimeSeries(BaseModel):
             An OpenTimeSeries object
         """
 
-        self.tsdf.index = DatetimeIndex(self.tsdf.index)
-        self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
+        self.tsdf = do_resample(data=self.tsdf, freq=freq)
         return self
 
     def resample_to_business_period_ends(
@@ -1934,40 +1780,16 @@ class OpenTimeSeries(BaseModel):
         """
 
         head = self.tsdf.iloc[0].copy()
-        head = head.to_frame().T
         tail = self.tsdf.iloc[-1].copy()
-        tail = tail.to_frame().T
-        self.tsdf.index = DatetimeIndex(self.tsdf.index)
-        self.tsdf = self.tsdf.resample(rule=freq, convention=convention).last()
-        self.tsdf.drop(index=self.tsdf.index[-1], inplace=True)
-        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
-
-        if head.index[0] not in self.tsdf.index:
-            self.tsdf = concat([self.tsdf, head])
-
-        if tail.index[0] not in self.tsdf.index:
-            self.tsdf = concat([self.tsdf, tail])
-
-        self.tsdf.sort_index(inplace=True)
-
-        dates = DatetimeIndex(
-            [self.tsdf.index[0]]
-            + [
-                date_offset_foll(
-                    dt.date(d.year, d.month, 1)
-                    + relativedelta(months=1)
-                    - dt.timedelta(days=1),
-                    countries=self.countries,
-                    months_offset=0,
-                    adjust=True,
-                    following=False,
-                )
-                for d in self.tsdf.index[1:-1]
-            ]
-            + [self.tsdf.index[-1]]
+        dates = do_resample_to_business_period_ends(
+            data=self.tsdf,
+            head=head,
+            tail=tail,
+            freq=freq,
+            countries=self.countries,
+            convention=convention,
         )
-        dates = dates.drop_duplicates()
-        self.tsdf = self.tsdf.reindex([d.date() for d in dates], method=method)
+        self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         return self
 
     def to_drawdown_series(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:

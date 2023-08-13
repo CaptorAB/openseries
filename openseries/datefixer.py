@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
-from pandas import date_range, Timestamp
+from pandas import DataFrame, date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
 
 from openseries.types import CountriesType, TradingDaysType
@@ -364,3 +364,38 @@ def generate_calender_date_range(
         "Provide one of start or end date, but not both. "
         "Date range is inferred from number of trading days."
     )
+
+
+def align_dataframe_to_local_cdays(
+    data: DataFrame, countries: CountriesType = "SE"
+) -> DataFrame:
+    """Changes the index of the associated Pandas DataFrame .tsdf to align with
+    local calendar business days
+
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        The timeseries data
+    countries: List[str] | str, default: "SE"
+        (List of) country code(s) according to ISO 3166-1 alpha-2
+
+    Returns
+    -------
+    pandas.DataFrame
+        An OpenFrame object
+    """
+    startyear = data.index[0].year
+    endyear = data.index[-1].year
+    calendar = holiday_calendar(
+        startyear=startyear, endyear=endyear, countries=countries
+    )
+
+    d_range = [
+        d.date()
+        for d in date_range(
+            start=data.first_valid_index(),
+            end=data.last_valid_index(),
+            freq=CustomBusinessDay(calendar=calendar),
+        )
+    ]
+    return data.reindex(d_range, method=None, copy=False)

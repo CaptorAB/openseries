@@ -1263,15 +1263,15 @@ class TestOpenFrame(TestCase):
             "Z-score",
             "Skew",
             "Kurtosis",
-            "Positive share",
+            "Positive Share",
             "VaR 95.0%",
             "CVaR 95.0%",
             "Imp vol from VaR 95%",
             "Worst",
             "Worst month",
-            "Max drawdown",
+            "Max Drawdown",
             "Max drawdown dates",
-            "Max drawdown in cal yr",
+            "Max Drawdown in cal yr",
             "first indices",
             "last indices",
             "observations",
@@ -1381,21 +1381,13 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(f"{simdatab[0]:.10f}", "0.1578870346")
 
-        simdatac = frame.ret_vol_ratio_func(
-            riskfree_column=("Asset_4", ValueType.PRICE)
-        )
-
-        self.assertEqual(f"{simdatac[0]:.10f}", "0.1580040085")
-
-        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
-
         with self.assertRaises(Exception) as e_retvolfunc:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(int, "string")
             _ = frame.ret_vol_ratio_func(riskfree_column=str_col)
 
         self.assertEqual(
             e_retvolfunc.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column argument should be an integer.",
         )
 
     def test_sortino_ratio_func(self: TestOpenFrame) -> None:
@@ -1413,21 +1405,13 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(f"{simdatab[0]:.10f}", "0.2008045175")
 
-        simdatac = frame.sortino_ratio_func(
-            riskfree_column=("Asset_4", ValueType.PRICE)
-        )
-
-        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
-
-        self.assertEqual(f"{simdatac[0]:.10f}", "0.2009532877")
-
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(int, "string")
             _ = frame.sortino_ratio_func(riskfree_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column argument should be an integer.",
         )
 
     def test_tracking_error_func(self: TestOpenFrame) -> None:
