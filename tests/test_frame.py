@@ -1253,7 +1253,7 @@ class TestOpenFrame(TestCase):
     def test_all_properties(self: TestOpenFrame) -> None:
         """Test all_properties method"""
         prop_index = [
-            "Total return",
+            "Simple return",
             "Geometric return",
             "Arithmetic return",
             "Volatility",
@@ -1805,6 +1805,7 @@ class TestOpenFrame(TestCase):
                 values=[0.0, 1.1],
             )
         )
+
         with self.assertRaises(Exception) as e_gr_zero:
             _ = geoframe.geo_ret
 
@@ -2116,7 +2117,7 @@ class TestOpenFrame(TestCase):
             _ = mframe.value_ret
 
         self.assertIn(
-            member="Error in function value_ret due to an initial value being zero",
+            member="Simple return cannot be calculated due to an",
             container=str(e_vr.exception),
         )
 
@@ -2124,7 +2125,7 @@ class TestOpenFrame(TestCase):
             _ = mframe.value_ret_func()
 
         self.assertIn(
-            member="Error in function value_ret due to an initial value " "being zero",
+            member="Simple return cannot be calculated due to an",
             container=str(e_vrf.exception),
         )
 

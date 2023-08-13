@@ -15,8 +15,6 @@ from typing import cast, Dict, List, Optional, Tuple, TypeVar, Union
 from dateutil.relativedelta import relativedelta
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt
-from openpyxl import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
 from pandas import (
     concat,
     DataFrame,
@@ -37,6 +35,13 @@ import statsmodels.api as sm
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
 
+from openseries.common import (
+    calc_arithmetic_ret,
+    calc_geo_ret,
+    calc_value_ret,
+    get_calc_range,
+    save_to_xlsx,
+)
 from openseries.series import OpenTimeSeries, ValueType, ewma_calc
 from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
@@ -159,26 +164,12 @@ class OpenFrame(BaseModel):
             The Excel file path
         """
 
-        if filename[-5:].lower() != ".xlsx":
-            raise NameError("Filename must end with .xlsx")
-        if directory:
-            sheetfile = path.join(directory, filename)
-        else:
-            script_path = path.abspath(__file__)
-            sheetfile = path.join(path.dirname(script_path), filename)
-
-        wrkbook = Workbook()
-        wrksheet = wrkbook.active
-
-        if sheet_title:
-            wrksheet.title = sheet_title
-
-        for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
-            wrksheet.append(row)
-
-        wrkbook.save(sheetfile)
-
-        return sheetfile
+        return save_to_xlsx(
+            data=self.tsdf,
+            filename=filename,
+            sheet_title=sheet_title,
+            directory=directory,
+        )
 
     def merge_series(
         self: TypeOpenFrame, how: LiteralHowMerge = "outer"
@@ -264,41 +255,9 @@ class OpenFrame(BaseModel):
         Tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
         """
-        earlier, later = self.first_idx, self.last_idx
-        if months_offset is not None or from_dt is not None or to_dt is not None:
-            if months_offset is not None:
-                earlier = date_offset_foll(
-                    raw_date=self.last_idx,
-                    months_offset=-months_offset,
-                    adjust=False,
-                    following=True,
-                )
-                assert (
-                    earlier >= self.first_idx
-                ), "Function calc_range returned earlier date < series start"
-                later = self.last_idx
-            else:
-                if from_dt is not None and to_dt is None:
-                    assert (
-                        from_dt >= self.first_idx
-                    ), "Function calc_range returned earlier date < series start"
-                    earlier, later = from_dt, self.last_idx
-                elif from_dt is None and to_dt is not None:
-                    assert (
-                        to_dt <= self.last_idx
-                    ), "Function calc_range returned later date > series end"
-                    earlier, later = self.first_idx, to_dt
-                elif from_dt is not None and to_dt is not None:
-                    assert (
-                        to_dt <= self.last_idx and from_dt >= self.first_idx
-                    ), "Function calc_range returned dates outside series range"
-                    earlier, later = from_dt, to_dt
-            while earlier not in self.tsdf.index.tolist():
-                earlier -= dt.timedelta(days=1)
-            while later not in self.tsdf.index.tolist():
-                later += dt.timedelta(days=1)
-
-        return earlier, later
+        return get_calc_range(
+            data=self.tsdf, months_offset=months_offset, from_dt=from_dt, to_dt=to_dt
+        )
 
     def align_index_to_local_cdays(
         self: TypeOpenFrame, countries: CountriesType = "SE"
@@ -498,16 +457,7 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Compounded Annual Growth Rate (CAGR)
         """
-        if 0.0 in self.tsdf.iloc[0].tolist() or self.tsdf.lt(0.0).any().any():
-            raise ValueError(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
-            )
-        return Series(
-            data=(self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / self.yearfrac) - 1,
-            name="Geometric return",
-            dtype="float64",
-        )
+        return calc_geo_ret(data=self.tsdf)
 
     def geo_ret_func(
         self: TypeOpenFrame,
@@ -532,24 +482,11 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Compounded Annual Growth Rate (CAGR)
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-
-        if (
-            0.0 in self.tsdf.loc[earlier].tolist()
-            or self.tsdf.loc[[earlier, later]].lt(0.0).any().any()
-        ):
-            raise ValueError(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
-            )
-
-        fraction = (later - earlier).days / 365.25
-
-        return Series(
-            data=(self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1,
-            name="Subset Geometric return",
-            dtype="float64",
+        return calc_geo_ret(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -562,11 +499,7 @@ class OpenFrame(BaseModel):
             Annualized arithmetic mean of returns
         """
 
-        return Series(
-            data=self.tsdf.pct_change().mean() * self.periods_in_a_year,
-            name="Arithmetic return",
-            dtype="float64",
-        )
+        return calc_arithmetic_ret(data=self.tsdf)
 
     def arithmetic_ret_func(
         self: TypeOpenFrame,
@@ -594,23 +527,12 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Annualized arithmetic mean of returns
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            fraction = (later - earlier).days / 365.25
-            how_many = (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
-            )
-            time_factor = how_many / fraction
-        return Series(
-            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .mean()
-            * time_factor,
-            name="Subset Arithmetic return",
-            dtype="float64",
+        return calc_arithmetic_ret(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
     @property
@@ -621,17 +543,7 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Simple return
         """
-
-        if 0.0 in self.tsdf.iloc[0].tolist():
-            raise ValueError(
-                f"Error in function value_ret due to an initial value "
-                f"being zero. ({self.tsdf.head(3)})"
-            )
-        return Series(
-            data=self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1,
-            name="Total return",
-            dtype="float64",
-        )
+        return calc_value_ret(data=self.tsdf)
 
     def value_ret_func(
         self: TypeOpenFrame,
@@ -655,17 +567,11 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Simple return
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if 0.0 in self.tsdf.iloc[0].tolist():
-            raise ValueError(
-                f"Error in function value_ret due to an initial value "
-                f"being zero. ({self.tsdf.head(3)})"
-            )
-        return Series(
-            data=self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1,
-            name="Subset Total return",
-            dtype="float64",
+        return calc_value_ret(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     def value_ret_calendar_period(

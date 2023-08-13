@@ -23,8 +23,6 @@ from numpy import (
 )
 from numpy.typing import NDArray
 from dateutil.relativedelta import relativedelta
-from openpyxl import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
 from pandas import (
     concat,
     DataFrame,
@@ -41,6 +39,13 @@ from scipy.stats import kurtosis, norm, skew
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
 
+from openseries.common import (
+    calc_arithmetic_ret,
+    calc_geo_ret,
+    calc_value_ret,
+    get_calc_range,
+    save_to_xlsx,
+)
 from openseries.datefixer import date_offset_foll, date_fix, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
@@ -522,26 +527,12 @@ class OpenTimeSeries(BaseModel):
             The Excel file path
         """
 
-        if filename[-5:].lower() != ".xlsx":
-            raise NameError("Filename must end with .xlsx")
-        if directory:
-            sheetfile = path.join(directory, filename)
-        else:
-            script_path = path.abspath(__file__)
-            sheetfile = path.join(path.dirname(script_path), filename)
-
-        wrkbook = Workbook()
-        wrksheet = wrkbook.active
-
-        if sheet_title:
-            wrksheet.title = sheet_title
-
-        for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
-            wrksheet.append(row)
-
-        wrkbook.save(sheetfile)
-
-        return sheetfile
+        return save_to_xlsx(
+            data=self.tsdf,
+            filename=filename,
+            sheet_title=sheet_title,
+            directory=directory,
+        )
 
     def to_json(
         self: TypeOpenTimeSeries, filename: str, directory: Optional[str] = None
@@ -620,44 +611,9 @@ class OpenTimeSeries(BaseModel):
         (datetime.date, datetime.date)
             Start and end date of the chosen date range
         """
-        earlier, later = self.first_idx, self.last_idx
-        if months_offset is not None or from_dt is not None or to_dt is not None:
-            if months_offset is not None:
-                earlier = date_offset_foll(
-                    raw_date=self.last_idx,
-                    months_offset=-months_offset,
-                    adjust=False,
-                    following=True,
-                )
-                assert (
-                    earlier >= self.first_idx
-                ), "Function calc_range returned earlier date < series start"
-                later = self.last_idx
-            else:
-                if from_dt is not None and to_dt is None:
-                    assert (
-                        from_dt >= self.first_idx
-                    ), "Function calc_range returned earlier date < series start"
-                    earlier, later = from_dt, self.last_idx
-                elif from_dt is None and to_dt is not None:
-                    assert (
-                        to_dt <= self.last_idx
-                    ), "Function calc_range returned later date > series end"
-                    earlier, later = self.first_idx, to_dt
-                elif from_dt is not None or to_dt is not None:
-                    assert (
-                        cast(dt.date, to_dt) <= self.last_idx
-                        and cast(dt.date, from_dt) >= self.first_idx
-                    ), "Function calc_range returned dates outside series range"
-                    earlier, later = cast(dt.date, from_dt), cast(dt.date, to_dt)
-            if earlier is not None:
-                while earlier not in self.tsdf.index.tolist():
-                    earlier -= dt.timedelta(days=1)
-            if later is not None:
-                while later not in self.tsdf.index.tolist():
-                    later += dt.timedelta(days=1)
-
-        return earlier, later
+        return get_calc_range(
+            data=self.tsdf, months_offset=months_offset, from_dt=from_dt, to_dt=to_dt
+        )
 
     def align_index_to_local_cdays(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
@@ -788,24 +744,7 @@ class OpenTimeSeries(BaseModel):
         float
             Compounded Annual Growth Rate (CAGR)
         """
-
-        if (
-            self.tsdf.loc[self.first_idx, self.tsdf.columns.values[0]] == 0.0
-            or self.tsdf.lt(0.0).values.any()
-        ):
-            raise ValueError(
-                "Geometric return cannot be calculated due to an initial "
-                "value being zero or a negative value."
-            )
-        return cast(
-            float,
-            (
-                self.tsdf.loc[self.last_idx, self.tsdf.columns.values[0]]
-                / self.tsdf.loc[self.first_idx, self.tsdf.columns.values[0]]
-            )
-            ** (1 / self.yearfrac)
-            - 1,
-        )
+        return calc_geo_ret(data=self.tsdf)
 
     def geo_ret_func(
         self: TypeOpenTimeSeries,
@@ -831,28 +770,11 @@ class OpenTimeSeries(BaseModel):
             Compounded Annual Growth Rate (CAGR)
         """
 
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        fraction = (later - earlier).days / 365.25
-
-        if (
-            self.tsdf.loc[earlier, self.tsdf.columns.values[0]] == 0.0
-            or self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .lt(0.0)
-            .values.any()
-        ):
-            raise ValueError(
-                "Geometric return cannot be calculated due to an initial "
-                "value being zero or a negative value."
-            )
-
-        return cast(
-            float,
-            (
-                self.tsdf.loc[later, self.tsdf.columns.values[0]]
-                / self.tsdf.loc[earlier, self.tsdf.columns.values[0]]
-            )
-            ** (1 / fraction)
-            - 1,
+        return calc_geo_ret(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -865,7 +787,7 @@ class OpenTimeSeries(BaseModel):
             Annualized arithmetic mean of returns
         """
 
-        return float((self.tsdf.pct_change().mean() * self.periods_in_a_year).iloc[0])
+        return calc_arithmetic_ret(data=self.tsdf)
 
     def arithmetic_ret_func(
         self: TypeOpenTimeSeries,
@@ -894,24 +816,12 @@ class OpenTimeSeries(BaseModel):
         float
             Annualized arithmetic mean of returns
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
-            ].count()
-            time_factor = how_many / fraction
-        return cast(
-            float,
-            (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change()
-                .mean()
-                * time_factor
-            ).iloc[0],
+        return calc_arithmetic_ret(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
     @property
@@ -922,13 +832,7 @@ class OpenTimeSeries(BaseModel):
         float
             Simple return
         """
-
-        if self.tsdf.iloc[0, 0] == 0.0:
-            raise ValueError(
-                "Simple Return cannot be calculated due to an initial value being "
-                "zero."
-            )
-        return float((self.tsdf.iloc[-1] / self.tsdf.iloc[0] - 1).iloc[0])
+        return calc_value_ret(data=self.tsdf)
 
     def value_ret_func(
         self: TypeOpenTimeSeries,
@@ -952,14 +856,12 @@ class OpenTimeSeries(BaseModel):
         float
             Simple return
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if self.tsdf.loc[earlier, self.tsdf.columns.values[0]] == 0.0:
-            raise ValueError(
-                "Simple Return cannot be calculated due to an initial value being "
-                "zero."
-            )
-        return float((self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1).iloc[0])
+        return calc_value_ret(
+            data=self.tsdf,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+        )
 
     def value_ret_calendar_period(
         self: TypeOpenTimeSeries, year: int, month: Optional[int] = None

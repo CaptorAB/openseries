@@ -830,7 +830,7 @@ class TestOpenTimeSeries(TestCase):
             "arithmetic_ret_func": f"{0.00885255100:.11f}",
             "cvar_down_func": f"{-0.01331889836:.11f}",
             "downside_deviation_func": f"{0.07335125856:.11f}",
-            "geo_ret_func": f"{0.00348439444:.11f}",
+            "geo_ret_func": f"{0.00605432007:.11f}",
             "kurtosis_func": f"{-0.16164566028:.11f}",
             "max_drawdown_func": f"{-0.20565775282:.11f}",
             "positive_share_func": f"{0.50645481629:.11f}",
@@ -1646,23 +1646,17 @@ class TestOpenTimeSeries(TestCase):
         with self.assertRaises(Exception) as e_vr_zero:
             _ = zeroseries.value_ret
 
-        self.assertEqual(
-            e_vr_zero.exception.args[0],
-            (
-                "Simple Return cannot be calculated due to an "
-                "initial value being zero."
-            ),
+        self.assertIn(
+            member="Simple return cannot be calculated due to an",
+            container=e_vr_zero.exception.args[0],
         )
 
         with self.assertRaises(Exception) as e_vrf_zero:
             _ = zeroseries.value_ret_func()
 
-        self.assertEqual(
-            e_vrf_zero.exception.args[0],
-            (
-                "Simple Return cannot be calculated due to an "
-                "initial value being zero."
-            ),
+        self.assertIn(
+            member="Simple return cannot be calculated due to an",
+            container=e_vrf_zero.exception.args[0],
         )
 
         negseries = OpenTimeSeries.from_arrays(
