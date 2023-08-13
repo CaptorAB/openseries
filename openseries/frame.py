@@ -39,6 +39,7 @@ from openseries.common import (
     calc_arithmetic_ret,
     calc_geo_ret,
     calc_value_ret,
+    calc_value_ret_calendar_period,
     get_calc_range,
     save_to_xlsx,
 )
@@ -590,19 +591,7 @@ class OpenFrame(BaseModel):
         Pandas.Series
             Simple return for a specific calendar period
         """
-
-        if month is None:
-            period = str(year)
-        else:
-            period = "-".join([str(year), str(month).zfill(2)])
-        vrdf = self.tsdf.copy()
-        vrdf.index = DatetimeIndex(vrdf.index)
-        rtn = vrdf.pct_change().copy()
-        rtn = rtn.loc[period] + 1
-        rtn = rtn.apply(cumprod, axis="index").iloc[-1] - 1
-        rtn.name = period
-        rtn = rtn.astype("float64")
-        return rtn
+        return calc_value_ret_calendar_period(data=self.tsdf, year=year, month=month)
 
     @property
     def vol(self: TypeOpenFrame) -> Series:

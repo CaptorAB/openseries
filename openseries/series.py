@@ -43,6 +43,7 @@ from openseries.common import (
     calc_arithmetic_ret,
     calc_geo_ret,
     calc_value_ret,
+    calc_value_ret_calendar_period,
     get_calc_range,
     save_to_xlsx,
 )
@@ -879,16 +880,7 @@ class OpenTimeSeries(BaseModel):
         float
             Simple return for a specific calendar period
         """
-
-        caldf = self.tsdf.copy()
-        caldf.index = DatetimeIndex(caldf.index)
-        if month is None:
-            period = str(year)
-        else:
-            period = "-".join([str(year), str(month).zfill(2)])
-        rtn = caldf.copy().pct_change()
-        rtn = rtn.loc[period] + 1
-        return float((rtn.apply(cumprod, axis="index").iloc[-1] - 1).iloc[0])
+        return calc_value_ret_calendar_period(data=self.tsdf, year=year, month=month)
 
     @property
     def vol(self: TypeOpenTimeSeries) -> float:

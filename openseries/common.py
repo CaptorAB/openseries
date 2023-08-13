@@ -1,13 +1,13 @@
 """
 Defining the OpenTimeSeries class
 """
-from __future__ import annotations
 import datetime as dt
 from os import path
 from typing import cast, Optional, Tuple, Union
+from numpy import cumprod
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
-from pandas import DataFrame, Series
+from pandas import DataFrame, DatetimeIndex, Series
 
 from openseries.datefixer import date_offset_foll
 
@@ -269,3 +269,38 @@ def calc_value_ret(
         name="Simple return",
         dtype="float64",
     )
+
+
+def calc_value_ret_calendar_period(
+    data: DataFrame, year: int, month: Optional[int] = None
+) -> Union[float, Series]:
+    """
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        The timeseries data
+    year : int
+        Calendar year of the period to calculate.
+    month : int, optional
+        Calendar month of the period to calculate.
+
+    Returns
+    -------
+    Pandas.Series
+        Simple return for a specific calendar period
+    """
+
+    if month is None:
+        period = str(year)
+    else:
+        period = "-".join([str(year), str(month).zfill(2)])
+    vrdf = data.copy()
+    vrdf.index = DatetimeIndex(vrdf.index)
+    result = vrdf.pct_change().copy()
+    result = result.loc[period] + 1
+    result = result.apply(cumprod, axis="index").iloc[-1] - 1
+    result.name = period
+    result = result.astype("float64")
+    if data.shape[1] == 1:
+        return float(result.iloc[0])
+    return result
