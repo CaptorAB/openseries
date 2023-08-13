@@ -457,7 +457,6 @@ def calc_ret_vol_ratio(
                 :, riskfree_column
             ]
             riskfree_item = data.iloc[:, riskfree_column].name
-            riskfree_label = data.iloc[:, riskfree_column].name[0]
         else:
             raise ValueError("base_column argument should be an integer.")
 
@@ -470,20 +469,12 @@ def calc_ret_vol_ratio(
                 riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
                 vol = float(longdf.pct_change().std() * sqrt(time_factor))
                 ratios.append((ret - riskfree_ret) / vol)
-
-        if data.shape[1] == 1:
-            return ratios[0]
-        return Series(
-            data=ratios,
-            index=data.columns,
-            name=f"Sharpe Ratios vs {riskfree_label}",
-            dtype="float64",
-        )
-    for item in data:
-        longdf = data.loc[cast(int, earlier) : cast(int, later)].loc[:, item]
-        ret = float(longdf.pct_change().mean() * time_factor)
-        vol = float(longdf.pct_change().std() * sqrt(time_factor))
-        ratios.append((ret - riskfree_rate) / vol)
+    else:
+        for item in data:
+            longdf = data.loc[cast(int, earlier) : cast(int, later)].loc[:, item]
+            ret = float(longdf.pct_change().mean() * time_factor)
+            vol = float(longdf.pct_change().std() * sqrt(time_factor))
+            ratios.append((ret - riskfree_rate) / vol)
 
     if data.shape[1] == 1:
         return ratios[0]
@@ -597,7 +588,6 @@ def calc_sortino_ratio(
                 :, riskfree_column
             ]
             riskfree_item = data.iloc[:, riskfree_column].name
-            riskfree_label = data.iloc[:, riskfree_column].name[0]
         else:
             raise ValueError("base_column argument should be an integer.")
 
@@ -615,23 +605,16 @@ def calc_sortino_ratio(
                 )
                 ratios.append((ret - riskfree_ret) / downdev)
 
-        if data.shape[1] == 1:
-            return ratios[0]
-        return Series(
-            data=ratios,
-            index=data.columns,
-            name=f"Sortino Ratios vs {riskfree_label}",
-            dtype="float64",
-        )
-    for item in data:
-        longdf = data.loc[cast(int, earlier) : cast(int, later)].loc[:, item]
-        ret = float(longdf.pct_change().mean() * time_factor)
-        dddf = longdf.pct_change()
-        downdev = float(
-            sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-            * sqrt(time_factor)
-        )
-        ratios.append((ret - riskfree_rate) / downdev)
+    else:
+        for item in data:
+            longdf = data.loc[cast(int, earlier) : cast(int, later)].loc[:, item]
+            ret = float(longdf.pct_change().mean() * time_factor)
+            dddf = longdf.pct_change()
+            downdev = float(
+                sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
+                * sqrt(time_factor)
+            )
+            ratios.append((ret - riskfree_rate) / downdev)
 
     if data.shape[1] == 1:
         return ratios[0]
