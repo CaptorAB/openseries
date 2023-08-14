@@ -45,7 +45,6 @@ from openseries.common_calc import (
 )
 from openseries.common_props import CommonProps
 from openseries.common_tools import (
-    do_resample,
     do_resample_to_business_period_ends,
     get_calc_range,
 )
@@ -1444,9 +1443,15 @@ class OpenFrame(BaseModel, CommonProps):
             An OpenFrame object
         """
 
-        self.tsdf = do_resample(data=self.tsdf, freq=freq)
+        self.tsdf.index = DatetimeIndex(self.tsdf.index)
+        self.tsdf = self.tsdf.resample(freq).last()
+        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
         for xerie in self.constituents:
-            xerie.tsdf = do_resample(data=xerie.tsdf, freq=freq)
+            xerie.tsdf.index = DatetimeIndex(xerie.tsdf.index)
+            xerie.tsdf = xerie.tsdf.resample(freq).last()
+            xerie.tsdf.index = [
+                dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)
+            ]
 
         return self
 

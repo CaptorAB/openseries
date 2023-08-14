@@ -4,7 +4,7 @@ Defining common tool functions
 from __future__ import annotations
 
 import datetime as dt
-from typing import Optional, Tuple, Union, Any, cast
+from typing import Optional, Tuple, Any, cast
 from dateutil.relativedelta import relativedelta
 from numpy import isnan
 from pandas import concat, DataFrame, DatetimeIndex, Series
@@ -15,28 +15,6 @@ from openseries.types import (
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
 )
-
-
-def do_resample(data: DataFrame, freq: Union[LiteralBizDayFreq, str]) -> DataFrame:
-    """Resamples timeseries data to a new frequency
-
-    Parameters
-    ----------
-    data: pandas.DataFrame
-        The timeseries data
-    freq: Union[LiteralBizDayFreq, str], default "BM"
-        The date offset string that sets the resampled frequency
-        Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
-
-    Returns
-    -------
-    pandas.DataFrame
-        The resampled data
-    """
-    data.index = DatetimeIndex(data.index)
-    data = data.resample(freq).last()
-    data.index = [d.date() for d in DatetimeIndex(data.index)]
-    return data
 
 
 def do_resample_to_business_period_ends(

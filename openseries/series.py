@@ -47,7 +47,6 @@ from openseries.common_calc import (
 )
 from openseries.common_props import CommonProps
 from openseries.common_tools import (
-    do_resample,
     do_resample_to_business_period_ends,
     get_calc_range,
     check_if_none,
@@ -1543,7 +1542,9 @@ class OpenTimeSeries(BaseModel, CommonProps):
             An OpenTimeSeries object
         """
 
-        self.tsdf = do_resample(data=self.tsdf, freq=freq)
+        self.tsdf.index = DatetimeIndex(self.tsdf.index)
+        self.tsdf = self.tsdf.resample(freq).last()
+        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
         return self
 
     def resample_to_business_period_ends(
