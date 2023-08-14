@@ -6,9 +6,10 @@ from typing import cast, Optional, Union
 from math import ceil
 from numpy import cumprod, sqrt
 from pandas import DataFrame, DatetimeIndex, Series
-from scipy.stats import kurtosis, skew
+from scipy.stats import kurtosis, norm, skew
 
 from openseries.common_tools import get_calc_range
+from openseries.types import LiteralQuantileInterp
 
 
 def calc_arithmetic_ret(
@@ -622,6 +623,100 @@ def calc_sortino_ratio(
         data=ratios,
         index=data.columns,
         name="Sortino ratio",
+        dtype="float64",
+    )
+
+
+def calc_var_implied_vol_and_target(
+    data: DataFrame,
+    level: float,
+    target_vol: Optional[float] = None,
+    min_leverage_local: float = 0.0,
+    max_leverage_local: float = 99999.0,
+    months_from_last: Optional[int] = None,
+    from_date: Optional[dt.date] = None,
+    to_date: Optional[dt.date] = None,
+    interpolation: LiteralQuantileInterp = "lower",
+    drift_adjust: bool = False,
+    periods_in_a_year_fixed: Optional[int] = None,
+) -> Union[float, Series]:
+    """A position weight multiplier from the ratio between a VaR implied
+    volatility and a given target volatility. Multiplier = 1.0 -> target met
+
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        The timeseries data
+    level: float
+        The sought VaR level
+    target_vol: Optional[float]
+        Target Volatility
+    min_leverage_local: float, default: 0.0
+        A minimum adjustment factor
+    max_leverage_local: float, default: 99999.0
+        A maximum adjustment factor
+    months_from_last : int, optional
+        number of months offset as positive integer. Overrides use of from_date
+        and to_date
+    from_date : datetime.date, optional
+        Specific from date
+    to_date : datetime.date, optional
+        Specific to date
+    interpolation: LiteralQuantileInterp, default: "lower"
+        type of interpolation in Pandas.DataFrame.quantile() function.
+    drift_adjust: bool, default: False
+        An adjustment to remove the bias implied by the average return
+    periods_in_a_year_fixed : int, optional
+        Allows locking the periods-in-a-year to simplify test cases and
+        comparisons
+
+    Returns
+    -------
+    Union[float, Pandas.Series]
+        A position weight multiplier from the ratio between a VaR implied
+        volatility and a given target volatility. Multiplier = 1.0 -> target met
+    """
+    earlier, later = get_calc_range(
+        data=data, months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+    )
+    if periods_in_a_year_fixed:
+        time_factor = float(periods_in_a_year_fixed)
+    else:
+        fraction = (later - earlier).days / 365.25
+        how_many = data.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
+        time_factor = how_many / fraction
+    if drift_adjust:
+        imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
+            data.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .quantile(1 - level, interpolation=interpolation)
+            - data.loc[cast(int, earlier) : cast(int, later)].pct_change().sum()
+            / len(data.loc[cast(int, earlier) : cast(int, later)].pct_change())
+        )
+    else:
+        imp_vol = (
+            -sqrt(time_factor)
+            * data.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .quantile(1 - level, interpolation=interpolation)
+            / norm.ppf(level)
+        )
+
+    if target_vol:
+        result = imp_vol.apply(
+            lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local))
+        )
+        label = "Weight from target vol"
+    else:
+        result = imp_vol
+        label = "Imp vol from VaR"
+
+    if data.shape[1] == 1:
+        return float(result.iloc[0])
+    return Series(
+        data=result,
+        index=data.columns,
+        name=label,
         dtype="float64",
     )
 

@@ -9,7 +9,8 @@ from unittest import TestCase
 from pandas import DataFrame, date_range
 
 from openseries.frame import OpenFrame
-from openseries.series import OpenTimeSeries, ValueType
+from openseries.series import OpenTimeSeries
+from openseries.types import ValueType
 from openseries.simulation import ReturnSimulation, ModelParameters
 
 TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")

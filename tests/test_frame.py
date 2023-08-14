@@ -14,12 +14,12 @@ from pandas.testing import assert_frame_equal
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down, var_down
-from openseries.series import OpenTimeSeries, ValueType
+from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation
 from openseries.types import (
-    LiteralNanMethod,
     LiteralFrameProps,
     LiteralPortfolioWeightings,
+    ValueType,
 )
 
 TypeTestOpenFrame = TypeVar("TypeTestOpenFrame", bound="TestOpenFrame")
@@ -492,10 +492,10 @@ class TestOpenFrame(TestCase):
             "max_drawdown_func",
             "positive_share_func",
             "skew_func",
+            "vol_from_var_func",
             "target_weight_from_var",
             "value_ret_func",
             "var_down_func",
-            "vol_from_var_func",
             "vol_func",
             "worst_func",
             "z_score_func",
@@ -1891,15 +1891,6 @@ class TestOpenFrame(TestCase):
             [2.1, 2.0, 1.8, 1.8, 2.0], fillframe.tsdf.iloc[:, 1].tolist()
         )
 
-        with self.assertRaises(AssertionError) as e_methd:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanframe.value_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_methd.exception.args[0],
-            "Method must be either fill or drop passed as string.",
-        )
-
     def test_return_nan_handle(self: TestOpenFrame) -> None:
         """Test return_nan_handle method"""
         nanframe = OpenFrame(
@@ -1944,15 +1935,6 @@ class TestOpenFrame(TestCase):
         )
         self.assertListEqual(
             [0.01, 0.04, 0.02, 0.0, 0.06], fillframe.tsdf.iloc[:, 1].tolist()
-        )
-
-        with self.assertRaises(AssertionError) as e_methd:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanframe.return_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_methd.exception.args[0],
-            "Method must be either fill or drop passed as string.",
         )
 
     def test_relative(self: TestOpenFrame) -> None:

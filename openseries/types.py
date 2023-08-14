@@ -1,6 +1,9 @@
 """
 Declaring types used throughout the project
 """
+from __future__ import annotations
+
+from enum import Enum
 from typing import Annotated, Literal, List, Union
 from pydantic import confloat, conint, conlist, constr, StringConstraints
 
@@ -224,3 +227,19 @@ class OpenFramePropertiesList(List[str]):
             if item in seen:
                 raise ValueError(f"Duplicate string: {item}")
             seen.add(item)
+
+
+class ValueType(str, Enum):
+    """Class defining the different timeseries types within the project"""
+
+    EWMA = "EWMA"
+    PRICE = "Price(Close)"
+    RTRN = "Return(Total)"
+    RELRTRN = "Relative return"
+    ROLLBETA = "Beta"
+    ROLLCORR = "Rolling correlation"
+    ROLLCVAR = "Rolling CVaR"
+    ROLLINFORATIO = "Information Ratio"
+    ROLLRTRN = "Rolling returns"
+    ROLLVAR = "Rolling VaR"
+    ROLLVOL = "Rolling volatility"

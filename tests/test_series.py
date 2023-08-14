@@ -14,11 +14,10 @@ from pydantic import ValidationError as PydanticValidationError
 import pytest
 
 from openseries.simulation import ReturnSimulation
-from openseries.types import CountriesType, LiteralNanMethod, LiteralSeriesProps
+from openseries.types import CountriesType, LiteralSeriesProps, ValueType
 from openseries.series import (
     OpenTimeSeries,
     timeseries_chain,
-    ValueType,
     check_if_none,
 )
 
@@ -1714,15 +1713,6 @@ class TestOpenTimeSeries(TestCase):
             [1.1, 1.0, 1.0, 1.1, 1.0], fillseries.tsdf.iloc[:, 0].tolist()
         )
 
-        with self.assertRaises(AssertionError) as e_method:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanseries.value_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_method.exception.args[0],
-            "Method must be either fill or drop passed as string.",
-        )
-
     def test_return_nan_handle(self: TestOpenTimeSeries) -> None:
         """Test return_nan_handle method"""
         nanseries = OpenTimeSeries.from_arrays(
@@ -1748,15 +1738,6 @@ class TestOpenTimeSeries(TestCase):
         fillseries.return_nan_handle(method="fill")
         self.assertListEqual(
             [0.1, 0.05, 0.0, 0.01, 0.04], fillseries.tsdf.iloc[:, 0].tolist()
-        )
-
-        with self.assertRaises(AssertionError) as e_method:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanseries.return_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_method.exception.args[0],
-            "Method must be either fill or drop passed as string.",
         )
 
     def test_miscellaneous(self: TestOpenTimeSeries) -> None:

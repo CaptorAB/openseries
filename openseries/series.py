@@ -4,10 +4,8 @@ Defining the OpenTimeSeries class
 from __future__ import annotations
 from copy import deepcopy
 import datetime as dt
-from enum import Enum
 from json import dump
 from os import path
-from pathlib import Path
 from re import compile as re_compile
 from typing import Any, cast, Dict, List, Optional, Tuple, Type, TypeVar, Union
 from numpy import (
@@ -29,9 +27,7 @@ from pandas import (
     Series,
 )
 from plotly.graph_objs import Figure
-from plotly.offline import plot
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
-from scipy.stats import norm
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
 
@@ -49,19 +45,21 @@ from openseries.common_calc import (
     calc_sortino_ratio,
     calc_value_ret,
     calc_value_ret_calendar_period,
+    calc_var_implied_vol_and_target,
 )
 from openseries.common_props import CommonProps
 from openseries.common_tools import (
     do_resample,
     do_resample_to_business_period_ends,
     get_calc_range,
+    make_plot_bars,
+    make_plot_series,
     save_to_xlsx,
 )
 from openseries.datefixer import (
     date_fix,
     align_dataframe_to_local_cdays,
 )
-from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
     CountriesType,
     CurrencyStringType,
@@ -72,17 +70,16 @@ from openseries.types import (
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
     LiteralPandasReindexMethod,
-    LiteralNanMethod,
     LiteralLinePlotMode,
     LiteralBarPlotMode,
     LiteralPlotlyOutput,
     LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
+    ValueType,
 )
 from openseries.risk import (
     cvar_down,
     var_down,
-    drawdown_series,
     drawdown_details,
 )
 
@@ -137,22 +134,6 @@ def ewma_calc(
     )
 
 
-class ValueType(str, Enum):
-    """Class defining the different timeseries types within the project"""
-
-    EWMA = "EWMA"
-    PRICE = "Price(Close)"
-    RTRN = "Return(Total)"
-    RELRTRN = "Relative return"
-    ROLLBETA = "Beta"
-    ROLLCORR = "Rolling correlation"
-    ROLLCVAR = "Rolling CVaR"
-    ROLLINFORATIO = "Information Ratio"
-    ROLLRTRN = "Rolling returns"
-    ROLLVAR = "Rolling VaR"
-    ROLLVOL = "Rolling volatility"
-
-
 class OpenTimeSeries(BaseModel, CommonProps):
     """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
 
@@ -164,7 +145,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         Database identifier of the instrument associated with the timeseries
     name : str
         string identifier of the timeseries and/or instrument
-    valuetype : ValueType
+    valuetype : openseries.types.ValueType
         Identifies if the series is a series of values or returns
     dates : DateListType
         Dates of the individual timeseries items
@@ -1476,13 +1457,10 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        return cast(
-            float,
-            (
-                -sqrt(self.periods_in_a_year)
-                * self.var_down_func(level, interpolation=interpolation)
-                / norm.ppf(level)
-            ),
+        return calc_var_implied_vol_and_target(
+            data=self.tsdf,
+            level=level,
+            interpolation=interpolation,
         )
 
     def vol_from_var_func(
@@ -1522,58 +1500,23 @@ class OpenTimeSeries(BaseModel, CommonProps):
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
-            ].count()
-            time_factor = how_many / fraction
-        if drift_adjust:
-            return cast(
-                float,
-                (
-                    (-sqrt(time_factor) / norm.ppf(level))
-                    * (
-                        self.var_down_func(
-                            level,
-                            months_from_last,
-                            from_date,
-                            to_date,
-                            interpolation,
-                        )
-                        - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                        .pct_change()
-                        .sum()
-                        / len(
-                            self.tsdf.loc[
-                                cast(int, earlier) : cast(int, later)
-                            ].pct_change()
-                        )
-                    )
-                ).iloc[0],
-            )
-
-        return cast(
-            float,
-            (
-                -sqrt(time_factor)
-                * self.var_down_func(
-                    level, months_from_last, from_date, to_date, interpolation
-                )
-                / norm.ppf(level)
-            ),
+        return calc_var_implied_vol_and_target(
+            data=self.tsdf,
+            level=level,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            interpolation=interpolation,
+            drift_adjust=drift_adjust,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
     def target_weight_from_var(
         self: TypeOpenTimeSeries,
         target_vol: float = 0.175,
+        level: float = 0.95,
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
-        level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1588,12 +1531,12 @@ class OpenTimeSeries(BaseModel, CommonProps):
         ----------
         target_vol: float, default: 0.175
             Target Volatility
+        level: float, default: 0.95
+            The sought VaR level
         min_leverage_local: float, default: 0.0
             A minimum adjustment factor
         max_leverage_local: float, default: 99999.0
             A maximum adjustment factor
-        level: float, default: 0.95
-            The sought VaR level
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -1615,22 +1558,18 @@ class OpenTimeSeries(BaseModel, CommonProps):
             A position weight multiplier from the ratio between a VaR implied
             volatility and a given target volatility. Multiplier = 1.0 -> target met
         """
-
-        return max(
-            min_leverage_local,
-            min(
-                target_vol
-                / self.vol_from_var_func(
-                    level=level,
-                    months_from_last=months_from_last,
-                    from_date=from_date,
-                    to_date=to_date,
-                    interpolation=interpolation,
-                    drift_adjust=drift_adjust,
-                    periods_in_a_year_fixed=periods_in_a_year_fixed,
-                ),
-                max_leverage_local,
-            ),
+        return calc_var_implied_vol_and_target(
+            data=self.tsdf,
+            target_vol=target_vol,
+            level=level,
+            min_leverage_local=min_leverage_local,
+            max_leverage_local=max_leverage_local,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            interpolation=interpolation,
+            drift_adjust=drift_adjust,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
     def value_to_ret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
@@ -1671,7 +1610,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         return self
 
     def value_to_log(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
-        """Converts a valueseries into logarithmic return series \n
+        """Converts a valueseries into logarithmic weighted series \n
         Equivalent to LN(value[t] / value[t=0]) in MS Excel
 
         Returns
@@ -1790,20 +1729,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
             convention=convention,
         )
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
-        return self
-
-    def to_drawdown_series(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
-        """Converts the timeseries into a drawdown series
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-
-        self.tsdf = drawdown_series(self.tsdf)
-        self.tsdf.columns = [[self.label], ["Drawdowns"]]
-
         return self
 
     def drawdown_details(self: TypeOpenTimeSeries) -> DataFrame:
@@ -2003,58 +1928,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
 
         return vardf
 
-    def value_nan_handle(
-        self: TypeOpenTimeSeries, method: LiteralNanMethod = "fill"
-    ) -> TypeOpenTimeSeries:
-        """Handling of missing values in a valueseries
-
-        Parameters
-        ----------
-        method: LiteralNanMethod, default: "fill"
-            Method used to handle NaN. Either fill with last known or drop
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-
-        assert method in [
-            "fill",
-            "drop",
-        ], "Method must be either fill or drop passed as string."
-        if method == "fill":
-            self.tsdf.fillna(method="ffill", inplace=True)
-        else:
-            self.tsdf.dropna(inplace=True)
-        return self
-
-    def return_nan_handle(
-        self: TypeOpenTimeSeries, method: LiteralNanMethod = "fill"
-    ) -> TypeOpenTimeSeries:
-        """Handling of missing values in a returnseries
-
-        Parameters
-        ----------
-        method: LiteralNanMethod, default: "fill"
-            Method used to handle NaN. Either fill with zero or drop
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-
-        assert method in [
-            "fill",
-            "drop",
-        ], "Method must be either fill or drop passed as string."
-        if method == "fill":
-            self.tsdf.fillna(value=0.0, inplace=True)
-        else:
-            self.tsdf.dropna(inplace=True)
-        return self
-
     def running_adjustment(
         self: TypeOpenTimeSeries, adjustment: float, days_in_year: int = 365
     ) -> TypeOpenTimeSeries:
@@ -2181,9 +2054,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         (plotly.go.Figure, str)
             Plotly Figure and html filename with location
         """
-
-        if not directory:
-            directory = path.join(str(Path.home()), "Documents")
         filename = (
             cast(str, self.label)
             .replace("/", "")
@@ -2191,53 +2061,19 @@ class OpenTimeSeries(BaseModel, CommonProps):
             .replace(" ", "")
             .upper()
         )
-        plotfile = path.join(path.abspath(directory), f"{filename}.html")
+        filename = f"{filename}.html"
 
-        fig, logo = load_plotly_dict()
-        figure = Figure(fig)
-        figure.add_scatter(
-            x=self.tsdf.index,
-            y=self.tsdf.iloc[:, 0],
+        return make_plot_series(
+            data=self.tsdf,
             mode=mode,
-            line={"width": 2.5, "dash": "solid"},
-            hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-            showlegend=True,
-            name=self.label,
-        )
-        figure.update_layout(yaxis={"tickformat": tick_fmt})
-
-        if add_logo:
-            figure.add_layout_image(logo)
-
-        if show_last is True:
-            if tick_fmt:
-                txt = f"Last {{:{tick_fmt}}}"
-            else:
-                txt = "Last {}"
-
-            figure.add_scatter(
-                x=[self.last_idx],
-                y=[self.tsdf.iloc[-1, 0]],
-                mode="markers + text",
-                marker={"color": "red", "size": 12},
-                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-                showlegend=False,
-                name=self.label,
-                text=[txt.format(self.tsdf.iloc[-1, 0])],
-                textposition="top center",
-            )
-
-        plot(
-            figure,
-            filename=plotfile,
+            tick_fmt=tick_fmt,
+            filename=filename,
+            directory=directory,
             auto_open=auto_open,
-            link_text="",
-            include_plotlyjs="cdn",
-            config=fig["config"],
+            add_logo=add_logo,
+            show_last=show_last,
             output_type=output_type,
         )
-
-        return figure, plotfile
 
     def plot_bars(
         self: TypeOpenTimeSeries,
@@ -2270,8 +2106,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         (plotly.go.Figure, str)
             Plotly Figure and html filename with location
         """
-        if not directory:
-            directory = path.join(str(Path.home()), "Documents")
         filename = (
             cast(str, self.label)
             .replace("/", "")
@@ -2279,32 +2113,18 @@ class OpenTimeSeries(BaseModel, CommonProps):
             .replace(" ", "")
             .upper()
         )
-        plotfile = path.join(path.abspath(directory), f"{filename}.html")
+        filename = f"{filename}.html"
 
-        fig, logo = load_plotly_dict()
-        figure = Figure(fig)
-        figure.add_bar(
-            x=self.tsdf.index,
-            y=self.tsdf.iloc[:, 0],
-            hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-            name=self.label,
-        )
-        figure.update_layout(barmode=mode, yaxis={"tickformat": tick_fmt})
-
-        if add_logo:
-            figure.add_layout_image(logo)
-
-        plot(
-            figure,
-            filename=plotfile,
+        return make_plot_bars(
+            data=self.tsdf,
+            mode=mode,
+            tick_fmt=tick_fmt,
+            filename=filename,
+            directory=directory,
             auto_open=auto_open,
-            link_text="",
-            include_plotlyjs="cdn",
-            config=fig["config"],
+            add_logo=add_logo,
             output_type=output_type,
         )
-
-        return figure, plotfile
 
 
 def timeseries_chain(

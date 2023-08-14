@@ -38,13 +38,13 @@ from pandas import concat, DataFrame
 from pydantic import BaseModel
 
 from openseries.datefixer import generate_calender_date_range
-from openseries.series import ValueType
 from openseries.types import (
     CountriesType,
     DaysInYearType,
     SimCountType,
     TradingDaysType,
     VolatilityType,
+    ValueType,
 )
 
 TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")

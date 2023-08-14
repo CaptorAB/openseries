@@ -6,10 +6,6 @@ from copy import deepcopy
 import datetime as dt
 from functools import reduce
 from logging import warning
-from os import path
-from pathlib import Path
-from random import choices
-from string import ascii_letters
 from typing import cast, Dict, List, Optional, Tuple, TypeVar, Union
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt
@@ -23,9 +19,7 @@ from pandas import (
     Series,
 )
 from plotly.graph_objs import Figure
-from plotly.offline import plot
 from pydantic import BaseModel, ConfigDict, field_validator
-from scipy.stats import norm
 import statsmodels.api as sm
 
 # noinspection PyProtectedMember
@@ -45,17 +39,19 @@ from openseries.common_calc import (
     calc_sortino_ratio,
     calc_value_ret,
     calc_value_ret_calendar_period,
+    calc_var_implied_vol_and_target,
 )
 from openseries.common_props import CommonProps
 from openseries.common_tools import (
     do_resample,
     do_resample_to_business_period_ends,
     get_calc_range,
+    make_plot_bars,
+    make_plot_series,
     save_to_xlsx,
 )
-from openseries.series import OpenTimeSeries, ValueType, ewma_calc
+from openseries.series import OpenTimeSeries, ewma_calc
 from openseries.datefixer import align_dataframe_to_local_cdays
-from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
     CountriesType,
     LiteralHowMerge,
@@ -63,7 +59,6 @@ from openseries.types import (
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
     LiteralPandasReindexMethod,
-    LiteralNanMethod,
     LiteralCaptureRatio,
     LiteralLinePlotMode,
     LiteralBarPlotMode,
@@ -75,9 +70,9 @@ from openseries.types import (
     LiteralCovMethod,
     LiteralRiskParityMethod,
     OpenFramePropertiesList,
+    ValueType,
 )
 from openseries.risk import (
-    drawdown_series,
     drawdown_details,
     cvar_down,
     var_down,
@@ -1306,14 +1301,16 @@ class OpenFrame(BaseModel, CommonProps):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        imp_vol = (
-            -sqrt(self.periods_in_a_year)
-            * self.var_down_func(interpolation=interpolation)
-            / norm.ppf(level)
+        imp_vol = cast(
+            Series,
+            calc_var_implied_vol_and_target(
+                data=self.tsdf,
+                level=level,
+                interpolation=interpolation,
+            ),
         )
-        return Series(
-            data=imp_vol, name=f"Imp vol from VaR {level:.0%}", dtype="float64"
-        )
+        imp_vol.name = f"Imp vol from VaR {level:.0%}"
+        return imp_vol
 
     def vol_from_var_func(
         self: TypeOpenFrame,
@@ -1352,46 +1349,23 @@ class OpenFrame(BaseModel, CommonProps):
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            fraction = (later - earlier).days / 365.25
-            how_many = (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
-            )
-            time_factor = how_many / fraction
-        if drift_adjust:
-            imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change()
-                .quantile(1 - level, interpolation=interpolation)
-                - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change()
-                .sum()
-                / len(
-                    self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()
-                )
-            )
-        else:
-            imp_vol = (
-                -sqrt(time_factor)
-                * self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change()
-                .quantile(1 - level, interpolation=interpolation)
-                / norm.ppf(level)
-            )
-        return Series(
-            data=imp_vol, name=f"Subset Imp vol from VaR {level:.0%}", dtype="float64"
+        return calc_var_implied_vol_and_target(
+            data=self.tsdf,
+            level=level,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            interpolation=interpolation,
+            drift_adjust=drift_adjust,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
     def target_weight_from_var(
         self: TypeOpenFrame,
         target_vol: float = 0.175,
+        level: float = 0.95,
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
-        level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1406,12 +1380,12 @@ class OpenFrame(BaseModel, CommonProps):
         ----------
         target_vol: float, default: 0.175
             Target Volatility
+        level: float, default: 0.95
+            The sought VaR level
         min_leverage_local: float, default: 0.0
             A minimum adjustment factor
         max_leverage_local: float, default: 99999.0
             A maximum adjustment factor
-        level: float, default: 0.95
-            The sought VaR level
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -1433,21 +1407,18 @@ class OpenFrame(BaseModel, CommonProps):
             A position weight multiplier from the ratio between a VaR implied
             volatility and a given target volatility. Multiplier = 1.0 -> target met
         """
-
-        vfv = self.vol_from_var_func(
+        return calc_var_implied_vol_and_target(
+            data=self.tsdf,
+            target_vol=target_vol,
             level=level,
+            min_leverage_local=min_leverage_local,
+            max_leverage_local=max_leverage_local,
             months_from_last=months_from_last,
             from_date=from_date,
             to_date=to_date,
             interpolation=interpolation,
             drift_adjust=drift_adjust,
             periods_in_a_year_fixed=periods_in_a_year_fixed,
-        )
-        vfv = vfv.apply(
-            lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local))
-        )
-        return Series(
-            data=vfv, name=f"Weight from target vol {target_vol:.1%}", dtype="float64"
         )
 
     def value_to_ret(self: TypeOpenFrame) -> TypeOpenFrame:
@@ -1488,7 +1459,7 @@ class OpenFrame(BaseModel, CommonProps):
         return self
 
     def value_to_log(self: TypeOpenFrame) -> TypeOpenFrame:
-        """Converts a valueseries into logarithmic return series \n
+        """Converts a valueseries into logarithmic weighted series \n
         Equivalent to LN(value[t] / value[t=0]) in MS Excel
 
         Returns
@@ -1587,19 +1558,6 @@ class OpenFrame(BaseModel, CommonProps):
             xerie.tsdf = xerie.tsdf.reindex(
                 [deyt.date() for deyt in dates], method=method
             )
-        return self
-
-    def to_drawdown_series(self: TypeOpenFrame) -> TypeOpenFrame:
-        """Converts the timeseries into a drawdown series
-
-        Returns
-        -------
-        OpenFrame
-            An OpenFrame object
-        """
-
-        for serie in self.tsdf:
-            self.tsdf.loc[:, serie] = drawdown_series(self.tsdf.loc[:, serie])
         return self
 
     def drawdown_details(self: TypeOpenFrame, min_periods: int = 1) -> DataFrame:
@@ -1882,58 +1840,6 @@ class OpenFrame(BaseModel, CommonProps):
         vardf.columns = [[var_label], ["Rolling VaR"]]
 
         return vardf
-
-    def value_nan_handle(
-        self: TypeOpenFrame, method: LiteralNanMethod = "fill"
-    ) -> TypeOpenFrame:
-        """Handling of missing values in a valueseries
-
-        Parameters
-        ----------
-        method: LiteralNanMethod, default: "fill"
-            Method used to handle NaN. Either fill with last known or drop
-
-        Returns
-        -------
-        OpenFrame
-            An OpenFrame object
-        """
-
-        assert method in [
-            "fill",
-            "drop",
-        ], "Method must be either fill or drop passed as string."
-        if method == "fill":
-            self.tsdf.fillna(method="pad", inplace=True)
-        else:
-            self.tsdf.dropna(inplace=True)
-        return self
-
-    def return_nan_handle(
-        self: TypeOpenFrame, method: LiteralNanMethod = "fill"
-    ) -> TypeOpenFrame:
-        """Handling of missing values in a returnseries
-
-        Parameters
-        ----------
-        method: LiteralNanMethod, default: "fill"
-            Method used to handle NaN. Either fill with zero or drop
-
-        Returns
-        -------
-        OpenFrame
-            An OpenFrame object
-        """
-
-        assert method in [
-            "fill",
-            "drop",
-        ], "Method must be either fill or drop passed as string."
-        if method == "fill":
-            self.tsdf.fillna(value=0.0, inplace=True)
-        else:
-            self.tsdf.dropna(inplace=True)
-        return self
 
     @property
     def correl_matrix(self: TypeOpenFrame) -> DataFrame:
@@ -2807,65 +2713,18 @@ class OpenFrame(BaseModel, CommonProps):
         (plotly.go.Figure, str)
             Plotly Figure and html filename with location
         """
-
-        if labels:
-            assert (
-                len(labels) == self.item_count
-            ), "Must provide same number of labels as items in frame."
-        else:
-            labels = self.columns_lvl_zero
-        if not directory:
-            directory = path.join(str(Path.home()), "Documents")
-        if not filename:
-            filename = "".join(choices(ascii_letters, k=6)) + ".html"
-        plotfile = path.join(path.abspath(directory), filename)
-
-        fig, logo = load_plotly_dict()
-        figure = Figure(fig)
-        for item in range(self.item_count):
-            figure.add_scatter(
-                x=self.tsdf.index,
-                y=self.tsdf.iloc[:, item],
-                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-                line={"width": 2.5, "dash": "solid"},
-                mode=mode,
-                name=labels[item],
-            )
-        figure.update_layout(yaxis={"tickformat": tick_fmt})
-
-        if add_logo:
-            figure.add_layout_image(logo)
-
-        if show_last is True:
-            if tick_fmt:
-                txt = f"Last {{:{tick_fmt}}}"
-            else:
-                txt = "Last {}"
-
-            for item in range(self.item_count):
-                figure.add_scatter(
-                    x=[self.tsdf.iloc[:, item].index[-1]],
-                    y=[self.tsdf.iloc[-1, item]],
-                    mode="markers + text",
-                    marker={"color": "red", "size": 12},
-                    hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-                    showlegend=False,
-                    name=labels[item],
-                    text=[txt.format(self.tsdf.iloc[-1, item])],
-                    textposition="top center",
-                )
-
-        plot(
-            figure,
-            filename=plotfile,
+        return make_plot_series(
+            data=self.tsdf,
+            mode=mode,
+            tick_fmt=tick_fmt,
+            filename=filename,
+            directory=directory,
+            labels=labels,
             auto_open=auto_open,
-            link_text="",
-            include_plotlyjs="cdn",
-            config=fig["config"],
+            add_logo=add_logo,
+            show_last=show_last,
             output_type=output_type,
         )
-
-        return figure, plotfile
 
     def plot_bars(
         self: TypeOpenFrame,
@@ -2904,46 +2763,14 @@ class OpenFrame(BaseModel, CommonProps):
         (plotly.go.Figure, str)
             Plotly Figure and html filename with location
         """
-        if labels:
-            assert (
-                len(labels) == self.item_count
-            ), "Must provide same number of labels as items in frame."
-        else:
-            labels = self.columns_lvl_zero
-        if not directory:
-            directory = path.join(str(Path.home()), "Documents")
-        if not filename:
-            filename = "".join(choices(ascii_letters, k=6)) + ".html"
-        plotfile = path.join(path.abspath(directory), filename)
-
-        if mode == "overlay":
-            opacity = 0.7
-        else:
-            opacity = None
-
-        fig, logo = load_plotly_dict()
-        figure = Figure(fig)
-        for item in range(self.item_count):
-            figure.add_bar(
-                x=self.tsdf.index,
-                y=self.tsdf.iloc[:, item],
-                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
-                name=labels[item],
-                opacity=opacity,
-            )
-        figure.update_layout(barmode=mode, yaxis={"tickformat": tick_fmt})
-
-        if add_logo:
-            figure.add_layout_image(logo)
-
-        plot(
-            figure,
-            filename=plotfile,
+        return make_plot_bars(
+            data=self.tsdf,
+            mode=mode,
+            tick_fmt=tick_fmt,
+            filename=filename,
+            directory=directory,
+            labels=labels,
             auto_open=auto_open,
-            link_text="",
-            include_plotlyjs="cdn",
-            config=fig["config"],
+            add_logo=add_logo,
             output_type=output_type,
         )
-
-        return figure, plotfile
