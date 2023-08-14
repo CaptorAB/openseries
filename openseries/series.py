@@ -4,19 +4,15 @@ Defining the OpenTimeSeries class
 from __future__ import annotations
 from copy import deepcopy
 import datetime as dt
-from json import dump
-from os import path
 from re import compile as re_compile
-from typing import Any, cast, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import cast, List, Optional, Tuple, Type, Union, TypeVar
 from numpy import (
     array,
     cumprod,
     float64,
     insert,
-    isnan,
     log,
     sqrt,
-    square,
 )
 from numpy.typing import NDArray
 from pandas import (
@@ -26,7 +22,6 @@ from pandas import (
     MultiIndex,
     Series,
 )
-from plotly.graph_objs import Figure
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
@@ -45,16 +40,17 @@ from openseries.common_calc import (
     calc_sortino_ratio,
     calc_value_ret,
     calc_value_ret_calendar_period,
+    calc_var_down,
     calc_var_implied_vol_and_target,
+    calc_worst,
+    # calc_z_score,
 )
 from openseries.common_props import CommonProps
 from openseries.common_tools import (
     do_resample,
     do_resample_to_business_period_ends,
     get_calc_range,
-    make_plot_bars,
-    make_plot_series,
-    save_to_xlsx,
+    check_if_none,
 )
 from openseries.datefixer import (
     date_fix,
@@ -70,68 +66,18 @@ from openseries.types import (
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
     LiteralPandasReindexMethod,
-    LiteralLinePlotMode,
-    LiteralBarPlotMode,
-    LiteralPlotlyOutput,
     LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
     ValueType,
 )
 from openseries.risk import (
-    cvar_down,
-    var_down,
+    cvar_down_calc,
+    var_down_calc,
     drawdown_details,
+    ewma_calc,
 )
 
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
-
-
-def check_if_none(item: Any) -> bool:
-    """Function to check if a variable is None or equivalent
-
-    Parameters
-    ----------
-    item : Any
-        variable to be checked
-
-    Returns
-    -------
-    bool
-        Answer to whether the variable is None or equivalent
-    """
-    try:
-        return cast(bool, isnan(item))
-    except TypeError:
-        if item is None:
-            return True
-        return len(str(item)) == 0
-
-
-def ewma_calc(
-    reeturn: float, prev_ewma: float, time_factor: float, lmbda: float = 0.94
-) -> float:
-    """Helper function for EWMA calculation
-
-    Parameters
-    ----------
-    reeturn : float
-        Return value
-    prev_ewma : float
-        Previous EWMA volatility value
-    time_factor : float
-        Scaling factor to annualize
-    lmbda: float, default: 0.94
-        Scaling factor to determine weighting.
-
-    Returns
-    -------
-    float
-        EWMA volatility value
-    """
-    return cast(
-        float,
-        sqrt(square(reeturn) * time_factor * (1 - lmbda) + square(prev_ewma) * lmbda),
-    )
 
 
 class OpenTimeSeries(BaseModel, CommonProps):
@@ -499,67 +445,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
 
         return deepcopy(self)
-
-    def to_xlsx(
-        self: TypeOpenTimeSeries,
-        filename: str,
-        sheet_title: Optional[str] = None,
-        directory: Optional[str] = None,
-    ) -> str:
-        """Saves the data in the .tsdf DataFrame to an Excel spreadsheet file
-
-        Parameters
-        ----------
-        filename: str
-            Filename that should include .xlsx
-        sheet_title: str, optional
-            Name of the sheet in the Excel file
-        directory: str, optional
-            The file directory where the Excel file is saved.
-        Returns
-        -------
-        str
-            The Excel file path
-        """
-
-        return save_to_xlsx(
-            data=self.tsdf,
-            filename=filename,
-            sheet_title=sheet_title,
-            directory=directory,
-        )
-
-    def to_json(
-        self: TypeOpenTimeSeries, filename: str, directory: Optional[str] = None
-    ) -> Dict[str, Union[str, bool, ValueType, List[str], List[float]]]:
-        """Dumps timeseries data into a json file
-
-        The label and tsdf parameters are deleted before the json file is saved
-
-        Parameters
-        ----------
-        filename: str
-            Filename including filetype
-        directory: str, optional
-            File folder location
-        Returns
-        -------
-        dict
-            A dictionary
-        """
-        if not directory:
-            directory = path.dirname(path.abspath(__file__))
-
-        data = self.__dict__
-
-        cleaner_list = ["label", "tsdf"]
-        for item in cleaner_list:
-            data.pop(item)
-
-        with open(path.join(directory, filename), "w", encoding="utf-8") as jsonfile:
-            dump(data, jsonfile, indent=2, sort_keys=False)
-
-        return data
 
     def pandas_df(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
         """Sets the .tsdf parameter as a Pandas DataFrame from the .dates and
@@ -1044,42 +929,37 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Z-score as (last return - mean return) / standard deviation of returns.
         """
+        return self.z_score_func()
 
-        return cast(
-            float,
-            (
-                (self.tsdf.pct_change().iloc[-1] - self.tsdf.pct_change().mean())
-                / self.tsdf.pct_change().std()
-            ).iloc[0],
-        )
-
-    def z_score_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """https://www.investopedia.com/terms/z/zscore.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            Z-score as (last return - mean return) / standard deviation of returns
-        """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        part = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().copy()
-        return float(((part.iloc[-1] - part.mean()) / part.std()).iloc[0])
+    # def z_score_func(
+    #     self: TypeOpenTimeSeries,
+    #     months_from_last: Optional[int] = None,
+    #     from_date: Optional[dt.date] = None,
+    #     to_date: Optional[dt.date] = None,
+    # ) -> float:
+    #     """https://www.investopedia.com/terms/z/zscore.asp
+    #
+    #     Parameters
+    #     ----------
+    #     months_from_last : int, optional
+    #         number of months offset as positive integer. Overrides use of from_date
+    #         and to_date
+    #     from_date : datetime.date, optional
+    #         Specific from date
+    #     to_date : datetime.date, optional
+    #         Specific to date
+    #
+    #     Returns
+    #     -------
+    #     float
+    #         Z-score as (last return - mean return) / standard deviation of returns
+    #     """
+    #     return calc_z_score(
+    #         data=self.tsdf,
+    #         months_from_last=months_from_last,
+    #         from_date=from_date,
+    #         to_date=to_date,
+    #     )
 
     @property
     def max_drawdown(self: TypeOpenTimeSeries) -> float:
@@ -1159,8 +1039,8 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Most negative percentage change
         """
-
-        return float((self.tsdf.pct_change().min()).iloc[0])
+        observations: int = 1
+        return calc_worst(data=self.tsdf, observations=observations)
 
     @property
     def worst_month(self: TypeOpenTimeSeries) -> float:
@@ -1201,17 +1081,12 @@ class OpenTimeSeries(BaseModel, CommonProps):
             within
             a chosen date range
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return cast(
-            float,
-            (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change()
-                .rolling(observations, min_periods=observations)
-                .sum()
-                .min()
-            ).iloc[0],
+        return calc_worst(
+            data=self.tsdf,
+            observations=observations,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1394,14 +1269,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        return cast(
-            float,
-            (
-                self.tsdf.pct_change()
-                .quantile(1 - level, interpolation=interpolation)
-                .iloc[0]
-            ),
-        )
+        return calc_var_down(data=self.tsdf, level=level, interpolation=interpolation)
 
     def var_down_func(
         self: TypeOpenTimeSeries,
@@ -1435,15 +1303,13 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Downside Value At Risk
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return cast(
-            float,
-            (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change()
-                .quantile(q=1 - level, interpolation=interpolation)
-            ).iloc[0],
+        return calc_var_down(
+            data=self.tsdf,
+            level=level,
+            interpolation=interpolation,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1607,19 +1473,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         self.tsdf.columns = [[self.label], [self.valuetype]]
-        return self
-
-    def value_to_log(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
-        """Converts a valueseries into logarithmic weighted series \n
-        Equivalent to LN(value[t] / value[t=0]) in MS Excel
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-
-        self.tsdf = log(self.tsdf / self.tsdf.iloc[0])
         return self
 
     def to_cumret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
@@ -1891,7 +1744,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
 
         cvardf = self.tsdf.rolling(observations, min_periods=observations).apply(
-            lambda x: cvar_down(x, level=level)
+            lambda x: cvar_down_calc(x, level=level)
         )
         cvardf = cvardf.dropna()
         cvardf.columns = [[self.label], ["Rolling CVaR"]]
@@ -1921,7 +1774,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
 
         vardf = self.tsdf.rolling(observations, min_periods=observations).apply(
-            lambda x: var_down(x, level=level, interpolation=interpolation)
+            lambda x: var_down_calc(x, level=level, interpolation=interpolation)
         )
         vardf = vardf.dropna()
         vardf.columns = [[self.label], ["Rolling VaR"]]
@@ -2019,112 +1872,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         if delete_lvl_one:
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
         return self
-
-    def plot_series(
-        self: TypeOpenTimeSeries,
-        mode: LiteralLinePlotMode = "lines",
-        tick_fmt: Optional[str] = None,
-        directory: Optional[str] = None,
-        auto_open: bool = True,
-        add_logo: bool = True,
-        show_last: bool = False,
-        output_type: LiteralPlotlyOutput = "file",
-    ) -> Tuple[Figure, str]:
-        """Creates a Plotly Figure
-
-        Parameters
-        ----------
-        mode: LiteralLinePlotMode, default: "lines"
-            The type of scatter to use
-        tick_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show
-        directory: str, optional
-            Directory where Plotly html file is saved
-        auto_open: bool, default: True
-            Determines whether to open a browser window with the plot
-        add_logo: bool, default: True
-            If True a Captor logo is added to the plot
-        show_last: bool, default: False
-            If True the last data point is highlighted as red dot with a label
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
-
-        Returns
-        -------
-        (plotly.go.Figure, str)
-            Plotly Figure and html filename with location
-        """
-        filename = (
-            cast(str, self.label)
-            .replace("/", "")
-            .replace("#", "")
-            .replace(" ", "")
-            .upper()
-        )
-        filename = f"{filename}.html"
-
-        return make_plot_series(
-            data=self.tsdf,
-            mode=mode,
-            tick_fmt=tick_fmt,
-            filename=filename,
-            directory=directory,
-            auto_open=auto_open,
-            add_logo=add_logo,
-            show_last=show_last,
-            output_type=output_type,
-        )
-
-    def plot_bars(
-        self: TypeOpenTimeSeries,
-        mode: LiteralBarPlotMode = "group",
-        tick_fmt: Optional[str] = None,
-        directory: Optional[str] = None,
-        auto_open: bool = True,
-        add_logo: bool = True,
-        output_type: LiteralPlotlyOutput = "file",
-    ) -> Tuple[Figure, str]:
-        """Creates a Plotly Bar Figure
-
-        Parameters
-        ----------
-        mode: LiteralBarPlotMode, default: "group"
-            The type of bar to use
-        tick_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show
-        directory: str, optional
-            Directory where Plotly html file is saved
-        auto_open: bool, default: True
-            Determines whether to open a browser window with the plot
-        add_logo: bool, default: True
-            If True a Captor logo is added to the plot
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
-
-        Returns
-        -------
-        (plotly.go.Figure, str)
-            Plotly Figure and html filename with location
-        """
-        filename = (
-            cast(str, self.label)
-            .replace("/", "")
-            .replace("#", "")
-            .replace(" ", "")
-            .upper()
-        )
-        filename = f"{filename}.html"
-
-        return make_plot_bars(
-            data=self.tsdf,
-            mode=mode,
-            tick_fmt=tick_fmt,
-            filename=filename,
-            directory=directory,
-            auto_open=auto_open,
-            add_logo=add_logo,
-            output_type=output_type,
-        )
 
 
 def timeseries_chain(

@@ -782,7 +782,7 @@ def calc_value_ret_calendar_period(
 
     Returns
     -------
-    Pandas.Series
+    Union[float, Pandas.Series]
         Simple return for a specific calendar period
     """
 
@@ -800,3 +800,148 @@ def calc_value_ret_calendar_period(
     if data.shape[1] == 1:
         return float(result.iloc[0])
     return result
+
+
+def calc_var_down(
+    data: DataFrame,
+    level: float,
+    months_from_last: Optional[int] = None,
+    from_date: Optional[dt.date] = None,
+    to_date: Optional[dt.date] = None,
+    interpolation: LiteralQuantileInterp = "lower",
+) -> Union[float, Series]:
+    """https://www.investopedia.com/terms/v/var.asp
+    Downside Value At Risk, "VaR". The equivalent of
+    percentile.inc([...], 1-level) over returns in MS Excel.
+
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        The timeseries data
+    level: float, default: 0.95
+        The sought VaR level
+    months_from_last : int, optional
+        number of months offset as positive integer. Overrides use of from_date
+        and to_date
+    from_date : datetime.date, optional
+        Specific from date
+    to_date : datetime.date, optional
+        Specific to date
+    interpolation: LiteralQuantileInterp, default: "lower"
+        Type of interpolation in Pandas.DataFrame.quantile() function.
+
+    Returns
+    -------
+    Union[float, Pandas.Series]
+        Downside Value At Risk
+    """
+    earlier, later = get_calc_range(
+        data=data, months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+    )
+    result = (
+        data.loc[cast(int, earlier) : cast(int, later)]
+        .pct_change()
+        .quantile(1 - level, interpolation=interpolation)
+    )
+
+    if data.shape[1] == 1:
+        return float(result.iloc[0])
+    return Series(
+        data=result,
+        index=data.columns,
+        name=f"VaR {level:.1%}",
+        dtype="float64",
+    )
+
+
+def calc_worst(
+    data: DataFrame,
+    observations: int,
+    months_from_last: Optional[int] = None,
+    from_date: Optional[dt.date] = None,
+    to_date: Optional[dt.date] = None,
+) -> Union[float, Series]:
+    """Most negative percentage change over a rolling number of observations
+    within a chosen date range
+
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        The timeseries data
+    observations: int, default: 1
+        Number of observations over which to measure the worst outcome
+    months_from_last : int, optional
+        number of months offset as positive integer. Overrides use of from_date
+        and to_date
+    from_date : datetime.date, optional
+        Specific from date
+    to_date : datetime.date, optional
+        Specific to date
+
+    Returns
+    -------
+    Union[float, Pandas.Series]
+        Most negative percentage change over a rolling number of observations
+        within a chosen date range
+    """
+    earlier, later = get_calc_range(
+        data=data, months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+    )
+    result = (
+        data.loc[cast(int, earlier) : cast(int, later)]
+        .pct_change()
+        .rolling(observations, min_periods=observations)
+        .sum()
+        .min()
+    )
+
+    if data.shape[1] == 1:
+        return float(result.iloc[0])
+    return Series(
+        data=result,
+        index=data.columns,
+        name="Worst",
+        dtype="float64",
+    )
+
+
+# def calc_z_score(
+#     data: DataFrame,
+#     months_from_last: Optional[int] = None,
+#     from_date: Optional[dt.date] = None,
+#     to_date: Optional[dt.date] = None,
+# ) -> Union[float, Series]:
+#     """https://www.investopedia.com/terms/z/zscore.asp
+#
+#     Parameters
+#     ----------
+#     data: pandas.DataFrame
+#         The timeseries data
+#     months_from_last : int, optional
+#         number of months offset as positive integer. Overrides use of from_date
+#         and to_date
+#     from_date : datetime.date, optional
+#         Specific from date
+#     to_date : datetime.date, optional
+#         Specific to date
+#
+#     Returns
+#     -------
+#     Union[float, Pandas.Series]
+#         Z-score as (last return - mean return) / standard deviation of returns
+#     """
+#
+#     earlier, later = get_calc_range(
+#         data=data, months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+#     )
+#     zscframe = data.loc[cast(int, earlier) : cast(int, later)].pct_change()
+#     result = (zscframe.iloc[-1] - zscframe.mean()) / zscframe.std()
+#
+#     if data.shape[1] == 1:
+#         return float(result.iloc[0])
+#     return Series(
+#         data=result,
+#         index=data.columns,
+#         name="Z-score",
+#         dtype="float64",
+#     )

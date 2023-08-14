@@ -18,8 +18,8 @@ from openseries.types import CountriesType, LiteralSeriesProps, ValueType
 from openseries.series import (
     OpenTimeSeries,
     timeseries_chain,
-    check_if_none,
 )
+from openseries.common_tools import check_if_none
 
 TypeTestOpenTimeSeries = TypeVar("TypeTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
@@ -450,7 +450,12 @@ class TestOpenTimeSeries(TestCase):
         )
 
         jseries = self.randomseries.from_deepcopy()
-        jseries.to_json(filename=seriesfile)
+        data = jseries.to_json(filename=seriesfile)
+
+        self.assertListEqual(
+            [item.get("name") for item in data],
+            ["Asset"],
+        )
 
         self.assertTrue(path.exists(seriesfile))
 

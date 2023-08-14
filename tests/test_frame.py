@@ -13,7 +13,7 @@ from pandas.testing import assert_frame_equal
 
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
-from openseries.risk import cvar_down, var_down
+from openseries.risk import cvar_down_calc, var_down_calc
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation
 from openseries.types import (
@@ -76,6 +76,24 @@ class TestOpenFrame(TestCase):
             ]
         )
         self.assertIsInstance(frame_df.tsdf, DataFrame)
+
+    def test_save_to_json(self: TestOpenFrame) -> None:
+        """Test to_json method"""
+        seriesfile = path.join(path.dirname(path.abspath(__file__)), "framesaved.json")
+
+        jseries = self.randomframe.from_deepcopy()
+        data = jseries.to_json(filename=seriesfile)
+
+        self.assertListEqual(
+            [item.get("name") for item in data],
+            ["Asset_0", "Asset_1", "Asset_2", "Asset_3", "Asset_4"],
+        )
+
+        self.assertTrue(path.exists(seriesfile))
+
+        remove(seriesfile)
+
+        self.assertFalse(path.exists(seriesfile))
 
     def test_save_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method"""
@@ -394,34 +412,34 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             riskseries.cvar_down,
-            cvar_down(riskseries.tsdf.iloc[:, 0].tolist()),
+            cvar_down_calc(riskseries.tsdf.iloc[:, 0].tolist()),
             msg="CVaR for OpenTimeSeries not equal",
         )
         self.assertEqual(
             riskseries.var_down,
-            var_down(riskseries.tsdf.iloc[:, 0].tolist()),
+            var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()),
             msg="VaR for OpenTimeSeries not equal",
         )
 
         self.assertEqual(
             riskframe.cvar_down.iloc[0],
-            cvar_down(riskframe.tsdf.iloc[:, 0]),
+            cvar_down_calc(riskframe.tsdf.iloc[:, 0]),
             msg="CVaR for OpenFrame not equal",
         )
         self.assertEqual(
             riskframe.var_down.iloc[0],
-            var_down(riskframe.tsdf.iloc[:, 0]),
+            var_down_calc(riskframe.tsdf.iloc[:, 0]),
             msg="VaR for OpenFrame not equal",
         )
 
         self.assertEqual(
             riskframe.cvar_down.iloc[0],
-            cvar_down(riskframe.tsdf),
+            cvar_down_calc(riskframe.tsdf),
             msg="CVaR for OpenFrame not equal",
         )
         self.assertEqual(
             riskframe.var_down.iloc[0],
-            var_down(riskframe.tsdf),
+            var_down_calc(riskframe.tsdf),
             msg="VaR for OpenFrame not equal",
         )
 
@@ -772,6 +790,7 @@ class TestOpenFrame(TestCase):
             "rolling_var_down",
             "to_cumret",
             "to_drawdown_series",
+            "to_json",
             "to_xlsx",
             "value_nan_handle",
             "value_ret_calendar_period",
@@ -792,7 +811,6 @@ class TestOpenFrame(TestCase):
             "pandas_df",
             "running_adjustment",
             "set_new_label",
-            "to_json",
             "setup_class",
             "check_isincode",
             "check_dates_unique",

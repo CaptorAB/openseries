@@ -18,7 +18,6 @@ from pandas import (
     MultiIndex,
     Series,
 )
-from plotly.graph_objs import Figure
 from pydantic import BaseModel, ConfigDict, field_validator
 import statsmodels.api as sm
 
@@ -39,18 +38,18 @@ from openseries.common_calc import (
     calc_sortino_ratio,
     calc_value_ret,
     calc_value_ret_calendar_period,
+    calc_var_down,
     calc_var_implied_vol_and_target,
+    calc_worst,
+    # calc_z_score,
 )
 from openseries.common_props import CommonProps
 from openseries.common_tools import (
     do_resample,
     do_resample_to_business_period_ends,
     get_calc_range,
-    make_plot_bars,
-    make_plot_series,
-    save_to_xlsx,
 )
-from openseries.series import OpenTimeSeries, ewma_calc
+from openseries.series import OpenTimeSeries
 from openseries.datefixer import align_dataframe_to_local_cdays
 from openseries.types import (
     CountriesType,
@@ -60,9 +59,6 @@ from openseries.types import (
     LiteralPandasResampleConvention,
     LiteralPandasReindexMethod,
     LiteralCaptureRatio,
-    LiteralLinePlotMode,
-    LiteralBarPlotMode,
-    LiteralPlotlyOutput,
     LiteralFrameProps,
     LiteralOlsFitMethod,
     LiteralOlsFitCovType,
@@ -74,8 +70,9 @@ from openseries.types import (
 )
 from openseries.risk import (
     drawdown_details,
-    cvar_down,
-    var_down,
+    cvar_down_calc,
+    var_down_calc,
+    ewma_calc,
 )
 
 TypeOpenFrame = TypeVar("TypeOpenFrame", bound="OpenFrame")
@@ -147,35 +144,6 @@ class OpenFrame(BaseModel, CommonProps):
         """
 
         return deepcopy(self)
-
-    def to_xlsx(
-        self: TypeOpenFrame,
-        filename: str,
-        sheet_title: Optional[str] = None,
-        directory: Optional[str] = None,
-    ) -> str:
-        """Saves the data in the .tsdf DataFrame to an Excel spreadsheet file
-
-        Parameters
-        ----------
-        filename: str
-            Filename that should include .xlsx
-        sheet_title: str, optional
-            Name of the sheet in the Excel file
-        directory: str, optional
-            The file directory where the Excel file is saved.
-        Returns
-        -------
-        str
-            The Excel file path
-        """
-
-        return save_to_xlsx(
-            data=self.tsdf,
-            filename=filename,
-            sheet_title=sheet_title,
-            directory=directory,
-        )
 
     def merge_series(
         self: TypeOpenFrame, how: LiteralHowMerge = "outer"
@@ -882,45 +850,37 @@ class OpenFrame(BaseModel, CommonProps):
         float
             Z-score as (last return - mean return) / standard deviation of returns.
         """
+        return self.z_score_func()
 
-        zscframe = self.tsdf.pct_change()
-        return Series(
-            data=(zscframe.iloc[-1] - zscframe.mean()) / zscframe.std(),
-            name="Z-score",
-            dtype="float64",
-        )
-
-    def z_score_func(
-        self: TypeOpenFrame,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Series:
-        """https://www.investopedia.com/terms/z/zscore.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        Pandas.Series
-            Z-score as (last return - mean return) / standard deviation of returns
-        """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        zscframe = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()
-        return Series(
-            data=(zscframe.iloc[-1] - zscframe.mean()) / zscframe.std(),
-            name="Subset Z-score",
-            dtype="float64",
-        )
+    # def z_score_func(
+    #     self: TypeOpenFrame,
+    #     months_from_last: Optional[int] = None,
+    #     from_date: Optional[dt.date] = None,
+    #     to_date: Optional[dt.date] = None,
+    # ) -> Series:
+    #     """https://www.investopedia.com/terms/z/zscore.asp
+    #
+    #     Parameters
+    #     ----------
+    #     months_from_last : int, optional
+    #         number of months offset as positive integer. Overrides use of from_date
+    #         and to_date
+    #     from_date : datetime.date, optional
+    #         Specific from date
+    #     to_date : datetime.date, optional
+    #         Specific to date
+    #
+    #     Returns
+    #     -------
+    #     Pandas.Series
+    #         Z-score as (last return - mean return) / standard deviation of returns
+    #     """
+    #     return calc_z_score(
+    #         data=self.tsdf,
+    #         months_from_last=months_from_last,
+    #         from_date=from_date,
+    #         to_date=to_date,
+    #     )
 
     @property
     def max_drawdown(self: TypeOpenFrame) -> Series:
@@ -1003,8 +963,8 @@ class OpenFrame(BaseModel, CommonProps):
         Pandas.Series
             Most negative percentage change
         """
-
-        return Series(data=self.tsdf.pct_change().min(), name="Worst", dtype="float64")
+        observations: int = 1
+        return calc_worst(data=self.tsdf, observations=observations)
 
     @property
     def worst_month(self: TypeOpenFrame) -> Series:
@@ -1048,16 +1008,12 @@ class OpenFrame(BaseModel, CommonProps):
             Most negative percentage change over a rolling number of observations
             within a chosen date range
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return Series(
-            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .rolling(observations, min_periods=observations)
-            .sum()
-            .min(),
-            name=f"Subset Worst {observations}day period",
-            dtype="float64",
+        return calc_worst(
+            data=self.tsdf,
+            observations=observations,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1240,13 +1196,7 @@ class OpenFrame(BaseModel, CommonProps):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        return Series(
-            data=self.tsdf.pct_change().quantile(
-                1 - level, interpolation=interpolation
-            ),
-            name=f"VaR {level:.1%}",
-            dtype="float64",
-        )
+        return calc_var_down(data=self.tsdf, level=level, interpolation=interpolation)
 
     def var_down_func(
         self: TypeOpenFrame,
@@ -1280,14 +1230,13 @@ class OpenFrame(BaseModel, CommonProps):
         Pandas.Series
             Downside Value At Risk
         """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        return Series(
-            data=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .quantile(1 - level, interpolation=interpolation),
-            name=f"VaR {level:.1%}",
-            dtype="float64",
+        return calc_var_down(
+            data=self.tsdf,
+            level=level,
+            interpolation=interpolation,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
         )
 
     @property
@@ -1456,19 +1405,6 @@ class OpenFrame(BaseModel, CommonProps):
         new_labels = [ValueType.RTRN] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
-        return self
-
-    def value_to_log(self: TypeOpenFrame) -> TypeOpenFrame:
-        """Converts a valueseries into logarithmic weighted series \n
-        Equivalent to LN(value[t] / value[t=0]) in MS Excel
-
-        Returns
-        -------
-        OpenFrame
-            An OpenFrame object
-        """
-
-        self.tsdf = log(self.tsdf / self.tsdf.iloc[0])
         return self
 
     def to_cumret(self: TypeOpenFrame) -> TypeOpenFrame:
@@ -1798,7 +1734,7 @@ class OpenFrame(BaseModel, CommonProps):
         cvardf = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
-            .apply(lambda x: cvar_down(x, level=level))
+            .apply(lambda x: cvar_down_calc(x, level=level))
         )
         cvardf = cvardf.dropna().to_frame()
         cvardf.columns = [[cvar_label], ["Rolling CVaR"]]
@@ -1834,7 +1770,9 @@ class OpenFrame(BaseModel, CommonProps):
         vardf = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
-            .apply(lambda x: var_down(x, level=level, interpolation=interpolation))
+            .apply(
+                lambda x: var_down_calc(x, level=level, interpolation=interpolation)
+            )
         )
         vardf = vardf.dropna().to_frame()
         vardf.columns = [[var_label], ["Rolling VaR"]]
@@ -2668,109 +2606,3 @@ class OpenFrame(BaseModel, CommonProps):
         corrdf.columns = [[corr_label], ["Rolling correlation"]]
 
         return corrdf
-
-    def plot_series(
-        self: TypeOpenFrame,
-        mode: LiteralLinePlotMode = "lines",
-        tick_fmt: Optional[str] = None,
-        filename: Optional[str] = None,
-        directory: Optional[str] = None,
-        labels: Optional[List[str]] = None,
-        auto_open: bool = True,
-        add_logo: bool = True,
-        show_last: bool = False,
-        output_type: LiteralPlotlyOutput = "file",
-    ) -> Tuple[Figure, str]:
-        """Creates a Plotly Figure
-
-        To scale the bubble size, use the attribute sizeref.
-        We recommend using the following formula to calculate a sizeref value:
-        sizeref = 2. * max(array of size values) / (desired maximum marker size ** 2)
-
-        Parameters
-        ----------
-        mode: LiteralLinePlotMode, default: "lines"
-            The type of scatter to use
-        tick_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show
-        filename: str, optional
-            Name of the Plotly html file
-        directory: str, optional
-            Directory where Plotly html file is saved
-        labels: List[str], optional
-            A list of labels to manually override using the names of the input data
-        auto_open: bool, default: True
-            Determines whether to open a browser window with the plot
-        add_logo: bool, default: True
-            If True a Captor logo is added to the plot
-        show_last: bool, default: False
-            If True the last data point is highlighted as red dot with a label
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
-
-        Returns
-        -------
-        (plotly.go.Figure, str)
-            Plotly Figure and html filename with location
-        """
-        return make_plot_series(
-            data=self.tsdf,
-            mode=mode,
-            tick_fmt=tick_fmt,
-            filename=filename,
-            directory=directory,
-            labels=labels,
-            auto_open=auto_open,
-            add_logo=add_logo,
-            show_last=show_last,
-            output_type=output_type,
-        )
-
-    def plot_bars(
-        self: TypeOpenFrame,
-        mode: LiteralBarPlotMode = "group",
-        tick_fmt: Optional[str] = None,
-        filename: Optional[str] = None,
-        directory: Optional[str] = None,
-        labels: Optional[List[str]] = None,
-        auto_open: bool = True,
-        add_logo: bool = True,
-        output_type: LiteralPlotlyOutput = "file",
-    ) -> Tuple[Figure, str]:
-        """Creates a Plotly Bar Figure
-
-        Parameters
-        ----------
-        mode: LiteralBarPlotMode, default: "group"
-            The type of bar to use
-        tick_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show
-        filename: str, optional
-            Name of the Plotly html file
-        directory: str, optional
-            Directory where Plotly html file is saved
-        labels: List[str], optional
-            A list of labels to manually override using the names of the input data
-        auto_open: bool, default: True
-            Determines whether to open a browser window with the plot
-        add_logo: bool, default: True
-            If True a Captor logo is added to the plot
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
-
-        Returns
-        -------
-        (plotly.go.Figure, str)
-            Plotly Figure and html filename with location
-        """
-        return make_plot_bars(
-            data=self.tsdf,
-            mode=mode,
-            tick_fmt=tick_fmt,
-            filename=filename,
-            directory=directory,
-            labels=labels,
-            auto_open=auto_open,
-            add_logo=add_logo,
-            output_type=output_type,
-        )
