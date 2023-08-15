@@ -26,26 +26,7 @@ from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
 
-from openseries.common_calc import (
-    calc_arithmetic_ret,
-    calc_cvar_down,
-    calc_downside_deviation,
-    calc_geo_ret,
-    calc_kurtosis,
-    calc_max_drawdown,
-    calc_max_drawdown_cal_year,
-    calc_positive_share,
-    calc_ret_vol_ratio,
-    calc_skew,
-    calc_sortino_ratio,
-    calc_value_ret,
-    calc_value_ret_calendar_period,
-    calc_var_down,
-    calc_var_implied_vol_and_target,
-    calc_worst,
-    # calc_z_score,
-)
-from openseries.common_props import CommonProps
+from openseries.common_model import CommonModel
 from openseries.common_tools import (
     do_resample_to_business_period_ends,
     get_calc_range,
@@ -79,7 +60,7 @@ from openseries.risk import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class OpenTimeSeries(BaseModel, CommonProps):
+class OpenTimeSeries(BaseModel, CommonModel):
     """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
 
     Parameters
@@ -543,38 +524,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Compounded Annual Growth Rate (CAGR)
         """
-        return calc_geo_ret(data=self.tsdf)
-
-    def geo_ret_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """https://www.investopedia.com/terms/c/cagr.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            Compounded Annual Growth Rate (CAGR)
-        """
-
-        return calc_geo_ret(
-            data=self.tsdf,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
+        return self.geo_ret_func()
 
     @property
     def arithmetic_ret(self: TypeOpenTimeSeries) -> float:
@@ -586,42 +536,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
             Annualized arithmetic mean of returns
         """
 
-        return calc_arithmetic_ret(data=self.tsdf)
-
-    def arithmetic_ret_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> float:
-        """https://www.investopedia.com/terms/a/arithmeticmean.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-
-        Returns
-        -------
-        float
-            Annualized arithmetic mean of returns
-        """
-        return calc_arithmetic_ret(
-            data=self.tsdf,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-            periods_in_a_year_fixed=periods_in_a_year_fixed,
-        )
+        return self.arithmetic_ret_func()
 
     @property
     def value_ret(self: TypeOpenTimeSeries) -> float:
@@ -631,54 +546,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Simple return
         """
-        return calc_value_ret(data=self.tsdf)
-
-    def value_ret_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            Simple return
-        """
-        return calc_value_ret(
-            data=self.tsdf,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
-
-    def value_ret_calendar_period(
-        self: TypeOpenTimeSeries, year: int, month: Optional[int] = None
-    ) -> float:
-        """
-        Parameters
-        ----------
-        year : int
-            Calendar year of the period to calculate.
-        month : int, optional
-            Calendar month of the period to calculate.
-
-        Returns
-        -------
-        float
-            Simple return for a specific calendar period
-        """
-        return calc_value_ret_calendar_period(data=self.tsdf, year=year, month=month)
+        return self.value_ret_func()
 
     @property
     def vol(self: TypeOpenTimeSeries) -> float:
@@ -692,57 +560,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
             Annualized volatility
         """
 
-        return cast(
-            float,
-            (self.tsdf.pct_change().std() * sqrt(self.periods_in_a_year)).iloc[0],
-        )
-
-    def vol_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> float:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...])
-        in MS Excel \n
-        https://www.investopedia.com/terms/v/volatility.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases
-            and comparisons
-
-        Returns
-        -------
-        float
-            Annualized volatility
-        """
-
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
-            ].count()
-            time_factor = how_many / fraction
-        return cast(
-            float,
-            (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().std()
-                * sqrt(time_factor)
-            ).iloc[0],
-        )
+        return self.vol_func()
 
     @property
     def downside_deviation(self: TypeOpenTimeSeries) -> float:
@@ -757,51 +575,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
             Downside deviation
         """
         min_accepted_return: float = 0.0
-        return calc_downside_deviation(
-            data=self.tsdf, min_accepted_return=min_accepted_return
-        )
-
-    def downside_deviation_func(
-        self: TypeOpenTimeSeries,
-        min_accepted_return: float = 0.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> float:
-        """The standard deviation of returns that are below a Minimum Accepted
-        Return of zero.
-        It is used to calculate the Sortino Ratio \n
-        https://www.investopedia.com/terms/d/downside-deviation.asp
-
-        Parameters
-        ----------
-        min_accepted_return : float, optional
-            The annualized Minimum Accepted Return (MAR)
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-
-        Returns
-        -------
-        float
-            Downside deviation
-        """
-        return calc_downside_deviation(
-            data=self.tsdf,
-            min_accepted_return=min_accepted_return,
-            periods_in_a_year_fixed=periods_in_a_year_fixed,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
+        return self.downside_deviation_func(min_accepted_return=min_accepted_return)
 
     @property
     def ret_vol_ratio(self: TypeOpenTimeSeries) -> float:
@@ -812,53 +586,8 @@ class OpenTimeSeries(BaseModel, CommonProps):
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility.
         """
-        return calc_ret_vol_ratio(data=self.tsdf, riskfree_rate=0.0)
-
-    def ret_vol_ratio_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        riskfree_rate: float = 0.0,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> float:
-        """The ratio of annualized arithmetic mean of returns and annualized
-        volatility or, if risk-free return provided, Sharpe ratio calculated
-        as ( geometric return - risk-free return ) / volatility. The latter ratio
-        implies that the riskfree asset has zero volatility. \n
-        https://www.investopedia.com/terms/s/sharperatio.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        riskfree_rate : float, optional
-            The return of the zero volatility asset used to calculate Sharpe ratio
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-
-        Returns
-        -------
-        float
-            Ratio of the annualized arithmetic mean of returns and annualized
-            volatility or,
-            if risk-free return provided, Sharpe ratio
-        """
-
-        return calc_ret_vol_ratio(
-            data=self.tsdf,
-            riskfree_rate=riskfree_rate,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-            periods_in_a_year_fixed=periods_in_a_year_fixed,
-        )
+        riskfree_rate: float = 0.0
+        return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
     def sortino_ratio(self: TypeOpenTimeSeries) -> float:
@@ -872,52 +601,8 @@ class OpenTimeSeries(BaseModel, CommonProps):
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
         """
-
-        return calc_sortino_ratio(data=self.tsdf, riskfree_rate=0.0)
-
-    def sortino_ratio_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        riskfree_rate: float = 0.0,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> float:
-        """The Sortino ratio calculated as ( asset return - risk free return )
-        / downside deviation. The ratio implies that the riskfree asset has
-        zero volatility. \n
-        https://www.investopedia.com/terms/s/sortinoratio.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        riskfree_rate : float, optional
-            The return of the zero volatility asset
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-
-        Returns
-        -------
-        float
-        Pandas.Series
-            Sortino ratio calculated as the annualized arithmetic mean of returns
-            / downside deviation.
-        """
-        return calc_sortino_ratio(
-            data=self.tsdf,
-            riskfree_rate=riskfree_rate,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-            periods_in_a_year_fixed=periods_in_a_year_fixed,
-        )
+        riskfree_rate: float = 0.0
+        return self.sortino_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
     def z_score(self: TypeOpenTimeSeries) -> float:
@@ -930,36 +615,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
         return self.z_score_func()
 
-    # def z_score_func(
-    #     self: TypeOpenTimeSeries,
-    #     months_from_last: Optional[int] = None,
-    #     from_date: Optional[dt.date] = None,
-    #     to_date: Optional[dt.date] = None,
-    # ) -> float:
-    #     """https://www.investopedia.com/terms/z/zscore.asp
-    #
-    #     Parameters
-    #     ----------
-    #     months_from_last : int, optional
-    #         number of months offset as positive integer. Overrides use of from_date
-    #         and to_date
-    #     from_date : datetime.date, optional
-    #         Specific from date
-    #     to_date : datetime.date, optional
-    #         Specific to date
-    #
-    #     Returns
-    #     -------
-    #     float
-    #         Z-score as (last return - mean return) / standard deviation of returns
-    #     """
-    #     return calc_z_score(
-    #         data=self.tsdf,
-    #         months_from_last=months_from_last,
-    #         from_date=from_date,
-    #         to_date=to_date,
-    #     )
-
     @property
     def max_drawdown(self: TypeOpenTimeSeries) -> float:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
@@ -969,7 +624,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Maximum drawdown without any limit on date range
         """
-        return calc_max_drawdown(data=self.tsdf)
+        return self.max_drawdown_func()
 
     @property
     def max_drawdown_date(self: TypeOpenTimeSeries) -> dt.date:
@@ -986,50 +641,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         mdd_date = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().values[0]
         return dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
 
-    def max_drawdown_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        min_periods: int = 1,
-    ) -> float:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        min_periods: int, default: 1
-
-        Returns
-        -------
-        float
-            Maximum drawdown without any limit on date range
-        """
-        return calc_max_drawdown(
-            data=self.tsdf,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-            min_periods=min_periods,
-        )
-
-    @property
-    def max_drawdown_cal_year(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
-
-        Returns
-        -------
-        float
-            Maximum drawdown in a single calendar year.
-        """
-        return calc_max_drawdown_cal_year(data=self.tsdf)
-
     @property
     def worst(self: TypeOpenTimeSeries) -> float:
         """
@@ -1039,7 +650,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
             Most negative percentage change
         """
         observations: int = 1
-        return calc_worst(data=self.tsdf, observations=observations)
+        return self.worst_func(observations=observations)
 
     @property
     def worst_month(self: TypeOpenTimeSeries) -> float:
@@ -1054,40 +665,6 @@ class OpenTimeSeries(BaseModel, CommonProps):
         resdf.index = DatetimeIndex(resdf.index)
         return float((resdf.resample("BM").last().pct_change().min()).iloc[0])
 
-    def worst_func(
-        self: TypeOpenTimeSeries,
-        observations: int = 1,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """
-        Parameters
-        ----------
-        observations: int, default: 1
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            Most negative percentage change over a rolling number of observations
-            within
-            a chosen date range
-        """
-        return calc_worst(
-            data=self.tsdf,
-            observations=observations,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
-
     @property
     def positive_share(self: TypeOpenTimeSeries) -> float:
         """
@@ -1096,36 +673,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             The share of percentage changes that are greater than zero
         """
-        return calc_positive_share(data=self.tsdf)
-
-    def positive_share_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            The share of percentage changes that are greater than zero
-        """
-        return calc_positive_share(
-            data=self.tsdf,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
+        return self.positive_share_func()
 
     @property
     def skew(self: TypeOpenTimeSeries) -> float:
@@ -1136,37 +684,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Skew of the return distribution
         """
-        return calc_skew(data=self.tsdf)
-
-    def skew_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """https://www.investopedia.com/terms/s/skewness.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            Skew of the return distribution
-        """
-        return calc_skew(
-            data=self.tsdf,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
+        return self.skew_func()
 
     @property
     def kurtosis(self: TypeOpenTimeSeries) -> float:
@@ -1177,37 +695,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         float
             Kurtosis of the return distribution
         """
-        return calc_kurtosis(data=self.tsdf)
-
-    def kurtosis_func(
-        self: TypeOpenTimeSeries,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """https://www.investopedia.com/terms/k/kurtosis.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            Kurtosis of the return distribution
-        """
-        return calc_kurtosis(
-            data=self.tsdf,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
+        return self.kurtosis_func()
 
     @property
     def cvar_down(self: TypeOpenTimeSeries) -> float:
@@ -1219,41 +707,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
             Downside Conditional 95% Value At Risk "CVaR"
         """
         level: float = 0.95
-        return calc_cvar_down(data=self.tsdf, level=level)
-
-    def cvar_down_func(
-        self: TypeOpenTimeSeries,
-        level: float = 0.95,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> float:
-        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
-
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought CVaR level
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        float
-            Downside Conditional Value At Risk "CVaR"
-        """
-        return calc_cvar_down(
-            data=self.tsdf,
-            level=level,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
+        return self.cvar_down_func(level=level)
 
     @property
     def var_down(self: TypeOpenTimeSeries) -> float:
@@ -1268,48 +722,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        return calc_var_down(data=self.tsdf, level=level, interpolation=interpolation)
-
-    def var_down_func(
-        self: TypeOpenTimeSeries,
-        level: float = 0.95,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        interpolation: LiteralQuantileInterp = "lower",
-    ) -> float:
-        """https://www.investopedia.com/terms/v/var.asp
-        Downside Value At Risk, "VaR". The equivalent of
-        percentile.inc([...], 1-level) over returns in MS Excel.
-
-        Parameters
-        ----------
-
-        level: float, default: 0.95
-            The sought VaR level
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-
-        Returns
-        -------
-        float
-            Downside Value At Risk
-        """
-        return calc_var_down(
-            data=self.tsdf,
-            level=level,
-            interpolation=interpolation,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-        )
+        return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
     def vol_from_var(self: TypeOpenTimeSeries) -> float:
@@ -1322,120 +735,7 @@ class OpenTimeSeries(BaseModel, CommonProps):
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
-        return calc_var_implied_vol_and_target(
-            data=self.tsdf,
-            level=level,
-            interpolation=interpolation,
-        )
-
-    def vol_from_var_func(
-        self: TypeOpenTimeSeries,
-        level: float = 0.95,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> float:
-        """
-        Parameters
-        ----------
-
-        level: float, default: 0.95
-            The sought VaR level
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-
-        Returns
-        -------
-        float
-            Implied annualized volatility from the Downside VaR using the
-            assumption that returns are normally distributed.
-        """
-        return calc_var_implied_vol_and_target(
-            data=self.tsdf,
-            level=level,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-            interpolation=interpolation,
-            drift_adjust=drift_adjust,
-            periods_in_a_year_fixed=periods_in_a_year_fixed,
-        )
-
-    def target_weight_from_var(
-        self: TypeOpenTimeSeries,
-        target_vol: float = 0.175,
-        level: float = 0.95,
-        min_leverage_local: float = 0.0,
-        max_leverage_local: float = 99999.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> float:
-        """A position weight multiplier from the ratio between a VaR implied
-        volatility and a given target volatility. Multiplier = 1.0 -> target met
-
-        Parameters
-        ----------
-        target_vol: float, default: 0.175
-            Target Volatility
-        level: float, default: 0.95
-            The sought VaR level
-        min_leverage_local: float, default: 0.0
-            A minimum adjustment factor
-        max_leverage_local: float, default: 99999.0
-            A maximum adjustment factor
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-
-        Returns
-        -------
-        float
-            A position weight multiplier from the ratio between a VaR implied
-            volatility and a given target volatility. Multiplier = 1.0 -> target met
-        """
-        return calc_var_implied_vol_and_target(
-            data=self.tsdf,
-            target_vol=target_vol,
-            level=level,
-            min_leverage_local=min_leverage_local,
-            max_leverage_local=max_leverage_local,
-            months_from_last=months_from_last,
-            from_date=from_date,
-            to_date=to_date,
-            interpolation=interpolation,
-            drift_adjust=drift_adjust,
-            periods_in_a_year_fixed=periods_in_a_year_fixed,
-        )
+        return self.vol_from_var_func(level=level, interpolation=interpolation)
 
     def value_to_ret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
         """

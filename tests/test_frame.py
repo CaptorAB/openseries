@@ -538,7 +538,7 @@ class TestOpenFrame(TestCase):
             samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
         )
         self.assertEqual(
-            f"{sames.ret_vol_ratio_func(months_from_last=12):.11f}",
+            f"{sames.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
             f"{smf_vrf:.11f}",
         )
 
@@ -546,7 +546,7 @@ class TestOpenFrame(TestCase):
             samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
         )
         self.assertEqual(
-            f"{sames.sortino_ratio_func(months_from_last=12):.11f}",
+            f"{sames.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
             f"{smf_srf:.11f}",
         )
 
@@ -1389,19 +1389,19 @@ class TestOpenFrame(TestCase):
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        simdataa = frame.ret_vol_ratio_func(riskfree_column=-1)
+        simdataa = frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=-1)
 
         self.assertEqual(f"{simdataa[0]:.10f}", "0.1580040085")
 
         simdatab = frame.ret_vol_ratio_func(
-            riskfree_column=-1, periods_in_a_year_fixed=251
+            riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
         )
 
         self.assertEqual(f"{simdatab[0]:.10f}", "0.1578870346")
 
         with self.assertRaises(Exception) as e_retvolfunc:
             str_col = cast(int, "string")
-            _ = frame.ret_vol_ratio_func(riskfree_column=str_col)
+            _ = frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=str_col)
 
         self.assertEqual(
             e_retvolfunc.exception.args[0],
@@ -1413,19 +1413,19 @@ class TestOpenFrame(TestCase):
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        simdataa = frame.sortino_ratio_func(riskfree_column=-1)
+        simdataa = frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=-1)
 
         self.assertEqual(f"{simdataa[0]:.10f}", "0.2009532877")
 
         simdatab = frame.sortino_ratio_func(
-            riskfree_column=-1, periods_in_a_year_fixed=251
+            riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
         )
 
         self.assertEqual(f"{simdatab[0]:.10f}", "0.2008045175")
 
         with self.assertRaises(Exception) as e_func:
             str_col = cast(int, "string")
-            _ = frame.sortino_ratio_func(riskfree_column=str_col)
+            _ = frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
