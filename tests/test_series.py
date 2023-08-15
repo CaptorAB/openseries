@@ -7,7 +7,7 @@ from io import StringIO
 from json import load, loads
 from os import path, remove
 import sys
-from typing import Any, cast, Dict, List, Type, TypeVar, Union
+from typing import Any, cast, Type, TypeVar, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pydantic import ValidationError as PydanticValidationError
@@ -116,7 +116,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         (["2023-01-bb", "2023-01-02"], pytest.raises(ValueError)),
     ],
 )
-def test_opentimeseries_invalid_dates(dates: List[str], expectation: Any) -> None:
+def test_opentimeseries_invalid_dates(dates: list[str], expectation: Any) -> None:
     """Pytest on invalid dates as input"""
     with expectation:
         OpenTimeSeries.from_arrays(
@@ -136,7 +136,7 @@ def test_opentimeseries_invalid_dates(dates: List[str], expectation: Any) -> Non
         ([1.0, "bb"], pytest.raises(ValueError)),
     ],
 )
-def test_opentimeseries_invalid_values(values: List[float], expectation: Any) -> None:
+def test_opentimeseries_invalid_values(values: list[float], expectation: Any) -> None:
     """Pytest on invalid values as input"""
     with expectation:
         OpenTimeSeries.from_arrays(
@@ -150,7 +150,7 @@ class TestOpenTimeSeries(TestCase):
     """class to run unittests on the module series.py"""
 
     randomseries: OpenTimeSeries
-    random_properties: Dict[str, Union[dt.date, int, float]]
+    random_properties: dict[str, Union[dt.date, int, float]]
 
     @classmethod
     def setUpClass(cls: Type[TypeTestOpenTimeSeries]) -> None:
@@ -791,7 +791,7 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(ValueError) as e_boo:
             faulty_props = ["geo_ret", "boo"]
-            _ = apseries.all_properties(cast(List[LiteralSeriesProps], faulty_props))
+            _ = apseries.all_properties(cast(list[LiteralSeriesProps], faulty_props))
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:

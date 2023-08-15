@@ -6,7 +6,7 @@ from datetime import date as dtdate
 from decimal import Decimal, localcontext, ROUND_HALF_UP
 from json import loads
 from os import path, remove
-from typing import cast, List, Tuple, Type, TypeVar, Union
+from typing import cast, Type, TypeVar, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range
 from pandas.testing import assert_frame_equal
@@ -318,7 +318,7 @@ class TestOpenFrame(TestCase):
 
         _ = mpframe.make_portfolio(name=name, weight_strat="eq_weights")
         self.assertListEqual(
-            cast(List[float], mpframe.weights), [0.2, 0.2, 0.2, 0.2, 0.2]
+            cast(list[float], mpframe.weights), [0.2, 0.2, 0.2, 0.2, 0.2]
         )
 
         with localcontext() as decimal_context:
@@ -326,7 +326,7 @@ class TestOpenFrame(TestCase):
 
             _ = mpframe.make_portfolio(name=name, weight_strat="eq_risk")
             eq_risk_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
             self.assertListEqual(
                 eq_risk_weights,
@@ -341,7 +341,7 @@ class TestOpenFrame(TestCase):
 
             _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
             inv_vol_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
             self.assertListEqual(
                 inv_vol_weights,
@@ -356,7 +356,7 @@ class TestOpenFrame(TestCase):
 
             _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
             mean_var_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
             self.assertListEqual(
                 mean_var_weights,
@@ -1307,7 +1307,7 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(ValueError) as e_boo:
             faulty_props = ["geo_ret", "boo"]
             _ = apframe.all_properties(
-                properties=cast(List[LiteralFrameProps], faulty_props)
+                properties=cast(list[LiteralFrameProps], faulty_props)
             )
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
@@ -1454,12 +1454,12 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
 
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = frame.tracking_error_func(base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_info_ratio_func(self: TestOpenFrame) -> None:
@@ -1480,12 +1480,12 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdatac[0]:.10f}", "0.2063067697")
 
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = frame.info_ratio_func(base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_rolling_corr(self: TestOpenFrame) -> None:
@@ -1768,12 +1768,12 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{upp.iloc[0]:.12f}", f"{uptuple.iloc[0]:.12f}")
 
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = cframe.capture_ratio_func(ratio="up", base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
@@ -2219,25 +2219,25 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_x:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
                 y_column=0, x_column=str_col, fitted_series=False
             )
 
         self.assertEqual(
             e_x.exception.args[0],
-            "x_column should be a Tuple[str, ValueType] or an integer.",
+            "x_column should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_y:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
                 y_column=str_col, x_column=1, fitted_series=False
             )
 
         self.assertEqual(
             e_y.exception.args[0],
-            "y_column should be a Tuple[str, ValueType] or an integer.",
+            "y_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_beta(self: TestOpenFrame) -> None:
@@ -2288,21 +2288,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_beta_returns_input(self: TestOpenFrame) -> None:
@@ -2352,21 +2352,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_jensen_alpha(self: TestOpenFrame) -> None:
@@ -2416,21 +2416,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
         ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
@@ -2527,21 +2527,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_ewma_risk(self: TestOpenFrame) -> None:

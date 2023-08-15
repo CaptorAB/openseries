@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import datetime as dt
 from math import ceil
-from typing import cast, List, Union
+from typing import cast, Union
 from numpy import (
     Inf,
     isnan,
@@ -26,13 +26,13 @@ from openseries.types import LiteralQuantileInterp
 
 
 def cvar_down_calc(
-    data: Union[DataFrame, Series, List[float]], level: float = 0.95
+    data: Union[DataFrame, Series, list[float]], level: float = 0.95
 ) -> float:
     """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
     Parameters
     ----------
-    data: DataFrame | Series | List[float]
+    data: DataFrame | Series | list[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought CVaR level
@@ -53,7 +53,7 @@ def cvar_down_calc(
 
 
 def var_down_calc(
-    data: Union[DataFrame, Series, List[float]],
+    data: Union[DataFrame, Series, list[float]],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
@@ -63,7 +63,7 @@ def var_down_calc(
 
     Parameters
     ----------
-    data: DataFrame | Series | List[float]
+    data: DataFrame | Series | list[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level

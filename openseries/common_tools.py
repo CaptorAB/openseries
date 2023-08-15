@@ -4,7 +4,7 @@ Defining common tool functions
 from __future__ import annotations
 
 import datetime as dt
-from typing import Optional, Tuple, Any, cast
+from typing import Optional, Any, cast
 from dateutil.relativedelta import relativedelta
 from numpy import isnan
 from pandas import concat, DataFrame, DatetimeIndex, Series
@@ -91,7 +91,7 @@ def get_calc_range(
     months_offset: Optional[int] = None,
     from_dt: Optional[dt.date] = None,
     to_dt: Optional[dt.date] = None,
-) -> Tuple[dt.date, dt.date]:
+) -> tuple[dt.date, dt.date]:
     """Creates user defined date range
 
     Parameters

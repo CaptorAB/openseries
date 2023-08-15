@@ -7,7 +7,7 @@ from pathlib import Path
 from random import choices
 from string import ascii_letters
 from os import path
-from typing import Any, cast, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, cast, Optional, TypeVar, Union
 from math import ceil
 from numpy import cumprod, log, sqrt
 from openpyxl import Workbook
@@ -300,7 +300,7 @@ class CommonModel:
 
     def to_json(
         self: TypeCommonModel, filename: str, directory: Optional[str] = None
-    ) -> List[Dict[str, Union[str, bool, ValueType, List[str], List[float]]]]:
+    ) -> list[dict[str, Union[str, bool, ValueType, list[str], list[float]]]]:
         """Dumps timeseries data into a json file
 
         The label and tsdf parameters are deleted before the json file is saved
@@ -313,7 +313,7 @@ class CommonModel:
             File folder location
         Returns
         -------
-        List[Dict[str, Union[str, bool, ValueType, List[str], List[float]]]]
+        list[Dict[str, Union[str, bool, ValueType, list[str], list[float]]]]
             A list of dictionaries with the raw original data of the series
         """
         if not directory:
@@ -329,7 +329,7 @@ class CommonModel:
             output.append(dict(data))
         else:
             series = [
-                serie.__dict__ for serie in cast(List[Any], data.get("constituents"))
+                serie.__dict__ for serie in cast(list[Any], data.get("constituents"))
             ]
             for data in series:
                 for item in cleaner_list:
@@ -390,11 +390,11 @@ class CommonModel:
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
         directory: Optional[str] = None,
-        labels: Optional[List[str]] = None,
+        labels: Optional[list[str]] = None,
         auto_open: bool = True,
         add_logo: bool = True,
         output_type: LiteralPlotlyOutput = "file",
-    ) -> Tuple[Figure, str]:
+    ) -> tuple[Figure, str]:
         """Creates a Plotly Bar Figure
 
         Parameters
@@ -409,7 +409,7 @@ class CommonModel:
             Name of the Plotly html file
         directory: str, optional
             Directory where Plotly html file is saved
-        labels: List[str], optional
+        labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
         auto_open: bool, default: True
@@ -474,12 +474,12 @@ class CommonModel:
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
         directory: Optional[str] = None,
-        labels: Optional[List[str]] = None,
+        labels: Optional[list[str]] = None,
         auto_open: bool = True,
         add_logo: bool = True,
         show_last: bool = False,
         output_type: LiteralPlotlyOutput = "file",
-    ) -> Tuple[Figure, str]:
+    ) -> tuple[Figure, str]:
         """Creates a Plotly Figure
 
         To scale the bubble size, use the attribute sizeref.
@@ -498,7 +498,7 @@ class CommonModel:
             Name of the Plotly html file
         directory: str, optional
             Directory where Plotly html file is saved
-        labels: List[str], optional
+        labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
         auto_open: bool, default: True

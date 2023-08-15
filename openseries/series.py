@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 import datetime as dt
 from re import compile as re_compile
-from typing import cast, List, Optional, Tuple, Type, Union, TypeVar
+from typing import cast, Optional, Type, Union, TypeVar
 from numpy import (
     array,
     cumprod,
@@ -152,7 +152,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         ----------
         domestic_ccy : str, default: "SEK"
             Currency code according to ISO 4217
-        countries: List[str] | str, default: "SE"
+        countries: list[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
         ccy_pattern = re_compile(r"^[A-Z]{3}$")
@@ -453,7 +453,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         months_offset: Optional[int] = None,
         from_dt: Optional[dt.date] = None,
         to_dt: Optional[dt.date] = None,
-    ) -> Tuple[dt.date, dt.date]:
+    ) -> tuple[dt.date, dt.date]:
         """Creates user defined date range
 
         Parameters
@@ -490,13 +490,13 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return self
 
     def all_properties(
-        self: TypeOpenTimeSeries, properties: Optional[List[LiteralSeriesProps]] = None
+        self: TypeOpenTimeSeries, properties: Optional[list[LiteralSeriesProps]] = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
         ----------
-        properties: List[LiteralSeriesProps], optional
+        properties: list[LiteralSeriesProps], optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -507,7 +507,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
         if not properties:
             properties = cast(
-                List[LiteralSeriesProps], OpenTimeSeriesPropertiesList.allowed_strings
+                list[LiteralSeriesProps], OpenTimeSeriesPropertiesList.allowed_strings
             )
 
         props = OpenTimeSeriesPropertiesList(*properties)
@@ -1100,7 +1100,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-        values: List[float]
+        values: list[float]
         if any(
             x == ValueType.RTRN
             for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).values
@@ -1116,7 +1116,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
         prev = self.first_idx
         idx: dt.date
-        dates: List[dt.date] = [prev]
+        dates: list[dt.date] = [prev]
 
         for idx, row in ra_df.iterrows():
             dates.append(idx)
@@ -1213,7 +1213,7 @@ def timeseries_chain(
         if first > olddf.index[-1]:
             raise ValueError("Failed to find a matching date between series")
 
-    dates: List[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
+    dates: list[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
     values = array([x[0] for x in old.tsdf.values][: len(dates)])
     values = cast(
         NDArray[float64],

@@ -3,7 +3,7 @@ Test suite for the openseries/datefixer.py module
 """
 from __future__ import annotations
 import datetime as dt
-from typing import cast, Dict, List, Union
+from typing import cast, Union
 from unittest import TestCase
 from numpy import datetime64
 from pandas import Timestamp
@@ -94,7 +94,7 @@ class TestDateFixer(TestCase):
     def test_date_offset_foll(self: TestDateFixer) -> None:
         """Test date_offset_foll function"""
         originals = [dt.date(2022, 6, 5), dt.date(2022, 7, 3)]
-        country_sets: List[Union[str, List[str]]] = ["SE", "US", ["SE", "US"]]
+        country_sets: list[Union[str, list[str]]] = ["SE", "US", ["SE", "US"]]
         earliers = [
             dt.date(2022, 6, 3),
             dt.date(2022, 7, 1),
@@ -211,8 +211,8 @@ class TestDateFixer(TestCase):
         self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_without)
 
         jacks_birthday: Union[
-            Dict[Union[dt.date, dt.datetime, str, float, int], str],
-            List[Union[dt.date, dt.datetime, str, float, int]],
+            dict[Union[dt.date, dt.datetime, str, float, int], str],
+            list[Union[dt.date, dt.datetime, str, float, int]],
             dt.date,
             dt.datetime,
             str,
@@ -234,7 +234,7 @@ class TestDateFixer(TestCase):
             self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)
         self.assertIsInstance(e_jack.exception, AssertionError)
 
-        jbirth = cast(Dict[str, str], jacks_birthday)
+        jbirth = cast(dict[str, str], jacks_birthday)
         twentytwentyoneholidays.append(date_fix(list(jbirth.keys())[0]))
         twentytwentyoneholidays.sort()
 

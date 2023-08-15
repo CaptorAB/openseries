@@ -4,7 +4,7 @@ Test suite for the openseries/simulation.py module
 from __future__ import annotations
 from copy import copy
 from datetime import date as dtdate
-from typing import cast, Dict, List, Type, TypeVar, Union
+from typing import cast, Type, TypeVar, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range
 
@@ -50,7 +50,7 @@ class TestSimulation(TestCase):
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes"""
-        args: Dict[str, Union[int, float]] = {
+        args: dict[str, Union[int, float]] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
@@ -65,7 +65,7 @@ class TestSimulation(TestCase):
             "from_heston_vol",
             "from_merton_jump_gbm",
         ]
-        added: List[Dict[str, Union[int, float]]] = [
+        added: list[dict[str, Union[int, float]]] = [
             {},
             {},
             {},
@@ -93,7 +93,7 @@ class TestSimulation(TestCase):
         returns = []
         volatilities = []
         for method, adding in zip(methods, added):
-            arguments: Dict[str, Union[int, float]] = {**args, **adding}
+            arguments: dict[str, Union[int, float]] = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")

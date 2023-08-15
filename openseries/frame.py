@@ -6,7 +6,7 @@ from copy import deepcopy
 import datetime as dt
 from functools import reduce
 from logging import warning
-from typing import cast, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import cast, Optional, TypeVar, Union
 from ffn.core import calc_mean_var_weights, calc_inv_vol_weights, calc_erc_weights
 from numpy import cov, cumprod, log, sqrt
 from pandas import (
@@ -63,9 +63,9 @@ class OpenFrame(BaseModel, CommonModel):
 
     Parameters
     ----------
-    constituents: List[TypeOpenTimeSeries]
+    constituents: list[TypeOpenTimeSeries]
         List of objects of Class OpenTimeSeries
-    weights: List[float], optional
+    weights: list[float], optional
         List of weights in float format.
 
     Returns
@@ -74,9 +74,9 @@ class OpenFrame(BaseModel, CommonModel):
         Object of the class OpenFrame
     """
 
-    constituents: List[OpenTimeSeries]
+    constituents: list[OpenTimeSeries]
     tsdf: DataFrame = DataFrame()
-    weights: Optional[List[float]] = None
+    weights: Optional[list[float]] = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -87,8 +87,8 @@ class OpenFrame(BaseModel, CommonModel):
     # noinspection PyMethodParameters
     @field_validator("constituents")
     def check_labels_unique(  # pylint: disable=no-self-argument
-        cls: TypeOpenFrame, tseries: List[OpenTimeSeries]
-    ) -> List[OpenTimeSeries]:
+        cls: TypeOpenFrame, tseries: list[OpenTimeSeries]
+    ) -> list[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique"""
         labls = [x.label for x in tseries]
         if len(set(labls)) != len(labls):
@@ -97,8 +97,8 @@ class OpenFrame(BaseModel, CommonModel):
 
     def __init__(
         self: OpenFrame,
-        constituents: List[OpenTimeSeries],
-        weights: Optional[List[float]] = None,
+        constituents: list[OpenTimeSeries],
+        weights: Optional[list[float]] = None,
     ) -> None:
         super().__init__(constituents=constituents, weights=weights)
 
@@ -162,13 +162,13 @@ class OpenFrame(BaseModel, CommonModel):
         return self
 
     def all_properties(
-        self: TypeOpenFrame, properties: Optional[List[LiteralFrameProps]] = None
+        self: TypeOpenFrame, properties: Optional[list[LiteralFrameProps]] = None
     ) -> DataFrame:
         """Calculates the chosen timeseries properties
 
         Parameters
         ----------
-        properties: List[LiteralFrameProps], optional
+        properties: list[LiteralFrameProps], optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -191,7 +191,7 @@ class OpenFrame(BaseModel, CommonModel):
         months_offset: Optional[int] = None,
         from_dt: Optional[dt.date] = None,
         to_dt: Optional[dt.date] = None,
-    ) -> Tuple[dt.date, dt.date]:
+    ) -> tuple[dt.date, dt.date]:
         """Creates user defined date range
 
         Parameters
@@ -206,7 +206,7 @@ class OpenFrame(BaseModel, CommonModel):
 
         Returns
         -------
-        Tuple[datetime.date, datetime.date]
+        tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
         """
         return get_calc_range(
@@ -255,11 +255,11 @@ class OpenFrame(BaseModel, CommonModel):
         return len(self.constituents)
 
     @property
-    def columns_lvl_zero(self: TypeOpenFrame) -> List[str]:
+    def columns_lvl_zero(self: TypeOpenFrame) -> list[str]:
         """
         Returns
         -------
-        List[str]
+        list[str]
             Level 0 values of the Pandas.MultiIndex columns in the .tsdf
             Pandas.DataFrame
         """
@@ -267,11 +267,11 @@ class OpenFrame(BaseModel, CommonModel):
         return list(self.tsdf.columns.get_level_values(0))
 
     @property
-    def columns_lvl_one(self: TypeOpenFrame) -> List[str]:
+    def columns_lvl_one(self: TypeOpenFrame) -> list[str]:
         """
         Returns
         -------
-        List[str]
+        list[str]
             Level 1 values of the Pandas.MultiIndex columns in the .tsdf
             Pandas.DataFrame
         """
@@ -395,8 +395,8 @@ class OpenFrame(BaseModel, CommonModel):
 
     def jensen_alpha(
         self: TypeOpenFrame,
-        asset: Union[Tuple[str, ValueType], int],
-        market: Union[Tuple[str, ValueType], int],
+        asset: Union[tuple[str, ValueType], int],
+        market: Union[tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
     ) -> float:
         """The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
@@ -408,9 +408,9 @@ class OpenFrame(BaseModel, CommonModel):
 
         Parameters
         ----------
-        asset: Union[Tuple[str, ValueType], int]
+        asset: Union[tuple[str, ValueType], int]
             The column of the asset
-        market: Union[Tuple[str, ValueType], int]
+        market: Union[tuple[str, ValueType], int]
             The column of the market against which Jensen's alpha is measured
         riskfree_rate : float, default: 0.0
             The return of the zero volatility riskfree asset
@@ -431,7 +431,7 @@ class OpenFrame(BaseModel, CommonModel):
                 asset_cagr = asset_log.mean()
             else:
                 raise ValueError(
-                    "asset should be a Tuple[str, ValueType] or an integer."
+                    "asset should be a tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
                 market_log = self.tsdf.loc[:, market]
@@ -441,7 +441,7 @@ class OpenFrame(BaseModel, CommonModel):
                 market_cagr = market_log.mean()
             else:
                 raise ValueError(
-                    "market should be a Tuple[str, ValueType] or an integer."
+                    "market should be a tuple[str, ValueType] or an integer."
                 )
         else:
             if isinstance(asset, tuple):
@@ -471,7 +471,7 @@ class OpenFrame(BaseModel, CommonModel):
                     )
             else:
                 raise ValueError(
-                    "asset should be a Tuple[str, ValueType] or an integer."
+                    "asset should be a tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
                 market_log = log(
@@ -500,7 +500,7 @@ class OpenFrame(BaseModel, CommonModel):
                     )
             else:
                 raise ValueError(
-                    "market should be a Tuple[str, ValueType] or an integer."
+                    "market should be a tuple[str, ValueType] or an integer."
                 )
 
         covariance = cov(asset_log, market_log, ddof=1)
@@ -1224,7 +1224,7 @@ class OpenFrame(BaseModel, CommonModel):
 
     def tracking_error_func(
         self: TypeOpenFrame,
-        base_column: Union[Tuple[str, ValueType], int] = -1,
+        base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1236,7 +1236,7 @@ class OpenFrame(BaseModel, CommonModel):
 
         Parameters
         ----------
-        base_column: Union[Tuple[str, ValueType], int], default: -1
+        base_column: Union[tuple[str, ValueType], int], default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -1272,7 +1272,7 @@ class OpenFrame(BaseModel, CommonModel):
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
             raise ValueError(
-                "base_column should be a Tuple[str, ValueType] or an integer."
+                "base_column should be a tuple[str, ValueType] or an integer."
             )
 
         if periods_in_a_year_fixed:
@@ -1301,7 +1301,7 @@ class OpenFrame(BaseModel, CommonModel):
 
     def info_ratio_func(
         self: TypeOpenFrame,
-        base_column: Union[Tuple[str, ValueType], int] = -1,
+        base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1314,7 +1314,7 @@ class OpenFrame(BaseModel, CommonModel):
 
         Parameters
         ----------
-        base_column: Union[Tuple[str, ValueType], int], default: -1
+        base_column: Union[tuple[str, ValueType], int], default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -1350,7 +1350,7 @@ class OpenFrame(BaseModel, CommonModel):
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
             raise ValueError(
-                "base_column should be a Tuple[str, ValueType] or an integer."
+                "base_column should be a tuple[str, ValueType] or an integer."
             )
 
         if periods_in_a_year_fixed:
@@ -1381,7 +1381,7 @@ class OpenFrame(BaseModel, CommonModel):
     def capture_ratio_func(
         self: TypeOpenFrame,
         ratio: LiteralCaptureRatio,
-        base_column: Union[Tuple[str, ValueType], int] = -1,
+        base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1400,7 +1400,7 @@ class OpenFrame(BaseModel, CommonModel):
         ----------
         ratio: LiteralCaptureRatio
             The ratio to calculate
-        base_column: Union[Tuple[str, ValueType], int], default: -1
+        base_column: Union[tuple[str, ValueType], int], default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -1441,7 +1441,7 @@ class OpenFrame(BaseModel, CommonModel):
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
             raise ValueError(
-                "base_column should be a Tuple[str, ValueType] or an integer."
+                "base_column should be a tuple[str, ValueType] or an integer."
             )
 
         if periods_in_a_year_fixed:
@@ -1548,17 +1548,17 @@ class OpenFrame(BaseModel, CommonModel):
 
     def beta(
         self: TypeOpenFrame,
-        asset: Union[Tuple[str, ValueType], int],
-        market: Union[Tuple[str, ValueType], int],
+        asset: Union[tuple[str, ValueType], int],
+        market: Union[tuple[str, ValueType], int],
     ) -> float:
         """https://www.investopedia.com/terms/b/beta.asp
         Calculates Beta as Co-variance of asset & market divided by Variance of market
 
         Parameters
         ----------
-        asset: Union[Tuple[str, ValueType], int]
+        asset: Union[tuple[str, ValueType], int]
             The column of the asset
-        market: Union[Tuple[str, ValueType], int]
+        market: Union[tuple[str, ValueType], int]
             The column of the market against which Beta is measured
 
         Returns
@@ -1576,7 +1576,7 @@ class OpenFrame(BaseModel, CommonModel):
                 y_value = self.tsdf.iloc[:, asset]
             else:
                 raise ValueError(
-                    "asset should be a Tuple[str, ValueType] or an integer."
+                    "asset should be a tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
                 x_value = self.tsdf.loc[:, market]
@@ -1584,7 +1584,7 @@ class OpenFrame(BaseModel, CommonModel):
                 x_value = self.tsdf.iloc[:, market]
             else:
                 raise ValueError(
-                    "market should be a Tuple[str, ValueType] or an integer."
+                    "market should be a tuple[str, ValueType] or an integer."
                 )
         else:
             if isinstance(asset, tuple):
@@ -1595,7 +1595,7 @@ class OpenFrame(BaseModel, CommonModel):
                 y_value = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
                 raise ValueError(
-                    "asset should be a Tuple[str, ValueType] or an integer."
+                    "asset should be a tuple[str, ValueType] or an integer."
                 )
             if isinstance(market, tuple):
                 x_value = log(
@@ -1605,7 +1605,7 @@ class OpenFrame(BaseModel, CommonModel):
                 x_value = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
             else:
                 raise ValueError(
-                    "market should be a Tuple[str, ValueType] or an integer."
+                    "market should be a tuple[str, ValueType] or an integer."
                 )
 
         covariance = cov(y_value, x_value, ddof=1)
@@ -1615,8 +1615,8 @@ class OpenFrame(BaseModel, CommonModel):
 
     def ord_least_squares_fit(
         self: TypeOpenFrame,
-        y_column: Union[Tuple[str, ValueType], int],
-        x_column: Union[Tuple[str, ValueType], int],
+        y_column: Union[tuple[str, ValueType], int],
+        x_column: Union[tuple[str, ValueType], int],
         fitted_series: bool = True,
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
@@ -1627,9 +1627,9 @@ class OpenFrame(BaseModel, CommonModel):
 
         Parameters
         ----------
-        y_column: Union[Tuple[str, ValueType], int]
+        y_column: Union[tuple[str, ValueType], int]
             The column level values of the dependent variable y
-        x_column: Union[Tuple[str, ValueType], int]
+        x_column: Union[tuple[str, ValueType], int]
             The column level values of the exogenous variable x
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
@@ -1652,7 +1652,7 @@ class OpenFrame(BaseModel, CommonModel):
             y_label = self.tsdf.iloc[:, y_column].name[0]
         else:
             raise ValueError(
-                "y_column should be a Tuple[str, ValueType] or an integer."
+                "y_column should be a tuple[str, ValueType] or an integer."
             )
 
         if isinstance(x_column, tuple):
@@ -1663,7 +1663,7 @@ class OpenFrame(BaseModel, CommonModel):
             x_label = self.tsdf.iloc[:, x_column].name[0]
         else:
             raise ValueError(
-                "x_column should be a Tuple[str, ValueType] or an integer."
+                "x_column should be a tuple[str, ValueType] or an integer."
             )
 
         results = sm.OLS(y_value, x_value).fit(method=method, cov_type=cov_type)
@@ -1676,15 +1676,15 @@ class OpenFrame(BaseModel, CommonModel):
         self: TypeOpenFrame,
         name: str,
         weight_strat: Optional[LiteralPortfolioWeightings] = None,
-        initial_weights: Optional[List[float]] = None,
-        risk_weights: Optional[List[float]] = None,
+        initial_weights: Optional[list[float]] = None,
+        risk_weights: Optional[list[float]] = None,
         risk_parity_method: LiteralRiskParityMethod = "ccd",
         maximum_iterations: int = 100,
         tolerance: float = 1e-8,
-        weight_bounds: Tuple[float, float] = (0.0, 1.0),
+        weight_bounds: tuple[float, float] = (0.0, 1.0),
         riskfree: float = 0.0,
         covar_method: LiteralCovMethod = "ledoit-wolf",
-        options: Optional[Dict[str, int]] = None,
+        options: Optional[dict[str, int]] = None,
     ) -> DataFrame:
         """Calculates a basket timeseries based on the supplied weights
 
@@ -1694,9 +1694,9 @@ class OpenFrame(BaseModel, CommonModel):
             Name of the basket timeseries
         weight_strat: LiteralPortfolioWeightings, optional
             weight calculation from https://github.com/pmorissette/ffn
-        initial_weights: List[float], optional
+        initial_weights: list[float], optional
             Starting asset weights, default inverse volatility
-        risk_weights: List[float], optional
+        risk_weights: list[float], optional
             Risk target weights, default equal weight
         risk_parity_method: LiteralRiskParityMethod, default: ccd
             Risk parity estimation method
@@ -1704,7 +1704,7 @@ class OpenFrame(BaseModel, CommonModel):
             Maximum iterations in iterative solutions
         tolerance: float, default: 1e-8
             Tolerance level in iterative solutions
-        weight_bounds: Tuple[float, float], default: (0.0, 1.0)
+        weight_bounds: tuple[float, float], default: (0.0, 1.0)
             Weigh limits for optimization
         riskfree: float, default: 0.0
             Risk-free rate used in utility calculation
