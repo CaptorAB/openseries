@@ -42,7 +42,6 @@ from openseries.types import (
     DatabaseIdStringType,
     DateListType,
     ValueListType,
-    LiteralQuantileInterp,
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
     LiteralPandasReindexMethod,
@@ -51,8 +50,6 @@ from openseries.types import (
     ValueType,
 )
 from openseries.risk import (
-    cvar_down_calc,
-    var_down_calc,
     drawdown_details,
     ewma_calc,
 )
@@ -516,117 +513,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return pdf
 
     @property
-    def geo_ret(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/c/cagr.asp
-
-        Returns
-        -------
-        float
-            Compounded Annual Growth Rate (CAGR)
-        """
-        return self.geo_ret_func()
-
-    @property
-    def arithmetic_ret(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/a/arithmeticmean.asp
-
-        Returns
-        -------
-        float
-            Annualized arithmetic mean of returns
-        """
-
-        return self.arithmetic_ret_func()
-
-    @property
-    def value_ret(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
-        -------
-        float
-            Simple return
-        """
-        return self.value_ret_func()
-
-    @property
-    def vol(self: TypeOpenTimeSeries) -> float:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...])
-        in MS Excel \n
-        https://www.investopedia.com/terms/v/volatility.asp
-
-        Returns
-        -------
-        float
-            Annualized volatility
-        """
-
-        return self.vol_func()
-
-    @property
-    def downside_deviation(self: TypeOpenTimeSeries) -> float:
-        """The standard deviation of returns that are below a Minimum Accepted
-        Return of zero.
-        It is used to calculate the Sortino Ratio \n
-        https://www.investopedia.com/terms/d/downside-deviation.asp
-
-        Returns
-        -------
-        float
-            Downside deviation
-        """
-        min_accepted_return: float = 0.0
-        return self.downside_deviation_func(min_accepted_return=min_accepted_return)
-
-    @property
-    def ret_vol_ratio(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
-        -------
-        float
-            Ratio of the annualized arithmetic mean of returns and annualized
-            volatility.
-        """
-        riskfree_rate: float = 0.0
-        return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
-
-    @property
-    def sortino_ratio(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/s/sortinoratio.asp
-
-        Returns
-        -------
-        float
-        Pandas.Series
-            Sortino ratio calculated as the annualized arithmetic mean of returns
-            / downside deviation. The ratio implies that the riskfree asset has zero
-            volatility, and a minimum acceptable return of zero.
-        """
-        riskfree_rate: float = 0.0
-        return self.sortino_ratio_func(riskfree_rate=riskfree_rate)
-
-    @property
-    def z_score(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/z/zscore.asp
-
-        Returns
-        -------
-        float
-            Z-score as (last return - mean return) / standard deviation of returns.
-        """
-        return self.z_score_func()
-
-    @property
-    def max_drawdown(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
-
-        Returns
-        -------
-        float
-            Maximum drawdown without any limit on date range
-        """
-        return self.max_drawdown_func()
-
-    @property
     def max_drawdown_date(self: TypeOpenTimeSeries) -> dt.date:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
@@ -642,17 +528,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
 
     @property
-    def worst(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
-        -------
-        float
-            Most negative percentage change
-        """
-        observations: int = 1
-        return self.worst_func(observations=observations)
-
-    @property
     def worst_month(self: TypeOpenTimeSeries) -> float:
         """
         Returns
@@ -664,78 +539,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         resdf = self.tsdf.copy()
         resdf.index = DatetimeIndex(resdf.index)
         return float((resdf.resample("BM").last().pct_change().min()).iloc[0])
-
-    @property
-    def positive_share(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
-        -------
-        float
-            The share of percentage changes that are greater than zero
-        """
-        return self.positive_share_func()
-
-    @property
-    def skew(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/s/skewness.asp
-
-        Returns
-        -------
-        float
-            Skew of the return distribution
-        """
-        return self.skew_func()
-
-    @property
-    def kurtosis(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/k/kurtosis.asp
-
-        Returns
-        -------
-        float
-            Kurtosis of the return distribution
-        """
-        return self.kurtosis_func()
-
-    @property
-    def cvar_down(self: TypeOpenTimeSeries) -> float:
-        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
-
-        Returns
-        -------
-        float
-            Downside Conditional 95% Value At Risk "CVaR"
-        """
-        level: float = 0.95
-        return self.cvar_down_func(level=level)
-
-    @property
-    def var_down(self: TypeOpenTimeSeries) -> float:
-        """Downside 95% Value At Risk, "VaR". The equivalent of
-        percentile.inc([...], 1-level) over returns in MS Excel \n
-        https://www.investopedia.com/terms/v/var.asp
-
-        Returns
-        -------
-        float
-            Downside 95% Value At Risk
-        """
-        level: float = 0.95
-        interpolation: LiteralQuantileInterp = "lower"
-        return self.var_down_func(level=level, interpolation=interpolation)
-
-    @property
-    def vol_from_var(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
-        -------
-        float
-            Implied annualized volatility from the Downside 95% VaR using the
-            assumption that returns are normally distributed.
-        """
-        level: float = 0.95
-        interpolation: LiteralQuantileInterp = "lower"
-        return self.vol_from_var_func(level=level, interpolation=interpolation)
 
     def value_to_ret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
         """
@@ -792,7 +595,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
         self.valuetype = ValueType.PRICE
         self.tsdf.columns = [[self.label], [self.valuetype]]
-
         return self
 
     def from_1d_rate_to_cumret(
@@ -972,115 +774,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         data.loc[:, (self.label, ValueType.EWMA)] = rawdata
 
         return data.loc[:, (self.label, ValueType.EWMA)]
-
-    def rolling_vol(
-        self: TypeOpenTimeSeries,
-        observations: int = 21,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> DataFrame:
-        """
-        Parameters
-        ----------
-        observations: int, default: 21
-            Number of observations in the overlapping window.
-        periods_in_a_year_fixed : int, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
-
-        Returns
-        -------
-        Pandas.DataFrame
-            Rolling annualised volatilities
-        """
-
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            time_factor = self.periods_in_a_year
-        dframe = self.tsdf.pct_change().copy()
-        voldf = dframe.rolling(observations, min_periods=observations).std() * sqrt(
-            time_factor
-        )
-        voldf.dropna(inplace=True)
-        voldf.columns = [[self.label], ["Rolling volatility"]]
-
-        return voldf
-
-    def rolling_return(self: TypeOpenTimeSeries, observations: int = 21) -> DataFrame:
-        """
-        Parameters
-        ----------
-        observations: int, default: 21
-            Number of observations in the overlapping window.
-
-        Returns
-        -------
-        Pandas.DataFrame
-            Rolling returns
-        """
-
-        retdf = (
-            self.tsdf.pct_change()
-            .rolling(observations, min_periods=observations)
-            .sum()
-        )
-        retdf.columns = [[self.label], ["Rolling returns"]]
-
-        return retdf.dropna()
-
-    def rolling_cvar_down(
-        self: TypeOpenTimeSeries, level: float = 0.95, observations: int = 252
-    ) -> DataFrame:
-        """
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought Conditional Value At Risk level
-        observations: int, default: 252
-            Number of observations in the overlapping window.
-
-        Returns
-        -------
-        Pandas.DataFrame
-            Rolling annualized downside CVaR
-        """
-
-        cvardf = self.tsdf.rolling(observations, min_periods=observations).apply(
-            lambda x: cvar_down_calc(x, level=level)
-        )
-        cvardf = cvardf.dropna()
-        cvardf.columns = [[self.label], ["Rolling CVaR"]]
-
-        return cvardf
-
-    def rolling_var_down(
-        self: TypeOpenTimeSeries,
-        level: float = 0.95,
-        observations: int = 252,
-        interpolation: LiteralQuantileInterp = "lower",
-    ) -> DataFrame:
-        """
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought Value At Risk level
-        observations: int, default: 252
-            Number of observations in the overlapping window.
-        interpolation: LiteralQuantileInterp, default: "lower"
-            Type of interpolation in Pandas.DataFrame.quantile() function.
-
-        Returns
-        -------
-        Pandas.DataFrame
-           Rolling annualized downside Value At Risk "VaR"
-        """
-
-        vardf = self.tsdf.rolling(observations, min_periods=observations).apply(
-            lambda x: var_down_calc(x, level=level, interpolation=interpolation)
-        )
-        vardf = vardf.dropna()
-        vardf.columns = [[self.label], ["Rolling VaR"]]
-
-        return vardf
 
     def running_adjustment(
         self: TypeOpenTimeSeries, adjustment: float, days_in_year: int = 365

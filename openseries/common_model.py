@@ -17,7 +17,7 @@ from plotly.graph_objs import Figure
 from plotly.offline import plot
 from scipy.stats import kurtosis, norm, skew
 
-from openseries.risk import drawdown_series
+from openseries.risk import cvar_down_calc, drawdown_series, var_down_calc
 from openseries.types import (
     LiteralBarPlotMode,
     LiteralLinePlotMode,
@@ -231,6 +231,198 @@ class CommonModel:
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
         return result
+
+    @property
+    def geo_ret(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/c/cagr.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Compounded Annual Growth Rate (CAGR)
+        """
+        return self.geo_ret_func()
+
+    @property
+    def arithmetic_ret(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/a/arithmeticmean.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Annualized arithmetic mean of returns
+        """
+
+        return self.arithmetic_ret_func()
+
+    @property
+    def value_ret(self: TypeCommonModel) -> Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            Simple return
+        """
+        return self.value_ret_func()
+
+    @property
+    def vol(self: TypeCommonModel) -> Series:
+        """Based on Pandas .std() which is the equivalent of stdev.s([...])
+        in MS Excel \n
+        https://www.investopedia.com/terms/v/volatility.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Annualized volatility
+        """
+        return self.vol_func()
+
+    @property
+    def downside_deviation(self: TypeCommonModel) -> Series:
+        """The standard deviation of returns that are below a Minimum Accepted
+        Return of zero.
+        It is used to calculate the Sortino Ratio \n
+        https://www.investopedia.com/terms/d/downside-deviation.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Downside deviation
+        """
+        min_accepted_return: float = 0.0
+        return self.downside_deviation_func(min_accepted_return=min_accepted_return)
+
+    @property
+    def ret_vol_ratio(self: TypeCommonModel) -> Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            Ratio of the annualized arithmetic mean of returns and annualized
+            volatility.
+        """
+        riskfree_rate: float = 0.0
+        return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
+
+    @property
+    def sortino_ratio(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/s/sortinoratio.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Sortino ratio calculated as the annualized arithmetic mean of returns
+            / downside deviation. The ratio implies that the riskfree asset has zero
+            volatility, and a minimum acceptable return of zero.
+        """
+        riskfree_rate: float = 0.0
+        return self.sortino_ratio_func(riskfree_rate=riskfree_rate)
+
+    @property
+    def z_score(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/z/zscore.asp
+
+        Returns
+        -------
+        float
+            Z-score as (last return - mean return) / standard deviation of returns.
+        """
+        return self.z_score_func()
+
+    @property
+    def max_drawdown(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Maximum drawdown without any limit on date range
+        """
+        return self.max_drawdown_func()
+
+    @property
+    def worst(self: TypeCommonModel) -> Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            Most negative percentage change
+        """
+        observations: int = 1
+        return self.worst_func(observations=observations)
+
+    @property
+    def positive_share(self: TypeCommonModel) -> Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            The share of percentage changes that are greater than zero
+        """
+        return self.positive_share_func()
+
+    @property
+    def skew(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/s/skewness.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Skew of the return distribution
+        """
+        return self.skew_func()
+
+    @property
+    def kurtosis(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/k/kurtosis.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Kurtosis of the return distribution
+        """
+        return self.kurtosis_func()
+
+    @property
+    def cvar_down(self: TypeCommonModel) -> Series:
+        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Downside 95% Conditional Value At Risk "CVaR"
+        """
+        level: float = 0.95
+        return self.cvar_down_func(level=level)
+
+    @property
+    def var_down(self: TypeCommonModel) -> Series:
+        """Downside 95% Value At Risk, "VaR". The equivalent of
+        percentile.inc([...], 1-level) over returns in MS Excel \n
+        https://www.investopedia.com/terms/v/var.asp
+
+        Returns
+        -------
+        Pandas.Series
+            Downside 95% Value At Risk
+        """
+        level: float = 0.95
+        interpolation: LiteralQuantileInterp = "lower"
+        return self.var_down_func(level=level, interpolation=interpolation)
+
+    @property
+    def vol_from_var(self: TypeCommonModel) -> Series:
+        """
+        Returns
+        -------
+        Pandas.Series
+            Implied annualized volatility from the Downside 95% VaR using the
+            assumption that returns are normally distributed.
+        """
+        level: float = 0.95
+        interpolation: LiteralQuantileInterp = "lower"
+        return self.vol_from_var_func(level=level, interpolation=interpolation)
 
     def value_to_log(self: TypeCommonModel) -> TypeCommonModel:
         """Converts a valueseries into logarithmic weighted series \n
@@ -1577,3 +1769,136 @@ class CommonModel:
             name="Z-score",
             dtype="float64",
         )
+
+    def rolling_cvar_down(
+        self: TypeCommonModel,
+        column: int = 0,
+        level: float = 0.95,
+        observations: int = 252,
+    ) -> DataFrame:
+        """
+        Parameters
+        ----------
+        column: int, default: 0
+            Position as integer of column to calculate
+        level: float, default: 0.95
+            The sought Conditional Value At Risk level
+        observations: int, default: 252
+            Number of observations in the overlapping window.
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling annualized downside CVaR
+        """
+        cvar_label = self.tsdf.iloc[:, column].name[0]
+        cvardf = (
+            self.tsdf.iloc[:, column]
+            .rolling(observations, min_periods=observations)
+            .apply(lambda x: cvar_down_calc(x, level=level))
+        )
+        cvardf = cvardf.dropna().to_frame()
+        cvardf.columns = [[cvar_label], ["Rolling CVaR"]]
+
+        return cvardf
+
+    def rolling_return(
+        self: TypeCommonModel, column: int = 0, observations: int = 21
+    ) -> DataFrame:
+        """
+        Parameters
+        ----------
+        column: int, default: 0
+            Position as integer of column to calculate
+        observations: int, default: 21
+            Number of observations in the overlapping window.
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling returns
+        """
+        ret_label = self.tsdf.iloc[:, column].name[0]
+        retdf = (
+            self.tsdf.iloc[:, column]
+            .pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
+        )
+        retdf = retdf.dropna().to_frame()
+        retdf.columns = [[ret_label], ["Rolling returns"]]
+
+        return retdf
+
+    def rolling_var_down(
+        self: TypeCommonModel,
+        column: int = 0,
+        level: float = 0.95,
+        observations: int = 252,
+        interpolation: LiteralQuantileInterp = "lower",
+    ) -> DataFrame:
+        """
+        Parameters
+        ----------
+        column: int, default: 0
+            Position as integer of column to calculate
+        level: float, default: 0.95
+            The sought Value At Risk level
+        observations: int, default: 252
+            Number of observations in the overlapping window.
+        interpolation: LiteralQuantileInterp, default: "lower"
+            Type of interpolation in Pandas.DataFrame.quantile() function.
+
+        Returns
+        -------
+        Pandas.DataFrame
+           Rolling annualized downside Value At Risk "VaR"
+        """
+        var_label = self.tsdf.iloc[:, column].name[0]
+        vardf = (
+            self.tsdf.iloc[:, column]
+            .rolling(observations, min_periods=observations)
+            .apply(
+                lambda x: var_down_calc(x, level=level, interpolation=interpolation)
+            )
+        )
+        vardf = vardf.dropna().to_frame()
+        vardf.columns = [[var_label], ["Rolling VaR"]]
+
+        return vardf
+
+    def rolling_vol(
+        self: TypeCommonModel,
+        column: int = 0,
+        observations: int = 21,
+        periods_in_a_year_fixed: Optional[int] = None,
+    ) -> DataFrame:
+        """
+        Parameters
+        ----------
+        column: int, default: 0
+            Position as integer of column to calculate
+        observations: int, default: 21
+            Number of observations in the overlapping window.
+        periods_in_a_year_fixed : int, optional
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
+
+        Returns
+        -------
+        Pandas.DataFrame
+            Rolling annualised volatilities
+        """
+        if periods_in_a_year_fixed:
+            time_factor = float(periods_in_a_year_fixed)
+        else:
+            time_factor = self.periods_in_a_year
+        vol_label = self.tsdf.iloc[:, column].name[0]
+        dframe = self.tsdf.iloc[:, column].pct_change()
+        voldf = dframe.rolling(observations, min_periods=observations).std() * sqrt(
+            time_factor
+        )
+        voldf = voldf.dropna().to_frame()
+        voldf.columns = [[vol_label], ["Rolling volatility"]]
+
+        return voldf

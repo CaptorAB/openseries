@@ -11,11 +11,11 @@ from unittest import TestCase
 from pandas import DataFrame, date_range, Series
 from pandas.testing import assert_frame_equal
 
+from tests.common_sim import FIVE_SIMS
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down_calc, var_down_calc
 from openseries.series import OpenTimeSeries
-from openseries.simulation import ReturnSimulation
 from openseries.types import (
     LiteralFrameProps,
     LiteralPortfolioWeightings,
@@ -28,34 +28,22 @@ TypeTestOpenFrame = TypeVar("TypeTestOpenFrame", bound="TestOpenFrame")
 class TestOpenFrame(TestCase):
     """class to run unittests on the module frame.py"""
 
-    sim: ReturnSimulation
     randomframe: OpenFrame
     randomseries: OpenTimeSeries
 
     @classmethod
     def setUpClass(cls: Type[TypeTestOpenFrame]) -> None:
         """setUpClass for the TestOpenFrame class"""
-        sim = ReturnSimulation.from_merton_jump_gbm(
-            number_of_sims=5,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            trading_days_in_year=252,
-            seed=71,
-        )
         cls.randomseries = OpenTimeSeries.from_df(
-            sim.to_dataframe(name="Asset", end=dtdate(2019, 6, 30))
+            FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30))
         ).to_cumret()
         cls.randomframe = OpenFrame(
             [
                 OpenTimeSeries.from_df(
-                    sim.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
+                    FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
                     column_nmbr=serie,
                 )
-                for serie in range(sim.number_of_sims)
+                for serie in range(FIVE_SIMS.number_of_sims)
             ]
         )
 

@@ -12,6 +12,7 @@ from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
 from openseries.types import ValueType
 from openseries.simulation import ReturnSimulation, ModelParameters
+from tests.common_sim import ONE_SIM, FIVE_SIMS
 
 TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")
 
@@ -25,28 +26,8 @@ class TestSimulation(TestCase):
     @classmethod
     def setUpClass(cls: Type[TypeTestSimulation]) -> None:
         """setUpClass for the TestSimulation class"""
-        cls.seriesim = ReturnSimulation.from_merton_jump_gbm(
-            number_of_sims=1,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            trading_days_in_year=252,
-            seed=71,
-        )
-        cls.framesim = ReturnSimulation.from_merton_jump_gbm(
-            number_of_sims=5,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            trading_days_in_year=252,
-            seed=71,
-        )
+        cls.seriesim = ONE_SIM
+        cls.framesim = FIVE_SIMS
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes"""
