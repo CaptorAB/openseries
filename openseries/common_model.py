@@ -131,7 +131,13 @@ def var_implied_vol_and_target_func(
 
 
 class CommonModel:
-    """CommonModel declared"""
+    """CommonModel declared
+
+    Parameters
+    ----------
+    tsdf: pandas.DataFrame
+        Pandas object holding dates and values that can be altered via methods
+    """
 
     tsdf: DataFrame
 

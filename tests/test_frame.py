@@ -8,7 +8,7 @@ from json import loads
 from os import path, remove
 from typing import cast, Type, TypeVar, Union
 from unittest import TestCase
-from pandas import DataFrame, date_range
+from pandas import DataFrame, date_range, Series
 from pandas.testing import assert_frame_equal
 
 from openseries.datefixer import date_offset_foll
@@ -534,17 +534,17 @@ class TestOpenFrame(TestCase):
         samef = self.randomframe.from_deepcopy()
         samef.to_cumret()
 
-        smf_vrf = float(
-            samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
-        )
+        smf_vrf = cast(
+            Series, samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12)
+        ).iloc[0]
         self.assertEqual(
             f"{sames.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
             f"{smf_vrf:.11f}",
         )
 
-        smf_srf = float(
-            samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
-        )
+        smf_srf = cast(
+            Series, samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12)
+        ).iloc[0]
         self.assertEqual(
             f"{sames.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
             f"{smf_srf:.11f}",
@@ -1389,15 +1389,20 @@ class TestOpenFrame(TestCase):
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        simdataa = frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=-1)
-
-        self.assertEqual(f"{simdataa[0]:.10f}", "0.1580040085")
-
-        simdatab = frame.ret_vol_ratio_func(
-            riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
+        simdataa = cast(
+            Series, frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=-1)
         )
 
-        self.assertEqual(f"{simdatab[0]:.10f}", "0.1578870346")
+        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.1580040085")
+
+        simdatab = cast(
+            Series,
+            frame.ret_vol_ratio_func(
+                riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
+            ),
+        )
+
+        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.1578870346")
 
         with self.assertRaises(Exception) as e_retvolfunc:
             str_col = cast(int, "string")
@@ -1413,15 +1418,20 @@ class TestOpenFrame(TestCase):
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        simdataa = frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=-1)
-
-        self.assertEqual(f"{simdataa[0]:.10f}", "0.2009532877")
-
-        simdatab = frame.sortino_ratio_func(
-            riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
+        simdataa = cast(
+            Series, frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=-1)
         )
 
-        self.assertEqual(f"{simdatab[0]:.10f}", "0.2008045175")
+        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.2009532877")
+
+        simdatab = cast(
+            Series,
+            frame.sortino_ratio_func(
+                riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
+            ),
+        )
+
+        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.2008045175")
 
         with self.assertRaises(Exception) as e_func:
             str_col = cast(int, "string")
@@ -1797,7 +1807,8 @@ class TestOpenFrame(TestCase):
         )
 
         self.assertListEqual(
-            [f"{gr:.5f}" for gr in geoframe.geo_ret_func()], ["0.10007", "0.20015"]
+            [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret_func())],
+            ["0.10007", "0.20015"],
         )
 
         geoframe.add_timeseries(
@@ -2057,7 +2068,7 @@ class TestOpenFrame(TestCase):
             for ddat, undat in zip(dated, undated):
                 self.assertEqual(f"{ddat:.10f}", f"{undat:.10f}")
 
-        ret = [f"{rr:.9f}" for rr in mframe.value_ret_func()]
+        ret = [f"{rr:.9f}" for rr in cast(Series, mframe.value_ret_func())]
         self.assertListEqual(
             [
                 "0.024471958",
@@ -2069,9 +2080,13 @@ class TestOpenFrame(TestCase):
             ret,
         )
 
-        impvol = [f"{iv:.11f}" for iv in mframe.vol_from_var_func(drift_adjust=False)]
+        impvol = [
+            f"{iv:.11f}"
+            for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=False))
+        ]
         impvoldrifted = [
-            f"{iv:.11f}" for iv in mframe.vol_from_var_func(drift_adjust=True)
+            f"{iv:.11f}"
+            for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=True))
         ]
 
         self.assertListEqual(
@@ -2126,11 +2141,11 @@ class TestOpenFrame(TestCase):
         vrff_y = vrcframe.value_ret_func(
             from_date=dtdate(2017, 12, 29), to_date=dtdate(2018, 12, 28)
         )
-        vrffl_y = [f"{rr:.11f}" for rr in vrff_y]
+        vrffl_y = [f"{rr:.11f}" for rr in cast(Series, vrff_y)]
 
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
         vrvrcf_y = vrcframe.value_ret_calendar_period(year=2018)
-        vrvrcfl_y = [f"{rr:.11f}" for rr in vrvrcf_y]
+        vrvrcfl_y = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_y)]
 
         self.assertEqual(f"{vrfs_y:.11f}", f"{vrvrcs_y:.11f}")
         self.assertListEqual(vrffl_y, vrvrcfl_y)
@@ -2141,11 +2156,11 @@ class TestOpenFrame(TestCase):
         vrff_ym = vrcframe.value_ret_func(
             from_date=dtdate(2018, 4, 30), to_date=dtdate(2018, 5, 31)
         )
-        vrffl_ym = [f"{rr:.11f}" for rr in vrff_ym]
+        vrffl_ym = [f"{rr:.11f}" for rr in cast(Series, vrff_ym)]
 
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
         vrvrcf_ym = vrcframe.value_ret_calendar_period(year=2018, month=5)
-        vrvrcfl_ym = [f"{rr:.11f}" for rr in vrvrcf_ym]
+        vrvrcfl_ym = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_ym)]
 
         self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")
         self.assertListEqual(vrffl_ym, vrvrcfl_ym)
