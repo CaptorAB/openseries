@@ -6,20 +6,20 @@ from datetime import date as dtdate
 from decimal import Decimal, localcontext, ROUND_HALF_UP
 from json import loads
 from os import path, remove
-from typing import cast, List, Tuple, Type, TypeVar, Union
+from typing import cast, Type, TypeVar, Union
 from unittest import TestCase
-from pandas import DataFrame, date_range
+from pandas import DataFrame, date_range, Series
 from pandas.testing import assert_frame_equal
 
+from tests.common_sim import FIVE_SIMS
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
-from openseries.risk import cvar_down, var_down
-from openseries.series import OpenTimeSeries, ValueType
-from openseries.simulation import ReturnSimulation
+from openseries.risk import cvar_down_calc, var_down_calc
+from openseries.series import OpenTimeSeries
 from openseries.types import (
-    LiteralNanMethod,
     LiteralFrameProps,
     LiteralPortfolioWeightings,
+    ValueType,
 )
 
 TypeTestOpenFrame = TypeVar("TypeTestOpenFrame", bound="TestOpenFrame")
@@ -28,34 +28,22 @@ TypeTestOpenFrame = TypeVar("TypeTestOpenFrame", bound="TestOpenFrame")
 class TestOpenFrame(TestCase):
     """class to run unittests on the module frame.py"""
 
-    sim: ReturnSimulation
     randomframe: OpenFrame
     randomseries: OpenTimeSeries
 
     @classmethod
     def setUpClass(cls: Type[TypeTestOpenFrame]) -> None:
         """setUpClass for the TestOpenFrame class"""
-        sim = ReturnSimulation.from_merton_jump_gbm(
-            number_of_sims=5,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            trading_days_in_year=252,
-            seed=71,
-        )
         cls.randomseries = OpenTimeSeries.from_df(
-            sim.to_dataframe(name="Asset", end=dtdate(2019, 6, 30))
+            FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30))
         ).to_cumret()
         cls.randomframe = OpenFrame(
             [
                 OpenTimeSeries.from_df(
-                    sim.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
+                    FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
                     column_nmbr=serie,
                 )
-                for serie in range(sim.number_of_sims)
+                for serie in range(FIVE_SIMS.number_of_sims)
             ]
         )
 
@@ -76,6 +64,24 @@ class TestOpenFrame(TestCase):
             ]
         )
         self.assertIsInstance(frame_df.tsdf, DataFrame)
+
+    def test_save_to_json(self: TestOpenFrame) -> None:
+        """Test to_json method"""
+        seriesfile = path.join(path.dirname(path.abspath(__file__)), "framesaved.json")
+
+        jseries = self.randomframe.from_deepcopy()
+        data = jseries.to_json(filename=seriesfile)
+
+        self.assertListEqual(
+            [item.get("name") for item in data],
+            ["Asset_0", "Asset_1", "Asset_2", "Asset_3", "Asset_4"],
+        )
+
+        self.assertTrue(path.exists(seriesfile))
+
+        remove(seriesfile)
+
+        self.assertFalse(path.exists(seriesfile))
 
     def test_save_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method"""
@@ -300,7 +306,7 @@ class TestOpenFrame(TestCase):
 
         _ = mpframe.make_portfolio(name=name, weight_strat="eq_weights")
         self.assertListEqual(
-            cast(List[float], mpframe.weights), [0.2, 0.2, 0.2, 0.2, 0.2]
+            cast(list[float], mpframe.weights), [0.2, 0.2, 0.2, 0.2, 0.2]
         )
 
         with localcontext() as decimal_context:
@@ -308,7 +314,7 @@ class TestOpenFrame(TestCase):
 
             _ = mpframe.make_portfolio(name=name, weight_strat="eq_risk")
             eq_risk_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
             self.assertListEqual(
                 eq_risk_weights,
@@ -323,7 +329,7 @@ class TestOpenFrame(TestCase):
 
             _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
             inv_vol_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
             self.assertListEqual(
                 inv_vol_weights,
@@ -338,7 +344,7 @@ class TestOpenFrame(TestCase):
 
             _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
             mean_var_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(List[float], mpframe.weights)
+                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
             self.assertListEqual(
                 mean_var_weights,
@@ -394,34 +400,34 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(
             riskseries.cvar_down,
-            cvar_down(riskseries.tsdf.iloc[:, 0].tolist()),
+            cvar_down_calc(riskseries.tsdf.iloc[:, 0].tolist()),
             msg="CVaR for OpenTimeSeries not equal",
         )
         self.assertEqual(
             riskseries.var_down,
-            var_down(riskseries.tsdf.iloc[:, 0].tolist()),
+            var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()),
             msg="VaR for OpenTimeSeries not equal",
         )
 
         self.assertEqual(
             riskframe.cvar_down.iloc[0],
-            cvar_down(riskframe.tsdf.iloc[:, 0]),
+            cvar_down_calc(riskframe.tsdf.iloc[:, 0]),
             msg="CVaR for OpenFrame not equal",
         )
         self.assertEqual(
             riskframe.var_down.iloc[0],
-            var_down(riskframe.tsdf.iloc[:, 0]),
+            var_down_calc(riskframe.tsdf.iloc[:, 0]),
             msg="VaR for OpenFrame not equal",
         )
 
         self.assertEqual(
             riskframe.cvar_down.iloc[0],
-            cvar_down(riskframe.tsdf),
+            cvar_down_calc(riskframe.tsdf),
             msg="CVaR for OpenFrame not equal",
         )
         self.assertEqual(
             riskframe.var_down.iloc[0],
-            var_down(riskframe.tsdf),
+            var_down_calc(riskframe.tsdf),
             msg="VaR for OpenFrame not equal",
         )
 
@@ -492,10 +498,10 @@ class TestOpenFrame(TestCase):
             "max_drawdown_func",
             "positive_share_func",
             "skew_func",
+            "vol_from_var_func",
             "target_weight_from_var",
             "value_ret_func",
             "var_down_func",
-            "vol_from_var_func",
             "vol_func",
             "worst_func",
             "z_score_func",
@@ -516,19 +522,19 @@ class TestOpenFrame(TestCase):
         samef = self.randomframe.from_deepcopy()
         samef.to_cumret()
 
-        smf_vrf = float(
-            samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
-        )
+        smf_vrf = cast(
+            Series, samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12)
+        ).iloc[0]
         self.assertEqual(
-            f"{sames.ret_vol_ratio_func(months_from_last=12):.11f}",
+            f"{sames.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
             f"{smf_vrf:.11f}",
         )
 
-        smf_srf = float(
-            samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12).iloc[0]
-        )
+        smf_srf = cast(
+            Series, samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12)
+        ).iloc[0]
         self.assertEqual(
-            f"{sames.sortino_ratio_func(months_from_last=12):.11f}",
+            f"{sames.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
             f"{smf_srf:.11f}",
         )
 
@@ -772,6 +778,7 @@ class TestOpenFrame(TestCase):
             "rolling_var_down",
             "to_cumret",
             "to_drawdown_series",
+            "to_json",
             "to_xlsx",
             "value_nan_handle",
             "value_ret_calendar_period",
@@ -792,7 +799,6 @@ class TestOpenFrame(TestCase):
             "pandas_df",
             "running_adjustment",
             "set_new_label",
-            "to_json",
             "setup_class",
             "check_isincode",
             "check_dates_unique",
@@ -1253,7 +1259,7 @@ class TestOpenFrame(TestCase):
     def test_all_properties(self: TestOpenFrame) -> None:
         """Test all_properties method"""
         prop_index = [
-            "Total return",
+            "Simple return",
             "Geometric return",
             "Arithmetic return",
             "Volatility",
@@ -1263,15 +1269,15 @@ class TestOpenFrame(TestCase):
             "Z-score",
             "Skew",
             "Kurtosis",
-            "Positive share",
+            "Positive Share",
             "VaR 95.0%",
             "CVaR 95.0%",
             "Imp vol from VaR 95%",
             "Worst",
             "Worst month",
-            "Max drawdown",
+            "Max Drawdown",
             "Max drawdown dates",
-            "Max drawdown in cal yr",
+            "Max Drawdown in cal yr",
             "first indices",
             "last indices",
             "observations",
@@ -1289,7 +1295,7 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(ValueError) as e_boo:
             faulty_props = ["geo_ret", "boo"]
             _ = apframe.all_properties(
-                properties=cast(List[LiteralFrameProps], faulty_props)
+                properties=cast(list[LiteralFrameProps], faulty_props)
             )
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
@@ -1371,31 +1377,28 @@ class TestOpenFrame(TestCase):
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        simdataa = frame.ret_vol_ratio_func(riskfree_column=-1)
-
-        self.assertEqual(f"{simdataa[0]:.10f}", "0.1580040085")
-
-        simdatab = frame.ret_vol_ratio_func(
-            riskfree_column=-1, periods_in_a_year_fixed=251
+        simdataa = cast(
+            Series, frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=-1)
         )
 
-        self.assertEqual(f"{simdatab[0]:.10f}", "0.1578870346")
+        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.1580040085")
 
-        simdatac = frame.ret_vol_ratio_func(
-            riskfree_column=("Asset_4", ValueType.PRICE)
+        simdatab = cast(
+            Series,
+            frame.ret_vol_ratio_func(
+                riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
+            ),
         )
 
-        self.assertEqual(f"{simdatac[0]:.10f}", "0.1580040085")
-
-        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
+        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.1578870346")
 
         with self.assertRaises(Exception) as e_retvolfunc:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
-            _ = frame.ret_vol_ratio_func(riskfree_column=str_col)
+            str_col = cast(int, "string")
+            _ = frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=str_col)
 
         self.assertEqual(
             e_retvolfunc.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column argument should be an integer.",
         )
 
     def test_sortino_ratio_func(self: TestOpenFrame) -> None:
@@ -1403,31 +1406,28 @@ class TestOpenFrame(TestCase):
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        simdataa = frame.sortino_ratio_func(riskfree_column=-1)
-
-        self.assertEqual(f"{simdataa[0]:.10f}", "0.2009532877")
-
-        simdatab = frame.sortino_ratio_func(
-            riskfree_column=-1, periods_in_a_year_fixed=251
+        simdataa = cast(
+            Series, frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=-1)
         )
 
-        self.assertEqual(f"{simdatab[0]:.10f}", "0.2008045175")
+        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.2009532877")
 
-        simdatac = frame.sortino_ratio_func(
-            riskfree_column=("Asset_4", ValueType.PRICE)
+        simdatab = cast(
+            Series,
+            frame.sortino_ratio_func(
+                riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
+            ),
         )
 
-        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
-
-        self.assertEqual(f"{simdatac[0]:.10f}", "0.2009532877")
+        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.2008045175")
 
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
-            _ = frame.sortino_ratio_func(riskfree_column=str_col)
+            str_col = cast(int, "string")
+            _ = frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column argument should be an integer.",
         )
 
     def test_tracking_error_func(self: TestOpenFrame) -> None:
@@ -1452,12 +1452,12 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
 
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = frame.tracking_error_func(base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_info_ratio_func(self: TestOpenFrame) -> None:
@@ -1478,12 +1478,12 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdatac[0]:.10f}", "0.2063067697")
 
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = frame.info_ratio_func(base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_rolling_corr(self: TestOpenFrame) -> None:
@@ -1766,12 +1766,12 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{upp.iloc[0]:.12f}", f"{uptuple.iloc[0]:.12f}")
 
         with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = cframe.capture_ratio_func(ratio="up", base_column=str_col)
 
         self.assertEqual(
             e_func.exception.args[0],
-            "base_column should be a Tuple[str, ValueType] or an integer.",
+            "base_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
@@ -1795,7 +1795,8 @@ class TestOpenFrame(TestCase):
         )
 
         self.assertListEqual(
-            [f"{gr:.5f}" for gr in geoframe.geo_ret_func()], ["0.10007", "0.20015"]
+            [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret_func())],
+            ["0.10007", "0.20015"],
         )
 
         geoframe.add_timeseries(
@@ -1805,6 +1806,7 @@ class TestOpenFrame(TestCase):
                 values=[0.0, 1.1],
             )
         )
+
         with self.assertRaises(Exception) as e_gr_zero:
             _ = geoframe.geo_ret
 
@@ -1906,15 +1908,6 @@ class TestOpenFrame(TestCase):
             [2.1, 2.0, 1.8, 1.8, 2.0], fillframe.tsdf.iloc[:, 1].tolist()
         )
 
-        with self.assertRaises(AssertionError) as e_methd:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanframe.value_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_methd.exception.args[0],
-            "Method must be either fill or drop passed as string.",
-        )
-
     def test_return_nan_handle(self: TestOpenFrame) -> None:
         """Test return_nan_handle method"""
         nanframe = OpenFrame(
@@ -1959,15 +1952,6 @@ class TestOpenFrame(TestCase):
         )
         self.assertListEqual(
             [0.01, 0.04, 0.02, 0.0, 0.06], fillframe.tsdf.iloc[:, 1].tolist()
-        )
-
-        with self.assertRaises(AssertionError) as e_methd:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanframe.return_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_methd.exception.args[0],
-            "Method must be either fill or drop passed as string.",
         )
 
     def test_relative(self: TestOpenFrame) -> None:
@@ -2072,7 +2056,7 @@ class TestOpenFrame(TestCase):
             for ddat, undat in zip(dated, undated):
                 self.assertEqual(f"{ddat:.10f}", f"{undat:.10f}")
 
-        ret = [f"{rr:.9f}" for rr in mframe.value_ret_func()]
+        ret = [f"{rr:.9f}" for rr in cast(Series, mframe.value_ret_func())]
         self.assertListEqual(
             [
                 "0.024471958",
@@ -2084,9 +2068,13 @@ class TestOpenFrame(TestCase):
             ret,
         )
 
-        impvol = [f"{iv:.11f}" for iv in mframe.vol_from_var_func(drift_adjust=False)]
+        impvol = [
+            f"{iv:.11f}"
+            for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=False))
+        ]
         impvoldrifted = [
-            f"{iv:.11f}" for iv in mframe.vol_from_var_func(drift_adjust=True)
+            f"{iv:.11f}"
+            for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=True))
         ]
 
         self.assertListEqual(
@@ -2116,7 +2104,7 @@ class TestOpenFrame(TestCase):
             _ = mframe.value_ret
 
         self.assertIn(
-            member="Error in function value_ret due to an initial value being zero",
+            member="Simple return cannot be calculated due to an",
             container=str(e_vr.exception),
         )
 
@@ -2124,7 +2112,7 @@ class TestOpenFrame(TestCase):
             _ = mframe.value_ret_func()
 
         self.assertIn(
-            member="Error in function value_ret due to an initial value " "being zero",
+            member="Simple return cannot be calculated due to an",
             container=str(e_vrf.exception),
         )
 
@@ -2141,11 +2129,11 @@ class TestOpenFrame(TestCase):
         vrff_y = vrcframe.value_ret_func(
             from_date=dtdate(2017, 12, 29), to_date=dtdate(2018, 12, 28)
         )
-        vrffl_y = [f"{rr:.11f}" for rr in vrff_y]
+        vrffl_y = [f"{rr:.11f}" for rr in cast(Series, vrff_y)]
 
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
         vrvrcf_y = vrcframe.value_ret_calendar_period(year=2018)
-        vrvrcfl_y = [f"{rr:.11f}" for rr in vrvrcf_y]
+        vrvrcfl_y = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_y)]
 
         self.assertEqual(f"{vrfs_y:.11f}", f"{vrvrcs_y:.11f}")
         self.assertListEqual(vrffl_y, vrvrcfl_y)
@@ -2156,11 +2144,11 @@ class TestOpenFrame(TestCase):
         vrff_ym = vrcframe.value_ret_func(
             from_date=dtdate(2018, 4, 30), to_date=dtdate(2018, 5, 31)
         )
-        vrffl_ym = [f"{rr:.11f}" for rr in vrff_ym]
+        vrffl_ym = [f"{rr:.11f}" for rr in cast(Series, vrff_ym)]
 
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
         vrvrcf_ym = vrcframe.value_ret_calendar_period(year=2018, month=5)
-        vrvrcfl_ym = [f"{rr:.11f}" for rr in vrvrcf_ym]
+        vrvrcfl_ym = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_ym)]
 
         self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")
         self.assertListEqual(vrffl_ym, vrvrcfl_ym)
@@ -2234,25 +2222,25 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_x:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
                 y_column=0, x_column=str_col, fitted_series=False
             )
 
         self.assertEqual(
             e_x.exception.args[0],
-            "x_column should be a Tuple[str, ValueType] or an integer.",
+            "x_column should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_y:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
                 y_column=str_col, x_column=1, fitted_series=False
             )
 
         self.assertEqual(
             e_y.exception.args[0],
-            "y_column should be a Tuple[str, ValueType] or an integer.",
+            "y_column should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_beta(self: TestOpenFrame) -> None:
@@ -2303,21 +2291,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_beta_returns_input(self: TestOpenFrame) -> None:
@@ -2367,21 +2355,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = bframe.beta(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_jensen_alpha(self: TestOpenFrame) -> None:
@@ -2431,21 +2419,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
         ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
@@ -2542,21 +2530,21 @@ class TestOpenFrame(TestCase):
             ],
         )
         with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=str_col, market=1)
 
         self.assertEqual(
             e_asset.exception.args[0],
-            "asset should be a Tuple[str, ValueType] or an integer.",
+            "asset should be a tuple[str, ValueType] or an integer.",
         )
 
         with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[Tuple[str, ValueType], int], "string")
+            str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = jframe.jensen_alpha(asset=0, market=str_col)
 
         self.assertEqual(
             e_market.exception.args[0],
-            "market should be a Tuple[str, ValueType] or an integer.",
+            "market should be a tuple[str, ValueType] or an integer.",
         )
 
     def test_ewma_risk(self: TestOpenFrame) -> None:

@@ -2,11 +2,11 @@
 Date related utilities
 """
 import datetime as dt
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
-from pandas import date_range, Timestamp
+from pandas import DataFrame, date_range, Timestamp
 from pandas.tseries.offsets import CustomBusinessDay
 
 from openseries.types import CountriesType, TradingDaysType
@@ -18,8 +18,8 @@ def holiday_calendar(
     countries: CountriesType = "SE",
     custom_holidays: Optional[
         Union[
-            Dict[Union[dt.date, dt.datetime, str, float, int], str],
-            List[Union[dt.date, dt.datetime, str, float, int]],
+            dict[Union[dt.date, dt.datetime, str, float, int], str],
+            list[Union[dt.date, dt.datetime, str, float, int]],
             Union[dt.date, dt.datetime, str, float, int],
         ]
     ] = None,
@@ -32,11 +32,11 @@ def holiday_calendar(
         First year in date range generated
     endyear: int
         Last year in date range generated
-    countries: List[str] | str, default: "SE"
+    countries: list[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
+        dict[Union[dt.date, dt.datetime, str, float, int], str],
+        list[Union[dt.date, dt.datetime, str, float, int]],
         Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
@@ -61,7 +61,7 @@ def holiday_calendar(
         country in list_supported_countries() for country in countries
     ):
         country: str
-        countryholidays: List[Union[dt.date, str]] = []
+        countryholidays: list[Union[dt.date, str]] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:
@@ -119,8 +119,8 @@ def date_offset_foll(
     countries: CountriesType = "SE",
     custom_holidays: Optional[
         Union[
-            Dict[Union[dt.date, dt.datetime, str, float, int], str],
-            List[Union[dt.date, dt.datetime, str, float, int]],
+            dict[Union[dt.date, dt.datetime, str, float, int], str],
+            list[Union[dt.date, dt.datetime, str, float, int]],
             Union[dt.date, dt.datetime, str, float, int],
         ]
     ] = None,
@@ -138,11 +138,11 @@ def date_offset_foll(
         Determines if offset should adjust for business days
     following: bool, default: True
         Determines if days should be offset forward (following) or backward
-    countries: List[str] | str, default: "SE"
+    countries: list[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
+        dict[Union[dt.date, dt.datetime, str, float, int], str],
+        list[Union[dt.date, dt.datetime, str, float, int]],
         Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
@@ -183,8 +183,8 @@ def get_previous_business_day_before_today(
     countries: CountriesType = "SE",
     custom_holidays: Optional[
         Union[
-            Dict[Union[dt.date, dt.datetime, str, float, int], str],
-            List[Union[dt.date, dt.datetime, str, float, int]],
+            dict[Union[dt.date, dt.datetime, str, float, int], str],
+            list[Union[dt.date, dt.datetime, str, float, int]],
             Union[dt.date, dt.datetime, str, float, int],
         ]
     ] = None,
@@ -195,11 +195,11 @@ def get_previous_business_day_before_today(
     ----------
     today: datetime.date, optional
         Manual input of the day from where the previous business day is found
-    countries: List[str] | str, default: "SE"
+    countries: list[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
+        dict[Union[dt.date, dt.datetime, str, float, int], str],
+        list[Union[dt.date, dt.datetime, str, float, int]],
         Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
@@ -229,8 +229,8 @@ def offset_business_days(
     countries: CountriesType = "SE",
     custom_holidays: Optional[
         Union[
-            Dict[Union[dt.date, dt.datetime, str, float, int], str],
-            List[Union[dt.date, dt.datetime, str, float, int]],
+            dict[Union[dt.date, dt.datetime, str, float, int], str],
+            list[Union[dt.date, dt.datetime, str, float, int]],
             Union[dt.date, dt.datetime, str, float, int],
         ]
     ] = None,
@@ -246,11 +246,11 @@ def offset_business_days(
     days: int
         The number of business days to offset from the business day that is
         the closest preceding the day given
-    countries: List[str] | str, default: "SE"
+    countries: list[str] | str, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: Union[
-        Dict[Union[dt.date, dt.datetime, str, float, int], str],
-        List[Union[dt.date, dt.datetime, str, float, int]],
+        dict[Union[dt.date, dt.datetime, str, float, int], str],
+        list[Union[dt.date, dt.datetime, str, float, int]],
         Union[dt.date, dt.datetime, str, float, int]], optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
@@ -269,7 +269,7 @@ def offset_business_days(
             countries=countries,
             custom_holidays=custom_holidays,
         )
-        local_bdays: List[dt.date] = [
+        local_bdays: list[dt.date] = [
             bday.date()
             for bday in date_range(
                 periods=abs(scaledtoyeardays),
@@ -311,7 +311,7 @@ def generate_calender_date_range(
     start: Optional[dt.date] = None,
     end: Optional[dt.date] = None,
     countries: CountriesType = "SE",
-) -> List[dt.date]:
+) -> list[dt.date]:
     """Generates a list of business day calender dates
 
         Parameters
@@ -327,7 +327,7 @@ def generate_calender_date_range(
 
     Returns
     -------
-    List[dt.date]
+    list[dt.date]
         List of business day calender dates
     """
     if start and not end:
@@ -364,3 +364,38 @@ def generate_calender_date_range(
         "Provide one of start or end date, but not both. "
         "Date range is inferred from number of trading days."
     )
+
+
+def align_dataframe_to_local_cdays(
+    data: DataFrame, countries: CountriesType = "SE"
+) -> DataFrame:
+    """Changes the index of the associated Pandas DataFrame .tsdf to align with
+    local calendar business days
+
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        The timeseries data
+    countries: list[str] | str, default: "SE"
+        (List of) country code(s) according to ISO 3166-1 alpha-2
+
+    Returns
+    -------
+    pandas.DataFrame
+        An OpenFrame object
+    """
+    startyear = data.index[0].year
+    endyear = data.index[-1].year
+    calendar = holiday_calendar(
+        startyear=startyear, endyear=endyear, countries=countries
+    )
+
+    d_range = [
+        d.date()
+        for d in date_range(
+            start=data.first_valid_index(),
+            end=data.last_valid_index(),
+            freq=CustomBusinessDay(calendar=calendar),
+        )
+    ]
+    return data.reindex(d_range, method=None, copy=False)

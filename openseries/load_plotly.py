@@ -3,24 +3,24 @@ Function to load plotly layout and configuration from local json file
 """
 from json import load
 from os.path import abspath, dirname, join
-from typing import Dict, List, Tuple, Union
+from typing import Union
 
 
 def load_plotly_dict(
     responsive: bool = True,
-) -> Tuple[
-    Dict[
+) -> tuple[
+    dict[
         str,
         Union[
             str,
             int,
             float,
             bool,
-            List[str],
-            Dict[str, Union[str, int, float, bool, List[str]]],
+            list[str],
+            dict[str, Union[str, int, float, bool, list[str]]],
         ],
     ],
-    Dict[str, Union[str, float]],
+    dict[str, Union[str, float]],
 ]:
     """Function to load the plotly defaults
 

@@ -7,6 +7,14 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.0] - 2023-08-16
+
+A significant change that will hopefully not break anything backwards as it is a
+rebuild to remove as much duplicate code as possible. This has been achieved by
+introducing a new base class that OpenTimeSeries and OpenFrame inherits properties
+and methods from, while still also inheriting from the Pydantic BaseModel.
+Further described in [issue 41](https://github.com/CaptorAB/OpenSeries/issues/41).
+
 ## Version [1.1.7] - 2023-08-11
 
 Changed the Pydantic configuration which will improve popup docs in e.g. Pycharm.

@@ -4,9 +4,11 @@ Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
+from __future__ import annotations
+
 import datetime as dt
 from math import ceil
-from typing import cast, List, Union
+from typing import cast, Union
 from numpy import (
     Inf,
     isnan,
@@ -15,20 +17,22 @@ from numpy import (
     nan_to_num,
     quantile,
     sort,
+    sqrt,
+    square,
 )
 from pandas import DataFrame, Series
 
 from openseries.types import LiteralQuantileInterp
 
 
-def cvar_down(
-    data: Union[DataFrame, Series, List[float]], level: float = 0.95
+def cvar_down_calc(
+    data: Union[DataFrame, Series, list[float]], level: float = 0.95
 ) -> float:
     """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
     Parameters
     ----------
-    data: DataFrame | Series | List[float]
+    data: DataFrame | Series | list[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought CVaR level
@@ -48,8 +52,8 @@ def cvar_down(
     return cast(float, mean(array[: int(ceil(len(array) * (1 - level)))]))
 
 
-def var_down(
-    data: Union[DataFrame, Series, List[float]],
+def var_down_calc(
+    data: Union[DataFrame, Series, list[float]],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
@@ -59,7 +63,7 @@ def var_down(
 
     Parameters
     ----------
-    data: DataFrame | Series | List[float]
+    data: DataFrame | Series | list[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
@@ -151,4 +155,31 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
             "Average fall per day",
         ],
         name="Drawdown details",
+    )
+
+
+def ewma_calc(
+    reeturn: float, prev_ewma: float, time_factor: float, lmbda: float = 0.94
+) -> float:
+    """Helper function for EWMA calculation
+
+    Parameters
+    ----------
+    reeturn : float
+        Return value
+    prev_ewma : float
+        Previous EWMA volatility value
+    time_factor : float
+        Scaling factor to annualize
+    lmbda: float, default: 0.94
+        Scaling factor to determine weighting.
+
+    Returns
+    -------
+    float
+        EWMA volatility value
+    """
+    return cast(
+        float,
+        sqrt(square(reeturn) * time_factor * (1 - lmbda) + square(prev_ewma) * lmbda),
     )

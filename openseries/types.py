@@ -1,7 +1,10 @@
 """
 Declaring types used throughout the project
 """
-from typing import Annotated, Literal, List, Union
+from __future__ import annotations
+
+from enum import Enum
+from typing import Annotated, Literal, Union
 from pydantic import confloat, conint, conlist, constr, StringConstraints
 
 CountryStringType = Annotated[
@@ -26,13 +29,13 @@ CurrencyStringType = Annotated[
 ]
 
 DateListType = Annotated[
-    List[str],
+    list[str],
     conlist(
         constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"), min_length=2
     ),
 ]
 
-ValueListType = Annotated[List[float], conlist(float, min_length=2)]
+ValueListType = Annotated[list[float], conlist(float, min_length=2)]
 
 DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
 
@@ -134,7 +137,7 @@ LiteralFrameProps = Literal[
 ]
 
 
-class OpenTimeSeriesPropertiesList(List[str]):
+class OpenTimeSeriesPropertiesList(list[str]):
     """Allowed property arguments for the OpenTimeSeries class"""
 
     allowed_strings = {
@@ -181,7 +184,7 @@ class OpenTimeSeriesPropertiesList(List[str]):
             seen.add(item)
 
 
-class OpenFramePropertiesList(List[str]):
+class OpenFramePropertiesList(list[str]):
     """Allowed property arguments for the OpenFrame class"""
 
     allowed_strings = {
@@ -224,3 +227,19 @@ class OpenFramePropertiesList(List[str]):
             if item in seen:
                 raise ValueError(f"Duplicate string: {item}")
             seen.add(item)
+
+
+class ValueType(str, Enum):
+    """Class defining the different timeseries types within the project"""
+
+    EWMA = "EWMA"
+    PRICE = "Price(Close)"
+    RTRN = "Return(Total)"
+    RELRTRN = "Relative return"
+    ROLLBETA = "Beta"
+    ROLLCORR = "Rolling correlation"
+    ROLLCVAR = "Rolling CVaR"
+    ROLLINFORATIO = "Information Ratio"
+    ROLLRTRN = "Rolling returns"
+    ROLLVAR = "Rolling VaR"
+    ROLLVOL = "Rolling volatility"

@@ -16,14 +16,7 @@ Processes that can be simulated in this module are:
 """
 import datetime as dt
 from math import log, pow as mathpow
-from typing import (
-    cast,
-    Optional,
-    List,
-    Tuple,
-    Type,
-    TypeVar,
-)
+from typing import cast, Optional, Type, TypeVar
 from numpy import (
     add,
     array,
@@ -38,13 +31,13 @@ from pandas import concat, DataFrame
 from pydantic import BaseModel
 
 from openseries.datefixer import generate_calender_date_range
-from openseries.series import ValueType
 from openseries.types import (
     CountriesType,
     DaysInYearType,
     SimCountType,
     TradingDaysType,
     VolatilityType,
+    ValueType,
 )
 
 TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
@@ -203,7 +196,7 @@ class ReturnSimulation(
 
         returns = exp(log_returns)
         # A sequence of prices starting with param.all_s0
-        price_sequence: List[float] = [param.all_s0]
+        price_sequence: list[float] = [param.all_s0]
         for rtn in range(1, len(returns)):
             # Add the price at t-1 * return at t
             price_sequence.append(price_sequence[rtn - 1] * returns[rtn - 1])
@@ -348,7 +341,7 @@ class ReturnSimulation(
         s_n = 0.0
         time = 0
         small_lamda = -(1.0 / param.jumps_lamda)
-        jump_sizes: List[float] = []
+        jump_sizes: list[float] = []
         for _ in range(0, param.all_time):
             jump_sizes.append(0.0)
         while s_n < param.all_time:
@@ -426,7 +419,7 @@ class ReturnSimulation(
         param: TypeModelParameters,
         brownian_motion_one: NDArray[float64],
         seed: Optional[int] = None,
-    ) -> Tuple[NDArray[float64], NDArray[float64]]:
+    ) -> tuple[NDArray[float64], NDArray[float64]]:
         """This method is a simplified version of the Cholesky decomposition method for
         just two assets. It does not make use of matrix algebra and is therefore quite
         easy to implement
@@ -442,7 +435,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        Tuple[NDArray[float64], NDArray[float64]]
+        tuple[NDArray[float64], NDArray[float64]]
             A correlated Brownian Motion path
         """
 
@@ -465,7 +458,7 @@ class ReturnSimulation(
         cls: Type[TypeReturnSimulation],
         param: TypeModelParameters,
         seed: Optional[int] = None,
-    ) -> Tuple[NDArray[float64], NDArray[float64]]:
+    ) -> tuple[NDArray[float64], NDArray[float64]]:
         """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
         volatility in the Heston model. Because the returns between the underlying
@@ -482,7 +475,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        Tuple[NDArray[float64], NDArray[float64]]
+        tuple[NDArray[float64], NDArray[float64]]
             The interest rate levels for the CIR process
         """
 
@@ -499,7 +492,7 @@ class ReturnSimulation(
             param.heston_mu,
             param.heston_vol0,
         )
-        volatilities: List[float] = [start_vol]
+        volatilities: list[float] = [start_vol]
         for hpath in range(1, param.all_time):
             drift = meanrev_vol * (avg_vol - volatilities[-1]) * param.all_delta
             randomness = (
@@ -514,7 +507,7 @@ class ReturnSimulation(
         cls: Type[TypeReturnSimulation],
         param: TypeModelParameters,
         seed: Optional[int] = None,
-    ) -> Tuple[NDArray[float64], NDArray[float64]]:
+    ) -> tuple[NDArray[float64], NDArray[float64]]:
         """The Heston model is the geometric brownian motion model with stochastic
         volatility. This stochastic volatility is given by the Cox Ingersoll Ross
         process. Step one on this method is to construct two correlated
@@ -533,7 +526,7 @@ class ReturnSimulation(
 
         Returns
         -------
-        Tuple[NDArray[float64], NDArray[float64]]
+        tuple[NDArray[float64], NDArray[float64]]
             The prices for an asset following a Heston process
         """
 
@@ -542,7 +535,7 @@ class ReturnSimulation(
             param, brownian, seed=seed
         )
 
-        heston_market_price_levels: List[float] = [param.all_s0]
+        heston_market_price_levels: list[float] = [param.all_s0]
         for hpath in range(1, param.all_time):
             drift = (
                 param.gbm_mu * heston_market_price_levels[hpath - 1] * param.all_delta
@@ -585,7 +578,7 @@ class ReturnSimulation(
 
         brownian_motion = cls.brownian_motion_log_returns(param, seed=seed)
 
-        levels: List[float] = [param.all_r0]
+        levels: list[float] = [param.all_r0]
         for hpath in range(1, param.all_time):
             drift = param.cir_a * (param.cir_mu - levels[hpath - 1]) * param.all_delta
             randomness = sqrt(levels[hpath - 1]) * brownian_motion[hpath - 1]
@@ -614,7 +607,7 @@ class ReturnSimulation(
             The interest rate levels for the Ornstein Uhlenbeck process
         """
 
-        ou_levels: List[float] = [param.all_r0]
+        ou_levels: list[float] = [param.all_r0]
         brownian_motion_returns = cls.brownian_motion_log_returns(param, seed=seed)
         for hpath in range(1, param.all_time):
             drift = param.ou_a * (param.ou_mu - ou_levels[hpath - 1]) * param.all_delta

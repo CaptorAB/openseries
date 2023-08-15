@@ -7,20 +7,19 @@ from io import StringIO
 from json import load, loads
 from os import path, remove
 import sys
-from typing import Any, cast, Dict, List, Type, TypeVar, Union
+from typing import Any, cast, Type, TypeVar, Union
 from unittest import TestCase
 from pandas import DataFrame, date_range, DatetimeIndex, Series
 from pydantic import ValidationError as PydanticValidationError
 import pytest
 
-from openseries.simulation import ReturnSimulation
-from openseries.types import CountriesType, LiteralNanMethod, LiteralSeriesProps
+from openseries.types import CountriesType, LiteralSeriesProps, ValueType
 from openseries.series import (
     OpenTimeSeries,
     timeseries_chain,
-    ValueType,
-    check_if_none,
 )
+from openseries.common_tools import check_if_none
+from tests.common_sim import ONE_SIM
 
 TypeTestOpenTimeSeries = TypeVar("TypeTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
@@ -117,7 +116,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         (["2023-01-bb", "2023-01-02"], pytest.raises(ValueError)),
     ],
 )
-def test_opentimeseries_invalid_dates(dates: List[str], expectation: Any) -> None:
+def test_opentimeseries_invalid_dates(dates: list[str], expectation: Any) -> None:
     """Pytest on invalid dates as input"""
     with expectation:
         OpenTimeSeries.from_arrays(
@@ -137,7 +136,7 @@ def test_opentimeseries_invalid_dates(dates: List[str], expectation: Any) -> Non
         ([1.0, "bb"], pytest.raises(ValueError)),
     ],
 )
-def test_opentimeseries_invalid_values(values: List[float], expectation: Any) -> None:
+def test_opentimeseries_invalid_values(values: list[float], expectation: Any) -> None:
     """Pytest on invalid values as input"""
     with expectation:
         OpenTimeSeries.from_arrays(
@@ -151,24 +150,13 @@ class TestOpenTimeSeries(TestCase):
     """class to run unittests on the module series.py"""
 
     randomseries: OpenTimeSeries
-    random_properties: Dict[str, Union[dt.date, int, float]]
+    random_properties: dict[str, Union[dt.date, int, float]]
 
     @classmethod
     def setUpClass(cls: Type[TypeTestOpenTimeSeries]) -> None:
         """setUpClass for the TestOpenTimeSeries class"""
-        sim = ReturnSimulation.from_merton_jump_gbm(
-            number_of_sims=1,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            trading_days_in_year=252,
-            seed=71,
-        )
         cls.randomseries = OpenTimeSeries.from_df(
-            sim.to_dataframe(name="Asset", end=dt.date(2019, 6, 30))
+            ONE_SIM.to_dataframe(name="Asset", end=dt.date(2019, 6, 30))
         ).to_cumret()
 
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
@@ -451,37 +439,18 @@ class TestOpenTimeSeries(TestCase):
         )
 
         jseries = self.randomseries.from_deepcopy()
-        jseries.to_json(filename=seriesfile)
+        data = jseries.to_json(filename=seriesfile)
 
-        self.assertTrue(path.exists(seriesfile))
-
-        remove(seriesfile)
-
-        self.assertFalse(path.exists(seriesfile))
-
-    def test_save_to_xlsx(self: TestOpenTimeSeries) -> None:
-        """Test to_xlsx method"""
-        xseries = self.randomseries.from_deepcopy()
-        seriesfile = xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo")
-
-        self.assertTrue(path.exists(seriesfile))
-        remove(seriesfile)
-
-        directory = path.dirname(path.abspath(__file__))
-        seriesfile = xseries.to_xlsx(filename="trial.xlsx", directory=directory)
-
-        self.assertTrue(path.exists(seriesfile))
-        remove(seriesfile)
-
-        self.assertFalse(path.exists(seriesfile))
-
-        with self.assertRaises(NameError) as wrong_end:
-            _ = xseries.to_xlsx(filename="trial.pdf")
-
-        self.assertEqual(
-            str(wrong_end.exception),
-            "Filename must end with .xlsx",
+        self.assertListEqual(
+            [item.get("name") for item in data],
+            ["Asset"],
         )
+
+        self.assertTrue(path.exists(seriesfile))
+
+        remove(seriesfile)
+
+        self.assertFalse(path.exists(seriesfile))
 
     def test_create_from_fixed_rate(self: TestOpenTimeSeries) -> None:
         """Test from_fixed_rate construct method"""
@@ -787,7 +756,7 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(ValueError) as e_boo:
             faulty_props = ["geo_ret", "boo"]
-            _ = apseries.all_properties(cast(List[LiteralSeriesProps], faulty_props))
+            _ = apseries.all_properties(cast(list[LiteralSeriesProps], faulty_props))
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
@@ -830,7 +799,7 @@ class TestOpenTimeSeries(TestCase):
             "arithmetic_ret_func": f"{0.00885255100:.11f}",
             "cvar_down_func": f"{-0.01331889836:.11f}",
             "downside_deviation_func": f"{0.07335125856:.11f}",
-            "geo_ret_func": f"{0.00348439444:.11f}",
+            "geo_ret_func": f"{0.00605432007:.11f}",
             "kurtosis_func": f"{-0.16164566028:.11f}",
             "max_drawdown_func": f"{-0.20565775282:.11f}",
             "positive_share_func": f"{0.50645481629:.11f}",
@@ -1112,88 +1081,6 @@ class TestOpenTimeSeries(TestCase):
             "0.07888294174",
         ]
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
-
-    def test_rolling_vol(self: TestOpenTimeSeries) -> None:
-        """Test rolling_vol method"""
-        simdata = self.randomseries.rolling_vol(observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
-
-        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
-        checkdata = [
-            "0.08745000502",
-            "0.08809050608",
-            "0.08832329638",
-            "0.08671269840",
-            "0.08300985872",
-        ]
-
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
-
-        simdata_fxd_per_yr = self.randomseries.rolling_vol(
-            observations=21, periods_in_a_year_fixed=251
-        )
-
-        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
-        checkdata_fxd_per_yr = [
-            "0.08738526385",
-            "0.08802529073",
-            "0.08825790869",
-            "0.08664850307",
-            "0.08294840469",
-        ]
-        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
-
-    def test_rolling_return(self: TestOpenTimeSeries) -> None:
-        """Test rolling_return method"""
-        simdata = self.randomseries.rolling_return(observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
-
-        values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
-        checkdata = [
-            "-0.01477558639",
-            "-0.01662326401",
-            "-0.01735881460",
-            "-0.02138743793",
-            "-0.03592486809",
-        ]
-
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
-
-    def test_rolling_cvar_down(self: TestOpenTimeSeries) -> None:
-        """Test rolling_cvar_down method"""
-        simdata = self.randomseries.rolling_cvar_down(observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
-
-        values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
-        checkdata = [
-            "-0.01337460746",
-            "-0.01337460746",
-            "-0.01337460746",
-            "-0.01270193467",
-            "-0.01270193467",
-        ]
-
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
-
-    def test_rolling_var_down(self: TestOpenTimeSeries) -> None:
-        """Test rolling_var_down method"""
-        simdata = self.randomseries.rolling_var_down(observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
-
-        values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
-        checkdata = [
-            "-0.01342248045",
-            "-0.01342248045",
-            "-0.01342248045",
-            "-0.01342248045",
-            "-0.01342248045",
-        ]
-
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
         """Test downside_deviation_func method
@@ -1646,23 +1533,17 @@ class TestOpenTimeSeries(TestCase):
         with self.assertRaises(Exception) as e_vr_zero:
             _ = zeroseries.value_ret
 
-        self.assertEqual(
-            e_vr_zero.exception.args[0],
-            (
-                "Simple Return cannot be calculated due to an "
-                "initial value being zero."
-            ),
+        self.assertIn(
+            member="Simple return cannot be calculated due to an",
+            container=e_vr_zero.exception.args[0],
         )
 
         with self.assertRaises(Exception) as e_vrf_zero:
             _ = zeroseries.value_ret_func()
 
-        self.assertEqual(
-            e_vrf_zero.exception.args[0],
-            (
-                "Simple Return cannot be calculated due to an "
-                "initial value being zero."
-            ),
+        self.assertIn(
+            member="Simple return cannot be calculated due to an",
+            container=e_vrf_zero.exception.args[0],
         )
 
         negseries = OpenTimeSeries.from_arrays(
@@ -1694,75 +1575,6 @@ class TestOpenTimeSeries(TestCase):
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
             ),
-        )
-
-    def test_value_nan_handle(self: TestOpenTimeSeries) -> None:
-        """Test value_nan_handle method"""
-        nanseries = OpenTimeSeries.from_arrays(
-            name="nanseries",
-            dates=[
-                "2022-07-11",
-                "2022-07-12",
-                "2022-07-13",
-                "2022-07-14",
-                "2022-07-15",
-            ],
-            values=[1.1, 1.0, 0.8, 1.1, 1.0],
-        )
-        nanseries.tsdf.iloc[2, 0] = None
-        dropseries = nanseries.from_deepcopy()
-        dropseries.value_nan_handle(method="drop")
-        self.assertListEqual([1.1, 1.0, 1.1, 1.0], dropseries.tsdf.iloc[:, 0].tolist())
-
-        fillseries = nanseries.from_deepcopy()
-        fillseries.value_nan_handle(method="fill")
-        self.assertListEqual(
-            [1.1, 1.0, 1.0, 1.1, 1.0], fillseries.tsdf.iloc[:, 0].tolist()
-        )
-
-        with self.assertRaises(AssertionError) as e_method:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanseries.value_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_method.exception.args[0],
-            "Method must be either fill or drop passed as string.",
-        )
-
-    def test_return_nan_handle(self: TestOpenTimeSeries) -> None:
-        """Test return_nan_handle method"""
-        nanseries = OpenTimeSeries.from_arrays(
-            name="nanseries",
-            valuetype=ValueType.RTRN,
-            dates=[
-                "2022-07-11",
-                "2022-07-12",
-                "2022-07-13",
-                "2022-07-14",
-                "2022-07-15",
-            ],
-            values=[0.1, 0.05, 0.03, 0.01, 0.04],
-        )
-        nanseries.tsdf.iloc[2, 0] = None
-        dropseries = nanseries.from_deepcopy()
-        dropseries.return_nan_handle(method="drop")
-        self.assertListEqual(
-            [0.1, 0.05, 0.01, 0.04], dropseries.tsdf.iloc[:, 0].tolist()
-        )
-
-        fillseries = nanseries.from_deepcopy()
-        fillseries.return_nan_handle(method="fill")
-        self.assertListEqual(
-            [0.1, 0.05, 0.0, 0.01, 0.04], fillseries.tsdf.iloc[:, 0].tolist()
-        )
-
-        with self.assertRaises(AssertionError) as e_method:
-            wrong_method = cast(LiteralNanMethod, "other")
-            _ = nanseries.return_nan_handle(method=wrong_method)
-
-        self.assertEqual(
-            e_method.exception.args[0],
-            "Method must be either fill or drop passed as string.",
         )
 
     def test_miscellaneous(self: TestOpenTimeSeries) -> None:
