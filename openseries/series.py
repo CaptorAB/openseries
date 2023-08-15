@@ -58,7 +58,7 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
 class OpenTimeSeries(BaseModel, CommonModel):
-    """Object of the class OpenTimeSeries. Subclass of the Pydantic BaseModel
+    """Object of the class OpenTimeSeries.
 
     Parameters
     ----------
@@ -113,7 +113,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         extra="allow",
     )
 
-    # noinspection PyMethodParameters
     @field_validator("isin")
     def check_isincode(  # pylint: disable=no-self-argument
         cls: TypeOpenTimeSeries, isin_code: str

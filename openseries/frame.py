@@ -56,7 +56,7 @@ TypeOpenFrame = TypeVar("TypeOpenFrame", bound="OpenFrame")
 
 
 class OpenFrame(BaseModel, CommonModel):
-    """Object of the class OpenFrame. Subclass of the Pydantic BaseModel
+    """Object of the class OpenFrame.
 
     Parameters
     ----------
@@ -81,7 +81,6 @@ class OpenFrame(BaseModel, CommonModel):
         revalidate_instances="always",
     )
 
-    # noinspection PyMethodParameters
     @field_validator("constituents")
     def check_labels_unique(  # pylint: disable=no-self-argument
         cls: TypeOpenFrame, tseries: list[OpenTimeSeries]
