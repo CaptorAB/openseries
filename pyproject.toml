@@ -97,15 +97,15 @@ warn_redundant_casts = true
 exclude = ["venv/*"]
 
 [tool.pylint]
-# Silenced below 'duplicate-code' error. 3 warnings silenced
+# Silenced below 'duplicate-code' error. 4 warnings silenced
 disable = ["R0801"]
 max-line-length = 87
-max-module-lines=3400
+max-module-lines=2700
 min-public-methods=0
-max-public-methods=89
+max-public-methods=58
 max-statements=51
 max-branches=22
-max-locals=29
+max-locals=28
 max-args=12
 output-format = "colorized"
 ignore-patterns= "\\w+\\.json$"
