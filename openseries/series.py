@@ -5,12 +5,13 @@ from __future__ import annotations
 from copy import deepcopy
 import datetime as dt
 from re import compile as re_compile
-from typing import cast, Optional, Type, Union, TypeVar
+from typing import cast, Optional, Type, Union, TypeVar, Any
 from numpy import (
     array,
     cumprod,
     float64,
     insert,
+    isnan,
     log,
     sqrt,
 )
@@ -27,14 +28,11 @@ from stdnum import isin as isincode
 from stdnum.exceptions import InvalidChecksum
 
 from openseries.common_model import CommonModel
-from openseries.common_tools import (
-    do_resample_to_business_period_ends,
-    get_calc_range,
-    check_if_none,
-)
 from openseries.datefixer import (
     date_fix,
     align_dataframe_to_local_cdays,
+    do_resample_to_business_period_ends,
+    get_calc_range,
 )
 from openseries.types import (
     CountriesType,
@@ -512,21 +510,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return pdf
 
     @property
-    def max_drawdown_date(self: TypeOpenTimeSeries) -> dt.date:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
-
-        Returns
-        -------
-        datetime.date
-            Date when the maximum drawdown occurred
-        """
-
-        mdddf = self.tsdf.copy()
-        mdddf.index = DatetimeIndex(mdddf.index)
-        mdd_date = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().values[0]
-        return dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
-
-    @property
     def worst_month(self: TypeOpenTimeSeries) -> float:
         """
         Returns
@@ -952,3 +935,24 @@ def timeseries_chain(
             dtype="float64",
         ),
     )
+
+
+def check_if_none(item: Any) -> bool:
+    """Function to check if a variable is None or equivalent
+
+    Parameters
+    ----------
+    item : Any
+        variable to be checked
+
+    Returns
+    -------
+    bool
+        Answer to whether the variable is None or equivalent
+    """
+    try:
+        return cast(bool, isnan(item))
+    except TypeError:
+        if item is None:
+            return True
+        return len(str(item)) == 0

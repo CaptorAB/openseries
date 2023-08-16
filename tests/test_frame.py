@@ -235,13 +235,13 @@ class TestOpenFrame(TestCase):
 
         self.assertListEqual(
             [
-                dtdate(2009, 7, 1),
-                dtdate(2009, 7, 1),
-                dtdate(2012, 4, 17),
-                dtdate(2013, 7, 29),
-                dtdate(2009, 7, 1),
+                dtdate(2018, 11, 8),
+                dtdate(2019, 6, 26),
+                dtdate(2018, 7, 13),
+                dtdate(2014, 11, 12),
+                dtdate(2019, 6, 17),
             ],
-            mddframe.max_drawdown_date.tolist(),
+            cast(Series, mddframe.max_drawdown_date).tolist(),
         )
 
     def test_make_portfolio(self: TestOpenFrame) -> None:
@@ -1276,7 +1276,7 @@ class TestOpenFrame(TestCase):
             "Worst",
             "Worst month",
             "Max Drawdown",
-            "Max drawdown dates",
+            "Max drawdown date",
             "Max Drawdown in cal yr",
             "first indices",
             "last indices",
@@ -1285,7 +1285,51 @@ class TestOpenFrame(TestCase):
         ]
         apframe = self.randomframe.from_deepcopy()
         apframe.to_cumret()
-        result_index = apframe.all_properties().index.tolist()
+        result = apframe.all_properties()
+        result_index = result.index.tolist()
+        self.assertTrue(set(prop_index) == set(result_index))
+        result_values = {}
+        for value in result.index:
+            if isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], float):
+                result_values[
+                    value
+                ] = f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
+            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
+                result_values[value] = result.loc[value, ("Asset_0", ValueType.PRICE)]
+            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dtdate):
+                result_values[value] = result.loc[
+                    value, ("Asset_0", ValueType.PRICE)
+                ].strftime("%Y-%m-%d")
+            else:
+                raise TypeError(
+                    f"all_properties returned unexpected type {type(value)}"
+                )
+        expected_values = {
+            "Max Drawdown": "-0.4001162541",
+            "VaR 95.0%": "-0.0105912961",
+            "last indices": "2019-06-28",
+            "span of days": 3650,
+            "Worst": "-0.1917423233",
+            "Max drawdown date": "2018-11-08",
+            "Imp vol from VaR 95%": "0.1020893290",
+            "Arithmetic return": "0.0095301451",
+            "Max Drawdown in cal yr": "-0.2381116780",
+            "Positive Share": "0.4994026284",
+            "Return vol ratio": "0.0814866231",
+            "Volatility": "0.1169534915",
+            "Kurtosis": "180.6335718351",
+            "Z-score": "1.2119535054",
+            "CVaR 95.0%": "-0.0140207727",
+            "observations": 2512,
+            "first indices": "2009-06-30",
+            "Simple return": "0.0244719580",
+            "Geometric return": "0.0024223168",
+            "Sortino ratio": "0.1036366417",
+            "Worst month": "-0.1916564407",
+            "Downside deviation": "0.0919572936",
+            "Skew": "-6.9467990606",
+        }
+        self.assertDictEqual(result_values, expected_values)
 
         self.assertTrue(set(prop_index) == set(result_index))
 
@@ -1371,64 +1415,6 @@ class TestOpenFrame(TestCase):
 
         self.assertListEqual(values, checkdata)
         self.assertIsInstance(simseries, OpenTimeSeries)
-
-    def test_ret_vol_ratio_func(self: TestOpenFrame) -> None:
-        """Test ret_vol_ratio_func method"""
-        frame = self.randomframe.from_deepcopy()
-        frame.to_cumret()
-
-        simdataa = cast(
-            Series, frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=-1)
-        )
-
-        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.1580040085")
-
-        simdatab = cast(
-            Series,
-            frame.ret_vol_ratio_func(
-                riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
-            ),
-        )
-
-        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.1578870346")
-
-        with self.assertRaises(Exception) as e_retvolfunc:
-            str_col = cast(int, "string")
-            _ = frame.ret_vol_ratio_func(riskfree_rate=None, riskfree_column=str_col)
-
-        self.assertEqual(
-            e_retvolfunc.exception.args[0],
-            "base_column argument should be an integer.",
-        )
-
-    def test_sortino_ratio_func(self: TestOpenFrame) -> None:
-        """Test sortino_ratio_func method"""
-        frame = self.randomframe.from_deepcopy()
-        frame.to_cumret()
-
-        simdataa = cast(
-            Series, frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=-1)
-        )
-
-        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.2009532877")
-
-        simdatab = cast(
-            Series,
-            frame.sortino_ratio_func(
-                riskfree_rate=None, riskfree_column=-1, periods_in_a_year_fixed=251
-            ),
-        )
-
-        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.2008045175")
-
-        with self.assertRaises(Exception) as e_func:
-            str_col = cast(int, "string")
-            _ = frame.sortino_ratio_func(riskfree_rate=None, riskfree_column=str_col)
-
-        self.assertEqual(
-            e_func.exception.args[0],
-            "base_column argument should be an integer.",
-        )
 
     def test_tracking_error_func(self: TestOpenFrame) -> None:
         """Test tracking_error_func method"""

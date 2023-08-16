@@ -25,12 +25,12 @@ import statsmodels.api as sm
 from statsmodels.regression.linear_model import RegressionResults
 
 from openseries.common_model import CommonModel
-from openseries.common_tools import (
+from openseries.series import OpenTimeSeries
+from openseries.datefixer import (
+    align_dataframe_to_local_cdays,
     do_resample_to_business_period_ends,
     get_calc_range,
 )
-from openseries.series import OpenTimeSeries
-from openseries.datefixer import align_dataframe_to_local_cdays
 from openseries.types import (
     CountriesType,
     LiteralHowMerge,
@@ -430,23 +430,6 @@ class OpenFrame(BaseModel, CommonModel):
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
-
-    @property
-    def max_drawdown_date(self: TypeOpenFrame) -> Series:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
-
-        Returns
-        -------
-        Pandas.Series
-            Date when the maximum drawdown occurred
-        """
-
-        md_dates = [c.max_drawdown_date for c in self.constituents]
-        return Series(
-            data=md_dates,
-            index=self.tsdf.columns,
-            name="Max drawdown dates",
-        )
 
     @property
     def worst_month(self: TypeOpenFrame) -> Series:

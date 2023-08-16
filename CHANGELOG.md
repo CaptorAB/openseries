@@ -7,6 +7,13 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.1] - 2023-08-16
+
+Removed the option of selecting a column as the riskfree asset for the Sortino
+ratio and Return/vol ratios. Also moved max drawdown date to common model after
+I noticed that the existing OpenFrame result was wrong. The result now has been
+verified against the timeseries.
+
 ## Version [1.2.0] - 2023-08-16
 
 A significant change that will hopefully not break anything backwards as it is a

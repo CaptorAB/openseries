@@ -17,8 +17,8 @@ from openseries.types import CountriesType, LiteralSeriesProps, ValueType
 from openseries.series import (
     OpenTimeSeries,
     timeseries_chain,
+    check_if_none,
 )
-from openseries.common_tools import check_if_none
 from tests.common_sim import ONE_SIM
 
 TypeTestOpenTimeSeries = TypeVar("TypeTestOpenTimeSeries", bound="TestOpenTimeSeries")
@@ -748,8 +748,53 @@ class TestOpenTimeSeries(TestCase):
         ]
         apseries = self.randomseries.from_deepcopy()
         apseries.to_cumret()
-        result_index = apseries.all_properties().index.tolist()
+        result = apseries.all_properties()
+        result_index = result.index.tolist()
         self.assertTrue(set(prop_index) == set(result_index))
+        result_values = {}
+        for value in result.index:
+            if isinstance(result.loc[value, ("Asset", ValueType.PRICE)], float):
+                result_values[
+                    value
+                ] = f"{result.loc[value, ('Asset', ValueType.PRICE)]:.10f}"
+            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], int):
+                result_values[value] = result.loc[value, ("Asset", ValueType.PRICE)]
+            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
+                result_values[value] = result.loc[
+                    value, ("Asset", ValueType.PRICE)
+                ].strftime("%Y-%m-%d")
+            else:
+                raise TypeError(
+                    f"all_properties returned unexpected type {type(value)}"
+                )
+        expected_values = {
+            "positive_share": "0.4994026284",
+            "vol": "0.1169534915",
+            "worst_month": "-0.1916564407",
+            "ret_vol_ratio": "0.0814866231",
+            "last_idx": "2019-06-28",
+            "max_drawdown": "-0.4001162541",
+            "z_score": "1.2119535054",
+            "geo_ret": "0.0024223168",
+            "span_of_days": 3650,
+            "yearfrac": "9.9931553730",
+            "length": 2512,
+            "first_idx": "2009-06-30",
+            "value_ret": "0.0244719580",
+            "skew": "-6.9467990606",
+            "kurtosis": "180.6335718351",
+            "max_drawdown_date": "2018-11-08",
+            "var_down": "-0.0105912961",
+            "max_drawdown_cal_year": "-0.2381116780",
+            "sortino_ratio": "0.1036366417",
+            "vol_from_var": "0.1020893290",
+            "periods_in_a_year": "251.3720547945",
+            "arithmetic_ret": "0.0095301451",
+            "worst": "-0.1917423233",
+            "downside_deviation": "0.0919572936",
+            "cvar_down": "-0.0140207727",
+        }
+        self.assertDictEqual(result_values, expected_values)
 
         props = apseries.all_properties(properties=["geo_ret", "vol"])
         self.assertIsInstance(props, DataFrame)

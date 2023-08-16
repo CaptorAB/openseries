@@ -26,7 +26,7 @@ from openseries.types import (
     ValueType,
 )
 from openseries.load_plotly import load_plotly_dict
-from openseries.common_tools import get_calc_range
+from openseries.datefixer import get_calc_range
 from openseries.types import LiteralQuantileInterp
 
 
@@ -317,7 +317,10 @@ class CommonModel:
             volatility, and a minimum acceptable return of zero.
         """
         riskfree_rate: float = 0.0
-        return self.sortino_ratio_func(riskfree_rate=riskfree_rate)
+        minimum_accepted_return: float = 0.0
+        return self.sortino_ratio_func(
+            riskfree_rate=riskfree_rate, min_accepted_return=minimum_accepted_return
+        )
 
     @property
     def z_score(self: TypeCommonModel) -> Series:
@@ -1258,6 +1261,29 @@ class CommonModel:
             dtype="float64",
         )
 
+    @property
+    def max_drawdown_date(self: TypeCommonModel) -> Union[dt.date, Series]:
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+
+        Returns
+        -------
+        Union[datetime.date, pandas.Series]
+            Date when the maximum drawdown occurred
+        """
+
+        mdddf = self.tsdf.copy()
+        mdddf.index = DatetimeIndex(mdddf.index)
+        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date
+
+        if self.tsdf.shape[1] == 1:
+            return result.iloc[0]
+        return Series(
+            data=result,
+            index=self.tsdf.columns,
+            name="Max drawdown date",
+            dtype="float64",
+        )
+
     def positive_share_func(
         self: TypeCommonModel,
         months_from_last: Optional[int] = None,
@@ -1309,8 +1335,7 @@ class CommonModel:
 
     def ret_vol_ratio_func(
         self: TypeCommonModel,
-        riskfree_rate: Optional[float] = 0.0,
-        riskfree_column: int = -1,
+        riskfree_rate: float = 0.0,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1324,9 +1349,7 @@ class CommonModel:
 
         Parameters
         ----------
-        riskfree_rate : float, optional
-            The return of the zero volatility asset used to calculate Sharpe ratio
-        riskfree_column : int, default: -1
+        riskfree_rate : float
             The return of the zero volatility asset used to calculate Sharpe ratio
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -1346,60 +1369,26 @@ class CommonModel:
             volatility or,
             if risk-free return provided, Sharpe ratio
         """
-
-        earlier, later = get_calc_range(
-            data=self.tsdf,
-            months_offset=months_from_last,
-            from_dt=from_date,
-            to_dt=to_date,
-        )
-        if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
-        else:
-            how_many = (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[:, 0].count()
+        ratio: Series = (
+            self.arithmetic_ret_func(
+                months_from_last=months_from_last,
+                from_date=from_date,
+                to_date=to_date,
+                periods_in_a_year_fixed=periods_in_a_year_fixed,
             )
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
-
-        ratios = []
-        if riskfree_rate is None:
-            if isinstance(riskfree_column, int):
-                riskfree = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
-                    :, riskfree_column
-                ]
-                riskfree_item = self.tsdf.iloc[:, riskfree_column].name
-            else:
-                raise ValueError("base_column argument should be an integer.")
-
-            for item in self.tsdf:
-                if item == riskfree_item:
-                    ratios.append(0.0)
-                else:
-                    longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                        :, item
-                    ]
-                    ret = float(longdf.pct_change().mean() * time_factor)
-                    riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
-                    vol = float(longdf.pct_change().std() * sqrt(time_factor))
-                    ratios.append((ret - riskfree_ret) / vol)
-        else:
-            for item in self.tsdf:
-                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                    :, item
-                ]
-                ret = float(longdf.pct_change().mean() * time_factor)
-                vol = float(longdf.pct_change().std() * sqrt(time_factor))
-                ratios.append((ret - riskfree_rate) / vol)
+            - riskfree_rate
+        ) / self.vol_func(
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
         if self.tsdf.shape[1] == 1:
-            return ratios[0]
-        return Series(
-            data=ratios,
-            index=self.tsdf.columns,
-            name="Return vol ratio",
-            dtype="float64",
-        )
+            return cast(float, ratio)
+        ratio.name = "Return vol ratio"
+        ratio = ratio.astype("float64")
+        return ratio
 
     def skew_func(
         self: TypeCommonModel,
@@ -1447,8 +1436,8 @@ class CommonModel:
 
     def sortino_ratio_func(
         self: TypeCommonModel,
-        riskfree_rate: Optional[float] = 0.0,
-        riskfree_column: int = -1,
+        riskfree_rate: float = 0.0,
+        min_accepted_return: float = 0.0,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1462,10 +1451,10 @@ class CommonModel:
 
         Parameters
         ----------
-        riskfree_rate : float, optional
+        riskfree_rate : float
             The return of the zero volatility asset
-        riskfree_column : int, default: -1
-            The return of the zero volatility asset used to calculate Sharpe ratio
+        min_accepted_return : float, optional
+            The annualized Minimum Accepted Return (MAR)
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -1481,71 +1470,29 @@ class CommonModel:
         -------
         Union[float, Pandas.Series]
             Sortino ratio calculated as ( return - riskfree return ) /
-            downside deviation
+            downside deviation (std dev of returns below MAR)
         """
-        earlier, later = get_calc_range(
-            data=self.tsdf,
-            months_offset=months_from_last,
-            from_dt=from_date,
-            to_dt=to_date,
+        ratio: Series = (
+            self.arithmetic_ret_func(
+                months_from_last=months_from_last,
+                from_date=from_date,
+                to_date=to_date,
+                periods_in_a_year_fixed=periods_in_a_year_fixed,
+            )
+            - riskfree_rate
+        ) / self.downside_deviation_func(
+            min_accepted_return=min_accepted_return,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
-        how_many = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[:, 0].count()
-        )
-        fraction = (later - earlier).days / 365.25
-
-        if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
-        else:
-            time_factor = how_many / fraction
-
-        ratios = []
-        if riskfree_rate is None:
-            if isinstance(riskfree_column, int):
-                riskfree = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
-                    :, riskfree_column
-                ]
-                riskfree_item = self.tsdf.iloc[:, riskfree_column].name
-            else:
-                raise ValueError("base_column argument should be an integer.")
-
-            for item in self.tsdf:
-                if item == riskfree_item:
-                    ratios.append(0.0)
-                else:
-                    longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                        :, item
-                    ]
-                    ret = float(longdf.pct_change().mean() * time_factor)
-                    riskfree_ret = float(riskfree.pct_change().mean() * time_factor)
-                    dddf = longdf.pct_change()
-                    downdev = float(
-                        sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-                        * sqrt(time_factor)
-                    )
-                    ratios.append((ret - riskfree_ret) / downdev)
-
-        else:
-            for item in self.tsdf:
-                longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                    :, item
-                ]
-                ret = float(longdf.pct_change().mean() * time_factor)
-                dddf = longdf.pct_change()
-                downdev = float(
-                    sqrt((dddf[dddf.values < 0.0].values ** 2).sum() / how_many)
-                    * sqrt(time_factor)
-                )
-                ratios.append((ret - riskfree_rate) / downdev)
 
         if self.tsdf.shape[1] == 1:
-            return ratios[0]
-        return Series(
-            data=ratios,
-            index=self.tsdf.columns,
-            name="Sortino ratio",
-            dtype="float64",
-        )
+            return cast(float, ratio)
+        ratio.name = "Sortino ratio"
+        ratio = ratio.astype("float64")
+        return ratio
 
     def value_ret_func(
         self: TypeCommonModel,
