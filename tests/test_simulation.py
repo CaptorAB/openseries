@@ -6,7 +6,7 @@ from copy import copy
 from datetime import date as dtdate
 from typing import cast, Type, TypeVar, Union
 from unittest import TestCase
-from pandas import DataFrame, date_range
+from pandas import DataFrame, date_range, Series
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
@@ -156,8 +156,8 @@ class TestSimulation(TestCase):
             )
 
         frame = OpenFrame(series)
-        means = [f"{r:.9f}" for r in frame.arithmetic_ret]
-        deviations = [f"{v:.9f}" for v in frame.vol]
+        means = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
+        deviations = [f"{v:.9f}" for v in cast(Series, frame.vol)]
 
         self.assertListEqual(target_returns, means)
         self.assertListEqual(target_volatilities, deviations)

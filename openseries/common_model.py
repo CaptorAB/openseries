@@ -136,7 +136,7 @@ class CommonModel:
         return result
 
     @property
-    def geo_ret(self: TypeCommonModel) -> Series:
+    def geo_ret(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/c/cagr.asp
 
         Returns
@@ -147,7 +147,7 @@ class CommonModel:
         return self.geo_ret_func()
 
     @property
-    def arithmetic_ret(self: TypeCommonModel) -> Series:
+    def arithmetic_ret(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp
 
         Returns
@@ -159,7 +159,7 @@ class CommonModel:
         return self.arithmetic_ret_func()
 
     @property
-    def value_ret(self: TypeCommonModel) -> Series:
+    def value_ret(self: TypeCommonModel) -> Union[float, Series]:
         """
         Returns
         -------
@@ -169,7 +169,7 @@ class CommonModel:
         return self.value_ret_func()
 
     @property
-    def vol(self: TypeCommonModel) -> Series:
+    def vol(self: TypeCommonModel) -> Union[float, Series]:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
         in MS Excel \n
         https://www.investopedia.com/terms/v/volatility.asp
@@ -182,7 +182,7 @@ class CommonModel:
         return self.vol_func()
 
     @property
-    def downside_deviation(self: TypeCommonModel) -> Series:
+    def downside_deviation(self: TypeCommonModel) -> Union[float, Series]:
         """The standard deviation of returns that are below a Minimum Accepted
         Return of zero.
         It is used to calculate the Sortino Ratio \n
@@ -197,7 +197,7 @@ class CommonModel:
         return self.downside_deviation_func(min_accepted_return=min_accepted_return)
 
     @property
-    def ret_vol_ratio(self: TypeCommonModel) -> Series:
+    def ret_vol_ratio(self: TypeCommonModel) -> Union[float, Series]:
         """
         Returns
         -------
@@ -209,7 +209,7 @@ class CommonModel:
         return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
-    def sortino_ratio(self: TypeCommonModel) -> Series:
+    def sortino_ratio(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/s/sortinoratio.asp
 
         Returns
@@ -226,7 +226,7 @@ class CommonModel:
         )
 
     @property
-    def z_score(self: TypeCommonModel) -> Series:
+    def z_score(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/z/zscore.asp
 
         Returns
@@ -237,7 +237,7 @@ class CommonModel:
         return self.z_score_func()
 
     @property
-    def max_drawdown(self: TypeCommonModel) -> Series:
+    def max_drawdown(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
@@ -248,7 +248,7 @@ class CommonModel:
         return self.max_drawdown_func()
 
     @property
-    def worst(self: TypeCommonModel) -> Series:
+    def worst(self: TypeCommonModel) -> Union[float, Series]:
         """
         Returns
         -------
@@ -259,7 +259,7 @@ class CommonModel:
         return self.worst_func(observations=observations)
 
     @property
-    def positive_share(self: TypeCommonModel) -> Series:
+    def positive_share(self: TypeCommonModel) -> Union[float, Series]:
         """
         Returns
         -------
@@ -269,7 +269,7 @@ class CommonModel:
         return self.positive_share_func()
 
     @property
-    def skew(self: TypeCommonModel) -> Series:
+    def skew(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/s/skewness.asp
 
         Returns
@@ -280,7 +280,7 @@ class CommonModel:
         return self.skew_func()
 
     @property
-    def kurtosis(self: TypeCommonModel) -> Series:
+    def kurtosis(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/k/kurtosis.asp
 
         Returns
@@ -291,7 +291,7 @@ class CommonModel:
         return self.kurtosis_func()
 
     @property
-    def cvar_down(self: TypeCommonModel) -> Series:
+    def cvar_down(self: TypeCommonModel) -> Union[float, Series]:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
         Returns
@@ -303,7 +303,7 @@ class CommonModel:
         return self.cvar_down_func(level=level)
 
     @property
-    def var_down(self: TypeCommonModel) -> Series:
+    def var_down(self: TypeCommonModel) -> Union[float, Series]:
         """Downside 95% Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel \n
         https://www.investopedia.com/terms/v/var.asp
@@ -318,7 +318,7 @@ class CommonModel:
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
-    def vol_from_var(self: TypeCommonModel) -> Series:
+    def vol_from_var(self: TypeCommonModel) -> Union[float, Series]:
         """
         Returns
         -------

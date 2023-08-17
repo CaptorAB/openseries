@@ -168,12 +168,12 @@ class TestOpenFrame(TestCase):
         rs_frame = self.randomframe.from_deepcopy()
         rs_frame.to_cumret()
 
-        before = rs_frame.value_ret.to_dict()
+        before = cast(Series, rs_frame.value_ret).to_dict()
 
         rs_frame.resample(freq="BM")
 
         self.assertEqual(121, rs_frame.length)
-        after = rs_frame.value_ret.to_dict()
+        after = cast(Series, rs_frame.value_ret).to_dict()
         self.assertDictEqual(before, after)
 
     def test_resample_to_business_period_ends(self: TestOpenFrame) -> None:
@@ -410,23 +410,23 @@ class TestOpenFrame(TestCase):
         )
 
         self.assertEqual(
-            riskframe.cvar_down.iloc[0],
+            cast(Series, riskframe.cvar_down).iloc[0],
             cvar_down_calc(riskframe.tsdf.iloc[:, 0]),
             msg="CVaR for OpenFrame not equal",
         )
         self.assertEqual(
-            riskframe.var_down.iloc[0],
+            cast(Series, riskframe.var_down).iloc[0],
             var_down_calc(riskframe.tsdf.iloc[:, 0]),
             msg="VaR for OpenFrame not equal",
         )
 
         self.assertEqual(
-            riskframe.cvar_down.iloc[0],
+            cast(Series, riskframe.cvar_down).iloc[0],
             cvar_down_calc(riskframe.tsdf),
             msg="CVaR for OpenFrame not equal",
         )
         self.assertEqual(
-            riskframe.var_down.iloc[0],
+            cast(Series, riskframe.var_down).iloc[0],
             var_down_calc(riskframe.tsdf),
             msg="VaR for OpenFrame not equal",
         )
@@ -1777,7 +1777,8 @@ class TestOpenFrame(TestCase):
             ]
         )
         self.assertListEqual(
-            [f"{gr:.5f}" for gr in geoframe.geo_ret], ["0.10007", "0.20015"]
+            [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)],
+            ["0.10007", "0.20015"],
         )
 
         self.assertListEqual(
@@ -1818,7 +1819,8 @@ class TestOpenFrame(TestCase):
         geoframe.delete_timeseries(lvl_zero_item="geoseries3")
 
         self.assertListEqual(
-            [f"{gr:.5f}" for gr in geoframe.geo_ret], ["0.10007", "0.20015"]
+            [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)],
+            ["0.10007", "0.20015"],
         )
 
         geoframe.add_timeseries(
@@ -2143,7 +2145,7 @@ class TestOpenFrame(TestCase):
         """Test to_drawdown_series method"""
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
-        ddown = [f"{dmax:.11f}" for dmax in mframe.max_drawdown]
+        ddown = [f"{dmax:.11f}" for dmax in cast(Series, mframe.max_drawdown)]
         mframe.to_drawdown_series()
         ddownserie = [f"{dmax:.11f}" for dmax in mframe.tsdf.min()]
         self.assertListEqual(ddown, ddownserie)
