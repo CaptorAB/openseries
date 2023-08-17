@@ -75,7 +75,7 @@ class CommonModel:
             The last date in the timeseries
         """
 
-        return cast(dt.date, self.tsdf.index[-1])
+        return self.tsdf.index.dt.date[-1]
 
     @property
     def span_of_days(self: TypeCommonModel) -> int:
@@ -141,7 +141,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Compounded Annual Growth Rate (CAGR)
         """
         return self.geo_ret_func()
@@ -152,7 +152,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Annualized arithmetic mean of returns
         """
 
@@ -163,7 +163,7 @@ class CommonModel:
         """
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Simple return
         """
         return self.value_ret_func()
@@ -176,7 +176,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Annualized volatility
         """
         return self.vol_func()
@@ -190,7 +190,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Downside deviation
         """
         min_accepted_return: float = 0.0
@@ -201,7 +201,7 @@ class CommonModel:
         """
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility.
         """
@@ -214,7 +214,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
@@ -242,7 +242,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Maximum drawdown without any limit on date range
         """
         return self.max_drawdown_func()
@@ -252,7 +252,7 @@ class CommonModel:
         """
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Most negative percentage change
         """
         observations: int = 1
@@ -263,7 +263,7 @@ class CommonModel:
         """
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             The share of percentage changes that are greater than zero
         """
         return self.positive_share_func()
@@ -274,7 +274,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Skew of the return distribution
         """
         return self.skew_func()
@@ -285,7 +285,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Kurtosis of the return distribution
         """
         return self.kurtosis_func()
@@ -296,7 +296,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Downside 95% Conditional Value At Risk "CVaR"
         """
         level: float = 0.95
@@ -310,7 +310,7 @@ class CommonModel:
 
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Downside 95% Value At Risk
         """
         level: float = 0.95
@@ -322,7 +322,7 @@ class CommonModel:
         """
         Returns
         -------
-        Pandas.Series
+        Union[float, Pandas.Series]
             Implied annualized volatility from the Downside 95% VaR using the
             assumption that returns are normally distributed.
         """
