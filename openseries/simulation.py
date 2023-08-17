@@ -1,6 +1,6 @@
 """
 Defining the ReturnSimulation class which simulates returns based on
-stochastic processes.
+stochastic processes, and defining ModelParameters used by it.
 
 Source:
 http://www.turingfinance.com/random-walks-down-wall-street-stochastic-processes-in-python/
@@ -44,70 +44,10 @@ TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
-class ModelParameters(BaseModel):
-    """Object of the class ModelParameters. Subclass of the Pydantic BaseModel
-
-    Parameters
-    ----------
-    all_s0: float
-        Starting asset value
-    all_time: TradingDaysType
-        Amount of time to simulate for
-    all_delta: float
-        Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
-    all_sigma: VolatilityType
-        Volatility of the stochastic processes
-    all_r0: float, default: 0.0
-        Starting interest rate value
-    gbm_mu: float
-        Annual drift factor for geometric brownian motion
-    jumps_lamda: float, default: 0.0
-        Probability of a jump happening at each point in time
-    jumps_sigma: VolatilityType, default: 0.0
-        Volatility of the jump size
-    jumps_mu: float, default: 0.0
-        Average jump size
-    cir_a: float, default: 0.0
-        Rate of mean reversion for Cox Ingersoll Ross
-    cir_mu: float, default: 0.0
-        Long run average interest rate for Cox Ingersoll Ross
-    cir_rho: float, default: 0.0
-        Correlation between the wiener processes of the Heston model
-    ou_a: float, default: 0.0
-        Rate of mean reversion for Ornstein Uhlenbeck
-    ou_mu: float, default: 0.0
-        Long run average interest rate for Ornstein Uhlenbeck
-    heston_a: float, default: 0.0
-        Rate of mean reversion for volatility in the Heston model
-    heston_mu: VolatilityType, default: 0.0
-        Long run average volatility for the Heston model
-    heston_vol0: VolatilityType, default: 0.0
-        Starting volatility value for the Heston vol model
-    """
-
-    all_s0: float
-    all_time: TradingDaysType
-    all_delta: float
-    all_sigma: VolatilityType
-    gbm_mu: float
-    jumps_lamda: float = 0.0
-    jumps_sigma: VolatilityType = 0.0
-    jumps_mu: float = 0.0
-    cir_a: float = 0.0
-    cir_mu: float = 0.0
-    all_r0: float = 0.0
-    cir_rho: float = 0.0
-    ou_a: float = 0.0
-    ou_mu: float = 0.0
-    heston_a: float = 0.0
-    heston_mu: VolatilityType = 0.0
-    heston_vol0: VolatilityType = 0.0
-
-
 class ReturnSimulation(
     BaseModel, arbitrary_types_allowed=True, validate_assignment=True
 ):
-    """Object of the class ReturnSimulation. Subclass of the Pydantic BaseModel
+    """Object of the class ReturnSimulation.
 
     Parameters
     ----------
@@ -1026,3 +966,63 @@ class ReturnSimulation(
             sdf.columns = [[f"Asset_{item}"], [ValueType.RTRN]]
             fdf = concat([fdf, sdf], axis="columns", sort=True)
         return fdf
+
+
+class ModelParameters(BaseModel):
+    """Object of the class ModelParameters.
+
+    Parameters
+    ----------
+    all_s0: float
+        Starting asset value
+    all_time: TradingDaysType
+        Amount of time to simulate for
+    all_delta: float
+        Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
+    all_sigma: VolatilityType
+        Volatility of the stochastic processes
+    all_r0: float, default: 0.0
+        Starting interest rate value
+    gbm_mu: float
+        Annual drift factor for geometric brownian motion
+    jumps_lamda: float, default: 0.0
+        Probability of a jump happening at each point in time
+    jumps_sigma: VolatilityType, default: 0.0
+        Volatility of the jump size
+    jumps_mu: float, default: 0.0
+        Average jump size
+    cir_a: float, default: 0.0
+        Rate of mean reversion for Cox Ingersoll Ross
+    cir_mu: float, default: 0.0
+        Long run average interest rate for Cox Ingersoll Ross
+    cir_rho: float, default: 0.0
+        Correlation between the wiener processes of the Heston model
+    ou_a: float, default: 0.0
+        Rate of mean reversion for Ornstein Uhlenbeck
+    ou_mu: float, default: 0.0
+        Long run average interest rate for Ornstein Uhlenbeck
+    heston_a: float, default: 0.0
+        Rate of mean reversion for volatility in the Heston model
+    heston_mu: VolatilityType, default: 0.0
+        Long run average volatility for the Heston model
+    heston_vol0: VolatilityType, default: 0.0
+        Starting volatility value for the Heston vol model
+    """
+
+    all_s0: float
+    all_time: TradingDaysType
+    all_delta: float
+    all_sigma: VolatilityType
+    gbm_mu: float
+    jumps_lamda: float = 0.0
+    jumps_sigma: VolatilityType = 0.0
+    jumps_mu: float = 0.0
+    cir_a: float = 0.0
+    cir_mu: float = 0.0
+    all_r0: float = 0.0
+    cir_rho: float = 0.0
+    ou_a: float = 0.0
+    ou_mu: float = 0.0
+    heston_a: float = 0.0
+    heston_mu: VolatilityType = 0.0
+    heston_vol0: VolatilityType = 0.0

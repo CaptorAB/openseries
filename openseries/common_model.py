@@ -1,5 +1,5 @@
 """
-Defining common properties
+Defining the CommonModel class
 """
 import datetime as dt
 from json import dump
@@ -31,103 +31,6 @@ from openseries.types import LiteralQuantileInterp
 
 
 TypeCommonModel = TypeVar("TypeCommonModel", bound="CommonModel")
-
-
-def var_implied_vol_and_target_func(
-    data: DataFrame,
-    level: float,
-    target_vol: Optional[float] = None,
-    min_leverage_local: float = 0.0,
-    max_leverage_local: float = 99999.0,
-    months_from_last: Optional[int] = None,
-    from_date: Optional[dt.date] = None,
-    to_date: Optional[dt.date] = None,
-    interpolation: LiteralQuantileInterp = "lower",
-    drift_adjust: bool = False,
-    periods_in_a_year_fixed: Optional[int] = None,
-) -> Union[float, Series]:
-    """A position weight multiplier from the ratio between a VaR implied
-    volatility and a given target volatility. Multiplier = 1.0 -> target met
-
-    Parameters
-    ----------
-    data: DataFrame
-        Timeseries data
-    level: float
-        The sought VaR level
-    target_vol: Optional[float]
-        Target Volatility
-    min_leverage_local: float, default: 0.0
-        A minimum adjustment factor
-    max_leverage_local: float, default: 99999.0
-        A maximum adjustment factor
-    months_from_last : int, optional
-        number of months offset as positive integer. Overrides use of from_date
-        and to_date
-    from_date : datetime.date, optional
-        Specific from date
-    to_date : datetime.date, optional
-        Specific to date
-    interpolation: LiteralQuantileInterp, default: "lower"
-        type of interpolation in Pandas.DataFrame.quantile() function.
-    drift_adjust: bool, default: False
-        An adjustment to remove the bias implied by the average return
-    periods_in_a_year_fixed : int, optional
-        Allows locking the periods-in-a-year to simplify test cases and
-        comparisons
-
-    Returns
-    -------
-    Union[float, Pandas.Series]
-        A position weight multiplier from the ratio between a VaR implied
-        volatility and a given target volatility. Multiplier = 1.0 -> target met
-    """
-    earlier, later = get_calc_range(
-        data=data,
-        months_offset=months_from_last,
-        from_dt=from_date,
-        to_dt=to_date,
-    )
-    if periods_in_a_year_fixed:
-        time_factor = float(periods_in_a_year_fixed)
-    else:
-        fraction = (later - earlier).days / 365.25
-        how_many = data.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
-        time_factor = how_many / fraction
-    if drift_adjust:
-        imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
-            data.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .quantile(1 - level, interpolation=interpolation)
-            - data.loc[cast(int, earlier) : cast(int, later)].pct_change().sum()
-            / len(data.loc[cast(int, earlier) : cast(int, later)].pct_change())
-        )
-    else:
-        imp_vol = (
-            -sqrt(time_factor)
-            * data.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change()
-            .quantile(1 - level, interpolation=interpolation)
-            / norm.ppf(level)
-        )
-
-    if target_vol:
-        result = imp_vol.apply(
-            lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local))
-        )
-        label = "Weight from target vol"
-    else:
-        result = imp_vol
-        label = f"Imp vol from VaR {level:.0%}"
-
-    if data.shape[1] == 1:
-        return float(result.iloc[0])
-    return Series(
-        data=result,
-        index=data.columns,
-        name=label,
-        dtype="float64",
-    )
 
 
 class CommonModel:
@@ -926,7 +829,7 @@ class CommonModel:
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
         """
-        return var_implied_vol_and_target_func(
+        return _var_implied_vol_and_target_func(
             data=self.tsdf,
             level=level,
             months_from_last=months_from_last,
@@ -984,7 +887,7 @@ class CommonModel:
             A position weight multiplier from the ratio between a VaR implied
             volatility and a given target volatility. Multiplier = 1.0 -> target met
         """
-        return var_implied_vol_and_target_func(
+        return _var_implied_vol_and_target_func(
             data=self.tsdf,
             target_vol=target_vol,
             level=level,
@@ -1849,3 +1752,102 @@ class CommonModel:
         voldf.columns = [[vol_label], ["Rolling volatility"]]
 
         return voldf
+
+
+def _var_implied_vol_and_target_func(
+    data: DataFrame,
+    level: float,
+    target_vol: Optional[float] = None,
+    min_leverage_local: float = 0.0,
+    max_leverage_local: float = 99999.0,
+    months_from_last: Optional[int] = None,
+    from_date: Optional[dt.date] = None,
+    to_date: Optional[dt.date] = None,
+    interpolation: LiteralQuantileInterp = "lower",
+    drift_adjust: bool = False,
+    periods_in_a_year_fixed: Optional[int] = None,
+) -> Union[float, Series]:
+    """The function returns a position weight multiplier from the ratio between
+    a VaR implied volatility and a given target volatility if the argument
+    target_vol is provided. Otherwise the function returns the VaR implied
+    volatility. Multiplier = 1.0 -> target met
+
+    Parameters
+    ----------
+    data: DataFrame
+        Timeseries data
+    level: float
+        The sought VaR level
+    target_vol: Optional[float]
+        Target Volatility
+    min_leverage_local: float, default: 0.0
+        A minimum adjustment factor
+    max_leverage_local: float, default: 99999.0
+        A maximum adjustment factor
+    months_from_last : int, optional
+        number of months offset as positive integer. Overrides use of from_date
+        and to_date
+    from_date : datetime.date, optional
+        Specific from date
+    to_date : datetime.date, optional
+        Specific to date
+    interpolation: LiteralQuantileInterp, default: "lower"
+        type of interpolation in Pandas.DataFrame.quantile() function.
+    drift_adjust: bool, default: False
+        An adjustment to remove the bias implied by the average return
+    periods_in_a_year_fixed : int, optional
+        Allows locking the periods-in-a-year to simplify test cases and
+        comparisons
+
+    Returns
+    -------
+    Union[float, Pandas.Series]
+        Target volatility if target_vol is provided otherwise the VaR
+        implied volatility.
+    """
+    earlier, later = get_calc_range(
+        data=data,
+        months_offset=months_from_last,
+        from_dt=from_date,
+        to_dt=to_date,
+    )
+    if periods_in_a_year_fixed:
+        time_factor = float(periods_in_a_year_fixed)
+    else:
+        fraction = (later - earlier).days / 365.25
+        how_many = data.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
+        time_factor = how_many / fraction
+    if drift_adjust:
+        imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
+            data.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .quantile(1 - level, interpolation=interpolation)
+            - data.loc[cast(int, earlier) : cast(int, later)].pct_change().sum()
+            / len(data.loc[cast(int, earlier) : cast(int, later)].pct_change())
+        )
+    else:
+        imp_vol = (
+            -sqrt(time_factor)
+            * data.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .quantile(1 - level, interpolation=interpolation)
+            / norm.ppf(level)
+        )
+
+    if target_vol:
+        result = imp_vol.apply(
+            lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local))
+        )
+        label = "Weight from target vol"
+    else:
+        result = imp_vol
+        label = f"Imp vol from VaR {level:.0%}"
+
+    if data.shape[1] == 1:
+        return float(result.iloc[0])
+    return Series(
+        data=result,
+        index=data.columns,
+        name=label,
+        dtype="float64",
+    )
