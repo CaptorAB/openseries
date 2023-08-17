@@ -1184,8 +1184,8 @@ class CommonModel:
             data=result,
             index=self.tsdf.columns,
             name="Max drawdown date",
-            dtype="float64",
-        )
+            dtype="datetime64[ns]",
+        ).dt.date
 
     def positive_share_func(
         self: TypeCommonModel,

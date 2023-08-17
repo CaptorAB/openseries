@@ -287,7 +287,8 @@ class OpenFrame(BaseModel, CommonModel):
             data=[i.first_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="first indices",
-        )
+            dtype="datetime64[ns]",
+        ).dt.date
 
     @property
     def last_indices(self: TypeOpenFrame) -> Series:
@@ -302,7 +303,8 @@ class OpenFrame(BaseModel, CommonModel):
             data=[i.last_idx for i in self.constituents],
             index=self.tsdf.columns,
             name="last indices",
-        )
+            dtype="datetime64[ns]",
+        ).dt.date
 
     @property
     def span_of_days_all(self: TypeOpenFrame) -> Series:
