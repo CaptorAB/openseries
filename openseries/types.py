@@ -2,7 +2,6 @@
 Declaring types used throughout the project
 """
 from __future__ import annotations
-
 from enum import Enum
 from typing import Annotated, Literal, Union
 from pydantic import confloat, conint, conlist, constr, StringConstraints

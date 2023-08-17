@@ -28,7 +28,7 @@ from numpy import (
 )
 from numpy.typing import NDArray
 from pandas import concat, DataFrame
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from openseries.datefixer import generate_calender_date_range
 from openseries.types import (
@@ -44,9 +44,7 @@ TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
-class ReturnSimulation(
-    BaseModel, arbitrary_types_allowed=True, validate_assignment=True
-):
+class ReturnSimulation(BaseModel):
     """Object of the class ReturnSimulation.
 
     Parameters
@@ -71,6 +69,8 @@ class ReturnSimulation(
     mean_annual_return: float
     mean_annual_vol: VolatilityType
     dframe: DataFrame
+
+    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True)
 
     @property
     def results(self: TypeReturnSimulation) -> DataFrame:

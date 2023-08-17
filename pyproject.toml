@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.2.1"
+version = "1.2.2"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -42,7 +42,7 @@ numpy = "^1.25.2"
 openpyxl = "^3.1.2"
 pandas = "^2.0.3"
 plotly = "^5.16.0"
-pydantic = "^2.1.1"
+pydantic = "^2.2.0"
 python-dateutil = "^2.8.2"
 python-stdnum = "^1.18"
 scipy = "^1.11.1"
@@ -50,18 +50,18 @@ statsmodels = "^0.14.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "23.7.0"
-coverage = {extras = ["toml"], version = "^7.2.7"}
+coverage = {extras = ["toml"], version = "^7.3.0"}
 coverage-badge = "^1.1.0"
 flake8 = "^6.1.0"
 flake8-black = "^0.3.6"
 flake8-pyproject = "^1.2.3"
-mypy = "^1.4.1"
+mypy = "^1.5.1"
 pre-commit = "^3.3.3"
-pylint = "^2.17.4"
+pylint = "^2.17.5"
 pytest = "^7.4.0"
 pytest-split = "^0.8.1"
 toml = "^0.10.2"
-types-python-dateutil = "^2.8.19.13"
+types-python-dateutil = "^2.8.19.14"
 
 [build-system]
 requires = ["poetry-core"]

@@ -7,6 +7,11 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.2] - 2023-08-17
+
+This version is primarily a fine tuning. I found some incorrect type hints and
+doc strings in common model to correct.
+
 ## Version [1.2.1] - 2023-08-16
 
 Removed the option of selecting a column as the riskfree asset for the Sortino

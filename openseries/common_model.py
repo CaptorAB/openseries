@@ -75,7 +75,7 @@ class CommonModel:
             The last date in the timeseries
         """
 
-        return self.tsdf.index.dt.date[-1]
+        return cast(dt.date, self.tsdf.index[-1])
 
     @property
     def span_of_days(self: TypeCommonModel) -> int:
