@@ -35,9 +35,10 @@ jobs:
           path: |
             ~/.local
             ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -45,6 +46,7 @@ jobs:
           virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
@@ -56,12 +58,13 @@ jobs:
         run: poetry install --no-root --with dev
 
       - name: Save cache
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
           path: |
             ~/.local
             ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
   run_tests:
     needs: stage_python
@@ -91,9 +94,10 @@ jobs:
           path: |
             ~/.local
             ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -101,6 +105,7 @@ jobs:
           virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
@@ -144,9 +149,10 @@ jobs:
           path: |
             ~/.local
             ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -154,6 +160,7 @@ jobs:
           virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
