@@ -46,6 +46,7 @@ jobs:
           virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true

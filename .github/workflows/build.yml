@@ -37,6 +37,7 @@ jobs:
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/build.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VER }}
@@ -44,6 +45,7 @@ jobs:
           virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
@@ -78,6 +80,7 @@ jobs:
           poetry check
 
       - name: Save cache
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
           path: |
