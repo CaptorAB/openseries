@@ -171,8 +171,7 @@ class CommonModel:
     @property
     def vol(self: TypeCommonModel) -> Union[float, Series]:
         """Based on Pandas .std() which is the equivalent of stdev.s([...])
-        in MS Excel \n
-        https://www.investopedia.com/terms/v/volatility.asp
+        in MS Excel. https://www.investopedia.com/terms/v/volatility.asp
 
         Returns
         -------
@@ -184,8 +183,7 @@ class CommonModel:
     @property
     def downside_deviation(self: TypeCommonModel) -> Union[float, Series]:
         """The standard deviation of returns that are below a Minimum Accepted
-        Return of zero.
-        It is used to calculate the Sortino Ratio \n
+        Return of zero. It is used to calculate the Sortino Ratio.
         https://www.investopedia.com/terms/d/downside-deviation.asp
 
         Returns
@@ -231,7 +229,7 @@ class CommonModel:
 
         Returns
         -------
-        float
+        Union[float, Pandas.Series]
             Z-score as (last return - mean return) / standard deviation of returns.
         """
         return self.z_score_func()
@@ -305,7 +303,7 @@ class CommonModel:
     @property
     def var_down(self: TypeCommonModel) -> Union[float, Series]:
         """Downside 95% Value At Risk, "VaR". The equivalent of
-        percentile.inc([...], 1-level) over returns in MS Excel \n
+        percentile.inc([...], 1-level) over returns in MS Excel.
         https://www.investopedia.com/terms/v/var.asp
 
         Returns
@@ -525,7 +523,7 @@ class CommonModel:
 
         Returns
         -------
-        (plotly.go.Figure, str)
+        tuple[plotly.go.Figure, str]
             Plotly Figure and html filename with location
         """
         if labels:
@@ -616,7 +614,7 @@ class CommonModel:
 
         Returns
         -------
-        (plotly.go.Figure, str)
+        tuple[plotly.go.Figure, str]
             Plotly Figure and html filename with location
         """
 
@@ -742,8 +740,8 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...])
-        in MS Excel \n
+        """Annualized volatility. Based on Pandas .std() which is the
+        equivalent of stdev.s([...]) in MS Excel.
         https://www.investopedia.com/terms/v/volatility.asp
 
         Parameters
@@ -802,7 +800,9 @@ class CommonModel:
         drift_adjust: bool = False,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """
+        """Implied annualized volatility from the Downside VaR using the
+        assumption that returns are normally distributed.
+
         Parameters
         ----------
 
@@ -908,7 +908,8 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
+        """Downside Conditional Value At Risk "CVaR"
+        https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
 
         Parameters
         ----------
@@ -961,8 +962,7 @@ class CommonModel:
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
         """The standard deviation of returns that are below a Minimum Accepted
-        Return of zero.
-        It is used to calculate the Sortino Ratio \n
+        Return of zero. It is used to calculate the Sortino Ratio.
         https://www.investopedia.com/terms/d/downside-deviation.asp
 
         Parameters
@@ -1026,7 +1026,8 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/c/cagr.asp
+        """Compounded Annual Growth Rate (CAGR).
+        https://www.investopedia.com/terms/c/cagr.asp
 
         Parameters
         ----------
@@ -1071,13 +1072,59 @@ class CommonModel:
             dtype="float64",
         )
 
+    def skew_func(
+        self: TypeCommonModel,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+    ) -> Union[float, Series]:
+        """Skew of the return distribution.
+        https://www.investopedia.com/terms/s/skewness.asp
+
+        Parameters
+        ----------
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Union[float, Pandas.Series]
+            Skew of the return distribution
+        """
+        earlier, later = get_calc_range(
+            data=self.tsdf,
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
+        )
+        result = skew(
+            a=self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().values,
+            bias=True,
+            nan_policy="omit",
+        )
+
+        if self.tsdf.shape[1] == 1:
+            return float(result[0])
+        return Series(
+            data=result,
+            index=self.tsdf.columns,
+            name="Skew",
+            dtype="float64",
+        )
+
     def kurtosis_func(
         self: TypeCommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/k/kurtosis.asp
+        """Kurtosis of the return distribution.
+        https://www.investopedia.com/terms/k/kurtosis.asp
 
         Parameters
         ----------
@@ -1124,7 +1171,8 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         min_periods: int = 1,
     ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+        """Maximum drawdown without any limit on date range.
+        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Parameters
         ----------
@@ -1166,7 +1214,8 @@ class CommonModel:
 
     @property
     def max_drawdown_date(self: TypeCommonModel) -> Union[dt.date, Series]:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+        """Date when the maximum drawdown occurred.
+        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
         Returns
         -------
@@ -1269,8 +1318,7 @@ class CommonModel:
         -------
         Union[float, Pandas.Series]
             Ratio of the annualized arithmetic mean of returns and annualized
-            volatility or,
-            if risk-free return provided, Sharpe ratio
+            volatility or, if risk-free return provided, Sharpe ratio
         """
         ratio: Series = (
             self.arithmetic_ret_func(
@@ -1292,50 +1340,6 @@ class CommonModel:
         ratio.name = "Return vol ratio"
         ratio = ratio.astype("float64")
         return ratio
-
-    def skew_func(
-        self: TypeCommonModel,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/s/skewness.asp
-
-        Parameters
-        ----------
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-
-        Returns
-        -------
-        Union[float, Pandas.Series]
-            Skew of the return distribution
-        """
-        earlier, later = get_calc_range(
-            data=self.tsdf,
-            months_offset=months_from_last,
-            from_dt=from_date,
-            to_dt=to_date,
-        )
-        result = skew(
-            a=self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().values,
-            bias=True,
-            nan_policy="omit",
-        )
-
-        if self.tsdf.shape[1] == 1:
-            return float(result[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Skew",
-            dtype="float64",
-        )
 
     def sortino_ratio_func(
         self: TypeCommonModel,
@@ -1403,7 +1407,8 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """
+        """Simple return
+
         Parameters
         ----------
         months_from_last : int, optional
@@ -1446,7 +1451,8 @@ class CommonModel:
     def value_ret_calendar_period(
         self: TypeCommonModel, year: int, month: Optional[int] = None
     ) -> Union[float, Series]:
-        """
+        """Simple return for a specific calendar period
+
         Parameters
         ----------
         year : int
@@ -1483,9 +1489,9 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/v/var.asp
-        Downside Value At Risk, "VaR". The equivalent of
+        """Downside Value At Risk, "VaR". The equivalent of
         percentile.inc([...], 1-level) over returns in MS Excel.
+        https://www.investopedia.com/terms/v/var.asp
 
         Parameters
         ----------
@@ -1584,7 +1590,8 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/z/zscore.asp
+        """Z-score as (last return - mean return) / standard deviation of returns.
+        https://www.investopedia.com/terms/z/zscore.asp
 
         Parameters
         ----------
@@ -1626,7 +1633,8 @@ class CommonModel:
         level: float = 0.95,
         observations: int = 252,
     ) -> DataFrame:
-        """
+        """Rolling annualized downside CVaR
+
         Parameters
         ----------
         column: int, default: 0
@@ -1655,7 +1663,8 @@ class CommonModel:
     def rolling_return(
         self: TypeCommonModel, column: int = 0, observations: int = 21
     ) -> DataFrame:
-        """
+        """Rolling returns
+
         Parameters
         ----------
         column: int, default: 0
@@ -1687,7 +1696,8 @@ class CommonModel:
         observations: int = 252,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> DataFrame:
-        """
+        """Rolling annualized downside Value At Risk "VaR"
+
         Parameters
         ----------
         column: int, default: 0
@@ -1723,7 +1733,8 @@ class CommonModel:
         observations: int = 21,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
-        """
+        """Rolling annualised volatilities
+
         Parameters
         ----------
         column: int, default: 0

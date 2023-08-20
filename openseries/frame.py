@@ -308,8 +308,14 @@ class OpenFrame(BaseModel, CommonModel):
 
     @property
     def span_of_days_all(self: TypeOpenFrame) -> Series:
-        """
-        Number of days from the first date to the last for all items in the frame.
+        """Number of days from the first date to the last for all
+        items in the frame.
+
+        Returns
+        -------
+        Pandas.Series
+            Number of days from the first date to the last for all
+            items in the frame.
         """
         return Series(
             data=[c.span_of_days for c in self.constituents],
@@ -435,7 +441,8 @@ class OpenFrame(BaseModel, CommonModel):
 
     @property
     def worst_month(self: TypeOpenFrame) -> Series:
-        """
+        """Most negative month
+
         Returns
         -------
         Pandas.Series
@@ -451,7 +458,8 @@ class OpenFrame(BaseModel, CommonModel):
         )
 
     def value_to_ret(self: TypeOpenFrame) -> TypeOpenFrame:
-        """
+        """The returns of the values in the series
+
         Returns
         -------
         OpenFrame
@@ -619,14 +627,13 @@ class OpenFrame(BaseModel, CommonModel):
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
         """Exponentially Weighted Moving Average Model for Volatilities and
-        Correlation.
-        https://www.investopedia.com/articles/07/ewma.asp
+        Correlation. https://www.investopedia.com/articles/07/ewma.asp
 
         Parameters
         ----------
         lmbda: float, default: 0.94
             Scaling factor to determine weighting.
-        day_chunk: int, default: 0
+        day_chunk: int, default: 11
             Sampling the data which is assumed to be daily.
         dlta_degr_freedms: int, default: 0
             Variance bias factor taking the value 0 or 1.
@@ -733,7 +740,8 @@ class OpenFrame(BaseModel, CommonModel):
 
     @property
     def correl_matrix(self: TypeOpenFrame) -> DataFrame:
-        """
+        """Correlation matrix
+
         Returns
         -------
         Pandas.DataFrame
@@ -748,7 +756,8 @@ class OpenFrame(BaseModel, CommonModel):
     def add_timeseries(
         self: TypeOpenFrame, new_series: OpenTimeSeries
     ) -> TypeOpenFrame:
-        """
+        """To add an OpenTimeSeries object
+
         Parameters
         ----------
         new_series: OpenTimeSeries
@@ -764,7 +773,8 @@ class OpenFrame(BaseModel, CommonModel):
         return self
 
     def delete_timeseries(self: TypeOpenFrame, lvl_zero_item: str) -> TypeOpenFrame:
-        """
+        """To delete an OpenTimeSeries object
+
         Parameters
         ----------
         lvl_zero_item: str
@@ -1206,8 +1216,8 @@ class OpenFrame(BaseModel, CommonModel):
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
     ) -> float:
-        """https://www.investopedia.com/terms/b/beta.asp
-        Calculates Beta as Co-variance of asset & market divided by Variance of market
+        """Calculates Beta as Co-variance of asset & market divided by Variance
+        of the market. https://www.investopedia.com/terms/b/beta.asp
 
         Parameters
         ----------
@@ -1276,9 +1286,9 @@ class OpenFrame(BaseModel, CommonModel):
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
     ) -> RegressionResults:
-        """https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
-        Performs a linear regression and adds a new column with a fitted line
+        """Performs a linear regression and adds a new column with a fitted line
         using Ordinary Least Squares fit
+        https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html
 
         Parameters
         ----------
@@ -1484,8 +1494,8 @@ class OpenFrame(BaseModel, CommonModel):
         market_column: int = 1,
         observations: int = 21,
     ) -> DataFrame:
-        """https://www.investopedia.com/terms/b/beta.asp
-        Calculates Beta as Co-variance of asset & market divided by Variance of market
+        """Calculates Beta as Co-variance of asset & market divided by Variance
+        of the market. https://www.investopedia.com/terms/b/beta.asp
 
         Parameters
         ----------
