@@ -119,7 +119,6 @@ extension-pkg-whitelist = "pydantic"
 max-line-length = 87
 filename = "/openseries/*.py,/tests/*.py"
 exclude = "venv,github,git"
-extend-ignore = ["C901", "E203", "F722", "F821", "W503"]
 format = "pylint"
 hang-closing = false
 doctests = true
