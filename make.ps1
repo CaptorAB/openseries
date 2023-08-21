@@ -13,7 +13,7 @@ elseif ($task -eq "make") {
     $env:PYTHONPATH = "$env:PYTHONPATH;$pwd"
     .\venv\Scripts\activate
     python -m pip install --upgrade pip
-    pip install poetry==1.5.1
+    pip install poetry==1.6.0
     Remove-Item -Path 'poetry.lock' -Force -ErrorAction SilentlyContinue
     poetry install --with dev
     pre-commit install
