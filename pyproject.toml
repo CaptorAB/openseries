@@ -20,9 +20,6 @@ classifiers = [
 ]
 keywords = [
     "python",
-    "python3",
-    "plotly",
-    "pandas",
     "finance",
     "fintech",
     "data-science",
@@ -111,9 +108,6 @@ ignore-patterns= "\\w+\\.json$"
 # This setting silences R0801 'duplicate-code' error. 4 warnings silenced
 [tool.pylint.similarities]
 min-similarity-lines = 7
-
-[tool.pylint."MESSAGES CONTROL"]
-extension-pkg-whitelist = "pydantic"
 
 [tool.flake8]
 max-line-length = 87
