@@ -31,6 +31,11 @@ repos:
       - id: trailing-whitespace
       - id: mixed-line-ending
         exclude: '^.test_durations'
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
   - repo: local
     hooks:
       - id: pylint

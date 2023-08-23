@@ -3,7 +3,7 @@ Date related utilities
 """
 from __future__ import annotations
 import datetime as dt
-from typing import Optional, Union
+from typing import cast, Optional, Union
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
@@ -309,7 +309,7 @@ def offset_business_days(
 
     idx = where(array(local_bdays) == ddate)[0]
 
-    return date_fix(local_bdays[idx[0] + days])
+    return cast(dt.date, local_bdays[idx[0] + days])
 
 
 def generate_calender_date_range(

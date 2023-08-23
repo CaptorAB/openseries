@@ -118,10 +118,10 @@ make install
 
 ## Testing and Linting / Type-checking
 
-Flake8, Black and Pylint checking is embedded in the pre-commit hook but not mypy. All
-packages are used in the project's GitHub workflows and are run when the `lint`
+Flake8, Black, Pylint and Mypy checking is embedded in the pre-commit hook. All
+are also used in the project's GitHub workflows and are run when the `lint`
 alternative is chosen in the below commands.
-The silenced error codes can be found in the
+Any silenced error codes can be found in the
 [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
 file or in in-line comments.
 

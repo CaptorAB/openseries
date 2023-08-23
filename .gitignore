@@ -2,19 +2,13 @@
 __pycache__/
 
 # Unit test / coverage reports
-htmlcov/
-coverage_html/
 /.mypy_cache/
 /.pytest_cache/
 .coverage
-.coveragerc
 
 # Environments
 .venv
 venv/
-
-# Poetry / Dependency Management
-requirements.txt
 
 # Pycharm
 .idea/*

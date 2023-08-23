@@ -92,6 +92,7 @@ fail_under = 99
 strict = true
 ignore_missing_imports = true
 warn_redundant_casts = true
+disable_error_code = ["misc"]
 exclude = ["venv/*"]
 
 [tool.pylint]
