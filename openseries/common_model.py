@@ -582,11 +582,7 @@ class CommonModel:
         show_last: bool = False,
         output_type: LiteralPlotlyOutput = "file",
     ) -> tuple[Figure, str]:
-        """Creates a Plotly Figure
-
-        To scale the bubble size, use the attribute sizeref.
-        We recommend using the following formula to calculate a sizeref value:
-        sizeref = 2. * max(array of size values) / (desired maximum marker size ** 2)
+        """Creates a Plotly Scatter Figure
 
         Parameters
         ----------
