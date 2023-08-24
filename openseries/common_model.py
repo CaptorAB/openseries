@@ -44,7 +44,9 @@ class CommonModel:
 
     @property
     def length(self: TypeCommonModel) -> int:
-        """Returns
+        """Number of observations.
+
+        Returns
         -------
         int
             Number of observations
@@ -53,7 +55,9 @@ class CommonModel:
 
     @property
     def first_idx(self: TypeCommonModel) -> dt.date:
-        """Returns
+        """The first date in the timeseries.
+
+        Returns
         -------
         datetime.date
             The first date in the timeseries
@@ -62,7 +66,9 @@ class CommonModel:
 
     @property
     def last_idx(self: TypeCommonModel) -> dt.date:
-        """Returns
+        """The last date in the timeseries.
+
+        Returns
         -------
         datetime.date
             The last date in the timeseries
@@ -71,7 +77,9 @@ class CommonModel:
 
     @property
     def span_of_days(self: TypeCommonModel) -> int:
-        """Returns
+        """Number of days from the first date to the last.
+
+        Returns
         -------
         int
             Number of days from the first date to the last
@@ -80,7 +88,9 @@ class CommonModel:
 
     @property
     def yearfrac(self: TypeCommonModel) -> float:
-        """Returns
+        """Length of the timeseries expressed in years assuming all years have 365.25 days.
+
+        Returns
         -------
         float
             Length of the timeseries expressed in years assuming all years
@@ -90,7 +100,9 @@ class CommonModel:
 
     @property
     def periods_in_a_year(self: TypeCommonModel) -> float:
-        """Returns
+        """The average number of observations per year.
+
+        Returns
         -------
         float
             The average number of observations per year
@@ -145,7 +157,9 @@ class CommonModel:
 
     @property
     def value_ret(self: TypeCommonModel) -> Union[float, Series]:
-        """Returns
+        """Simple return.
+
+        Returns
         -------
         Union[float, Pandas.Series]
             Simple return
@@ -154,8 +168,7 @@ class CommonModel:
 
     @property
     def vol(self: TypeCommonModel) -> Union[float, Series]:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...])
-        in MS Excel. https://www.investopedia.com/terms/v/volatility.asp.
+        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel. https://www.investopedia.com/terms/v/volatility.asp.
 
         Returns
         -------
@@ -166,9 +179,7 @@ class CommonModel:
 
     @property
     def downside_deviation(self: TypeCommonModel) -> Union[float, Series]:
-        """The standard deviation of returns that are below a Minimum Accepted
-        Return of zero. It is used to calculate the Sortino Ratio.
-        https://www.investopedia.com/terms/d/downside-deviation.asp.
+        """The standard deviation of returns that are below a Minimum Accepted Return of zero. It is used to calculate the Sortino Ratio. https://www.investopedia.com/terms/d/downside-deviation.asp.
 
         Returns
         -------
@@ -180,7 +191,9 @@ class CommonModel:
 
     @property
     def ret_vol_ratio(self: TypeCommonModel) -> Union[float, Series]:
-        """Returns
+        """Ratio of the annualized arithmetic mean of returns and annualized volatility.
+
+        Returns
         -------
         Union[float, Pandas.Series]
             Ratio of the annualized arithmetic mean of returns and annualized
@@ -231,7 +244,9 @@ class CommonModel:
 
     @property
     def worst(self: TypeCommonModel) -> Union[float, Series]:
-        """Returns
+        """Most negative percentage change.
+
+        Returns
         -------
         Union[float, Pandas.Series]
             Most negative percentage change
@@ -241,7 +256,9 @@ class CommonModel:
 
     @property
     def positive_share(self: TypeCommonModel) -> Union[float, Series]:
-        """Returns
+        """The share of percentage changes that are greater than zero.
+
+        Returns
         -------
         Union[float, Pandas.Series]
             The share of percentage changes that are greater than zero
@@ -284,9 +301,7 @@ class CommonModel:
 
     @property
     def var_down(self: TypeCommonModel) -> Union[float, Series]:
-        """Downside 95% Value At Risk, "VaR". The equivalent of
-        percentile.inc([...], 1-level) over returns in MS Excel.
-        https://www.investopedia.com/terms/v/var.asp.
+        """Downside 95% Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel. https://www.investopedia.com/terms/v/var.asp.
 
         Returns
         -------
@@ -299,7 +314,9 @@ class CommonModel:
 
     @property
     def vol_from_var(self: TypeCommonModel) -> Union[float, Series]:
-        """Returns
+        """Implied annualized volatility from the Downside 95% VaR using the assumption that returns are normally distributed.
+
+        Returns
         -------
         Union[float, Pandas.Series]
             Implied annualized volatility from the Downside 95% VaR using the
@@ -310,8 +327,7 @@ class CommonModel:
         return self.vol_from_var_func(level=level, interpolation=interpolation)
 
     def value_to_log(self: TypeCommonModel) -> TypeCommonModel:
-        """Converts a valueseries into logarithmic weighted series \n
-        Equivalent to LN(value[t] / value[t=0]) in MS Excel.
+        """Converts a valueseries into logarithmic weighted series Equivalent to LN(value[t] / value[t=0]) in MS Excel.
 
         Returns
         -------
@@ -719,9 +735,7 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """Annualized volatility. Based on Pandas .std() which is the
-        equivalent of stdev.s([...]) in MS Excel.
-        https://www.investopedia.com/terms/v/volatility.asp.
+        """Annualized volatility. Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel. https://www.investopedia.com/terms/v/volatility.asp.
 
         Parameters
         ----------

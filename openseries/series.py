@@ -127,7 +127,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return isin_code
 
     @model_validator(mode="after")
-    def check_dates_unique(self) -> OpenTimeSeries:
+    def check_dates_unique(self: TypeOpenTimeSeries) -> OpenTimeSeries:
         """Pydantic validator to ensure that the dates are unique."""
         dates_list_length = len(self.dates)
         dates_set_length = len(set(self.dates))

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal, TypeVar, Union
 
 from pydantic import StringConstraints, confloat, conint, conlist, constr
 
@@ -153,6 +153,11 @@ LiteralFrameProps = Literal[
     "span_of_days_all",
 ]
 
+TypeOpenTimeSeriesPropertiesList = TypeVar(
+    "TypeOpenTimeSeriesPropertiesList",
+    bound="OpenTimeSeriesPropertiesList",
+)
+
 
 class OpenTimeSeriesPropertiesList(list[str]):
     """Allowed property arguments for the OpenTimeSeries class."""
@@ -185,11 +190,15 @@ class OpenTimeSeriesPropertiesList(list[str]):
         "periods_in_a_year",
     }
 
-    def __init__(self, *args: LiteralSeriesProps) -> None:
+    def __init__(
+        self: TypeOpenTimeSeriesPropertiesList,
+        *args: LiteralSeriesProps,
+    ) -> None:
+        """Allowed property arguments for the OpenTimeSeries class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self) -> None:
+    def _validate(self: TypeOpenTimeSeriesPropertiesList) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
@@ -199,6 +208,12 @@ class OpenTimeSeriesPropertiesList(list[str]):
             if item in seen:
                 raise ValueError(f"Duplicate string: {item}")
             seen.add(item)
+
+
+TypeOpenFramePropertiesList = TypeVar(
+    "TypeOpenFramePropertiesList",
+    bound="OpenFramePropertiesList",
+)
 
 
 class OpenFramePropertiesList(list[str]):
@@ -230,11 +245,12 @@ class OpenFramePropertiesList(list[str]):
         "span_of_days_all",
     }
 
-    def __init__(self, *args: LiteralFrameProps) -> None:
+    def __init__(self: TypeOpenFramePropertiesList, *args: LiteralFrameProps) -> None:
+        """Allowed property arguments for the OpenFrame class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self) -> None:
+    def _validate(self: TypeOpenFramePropertiesList) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:

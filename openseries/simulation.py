@@ -919,18 +919,18 @@ class ReturnSimulation(BaseModel):
         end: Optional[dt.date] = None,
         countries: CountriesType = "SE",
     ) -> DataFrame:
-        """Creates pandas.DataFrame from the simulation(s).
+        """Create pandas.DataFrame from simulation(s).
 
         Parameters
         ----------
-            name: str
-                Name label of the serie(s)
-            start: datetime.date, optional
-                Date when the simulation starts
-            end: datetime.date, optional
-                Date when the simulation ends
-            countries: CountriesType, default: "SE"
-                (List of) country code(s) according to ISO 3166-1 alpha-2
+        name: str
+            Name label of the serie(s)
+        start: datetime.date, optional
+            Date when the simulation starts
+        end: datetime.date, optional
+            Date when the simulation ends
+        countries: CountriesType, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
         -------
