@@ -58,16 +58,13 @@ jobs:
         run: poetry install --no-root --with dev
 
       - name: Check and fix with Ruff
-        uses: chartboost/ruff-action@v1
+        run: poetry run ruff check . --fix --exit-non-zero-on-fix
 
       - name: Format with Black
         run: poetry run black ./openseries/*.py ./tests/*.py
 
       - name: Type check with Mypy
         run: poetry run mypy .
-
-      - name: Lint check with Pylint
-        run: poetry run pylint ./openseries/* ./tests/*
 
       - name: Save cache
         if: steps.restore_cache.outputs.cache-hit != 'true'

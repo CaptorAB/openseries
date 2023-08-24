@@ -56,17 +56,14 @@ jobs:
         if: steps.restore_cache.outputs.cache-hit != 'true'
         run: poetry install --no-root --with dev
 
+      - name: Check and fix with Ruff
+        run: poetry run ruff check . --fix --exit-non-zero-on-fix
+
       - name: Format with Black
         run: poetry run black ./openseries/*.py ./tests/*.py
 
-      - name: Check with Flake8
-        run: poetry run flake8
-
       - name: Type check with Mypy
         run: poetry run mypy .
-
-      - name: Lint check with Pylint
-        run: poetry run pylint ./openseries/* ./tests/*
 
       - name: Tests with Pytest
         run: poetry run coverage run -m pytest --verbose
