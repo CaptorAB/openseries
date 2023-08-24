@@ -1,20 +1,20 @@
-"""
-Date related utilities
-"""
+"""Date related utilities."""
 from __future__ import annotations
+
 import datetime as dt
-from typing import cast, Optional, Union
+from typing import cast
+
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
-from numpy import array, busdaycalendar, datetime64, is_busday, where, timedelta64
-from pandas import DataFrame, date_range, Timestamp, Series, DatetimeIndex, concat
+from numpy import array, busdaycalendar, datetime64, is_busday, timedelta64, where
+from pandas import DataFrame, DatetimeIndex, Series, Timestamp, concat, date_range
 from pandas.tseries.offsets import CustomBusinessDay
 
 from openseries.types import (
     CountriesType,
-    TradingDaysType,
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
+    TradingDaysType,
 )
 
 
@@ -22,15 +22,16 @@ def holiday_calendar(
     startyear: int,
     endyear: int,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[
-        Union[
-            dict[Union[dt.date, dt.datetime, str, float, int], str],
-            list[Union[dt.date, dt.datetime, str, float, int]],
-            Union[dt.date, dt.datetime, str, float, int],
-        ]
-    ] = None,
+    custom_holidays: dict[dt.date | dt.datetime | str | float | int, str]
+    | list[dt.date | dt.datetime | str | float | int]
+    | dt.date
+    | dt.datetime
+    | str
+    | float
+    | int
+    | None = None,
 ) -> busdaycalendar:
-    """Function to generate a business calendar
+    """Function to generate a business calendar.
 
     Parameters
     ----------
@@ -67,26 +68,26 @@ def holiday_calendar(
         country in list_supported_countries() for country in countries
     ):
         country: str
-        countryholidays: list[Union[dt.date, str]] = []
+        countryholidays: list[dt.date | str] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:
                 staging.update(custom_holidays)
             countryholidays += list(staging)
-        hols = array(sorted(list(set(countryholidays))), dtype="datetime64[D]")
+        hols = array(sorted(set(countryholidays)), dtype="datetime64[D]")
     else:
         raise ValueError(
             "Argument countries must be a string country code or a list "
-            "of string country codes according to ISO 3166-1 alpha-2."
+            "of string country codes according to ISO 3166-1 alpha-2.",
         )
 
     return busdaycalendar(holidays=hols)
 
 
 def date_fix(
-    fixerdate: Union[str, dt.date, dt.datetime, datetime64, Timestamp],
+    fixerdate: str | dt.date | dt.datetime | datetime64 | Timestamp,
 ) -> dt.date:
-    """Function to parse from different date formats into datetime.date
+    """Function to parse from different date formats into datetime.date.
 
     Parameters
     ----------
@@ -99,7 +100,6 @@ def date_fix(
     datetime.date
         Parsed date
     """
-
     if isinstance(fixerdate, (Timestamp, dt.datetime)):
         return fixerdate.date()
     if isinstance(fixerdate, dt.date):
@@ -112,26 +112,27 @@ def date_fix(
     if isinstance(fixerdate, str):
         return dt.datetime.strptime(fixerdate, "%Y-%m-%d").date()
     raise TypeError(
-        f"Unknown date format {str(fixerdate)} of "
-        f"type {str(type(fixerdate))} encountered"
+        f"Unknown date format {fixerdate!s} of "
+        f"type {type(fixerdate)!s} encountered",
     )
 
 
 def date_offset_foll(
-    raw_date: Union[str, dt.date, dt.datetime, datetime64, Timestamp],
+    raw_date: str | dt.date | dt.datetime | datetime64 | Timestamp,
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[
-        Union[
-            dict[Union[dt.date, dt.datetime, str, float, int], str],
-            list[Union[dt.date, dt.datetime, str, float, int]],
-            Union[dt.date, dt.datetime, str, float, int],
-        ]
-    ] = None,
+    custom_holidays: dict[dt.date | dt.datetime | str | float | int, str]
+    | list[dt.date | dt.datetime | str | float | int]
+    | dt.date
+    | dt.datetime
+    | str
+    | float
+    | int
+    | None = None,
 ) -> dt.date:
-    """Function to offset dates according to a given calendar
+    """Function to offset dates according to a given calendar.
 
     Parameters
     ----------
@@ -158,7 +159,6 @@ def date_offset_foll(
     datetime.date
         Off-set date
     """
-
     raw_date = date_fix(raw_date)
     month_delta = relativedelta(months=months_offset)
 
@@ -185,17 +185,18 @@ def date_offset_foll(
 
 
 def get_previous_business_day_before_today(
-    today: Optional[dt.date] = None,
+    today: dt.date | None = None,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[
-        Union[
-            dict[Union[dt.date, dt.datetime, str, float, int], str],
-            list[Union[dt.date, dt.datetime, str, float, int]],
-            Union[dt.date, dt.datetime, str, float, int],
-        ]
-    ] = None,
+    custom_holidays: dict[dt.date | dt.datetime | str | float | int, str]
+    | list[dt.date | dt.datetime | str | float | int]
+    | dt.date
+    | dt.datetime
+    | str
+    | float
+    | int
+    | None = None,
 ) -> dt.date:
-    """Function to bump backwards to find the previous business day before today
+    """Function to bump backwards to find the previous business day before today.
 
     Parameters
     ----------
@@ -215,7 +216,6 @@ def get_previous_business_day_before_today(
     datetime.date
         The previous business day
     """
-
     if today is None:
         today = dt.date.today()
 
@@ -233,17 +233,18 @@ def offset_business_days(
     ddate: dt.date,
     days: int,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[
-        Union[
-            dict[Union[dt.date, dt.datetime, str, float, int], str],
-            list[Union[dt.date, dt.datetime, str, float, int]],
-            Union[dt.date, dt.datetime, str, float, int],
-        ]
-    ] = None,
+    custom_holidays: dict[dt.date | dt.datetime | str | float | int, str]
+    | list[dt.date | dt.datetime | str | float | int]
+    | dt.date
+    | dt.datetime
+    | str
+    | float
+    | int
+    | None = None,
 ) -> dt.date:
     """Function to bump a date by business days instead of calendar days.
     It first adjusts to a valid business day and then bumps with given
-    number of business days from there
+    number of business days from there.
 
     Parameters
     ----------
@@ -314,14 +315,14 @@ def offset_business_days(
 
 def generate_calender_date_range(
     trading_days: TradingDaysType,
-    start: Optional[dt.date] = None,
-    end: Optional[dt.date] = None,
+    start: dt.date | None = None,
+    end: dt.date | None = None,
     countries: CountriesType = "SE",
 ) -> list[dt.date]:
-    """Generates a list of business day calender dates
+    """Generates a list of business day calender dates.
 
-        Parameters
-        ----------
+    Parameters
+    ----------
         trading_days: TradingDaysType
             Number of days to generate
         start: datetime.date, optional
@@ -338,10 +339,14 @@ def generate_calender_date_range(
     """
     if start and not end:
         tmp_range = date_range(
-            start=start, periods=trading_days * 365 // 252, freq="D"
+            start=start,
+            periods=trading_days * 365 // 252,
+            freq="D",
         )
         calendar = holiday_calendar(
-            startyear=start.year, endyear=tmp_range[-1].year, countries=countries
+            startyear=start.year,
+            endyear=tmp_range[-1].year,
+            countries=countries,
         )
         return [
             d.date()
@@ -355,7 +360,9 @@ def generate_calender_date_range(
     if end and not start:
         tmp_range = date_range(end=end, periods=trading_days * 365 // 252, freq="D")
         calendar = holiday_calendar(
-            startyear=tmp_range[0].year, endyear=end.year, countries=countries
+            startyear=tmp_range[0].year,
+            endyear=end.year,
+            countries=countries,
         )
         return [
             d.date()
@@ -368,15 +375,16 @@ def generate_calender_date_range(
 
     raise ValueError(
         "Provide one of start or end date, but not both. "
-        "Date range is inferred from number of trading days."
+        "Date range is inferred from number of trading days.",
     )
 
 
 def align_dataframe_to_local_cdays(
-    data: DataFrame, countries: CountriesType = "SE"
+    data: DataFrame,
+    countries: CountriesType = "SE",
 ) -> DataFrame:
     """Changes the index of the associated Pandas DataFrame .tsdf to align with
-    local calendar business days
+    local calendar business days.
 
     Parameters
     ----------
@@ -393,7 +401,9 @@ def align_dataframe_to_local_cdays(
     startyear = data.index[0].year
     endyear = data.index[-1].year
     calendar = holiday_calendar(
-        startyear=startyear, endyear=endyear, countries=countries
+        startyear=startyear,
+        endyear=endyear,
+        countries=countries,
     )
 
     d_range = [
@@ -417,7 +427,7 @@ def do_resample_to_business_period_ends(
 ) -> DatetimeIndex:
     """Resamples timeseries frequency to the business calendar
     month end dates of each period while leaving any stubs
-    in place. Stubs will be aligned to the shortest stub
+    in place. Stubs will be aligned to the shortest stub.
 
     Parameters
     ----------
@@ -440,12 +450,11 @@ def do_resample_to_business_period_ends(
     Pandas.DatetimeIndex
         A date range aligned to business period ends
     """
-
     head = head.to_frame().T
     tail = tail.to_frame().T
     data.index = DatetimeIndex(data.index)
     data = data.resample(rule=freq, convention=convention).last()
-    data.drop(index=data.index[-1], inplace=True)
+    data = data.drop(index=data.index[-1])
     data.index = [d.date() for d in DatetimeIndex(data.index)]
 
     if head.index[0] not in data.index:
@@ -454,7 +463,7 @@ def do_resample_to_business_period_ends(
     if tail.index[0] not in data.index:
         data = concat([data, tail])
 
-    data.sort_index(inplace=True)
+    data = data.sort_index()
 
     dates = DatetimeIndex(
         [data.index[0]]
@@ -470,7 +479,7 @@ def do_resample_to_business_period_ends(
             )
             for d in data.index[1:-1]
         ]
-        + [data.index[-1]]
+        + [data.index[-1]],
     )
     dates = dates.drop_duplicates()
     return dates
@@ -478,11 +487,11 @@ def do_resample_to_business_period_ends(
 
 def get_calc_range(
     data: DataFrame,
-    months_offset: Optional[int] = None,
-    from_dt: Optional[dt.date] = None,
-    to_dt: Optional[dt.date] = None,
+    months_offset: int | None = None,
+    from_dt: dt.date | None = None,
+    to_dt: dt.date | None = None,
 ) -> tuple[dt.date, dt.date]:
-    """Creates user defined date range
+    """Creates user defined date range.
 
     Parameters
     ----------

@@ -1,11 +1,11 @@
-"""
-Defining the OpenTimeSeries class
-"""
+"""Defining the OpenTimeSeries class."""
 from __future__ import annotations
-from copy import deepcopy
+
 import datetime as dt
+from copy import deepcopy
 from re import compile as re_compile
-from typing import cast, Optional, Type, Union, TypeVar, Any
+from typing import Any, TypeVar, cast
+
 from numpy import (
     array,
     cumprod,
@@ -19,9 +19,9 @@ from numpy.typing import NDArray
 from pandas import (
     DataFrame,
     DatetimeIndex,
-    date_range,
     MultiIndex,
     Series,
+    date_range,
 )
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from stdnum import isin as isincode
@@ -29,27 +29,27 @@ from stdnum.exceptions import InvalidChecksum
 
 from openseries.common_model import CommonModel
 from openseries.datefixer import (
-    date_fix,
     align_dataframe_to_local_cdays,
+    date_fix,
     do_resample_to_business_period_ends,
     get_calc_range,
+)
+from openseries.risk import (
+    drawdown_details,
+    ewma_calc,
 )
 from openseries.types import (
     CountriesType,
     CurrencyStringType,
     DatabaseIdStringType,
     DateListType,
-    ValueListType,
     LiteralBizDayFreq,
-    LiteralPandasResampleConvention,
     LiteralPandasReindexMethod,
+    LiteralPandasResampleConvention,
     LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
+    ValueListType,
     ValueType,
-)
-from openseries.risk import (
-    drawdown_details,
-    ewma_calc,
 )
 
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
@@ -101,8 +101,8 @@ class OpenTimeSeries(BaseModel, CommonModel):
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
     countries: CountriesType = "SE"
-    isin: Optional[str] = None
-    label: Optional[str] = None
+    isin: str | None = None
+    label: str | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -113,21 +113,22 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
     @field_validator("isin")
     def check_isincode(  # pylint: disable=no-self-argument
-        cls: TypeOpenTimeSeries, isin_code: str
+        cls: TypeOpenTimeSeries,
+        isin_code: str,
     ) -> str:
-        """Pydantic validator to ensure that the ISIN code is valid if provided"""
+        """Pydantic validator to ensure that the ISIN code is valid if provided."""
         if isin_code:
             try:
                 isincode.validate(isin_code)
             except InvalidChecksum as exc:
                 raise ValueError(
-                    "The ISIN code's checksum or check digit is invalid."
+                    "The ISIN code's checksum or check digit is invalid.",
                 ) from exc
         return isin_code
 
     @model_validator(mode="after")
     def check_dates_unique(self) -> OpenTimeSeries:
-        """Pydantic validator to ensure that the dates are unique"""
+        """Pydantic validator to ensure that the dates are unique."""
         dates_list_length = len(self.dates)
         dates_set_length = len(set(self.dates))
         if dates_list_length != dates_set_length:
@@ -136,7 +137,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
     @classmethod
     def setup_class(
-        cls: Type[TypeOpenTimeSeries],
+        cls: type[TypeOpenTimeSeries],
         domestic_ccy: CurrencyStringType = "SEK",
         countries: CountriesType = "SE",
     ) -> None:
@@ -155,7 +156,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
             ccy_ok = ccy_pattern.match(domestic_ccy)
         except TypeError as exc:
             raise ValueError(
-                "domestic currency must be a code according to ISO 4217"
+                "domestic currency must be a code according to ISO 4217",
             ) from exc
         if not ccy_ok:
             raise ValueError("domestic currency must be a code according to ISO 4217")
@@ -163,7 +164,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
             if not ctry_pattern.match(countries):
                 raise ValueError(
                     "countries must be a country code according to "
-                    "ISO 3166-1 alpha-2"
+                    "ISO 3166-1 alpha-2",
                 )
         elif isinstance(countries, list):
             try:
@@ -171,17 +172,17 @@ class OpenTimeSeries(BaseModel, CommonModel):
             except TypeError as exc:
                 raise ValueError(
                     "countries must be a list of country codes "
-                    "according to ISO 3166-1 alpha-2"
+                    "according to ISO 3166-1 alpha-2",
                 ) from exc
             if not all_ctries:
                 raise ValueError(
                     "countries must be a list of country codes "
-                    "according to ISO 3166-1 alpha-2"
+                    "according to ISO 3166-1 alpha-2",
                 )
         else:
             raise ValueError(
                 "countries must be a (list of) country code(s) "
-                "according to ISO 3166-1 alpha-2"
+                "according to ISO 3166-1 alpha-2",
             )
 
         cls.domestic = domestic_ccy
@@ -189,18 +190,18 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
     @classmethod
     def from_arrays(
-        cls: Type[TypeOpenTimeSeries],
+        cls: type[TypeOpenTimeSeries],
         name: str,
         dates: DateListType,
         values: ValueListType,
         valuetype: ValueType = ValueType.PRICE,
         timeseries_id: DatabaseIdStringType = "",
         instrument_id: DatabaseIdStringType = "",
-        isin: Optional[str] = None,
+        isin: str | None = None,
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> TypeOpenTimeSeries:
-        """Creates a timeseries from a Pandas DataFrame or Series
+        """Creates a timeseries from a Pandas DataFrame or Series.
 
         Parameters
         ----------
@@ -228,7 +229,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         return cls(
             name=name,
             label=name,
@@ -250,14 +250,14 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
     @classmethod
     def from_df(
-        cls: Type[TypeOpenTimeSeries],
-        dframe: Union[DataFrame, Series],
+        cls: type[TypeOpenTimeSeries],
+        dframe: DataFrame | Series,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> TypeOpenTimeSeries:
-        """Creates a timeseries from a Pandas DataFrame or Series
+        """Creates a timeseries from a Pandas DataFrame or Series.
 
         Parameters
         ----------
@@ -277,7 +277,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         if isinstance(dframe, Series):
             if isinstance(dframe.name, tuple):
                 label, _ = dframe.name
@@ -288,7 +287,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
             values = dframe.iloc[:, column_nmbr].tolist()
             if isinstance(dframe.columns, MultiIndex):
                 if check_if_none(
-                    dframe.columns.get_level_values(0).values[column_nmbr]
+                    dframe.columns.get_level_values(0).values[column_nmbr],
                 ):
                     print(
                         "checked item",
@@ -299,11 +298,11 @@ class OpenTimeSeries(BaseModel, CommonModel):
                 else:
                     label = dframe.columns.get_level_values(0).values[column_nmbr]
                 if check_if_none(
-                    dframe.columns.get_level_values(1).values[column_nmbr]
+                    dframe.columns.get_level_values(1).values[column_nmbr],
                 ):
                     valuetype = ValueType.PRICE
                     print(
-                        f"valuetype missing. Adding '{valuetype.value}' as valuetype"
+                        f"valuetype missing. Adding '{valuetype.value}' as valuetype",
                     )
                 else:
                     valuetype = dframe.columns.get_level_values(1).values[column_nmbr]
@@ -331,17 +330,17 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
     @classmethod
     def from_fixed_rate(
-        cls: Type[TypeOpenTimeSeries],
+        cls: type[TypeOpenTimeSeries],
         rate: float,
-        d_range: Optional[DatetimeIndex] = None,
-        days: Optional[int] = None,
-        end_dt: Optional[dt.date] = None,
+        d_range: DatetimeIndex | None = None,
+        days: int | None = None,
+        end_dt: dt.date | None = None,
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> TypeOpenTimeSeries:
-        """Creates a timeseries from values accruing with a given fixed rate return
+        """Creates a timeseries from values accruing with a given fixed rate return.
 
         Providing a date_range of type Pandas DatetimeIndex takes priority over
         providing a combination of days and an end date.
@@ -374,11 +373,11 @@ class OpenTimeSeries(BaseModel, CommonModel):
         """
         if not isinstance(d_range, DatetimeIndex) and all([days, end_dt]):
             d_range = DatetimeIndex(
-                [d.date() for d in date_range(periods=days, end=end_dt, freq="D")]
+                [d.date() for d in date_range(periods=days, end=end_dt, freq="D")],
             )
         elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
             raise ValueError(
-                "If d_range is not provided both days and end_dt must be."
+                "If d_range is not provided both days and end_dt must be.",
             )
 
         deltas = array(
@@ -386,7 +385,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
                 i.days
                 for i in cast(DatetimeIndex, d_range)[1:]
                 - cast(DatetimeIndex, d_range)[:-1]
-            ]
+            ],
         )
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
         d_range = [d.strftime("%Y-%m-%d") for d in cast(DatetimeIndex, d_range)]
@@ -410,19 +409,18 @@ class OpenTimeSeries(BaseModel, CommonModel):
         )
 
     def from_deepcopy(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
-        """Creates a copy of an OpenTimeSeries object
+        """Creates a copy of an OpenTimeSeries object.
 
         Returns
         -------
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         return deepcopy(self)
 
     def pandas_df(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
         """Sets the .tsdf parameter as a Pandas DataFrame from the .dates and
-        .values lists
+        .values lists.
 
         Returns
         -------
@@ -437,18 +435,18 @@ class OpenTimeSeries(BaseModel, CommonModel):
         )
         dframe.index = [d.date() for d in DatetimeIndex(dframe.index)]
 
-        dframe.sort_index(inplace=True)
+        dframe = dframe.sort_index()
         self.tsdf = dframe
 
         return self
 
     def calc_range(
         self: TypeOpenTimeSeries,
-        months_offset: Optional[int] = None,
-        from_dt: Optional[dt.date] = None,
-        to_dt: Optional[dt.date] = None,
+        months_offset: int | None = None,
+        from_dt: dt.date | None = None,
+        to_dt: dt.date | None = None,
     ) -> tuple[dt.date, dt.date]:
-        """Creates user defined date range
+        """Creates user defined date range.
 
         Parameters
         ----------
@@ -466,12 +464,15 @@ class OpenTimeSeries(BaseModel, CommonModel):
             Start and end date of the chosen date range
         """
         return get_calc_range(
-            data=self.tsdf, months_offset=months_offset, from_dt=from_dt, to_dt=to_dt
+            data=self.tsdf,
+            months_offset=months_offset,
+            from_dt=from_dt,
+            to_dt=to_dt,
         )
 
     def align_index_to_local_cdays(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
         """Changes the index of the associated Pandas DataFrame .tsdf to align with
-        local calendar business days
+        local calendar business days.
 
         Returns
         -------
@@ -479,14 +480,16 @@ class OpenTimeSeries(BaseModel, CommonModel):
             An OpenTimeSeries object
         """
         self.tsdf = align_dataframe_to_local_cdays(
-            data=self.tsdf, countries=self.countries
+            data=self.tsdf,
+            countries=self.countries,
         )
         return self
 
     def all_properties(
-        self: TypeOpenTimeSeries, properties: Optional[list[LiteralSeriesProps]] = None
+        self: TypeOpenTimeSeries,
+        properties: list[LiteralSeriesProps] | None = None,
     ) -> DataFrame:
-        """Calculates the chosen timeseries properties
+        """Calculates the chosen timeseries properties.
 
         Parameters
         ----------
@@ -498,10 +501,10 @@ class OpenTimeSeries(BaseModel, CommonModel):
         pandas.DataFrame
             Properties of the OpenTimeSeries
         """
-
         if not properties:
             properties = cast(
-                list[LiteralSeriesProps], OpenTimeSeriesPropertiesList.allowed_strings
+                list[LiteralSeriesProps],
+                OpenTimeSeriesPropertiesList.allowed_strings,
             )
 
         props = OpenTimeSeriesPropertiesList(*properties)
@@ -511,25 +514,21 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
     @property
     def worst_month(self: TypeOpenTimeSeries) -> float:
-        """
-        Returns
+        """Returns
         -------
         float
             Most negative month
         """
-
         resdf = self.tsdf.copy()
         resdf.index = DatetimeIndex(resdf.index)
         return float((resdf.resample("BM").last().pct_change().min()).iloc[0])
 
     def value_to_ret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
-        """
-        Returns
+        """Returns
         -------
         OpenTimeSeries
             The returns of the values in the series
         """
-
         self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
@@ -537,9 +536,10 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return self
 
     def value_to_diff(
-        self: TypeOpenTimeSeries, periods: int = 1
+        self: TypeOpenTimeSeries,
+        periods: int = 1,
     ) -> TypeOpenTimeSeries:
-        """Converts a valueseries to a series of its period differences
+        """Converts a valueseries to a series of its period differences.
 
         Parameters
         ----------
@@ -552,7 +552,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
@@ -560,7 +559,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return self
 
     def to_cumret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
-        """Converts a returnseries into a cumulative valueseries
+        """Converts a returnseries into a cumulative valueseries.
 
         Returns
         -------
@@ -580,9 +579,11 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return self
 
     def from_1d_rate_to_cumret(
-        self: TypeOpenTimeSeries, days_in_year: int = 365, divider: float = 1.0
+        self: TypeOpenTimeSeries,
+        days_in_year: int = 365,
+        divider: float = 1.0,
     ) -> TypeOpenTimeSeries:
-        """Converts a series of 1-day rates into a cumulative valueseries
+        """Converts a series of 1-day rates into a cumulative valueseries.
 
         Parameters
         ----------
@@ -596,7 +597,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         arr = array(self.values) / divider
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
@@ -610,9 +610,10 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return self
 
     def resample(
-        self: TypeOpenTimeSeries, freq: Union[LiteralBizDayFreq, str] = "BM"
+        self: TypeOpenTimeSeries,
+        freq: LiteralBizDayFreq | str = "BM",
     ) -> TypeOpenTimeSeries:
-        """Resamples the timeseries frequency
+        """Resamples the timeseries frequency.
 
         Parameters
         ----------
@@ -625,7 +626,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
         self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
@@ -639,7 +639,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
     ) -> TypeOpenTimeSeries:
         """Resamples timeseries frequency to the business calendar
         month end dates of each period while leaving any stubs
-        in place
+        in place.
 
         Parameters
         ----------
@@ -655,7 +655,6 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         head = self.tsdf.iloc[0].copy()
         tail = self.tsdf.iloc[-1].copy()
         dates = do_resample_to_business_period_ends(
@@ -670,14 +669,12 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return self
 
     def drawdown_details(self: TypeOpenTimeSeries) -> DataFrame:
-        """
-        Returns
+        """Returns
         -------
         Pandas.DataFrame
             Calculates 'Max Drawdown', 'Start of drawdown', 'Date of bottom',
             'Days from start to bottom', & 'Average fall per day'
         """
-
         dddf = self.tsdf.copy()
         dddf.index = DatetimeIndex(dddf.index)
         return drawdown_details(dddf).to_frame()
@@ -687,13 +684,13 @@ class OpenTimeSeries(BaseModel, CommonModel):
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> Series:
         """Exponentially Weighted Moving Average Model for Volatility.
-        https://www.investopedia.com/articles/07/ewma.asp
+        https://www.investopedia.com/articles/07/ewma.asp.
 
         Parameters
         ----------
@@ -718,13 +715,13 @@ class OpenTimeSeries(BaseModel, CommonModel):
         Pandas.DataFrame
             Series EWMA volatility
         """
-
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
             how_many = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later), self.tsdf.columns.values[0]
+                cast(int, earlier) : cast(int, later),
+                self.tsdf.columns.values[0],
             ].count()
             fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
@@ -739,7 +736,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
             data.loc[:, (self.label, "Returns")]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
-            * sqrt(time_factor)
+            * sqrt(time_factor),
         ]
 
         for item in data.loc[:, (self.label, "Returns")].iloc[1:]:
@@ -750,7 +747,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
                     prev_ewma=previous,
                     time_factor=time_factor,
                     lmbda=lmbda,
-                )
+                ),
             )
 
         data.loc[:, (self.label, ValueType.EWMA)] = rawdata
@@ -758,9 +755,11 @@ class OpenTimeSeries(BaseModel, CommonModel):
         return data.loc[:, (self.label, ValueType.EWMA)]
 
     def running_adjustment(
-        self: TypeOpenTimeSeries, adjustment: float, days_in_year: int = 365
+        self: TypeOpenTimeSeries,
+        adjustment: float,
+        days_in_year: int = 365,
     ) -> TypeOpenTimeSeries:
-        """Adds (+) or subtracts (-) a fee from the timeseries return
+        """Adds (+) or subtracts (-) a fee from the timeseries return.
 
         Parameters
         ----------
@@ -787,7 +786,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
             values = [self.tsdf.iloc[0, 0]]
             ra_df = self.tsdf.pct_change().copy()
             returns_input = False
-        ra_df.dropna(inplace=True)
+        ra_df = ra_df.dropna()
 
         prev = self.first_idx
         idx: dt.date
@@ -797,7 +796,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
             dates.append(idx)
             values.append(
                 values[-1]
-                * (1 + row.iloc[0] + adjustment * (idx - prev).days / days_in_year)
+                * (1 + row.iloc[0] + adjustment * (idx - prev).days / days_in_year),
             )
             prev = idx
         self.tsdf = DataFrame(data=values, index=dates)
@@ -810,12 +809,12 @@ class OpenTimeSeries(BaseModel, CommonModel):
 
     def set_new_label(
         self: TypeOpenTimeSeries,
-        lvl_zero: Optional[str] = None,
-        lvl_one: Optional[ValueType] = None,
+        lvl_zero: str | None = None,
+        lvl_one: ValueType | None = None,
         delete_lvl_one: bool = False,
     ) -> TypeOpenTimeSeries:
         """Sets the column labels of the .tsdf Pandas Dataframe associated
-        with the timeseries
+        with the timeseries.
 
         Parameters
         ----------
@@ -831,10 +830,9 @@ class OpenTimeSeries(BaseModel, CommonModel):
         OpenTimeSeries
             An OpenTimeSeries object
         """
-
         if lvl_zero is None and lvl_one is None:
             self.tsdf.columns = MultiIndex.from_arrays(
-                [[self.label], [self.valuetype]]
+                [[self.label], [self.valuetype]],
             )
         elif lvl_zero is not None and lvl_one is None:
             self.tsdf.columns = MultiIndex.from_arrays([[lvl_zero], [self.valuetype]])
@@ -854,8 +852,8 @@ def timeseries_chain(
     front: TypeOpenTimeSeries,
     back: TypeOpenTimeSeries,
     old_fee: float = 0.0,
-) -> Union[TypeOpenTimeSeries, OpenTimeSeries]:
-    """Chain two timeseries together
+) -> TypeOpenTimeSeries | OpenTimeSeries:
+    """Chain two timeseries together.
 
     Parameters
     ----------
@@ -899,7 +897,7 @@ def timeseries_chain(
     values += [x[0] for x in new.tsdf.values]
 
     if back.__class__.__subclasscheck__(  # pylint: disable=unnecessary-dunder-call
-        OpenTimeSeries
+        OpenTimeSeries,
     ):
         return OpenTimeSeries(
             timeseriesId=new.timeseriesId,
@@ -938,7 +936,7 @@ def timeseries_chain(
 
 
 def check_if_none(item: Any) -> bool:
-    """Function to check if a variable is None or equivalent
+    """Function to check if a variable is None or equivalent.
 
     Parameters
     ----------

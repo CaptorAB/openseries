@@ -1,38 +1,38 @@
-"""
-Test suite for the openseries/series.py module
-"""
+"""Test suite for the openseries/series.py module."""
 from __future__ import annotations
+
 import datetime as dt
+import sys
 from io import StringIO
 from json import load, loads
 from os import path, remove
-import sys
-from typing import Any, cast, Type, TypeVar, Union
+from typing import Any, TypeVar, cast
 from unittest import TestCase
-from pandas import DataFrame, date_range, DatetimeIndex, Series
-from pydantic import ValidationError as PydanticValidationError
-import pytest
 
-from openseries.types import CountriesType, LiteralSeriesProps, ValueType
+import pytest
+from pandas import DataFrame, DatetimeIndex, Series, date_range
+from pydantic import ValidationError as PydanticValidationError
+
 from openseries.series import (
     OpenTimeSeries,
-    timeseries_chain,
     check_if_none,
+    timeseries_chain,
 )
+from openseries.types import CountriesType, LiteralSeriesProps, ValueType
 from tests.common_sim import ONE_SIM
 
 TypeTestOpenTimeSeries = TypeVar("TypeTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
 
 class NewTimeSeries(OpenTimeSeries):
-    """class to test correct pass-through of classes"""
+    """class to test correct pass-through of classes."""
 
     extra_info: str = "cool"
 
 
 @pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
 def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
-    """Pytest on valid valuetype as input"""
+    """Pytest on valid valuetype as input."""
     assert isinstance(
         OpenTimeSeries.from_arrays(
             name="Asset",
@@ -46,7 +46,7 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
 
 @pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
-    """Pytest on invalid valuetype as input"""
+    """Pytest on invalid valuetype as input."""
     with pytest.raises(PydanticValidationError) as e_invalid_valuetype:
         OpenTimeSeries.from_arrays(
             name="Asset",
@@ -55,13 +55,13 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
             values=[1.0, 1.1],
         )
     assert "type=enum" in str(
-        e_invalid_valuetype.getrepr(style="short")
+        e_invalid_valuetype.getrepr(style="short"),
     ) or "type=string_type" in str(e_invalid_valuetype.getrepr(style="short"))
 
 
 @pytest.mark.parametrize("currency", ["SE", True, "12", 1, None])
 def test_opentimeseries_invalid_currency(currency: str) -> None:
-    """Pytest on invalid currency code as input for currency"""
+    """Pytest on invalid currency code as input for currency."""
     with pytest.raises(PydanticValidationError) as e_invalid_currency:
         OpenTimeSeries.from_arrays(
             name="Asset",
@@ -71,13 +71,13 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
             values=[1.0, 1.1],
         )
     assert "type=string_too_short" in str(
-        e_invalid_currency.getrepr(style="short")
+        e_invalid_currency.getrepr(style="short"),
     ) or "type=string_type" in str(e_invalid_currency.getrepr(style="short"))
 
 
 @pytest.mark.parametrize("domestic", ["SE", True, "12", 1, None])
 def test_opentimeseries_invalid_domestic(domestic: str) -> None:
-    """Pytest on invalid currency code as input for domestic"""
+    """Pytest on invalid currency code as input for domestic."""
     with pytest.raises(PydanticValidationError) as e_dom:
         serie = OpenTimeSeries.from_arrays(
             name="Asset",
@@ -86,15 +86,16 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
         )
         serie.domestic = domestic
     assert "type=string_too_short" in str(
-        e_dom.getrepr(style="short")
+        e_dom.getrepr(style="short"),
     ) or "type=string_type" in str(e_dom.getrepr(style="short"))
 
 
 @pytest.mark.parametrize(
-    "countries", ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []]
+    "countries",
+    ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []],
 )
 def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
-    """Pytest on invalid country codes as input"""
+    """Pytest on invalid country codes as input."""
     with pytest.raises(PydanticValidationError) as e_ctries:
         serie = OpenTimeSeries.from_arrays(
             name="Asset",
@@ -103,7 +104,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         )
         serie.countries = countries
     assert "type=list_type" in str(
-        e_ctries.getrepr(style="short")
+        e_ctries.getrepr(style="short"),
     ) or "type=string_type" in str(e_ctries.getrepr(style="short"))
 
 
@@ -117,7 +118,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     ],
 )
 def test_opentimeseries_invalid_dates(dates: list[str], expectation: Any) -> None:
-    """Pytest on invalid dates as input"""
+    """Pytest on invalid dates as input."""
     with expectation:
         OpenTimeSeries.from_arrays(
             name="Asset",
@@ -137,7 +138,7 @@ def test_opentimeseries_invalid_dates(dates: list[str], expectation: Any) -> Non
     ],
 )
 def test_opentimeseries_invalid_values(values: list[float], expectation: Any) -> None:
-    """Pytest on invalid values as input"""
+    """Pytest on invalid values as input."""
     with expectation:
         OpenTimeSeries.from_arrays(
             name="Asset",
@@ -147,16 +148,16 @@ def test_opentimeseries_invalid_values(values: list[float], expectation: Any) ->
 
 
 class TestOpenTimeSeries(TestCase):
-    """class to run unittests on the module series.py"""
+    """class to run unittests on the module series.py."""
 
     randomseries: OpenTimeSeries
-    random_properties: dict[str, Union[dt.date, int, float]]
+    random_properties: dict[str, dt.date | int | float]
 
     @classmethod
-    def setUpClass(cls: Type[TypeTestOpenTimeSeries]) -> None:
-        """setUpClass for the TestOpenTimeSeries class"""
+    def setUpClass(cls: type[TypeTestOpenTimeSeries]) -> None:
+        """SetUpClass for the TestOpenTimeSeries class."""
         cls.randomseries = OpenTimeSeries.from_df(
-            ONE_SIM.to_dataframe(name="Asset", end=dt.date(2019, 6, 30))
+            ONE_SIM.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
         ).to_cumret()
 
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
@@ -164,7 +165,7 @@ class TestOpenTimeSeries(TestCase):
         ]
 
     def test_setup_class(self: TestOpenTimeSeries) -> None:
-        """Test setup_class method"""
+        """Test setup_class method."""
         with self.assertRaises(ValueError) as e_dom:
             OpenTimeSeries.setup_class(domestic_ccy="12")
         self.assertIn(
@@ -215,9 +216,9 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(OpenTimeSeries.countries, "US")
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
-        """Test duplicate handling"""
+        """Test duplicate handling."""
         json_file = path.join(path.dirname(path.abspath(__file__)), "series.json")
-        with open(json_file, "r", encoding="utf-8") as jsonfile:
+        with open(json_file, encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         dates = (
@@ -246,7 +247,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertIn(member="Dates are not unique", container=str(e_dup.exception))
 
     def test_valid_tsdf(self: TestOpenTimeSeries) -> None:
-        """Test valid pandas.DataFrame property"""
+        """Test valid pandas.DataFrame property."""
         dframe = DataFrame(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
             index=[
@@ -305,7 +306,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_create_from_arrays(self: TestOpenTimeSeries) -> None:
-        """Test from_arrays construct method"""
+        """Test from_arrays construct method."""
         arrseries = OpenTimeSeries.from_arrays(
             name="arrseries",
             dates=[
@@ -320,7 +321,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertTrue(isinstance(arrseries, OpenTimeSeries))
 
     def test_create_from_pandas_df(self: TestOpenTimeSeries) -> None:
-        """Test construct from pandas.DataFrame"""
+        """Test construct from pandas.DataFrame."""
         serie = Series(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
             index=[
@@ -433,9 +434,10 @@ class TestOpenTimeSeries(TestCase):
         self.assertFalse(check_if_none(0.0))
 
     def test_save_to_json(self: TestOpenTimeSeries) -> None:
-        """Test to_json method"""
+        """Test to_json method."""
         seriesfile = path.join(
-            path.dirname(path.abspath(__file__)), "seriessaved.json"
+            path.dirname(path.abspath(__file__)),
+            "seriessaved.json",
         )
 
         jseries = self.randomseries.from_deepcopy()
@@ -453,15 +455,18 @@ class TestOpenTimeSeries(TestCase):
         self.assertFalse(path.exists(seriesfile))
 
     def test_create_from_fixed_rate(self: TestOpenTimeSeries) -> None:
-        """Test from_fixed_rate construct method"""
+        """Test from_fixed_rate construct method."""
         fixseries_one = OpenTimeSeries.from_fixed_rate(
-            rate=0.03, days=756, end_dt=dt.date(2019, 6, 30)
+            rate=0.03,
+            days=756,
+            end_dt=dt.date(2019, 6, 30),
         )
         self.assertTrue(isinstance(fixseries_one, OpenTimeSeries))
 
         rnd_series = self.randomseries.from_deepcopy()
         fixseries_two = OpenTimeSeries.from_fixed_rate(
-            rate=0.03, d_range=DatetimeIndex(rnd_series.tsdf.index)
+            rate=0.03,
+            d_range=DatetimeIndex(rnd_series.tsdf.index),
         )
         self.assertTrue(isinstance(fixseries_two, OpenTimeSeries))
 
@@ -478,7 +483,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertIsInstance(only_days_noend.exception, ValueError)
 
     def test_periods_in_a_year(self: TestOpenTimeSeries) -> None:
-        """Test periods_in_a_year property"""
+        """Test periods_in_a_year property."""
         calc = len(self.randomseries.dates) / (
             (self.randomseries.last_idx - self.randomseries.first_idx).days / 365.25
         )
@@ -490,19 +495,21 @@ class TestOpenTimeSeries(TestCase):
         )
         all_prop = self.random_properties["periods_in_a_year"]
         self.assertEqual(
-            f"{all_prop:.13f}", f"{self.randomseries.periods_in_a_year:.13f}"
+            f"{all_prop:.13f}",
+            f"{self.randomseries.periods_in_a_year:.13f}",
         )
 
     def test_yearfrac(self: TestOpenTimeSeries) -> None:
-        """Test yearfrac property"""
+        """Test yearfrac property."""
         self.assertEqual(
-            f"{9.9931553730322:.13f}", f"{self.randomseries.yearfrac:.13f}"
+            f"{9.9931553730322:.13f}",
+            f"{self.randomseries.yearfrac:.13f}",
         )
         all_prop = self.random_properties["yearfrac"]
         self.assertEqual(f"{all_prop:.13f}", f"{self.randomseries.yearfrac:.13f}")
 
     def test_resample(self: TestOpenTimeSeries) -> None:
-        """Test resample method"""
+        """Test resample method."""
         rs_series = self.randomseries.from_deepcopy()
 
         before = rs_series.value_ret
@@ -515,9 +522,11 @@ class TestOpenTimeSeries(TestCase):
     def test_resample_to_business_period_ends(
         self: TestOpenTimeSeries,
     ) -> None:
-        """Test resample_to_business_period_ends method"""
+        """Test resample_to_business_period_ends method."""
         rsb_stubs_series = OpenTimeSeries.from_fixed_rate(
-            rate=0.01, days=121, end_dt=dt.date(2023, 5, 15)
+            rate=0.01,
+            days=121,
+            end_dt=dt.date(2023, 5, 15),
         )
 
         rsb_stubs_series.resample_to_business_period_ends(freq="BM")
@@ -536,7 +545,9 @@ class TestOpenTimeSeries(TestCase):
         )
 
         rsb_series = OpenTimeSeries.from_fixed_rate(
-            rate=0.01, days=88, end_dt=dt.date(2023, 4, 28)
+            rate=0.01,
+            days=88,
+            end_dt=dt.date(2023, 4, 28),
         )
 
         rsb_series.resample_to_business_period_ends(freq="BM")
@@ -553,16 +564,17 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_calc_range(self: TestOpenTimeSeries) -> None:
-        """Test calc_range method"""
+        """Test calc_range method."""
         cseries = self.randomseries.from_deepcopy()
         start, end = cseries.first_idx.strftime("%Y-%m-%d"), cseries.last_idx.strftime(
-            "%Y-%m-%d"
+            "%Y-%m-%d",
         )
 
         rst, ren = cseries.calc_range()
 
         self.assertListEqual(
-            [start, end], [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]
+            [start, end],
+            [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")],
         )
 
         with self.assertRaises(AssertionError) as too_far:
@@ -579,24 +591,28 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(AssertionError) as outside:
             _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 7, 31)
+                from_dt=dt.date(2009, 5, 31),
+                to_dt=dt.date(2019, 7, 31),
             )
         self.assertIsInstance(outside.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_end:
             _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 7, 31), to_dt=dt.date(2019, 7, 31)
+                from_dt=dt.date(2009, 7, 31),
+                to_dt=dt.date(2019, 7, 31),
             )
         self.assertIsInstance(outside_end.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_start:
             _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31), to_dt=dt.date(2019, 5, 31)
+                from_dt=dt.date(2009, 5, 31),
+                to_dt=dt.date(2019, 5, 31),
             )
         self.assertIsInstance(outside_start.exception, AssertionError)
 
         nst, nen = cseries.calc_range(
-            from_dt=dt.date(2009, 7, 3), to_dt=dt.date(2019, 6, 25)
+            from_dt=dt.date(2009, 7, 3),
+            to_dt=dt.date(2019, 6, 25),
         )
         self.assertEqual(nst, dt.date(2009, 7, 3))
         self.assertEqual(nen, dt.date(2019, 6, 25))
@@ -610,7 +626,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(later_moved, dt.date(2009, 8, 31))
 
     def test_calc_range_output(self: TestOpenTimeSeries) -> None:
-        """Test output consistency after calc_range applied"""
+        """Test output consistency after calc_range applied."""
         cseries = self.randomseries.from_deepcopy()
 
         dates = cseries.calc_range(months_offset=48)
@@ -641,7 +657,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(f"{gr_0:.13f}", f"{gr_1:.13f}")
 
     def test_value_to_diff(self: TestOpenTimeSeries) -> None:
-        """Test value_to_diff method"""
+        """Test value_to_diff method."""
         diffseries = self.randomseries.from_deepcopy()
         diffseries.value_to_diff()
         are_bes = [f"{nn[0]:.12f}" for nn in diffseries.tsdf.values[:15]]
@@ -666,7 +682,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(are_bes, should_bes)
 
     def test_value_to_ret(self: TestOpenTimeSeries) -> None:
-        """Test value_to_ret method"""
+        """Test value_to_ret method."""
         retseries = self.randomseries.from_deepcopy()
         retseries.value_to_ret()
         are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.values[:15]]
@@ -693,7 +709,7 @@ class TestOpenTimeSeries(TestCase):
         retseries.to_cumret()
 
     def test_valute_to_log(self: TestOpenTimeSeries) -> None:
-        """Test value_to_log method"""
+        """Test value_to_log method."""
         logseries = self.randomseries.from_deepcopy()
         logseries.value_to_log()
         are_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values[:15]]
@@ -718,7 +734,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(are_log, should_log)
 
     def test_all_properties(self: TestOpenTimeSeries) -> None:
-        """Test all_properties method"""
+        """Test all_properties method."""
         prop_index = [
             "vol",
             "last_idx",
@@ -761,11 +777,12 @@ class TestOpenTimeSeries(TestCase):
                 result_values[value] = result.loc[value, ("Asset", ValueType.PRICE)]
             elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
                 result_values[value] = result.loc[
-                    value, ("Asset", ValueType.PRICE)
+                    value,
+                    ("Asset", ValueType.PRICE),
                 ].strftime("%Y-%m-%d")
             else:
                 raise TypeError(
-                    f"all_properties returned unexpected type {type(value)}"
+                    f"all_properties returned unexpected type {type(value)}",
                 )
         expected_values = {
             "positive_share": "0.4994026284",
@@ -805,7 +822,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
-        """Test all calculated properties"""
+        """Test all calculated properties."""
         checks = {
             "arithmetic_ret": f"{0.00953014509:.11f}",
             "cvar_down": f"{-0.01402077271:.11f}",
@@ -839,7 +856,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
-        """Test all calculation methods"""
+        """Test all calculation methods."""
         checks = {
             "arithmetic_ret_func": f"{0.00885255100:.11f}",
             "cvar_down_func": f"{-0.01331889836:.11f}",
@@ -872,13 +889,13 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
-        """Test max_drawdown_date property"""
+        """Test max_drawdown_date property."""
         self.assertEqual(dt.date(2018, 11, 8), self.randomseries.max_drawdown_date)
         all_prop = self.random_properties["max_drawdown_date"]
         self.assertEqual(all_prop, self.randomseries.max_drawdown_date)
 
     def test_running_adjustment(self: TestOpenTimeSeries) -> None:
-        """Test running_adjustment method"""
+        """Test running_adjustment method."""
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
@@ -902,7 +919,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_timeseries_chain(self: TestOpenTimeSeries) -> None:
-        """Test timeseries_chain function"""
+        """Test timeseries_chain function."""
         full_series = self.randomseries.from_deepcopy()
         full_values = [f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0].tolist()]
 
@@ -911,7 +928,7 @@ class TestOpenTimeSeries(TestCase):
         back_series = OpenTimeSeries.from_df(
             full_series.tsdf.iloc[
                 full_series.tsdf.index.get_loc(front_series.last_idx) :
-            ]
+            ],
         )
         full_series.tsdf.index.get_loc(front_series.last_idx)
         chained_series = timeseries_chain(front_series, back_series)
@@ -922,7 +939,7 @@ class TestOpenTimeSeries(TestCase):
 
         pushed_date = front_series.last_idx + dt.timedelta(days=10)
         no_overlap_series = OpenTimeSeries.from_df(
-            full_series.tsdf.loc[cast(int, pushed_date) :]
+            full_series.tsdf.loc[cast(int, pushed_date) :],
         )
         with self.assertRaises(Exception) as e_chain:
             _ = timeseries_chain(front_series, no_overlap_series)
@@ -945,13 +962,14 @@ class TestOpenTimeSeries(TestCase):
             _ = timeseries_chain(front_series_three, back_series)
 
         self.assertEqual(
-            e_fail.exception.args[0], "Failed to find a matching date between series"
+            e_fail.exception.args[0],
+            "Failed to find a matching date between series",
         )
 
     def test_timeserieschain_newclass(
         self: TestOpenTimeSeries,
     ) -> None:
-        """Test correct pass-through of classes in timeseries_chain"""
+        """Test correct pass-through of classes in timeseries_chain."""
         base_series_one = self.randomseries.from_deepcopy()
 
         sub_series_one = NewTimeSeries.from_arrays(
@@ -1002,7 +1020,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(list1=new_base.values, list2=new_sub.values)
 
     def test_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
-        """Test that chained methods on subclass returns subclass and not baseclass"""
+        """Test that chained methods on subclass returns subclass and not baseclass."""
         cseries = self.randomseries.from_deepcopy()
         self.assertIsInstance(cseries, OpenTimeSeries)
 
@@ -1014,12 +1032,12 @@ class TestOpenTimeSeries(TestCase):
         self.assertIsInstance(copyseries, NewTimeSeries)
 
         copyseries.set_new_label("boo").running_adjustment(0.001).resample(
-            "BM"
+            "BM",
         ).value_to_ret()
         self.assertIsInstance(copyseries, NewTimeSeries)
 
     def test_plot_series(self: TestOpenTimeSeries) -> None:
-        """Test plot_series method"""
+        """Test plot_series method."""
         plotseries = self.randomseries.from_deepcopy()
         rawdata = [f"{x:.11f}" for x in plotseries.tsdf.iloc[1:5, 0]]
 
@@ -1030,21 +1048,26 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(rawdata, fig_data)
 
         fig_last, _ = plotseries.plot_series(
-            auto_open=False, output_type="div", show_last=True
+            auto_open=False,
+            output_type="div",
+            show_last=True,
         )
         fig_last_json = loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
         self.assertEqual(f"{last:.12f}", "1.024471958022")
 
         fig_last_fmt, _ = plotseries.plot_series(
-            auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
+            auto_open=False,
+            output_type="div",
+            show_last=True,
+            tick_fmt=".3%",
         )
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
         self.assertEqual(last_fmt, "Last 102.447%")
 
     def test_plot_bars(self: TestOpenTimeSeries) -> None:
-        """Test plot_bars method"""
+        """Test plot_bars method."""
         barseries = self.randomseries.from_deepcopy()
         barseries.resample(freq="BM").value_to_ret()
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
@@ -1056,7 +1079,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(rawdata, fig_data)
 
     def test_drawdown_details(self: TestOpenTimeSeries) -> None:
-        """Test drawdown_details method"""
+        """Test drawdown_details method."""
         details = self.randomseries.drawdown_details()
         self.assertEqual(
             f"{details.loc['Max Drawdown', 'Drawdown details']:7f}",
@@ -1071,7 +1094,8 @@ class TestOpenTimeSeries(TestCase):
             dt.date(2018, 11, 8),
         )
         self.assertEqual(
-            details.loc["Days from start to bottom", "Drawdown details"], 2317
+            details.loc["Days from start to bottom", "Drawdown details"],
+            2317,
         )
         self.assertEqual(
             f"{details.loc['Average fall per day', 'Drawdown details']:.9f}",
@@ -1081,7 +1105,7 @@ class TestOpenTimeSeries(TestCase):
     def test_align_index_to_local_cdays(
         self: TestOpenTimeSeries,
     ) -> None:
-        """Test align_index_to_local_cdays method"""
+        """Test align_index_to_local_cdays method."""
         d_range = [d.date() for d in date_range(start="2020-06-15", end="2020-06-25")]
         asim = [1.0] * len(d_range)
         adf = DataFrame(
@@ -1098,7 +1122,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertFalse(midsummer in aseries.tsdf.index)
 
     def test_ewma_vol_func(self: TestOpenTimeSeries) -> None:
-        """Test ewma_vol_func method"""
+        """Test ewma_vol_func method."""
         simdata = self.randomseries.ewma_vol_func()
         simseries = OpenTimeSeries.from_df(simdata, valuetype=ValueType.PRICE)
         values = [f"{v:.11f}" for v in simdata.iloc[:5]]
@@ -1114,7 +1138,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
         simdata_fxd_per_yr = self.randomseries.ewma_vol_func(
-            periods_in_a_year_fixed=251
+            periods_in_a_year_fixed=251,
         )
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5]]
@@ -1129,7 +1153,7 @@ class TestOpenTimeSeries(TestCase):
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
         """Test downside_deviation_func method
-        Source: https://www.investopedia.com/terms/d/downside-deviation.asp
+        Source: https://www.investopedia.com/terms/d/downside-deviation.asp.
         """
         dd_asset = OpenTimeSeries.from_arrays(
             name="asset",
@@ -1163,13 +1187,14 @@ class TestOpenTimeSeries(TestCase):
 
         mar = 0.01
         downdev = dd_asset.downside_deviation_func(
-            min_accepted_return=mar, periods_in_a_year_fixed=1
+            min_accepted_return=mar,
+            periods_in_a_year_fixed=1,
         )
 
         self.assertEqual(f"{downdev:.12f}", "0.043333333333")
 
     def test_validations(self: TestOpenTimeSeries) -> None:
-        """Test input validations"""
+        """Test input validations."""
         valid_isin = "SE0009807308"
         invalid_isin = "SE0009807307"
         valid_instrument_id = "58135911b239b413482758c9"
@@ -1207,7 +1232,7 @@ class TestOpenTimeSeries(TestCase):
                         [
                             "2017-05-29",
                             "2017-05-30",
-                        ]
+                        ],
                     )
                 ],
                 columns=[["asset"], [ValueType.PRICE]],
@@ -1278,7 +1303,7 @@ class TestOpenTimeSeries(TestCase):
                             [
                                 "2017-05-29",
                                 "2017-05-30",
-                            ]
+                            ],
                         )
                     ],
                     columns=[["asset"], [ValueType.PRICE]],
@@ -1319,7 +1344,7 @@ class TestOpenTimeSeries(TestCase):
                             [
                                 "2017-05-29",
                                 "2017-05-30",
-                            ]
+                            ],
                         )
                     ],
                     columns=[["asset"], [ValueType.PRICE]],
@@ -1360,7 +1385,7 @@ class TestOpenTimeSeries(TestCase):
                             [
                                 "2017-05-29",
                                 "2017-05-30",
-                            ]
+                            ],
                         )
                     ],
                     columns=[["asset"], [ValueType.PRICE]],
@@ -1401,7 +1426,7 @@ class TestOpenTimeSeries(TestCase):
                             [
                                 "2017-05-29",
                                 "2017-05-30",
-                            ]
+                            ],
                         )
                     ],
                     columns=[["asset"], [ValueType.PRICE]],
@@ -1442,7 +1467,7 @@ class TestOpenTimeSeries(TestCase):
                             [
                                 "2017-05-29",
                                 "2017-05-30",
-                            ]
+                            ],
                         )
                     ],
                     columns=[["asset"], [ValueType.PRICE]],
@@ -1492,7 +1517,7 @@ class TestOpenTimeSeries(TestCase):
         # )
 
     def test_from_1d_rate_to_cumret(self: TestOpenTimeSeries) -> None:
-        """Test from_1d_rate_to_cumret method"""
+        """Test from_1d_rate_to_cumret method."""
         tms = OpenTimeSeries.from_arrays(
             name="asset",
             valuetype=ValueType.RTRN,
@@ -1534,7 +1559,7 @@ class TestOpenTimeSeries(TestCase):
     def test_geo_ret_value_ret_exceptions(
         self: TestOpenTimeSeries,
     ) -> None:
-        """Test georet property raising exceptions on bad input data"""
+        """Test georet property raising exceptions on bad input data."""
         geoseries = OpenTimeSeries.from_arrays(
             name="asset",
             dates=["2022-07-01", "2023-07-01"],
@@ -1628,7 +1653,7 @@ class TestOpenTimeSeries(TestCase):
         vol_func
         vol_from_var_func
         downside_deviation_func
-        target_weight_from_var
+        target_weight_from_var.
         """
         mseries = self.randomseries.from_deepcopy()
 
@@ -1653,23 +1678,25 @@ class TestOpenTimeSeries(TestCase):
     def test_value_ret_calendar_period(
         self: TestOpenTimeSeries,
     ) -> None:
-        """Test value_ret_calendar_period method"""
+        """Test value_ret_calendar_period method."""
         vrcseries = self.randomseries.from_deepcopy()
 
         vrfs_y = vrcseries.value_ret_func(
-            from_date=dt.date(2017, 12, 29), to_date=dt.date(2018, 12, 28)
+            from_date=dt.date(2017, 12, 29),
+            to_date=dt.date(2018, 12, 28),
         )
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
         self.assertEqual(f"{vrfs_y:.11f}", f"{vrvrcs_y:.11f}")
 
         vrfs_ym = vrcseries.value_ret_func(
-            from_date=dt.date(2018, 4, 30), to_date=dt.date(2018, 5, 31)
+            from_date=dt.date(2018, 4, 30),
+            to_date=dt.date(2018, 5, 31),
         )
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
         self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")
 
     def test_to_drawdown_series(self: TestOpenTimeSeries) -> None:
-        """Test to_drawdown_series method"""
+        """Test to_drawdown_series method."""
         mseries = self.randomseries.from_deepcopy()
         ddvalue = mseries.max_drawdown
         mseries.to_drawdown_series()
@@ -1677,7 +1704,7 @@ class TestOpenTimeSeries(TestCase):
         self.assertEqual(f"{ddvalue:.11f}", f"{ddserievalue:.11f}")
 
     def test_set_new_label(self: TestOpenTimeSeries) -> None:
-        """Test set_new_label method"""
+        """Test set_new_label method."""
         lseries = self.randomseries.from_deepcopy()
 
         self.assertTupleEqual(lseries.tsdf.columns[0], ("Asset", ValueType.PRICE))

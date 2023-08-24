@@ -1,37 +1,37 @@
-"""
-Test suite for the openseries/simulation.py module
-"""
+"""Test suite for the openseries/simulation.py module."""
 from __future__ import annotations
+
 from copy import copy
 from datetime import date as dtdate
-from typing import cast, Type, TypeVar, Union
+from typing import TypeVar, cast
 from unittest import TestCase
-from pandas import DataFrame, date_range, Series
+
+from pandas import DataFrame, Series, date_range
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
+from openseries.simulation import ModelParameters, ReturnSimulation
 from openseries.types import ValueType
-from openseries.simulation import ReturnSimulation, ModelParameters
-from tests.common_sim import ONE_SIM, FIVE_SIMS
+from tests.common_sim import FIVE_SIMS, ONE_SIM
 
 TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")
 
 
 class TestSimulation(TestCase):
-    """class to run unittests on the module simulation.py"""
+    """class to run unittests on the module simulation.py."""
 
     seriesim: ReturnSimulation
     framesim: ReturnSimulation
 
     @classmethod
-    def setUpClass(cls: Type[TypeTestSimulation]) -> None:
-        """setUpClass for the TestSimulation class"""
+    def setUpClass(cls: type[TypeTestSimulation]) -> None:
+        """SetUpClass for the TestSimulation class."""
         cls.seriesim = ONE_SIM
         cls.framesim = FIVE_SIMS
 
     def test_processes(self: TestSimulation) -> None:
-        """Test ReturnSimulation based on different stochastic processes"""
-        args: dict[str, Union[int, float]] = {
+        """Test ReturnSimulation based on different stochastic processes."""
+        args: dict[str, int | float] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
@@ -46,7 +46,7 @@ class TestSimulation(TestCase):
             "from_heston_vol",
             "from_merton_jump_gbm",
         ]
-        added: list[dict[str, Union[int, float]]] = [
+        added: list[dict[str, int | float]] = [
             {},
             {},
             {},
@@ -74,7 +74,7 @@ class TestSimulation(TestCase):
         returns = []
         volatilities = []
         for method, adding in zip(methods, added):
-            arguments: dict[str, Union[int, float]] = {**args, **adding}
+            arguments: dict[str, int | float] = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")
@@ -83,7 +83,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_volatilities, volatilities)
 
     def test_properties(self: TestSimulation) -> None:
-        """Test ReturnSimulation properties output"""
+        """Test ReturnSimulation properties output."""
         days = 2512
         psim = copy(self.seriesim)
 
@@ -96,7 +96,7 @@ class TestSimulation(TestCase):
         self.assertEqual(f"{psim.realized_vol:.9f}", "0.117099479")
 
     def test_assets(self: TestSimulation) -> None:
-        """Test stoch processes output"""
+        """Test stoch processes output."""
         days = 2520
         target_returns = [
             "-0.031826675",
@@ -152,7 +152,7 @@ class TestSimulation(TestCase):
                 columns=[f"Simulation_{i}"],
             )
             series.append(
-                OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE).to_cumret()
+                OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE).to_cumret(),
             )
 
         frame = OpenFrame(series)
@@ -163,7 +163,7 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_volatilities, deviations)
 
     def test_cir_and_ou(self: TestSimulation) -> None:
-        """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels"""
+        """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels."""
         series = []
         days = 2520
         target_means = ["0.024184423", "0.019893950"]
@@ -211,16 +211,16 @@ class TestSimulation(TestCase):
         self.assertListEqual(target_deviations, deviations)
 
     def test_to_dataframe(self: TestSimulation) -> None:
-        """Test method to_dataframe"""
+        """Test method to_dataframe."""
         seriesim = copy(self.seriesim)
 
         start = dtdate(2009, 6, 30)
 
         startseries = OpenTimeSeries.from_df(
-            seriesim.to_dataframe(name="Asset", start=start)
+            seriesim.to_dataframe(name="Asset", start=start),
         ).to_cumret()
         returnseries = OpenTimeSeries.from_df(
-            seriesim.to_dataframe(name="Asset", start=start)
+            seriesim.to_dataframe(name="Asset", start=start),
         )
 
         self.assertEqual(ValueType.PRICE, startseries.valuetype)

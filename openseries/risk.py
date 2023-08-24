@@ -1,5 +1,4 @@
-"""
-Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
+"""Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
 
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
@@ -8,7 +7,8 @@ from __future__ import annotations
 
 import datetime as dt
 from math import ceil
-from typing import cast, Union
+from typing import cast
+
 from numpy import (
     Inf,
     isnan,
@@ -26,9 +26,10 @@ from openseries.types import LiteralQuantileInterp
 
 
 def cvar_down_calc(
-    data: Union[DataFrame, Series, list[float]], level: float = 0.95
+    data: DataFrame | Series | list[float],
+    level: float = 0.95,
 ) -> float:
-    """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp
+    """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
     Parameters
     ----------
@@ -42,7 +43,6 @@ def cvar_down_calc(
     float
         Downside Conditional Value At Risk "CVaR"
     """
-
     if isinstance(data, DataFrame):
         clean = nan_to_num(data.iloc[:, 0])
     else:
@@ -53,13 +53,13 @@ def cvar_down_calc(
 
 
 def var_down_calc(
-    data: Union[DataFrame, Series, list[float]],
+    data: DataFrame | Series | list[float],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
     """Downside Value At Risk, "VaR". The equivalent of
     percentile.inc([...], 1-level) over returns in MS Excel \n
-    https://www.investopedia.com/terms/v/var.asp
+    https://www.investopedia.com/terms/v/var.asp.
 
     Parameters
     ----------
@@ -75,7 +75,6 @@ def var_down_calc(
     float
         Downside Value At Risk
     """
-
     if isinstance(data, DataFrame):
         clean = nan_to_num(data.iloc[:, 0])
     else:
@@ -84,7 +83,7 @@ def var_down_calc(
     return cast(float, quantile(ret, 1 - level, method=interpolation))
 
 
-def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series]:
+def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
     """Calculates https://www.investopedia.com/terms/d/drawdown.asp
     This returns a series representing a drawdown. When the price is at all-time
     highs, the drawdown is 0. However, when prices are below high watermarks,
@@ -110,8 +109,8 @@ def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series
     return drawdown
 
 
-def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> Series:
-    """Details of the maximum drawdown
+def drawdown_details(prices: DataFrame | Series, min_periods: int = 1) -> Series:
+    """Details of the maximum drawdown.
 
     Parameters
     ----------
@@ -129,7 +128,6 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
         Days from start to bottom
         Average fall per day
     """
-
     mdd_date = (
         (prices / prices.expanding(min_periods=min_periods).max()).idxmin().values[0]
     )
@@ -139,7 +137,7 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
     ).iloc[0]
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
-    drwdwn.sort_index(ascending=False, inplace=True)
+    drwdwn = drwdwn.sort_index(ascending=False)
     sdate = drwdwn[drwdwn == 0.0].idxmax().values[0]
     sdate = dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d").date()
     duration = (mdate - sdate).days
@@ -159,9 +157,12 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
 
 
 def ewma_calc(
-    reeturn: float, prev_ewma: float, time_factor: float, lmbda: float = 0.94
+    reeturn: float,
+    prev_ewma: float,
+    time_factor: float,
+    lmbda: float = 0.94,
 ) -> float:
-    """Helper function for EWMA calculation
+    """Helper function for EWMA calculation.
 
     Parameters
     ----------

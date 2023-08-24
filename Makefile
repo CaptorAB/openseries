@@ -15,10 +15,9 @@ test:
 	poetry run coverage-badge -o coverage.svg -f
 
 lint:
+	poetry run ruff check . --fix --exit-non-zero-on-fix
 	poetry run black ./openseries/*.py ./tests/*.py
-	poetry run flake8
 	poetry run mypy .
-	poetry run pylint ./openseries/* ./tests/*
 
 clean:
 	rm -rf venv

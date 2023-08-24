@@ -1,8 +1,5 @@
-"""
-Defining simulated data used in test suite
-"""
+"""Defining simulated data used in test suite."""
 from openseries.simulation import ReturnSimulation
-
 
 ONE_SIM = ReturnSimulation.from_merton_jump_gbm(
     number_of_sims=1,

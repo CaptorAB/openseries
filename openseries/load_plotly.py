@@ -1,6 +1,4 @@
-"""
-Function to load plotly layout and configuration from local json file
-"""
+"""Function to load plotly layout and configuration from local json file."""
 from json import load
 from os.path import abspath, dirname, join
 from typing import Union
@@ -22,7 +20,7 @@ def load_plotly_dict(
     ],
     dict[str, Union[str, float]],
 ]:
-    """Function to load the plotly defaults
+    """Function to load the plotly defaults.
 
     Parameters
     ----------
@@ -36,9 +34,9 @@ def load_plotly_dict(
     layoutfile = join(abspath(project_root), "openseries", "plotly_layouts.json")
     logofile = join(abspath(project_root), "openseries", "plotly_captor_logo.json")
 
-    with open(layoutfile, "r", encoding="utf-8") as layout_file:
+    with open(layoutfile, encoding="utf-8") as layout_file:
         fig = load(layout_file)
-    with open(logofile, "r", encoding="utf-8") as logo_file:
+    with open(logofile, encoding="utf-8") as logo_file:
         logo = load(logo_file)
 
     fig["config"].update({"responsive": responsive})

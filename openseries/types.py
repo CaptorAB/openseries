@@ -1,20 +1,28 @@
-"""
-Declaring types used throughout the project
-"""
+"""Declaring types used throughout the project."""
 from __future__ import annotations
+
 from enum import Enum
 from typing import Annotated, Literal, Union
-from pydantic import confloat, conint, conlist, constr, StringConstraints
+
+from pydantic import StringConstraints, confloat, conint, conlist, constr
 
 CountryStringType = Annotated[
     str,
     StringConstraints(
-        pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
+        pattern=r"^[A-Z]{2}$",
+        to_upper=True,
+        min_length=2,
+        max_length=2,
+        strict=True,
     ),
 ]
 CountryListType = conlist(
     constr(
-        pattern=r"^[A-Z]{2}$", to_upper=True, min_length=2, max_length=2, strict=True
+        pattern=r"^[A-Z]{2}$",
+        to_upper=True,
+        min_length=2,
+        max_length=2,
+        strict=True,
     ),
     min_length=1,
 )
@@ -23,14 +31,19 @@ CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-
 CurrencyStringType = Annotated[
     str,
     StringConstraints(
-        pattern=r"^[A-Z]{3}$", to_upper=True, min_length=3, max_length=3, strict=True
+        pattern=r"^[A-Z]{3}$",
+        to_upper=True,
+        min_length=3,
+        max_length=3,
+        strict=True,
     ),
 ]
 
 DateListType = Annotated[
     list[str],
     conlist(
-        constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"), min_length=2
+        constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"),
+        min_length=2,
     ),
 ]
 
@@ -59,7 +72,12 @@ LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "neares
 LiteralBizDayFreq = Literal["BM", "BQ", "BA"]
 LiteralPandasResampleConvention = Literal["start", "s", "end", "e"]
 LiteralPandasReindexMethod = Literal[
-    None, "pad", "ffill", "backfill", "bfill", "nearest"
+    None,
+    "pad",
+    "ffill",
+    "backfill",
+    "bfill",
+    "nearest",
 ]
 LiteralNanMethod = Literal["fill", "drop"]
 LiteralCaptureRatio = Literal["up", "down", "both"]
@@ -137,7 +155,7 @@ LiteralFrameProps = Literal[
 
 
 class OpenTimeSeriesPropertiesList(list[str]):
-    """Allowed property arguments for the OpenTimeSeries class"""
+    """Allowed property arguments for the OpenTimeSeries class."""
 
     allowed_strings = {
         "value_ret",
@@ -176,7 +194,7 @@ class OpenTimeSeriesPropertiesList(list[str]):
         for item in self:
             if item not in self.allowed_strings:
                 raise ValueError(
-                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}",
                 )
             if item in seen:
                 raise ValueError(f"Duplicate string: {item}")
@@ -184,7 +202,7 @@ class OpenTimeSeriesPropertiesList(list[str]):
 
 
 class OpenFramePropertiesList(list[str]):
-    """Allowed property arguments for the OpenFrame class"""
+    """Allowed property arguments for the OpenFrame class."""
 
     allowed_strings = {
         "value_ret",
@@ -221,7 +239,7 @@ class OpenFramePropertiesList(list[str]):
         for item in self:
             if item not in self.allowed_strings:
                 raise ValueError(
-                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}",
                 )
             if item in seen:
                 raise ValueError(f"Duplicate string: {item}")
@@ -229,7 +247,7 @@ class OpenFramePropertiesList(list[str]):
 
 
 class ValueType(str, Enum):
-    """Class defining the different timeseries types within the project"""
+    """Class defining the different timeseries types within the project."""
 
     EWMA = "EWMA"
     PRICE = "Price(Close)"

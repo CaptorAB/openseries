@@ -1,17 +1,16 @@
-"""
-Test suite for the openseries/frame.py module
-"""
+"""Test suite for the openseries/frame.py module."""
 from __future__ import annotations
+
 from datetime import date as dtdate
-from decimal import Decimal, localcontext, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from os import path, remove
-from typing import cast, Type, TypeVar, Union
+from typing import TypeVar, Union, cast
 from unittest import TestCase
-from pandas import DataFrame, date_range, Series
+
+from pandas import DataFrame, Series, date_range
 from pandas.testing import assert_frame_equal
 
-from tests.common_sim import FIVE_SIMS
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.risk import cvar_down_calc, var_down_calc
@@ -21,21 +20,22 @@ from openseries.types import (
     LiteralPortfolioWeightings,
     ValueType,
 )
+from tests.common_sim import FIVE_SIMS
 
 TypeTestOpenFrame = TypeVar("TypeTestOpenFrame", bound="TestOpenFrame")
 
 
 class TestOpenFrame(TestCase):
-    """class to run unittests on the module frame.py"""
+    """class to run unittests on the module frame.py."""
 
     randomframe: OpenFrame
     randomseries: OpenTimeSeries
 
     @classmethod
-    def setUpClass(cls: Type[TypeTestOpenFrame]) -> None:
-        """setUpClass for the TestOpenFrame class"""
+    def setUpClass(cls: type[TypeTestOpenFrame]) -> None:
+        """SetUpClass for the TestOpenFrame class."""
         cls.randomseries = OpenTimeSeries.from_df(
-            FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30))
+            FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
         ).to_cumret()
         cls.randomframe = OpenFrame(
             [
@@ -44,11 +44,11 @@ class TestOpenFrame(TestCase):
                     column_nmbr=serie,
                 )
                 for serie in range(FIVE_SIMS.number_of_sims)
-            ]
+            ],
         )
 
     def test_valid_tsdf(self: TestOpenFrame) -> None:
-        """Test valid pandas.DataFrame property"""
+        """Test valid pandas.DataFrame property."""
         frame_df = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
@@ -61,12 +61,12 @@ class TestOpenFrame(TestCase):
                     dates=["2023-01-01", "2023-01-02"],
                     values=[1.0, 1.1],
                 ),
-            ]
+            ],
         )
         self.assertIsInstance(frame_df.tsdf, DataFrame)
 
     def test_save_to_json(self: TestOpenFrame) -> None:
-        """Test to_json method"""
+        """Test to_json method."""
         seriesfile = path.join(path.dirname(path.abspath(__file__)), "framesaved.json")
 
         jseries = self.randomframe.from_deepcopy()
@@ -84,7 +84,7 @@ class TestOpenFrame(TestCase):
         self.assertFalse(path.exists(seriesfile))
 
     def test_save_to_xlsx(self: TestOpenFrame) -> None:
-        """Test to_xlsx method"""
+        """Test to_xlsx method."""
         xseries = self.randomframe.from_deepcopy()
         seriesfile = xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo")
 
@@ -108,15 +108,16 @@ class TestOpenFrame(TestCase):
         )
 
     def test_calc_range(self: TestOpenFrame) -> None:
-        """Test calc_range method"""
+        """Test calc_range method."""
         crframe = self.randomframe.from_deepcopy()
         start, end = crframe.first_idx.strftime("%Y-%m-%d"), crframe.last_idx.strftime(
-            "%Y-%m-%d"
+            "%Y-%m-%d",
         )
         rst, ren = crframe.calc_range()
 
         self.assertListEqual(
-            [start, end], [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]
+            [start, end],
+            [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")],
         )
 
         with self.assertRaises(AssertionError) as too_far:
@@ -133,24 +134,28 @@ class TestOpenFrame(TestCase):
 
         with self.assertRaises(AssertionError) as outside:
             _, _ = crframe.calc_range(
-                from_dt=dtdate(2009, 5, 31), to_dt=dtdate(2019, 7, 31)
+                from_dt=dtdate(2009, 5, 31),
+                to_dt=dtdate(2019, 7, 31),
             )
         self.assertIsInstance(outside.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_end:
             _, _ = crframe.calc_range(
-                from_dt=dtdate(2009, 7, 31), to_dt=dtdate(2019, 7, 31)
+                from_dt=dtdate(2009, 7, 31),
+                to_dt=dtdate(2019, 7, 31),
             )
         self.assertIsInstance(outside_end.exception, AssertionError)
 
         with self.assertRaises(AssertionError) as outside_start:
             _, _ = crframe.calc_range(
-                from_dt=dtdate(2009, 5, 31), to_dt=dtdate(2019, 5, 31)
+                from_dt=dtdate(2009, 5, 31),
+                to_dt=dtdate(2019, 5, 31),
             )
         self.assertIsInstance(outside_start.exception, AssertionError)
 
         nst, nen = crframe.calc_range(
-            from_dt=dtdate(2009, 7, 3), to_dt=dtdate(2019, 6, 25)
+            from_dt=dtdate(2009, 7, 3),
+            to_dt=dtdate(2019, 6, 25),
         )
         self.assertEqual(nst, dtdate(2009, 7, 3))
         self.assertEqual(nen, dtdate(2019, 6, 25))
@@ -164,7 +169,7 @@ class TestOpenFrame(TestCase):
         self.assertEqual(later_moved, dtdate(2009, 8, 31))
 
     def test_resample(self: TestOpenFrame) -> None:
-        """Test resample method"""
+        """Test resample method."""
         rs_frame = self.randomframe.from_deepcopy()
         rs_frame.to_cumret()
 
@@ -177,16 +182,20 @@ class TestOpenFrame(TestCase):
         self.assertDictEqual(before, after)
 
     def test_resample_to_business_period_ends(self: TestOpenFrame) -> None:
-        """Test resample_to_business_period_ends method"""
+        """Test resample_to_business_period_ends method."""
         rsb_stubs_frame = OpenFrame(
             [
                 OpenTimeSeries.from_fixed_rate(
-                    rate=0.01, days=121, end_dt=dtdate(2023, 5, 15)
+                    rate=0.01,
+                    days=121,
+                    end_dt=dtdate(2023, 5, 15),
                 ).set_new_label("A"),
                 OpenTimeSeries.from_fixed_rate(
-                    rate=0.01, days=123, end_dt=dtdate(2023, 5, 16)
+                    rate=0.01,
+                    days=123,
+                    end_dt=dtdate(2023, 5, 16),
                 ).set_new_label("B"),
-            ]
+            ],
         )
 
         rsb_stubs_frame.resample_to_business_period_ends(freq="BM")
@@ -207,12 +216,16 @@ class TestOpenFrame(TestCase):
         rsb_frame = OpenFrame(
             [
                 OpenTimeSeries.from_fixed_rate(
-                    rate=0.01, days=88, end_dt=dtdate(2023, 4, 28)
+                    rate=0.01,
+                    days=88,
+                    end_dt=dtdate(2023, 4, 28),
                 ).set_new_label("A"),
                 OpenTimeSeries.from_fixed_rate(
-                    rate=0.01, days=8, end_dt=dtdate(2023, 4, 28)
+                    rate=0.01,
+                    days=8,
+                    end_dt=dtdate(2023, 4, 28),
                 ).set_new_label("B"),
-            ]
+            ],
         )
 
         rsb_frame.resample_to_business_period_ends(freq="BM")
@@ -229,7 +242,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_max_drawdown_date(self: TestOpenFrame) -> None:
-        """Test max_drawdown_date method"""
+        """Test max_drawdown_date method."""
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
 
@@ -245,7 +258,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_make_portfolio(self: TestOpenFrame) -> None:
-        """Test make_portfolio method"""
+        """Test make_portfolio method."""
         mpframe = self.randomframe.from_deepcopy()
         mpframe.to_cumret()
         mpframe.weights = [1.0 / mpframe.item_count] * mpframe.item_count
@@ -299,14 +312,15 @@ class TestOpenFrame(TestCase):
         )
 
     def test_make_portfolio_weight_strat(self: TestOpenFrame) -> None:
-        """Test make_portfolio method with weight_strat"""
+        """Test make_portfolio method with weight_strat."""
         mpframe = self.randomframe.from_deepcopy()
         mpframe.to_cumret()
         name = "portfolio"
 
         _ = mpframe.make_portfolio(name=name, weight_strat="eq_weights")
         self.assertListEqual(
-            cast(list[float], mpframe.weights), [0.2, 0.2, 0.2, 0.2, 0.2]
+            cast(list[float], mpframe.weights),
+            [0.2, 0.2, 0.2, 0.2, 0.2],
         )
 
         with localcontext() as decimal_context:
@@ -362,7 +376,7 @@ class TestOpenFrame(TestCase):
             _ = mpframe.make_portfolio(name=name, weight_strat=bogus)
 
     def test_add_timeseries(self: TestOpenFrame) -> None:
-        """Test add_timeseries method"""
+        """Test add_timeseries method."""
         frameas = self.randomframe.from_deepcopy()
         items = int(frameas.item_count)
         frameas.weights = [1 / items] * items
@@ -374,10 +388,10 @@ class TestOpenFrame(TestCase):
 
         self.assertEqual(items + 1, frameas.item_count)
         self.assertEqual(nbr_cols + 1, len(frameas.columns_lvl_zero))
-        self.assertListEqual(cols + ["Asset_6"], frameas.columns_lvl_zero)
+        self.assertListEqual([*cols, "Asset_6"], frameas.columns_lvl_zero)
 
     def test_delete_timeseries(self: TestOpenFrame) -> None:
-        """Test delete_timeseries method"""
+        """Test delete_timeseries method."""
         frame = self.randomframe.from_deepcopy()
         frame.weights = [0.4, 0.1, 0.2, 0.1, 0.2]
 
@@ -391,7 +405,7 @@ class TestOpenFrame(TestCase):
     def test_risk_functions_same_as_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that risk measure results align between OpenFrame and OpenTimeSeries"""
+        """Test that risk measure results align between OpenFrame and OpenTimeSeries."""
         riskseries = self.randomseries.from_deepcopy()
         riskseries.set_new_label(lvl_zero="Asset_0")
         riskframe = self.randomframe.from_deepcopy()
@@ -432,7 +446,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_methods_same_as_opentimeseries(self: TestOpenFrame) -> None:
-        """Test that method results align between OpenFrame and OpenTimeSeries"""
+        """Test that method results align between OpenFrame and OpenTimeSeries."""
         sameseries = self.randomseries.from_deepcopy()
         sameseries.value_to_ret()
         sameframe = self.randomframe.from_deepcopy()
@@ -480,7 +494,7 @@ class TestOpenFrame(TestCase):
     def test_calc_methods_same_as_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that calc results align between OpenFrame and OpenTimeSeries"""
+        """Test that calc results align between OpenFrame and OpenTimeSeries."""
         sames = self.randomseries.from_deepcopy()
         sames.to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
@@ -515,7 +529,7 @@ class TestOpenFrame(TestCase):
     def test_ratio_methods_same_as_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that ratio method results align between OpenFrame and OpenTimeSeries"""
+        """Test that ratio method results align between OpenFrame and OpenTimeSeries."""
         sames = self.randomseries.from_deepcopy()
         sames.to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
@@ -523,7 +537,8 @@ class TestOpenFrame(TestCase):
         samef.to_cumret()
 
         smf_vrf = cast(
-            Series, samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12)
+            Series,
+            samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12),
         ).iloc[0]
         self.assertEqual(
             f"{sames.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
@@ -531,7 +546,8 @@ class TestOpenFrame(TestCase):
         )
 
         smf_srf = cast(
-            Series, samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12)
+            Series,
+            samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12),
         ).iloc[0]
         self.assertEqual(
             f"{sames.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
@@ -539,7 +555,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_measures_same_as_opentimeseries(self: TestOpenFrame) -> None:
-        """Test that measure results align between OpenFrame and OpenTimeSeries"""
+        """Test that measure results align between OpenFrame and OpenTimeSeries."""
         frame_0 = self.randomframe.from_deepcopy()
         for zerie in frame_0.constituents:
             zerie.to_cumret()
@@ -582,7 +598,7 @@ class TestOpenFrame(TestCase):
     def test_properties_same_as_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that property results align between OpenFrame and OpenTimeSeries"""
+        """Test that property results align between OpenFrame and OpenTimeSeries."""
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
         sameframe = self.randomframe.from_deepcopy()
@@ -591,13 +607,14 @@ class TestOpenFrame(TestCase):
         common_props_to_compare = ["periods_in_a_year", "yearfrac"]
         for comnprop in common_props_to_compare:
             self.assertEqual(
-                getattr(sameseries, comnprop), getattr(sameframe, comnprop)
+                getattr(sameseries, comnprop),
+                getattr(sameframe, comnprop),
             )
 
     def test_keeping_attributes_aligned_vs_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that attributes are aligned between OpenFrame and OpenTimeSeries"""
+        """Test that attributes are aligned between OpenFrame and OpenTimeSeries."""
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
         sameframe = self.randomframe.from_deepcopy()
@@ -682,11 +699,12 @@ class TestOpenFrame(TestCase):
                 + common_props
                 + common_attributes
                 + pydantic_basemodel_attributes
-                + series_attributes
-            )
+                + series_attributes,
+            ),
         )
         self.assertTrue(
-            len(series_compared) == 0, msg=f"Difference is: {series_compared}"
+            len(series_compared) == 0,
+            msg=f"Difference is: {series_compared}",
         )
         frame_props = [
             a
@@ -700,17 +718,18 @@ class TestOpenFrame(TestCase):
                 + common_attributes
                 + pydantic_basemodel_attributes
                 + frame_attributes
-                + frame_calc_props
-            )
+                + frame_calc_props,
+            ),
         )
         self.assertTrue(
-            len(frame_compared) == 0, msg=f"Difference is: {frame_compared}"
+            len(frame_compared) == 0,
+            msg=f"Difference is: {frame_compared}",
         )
 
     def test_keeping_methods_aligned_vs_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that methods are aligned between OpenFrame and OpenTimeSeries"""
+        """Test that methods are aligned between OpenFrame and OpenTimeSeries."""
         sameseries = self.randomseries.from_deepcopy()
         sameseries.to_cumret()
         sameframe = self.randomframe.from_deepcopy()
@@ -835,11 +854,12 @@ class TestOpenFrame(TestCase):
                 + common_calc_methods
                 + common_methods
                 + series_createmethods
-                + series_unique
-            )
+                + series_unique,
+            ),
         )
         self.assertTrue(
-            len(series_compared) == 0, msg=f"Difference is: {series_compared}"
+            len(series_compared) == 0,
+            msg=f"Difference is: {series_compared}",
         )
 
         frame_methods = [
@@ -852,15 +872,16 @@ class TestOpenFrame(TestCase):
                 pydantic_basemodel_methods
                 + common_calc_methods
                 + common_methods
-                + frame_unique
-            )
+                + frame_unique,
+            ),
         )
         self.assertTrue(
-            len(frame_compared) == 0, msg=f"Difference is: {frame_compared}"
+            len(frame_compared) == 0,
+            msg=f"Difference is: {frame_compared}",
         )
 
     def test_value_to_log(self: TestOpenFrame) -> None:
-        """Test value_to_log method"""
+        """Test value_to_log method."""
         logframe = self.randomframe.from_deepcopy()
         logframe.to_cumret()
 
@@ -877,7 +898,7 @@ class TestOpenFrame(TestCase):
         self.assertNotEqual(b4_log, middle_log)
 
     def test_correl_matrix(self: TestOpenFrame) -> None:
-        """Test correl_matrix method"""
+        """Test correl_matrix method."""
         corrframe = self.randomframe.from_deepcopy()
         corrframe.to_cumret()
         dict1 = corrframe.correl_matrix.applymap(lambda nn: f"{nn:.12f}").to_dict()
@@ -922,7 +943,7 @@ class TestOpenFrame(TestCase):
         self.assertDictEqual(dict1, dict2)
 
     def test_plot_series(self: TestOpenFrame) -> None:
-        """Test plot_series method"""
+        """Test plot_series method."""
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
@@ -935,7 +956,9 @@ class TestOpenFrame(TestCase):
             self.assertListEqual(rawdata, fig_data)
 
         fig_last, _ = plotframe.plot_series(
-            auto_open=False, output_type="div", show_last=True
+            auto_open=False,
+            output_type="div",
+            show_last=True,
         )
         fig_last_json = loads(fig_last.to_json())
         rawlast = plotframe.tsdf.iloc[-1, -1]
@@ -943,7 +966,10 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{figlast:.12f}", f"{rawlast:.12f}")
 
         fig_last_fmt, _ = plotframe.plot_series(
-            auto_open=False, output_type="div", show_last=True, tick_fmt=".3%"
+            auto_open=False,
+            output_type="div",
+            show_last=True,
+            tick_fmt=".3%",
         )
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
@@ -955,7 +981,7 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(e_plot.exception, AssertionError)
 
     def test_plot_bars(self: TestOpenFrame) -> None:
-        """Test plot_bars method"""
+        """Test plot_bars method."""
         plotframe = self.randomframe.from_deepcopy()
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
@@ -976,25 +1002,29 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(e_plot.exception, AssertionError)
 
         overlayfig, _ = plotframe.plot_bars(
-            auto_open=False, output_type="div", mode="overlay"
+            auto_open=False,
+            output_type="div",
+            mode="overlay",
         )
         overlayfig_json = loads(overlayfig.to_json())
 
         fig_keys.append("opacity")
         self.assertListEqual(
-            sorted(list(overlayfig_json["data"][0].keys())), sorted(fig_keys)
+            sorted(overlayfig_json["data"][0].keys()),
+            sorted(fig_keys),
         )
 
     def test_passed_empty_list(self: TestOpenFrame) -> None:
-        """Test warning on object construct with empty list"""
+        """Test warning on object construct with empty list."""
         with self.assertLogs() as contextmgr:
             OpenFrame([])
         self.assertListEqual(
-            contextmgr.output, ["WARNING:root:OpenFrame() was passed an empty list."]
+            contextmgr.output,
+            ["WARNING:root:OpenFrame() was passed an empty list."],
         )
 
     def test_drawdown_details(self: TestOpenFrame) -> None:
-        """Test drawdown_details method"""
+        """Test drawdown_details method."""
         ddframe = self.randomframe.from_deepcopy()
         for serie in ddframe.constituents:
             serie.to_cumret()
@@ -1003,7 +1033,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual([2317, 1797, 2439, 1024, 1278], dds)
 
     def test_trunc_frame(self: TestOpenFrame) -> None:
-        """Test trunc_frame method"""
+        """Test trunc_frame method."""
         series_long = self.randomseries.from_deepcopy()
         series_long.set_new_label("Long")
         tmp_series = self.randomseries.from_deepcopy()
@@ -1011,7 +1041,7 @@ class TestOpenFrame(TestCase):
             tmp_series.tsdf.loc[
                 cast(int, dtdate(2017, 6, 27)) : cast(int, dtdate(2018, 6, 27)),
                 ("Asset_0", ValueType.PRICE),
-            ]
+            ],
         )
         series_short.set_new_label("Short")
         frame = OpenFrame([series_long, series_short])
@@ -1040,7 +1070,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(trunced, [frame.first_idx, frame.last_idx])
 
     def test_trunc_frame_start_fail(self: TestOpenFrame) -> None:
-        """Test trunc_frame method start fail scenario"""
+        """Test trunc_frame method start fail scenario."""
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
@@ -1054,7 +1084,7 @@ class TestOpenFrame(TestCase):
                             "2022-10-04",
                             "2022-10-05",
                         ],
-                    )
+                    ),
                 ),
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
@@ -1067,7 +1097,7 @@ class TestOpenFrame(TestCase):
                             "2022-10-05",
                             "2022-10-06",
                         ],
-                    )
+                    ),
                 ),
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
@@ -1080,7 +1110,7 @@ class TestOpenFrame(TestCase):
                             "2022-10-06",
                             "2022-10-07",
                         ],
-                    )
+                    ),
                 ),
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
@@ -1093,9 +1123,9 @@ class TestOpenFrame(TestCase):
                             "2022-10-06",
                             "2022-10-07",
                         ],
-                    )
+                    ),
                 ),
-            ]
+            ],
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
@@ -1108,7 +1138,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_trunc_frame_end_fail(self: TestOpenFrame) -> None:
-        """Test trunc_frame method end fail scenario"""
+        """Test trunc_frame method end fail scenario."""
         frame = OpenFrame(
             [
                 OpenTimeSeries.from_df(
@@ -1122,7 +1152,7 @@ class TestOpenFrame(TestCase):
                             "2022-10-04",
                             "2022-10-07",
                         ],
-                    )
+                    ),
                 ),
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
@@ -1134,7 +1164,7 @@ class TestOpenFrame(TestCase):
                             "2022-10-05",
                             "2022-10-07",
                         ],
-                    )
+                    ),
                 ),
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
@@ -1147,7 +1177,7 @@ class TestOpenFrame(TestCase):
                             "2022-10-05",
                             "2022-10-07",
                         ],
-                    )
+                    ),
                 ),
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
@@ -1160,9 +1190,9 @@ class TestOpenFrame(TestCase):
                             "2022-10-04",
                             "2022-10-05",
                         ],
-                    )
+                    ),
                 ),
-            ]
+            ],
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
@@ -1175,7 +1205,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_merge_series(self: TestOpenFrame) -> None:
-        """Test merge_series method"""
+        """Test merge_series method."""
         aframe = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
@@ -1200,7 +1230,7 @@ class TestOpenFrame(TestCase):
                     ],
                     values=[1.1, 1.0, 0.8, 1.1, 1.0],
                 ),
-            ]
+            ],
         )
         bframe = OpenFrame(
             [
@@ -1226,7 +1256,7 @@ class TestOpenFrame(TestCase):
                     ],
                     values=[1.1, 1.0, 0.8, 1.1, 1.0],
                 ),
-            ]
+            ],
         )
 
         b4df = aframe.tsdf.copy()
@@ -1257,7 +1287,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_all_properties(self: TestOpenFrame) -> None:
-        """Test all_properties method"""
+        """Test all_properties method."""
         prop_index = [
             "Simple return",
             "Geometric return",
@@ -1298,11 +1328,12 @@ class TestOpenFrame(TestCase):
                 result_values[value] = result.loc[value, ("Asset_0", ValueType.PRICE)]
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dtdate):
                 result_values[value] = result.loc[
-                    value, ("Asset_0", ValueType.PRICE)
+                    value,
+                    ("Asset_0", ValueType.PRICE),
                 ].strftime("%Y-%m-%d")
             else:
                 raise TypeError(
-                    f"all_properties returned unexpected type {type(value)}"
+                    f"all_properties returned unexpected type {type(value)}",
                 )
         expected_values = {
             "Max Drawdown": "-0.4001162541",
@@ -1339,12 +1370,12 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(ValueError) as e_boo:
             faulty_props = ["geo_ret", "boo"]
             _ = apframe.all_properties(
-                properties=cast(list[LiteralFrameProps], faulty_props)
+                properties=cast(list[LiteralFrameProps], faulty_props),
             )
         self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_align_index_to_local_cdays(self: TestOpenFrame) -> None:
-        """Test align_index_to_local_cdays method"""
+        """Test align_index_to_local_cdays method."""
         d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
         asim = [1.0] * len(d_range)
         adf = DataFrame(
@@ -1364,7 +1395,7 @@ class TestOpenFrame(TestCase):
         self.assertFalse(midsummer in aframe.tsdf.index)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:
-        """Test rolling_info_ratio method"""
+        """Test rolling_info_ratio method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1384,7 +1415,9 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
         simdata_fxd_per_yr = frame.rolling_info_ratio(
-            long_column=0, short_column=1, periods_in_a_year_fixed=251
+            long_column=0,
+            short_column=1,
+            periods_in_a_year_fixed=251,
         )
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
@@ -1398,7 +1431,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_rolling_beta(self: TestOpenFrame) -> None:
-        """Test rolling_beta method"""
+        """Test rolling_beta method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
         simdata = frame.rolling_beta(asset_column=0, market_column=1)
@@ -1417,7 +1450,7 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_tracking_error_func(self: TestOpenFrame) -> None:
-        """Test tracking_error_func method"""
+        """Test tracking_error_func method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1426,7 +1459,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(f"{simdataa[0]:.10f}", "0.2462231908")
 
         simdatab = frame.tracking_error_func(
-            base_column=-1, periods_in_a_year_fixed=251
+            base_column=-1,
+            periods_in_a_year_fixed=251,
         )
 
         self.assertEqual(f"{simdatab[0]:.10f}", "0.2460409063")
@@ -1447,7 +1481,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_info_ratio_func(self: TestOpenFrame) -> None:
-        """Test info_ratio_func method"""
+        """Test info_ratio_func method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1473,7 +1507,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_rolling_corr(self: TestOpenFrame) -> None:
-        """Test rolling_corr method"""
+        """Test rolling_corr method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1493,7 +1527,7 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_rolling_vol(self: TestOpenFrame) -> None:
-        """Test rolling_vol method"""
+        """Test rolling_vol method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1513,7 +1547,9 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
         simdata_fxd_per_yr = frame.rolling_vol(
-            column=0, observations=21, periods_in_a_year_fixed=251
+            column=0,
+            observations=21,
+            periods_in_a_year_fixed=251,
         )
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
@@ -1527,7 +1563,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_rolling_return(self: TestOpenFrame) -> None:
-        """Test rolling_return method"""
+        """Test rolling_return method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1547,7 +1583,7 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_rolling_cvar_down(self: TestOpenFrame) -> None:
-        """Test rolling_cvar_down method"""
+        """Test rolling_cvar_down method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1567,7 +1603,7 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_rolling_var_down(self: TestOpenFrame) -> None:
-        """Test rolling_var_down method"""
+        """Test rolling_var_down method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
@@ -1587,7 +1623,7 @@ class TestOpenFrame(TestCase):
         self.assertIsInstance(simseries, OpenTimeSeries)
 
     def test_label_uniqueness(self: TestOpenFrame) -> None:
-        """Test label uniqueness"""
+        """Test label uniqueness."""
         aseries = self.randomseries.from_deepcopy()
         bseries = self.randomseries.from_deepcopy()
 
@@ -1609,7 +1645,7 @@ class TestOpenFrame(TestCase):
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and
         Finance Education (Vol 2 Winter 2013).
-        https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf
+        https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf.
         """
         asset = OpenTimeSeries.from_arrays(
             name="asset",
@@ -1745,7 +1781,8 @@ class TestOpenFrame(TestCase):
         self.assertAlmostEqual(upp.iloc[0], upfixed.iloc[0], places=2)
 
         uptuple = cframe.capture_ratio_func(
-            ratio="up", base_column=("indxx", ValueType.PRICE)
+            ratio="up",
+            base_column=("indxx", ValueType.PRICE),
         )
 
         self.assertEqual(f"{uptuple.iloc[0]:.12f}", "1.063842457805")
@@ -1761,7 +1798,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
-        """Test georet property raising exceptions on bad input data"""
+        """Test georet property raising exceptions on bad input data."""
         geoframe = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
@@ -1774,7 +1811,7 @@ class TestOpenFrame(TestCase):
                     dates=["2022-07-01", "2023-07-01"],
                     values=[1.0, 1.2],
                 ),
-            ]
+            ],
         )
         self.assertListEqual(
             [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)],
@@ -1791,7 +1828,7 @@ class TestOpenFrame(TestCase):
                 name="geoseries3",
                 dates=["2022-07-01", "2023-07-01"],
                 values=[0.0, 1.1],
-            )
+            ),
         )
 
         with self.assertRaises(Exception) as e_gr_zero:
@@ -1828,7 +1865,7 @@ class TestOpenFrame(TestCase):
                 name="geoseries4",
                 dates=["2022-07-01", "2023-07-01"],
                 values=[1.0, -1.1],
-            )
+            ),
         )
         with self.assertRaises(Exception) as e_gr_neg:
             _ = geoframe.geo_ret
@@ -1853,7 +1890,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_value_nan_handle(self: TestOpenFrame) -> None:
-        """Test value_nan_handle method"""
+        """Test value_nan_handle method."""
         nanframe = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
@@ -1878,7 +1915,7 @@ class TestOpenFrame(TestCase):
                     ],
                     values=[2.1, 2.0, 1.8, 2.1, 2.0],
                 ),
-            ]
+            ],
         )
         nanframe.tsdf.iloc[2, 0] = None
         nanframe.tsdf.iloc[3, 1] = None
@@ -1890,14 +1927,16 @@ class TestOpenFrame(TestCase):
         fillframe = nanframe.from_deepcopy()
         fillframe.value_nan_handle(method="fill")
         self.assertListEqual(
-            [1.1, 1.0, 1.0, 1.1, 1.0], fillframe.tsdf.iloc[:, 0].tolist()
+            [1.1, 1.0, 1.0, 1.1, 1.0],
+            fillframe.tsdf.iloc[:, 0].tolist(),
         )
         self.assertListEqual(
-            [2.1, 2.0, 1.8, 1.8, 2.0], fillframe.tsdf.iloc[:, 1].tolist()
+            [2.1, 2.0, 1.8, 1.8, 2.0],
+            fillframe.tsdf.iloc[:, 1].tolist(),
         )
 
     def test_return_nan_handle(self: TestOpenFrame) -> None:
-        """Test return_nan_handle method"""
+        """Test return_nan_handle method."""
         nanframe = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
@@ -1924,7 +1963,7 @@ class TestOpenFrame(TestCase):
                     valuetype=ValueType.RTRN,
                     values=[0.01, 0.04, 0.02, 0.11, 0.06],
                 ),
-            ]
+            ],
         )
         nanframe.tsdf.iloc[2, 0] = None
         nanframe.tsdf.iloc[3, 1] = None
@@ -1936,14 +1975,16 @@ class TestOpenFrame(TestCase):
         fillframe = nanframe.from_deepcopy()
         fillframe.return_nan_handle(method="fill")
         self.assertListEqual(
-            [0.1, 0.05, 0.0, 0.01, 0.04], fillframe.tsdf.iloc[:, 0].tolist()
+            [0.1, 0.05, 0.0, 0.01, 0.04],
+            fillframe.tsdf.iloc[:, 0].tolist(),
         )
         self.assertListEqual(
-            [0.01, 0.04, 0.02, 0.0, 0.06], fillframe.tsdf.iloc[:, 1].tolist()
+            [0.01, 0.04, 0.02, 0.0, 0.06],
+            fillframe.tsdf.iloc[:, 1].tolist(),
         )
 
     def test_relative(self: TestOpenFrame) -> None:
-        """Test relative method"""
+        """Test relative method."""
         rframe = self.randomframe.from_deepcopy()
         rframe.to_cumret()
         sframe = self.randomframe.from_deepcopy()
@@ -1961,7 +2002,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(rflist, sflist)
 
     def test_to_cumret(self: TestOpenFrame) -> None:
-        """Test to_cumret method"""
+        """Test to_cumret method."""
         rseries = self.randomseries.from_deepcopy()
         rseries.value_to_ret()
         rrseries = rseries.from_deepcopy()
@@ -1978,7 +2019,8 @@ class TestOpenFrame(TestCase):
 
         self.assertListEqual([ValueType.RTRN, ValueType.PRICE], mframe.columns_lvl_one)
         self.assertListEqual(
-            [ValueType.PRICE, ValueType.PRICE], cframe.columns_lvl_one
+            [ValueType.PRICE, ValueType.PRICE],
+            cframe.columns_lvl_one,
         )
         cframe_lvl_one = list(cframe.columns_lvl_one)
         self.assertListEqual([ValueType.RTRN, ValueType.RTRN], rframe.columns_lvl_one)
@@ -1988,11 +2030,13 @@ class TestOpenFrame(TestCase):
         rframe.to_cumret()
 
         self.assertListEqual(
-            [ValueType.PRICE, ValueType.PRICE], mframe.columns_lvl_one
+            [ValueType.PRICE, ValueType.PRICE],
+            mframe.columns_lvl_one,
         )
         self.assertListEqual(cframe_lvl_one, cframe.columns_lvl_one)
         self.assertListEqual(
-            [ValueType.PRICE, ValueType.PRICE], rframe.columns_lvl_one
+            [ValueType.PRICE, ValueType.PRICE],
+            rframe.columns_lvl_one,
         )
 
         fmt = "{:.12f}"
@@ -2015,7 +2059,7 @@ class TestOpenFrame(TestCase):
         vol_func
         vol_from_var_func
         downside_deviation_func
-        target_weight_from_var
+        target_weight_from_var.
         """
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
@@ -2035,7 +2079,8 @@ class TestOpenFrame(TestCase):
                 self.assertNotAlmostEqual(nofix, fix, places=6)
         for methd in methods:
             dated = getattr(mframe, methd)(
-                from_date=mframe.first_idx, to_date=mframe.last_idx
+                from_date=mframe.first_idx,
+                to_date=mframe.last_idx,
             )
             undated = getattr(mframe, methd)(
                 from_date=mframe.first_idx,
@@ -2105,17 +2150,19 @@ class TestOpenFrame(TestCase):
         )
 
     def test_value_ret_calendar_period(self: TestOpenFrame) -> None:
-        """Test value_ret_calendar_period method"""
+        """Test value_ret_calendar_period method."""
         vrcseries = self.randomseries.from_deepcopy()
         vrcseries.to_cumret()
         vrcframe = self.randomframe.from_deepcopy()
         vrcframe.to_cumret()
 
         vrfs_y = vrcseries.value_ret_func(
-            from_date=dtdate(2017, 12, 29), to_date=dtdate(2018, 12, 28)
+            from_date=dtdate(2017, 12, 29),
+            to_date=dtdate(2018, 12, 28),
         )
         vrff_y = vrcframe.value_ret_func(
-            from_date=dtdate(2017, 12, 29), to_date=dtdate(2018, 12, 28)
+            from_date=dtdate(2017, 12, 29),
+            to_date=dtdate(2018, 12, 28),
         )
         vrffl_y = [f"{rr:.11f}" for rr in cast(Series, vrff_y)]
 
@@ -2127,10 +2174,12 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(vrffl_y, vrvrcfl_y)
 
         vrfs_ym = vrcseries.value_ret_func(
-            from_date=dtdate(2018, 4, 30), to_date=dtdate(2018, 5, 31)
+            from_date=dtdate(2018, 4, 30),
+            to_date=dtdate(2018, 5, 31),
         )
         vrff_ym = vrcframe.value_ret_func(
-            from_date=dtdate(2018, 4, 30), to_date=dtdate(2018, 5, 31)
+            from_date=dtdate(2018, 4, 30),
+            to_date=dtdate(2018, 5, 31),
         )
         vrffl_ym = [f"{rr:.11f}" for rr in cast(Series, vrff_ym)]
 
@@ -2142,7 +2191,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(vrffl_ym, vrvrcfl_ym)
 
     def test_to_drawdown_series(self: TestOpenFrame) -> None:
-        """Test to_drawdown_series method"""
+        """Test to_drawdown_series method."""
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
         ddown = [f"{dmax:.11f}" for dmax in cast(Series, mframe.max_drawdown)]
@@ -2151,7 +2200,7 @@ class TestOpenFrame(TestCase):
         self.assertListEqual(ddown, ddownserie)
 
     def test_ord_least_squares_fit(self: TestOpenFrame) -> None:
-        """Test ord_least_squares_fit method"""
+        """Test ord_least_squares_fit method."""
         oframe = self.randomframe.from_deepcopy()
         oframe.to_cumret()
         oframe.value_to_log()
@@ -2166,7 +2215,9 @@ class TestOpenFrame(TestCase):
         for i in range(oframe.item_count):
             for j in range(oframe.item_count):
                 tmp = oframe.ord_least_squares_fit(
-                    y_column=i, x_column=j, fitted_series=False
+                    y_column=i,
+                    x_column=j,
+                    fitted_series=False,
                 )
                 results.append(f"{float(tmp.params.iloc[0]):.11f}")
 
@@ -2174,7 +2225,9 @@ class TestOpenFrame(TestCase):
         for i in oframe.tsdf:
             for j in oframe.tsdf:
                 tmp = oframe.ord_least_squares_fit(
-                    y_column=i, x_column=j, fitted_series=False
+                    y_column=i,
+                    x_column=j,
+                    fitted_series=False,
                 )
                 results_tuple.append(f"{float(tmp.params.iloc[0]):.11f}")
 
@@ -2212,7 +2265,9 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(Exception) as e_x:
             str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
-                y_column=0, x_column=str_col, fitted_series=False
+                y_column=0,
+                x_column=str_col,
+                fitted_series=False,
             )
 
         self.assertEqual(
@@ -2223,7 +2278,9 @@ class TestOpenFrame(TestCase):
         with self.assertRaises(Exception) as e_y:
             str_col = cast(Union[tuple[str, ValueType], int], "string")
             _ = oframe.ord_least_squares_fit(
-                y_column=str_col, x_column=1, fitted_series=False
+                y_column=str_col,
+                x_column=1,
+                fitted_series=False,
             )
 
         self.assertEqual(
@@ -2232,7 +2289,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_beta(self: TestOpenFrame) -> None:
-        """Test beta method"""
+        """Test beta method."""
         bframe = self.randomframe.from_deepcopy()
         bframe.to_cumret()
         bframe.resample("7D")
@@ -2297,7 +2354,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_beta_returns_input(self: TestOpenFrame) -> None:
-        """Test beta method with returns input"""
+        """Test beta method with returns input."""
         bframe = self.randomframe.from_deepcopy()
         bframe.resample("7D")
         results = []
@@ -2361,7 +2418,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_jensen_alpha(self: TestOpenFrame) -> None:
-        """Test jensen_alpha method"""
+        """Test jensen_alpha method."""
         jframe = self.randomframe.from_deepcopy()
         jframe.to_cumret()
         jframe.resample("7D")
@@ -2436,7 +2493,7 @@ class TestOpenFrame(TestCase):
         for i in shortframe.tsdf:
             for j in shortframe.tsdf:
                 sresults_tuple.append(
-                    f"{shortframe.jensen_alpha(asset=i, market=j):.9f}"
+                    f"{shortframe.jensen_alpha(asset=i, market=j):.9f}",
                 )
 
         self.assertListEqual(sresults, sresults_tuple)
@@ -2472,7 +2529,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_jensen_alpha_returns_input(self: TestOpenFrame) -> None:
-        """Test jensen_alpha method with returns input"""
+        """Test jensen_alpha method with returns input."""
         jframe = self.randomframe.from_deepcopy()
         jframe.resample("7D")
         results = []
@@ -2536,7 +2593,7 @@ class TestOpenFrame(TestCase):
         )
 
     def test_ewma_risk(self: TestOpenFrame) -> None:
-        """Test ewma_risk method"""
+        """Test ewma_risk method."""
         eframe = self.randomframe.from_deepcopy()
         eframe.to_cumret()
         edf = eframe.ewma_risk()
@@ -2591,11 +2648,13 @@ class TestOpenFrame(TestCase):
         )
 
     def test_ewma_risk_set_columns(self: TestOpenFrame) -> None:
-        """Test ewma_risk method on specified columns"""
+        """Test ewma_risk method on specified columns."""
         eframe = self.randomframe.from_deepcopy()
         eframe.to_cumret()
         fdf = eframe.ewma_risk(
-            first_column=3, second_column=4, periods_in_a_year_fixed=251
+            first_column=3,
+            second_column=4,
+            periods_in_a_year_fixed=251,
         )
         list_three = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 0]]
         list_four = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 1]]
