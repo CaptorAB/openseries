@@ -26,7 +26,7 @@ class TestDateFixer(TestCase):
         formats = [
             "2022-07-15",
             dt.date(year=2022, month=7, day=15),
-            dt.datetime(year=2022, month=7, day=15),
+            dt.datetime(year=2022, month=7, day=15, tzinfo=dt.timezone.utc),
             Timestamp(year=2022, month=7, day=15),
             datetime64("2022-07-15"),
         ]
@@ -89,7 +89,8 @@ class TestDateFixer(TestCase):
         self.assertEqual(
             get_previous_business_day_before_today(countries=["SE", "US"]),
             date_offset_foll(
-                raw_date=dt.date.today() - dt.timedelta(days=1),
+                raw_date=dt.datetime.now(tz=dt.timezone.utc).date()
+                - dt.timedelta(days=1),
                 months_offset=0,
                 countries=["SE", "US"],
                 adjust=True,
@@ -167,7 +168,7 @@ class TestDateFixer(TestCase):
 
         with self.assertRaises(Exception) as e_country:
             _ = date_offset_foll(
-                raw_date=dt.date.today(),
+                raw_date=dt.datetime.now(tz=dt.timezone.utc).date(),
                 adjust=True,
                 countries="ZZ",
             )

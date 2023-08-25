@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Annotated, Literal, TypeVar, Union
+from typing import Annotated, ClassVar, Literal, TypeVar, Union
 
 from pydantic import StringConstraints, confloat, conint, conlist, constr
 
@@ -162,7 +162,7 @@ TypeOpenTimeSeriesPropertiesList = TypeVar(
 class OpenTimeSeriesPropertiesList(list[str]):
     """Allowed property arguments for the OpenTimeSeries class."""
 
-    allowed_strings = {
+    allowed_strings: ClassVar[set[str]] = {
         "value_ret",
         "geo_ret",
         "arithmetic_ret",
@@ -194,7 +194,7 @@ class OpenTimeSeriesPropertiesList(list[str]):
         self: TypeOpenTimeSeriesPropertiesList,
         *args: LiteralSeriesProps,
     ) -> None:
-        """Allowed property arguments for the OpenTimeSeries class."""
+        """Property arguments for the OpenTimeSeries class."""
         super().__init__(args)
         self._validate()
 
@@ -219,7 +219,7 @@ TypeOpenFramePropertiesList = TypeVar(
 class OpenFramePropertiesList(list[str]):
     """Allowed property arguments for the OpenFrame class."""
 
-    allowed_strings = {
+    allowed_strings: ClassVar[set[str]] = {
         "value_ret",
         "geo_ret",
         "arithmetic_ret",
@@ -246,7 +246,7 @@ class OpenFramePropertiesList(list[str]):
     }
 
     def __init__(self: TypeOpenFramePropertiesList, *args: LiteralFrameProps) -> None:
-        """Allowed property arguments for the OpenFrame class."""
+        """Property arguments for the OpenFrame class."""
         super().__init__(args)
         self._validate()
 

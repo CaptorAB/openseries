@@ -293,7 +293,7 @@ class TestOpenTimeSeries(TestCase):
         serie_data = {"tsdf": serie, **data}
 
         df_obj = OpenTimeSeries(**df_data)
-        self.assertListEqual(list(df_obj.tsdf.values), df_obj.values)
+        self.assertListEqual(list(df_obj.tsdf.to_numpy()), df_obj.values)
         self.assertTrue(isinstance(df_obj, OpenTimeSeries))
 
         with self.assertRaises(PydanticValidationError) as e_pdtype:
@@ -646,7 +646,7 @@ class TestOpenTimeSeries(TestCase):
 
         cseries.model_config.update({"validate_assignment": False})
         cseries.dates = cseries.dates[-1008:]
-        cseries.values = cseries.values[-1008:]
+        cseries.values = list(cseries.values)[-1008:]
         cseries.model_config.update({"validate_assignment": True})
         cseries.pandas_df()
         cseries.set_new_label(lvl_one=ValueType.RTRN)
@@ -660,7 +660,7 @@ class TestOpenTimeSeries(TestCase):
         """Test value_to_diff method."""
         diffseries = self.randomseries.from_deepcopy()
         diffseries.value_to_diff()
-        are_bes = [f"{nn[0]:.12f}" for nn in diffseries.tsdf.values[:15]]
+        are_bes = [f"{nn[0]:.12f}" for nn in diffseries.tsdf.to_numpy()[:15]]
         should_bes = [
             "0.000000000000",
             "-0.002244525566",
@@ -685,7 +685,7 @@ class TestOpenTimeSeries(TestCase):
         """Test value_to_ret method."""
         retseries = self.randomseries.from_deepcopy()
         retseries.value_to_ret()
-        are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.values[:15]]
+        are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.to_numpy()[:15]]
         should_bes = [
             "0.000000000000",
             "-0.002244525566",
@@ -712,7 +712,7 @@ class TestOpenTimeSeries(TestCase):
         """Test value_to_log method."""
         logseries = self.randomseries.from_deepcopy()
         logseries.value_to_log()
-        are_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.values[:15]]
+        are_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.to_numpy()[:15]]
         should_log = [
             "0.000000000000",
             "-0.002247048289",
@@ -932,7 +932,7 @@ class TestOpenTimeSeries(TestCase):
         )
         full_series.tsdf.index.get_loc(front_series.last_idx)
         chained_series = timeseries_chain(front_series, back_series)
-        chained_values = [f"{nn:.10f}" for nn in chained_series.values]
+        chained_values = [f"{nn:.10f}" for nn in list(chained_series.values)]
 
         self.assertListEqual(full_series.dates, chained_series.dates)
         self.assertListEqual(full_values, chained_values)
@@ -975,7 +975,7 @@ class TestOpenTimeSeries(TestCase):
         sub_series_one = NewTimeSeries.from_arrays(
             name="sub_series_one",
             dates=base_series_one.dates,
-            values=list(base_series_one.tsdf.iloc[:, 0].values),
+            values=list(base_series_one.tsdf.iloc[:, 0].to_numpy()),
         )
         base_series_two = OpenTimeSeries.from_arrays(
             name="base_series_two",
@@ -1027,7 +1027,7 @@ class TestOpenTimeSeries(TestCase):
         copyseries = NewTimeSeries.from_arrays(
             name="moo",
             dates=cseries.dates,
-            values=list(cseries.tsdf.iloc[:, 0].values),
+            values=list(cseries.tsdf.iloc[:, 0].to_numpy()),
         )
         self.assertIsInstance(copyseries, NewTimeSeries)
 
@@ -1152,7 +1152,8 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
-        """Test downside_deviation_func method
+        """Test downside_deviation_func method.
+
         Source: https://www.investopedia.com/terms/d/downside-deviation.asp.
         """
         dd_asset = OpenTimeSeries.from_arrays(
@@ -1648,13 +1649,7 @@ class TestOpenTimeSeries(TestCase):
         )
 
     def test_miscellaneous(self: TestOpenTimeSeries) -> None:
-        """Test these methods:
-        arithmetic_ret_func
-        vol_func
-        vol_from_var_func
-        downside_deviation_func
-        target_weight_from_var.
-        """
+        """Test miscellaneous methods."""
         mseries = self.randomseries.from_deepcopy()
 
         methods = [

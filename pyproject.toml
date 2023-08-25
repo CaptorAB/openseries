@@ -93,8 +93,23 @@ disable_error_code = ["misc"]
 exclude = ["venv/*"]
 
 [tool.ruff]
-select = ["A", "ANN", "B", "E", "F", "I", "TID", "UP", "W", "COM"]
-ignore = ["ANN401", "D", "E501", "N", "DTZ", "PD", "RUF"]
+select = [
+    "A",
+    "ANN",
+    "B",
+    "COM",
+    "DTZ",
+    "E",
+    "F",
+    "I",
+    "N",
+    "PD",
+    "RUF",
+    "TID",
+    "UP",
+    "W"
+]
+ignore = ["ANN401", "E501", "D"]
 fixable = ["ALL"]
 unfixable = []
 exclude = [

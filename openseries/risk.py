@@ -129,17 +129,27 @@ def drawdown_details(prices: DataFrame | Series, min_periods: int = 1) -> Series
         Average fall per day
     """
     mdd_date = (
-        (prices / prices.expanding(min_periods=min_periods).max()).idxmin().values[0]
+        (prices / prices.expanding(min_periods=min_periods).max())
+        .idxmin()
+        .to_numpy()[0]
     )
-    mdate = dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d").date()
+    mdate = (
+        dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d")
+        .replace(tzinfo=dt.timezone.utc)
+        .date()
+    )
     maxdown = (
         (prices / prices.expanding(min_periods=min_periods).max()).min() - 1
     ).iloc[0]
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn = drwdwn.sort_index(ascending=False)
-    sdate = drwdwn[drwdwn == 0.0].idxmax().values[0]
-    sdate = dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d").date()
+    sdate = drwdwn[drwdwn == 0.0].idxmax().to_numpy()[0]
+    sdate = (
+        dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d")
+        .replace(tzinfo=dt.timezone.utc)
+        .date()
+    )
     duration = (mdate - sdate).days
     ret_per_day = maxdown / duration
 

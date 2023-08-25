@@ -82,8 +82,8 @@ class OpenFrame(BaseModel, CommonModel):
     )
 
     @field_validator("constituents")
-    def check_labels_unique(  # pylint: disable=no-self-argument
-        cls: TypeOpenFrame,
+    def check_labels_unique(
+        cls: TypeOpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique."""
@@ -345,7 +345,8 @@ class OpenFrame(BaseModel, CommonModel):
             Jensen's alpha
         """
         if all(
-            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
+            x == ValueType.RTRN
+            for x in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
             if isinstance(asset, tuple):
                 asset_log = self.tsdf.loc[:, asset]
@@ -494,7 +495,8 @@ class OpenFrame(BaseModel, CommonModel):
             An OpenFrame object
         """
         if any(
-            x == ValueType.PRICE for x in self.tsdf.columns.get_level_values(1).values
+            x == ValueType.PRICE
+            for x in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
             self.value_to_ret()
 
@@ -1120,17 +1122,17 @@ class OpenFrame(BaseModel, CommonModel):
                 ]
                 if ratio == "up":
                     uparray = (
-                        longdf.pct_change()[shortdf.pct_change().values > 0.0]
+                        longdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     up_return = (
                         uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     )
                     upidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().values > 0.0]
+                        shortdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     up_idx_return = (
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
@@ -1138,17 +1140,17 @@ class OpenFrame(BaseModel, CommonModel):
                     ratios.append(up_return / up_idx_return)
                 elif ratio == "down":
                     downarray = (
-                        longdf.pct_change()[shortdf.pct_change().values < 0.0]
+                        longdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     down_return = (
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().values < 0.0]
+                        shortdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     down_idx_return = (
                         downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
@@ -1157,33 +1159,33 @@ class OpenFrame(BaseModel, CommonModel):
                     ratios.append(down_return / down_idx_return)
                 elif ratio == "both":
                     uparray = (
-                        longdf.pct_change()[shortdf.pct_change().values > 0.0]
+                        longdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     up_return = (
                         uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     )
                     upidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().values > 0.0]
+                        shortdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     up_idx_return = (
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     downarray = (
-                        longdf.pct_change()[shortdf.pct_change().values < 0.0]
+                        longdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     down_return = (
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().values < 0.0]
+                        shortdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
                         .add(1)
-                        .values
+                        .to_numpy()
                     )
                     down_idx_return = (
                         downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
@@ -1229,7 +1231,7 @@ class OpenFrame(BaseModel, CommonModel):
         """
         if all(
             x_value == ValueType.RTRN
-            for x_value in self.tsdf.columns.get_level_values(1).values
+            for x_value in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
             if isinstance(asset, tuple):
                 y_value = self.tsdf.loc[:, asset]
@@ -1385,7 +1387,8 @@ class OpenFrame(BaseModel, CommonModel):
             )
         dframe = self.tsdf.copy()
         if not any(
-            x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1).values
+            x == ValueType.RTRN
+            for x in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
             dframe = dframe.pct_change()
             dframe.iloc[0] = 0

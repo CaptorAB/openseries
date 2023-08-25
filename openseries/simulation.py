@@ -145,7 +145,7 @@ class ReturnSimulation(BaseModel):
         param: TypeModelParameters,
         seed: Optional[int] = None,
     ) -> NDArray[float64]:
-        """This method returns a Wiener process. The Wiener process is also called
+        """Method returns a Wiener process. The Wiener process is also called
         Brownian motion. For more information about the Wiener process check out
         the Wikipedia page: http://en.wikipedia.org/wiki/Wiener_process.
 
@@ -200,7 +200,7 @@ class ReturnSimulation(BaseModel):
         param: TypeModelParameters,
         seed: Optional[int] = None,
     ) -> NDArray[float64]:
-        """This method constructs a sequence of log returns which, when
+        """Method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM).
         GBM is the stochastic process underlying the Black Scholes
         options pricing formula.
@@ -254,7 +254,7 @@ class ReturnSimulation(BaseModel):
         param: TypeModelParameters,
         seed: Optional[int] = None,
     ) -> NDArray[float64]:
-        """This method produces a sequence of Jump Sizes which represent a jump
+        """Method produces a sequence of Jump Sizes which represent a jump
         diffusion process. These jumps are combined with a geometric brownian
         motion (log returns) to produce the Merton model.
 
@@ -297,7 +297,7 @@ class ReturnSimulation(BaseModel):
         param: TypeModelParameters,
         seed: Optional[int] = None,
     ) -> NDArray[float64]:
-        """This method constructs combines a geometric brownian motion process
+        """Method constructs combines a geometric brownian motion process
         (log returns) with a jump diffusion process (log returns) to produce a
         sequence of gbm jump returns.
 
@@ -353,7 +353,7 @@ class ReturnSimulation(BaseModel):
         brownian_motion_one: NDArray[float64],
         seed: Optional[int] = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
-        """This method is a simplified version of the Cholesky decomposition method for
+        """Method is a simplified version of the Cholesky decomposition method for
         just two assets. It does not make use of matrix algebra and is therefore quite
         easy to implement.
 
@@ -392,7 +392,7 @@ class ReturnSimulation(BaseModel):
         param: TypeModelParameters,
         seed: Optional[int] = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
-        """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
+        """Method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
         volatility in the Heston model. Because the returns between the underlying
         and the stochastic volatility should be correlated we pass a correlated
@@ -491,7 +491,7 @@ class ReturnSimulation(BaseModel):
         param: TypeModelParameters,
         seed: Optional[int] = None,
     ) -> NDArray[float64]:
-        """This method returns the rate levels of a mean-reverting Cox Ingersoll Ross
+        """Method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
         volatility in the Heston model. Because the returns between the underlying
         and the stochastic volatility should be correlated we pass a correlated
@@ -525,7 +525,7 @@ class ReturnSimulation(BaseModel):
         param: TypeModelParameters,
         seed: Optional[int] = None,
     ) -> NDArray[float64]:
-        """This method returns the rate levels of a mean-reverting
+        """Method returns the rate levels of a mean-reverting
         Ornstein Uhlenbeck process.
 
         Parameters
@@ -659,7 +659,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
         seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
-        """This method constructs a sequence of log returns which, when
+        """Method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM).
 
         Parameters

@@ -90,8 +90,8 @@ class OpenTimeSeries(BaseModel, CommonModel):
         Placeholder for a name of the timeseries
     """
 
-    timeseriesId: DatabaseIdStringType
-    instrumentId: DatabaseIdStringType
+    timeseriesId: DatabaseIdStringType  # noqa: N815
+    instrumentId: DatabaseIdStringType  # noqa: N815
     name: str
     valuetype: ValueType
     dates: DateListType
@@ -112,10 +112,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
     )
 
     @field_validator("isin")
-    def check_isincode(  # pylint: disable=no-self-argument
-        cls: TypeOpenTimeSeries,
-        isin_code: str,
-    ) -> str:
+    def check_isincode(cls: TypeOpenTimeSeries, isin_code: str) -> str:  # noqa: N805
         """Pydantic validator to ensure that the ISIN code is valid if provided."""
         if isin_code:
             try:
@@ -282,32 +279,34 @@ class OpenTimeSeries(BaseModel, CommonModel):
                 label, _ = dframe.name
             else:
                 label = dframe.name
-            values = dframe.values.tolist()
+            values = dframe.to_numpy().tolist()
         else:
             values = dframe.iloc[:, column_nmbr].tolist()
             if isinstance(dframe.columns, MultiIndex):
                 if check_if_none(
-                    dframe.columns.get_level_values(0).values[column_nmbr],
+                    dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
                 ):
                     print(
                         "checked item",
-                        dframe.columns.get_level_values(0).values[column_nmbr],
+                        dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
                     )
                     label = "Series"
                     print(f"label missing. Adding '{label}' as label")
                 else:
-                    label = dframe.columns.get_level_values(0).values[column_nmbr]
+                    label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
                 if check_if_none(
-                    dframe.columns.get_level_values(1).values[column_nmbr],
+                    dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
                 ):
                     valuetype = ValueType.PRICE
                     print(
                         f"valuetype missing. Adding '{valuetype.value}' as valuetype",
                     )
                 else:
-                    valuetype = dframe.columns.get_level_values(1).values[column_nmbr]
+                    valuetype = dframe.columns.get_level_values(1).to_numpy()[
+                        column_nmbr
+                    ]
             else:
-                label = dframe.columns.values[column_nmbr]
+                label = dframe.columns.to_numpy()[column_nmbr]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
 
         return cls(
@@ -568,7 +567,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         """
         if not any(
             x == ValueType.RTRN
-            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).values
+            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).to_numpy()
         ):
             self.value_to_ret()
 
@@ -721,7 +720,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         else:
             how_many = self.tsdf.loc[
                 cast(int, earlier) : cast(int, later),
-                self.tsdf.columns.values[0],
+                self.tsdf.columns.to_numpy()[0],
             ].count()
             fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
@@ -729,7 +728,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         data[self.label, "Returns"] = (
-            data.loc[:, self.tsdf.columns.values[0]].apply(log).diff()
+            data.loc[:, self.tsdf.columns.to_numpy()[0]].apply(log).diff()
         )
 
         rawdata = [
@@ -777,7 +776,7 @@ class OpenTimeSeries(BaseModel, CommonModel):
         values: list[float]
         if any(
             x == ValueType.RTRN
-            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).values
+            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).to_numpy()
         ):
             ra_df = self.tsdf.copy()
             values = [1.0]
@@ -887,14 +886,14 @@ def timeseries_chain(
             raise ValueError("Failed to find a matching date between series")
 
     dates: list[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
-    values = array([x[0] for x in old.tsdf.values][: len(dates)])
+    values = array([x[0] for x in old.tsdf.to_numpy()][: len(dates)])
     values = cast(
         NDArray[float64],
         list(values * new.tsdf.iloc[:, 0].loc[first] / olddf.iloc[:, 0].loc[first]),
     )
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
-    values += [x[0] for x in new.tsdf.values]
+    values += [x[0] for x in new.tsdf.to_numpy()]
 
     if back.__class__.__subclasscheck__(  # pylint: disable=unnecessary-dunder-call
         OpenTimeSeries,

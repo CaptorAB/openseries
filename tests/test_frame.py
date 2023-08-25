@@ -1641,7 +1641,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(len(set(uframe.columns_lvl_zero)), 2)
 
     def test_capture_ratio(self: TestOpenFrame) -> None:
-        """Test the capture_ratio_func method
+        """Test the capture_ratio_func method.
+
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and
         Finance Education (Vol 2 Winter 2013).
@@ -2054,13 +2055,7 @@ class TestOpenFrame(TestCase):
         self.assertDictEqual(dict_toframe_0, dict_toframe_1)
 
     def test_miscellaneous(self: TestOpenFrame) -> None:
-        """Test these methods:
-        arithmetic_ret_func
-        vol_func
-        vol_from_var_func
-        downside_deviation_func
-        target_weight_from_var.
-        """
+        """Test miscellaneous methods."""
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
 

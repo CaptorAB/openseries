@@ -711,7 +711,7 @@ class CommonModel:
             fraction = (later - earlier).days / 365.25
             how_many = self.tsdf.loc[
                 cast(int, earlier) : cast(int, later),
-                self.tsdf.columns.values[0],
+                self.tsdf.columns.to_numpy()[0],
             ].count()
             time_factor = how_many / fraction
 
@@ -1092,7 +1092,9 @@ class CommonModel:
             to_dt=to_date,
         )
         result = skew(
-            a=self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().values,
+            a=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .pct_change()
+            .to_numpy(),
             bias=True,
             nan_policy="omit",
         )

@@ -6,7 +6,7 @@ from typing import cast
 
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
-from numpy import array, busdaycalendar, datetime64, is_busday, timedelta64, where
+from numpy import array, busdaycalendar, datetime64, is_busday, where
 from pandas import DataFrame, DatetimeIndex, Series, Timestamp, concat, date_range
 from pandas.tseries.offsets import CustomBusinessDay
 
@@ -105,12 +105,17 @@ def date_fix(
     if isinstance(fixerdate, dt.date):
         return fixerdate
     if isinstance(fixerdate, datetime64):
-        unix_epoch = datetime64(0, "s")
-        one_second = timedelta64(1, "s")
-        seconds_since_epoch = (fixerdate - unix_epoch) / one_second
-        return dt.datetime.utcfromtimestamp(float(seconds_since_epoch)).date()
+        return (
+            dt.datetime.strptime(str(fixerdate)[:10], "%Y-%m-%d")
+            .replace(tzinfo=dt.timezone.utc)
+            .date()
+        )
     if isinstance(fixerdate, str):
-        return dt.datetime.strptime(fixerdate, "%Y-%m-%d").date()
+        return (
+            dt.datetime.strptime(fixerdate, "%Y-%m-%d")
+            .replace(tzinfo=dt.timezone.utc)
+            .date()
+        )
     raise TypeError(
         f"Unknown date format {fixerdate!s} of "
         f"type {type(fixerdate)!s} encountered",
@@ -217,7 +222,7 @@ def get_previous_business_day_before_today(
         The previous business day
     """
     if today is None:
-        today = dt.date.today()
+        today = dt.datetime.now(tz=dt.timezone.utc).date()
 
     return date_offset_foll(
         today - dt.timedelta(days=1),
