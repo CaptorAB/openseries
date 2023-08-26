@@ -6,7 +6,7 @@ import sys
 from io import StringIO
 from json import load, loads
 from os import path, remove
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar, Union, cast
 from unittest import TestCase
 
 import pytest
@@ -196,7 +196,9 @@ class TestOpenTimeSeries(TestCase):
             (["2023-01-bb", "2023-01-02"], ValueError),
         ]
         for item in invalid_dates:
-            with self.assertRaises(cast(tuple[Any, Any] | Any, item[1])) as e_invalid:
+            with self.assertRaises(
+                cast(Union[tuple[Any, Any], Any], item[1]),
+            ) as e_invalid:
                 OpenTimeSeries.from_arrays(
                     name="Asset",
                     dates=cast(list[str], item[0]),
@@ -204,7 +206,7 @@ class TestOpenTimeSeries(TestCase):
                 )
             self.assertIsInstance(
                 e_invalid.exception,
-                cast(tuple[Any, Any] | Any, item[1]),
+                cast(Union[tuple[Any, Any], Any], item[1]),
             )
 
     def test_invalid_values(self: TestOpenTimeSeries) -> None:
@@ -216,7 +218,9 @@ class TestOpenTimeSeries(TestCase):
             ([1.0, "bb"], ValueError),
         ]
         for item in invalid_values:
-            with self.assertRaises(cast(tuple[Any, Any] | Any, item[1])) as e_invalid:
+            with self.assertRaises(
+                cast(Union[tuple[Any, Any], Any], item[1]),
+            ) as e_invalid:
                 OpenTimeSeries.from_arrays(
                     name="Asset",
                     dates=["2023-01-01", "2023-01-02"],
@@ -224,7 +228,7 @@ class TestOpenTimeSeries(TestCase):
                 )
             self.assertIsInstance(
                 e_invalid.exception,
-                cast(tuple[Any, Any] | Any, item[1]),
+                cast(Union[tuple[Any, Any], Any], item[1]),
             )
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
