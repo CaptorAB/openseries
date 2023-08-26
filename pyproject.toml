@@ -38,8 +38,8 @@ holidays = "^0.31"
 numpy = "^1.25.2"
 openpyxl = "^3.1.2"
 pandas = "^2.0.3"
-plotly = "^5.16.0"
-pydantic = "^2.2.1"
+plotly = "^5.16.1"
+pydantic = "^2.3.0"
 python-dateutil = "^2.8.2"
 python-stdnum = "^1.19"
 scipy = "^1.11.2"
@@ -112,14 +112,4 @@ select = [
 ]
 ignore = ["D211", "D212", "UP007"]
 fixable = ["ALL"]
-unfixable = []
-exclude = [
-    ".git",
-    ".mypy_cache",
-    ".pytest_cache",
-    ".ruff_cache",
-    ".venv",
-    "venv",
-]
-per-file-ignores = {}
 line-length = 87
