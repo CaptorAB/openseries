@@ -31,8 +31,7 @@ class NewTimeSeries(OpenTimeSeries):
     extra_info: str = "cool"
 
 
-# noinspection PyUnresolvedReferences
-@pytest.mark.parametrize(  # type: ignore [misc]
+@pytest.mark.parametrize(  # type: ignore[misc]
     "valuetype",
     [ValueType.PRICE, "Price(Close)"],
 )
@@ -49,8 +48,7 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
     )
 
 
-# noinspection PyUnresolvedReferences
-@pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])  # type: ignore [misc]
+@pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])  # type: ignore[misc]
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     """Pytest on invalid valuetype as input."""
     with pytest.raises(PydanticValidationError) as e_invalid_valuetype:
@@ -65,8 +63,7 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     ) or "type=string_type" in str(e_invalid_valuetype.getrepr(style="short"))
 
 
-# noinspection PyUnresolvedReferences
-@pytest.mark.parametrize(  # type: ignore [misc]
+@pytest.mark.parametrize(  # type: ignore[misc]
     "currency",
     ["SE", True, "12", 1, None],
 )
@@ -85,8 +82,7 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
     ) or "type=string_type" in str(e_invalid_currency.getrepr(style="short"))
 
 
-# noinspection PyUnresolvedReferences
-@pytest.mark.parametrize(  # type: ignore [misc]
+@pytest.mark.parametrize(  # type: ignore[misc]
     "domestic",
     ["SE", True, "12", 1, None],
 )
@@ -104,8 +100,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
     ) or "type=string_type" in str(e_dom.getrepr(style="short"))
 
 
-# noinspection PyUnresolvedReferences
-@pytest.mark.parametrize(  # type: ignore [misc]
+@pytest.mark.parametrize(  # type: ignore[misc]
     "countries",
     ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []],
 )
@@ -201,7 +196,7 @@ class TestOpenTimeSeries(TestCase):
             (["2023-01-bb", "2023-01-02"], ValueError),
         ]
         for item in invalid_dates:
-            with self.assertRaises(cast(tuple[Any, ...] | Any, item[1])) as e_invalid:
+            with self.assertRaises(cast(tuple[Any, Any] | Any, item[1])) as e_invalid:
                 OpenTimeSeries.from_arrays(
                     name="Asset",
                     dates=cast(list[str], item[0]),
@@ -209,7 +204,7 @@ class TestOpenTimeSeries(TestCase):
                 )
             self.assertIsInstance(
                 e_invalid.exception,
-                cast(tuple[Any, ...] | Any, item[1]),
+                cast(tuple[Any, Any] | Any, item[1]),
             )
 
     def test_invalid_values(self: TestOpenTimeSeries) -> None:
@@ -221,7 +216,7 @@ class TestOpenTimeSeries(TestCase):
             ([1.0, "bb"], ValueError),
         ]
         for item in invalid_values:
-            with self.assertRaises(cast(tuple[Any, ...] | Any, item[1])) as e_invalid:
+            with self.assertRaises(cast(tuple[Any, Any] | Any, item[1])) as e_invalid:
                 OpenTimeSeries.from_arrays(
                     name="Asset",
                     dates=["2023-01-01", "2023-01-02"],
@@ -229,7 +224,7 @@ class TestOpenTimeSeries(TestCase):
                 )
             self.assertIsInstance(
                 e_invalid.exception,
-                cast(tuple[Any, ...] | Any, item[1]),
+                cast(tuple[Any, Any] | Any, item[1]),
             )
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:

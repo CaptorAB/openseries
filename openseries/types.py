@@ -5,6 +5,8 @@ import datetime as dt
 from enum import Enum
 from typing import Annotated, ClassVar, Literal, TypeVar, Union
 
+from numpy import datetime64
+from pandas import Timestamp
 from pydantic import StringConstraints, confloat, conint, conlist, constr
 
 CountryStringType = Annotated[
@@ -60,28 +62,32 @@ SimCountType = Annotated[int, conint(strict=True, ge=1)]
 
 VolatilityType = Annotated[float, confloat(strict=True, gt=0.0)]
 
-HolidayType = (
-    dict[dt.date | dt.datetime | str | float | int, str]
-    | list[dt.date | dt.datetime | str | float | int]
-    | dt.date
-    | dt.datetime
-    | str
-    | float
-    | int
-    | None
-)
+DateType = Union[str, dt.date, dt.datetime, datetime64, Timestamp]
+
+HolidayType = Union[
+    dict[Union[dt.date, dt.datetime, str, float, int], str],
+    list[Union[dt.date, dt.datetime, str, float, int]],
+    dt.date,
+    dt.datetime,
+    str,
+    float,
+    int,
+    None,
+]
 
 PlotlyLayoutType = tuple[
     dict[
         str,
-        str
-        | int
-        | float
-        | bool
-        | list[str]
-        | dict[str, str | int | float | bool | list[str]],
+        Union[
+            str,
+            int,
+            float,
+            bool,
+            list[str],
+            dict[str, Union[str, int, float, bool, list[str]]],
+        ],
     ],
-    dict[str, str | float],
+    dict[str, Union[str, float]],
 ]
 
 LiteralLinePlotMode = Literal[

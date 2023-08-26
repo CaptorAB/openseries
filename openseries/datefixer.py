@@ -12,6 +12,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 
 from openseries.types import (
     CountriesType,
+    DateType,
     HolidayType,
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
@@ -77,14 +78,14 @@ def holiday_calendar(
 
 
 def date_fix(
-    fixerdate: str | dt.date | dt.datetime | datetime64 | Timestamp,
+    fixerdate: DateType,
 ) -> dt.date:
     """
     Parse different date formats into datetime.date.
 
     Parameters
     ----------
-    fixerdate: Union[str, dt.date, dt.datetime, datetime64, Timestamp]
+    fixerdate: DateType
         The data item to parse
 
     Returns
@@ -115,7 +116,7 @@ def date_fix(
 
 
 def date_offset_foll(
-    raw_date: str | dt.date | dt.datetime | datetime64 | Timestamp,
+    raw_date: DateType,
     months_offset: int = 12,
     adjust: bool = False,
     following: bool = True,

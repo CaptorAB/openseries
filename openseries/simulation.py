@@ -49,8 +49,7 @@ TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
-# noinspection PyUnresolvedReferences
-class ReturnSimulation(BaseModel):  # type: ignore [misc]
+class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
     """
     Object of the class ReturnSimulation.
@@ -1015,8 +1014,7 @@ class ReturnSimulation(BaseModel):  # type: ignore [misc]
         return fdf
 
 
-# noinspection PyUnresolvedReferences
-class ModelParameters(BaseModel):  # type: ignore [misc]
+class ModelParameters(BaseModel):  # type: ignore[misc]
 
     """
     Object of the class ModelParameters.

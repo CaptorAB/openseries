@@ -55,8 +55,7 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-# noinspection PyUnresolvedReferences
-class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore [misc]
+class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
 
     """
     Object of the class OpenTimeSeries.
@@ -114,8 +113,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore [misc]
         extra="allow",
     )
 
-    # noinspection PyUnresolvedReferences
-    @field_validator("isin")  # type: ignore [misc]
+    @field_validator("isin")  # type: ignore[misc]
     def check_isincode(cls: TypeOpenTimeSeries, isin_code: str) -> str:  # noqa: N805
         """Pydantic validator to ensure that the ISIN code is valid if provided."""
         if isin_code:
@@ -127,8 +125,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore [misc]
                 ) from exc
         return isin_code
 
-    # noinspection PyUnresolvedReferences
-    @model_validator(mode="after")  # type: ignore [misc]
+    @model_validator(mode="after")  # type: ignore[misc]
     def check_dates_unique(self: TypeOpenTimeSeries) -> OpenTimeSeries:
         """Pydantic validator to ensure that the dates are unique."""
         dates_list_length = len(self.dates)

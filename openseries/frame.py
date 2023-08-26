@@ -55,8 +55,7 @@ from openseries.types import (
 TypeOpenFrame = TypeVar("TypeOpenFrame", bound="OpenFrame")
 
 
-# noinspection PyUnresolvedReferences
-class OpenFrame(BaseModel, CommonModel):  # type: ignore [misc]
+class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     """
     Object of the class OpenFrame.
@@ -84,8 +83,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore [misc]
         revalidate_instances="always",
     )
 
-    # noinspection PyUnresolvedReferences
-    @field_validator("constituents")  # type: ignore [misc]
+    @field_validator("constituents")  # type: ignore[misc]
     def check_labels_unique(
         cls: TypeOpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
