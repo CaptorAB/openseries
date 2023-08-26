@@ -18,7 +18,7 @@ from __future__ import annotations
 import datetime as dt
 from math import log
 from math import pow as mathpow
-from typing import TypeVar, cast
+from typing import Optional, TypeVar, cast
 
 from numpy import (
     add,
@@ -159,7 +159,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def brownian_motion_log_returns(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Brownian Motion log returns.
@@ -192,7 +192,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def brownian_motion_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Delivers a price sequence whose returns evolve as to a brownian motion.
@@ -218,7 +218,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def geometric_brownian_motion_log_returns(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Log returns of a Geometric Brownian Motion process.
@@ -250,7 +250,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def geometric_brownian_motion_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Prices for an asset which evolves according to a geometric brownian motion.
@@ -276,7 +276,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def jump_diffusion_process(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Jump sizes for each point in time (mostly zeroes if jumps are infrequent).
@@ -322,7 +322,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def geometric_brownian_motion_jump_diffusion_log_returns(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Geometric Brownian Motion process with jumps in it.
@@ -354,7 +354,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def geometric_brownian_motion_jump_diffusion_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Geometric Brownian Motion generated prices.
@@ -384,7 +384,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
         brownian_motion_one: NDArray[float64],
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
         """
         Generate correlated Brownian Motion path.
@@ -426,7 +426,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def cox_ingersoll_ross_heston(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
         """
         Generate interest rate levels for the CIR process.
@@ -479,7 +479,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def heston_model_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
         """
         Generate prices for an asset following a Heston process.
@@ -531,7 +531,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def cox_ingersoll_ross_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Generate interest rate levels for the CIR process.
@@ -568,7 +568,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def ornstein_uhlenbeck_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: int | None = None,
+        seed: Optional[int] = None,
     ) -> NDArray[float64]:
         """
         Generate rate levels of a mean-reverting Ornstein Uhlenbeck process.
@@ -601,7 +601,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
         trading_days_in_year: DaysInYearType = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Simulate normally distributed prices.
@@ -651,7 +651,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
         trading_days_in_year: DaysInYearType = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Lognormal distribution simulation.
@@ -704,7 +704,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
         trading_days_in_year: DaysInYearType = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Geometric Brownian Motion simulation.
@@ -767,7 +767,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         heston_mu: VolatilityType,
         heston_a: float,
         trading_days_in_year: DaysInYearType = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Heston model simulation.
@@ -838,7 +838,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         heston_mu: VolatilityType,
         heston_a: float,
         trading_days_in_year: DaysInYearType = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Heston Vol model simulation.
@@ -907,7 +907,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         jumps_sigma: VolatilityType,
         jumps_mu: float,
         trading_days_in_year: DaysInYearType = 252,
-        seed: int | None = 71,
+        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Merton Jump-Diffusion model simulation.
@@ -970,8 +970,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
     def to_dataframe(
         self: TypeReturnSimulation,
         name: str,
-        start: dt.date | None = None,
-        end: dt.date | None = None,
+        start: Optional[dt.date] = None,
+        end: Optional[dt.date] = None,
         countries: CountriesType = "SE",
     ) -> DataFrame:
         """

@@ -123,7 +123,7 @@ class TestOpenTimeSeries(TestCase):
     """class to run unittests on the module series.py."""
 
     randomseries: OpenTimeSeries
-    random_properties: dict[str, dt.date | int | float]
+    random_properties: dict[str, Union[dt.date, int, float]]
 
     @classmethod
     def setUpClass(cls: type[TypeTestOpenTimeSeries]) -> None:

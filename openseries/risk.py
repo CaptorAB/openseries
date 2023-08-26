@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import datetime as dt
 from math import ceil
-from typing import cast
+from typing import Union, cast
 
 from numpy import (
     Inf,
@@ -27,15 +27,17 @@ from openseries.types import LiteralQuantileInterp
 
 
 def cvar_down_calc(
-    data: DataFrame | Series | list[float],
+    data: Union[DataFrame, Series, list[float]],
     level: float = 0.95,
 ) -> float:
     """
+    Calculate downside Conditional Value at Risk (CVaR).
+
     https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
     Parameters
     ----------
-    data: DataFrame | Series | list[float]
+    data: Union[DataFrame, Series, list[float]]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought CVaR level
@@ -55,19 +57,19 @@ def cvar_down_calc(
 
 
 def var_down_calc(
-    data: DataFrame | Series | list[float],
+    data: Union[DataFrame, Series, list[float]],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
     """
-    Downside Value At Risk, "VaR".
+    Calculate downside Value At Risk (VaR).
 
     The equivalent of percentile.inc([...], 1-level) over returns in MS Excel
     https://www.investopedia.com/terms/v/var.asp.
 
     Parameters
     ----------
-    data: DataFrame | Series | list[float]
+    data: Union[DataFrame, Series, list[float]]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
@@ -87,7 +89,7 @@ def var_down_calc(
     return cast(float, quantile(ret, 1 - level, method=interpolation))
 
 
-def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
+def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series]:
     """
     Convert series into a maximum drawdown series.
 
@@ -100,12 +102,12 @@ def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
 
     Parameters
     ----------
-    prices: DataFrame | Series
+    prices: Union[DataFrame, Series]
         A timeserie of dates and values
 
     Returns
     -------
-    DataFrame | Series
+    Union[DataFrame, Series]
         A drawdown timeserie
     """
     drawdown = prices.copy()
@@ -116,13 +118,13 @@ def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
     return drawdown
 
 
-def drawdown_details(prices: DataFrame | Series, min_periods: int = 1) -> Series:
+def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> Series:
     """
     Details of the maximum drawdown.
 
     Parameters
     ----------
-    prices: DataFrame | Series
+    prices: Union[DataFrame, Series]
         A timeserie of dates and values
     min_periods: int, default: 1
         Smallest number of observations to use to find the maximum drawdown

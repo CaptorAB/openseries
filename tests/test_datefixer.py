@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import cast
+from typing import Union, cast
 from unittest import TestCase
 
 from numpy import datetime64
@@ -103,7 +103,7 @@ class TestDateFixer(TestCase):
     def test_date_offset_foll(self: TestDateFixer) -> None:
         """Test date_offset_foll function."""
         originals = [dt.date(2022, 6, 5), dt.date(2022, 7, 3)]
-        country_sets: list[str | list[str]] = ["SE", "US", ["SE", "US"]]
+        country_sets: list[Union[str, list[str]]] = ["SE", "US", ["SE", "US"]]
         earliers = [
             dt.date(2022, 6, 3),
             dt.date(2022, 7, 1),

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import cast
+from typing import Optional, Union, cast
 
 from dateutil.relativedelta import relativedelta
 from holidays import country_holidays, list_supported_countries
@@ -61,7 +61,7 @@ def holiday_calendar(
         country in list_supported_countries() for country in countries
     ):
         country: str
-        countryholidays: list[dt.date | str] = []
+        countryholidays: list[Union[dt.date, str]] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:
@@ -173,7 +173,7 @@ def date_offset_foll(
 
 
 def get_previous_business_day_before_today(
-    today: dt.date | None = None,
+    today: Optional[dt.date] = None,
     countries: CountriesType = "SE",
     custom_holidays: HolidayType = None,
 ) -> dt.date:
@@ -286,8 +286,8 @@ def offset_business_days(
 
 def generate_calender_date_range(
     trading_days: TradingDaysType,
-    start: dt.date | None = None,
-    end: dt.date | None = None,
+    start: Optional[dt.date] = None,
+    end: Optional[dt.date] = None,
     countries: CountriesType = "SE",
 ) -> list[dt.date]:
     """
@@ -460,9 +460,9 @@ def do_resample_to_business_period_ends(
 
 def get_calc_range(
     data: DataFrame,
-    months_offset: int | None = None,
-    from_dt: dt.date | None = None,
-    to_dt: dt.date | None = None,
+    months_offset: Optional[int] = None,
+    from_dt: Optional[dt.date] = None,
+    to_dt: Optional[dt.date] = None,
 ) -> tuple[dt.date, dt.date]:
     """
     Create user defined date range.

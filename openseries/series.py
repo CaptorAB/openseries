@@ -4,7 +4,7 @@ from __future__ import annotations
 import datetime as dt
 from copy import deepcopy
 from re import compile as re_compile
-from typing import Any, TypeVar, cast
+from typing import Any, Optional, TypeVar, Union, cast
 
 from numpy import (
     array,
@@ -103,8 +103,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
     countries: CountriesType = "SE"
-    isin: str | None = None
-    label: str | None = None
+    isin: Optional[str] = None
+    label: Optional[str] = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -145,9 +145,9 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
 
         Parameters
         ----------
-        domestic_ccy : str, default: "SEK"
+        domestic_ccy : CurrencyStringType, default: "SEK"
             Currency code according to ISO 4217
-        countries: list[str] | str, default: "SE"
+        countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
         ccy_pattern = re_compile(r"^[A-Z]{3}$")
@@ -197,7 +197,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         valuetype: ValueType = ValueType.PRICE,
         timeseries_id: DatabaseIdStringType = "",
         instrument_id: DatabaseIdStringType = "",
-        isin: str | None = None,
+        isin: Optional[str] = None,
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,
     ) -> TypeOpenTimeSeries:
@@ -252,7 +252,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
     @classmethod
     def from_df(
         cls: type[TypeOpenTimeSeries],
-        dframe: DataFrame | Series,
+        dframe: Union[DataFrame, Series],
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -336,9 +336,9 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
     def from_fixed_rate(
         cls: type[TypeOpenTimeSeries],
         rate: float,
-        d_range: DatetimeIndex | None = None,
-        days: int | None = None,
-        end_dt: dt.date | None = None,
+        d_range: Optional[DatetimeIndex] = None,
+        days: Optional[int] = None,
+        end_dt: Optional[dt.date] = None,
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -448,9 +448,9 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
 
     def calc_range(
         self: TypeOpenTimeSeries,
-        months_offset: int | None = None,
-        from_dt: dt.date | None = None,
-        to_dt: dt.date | None = None,
+        months_offset: Optional[int] = None,
+        from_dt: Optional[dt.date] = None,
+        to_dt: Optional[dt.date] = None,
     ) -> tuple[dt.date, dt.date]:
         """
         Create user defined date range.
@@ -494,7 +494,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
 
     def all_properties(
         self: TypeOpenTimeSeries,
-        properties: list[LiteralSeriesProps] | None = None,
+        properties: Optional[list[LiteralSeriesProps]] = None,
     ) -> DataFrame:
         """
         Calculate chosen properties.
@@ -628,7 +628,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
 
     def resample(
         self: TypeOpenTimeSeries,
-        freq: LiteralBizDayFreq | str = "BM",
+        freq: Union[LiteralBizDayFreq, str] = "BM",
     ) -> TypeOpenTimeSeries:
         """
         Resamples the timeseries frequency.
@@ -706,10 +706,10 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """
         Exponentially Weighted Moving Average Model for Volatility.
@@ -834,8 +834,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
 
     def set_new_label(
         self: TypeOpenTimeSeries,
-        lvl_zero: str | None = None,
-        lvl_one: ValueType | None = None,
+        lvl_zero: Optional[str] = None,
+        lvl_one: Optional[ValueType] = None,
         delete_lvl_one: bool = False,
     ) -> TypeOpenTimeSeries:
         """
@@ -877,7 +877,7 @@ def timeseries_chain(
     front: TypeOpenTimeSeries,
     back: TypeOpenTimeSeries,
     old_fee: float = 0.0,
-) -> TypeOpenTimeSeries | OpenTimeSeries:
+) -> Union[TypeOpenTimeSeries, OpenTimeSeries]:
     """
     Chain two timeseries together.
 
@@ -892,7 +892,7 @@ def timeseries_chain(
 
     Returns
     -------
-    TypeOpenTimeSeries
+    Union[TypeOpenTimeSeries, OpenTimeSeries]
         An OpenTimeSeries object or a subclass thereof
     """
     old = front.from_deepcopy()

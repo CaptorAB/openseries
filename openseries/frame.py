@@ -5,7 +5,7 @@ import datetime as dt
 from copy import deepcopy
 from functools import reduce
 from logging import warning
-from typing import TypeVar, cast
+from typing import Optional, TypeVar, Union, cast
 
 import statsmodels.api as sm
 from ffn.core import calc_erc_weights, calc_inv_vol_weights, calc_mean_var_weights
@@ -75,7 +75,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     constituents: list[OpenTimeSeries]
     tsdf: DataFrame = DataFrame()
-    weights: list[float] | None = None
+    weights: Optional[list[float]] = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -97,7 +97,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
     def __init__(
         self: OpenFrame,
         constituents: list[OpenTimeSeries],
-        weights: list[float] | None = None,
+        weights: Optional[list[float]] = None,
     ) -> None:
         """
         Object of the class OpenFrame.
@@ -178,7 +178,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def all_properties(
         self: TypeOpenFrame,
-        properties: list[LiteralFrameProps] | None = None,
+        properties: Optional[list[LiteralFrameProps]] = None,
     ) -> DataFrame:
         """
         Calculate chosen timeseries properties.
@@ -205,9 +205,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def calc_range(
         self: TypeOpenFrame,
-        months_offset: int | None = None,
-        from_dt: dt.date | None = None,
-        to_dt: dt.date | None = None,
+        months_offset: Optional[int] = None,
+        from_dt: Optional[dt.date] = None,
+        to_dt: Optional[dt.date] = None,
     ) -> tuple[dt.date, dt.date]:
         """
         Create user defined date range.
@@ -356,8 +356,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def jensen_alpha(
         self: TypeOpenFrame,
-        asset: tuple[str, ValueType] | int,
-        market: tuple[str, ValueType] | int,
+        asset: Union[tuple[str, ValueType], int],
+        market: Union[tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
     ) -> float:
         """
@@ -553,7 +553,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def resample(
         self: TypeOpenFrame,
-        freq: LiteralBizDayFreq | str = "BM",
+        freq: Union[LiteralBizDayFreq, str] = "BM",
     ) -> TypeOpenFrame:
         """
         Resample the timeseries frequency.
@@ -597,7 +597,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         ----------
         freq: LiteralBizDayFreq, default BM
             The date offset string that sets the resampled frequency
-        countries: list | str, default: "SE"
+        countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
             to create a business day calendar used for date adjustments
         convention: LiteralPandasResampleConvention, default; end
@@ -662,10 +662,10 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         dlta_degr_freedms: int = 0,
         first_column: int = 0,
         second_column: int = 1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
         """
         Exponentially Weighted Moving Average Volatilities and Correlation.
@@ -849,8 +849,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def trunc_frame(
         self: TypeOpenFrame,
-        start_cut: dt.date | None = None,
-        end_cut: dt.date | None = None,
+        start_cut: Optional[dt.date] = None,
+        end_cut: Optional[dt.date] = None,
         before: bool = True,
         after: bool = True,
     ) -> TypeOpenFrame:
@@ -937,11 +937,11 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def tracking_error_func(
         self: TypeOpenFrame,
-        base_column: tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        base_column: Union[tuple[str, ValueType], int] = -1,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """
         Tracking Error.
@@ -1019,11 +1019,11 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def info_ratio_func(
         self: TypeOpenFrame,
-        base_column: tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        base_column: Union[tuple[str, ValueType], int] = -1,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """
         Information Ratio.
@@ -1104,11 +1104,11 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
     def capture_ratio_func(
         self: TypeOpenFrame,
         ratio: LiteralCaptureRatio,
-        base_column: tuple[str, ValueType] | int = -1,
-        months_from_last: int | None = None,
-        from_date: dt.date | None = None,
-        to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        base_column: Union[tuple[str, ValueType], int] = -1,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> Series:
         """
         Capture Ratio.
@@ -1277,8 +1277,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def beta(
         self: TypeOpenFrame,
-        asset: tuple[str, ValueType] | int,
-        market: tuple[str, ValueType] | int,
+        asset: Union[tuple[str, ValueType], int],
+        market: Union[tuple[str, ValueType], int],
     ) -> float:
         """
         Market Beta.
@@ -1347,8 +1347,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
 
     def ord_least_squares_fit(
         self: TypeOpenFrame,
-        y_column: tuple[str, ValueType] | int,
-        x_column: tuple[str, ValueType] | int,
+        y_column: Union[tuple[str, ValueType], int],
+        x_column: Union[tuple[str, ValueType], int],
         fitted_series: bool = True,
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
@@ -1409,16 +1409,16 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
     def make_portfolio(
         self: TypeOpenFrame,
         name: str,
-        weight_strat: LiteralPortfolioWeightings | None = None,
-        initial_weights: list[float] | None = None,
-        risk_weights: list[float] | None = None,
+        weight_strat: Optional[LiteralPortfolioWeightings] = None,
+        initial_weights: Optional[list[float]] = None,
+        risk_weights: Optional[list[float]] = None,
         risk_parity_method: LiteralRiskParityMethod = "ccd",
         maximum_iterations: int = 100,
         tolerance: float = 1e-8,
         weight_bounds: tuple[float, float] = (0.0, 1.0),
         riskfree: float = 0.0,
         covar_method: LiteralCovMethod = "ledoit-wolf",
-        options: dict[str, int] | None = None,
+        options: Optional[dict[str, int]] = None,
     ) -> DataFrame:
         """
         Calculate a basket timeseries based on the supplied weights.
@@ -1508,7 +1508,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
         """
         Calculate rolling Information Ratio.
