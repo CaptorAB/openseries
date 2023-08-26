@@ -24,7 +24,7 @@ def holiday_calendar(
     startyear: int,
     endyear: int,
     countries: CountriesType = "SE",
-    custom_holidays: HolidayType = None,
+    custom_holidays: Optional[HolidayType] = None,
 ) -> busdaycalendar:
     """
     Generate a business calendar.
@@ -121,14 +121,14 @@ def date_offset_foll(
     adjust: bool = False,
     following: bool = True,
     countries: CountriesType = "SE",
-    custom_holidays: HolidayType = None,
+    custom_holidays: Optional[HolidayType] = None,
 ) -> dt.date:
     """
     Offset dates according to a given calendar.
 
     Parameters
     ----------
-    raw_date: Union[str, dt.date, dt.datetime, datetime64, Timestamp]
+    raw_date: DateType
         The date to offset from
     months_offset: int, default: 12
         Number of months as integer
@@ -175,7 +175,7 @@ def date_offset_foll(
 def get_previous_business_day_before_today(
     today: Optional[dt.date] = None,
     countries: CountriesType = "SE",
-    custom_holidays: HolidayType = None,
+    custom_holidays: Optional[HolidayType] = None,
 ) -> dt.date:
     """
     Bump date backwards to find the previous business day.
@@ -212,7 +212,7 @@ def offset_business_days(
     ddate: dt.date,
     days: int,
     countries: CountriesType = "SE",
-    custom_holidays: HolidayType = None,
+    custom_holidays: Optional[HolidayType] = None,
 ) -> dt.date:
     """
     Bump date by business days.

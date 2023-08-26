@@ -72,7 +72,6 @@ HolidayType = Union[
     str,
     float,
     int,
-    None,
 ]
 
 PlotlyLayoutType = tuple[
