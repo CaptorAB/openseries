@@ -7,6 +7,10 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.4] - 2023-08-26
+
+Minor cleanup.
+
 ## Version [1.2.3] - 2023-08-26
 
 Changed linter check package from Pylint to Ruff and made changes in code to
