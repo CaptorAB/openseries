@@ -1,30 +1,22 @@
 """Function to load plotly layout and configuration from local json file."""
+from __future__ import annotations
+
 from json import load
 from os.path import abspath, dirname, join
-from typing import Union
+
+from openseries.types import PlotlyLayoutType
 
 
 def load_plotly_dict(
     responsive: bool = True,
-) -> tuple[
-    dict[
-        str,
-        Union[
-            str,
-            int,
-            float,
-            bool,
-            list[str],
-            dict[str, Union[str, int, float, bool, list[str]]],
-        ],
-    ],
-    dict[str, Union[str, float]],
-]:
-    """Function to load the plotly defaults.
+) -> PlotlyLayoutType:
+    """
+    Load Plotly defaults.
 
     Parameters
     ----------
     responsive : bool
+        Flag whether to load as responsive
 
     Returns
     -------

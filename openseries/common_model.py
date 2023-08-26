@@ -32,7 +32,9 @@ TypeCommonModel = TypeVar("TypeCommonModel", bound="CommonModel")
 
 
 class CommonModel:
-    """CommonModel declared.
+
+    """
+    CommonModel declared.
 
     Parameters
     ----------
@@ -44,7 +46,8 @@ class CommonModel:
 
     @property
     def length(self: TypeCommonModel) -> int:
-        """Number of observations.
+        """
+        Number of observations.
 
         Returns
         -------
@@ -55,7 +58,8 @@ class CommonModel:
 
     @property
     def first_idx(self: TypeCommonModel) -> dt.date:
-        """The first date in the timeseries.
+        """
+        The first date in the timeseries.
 
         Returns
         -------
@@ -66,7 +70,8 @@ class CommonModel:
 
     @property
     def last_idx(self: TypeCommonModel) -> dt.date:
-        """The last date in the timeseries.
+        """
+        The last date in the timeseries.
 
         Returns
         -------
@@ -77,7 +82,8 @@ class CommonModel:
 
     @property
     def span_of_days(self: TypeCommonModel) -> int:
-        """Number of days from the first date to the last.
+        """
+        Number of days from the first date to the last.
 
         Returns
         -------
@@ -88,7 +94,8 @@ class CommonModel:
 
     @property
     def yearfrac(self: TypeCommonModel) -> float:
-        """Length of the timeseries expressed in years assuming all years have 365.25 days.
+        """
+        Length of series expressed in years assuming all years have 365.25 days.
 
         Returns
         -------
@@ -100,7 +107,8 @@ class CommonModel:
 
     @property
     def periods_in_a_year(self: TypeCommonModel) -> float:
-        """The average number of observations per year.
+        """
+        The average number of observations per year.
 
         Returns
         -------
@@ -111,7 +119,8 @@ class CommonModel:
 
     @property
     def max_drawdown_cal_year(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+        """
+        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
         -------
@@ -135,7 +144,8 @@ class CommonModel:
 
     @property
     def geo_ret(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/c/cagr.asp.
+        """
+        https://www.investopedia.com/terms/c/cagr.asp.
 
         Returns
         -------
@@ -146,7 +156,8 @@ class CommonModel:
 
     @property
     def arithmetic_ret(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/a/arithmeticmean.asp.
+        """
+        https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Returns
         -------
@@ -157,7 +168,8 @@ class CommonModel:
 
     @property
     def value_ret(self: TypeCommonModel) -> Union[float, Series]:
-        """Simple return.
+        """
+        Simple return.
 
         Returns
         -------
@@ -168,7 +180,11 @@ class CommonModel:
 
     @property
     def vol(self: TypeCommonModel) -> Union[float, Series]:
-        """Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel. https://www.investopedia.com/terms/v/volatility.asp.
+        """
+        Annualized volatility.
+
+        Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
+        https://www.investopedia.com/terms/v/volatility.asp.
 
         Returns
         -------
@@ -179,7 +195,12 @@ class CommonModel:
 
     @property
     def downside_deviation(self: TypeCommonModel) -> Union[float, Series]:
-        """The standard deviation of returns that are below a Minimum Accepted Return of zero. It is used to calculate the Sortino Ratio. https://www.investopedia.com/terms/d/downside-deviation.asp.
+        """
+        Downside Deviation.
+
+        Standard deviation of returns that are below a Minimum Accepted Return
+        of zero. It is used to calculate the Sortino Ratio.
+        https://www.investopedia.com/terms/d/downside-deviation.asp.
 
         Returns
         -------
@@ -191,7 +212,8 @@ class CommonModel:
 
     @property
     def ret_vol_ratio(self: TypeCommonModel) -> Union[float, Series]:
-        """Ratio of the annualized arithmetic mean of returns and annualized volatility.
+        """
+        Ratio of annualized arithmetic mean of returns and annualized volatility.
 
         Returns
         -------
@@ -204,7 +226,8 @@ class CommonModel:
 
     @property
     def sortino_ratio(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/s/sortinoratio.asp.
+        """
+        https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Returns
         -------
@@ -222,7 +245,8 @@ class CommonModel:
 
     @property
     def z_score(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/z/zscore.asp.
+        """
+        https://www.investopedia.com/terms/z/zscore.asp.
 
         Returns
         -------
@@ -233,7 +257,8 @@ class CommonModel:
 
     @property
     def max_drawdown(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+        """
+        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
         -------
@@ -244,7 +269,8 @@ class CommonModel:
 
     @property
     def worst(self: TypeCommonModel) -> Union[float, Series]:
-        """Most negative percentage change.
+        """
+        Most negative percentage change.
 
         Returns
         -------
@@ -256,7 +282,8 @@ class CommonModel:
 
     @property
     def positive_share(self: TypeCommonModel) -> Union[float, Series]:
-        """The share of percentage changes that are greater than zero.
+        """
+        The share of percentage changes that are greater than zero.
 
         Returns
         -------
@@ -267,7 +294,8 @@ class CommonModel:
 
     @property
     def skew(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/s/skewness.asp.
+        """
+        https://www.investopedia.com/terms/s/skewness.asp.
 
         Returns
         -------
@@ -278,7 +306,8 @@ class CommonModel:
 
     @property
     def kurtosis(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/k/kurtosis.asp.
+        """
+        https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Returns
         -------
@@ -289,7 +318,8 @@ class CommonModel:
 
     @property
     def cvar_down(self: TypeCommonModel) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
+        """
+        https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Returns
         -------
@@ -301,12 +331,16 @@ class CommonModel:
 
     @property
     def var_down(self: TypeCommonModel) -> Union[float, Series]:
-        """Downside 95% Value At Risk, "VaR". The equivalent of percentile.inc([...], 1-level) over returns in MS Excel. https://www.investopedia.com/terms/v/var.asp.
+        """
+        Downside 95% Value At Risk (VaR).
+
+        The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
+        https://www.investopedia.com/terms/v/var.asp.
 
         Returns
         -------
         Union[float, Pandas.Series]
-            Downside 95% Value At Risk
+            Downside 95% Value At Risk (VaR)
         """
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
@@ -314,7 +348,10 @@ class CommonModel:
 
     @property
     def vol_from_var(self: TypeCommonModel) -> Union[float, Series]:
-        """Implied annualized volatility from the Downside 95% VaR using the assumption that returns are normally distributed.
+        """
+        Implied annualized volatility from Downside 95% Value at Risk.
+
+        Assumes that returns are normally distributed.
 
         Returns
         -------
@@ -327,7 +364,10 @@ class CommonModel:
         return self.vol_from_var_func(level=level, interpolation=interpolation)
 
     def value_to_log(self: TypeCommonModel) -> TypeCommonModel:
-        """Converts a valueseries into logarithmic weighted series Equivalent to LN(value[t] / value[t=0]) in MS Excel.
+        """
+        Series of values converted into logarithmic weighted series.
+
+        Equivalent to LN(value[t] / value[t=0]) in Excel.
 
         Returns
         -------
@@ -345,7 +385,8 @@ class CommonModel:
         self: TypeCommonModel,
         method: LiteralNanMethod = "fill",
     ) -> TypeCommonModel:
-        """Handling of missing values in a valueseries.
+        """
+        Handle missing values in a valueseries.
 
         Parameters
         ----------
@@ -367,7 +408,8 @@ class CommonModel:
         self: TypeCommonModel,
         method: LiteralNanMethod = "fill",
     ) -> TypeCommonModel:
-        """Handling of missing values in a returnseries.
+        """
+        Handle missing values in a returnseries.
 
         Parameters
         ----------
@@ -386,7 +428,8 @@ class CommonModel:
         return self
 
     def to_drawdown_series(self: TypeCommonModel) -> TypeCommonModel:
-        """Converts timeseries into a drawdown series.
+        """
+        Convert timeseries into a drawdown series.
 
         Returns
         -------
@@ -402,7 +445,8 @@ class CommonModel:
         filename: str,
         directory: Optional[str] = None,
     ) -> list[dict[str, Union[str, bool, ValueType, list[str], list[float]]]]:
-        """Dumps timeseries data into a json file.
+        """
+        Dump timeseries data into a json file.
 
         The label and tsdf parameters are deleted before the json file is saved
 
@@ -449,7 +493,8 @@ class CommonModel:
         sheet_title: Optional[str] = None,
         directory: Optional[str] = None,
     ) -> str:
-        """Saves the data in the .tsdf DataFrame to an Excel spreadsheet file.
+        """
+        Save .tsdf DataFrame to an Excel spreadsheet file.
 
         Parameters
         ----------
@@ -497,7 +542,8 @@ class CommonModel:
         add_logo: bool = True,
         output_type: LiteralPlotlyOutput = "file",
     ) -> tuple[Figure, str]:
-        """Creates a Plotly Bar Figure.
+        """
+        Create a Plotly Bar Figure.
 
         Parameters
         ----------
@@ -582,7 +628,8 @@ class CommonModel:
         show_last: bool = False,
         output_type: LiteralPlotlyOutput = "file",
     ) -> tuple[Figure, str]:
-        """Creates a Plotly Scatter Figure.
+        """
+        Create a Plotly Scatter Figure.
 
         Parameters
         ----------
@@ -679,7 +726,8 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """https://www.investopedia.com/terms/a/arithmeticmean.asp.
+        """
+        https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Parameters
         ----------
@@ -735,7 +783,11 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """Annualized volatility. Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel. https://www.investopedia.com/terms/v/volatility.asp.
+        """
+        Annualized volatility.
+
+        Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
+        https://www.investopedia.com/terms/v/volatility.asp.
 
         Parameters
         ----------
@@ -792,8 +844,11 @@ class CommonModel:
         drift_adjust: bool = False,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """Implied annualized volatility from the Downside VaR using the
-        assumption that returns are normally distributed.
+        """
+        Implied annualized volatility.
+
+        Implied annualized volatility from the Downside VaR using the assumption
+        that returns are normally distributed.
 
         Parameters
         ----------
@@ -844,7 +899,10 @@ class CommonModel:
         drift_adjust: bool = False,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """A position weight multiplier from the ratio between a VaR implied
+        """
+        Target weight from VaR.
+
+        A position weight multiplier from the ratio between a VaR implied
         volatility and a given target volatility. Multiplier = 1.0 -> target met.
 
         Parameters
@@ -899,7 +957,9 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """Downside Conditional Value At Risk "CVaR"
+        """
+        Downside Conditional Value At Risk "CVaR".
+
         https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Parameters
@@ -951,7 +1011,10 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """The standard deviation of returns that are below a Minimum Accepted
+        """
+        Downside Deviation.
+
+        The standard deviation of returns that are below a Minimum Accepted
         Return of zero. It is used to calculate the Sortino Ratio.
         https://www.investopedia.com/terms/d/downside-deviation.asp.
 
@@ -1015,7 +1078,9 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """Compounded Annual Growth Rate (CAGR).
+        """
+        Compounded Annual Growth Rate (CAGR).
+
         https://www.investopedia.com/terms/c/cagr.asp.
 
         Parameters
@@ -1067,7 +1132,9 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """Skew of the return distribution.
+        """
+        Skew of the return distribution.
+
         https://www.investopedia.com/terms/s/skewness.asp.
 
         Parameters
@@ -1114,7 +1181,9 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """Kurtosis of the return distribution.
+        """
+        Kurtosis of the return distribution.
+
         https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Parameters
@@ -1161,7 +1230,9 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         min_periods: int = 1,
     ) -> Union[float, Series]:
-        """Maximum drawdown without any limit on date range.
+        """
+        Maximum drawdown without any limit on date range.
+
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Parameters
@@ -1204,7 +1275,9 @@ class CommonModel:
 
     @property
     def max_drawdown_date(self: TypeCommonModel) -> Union[dt.date, Series]:
-        """Date when the maximum drawdown occurred.
+        """
+        Date when the maximum drawdown occurred.
+
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
@@ -1231,7 +1304,8 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """The share of percentage changes that are greater than zero.
+        """
+        Calculate share of percentage changes that are greater than zero.
 
         Parameters
         ----------
@@ -1246,7 +1320,7 @@ class CommonModel:
         Returns
         -------
         Union[float, Pandas.Series]
-            The share of percentage changes that are greater than zero
+            Calculate share of percentage changes that are greater than zero
         """
         earlier, later = get_calc_range(
             data=self.tsdf,
@@ -1282,10 +1356,13 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """The ratio of annualized arithmetic mean of returns and annualized
+        """
+        Ratio between arithmetic mean of returns and annualized volatility.
+
+        The ratio of annualized arithmetic mean of returns and annualized
         volatility or, if riskfree return provided, Sharpe ratio calculated
         as ( geometric return - risk-free return ) / volatility. The latter ratio
-        implies that the riskfree asset has zero volatility. \n
+        implies that the riskfree asset has zero volatility.
         https://www.investopedia.com/terms/s/sharperatio.asp.
 
         Parameters
@@ -1339,10 +1416,13 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
-        """The Sortino ratio calculated as ( return - risk free return )
+        """
+        Sortino Ratio.
+
+        The Sortino ratio calculated as ( return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has zero
         volatility, and a minimum acceptable return of zero. The ratio is
-        calculated using the annualized arithmetic mean of returns. \n
+        calculated using the annualized arithmetic mean of returns.
         https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Parameters
@@ -1396,7 +1476,8 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """Simple return.
+        """
+        Calculate simple return.
 
         Parameters
         ----------
@@ -1411,7 +1492,7 @@ class CommonModel:
         Returns
         -------
         Union[float, Pandas.Series]
-            Simple return
+            Calculate simple return
         """
         earlier, later = get_calc_range(
             data=self.tsdf,
@@ -1441,7 +1522,8 @@ class CommonModel:
         year: int,
         month: Optional[int] = None,
     ) -> Union[float, Series]:
-        """Simple return for a specific calendar period.
+        """
+        Calculate simple return for a specific calendar period.
 
         Parameters
         ----------
@@ -1453,7 +1535,7 @@ class CommonModel:
         Returns
         -------
         Union[float, Pandas.Series]
-            Simple return for a specific calendar period
+            Calculate simple return for a specific calendar period
         """
         if month is None:
             period = str(year)
@@ -1478,8 +1560,10 @@ class CommonModel:
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> Union[float, Series]:
-        """Downside Value At Risk, "VaR". The equivalent of
-        percentile.inc([...], 1-level) over returns in MS Excel.
+        """
+        Downside Value At Risk, "VaR".
+
+        The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
         https://www.investopedia.com/terms/v/var.asp.
 
         Parameters
@@ -1529,8 +1613,8 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """Most negative percentage change over a rolling number of observations
-        within a chosen date range.
+        """
+        Most negative percentage change over a rolling number of observations.
 
         Parameters
         ----------
@@ -1579,7 +1663,9 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
     ) -> Union[float, Series]:
-        """Z-score as (last return - mean return) / standard deviation of returns.
+        """
+        Z-score as (last return - mean return) / standard deviation of returns.
+
         https://www.investopedia.com/terms/z/zscore.asp.
 
         Parameters
@@ -1621,7 +1707,8 @@ class CommonModel:
         level: float = 0.95,
         observations: int = 252,
     ) -> DataFrame:
-        """Rolling annualized downside CVaR.
+        """
+        Calculate rolling annualized downside CVaR.
 
         Parameters
         ----------
@@ -1635,7 +1722,7 @@ class CommonModel:
         Returns
         -------
         Pandas.DataFrame
-            Rolling annualized downside CVaR
+            Calculate rolling annualized downside CVaR
         """
         cvar_label = self.tsdf.iloc[:, column].name[0]
         cvardf = (
@@ -1653,7 +1740,8 @@ class CommonModel:
         column: int = 0,
         observations: int = 21,
     ) -> DataFrame:
-        """Rolling returns.
+        """
+        Calculate rolling returns.
 
         Parameters
         ----------
@@ -1665,7 +1753,7 @@ class CommonModel:
         Returns
         -------
         Pandas.DataFrame
-            Rolling returns
+            Calculate rolling returns
         """
         ret_label = self.tsdf.iloc[:, column].name[0]
         retdf = (
@@ -1686,7 +1774,8 @@ class CommonModel:
         observations: int = 252,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> DataFrame:
-        """Rolling annualized downside Value At Risk "VaR".
+        """
+        Calculate rolling annualized downside Value At Risk "VaR".
 
         Parameters
         ----------
@@ -1702,7 +1791,7 @@ class CommonModel:
         Returns
         -------
         Pandas.DataFrame
-           Rolling annualized downside Value At Risk "VaR"
+           Calculate rolling annualized downside Value At Risk "VaR"
         """
         var_label = self.tsdf.iloc[:, column].name[0]
         vardf = (
@@ -1723,7 +1812,8 @@ class CommonModel:
         observations: int = 21,
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> DataFrame:
-        """Rolling annualised volatilities.
+        """
+        Calculate rolling annualised volatilities.
 
         Parameters
         ----------
@@ -1738,7 +1828,7 @@ class CommonModel:
         Returns
         -------
         Pandas.DataFrame
-            Rolling annualised volatilities
+            Calculate rolling annualised volatilities
         """
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -1768,7 +1858,10 @@ def _var_implied_vol_and_target_func(
     drift_adjust: bool = False,
     periods_in_a_year_fixed: Optional[int] = None,
 ) -> Union[float, Series]:
-    """The function returns a position weight multiplier from the ratio between
+    """
+    Volatility implied from VaR or Target Weight.
+
+    The function returns a position weight multiplier from the ratio between
     a VaR implied volatility and a given target volatility if the argument
     target_vol is provided. Otherwise the function returns the VaR implied
     volatility. Multiplier = 1.0 -> target met.

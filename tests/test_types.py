@@ -13,6 +13,7 @@ from openseries.types import (
 
 
 class TestTypes(TestCase):
+
     """class to run unittests on the module types.py."""
 
     def test_opentimeseriesproplist_validate(self: TestTypes) -> None:

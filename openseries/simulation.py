@@ -1,5 +1,5 @@
-"""Defining the ReturnSimulation class which simulates returns based on
-stochastic processes, and defining ModelParameters used by it.
+"""
+Defining the ReturnSimulation class and ModelParameters used by it.
 
 Source:
 http://www.turingfinance.com/random-walks-down-wall-street-stochastic-processes-in-python/
@@ -13,10 +13,12 @@ Processes that can be simulated in this module are:
 - Cox Ingersoll Ross
 - Ornstein Uhlenbeck
 """
+from __future__ import annotations
+
 import datetime as dt
 from math import log
 from math import pow as mathpow
-from typing import Optional, Type, TypeVar, cast
+from typing import TypeVar, cast
 
 from numpy import (
     add,
@@ -47,8 +49,11 @@ TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
-class ReturnSimulation(BaseModel):
-    """Object of the class ReturnSimulation.
+# noinspection PyUnresolvedReferences
+class ReturnSimulation(BaseModel):  # type: ignore [misc]
+
+    """
+    Object of the class ReturnSimulation.
 
     Parameters
     ----------
@@ -77,7 +82,10 @@ class ReturnSimulation(BaseModel):
 
     @property
     def results(self: TypeReturnSimulation) -> DataFrame:
-        """Returns
+        """
+        Simulation data.
+
+        Returns
         -------
         pandas.DataFrame
             Simulation data
@@ -86,7 +94,10 @@ class ReturnSimulation(BaseModel):
 
     @property
     def realized_mean_return(self: TypeReturnSimulation) -> float:
-        """Returns
+        """
+        Annualized arithmetic mean of returns.
+
+        Returns
         -------
         float
             Annualized arithmetic mean of returns
@@ -98,7 +109,10 @@ class ReturnSimulation(BaseModel):
 
     @property
     def realized_vol(self: TypeReturnSimulation) -> float:
-        """Returns
+        """
+        Annualized volatility.
+
+        Returns
         -------
         float
             Annualized volatility
@@ -112,11 +126,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def convert_to_prices(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
         log_returns: NDArray[float64],
     ) -> NDArray[float64]:
-        """Converts a sequence of log returns into normal returns (exponentiation)
+        """
+        Price series.
+
+        Converts a sequence of log returns into normal returns (exponentiation)
         and then computes a price sequence given a starting price, param.all_s0.
 
         Parameters
@@ -141,11 +158,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def brownian_motion_log_returns(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Method returns a Wiener process. The Wiener process is also called
+        """
+        Brownian Motion log returns.
+
+        Method returns a Wiener process. The Wiener process is also called
         Brownian motion. For more information about the Wiener process check out
         the Wikipedia page: http://en.wikipedia.org/wiki/Wiener_process.
 
@@ -171,11 +191,12 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def brownian_motion_levels(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Delivers a price sequence whose returns evolve as to a brownian motion.
+        """
+        Delivers a price sequence whose returns evolve as to a brownian motion.
 
         Parameters
         ----------
@@ -196,11 +217,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def geometric_brownian_motion_log_returns(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Method constructs a sequence of log returns which, when
+        """
+        Log returns of a Geometric Brownian Motion process.
+
+        Method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM).
         GBM is the stochastic process underlying the Black Scholes
         options pricing formula.
@@ -225,11 +249,12 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def geometric_brownian_motion_levels(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Prices for an asset which evolves according to a geometric brownian motion.
+        """
+        Prices for an asset which evolves according to a geometric brownian motion.
 
         Parameters
         ----------
@@ -250,11 +275,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def jump_diffusion_process(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Method produces a sequence of Jump Sizes which represent a jump
+        """
+        Jump sizes for each point in time (mostly zeroes if jumps are infrequent).
+
+        Method produces a sequence of Jump Sizes which represent a jump
         diffusion process. These jumps are combined with a geometric brownian
         motion (log returns) to produce the Merton model.
 
@@ -293,11 +321,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_log_returns(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Method constructs combines a geometric brownian motion process
+        """
+        Geometric Brownian Motion process with jumps in it.
+
+        Method constructs combines a geometric brownian motion process
         (log returns) with a jump diffusion process (log returns) to produce a
         sequence of gbm jump returns.
 
@@ -322,11 +353,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_levels(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Converts returns generated with a Geometric Brownian Motion process
+        """
+        Geometric Brownian Motion generated prices.
+
+        Converts returns generated with a Geometric Brownian Motion process
         with jumps into prices.
 
         Parameters
@@ -348,12 +382,15 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def heston_construct_correlated_path(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
         brownian_motion_one: NDArray[float64],
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
-        """Method is a simplified version of the Cholesky decomposition method for
+        """
+        Generate correlated Brownian Motion path.
+
+        Method is a simplified version of the Cholesky decomposition method for
         just two assets. It does not make use of matrix algebra and is therefore quite
         easy to implement.
 
@@ -373,9 +410,9 @@ class ReturnSimulation(BaseModel):
         """
         if seed is not None:
             nprandom.seed(seed)
-        # We do not multiply by sigma here, we do that in the Heston model
+
         sqrt_delta = sqrt(param.all_delta)
-        # Construct a path correlated to the first path
+
         brownian_motion_two = []
         for npath in range(param.all_time - 1):
             term_one = param.cir_rho * brownian_motion_one[npath]
@@ -388,11 +425,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def cox_ingersoll_ross_heston(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
-        """Method returns the rate levels of a mean-reverting Cox Ingersoll Ross
+        """
+        Generate interest rate levels for the CIR process.
+
+        Method returns the rate levels of a mean-reverting Cox Ingersoll Ross
         process. It is used to model interest rates as well as stochastic
         volatility in the Heston model. Because the returns between the underlying
         and the stochastic volatility should be correlated we pass a correlated
@@ -414,8 +454,8 @@ class ReturnSimulation(BaseModel):
         if seed is not None:
             nprandom.seed(seed)
 
-        # We don't multiply by sigma here because we do that in heston
         sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
+
         brownian_motion_volatility = nprandom.normal(
             loc=0,
             scale=sqrt_delta_sigma,
@@ -438,11 +478,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def heston_model_levels(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
-        """The Heston model is the geometric brownian motion model with stochastic
+        """
+        Generate prices for an asset following a Heston process.
+
+        The Heston model is the geometric brownian motion model with stochastic
         volatility. This stochastic volatility is given by the Cox Ingersoll Ross
         process. Step one on this method is to construct two correlated
         GBM processes. One is used for the underlying asset prices and the other
@@ -487,11 +530,14 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def cox_ingersoll_ross_levels(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Method returns the rate levels of a mean-reverting Cox Ingersoll Ross
+        """
+        Generate interest rate levels for the CIR process.
+
+        Method returns the rate levels of a mean-reverting Cox Ingersoll Ross (CIR)
         process. It is used to model interest rates as well as stochastic
         volatility in the Heston model. Because the returns between the underlying
         and the stochastic volatility should be correlated we pass a correlated
@@ -521,12 +567,12 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def ornstein_uhlenbeck_levels(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> NDArray[float64]:
-        """Method returns the rate levels of a mean-reverting
-        Ornstein Uhlenbeck process.
+        """
+        Generate rate levels of a mean-reverting Ornstein Uhlenbeck process.
 
         Parameters
         ----------
@@ -550,15 +596,16 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def from_normal(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         number_of_sims: SimCountType,
         mean_annual_return: float,
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
+        seed: int | None = 71,
     ) -> TypeReturnSimulation:
-        """Normal distribution simulation.
+        """
+        Simulate normally distributed prices.
 
         Parameters
         ----------
@@ -579,7 +626,7 @@ class ReturnSimulation(BaseModel):
         Returns
         -------
         ReturnSimulation
-            Normal distribution simulation
+            Normally distributed prices
         """
         if seed:
             nprandom.seed(seed)
@@ -599,15 +646,16 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def from_lognormal(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         number_of_sims: SimCountType,
         mean_annual_return: float,
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
+        seed: int | None = 71,
     ) -> TypeReturnSimulation:
-        """Lognormal distribution simulation.
+        """
+        Lognormal distribution simulation.
 
         Parameters
         ----------
@@ -651,15 +699,18 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def from_gbm(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         number_of_sims: SimCountType,
         mean_annual_return: float,
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
+        seed: int | None = 71,
     ) -> TypeReturnSimulation:
-        """Method constructs a sequence of log returns which, when
+        """
+        Geometric Brownian Motion simulation.
+
+        Method constructs a sequence of log returns which, when
         exponentiated, produce a random Geometric Brownian Motion (GBM).
 
         Parameters
@@ -681,7 +732,7 @@ class ReturnSimulation(BaseModel):
         Returns
         -------
         ReturnSimulation
-            Normal distribution simulation
+            Geometric Brownian Motion simulation
         """
         if seed:
             nprandom.seed(seed)
@@ -709,7 +760,7 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def from_heston(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         number_of_sims: SimCountType,
         trading_days: TradingDaysType,
         mean_annual_return: float,
@@ -717,9 +768,12 @@ class ReturnSimulation(BaseModel):
         heston_mu: VolatilityType,
         heston_a: float,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
+        seed: int | None = 71,
     ) -> TypeReturnSimulation:
-        """Heston model is the geometric brownian motion model
+        """
+        Heston model simulation.
+
+        Heston model is the geometric brownian motion model
         with stochastic volatility.
 
         Parameters
@@ -777,7 +831,7 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def from_heston_vol(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         number_of_sims: SimCountType,
         trading_days: TradingDaysType,
         mean_annual_return: float,
@@ -785,9 +839,10 @@ class ReturnSimulation(BaseModel):
         heston_mu: VolatilityType,
         heston_a: float,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
+        seed: int | None = 71,
     ) -> TypeReturnSimulation:
-        """Heston Vol model simulation.
+        """
+        Heston Vol model simulation.
 
         Parameters
         ----------
@@ -844,7 +899,7 @@ class ReturnSimulation(BaseModel):
 
     @classmethod
     def from_merton_jump_gbm(
-        cls: Type[TypeReturnSimulation],
+        cls: type[TypeReturnSimulation],
         number_of_sims: SimCountType,
         trading_days: TradingDaysType,
         mean_annual_return: float,
@@ -853,9 +908,10 @@ class ReturnSimulation(BaseModel):
         jumps_sigma: VolatilityType,
         jumps_mu: float,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
+        seed: int | None = 71,
     ) -> TypeReturnSimulation:
-        """Merton Jump-Diffusion model simulation.
+        """
+        Merton Jump-Diffusion model simulation.
 
         Parameters
         ----------
@@ -915,11 +971,12 @@ class ReturnSimulation(BaseModel):
     def to_dataframe(
         self: TypeReturnSimulation,
         name: str,
-        start: Optional[dt.date] = None,
-        end: Optional[dt.date] = None,
+        start: dt.date | None = None,
+        end: dt.date | None = None,
         countries: CountriesType = "SE",
     ) -> DataFrame:
-        """Create pandas.DataFrame from simulation(s).
+        """
+        Create pandas.DataFrame from simulation(s).
 
         Parameters
         ----------
@@ -958,8 +1015,11 @@ class ReturnSimulation(BaseModel):
         return fdf
 
 
-class ModelParameters(BaseModel):
-    """Object of the class ModelParameters.
+# noinspection PyUnresolvedReferences
+class ModelParameters(BaseModel):  # type: ignore [misc]
+
+    """
+    Object of the class ModelParameters.
 
     Parameters
     ----------

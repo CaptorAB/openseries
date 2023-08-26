@@ -26,6 +26,7 @@ TypeTestOpenFrame = TypeVar("TypeTestOpenFrame", bound="TestOpenFrame")
 
 
 class TestOpenFrame(TestCase):
+
     """class to run unittests on the module frame.py."""
 
     randomframe: OpenFrame
@@ -405,7 +406,7 @@ class TestOpenFrame(TestCase):
     def test_risk_functions_same_as_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that risk measure results align between OpenFrame and OpenTimeSeries."""
+        """Test that risk measures align between OpenFrame and OpenTimeSeries."""
         riskseries = self.randomseries.from_deepcopy()
         riskseries.set_new_label(lvl_zero="Asset_0")
         riskframe = self.randomframe.from_deepcopy()
@@ -529,7 +530,7 @@ class TestOpenFrame(TestCase):
     def test_ratio_methods_same_as_opentimeseries(
         self: TestOpenFrame,
     ) -> None:
-        """Test that ratio method results align between OpenFrame and OpenTimeSeries."""
+        """Test that ratio methods align between OpenFrame and OpenTimeSeries."""
         sames = self.randomseries.from_deepcopy()
         sames.to_cumret()
         sames.set_new_label(lvl_zero="Asset_0")
@@ -1641,7 +1642,8 @@ class TestOpenFrame(TestCase):
         self.assertEqual(len(set(uframe.columns_lvl_zero)), 2)
 
     def test_capture_ratio(self: TestOpenFrame) -> None:
-        """Test the capture_ratio_func method.
+        """
+        Test the capture_ratio_func method.
 
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and

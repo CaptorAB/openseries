@@ -16,9 +16,11 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
+from openseries.types import HolidayType
 
 
 class TestDateFixer(TestCase):
+
     """class to run unittests on the module datefixer.py."""
 
     def test_arg_types(self: TestDateFixer) -> None:
@@ -217,9 +219,7 @@ class TestDateFixer(TestCase):
         ]
         self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_without)
 
-        jacks_birthday: dict[dt.date | dt.datetime | str | float | int, str] | list[
-            dt.date | dt.datetime | str | float | int
-        ] | dt.date | dt.datetime | str | float | int | None = {
+        jacks_birthday: HolidayType = {
             "2021-02-12": "Jack's birthday",
         }
         cdr_with = holiday_calendar(

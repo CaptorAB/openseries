@@ -1,6 +1,7 @@
 """Declaring types used throughout the project."""
 from __future__ import annotations
 
+import datetime as dt
 from enum import Enum
 from typing import Annotated, ClassVar, Literal, TypeVar, Union
 
@@ -58,6 +59,30 @@ TradingDaysType = Annotated[int, conint(strict=True, gt=1)]
 SimCountType = Annotated[int, conint(strict=True, ge=1)]
 
 VolatilityType = Annotated[float, confloat(strict=True, gt=0.0)]
+
+HolidayType = (
+    dict[dt.date | dt.datetime | str | float | int, str]
+    | list[dt.date | dt.datetime | str | float | int]
+    | dt.date
+    | dt.datetime
+    | str
+    | float
+    | int
+    | None
+)
+
+PlotlyLayoutType = tuple[
+    dict[
+        str,
+        str
+        | int
+        | float
+        | bool
+        | list[str]
+        | dict[str, str | int | float | bool | list[str]],
+    ],
+    dict[str, str | float],
+]
 
 LiteralLinePlotMode = Literal[
     "lines",
@@ -160,6 +185,7 @@ TypeOpenTimeSeriesPropertiesList = TypeVar(
 
 
 class OpenTimeSeriesPropertiesList(list[str]):
+
     """Allowed property arguments for the OpenTimeSeries class."""
 
     allowed_strings: ClassVar[set[str]] = {
@@ -217,6 +243,7 @@ TypeOpenFramePropertiesList = TypeVar(
 
 
 class OpenFramePropertiesList(list[str]):
+
     """Allowed property arguments for the OpenFrame class."""
 
     allowed_strings: ClassVar[set[str]] = {
@@ -263,6 +290,7 @@ class OpenFramePropertiesList(list[str]):
 
 
 class ValueType(str, Enum):
+
     """Class defining the different timeseries types within the project."""
 
     EWMA = "EWMA"

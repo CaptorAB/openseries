@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.2.2"
+version = "1.2.3"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -34,7 +34,7 @@ keywords = [
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
 ffn = "^0.3.7"
-holidays = "^0.30"
+holidays = "^0.31"
 numpy = "^1.25.2"
 openpyxl = "^3.1.2"
 pandas = "^2.0.3"
@@ -53,7 +53,7 @@ mypy = "^1.5.1"
 pre-commit = "^3.3.3"
 pytest = "^7.4.0"
 pytest-split = "^0.8.1"
-ruff = "^0.0.285"
+ruff = "^0.0.286"
 toml = "^0.10.2"
 # This import takes care of single mypy import error on dateutil in datefixer.py
 types-python-dateutil = "^2.8.19.14"
@@ -89,7 +89,7 @@ fail_under = 99
 strict = true
 ignore_missing_imports = true
 warn_redundant_casts = true
-disable_error_code = ["misc"]
+disable_error_code = ["unused-ignore"]
 exclude = ["venv/*"]
 
 [tool.ruff]
@@ -98,6 +98,7 @@ select = [
     "ANN",
     "B",
     "COM",
+    "D",
     "DTZ",
     "E",
     "F",
@@ -109,7 +110,7 @@ select = [
     "UP",
     "W"
 ]
-ignore = ["ANN401", "E501", "D"]
+ignore = ["D211", "D212"]
 fixable = ["ALL"]
 unfixable = []
 exclude = [

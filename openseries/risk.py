@@ -1,4 +1,5 @@
-"""Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
+"""
+Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
 
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
@@ -29,7 +30,8 @@ def cvar_down_calc(
     data: DataFrame | Series | list[float],
     level: float = 0.95,
 ) -> float:
-    """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
+    """
+    https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
     Parameters
     ----------
@@ -57,8 +59,10 @@ def var_down_calc(
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
-    """Downside Value At Risk, "VaR". The equivalent of
-    percentile.inc([...], 1-level) over returns in MS Excel \n
+    """
+    Downside Value At Risk, "VaR".
+
+    The equivalent of percentile.inc([...], 1-level) over returns in MS Excel
     https://www.investopedia.com/terms/v/var.asp.
 
     Parameters
@@ -84,7 +88,10 @@ def var_down_calc(
 
 
 def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
-    """Calculates https://www.investopedia.com/terms/d/drawdown.asp
+    """
+    Convert series into a maximum drawdown series.
+
+    Calculates https://www.investopedia.com/terms/d/drawdown.asp
     This returns a series representing a drawdown. When the price is at all-time
     highs, the drawdown is 0. However, when prices are below high watermarks,
     the drawdown series = current / hwm - 1 The max drawdown can be obtained by
@@ -110,7 +117,8 @@ def drawdown_series(prices: DataFrame | Series) -> DataFrame | Series:
 
 
 def drawdown_details(prices: DataFrame | Series, min_periods: int = 1) -> Series:
-    """Details of the maximum drawdown.
+    """
+    Details of the maximum drawdown.
 
     Parameters
     ----------
@@ -172,7 +180,8 @@ def ewma_calc(
     time_factor: float,
     lmbda: float = 0.94,
 ) -> float:
-    """Helper function for EWMA calculation.
+    """
+    Calculate Exponentially Weighted Moving Average volatility.
 
     Parameters
     ----------

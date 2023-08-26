@@ -118,7 +118,7 @@ make install
 
 ## Testing and Linting / Type-checking
 
-Flake8, Black, Pylint and Mypy checking is embedded in the pre-commit hook. All
+Ruff, Black and Mypy checking is embedded in the pre-commit hook. All
 are also used in the project's GitHub workflows and are run when the `lint`
 alternative is chosen in the below commands.
 Any silenced error codes can be found in the

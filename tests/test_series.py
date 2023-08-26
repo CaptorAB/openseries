@@ -25,12 +25,17 @@ TypeTestOpenTimeSeries = TypeVar("TypeTestOpenTimeSeries", bound="TestOpenTimeSe
 
 
 class NewTimeSeries(OpenTimeSeries):
+
     """class to test correct pass-through of classes."""
 
     extra_info: str = "cool"
 
 
-@pytest.mark.parametrize("valuetype", [ValueType.PRICE, "Price(Close)"])
+# noinspection PyUnresolvedReferences
+@pytest.mark.parametrize(  # type: ignore [misc]
+    "valuetype",
+    [ValueType.PRICE, "Price(Close)"],
+)
 def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
     """Pytest on valid valuetype as input."""
     assert isinstance(
@@ -44,7 +49,8 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
     )
 
 
-@pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])
+# noinspection PyUnresolvedReferences
+@pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])  # type: ignore [misc]
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     """Pytest on invalid valuetype as input."""
     with pytest.raises(PydanticValidationError) as e_invalid_valuetype:
@@ -59,7 +65,11 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     ) or "type=string_type" in str(e_invalid_valuetype.getrepr(style="short"))
 
 
-@pytest.mark.parametrize("currency", ["SE", True, "12", 1, None])
+# noinspection PyUnresolvedReferences
+@pytest.mark.parametrize(  # type: ignore [misc]
+    "currency",
+    ["SE", True, "12", 1, None],
+)
 def test_opentimeseries_invalid_currency(currency: str) -> None:
     """Pytest on invalid currency code as input for currency."""
     with pytest.raises(PydanticValidationError) as e_invalid_currency:
@@ -75,7 +85,11 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
     ) or "type=string_type" in str(e_invalid_currency.getrepr(style="short"))
 
 
-@pytest.mark.parametrize("domestic", ["SE", True, "12", 1, None])
+# noinspection PyUnresolvedReferences
+@pytest.mark.parametrize(  # type: ignore [misc]
+    "domestic",
+    ["SE", True, "12", 1, None],
+)
 def test_opentimeseries_invalid_domestic(domestic: str) -> None:
     """Pytest on invalid currency code as input for domestic."""
     with pytest.raises(PydanticValidationError) as e_dom:
@@ -90,7 +104,8 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
     ) or "type=string_type" in str(e_dom.getrepr(style="short"))
 
 
-@pytest.mark.parametrize(
+# noinspection PyUnresolvedReferences
+@pytest.mark.parametrize(  # type: ignore [misc]
     "countries",
     ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []],
 )
@@ -108,46 +123,8 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     ) or "type=string_type" in str(e_ctries.getrepr(style="short"))
 
 
-@pytest.mark.parametrize(
-    "dates,expectation",
-    [
-        (["2023-01-01", None], pytest.raises(PydanticValidationError)),
-        (None, pytest.raises(TypeError)),
-        ("2023-01-01", pytest.raises(TypeError)),
-        (["2023-01-bb", "2023-01-02"], pytest.raises(ValueError)),
-    ],
-)
-def test_opentimeseries_invalid_dates(dates: list[str], expectation: Any) -> None:
-    """Pytest on invalid dates as input."""
-    with expectation:
-        OpenTimeSeries.from_arrays(
-            name="Asset",
-            dates=dates,
-            values=[1.0, 1.1],
-            local_ccy=True,
-        )
-
-
-@pytest.mark.parametrize(
-    "values,expectation",
-    [
-        ([1.0, None], pytest.raises(PydanticValidationError)),
-        (None, pytest.raises(PydanticValidationError)),
-        (1.0, pytest.raises(PydanticValidationError)),
-        ([1.0, "bb"], pytest.raises(ValueError)),
-    ],
-)
-def test_opentimeseries_invalid_values(values: list[float], expectation: Any) -> None:
-    """Pytest on invalid values as input."""
-    with expectation:
-        OpenTimeSeries.from_arrays(
-            name="Asset",
-            dates=["2023-01-01", "2023-01-02"],
-            values=values,
-        )
-
-
 class TestOpenTimeSeries(TestCase):
+
     """class to run unittests on the module series.py."""
 
     randomseries: OpenTimeSeries
@@ -214,6 +191,46 @@ class TestOpenTimeSeries(TestCase):
         OpenTimeSeries.setup_class(domestic_ccy="USD", countries="US")
         self.assertEqual(OpenTimeSeries.domestic, "USD")
         self.assertEqual(OpenTimeSeries.countries, "US")
+
+    def test_invalid_dates(self: TestOpenTimeSeries) -> None:
+        """Test invalid dates as input."""
+        invalid_dates = [
+            (["2023-01-01", None], PydanticValidationError),
+            (None, TypeError),
+            ("2023-01-01", TypeError),
+            (["2023-01-bb", "2023-01-02"], ValueError),
+        ]
+        for item in invalid_dates:
+            with self.assertRaises(cast(tuple[Any, ...] | Any, item[1])) as e_invalid:
+                OpenTimeSeries.from_arrays(
+                    name="Asset",
+                    dates=cast(list[str], item[0]),
+                    values=[1.0, 1.1],
+                )
+            self.assertIsInstance(
+                e_invalid.exception,
+                cast(tuple[Any, ...] | Any, item[1]),
+            )
+
+    def test_invalid_values(self: TestOpenTimeSeries) -> None:
+        """Test invalid values as input."""
+        invalid_values = [
+            ([1.0, None], PydanticValidationError),
+            (None, PydanticValidationError),
+            (1.0, PydanticValidationError),
+            ([1.0, "bb"], ValueError),
+        ]
+        for item in invalid_values:
+            with self.assertRaises(cast(tuple[Any, ...] | Any, item[1])) as e_invalid:
+                OpenTimeSeries.from_arrays(
+                    name="Asset",
+                    dates=["2023-01-01", "2023-01-02"],
+                    values=cast(list[float], item[0]),
+                )
+            self.assertIsInstance(
+                e_invalid.exception,
+                cast(tuple[Any, ...] | Any, item[1]),
+            )
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
         """Test duplicate handling."""
@@ -1152,7 +1169,8 @@ class TestOpenTimeSeries(TestCase):
         self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
-        """Test downside_deviation_func method.
+        """
+        Test downside_deviation_func method.
 
         Source: https://www.investopedia.com/terms/d/downside-deviation.asp.
         """

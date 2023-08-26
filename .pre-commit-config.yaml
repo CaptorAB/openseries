@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.285'
+    rev: 'v0.0.286'
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
@@ -19,7 +19,6 @@ repos:
     hooks:
       - id: python-use-type-annotations
       - id: python-check-blanket-noqa
-      - id: python-check-blanket-type-ignore
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:

@@ -1,4 +1,4 @@
-name: pylint
+name: ruff
 
 on:
   workflow_dispatch:
@@ -35,7 +35,7 @@ jobs:
           path: |
             ~/.local
             ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pylint.yml') }}-${{ hashFiles('**/pyproject.toml') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/ruff.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -73,4 +73,4 @@ jobs:
           path: |
             ~/.local
             ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/pylint.yml') }}-${{ hashFiles('**/pyproject.toml') }}
+          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/ruff.yml') }}-${{ hashFiles('**/pyproject.toml') }}

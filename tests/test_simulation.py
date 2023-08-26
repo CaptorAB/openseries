@@ -18,6 +18,7 @@ TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")
 
 
 class TestSimulation(TestCase):
+
     """class to run unittests on the module simulation.py."""
 
     seriesim: ReturnSimulation
