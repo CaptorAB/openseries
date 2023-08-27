@@ -11,7 +11,7 @@ width="81" height="100" align="left" float="right"/><br/>
 ![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml/badge.svg)
 ![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)
 [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/index.html)
-![ruff](https://github.com/CaptorAB/OpenSeries/actions/workflows/ruff.yml/badge.svg)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/CaptorAB/OpenSeries/actions/workflows/ruff.yml/badge.svg)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 **OpenSeries** is a project with tools to analyse financial timeseries of a single
