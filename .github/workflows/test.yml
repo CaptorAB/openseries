@@ -1,4 +1,4 @@
-name: pytest
+name: testing
 
 on:
   workflow_dispatch:
