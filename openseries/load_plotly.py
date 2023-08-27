@@ -20,7 +20,8 @@ def load_plotly_dict(
 
     Returns
     -------
-    A dictionary with the Plotly config and layout template
+    PlotlyLayoutType
+        A dictionary with the Plotly config and layout template
     """
     project_root = dirname(dirname(abspath(__file__)))
     layoutfile = join(abspath(project_root), "openseries", "plotly_layouts.json")

@@ -296,7 +296,7 @@ class OpenFramePropertiesList(list[str]):
 
 class ValueType(str, Enum):
 
-    """Class defining the different timeseries types within the project."""
+    """Enum types of OpenTimeSeries to identify the output."""
 
     EWMA = "EWMA"
     PRICE = "Price(Close)"
