@@ -7,15 +7,14 @@ from re import compile as re_compile
 from typing import Any, Optional, TypeVar, Union, cast
 
 from numpy import (
+    append,
     array,
     cumprod,
-    float64,
     insert,
     isnan,
     log,
     sqrt,
 )
-from numpy.typing import NDArray
 from pandas import (
     DataFrame,
     DatetimeIndex,
@@ -913,14 +912,12 @@ def timeseries_chain(
             raise ValueError("Failed to find a matching date between series")
 
     dates: list[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
-    values = array([x[0] for x in old.tsdf.to_numpy()][: len(dates)])
-    values = cast(
-        NDArray[float64],
-        list(values * new.tsdf.iloc[:, 0].loc[first] / olddf.iloc[:, 0].loc[first]),
-    )
+
+    values = old.tsdf.iloc[: len(dates), 0]
+    values = values.mul(new.tsdf.iloc[:, 0].loc[first] / olddf.iloc[:, 0].loc[first])
+    values = append(values, new.tsdf.iloc[:, 0])
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
-    values += [x[0] for x in new.tsdf.to_numpy()]
 
     if back.__class__.__subclasscheck__(
         OpenTimeSeries,
