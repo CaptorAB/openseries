@@ -7,6 +7,10 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.5] - 2023-08-28
+
+Simplified timeseries_chain function and changed variable case to resolve N815 error.
+
 ## Version [1.2.4] - 2023-08-26
 
 Minor cleanup.

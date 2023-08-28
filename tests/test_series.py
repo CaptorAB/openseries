@@ -289,7 +289,7 @@ class TestOpenTimeSeries(TestCase):
             dtype="float64",
         )
         data = {
-            "timeseriesId": "",
+            "timeseries_id": "",
             "currency": "SEK",
             "dates": [
                 "2019-06-24",
@@ -298,7 +298,7 @@ class TestOpenTimeSeries(TestCase):
                 "2019-06-27",
                 "2019-06-28",
             ],
-            "instrumentId": "",
+            "instrument_id": "",
             "isin": "",
             "local_ccy": True,
             "name": "Asset_0",
@@ -1223,8 +1223,8 @@ class TestOpenTimeSeries(TestCase):
         invalid_timeseries_id_two = "5_13595971051506189ba416"
 
         timeseries_with_valid_isin = OpenTimeSeries(
-            timeseriesId=valid_timeseries_id,
-            instrumentId=valid_instrument_id,
+            timeseries_id=valid_timeseries_id,
+            instrument_id=valid_instrument_id,
             isin=valid_isin,
             currency="SEK",
             dates=[
@@ -1294,8 +1294,8 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(Exception) as e_one:
             _ = OpenTimeSeries(
-                timeseriesId=valid_timeseries_id,
-                instrumentId=valid_instrument_id,
+                timeseries_id=valid_timeseries_id,
+                instrument_id=valid_instrument_id,
                 isin=invalid_isin,
                 currency="SEK",
                 dates=[
@@ -1335,8 +1335,8 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(PydanticValidationError) as e_three:
             OpenTimeSeries(
-                timeseriesId=invalid_timeseries_id_one,
-                instrumentId=valid_instrument_id,
+                timeseries_id=invalid_timeseries_id_one,
+                instrument_id=valid_instrument_id,
                 isin=valid_isin,
                 currency="SEK",
                 dates=[
@@ -1376,8 +1376,8 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(PydanticValidationError) as e_four:
             OpenTimeSeries(
-                timeseriesId=invalid_timeseries_id_two,
-                instrumentId=valid_instrument_id,
+                timeseries_id=invalid_timeseries_id_two,
+                instrument_id=valid_instrument_id,
                 isin=valid_isin,
                 currency="SEK",
                 dates=[
@@ -1417,8 +1417,8 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(PydanticValidationError) as e_five:
             OpenTimeSeries(
-                timeseriesId=valid_timeseries_id,
-                instrumentId=invalid_instrument_id_one,
+                timeseries_id=valid_timeseries_id,
+                instrument_id=invalid_instrument_id_one,
                 isin=valid_isin,
                 currency="SEK",
                 dates=[
@@ -1458,8 +1458,8 @@ class TestOpenTimeSeries(TestCase):
 
         with self.assertRaises(PydanticValidationError) as e_six:
             OpenTimeSeries(
-                timeseriesId=valid_timeseries_id,
-                instrumentId=invalid_instrument_id_two,
+                timeseries_id=valid_timeseries_id,
+                instrument_id=invalid_instrument_id_two,
                 isin=valid_isin,
                 currency="SEK",
                 dates=[

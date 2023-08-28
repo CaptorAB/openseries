@@ -1,8 +1,8 @@
 {
-  "timeseriesId": "",
+  "timeseries_id": "",
   "name": "Captor Iris Bond",
   "currency": "SEK",
-  "instrumentId": "",
+  "instrument_id": "",
   "isin": "SE0009807308",
   "local_ccy": true,
   "valuetype": "Price(Close)",

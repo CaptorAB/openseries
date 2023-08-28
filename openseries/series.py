@@ -61,13 +61,13 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
 
     Parameters
     ----------
-    timeseriesId : DatabaseIdStringType
+    timeseries_id : DatabaseIdStringType
         Database identifier of the timeseries
-    instrumentId: DatabaseIdStringType
+    instrument_id: DatabaseIdStringType
         Database identifier of the instrument associated with the timeseries
     name : str
         string identifier of the timeseries and/or instrument
-    valuetype : openseries.types.ValueType
+    valuetype : ValueType
         Identifies if the series is a series of values or returns
     dates : DateListType
         Dates of the individual timeseries items
@@ -83,7 +83,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         ISO 4217 currency code of the timeseries
     domestic : CurrencyStringType, default: "SEK"
         ISO 4217 currency code of the user's home currency
-    countries: Union[CountryStringType, CountryListType], default: "SE"
+    countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     isin : str, optional
         ISO 6166 identifier code of the associated instrument
@@ -91,8 +91,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         Placeholder for a name of the timeseries
     """
 
-    timeseriesId: DatabaseIdStringType  # noqa: N815
-    instrumentId: DatabaseIdStringType  # noqa: N815
+    timeseries_id: DatabaseIdStringType
+    instrument_id: DatabaseIdStringType
     name: str
     valuetype: ValueType
     dates: DateListType
@@ -235,8 +235,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
             dates=dates,
             values=values,
             valuetype=valuetype,
-            timeseriesId=timeseries_id,
-            instrumentId=instrument_id,
+            timeseries_id=timeseries_id,
+            instrument_id=instrument_id,
             isin=isin,
             currency=baseccy,
             local_ccy=local_ccy,
@@ -314,8 +314,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
 
         return cls(
-            timeseriesId="",
-            instrumentId="",
+            timeseries_id="",
+            instrument_id="",
             currency=baseccy,
             dates=dates,
             name=label,
@@ -395,8 +395,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         d_range = [d.strftime("%Y-%m-%d") for d in cast(DatetimeIndex, d_range)]
 
         return cls(
-            timeseriesId="",
-            instrumentId="",
+            timeseries_id="",
+            instrument_id="",
             currency=baseccy,
             dates=d_range,
             name=label,
@@ -783,7 +783,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         days_in_year: int = 365,
     ) -> TypeOpenTimeSeries:
         """
-        Add (+) or subtract (-) a fee from the timeseries return.
+        Add or subtract a fee from the timeseries return.
 
         Parameters
         ----------
@@ -923,8 +923,8 @@ def timeseries_chain(
         OpenTimeSeries,
     ):
         return OpenTimeSeries(
-            timeseriesId=new.timeseriesId,
-            instrumentId=new.instrumentId,
+            timeseries_id=new.timeseries_id,
+            instrument_id=new.instrument_id,
             currency=new.currency,
             dates=dates,
             name=new.name,
@@ -940,8 +940,8 @@ def timeseries_chain(
             ),
         )
     return back.__class__(
-        timeseriesId=new.timeseriesId,
-        instrumentId=new.instrumentId,
+        timeseries_id=new.timeseries_id,
+        instrument_id=new.instrument_id,
         currency=new.currency,
         dates=dates,
         name=new.name,

@@ -481,7 +481,7 @@ def get_calc_range(
 
     Returns
     -------
-    Tuple[datetime.date, datetime.date]
+    tuple[datetime.date, datetime.date]
         Start and end date of the chosen date range
     """
     earlier, later = data.index[0], data.index[-1]

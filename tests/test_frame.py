@@ -655,8 +655,8 @@ class TestOpenFrame(TestCase):
         series_attributes = [
             "values",
             "local_ccy",
-            "timeseriesId",
-            "instrumentId",
+            "timeseries_id",
+            "instrument_id",
             "currency",
             "isin",
             "dates",
