@@ -513,7 +513,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
             seed=seed,
         )
 
-        heston_market_price_levels: NDArray[float64] = array([param.all_s0])
+        heston_market_price_levels = array([param.all_s0])
         for hpath in range(1, param.all_time):
             drift = (
                 param.gbm_mu * heston_market_price_levels[hpath - 1] * param.all_delta
@@ -559,7 +559,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         """
         brownian_motion = cls.brownian_motion_log_returns(param, seed=seed)
 
-        levels: NDArray[float64] = array([param.all_r0])
+        levels = array([param.all_r0])
         for hpath in range(1, param.all_time):
             drift = param.cir_a * (param.cir_mu - levels[hpath - 1]) * param.all_delta
             randomness = sqrt(levels[hpath - 1]) * brownian_motion[hpath - 1]
@@ -587,7 +587,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         numpy.NDArray[float64]
             The interest rate levels for the Ornstein Uhlenbeck process
         """
-        ou_levels: NDArray[float64] = array([param.all_r0])
+        ou_levels = array([param.all_r0])
         brownian_motion_returns = cls.brownian_motion_log_returns(param, seed=seed)
         for hpath in range(1, param.all_time):
             drift = param.ou_a * (param.ou_mu - ou_levels[hpath - 1]) * param.all_delta
