@@ -74,20 +74,19 @@ HolidayType = Union[
     int,
 ]
 
-PlotlyLayoutType = tuple[
-    dict[
+PlotlyLayoutType = dict[
+    str,
+    Union[
         str,
-        Union[
-            str,
-            int,
-            float,
-            bool,
-            list[str],
-            dict[str, Union[str, int, float, bool, list[str]]],
-        ],
+        int,
+        float,
+        bool,
+        list[str],
+        dict[str, Union[str, int, float, bool, list[str]]],
     ],
-    dict[str, Union[str, float]],
 ]
+
+CaptorLogoType = dict[str, Union[str, float]]
 
 LiteralLinePlotMode = Literal[
     "lines",

@@ -4,12 +4,12 @@ from __future__ import annotations
 from json import load
 from os.path import abspath, dirname, join
 
-from openseries.types import PlotlyLayoutType
+from openseries.types import CaptorLogoType, PlotlyLayoutType
 
 
 def load_plotly_dict(
     responsive: bool = True,
-) -> PlotlyLayoutType:
+) -> tuple[PlotlyLayoutType, CaptorLogoType]:
     """
     Load Plotly defaults.
 
@@ -20,7 +20,7 @@ def load_plotly_dict(
 
     Returns
     -------
-    PlotlyLayoutType
+    tuple[PlotlyLayoutType, CaptorLogoType]
         A dictionary with the Plotly config and layout template
     """
     project_root = dirname(dirname(abspath(__file__)))

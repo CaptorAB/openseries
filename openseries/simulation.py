@@ -140,12 +140,12 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         ----------
         param: TypeModelParameters
             Model input
-        log_returns: numpy.NDArray[float64]
+        log_returns: NDArray[float64]
             Log returns to exponentiate
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Price series
         """
         returns = exp(log_returns)
@@ -178,7 +178,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Brownian Motion log returns
         """
         if seed is not None:
@@ -207,7 +207,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Price sequence which follows a brownian motion
         """
         return cls.convert_to_prices(
@@ -238,7 +238,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Log returns of a Geometric Brownian Motion process
         """
         wiener_process = array(cls.brownian_motion_log_returns(param, seed=seed))
@@ -265,7 +265,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Price levels for the asset
         """
         return cls.convert_to_prices(
@@ -295,7 +295,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Jump sizes for each point in time (mostly zeroes if jumps are infrequent)
         """
         if seed is not None:
@@ -341,7 +341,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Geometric Brownian Motion process with jumps in it
         """
         jump_diffusion = cls.jump_diffusion_process(param, seed=seed)
@@ -372,7 +372,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             Geometric Brownian Motion generated prices
         """
         return cls.convert_to_prices(
@@ -398,7 +398,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         ----------
         param: TypeModelParameters
             Model input
-        brownian_motion_one: numpy.NDArray[float64]
+        brownian_motion_one: NDArray[float64]
             A first path to correlate against
         seed: int, optional
             Random seed going into numpy.random.seed()
@@ -554,7 +554,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             The interest rate levels for the CIR process
         """
         brownian_motion = cls.brownian_motion_log_returns(param, seed=seed)
@@ -584,7 +584,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
 
         Returns
         -------
-        numpy.NDArray[float64]
+        NDArray[float64]
             The interest rate levels for the Ornstein Uhlenbeck process
         """
         ou_levels = array([param.all_r0])
