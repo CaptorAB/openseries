@@ -22,6 +22,7 @@ from typing import Optional, TypeVar, cast
 
 from numpy import (
     add,
+    append,
     array,
     exp,
     float64,
@@ -512,7 +513,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
             seed=seed,
         )
 
-        heston_market_price_levels: list[float] = [param.all_s0]
+        heston_market_price_levels: NDArray[float64] = array([param.all_s0])
         for hpath in range(1, param.all_time):
             drift = (
                 param.gbm_mu * heston_market_price_levels[hpath - 1] * param.all_delta
@@ -522,7 +523,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
                 * heston_market_price_levels[hpath - 1]
                 * brownian_motion_market[hpath - 1]
             )
-            heston_market_price_levels.append(
+            heston_market_price_levels = append(
+                heston_market_price_levels,
                 heston_market_price_levels[hpath - 1] + drift + vol,
             )
         return array(heston_market_price_levels), array(cir_process)
@@ -557,11 +559,11 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         """
         brownian_motion = cls.brownian_motion_log_returns(param, seed=seed)
 
-        levels: list[float] = [param.all_r0]
+        levels: NDArray[float64] = array([param.all_r0])
         for hpath in range(1, param.all_time):
             drift = param.cir_a * (param.cir_mu - levels[hpath - 1]) * param.all_delta
             randomness = sqrt(levels[hpath - 1]) * brownian_motion[hpath - 1]
-            levels.append(levels[hpath - 1] + drift + randomness)
+            levels = append(levels, levels[hpath - 1] + drift + randomness)
         return array(levels)
 
     @classmethod
@@ -585,12 +587,12 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         numpy.NDArray[float64]
             The interest rate levels for the Ornstein Uhlenbeck process
         """
-        ou_levels: list[float] = [param.all_r0]
+        ou_levels: NDArray[float64] = array([param.all_r0])
         brownian_motion_returns = cls.brownian_motion_log_returns(param, seed=seed)
         for hpath in range(1, param.all_time):
             drift = param.ou_a * (param.ou_mu - ou_levels[hpath - 1]) * param.all_delta
             randomness = brownian_motion_returns[hpath - 1]
-            ou_levels.append(ou_levels[hpath - 1] + drift + randomness)
+            ou_levels = append(ou_levels, ou_levels[hpath - 1] + drift + randomness)
         return array(ou_levels)
 
     @classmethod
