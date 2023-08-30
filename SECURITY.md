@@ -2,10 +2,12 @@
 
 ## Supported Versions
 
-Given the almost non-existent audience for this project I typically only maintain the latest version. However, please do reach out if support is needed for an earlier version.
+Given the almost non-existent audience for this project I typically only maintain the
+latest version. However, please reach out if support is needed for an earlier version.
 
 | Version | Supported          |
 |---------|--------------------|
+| 1.2.7   | :white_check_mark: |
 | 1.2.6   | :white_check_mark: |
 | 1.2.5   | :white_check_mark: |
 | 1.2.4   | :white_check_mark: |

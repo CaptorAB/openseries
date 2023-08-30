@@ -8,7 +8,7 @@ from logging import warning
 from typing import Optional, TypeVar, Union, cast
 
 import statsmodels.api as sm
-from ffn.core import calc_erc_weights, calc_inv_vol_weights, calc_mean_var_weights
+from ffn.core import calc_erc_weights, calc_mean_var_weights
 from numpy import cov, cumprod, log, sqrt
 from pandas import (
     DataFrame,
@@ -31,6 +31,7 @@ from openseries.datefixer import (
     get_calc_range,
 )
 from openseries.risk import (
+    calc_inv_vol_weights,
     drawdown_details,
     ewma_calc,
 )
@@ -1469,8 +1470,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
             if weight_strat == "eq_weights":
                 self.weights = [1.0 / self.item_count] * self.item_count
             elif weight_strat == "eq_risk":
-                weight_calc = cast(
-                    Series,
+                weight_calc = list(
                     calc_erc_weights(
                         returns=dframe,
                         initial_weights=initial_weights,
@@ -1480,13 +1480,12 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                         tolerance=tolerance,
                     ),
                 )
-                self.weights = weight_calc.tolist()
+                self.weights = weight_calc
             elif weight_strat == "inv_vol":
-                weight_calc = cast(Series, calc_inv_vol_weights(returns=dframe))
-                self.weights = weight_calc.tolist()
+                weight_calc = list(calc_inv_vol_weights(returns=dframe))
+                self.weights = weight_calc
             elif weight_strat == "mean_var":
-                weight_calc = cast(
-                    Series,
+                weight_calc = list(
                     calc_mean_var_weights(
                         returns=dframe,
                         weight_bounds=weight_bounds,
@@ -1495,7 +1494,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                         options=options,
                     ),
                 )
-                self.weights = weight_calc.tolist()
+                self.weights = weight_calc
             else:
                 raise NotImplementedError("Weight strategy not implemented")
         portfolio = dframe.dot(self.weights)

@@ -12,6 +12,10 @@ from typing import Union, cast
 
 from numpy import (
     Inf,
+    NaN,
+    divide,
+    float64,
+    isinf,
     isnan,
     maximum,
     mean,
@@ -20,7 +24,9 @@ from numpy import (
     sort,
     sqrt,
     square,
+    std,
 )
+from numpy.typing import NDArray
 from pandas import DataFrame, Series
 
 from openseries.types import LiteralQuantileInterp
@@ -111,7 +117,7 @@ def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series
         A drawdown timeserie
     """
     drawdown = prices.copy()
-    drawdown = drawdown.fillna(method="ffill")
+    drawdown = drawdown.ffill()
     drawdown[isnan(drawdown)] = -Inf
     roll_max = maximum.accumulate(drawdown)
     drawdown = drawdown / roll_max - 1.0
@@ -205,3 +211,26 @@ def ewma_calc(
         float,
         sqrt(square(reeturn) * time_factor * (1 - lmbda) + square(prev_ewma) * lmbda),
     )
+
+
+def calc_inv_vol_weights(returns: DataFrame) -> NDArray[float64]:
+    """
+    Calculate weights proportional to inverse volatility.
+
+    Source: https://github.com/pmorissette/ffn.
+    Function copied here because of FutureWarning from pandas ^2.1.0
+
+    Parameters
+    ----------
+    returns: pandas.DataFrame
+        returns data
+
+    Returns
+    -------
+    NDArray[float64]
+        Calculated weights
+    """
+    vol = divide(1.0, std(returns, axis=0, ddof=1))
+    vol[isinf(vol)] = NaN
+    volsum = vol.sum()
+    return cast(NDArray[float64], divide(vol, volsum))

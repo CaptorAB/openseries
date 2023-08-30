@@ -266,7 +266,7 @@ class TestOpenFrame(TestCase):
 
         name = "portfolio"
         mptail = mpframe.make_portfolio(name=name).tail()
-        mptail = mptail.applymap(lambda nn: f"{nn:.6f}")
+        mptail = mptail.map(lambda nn: f"{nn:.6f}")
 
         correct = ["0.832536", "0.830516", "0.829576", "0.826926", "0.824288"]
         wrong = ["0.832536", "0.830516", "0.829576", "0.826926", "0.824285"]
@@ -885,13 +885,13 @@ class TestOpenFrame(TestCase):
         logframe = self.randomframe.from_deepcopy()
         logframe.to_cumret()
 
-        aaframe = logframe.tsdf.applymap(lambda item: f"{item:.12f}")
+        aaframe = logframe.tsdf.map(lambda item: f"{item:.12f}")
         bbdict = aaframe.to_dict(orient="list")
         b4_log = [bbdict[key] for key in bbdict]
 
         logframe.value_to_log()
 
-        ccframe = logframe.tsdf.applymap(lambda item: f"{item:.12f}")
+        ccframe = logframe.tsdf.map(lambda item: f"{item:.12f}")
         eedict = ccframe.to_dict(orient="list")
         middle_log = [eedict[key] for key in eedict]
 
@@ -901,7 +901,7 @@ class TestOpenFrame(TestCase):
         """Test correl_matrix method."""
         corrframe = self.randomframe.from_deepcopy()
         corrframe.to_cumret()
-        dict1 = corrframe.correl_matrix.applymap(lambda nn: f"{nn:.12f}").to_dict()
+        dict1 = corrframe.correl_matrix.map(lambda nn: f"{nn:.12f}").to_dict()
         dict2 = {
             "Asset_0": {
                 "Asset_0": "1.000000000000",
@@ -1456,20 +1456,20 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.tracking_error_func(base_column=-1)
 
-        self.assertEqual(f"{simdataa[0]:.10f}", "0.2462231908")
+        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.2462231908")
 
         simdatab = frame.tracking_error_func(
             base_column=-1,
             periods_in_a_year_fixed=251,
         )
 
-        self.assertEqual(f"{simdatab[0]:.10f}", "0.2460409063")
+        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.2460409063")
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
-        self.assertEqual(f"{simdatac[0]:.10f}", "0.2462231908")
+        self.assertEqual(f"{simdatac.iloc[0]:.10f}", "0.2462231908")
 
-        self.assertEqual(f"{simdataa[0]:.10f}", f"{simdatac[0]:.10f}")
+        self.assertEqual(f"{simdataa.iloc[0]:.10f}", f"{simdatac.iloc[0]:.10f}")
 
         with self.assertRaises(Exception) as e_func:
             str_col = cast(Union[tuple[str, ValueType], int], "string")
@@ -1487,15 +1487,15 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.info_ratio_func(base_column=-1)
 
-        self.assertEqual(f"{simdataa[0]:.10f}", "0.2063067697")
+        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.2063067697")
 
         simdatab = frame.info_ratio_func(base_column=-1, periods_in_a_year_fixed=251)
 
-        self.assertEqual(f"{simdatab[0]:.10f}", "0.2061540363")
+        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.2061540363")
 
         simdatac = frame.info_ratio_func(base_column=("Asset_4", ValueType.PRICE))
 
-        self.assertEqual(f"{simdatac[0]:.10f}", "0.2063067697")
+        self.assertEqual(f"{simdatac.iloc[0]:.10f}", "0.2063067697")
 
         with self.assertRaises(Exception) as e_func:
             str_col = cast(Union[tuple[str, ValueType], int], "string")
@@ -2046,11 +2046,11 @@ class TestOpenFrame(TestCase):
         frame_0 = self.randomframe.from_deepcopy()
         frame_0.to_cumret()
         frame_0.value_to_ret()
-        frame_0.tsdf = frame_0.tsdf.applymap(fmt.format)
+        frame_0.tsdf = frame_0.tsdf.map(fmt.format)
         dict_toframe_0 = frame_0.tsdf.to_dict()
 
         frame_1 = self.randomframe.from_deepcopy()
-        frame_1.tsdf = frame_1.tsdf.applymap(fmt.format)
+        frame_1.tsdf = frame_1.tsdf.map(fmt.format)
         dict_toframe_1 = frame_1.tsdf.to_dict()
 
         self.assertDictEqual(dict_toframe_0, dict_toframe_1)

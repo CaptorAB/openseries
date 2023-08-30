@@ -399,7 +399,7 @@ class CommonModel:
             An object of the same class
         """
         if method == "fill":
-            self.tsdf = self.tsdf.fillna(method="pad")
+            self.tsdf = self.tsdf.ffill()
         else:
             self.tsdf = self.tsdf.dropna()
         return self
@@ -826,7 +826,7 @@ class CommonModel:
         ].pct_change().std() * sqrt(time_factor)
 
         if self.tsdf.shape[1] == 1:
-            return float(result[0])
+            return float(result.iloc[0])
         return Series(
             data=result,
             index=self.tsdf.columns,
