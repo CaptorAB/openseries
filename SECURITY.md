@@ -6,6 +6,7 @@ Given the almost non-existent audience for this project I typically only maintai
 
 | Version | Supported          |
 |---------|--------------------|
+| 1.2.6   | :white_check_mark: |
 | 1.2.5   | :white_check_mark: |
 | 1.2.4   | :white_check_mark: |
 | 1.2.3   | :white_check_mark: |

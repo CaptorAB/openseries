@@ -22,9 +22,7 @@ from pandas import (
     Series,
     date_range,
 )
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
-from stdnum import isin as isincode
-from stdnum.exceptions import InvalidChecksum
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from openseries.common_model import CommonModel
 from openseries.datefixer import (
@@ -111,18 +109,6 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         revalidate_instances="always",
         extra="allow",
     )
-
-    @field_validator("isin")  # type: ignore[misc]
-    def check_isincode(cls: TypeOpenTimeSeries, isin_code: str) -> str:  # noqa: N805
-        """Pydantic validator to ensure that the ISIN code is valid if provided."""
-        if isin_code:
-            try:
-                isincode.validate(isin_code)
-            except InvalidChecksum as exc:
-                raise ValueError(
-                    "The ISIN code's checksum or check digit is invalid.",
-                ) from exc
-        return isin_code
 
     @model_validator(mode="after")  # type: ignore[misc]
     def check_dates_unique(self: TypeOpenTimeSeries) -> OpenTimeSeries:

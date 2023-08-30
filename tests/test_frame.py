@@ -820,7 +820,6 @@ class TestOpenFrame(TestCase):
             "running_adjustment",
             "set_new_label",
             "setup_class",
-            "check_isincode",
             "check_dates_unique",
         ]
 

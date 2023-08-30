@@ -7,6 +7,10 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.6] - 2023-08-30
+
+Removed isin code validation because it created conflicting validations downstream within our fund company. Removed python-stdnum dependency as a result Also continued typing cleanup.
+
 ## Version [1.2.5] - 2023-08-28
 
 Simplified timeseries_chain function and changed variable case to resolve N815 error.

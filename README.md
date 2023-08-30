@@ -237,7 +237,7 @@ make lint
 | `running_adjustment`     | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
 | `ewma_vol_func`          | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 | `from_1d_rate_to_cumret` | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
-| `check_isincode`         | `OpenTimeSeries` | Pydantic validator method to validate the ISIN code if provided.                                                                               |
+                                                                           |
 
 ### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 

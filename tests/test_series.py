@@ -1213,8 +1213,6 @@ class TestOpenTimeSeries(TestCase):
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
-        valid_isin = "SE0009807308"
-        invalid_isin = "SE0009807307"
         valid_instrument_id = "58135911b239b413482758c9"
         invalid_instrument_id_one = "58135911b239b413482758c"
         invalid_instrument_id_two = "5_135911b239b413482758c9"
@@ -1222,49 +1220,11 @@ class TestOpenTimeSeries(TestCase):
         invalid_timeseries_id_one = "5813595971051506189ba41"
         invalid_timeseries_id_two = "5_13595971051506189ba416"
 
-        timeseries_with_valid_isin = OpenTimeSeries(
-            timeseries_id=valid_timeseries_id,
-            instrument_id=valid_instrument_id,
-            isin=valid_isin,
-            currency="SEK",
-            dates=[
-                "2017-05-29",
-                "2017-05-30",
-            ],
-            name="asset",
-            label="asset",
-            valuetype=ValueType.PRICE,
-            values=[
-                100.0,
-                100.0978,
-            ],
-            local_ccy=True,
-            tsdf=DataFrame(
-                data=[
-                    100.0,
-                    100.0978,
-                ],
-                index=[
-                    d.date()
-                    for d in DatetimeIndex(
-                        [
-                            "2017-05-29",
-                            "2017-05-30",
-                        ],
-                    )
-                ],
-                columns=[["asset"], [ValueType.PRICE]],
-                dtype="float64",
-            ),
-        )
-        self.assertIsInstance(timeseries_with_valid_isin, OpenTimeSeries)
-
         with self.assertRaises(ValueError) as e_min_items:
             OpenTimeSeries.from_arrays(
                 name="asset",
                 timeseries_id=valid_timeseries_id,
                 instrument_id=valid_instrument_id,
-                isin=valid_isin,
                 dates=[],
                 values=[
                     100.0,
@@ -1292,82 +1252,19 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_min_items_two.exception),
         )
 
-        with self.assertRaises(Exception) as e_one:
-            _ = OpenTimeSeries(
-                timeseries_id=valid_timeseries_id,
-                instrument_id=valid_instrument_id,
-                isin=invalid_isin,
-                currency="SEK",
-                dates=[
-                    "2017-05-29",
-                    "2017-05-30",
-                ],
-                name="asset",
-                label="asset",
-                valuetype=ValueType.PRICE,
-                values=[
-                    100.0,
-                    100.0978,
-                ],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[
-                        100.0,
-                        100.0978,
-                    ],
-                    index=[
-                        d.date()
-                        for d in DatetimeIndex(
-                            [
-                                "2017-05-29",
-                                "2017-05-30",
-                            ],
-                        )
-                    ],
-                    columns=[["asset"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
-            )
-        self.assertIn(
-            member="The ISIN code's checksum or check digit is invalid.",
-            container=str(e_one.exception),
-        )
-
         with self.assertRaises(PydanticValidationError) as e_three:
-            OpenTimeSeries(
+            OpenTimeSeries.from_arrays(
                 timeseries_id=invalid_timeseries_id_one,
                 instrument_id=valid_instrument_id,
-                isin=valid_isin,
-                currency="SEK",
                 dates=[
                     "2017-05-29",
                     "2017-05-30",
                 ],
                 name="asset",
-                label="asset",
-                valuetype=ValueType.PRICE,
                 values=[
                     100.0,
                     100.0978,
                 ],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[
-                        100.0,
-                        100.0978,
-                    ],
-                    index=[
-                        d.date()
-                        for d in DatetimeIndex(
-                            [
-                                "2017-05-29",
-                                "2017-05-30",
-                            ],
-                        )
-                    ],
-                    columns=[["asset"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1375,40 +1272,18 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(PydanticValidationError) as e_four:
-            OpenTimeSeries(
+            OpenTimeSeries.from_arrays(
                 timeseries_id=invalid_timeseries_id_two,
                 instrument_id=valid_instrument_id,
-                isin=valid_isin,
-                currency="SEK",
+                name="asset",
                 dates=[
                     "2017-05-29",
                     "2017-05-30",
                 ],
-                name="asset",
-                label="asset",
-                valuetype=ValueType.PRICE,
                 values=[
                     100.0,
                     100.0978,
                 ],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[
-                        100.0,
-                        100.0978,
-                    ],
-                    index=[
-                        d.date()
-                        for d in DatetimeIndex(
-                            [
-                                "2017-05-29",
-                                "2017-05-30",
-                            ],
-                        )
-                    ],
-                    columns=[["asset"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1416,40 +1291,18 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(PydanticValidationError) as e_five:
-            OpenTimeSeries(
+            OpenTimeSeries.from_arrays(
                 timeseries_id=valid_timeseries_id,
                 instrument_id=invalid_instrument_id_one,
-                isin=valid_isin,
-                currency="SEK",
+                name="asset",
                 dates=[
                     "2017-05-29",
                     "2017-05-30",
                 ],
-                name="asset",
-                label="asset",
-                valuetype=ValueType.PRICE,
                 values=[
                     100.0,
                     100.0978,
                 ],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[
-                        100.0,
-                        100.0978,
-                    ],
-                    index=[
-                        d.date()
-                        for d in DatetimeIndex(
-                            [
-                                "2017-05-29",
-                                "2017-05-30",
-                            ],
-                        )
-                    ],
-                    columns=[["asset"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1457,40 +1310,18 @@ class TestOpenTimeSeries(TestCase):
         )
 
         with self.assertRaises(PydanticValidationError) as e_six:
-            OpenTimeSeries(
+            OpenTimeSeries.from_arrays(
                 timeseries_id=valid_timeseries_id,
                 instrument_id=invalid_instrument_id_two,
-                isin=valid_isin,
-                currency="SEK",
+                name="asset",
                 dates=[
                     "2017-05-29",
                     "2017-05-30",
                 ],
-                name="asset",
-                label="asset",
-                valuetype=ValueType.PRICE,
                 values=[
                     100.0,
                     100.0978,
                 ],
-                local_ccy=True,
-                tsdf=DataFrame(
-                    data=[
-                        100.0,
-                        100.0978,
-                    ],
-                    index=[
-                        d.date()
-                        for d in DatetimeIndex(
-                            [
-                                "2017-05-29",
-                                "2017-05-30",
-                            ],
-                        )
-                    ],
-                    columns=[["asset"], [ValueType.PRICE]],
-                    dtype="float64",
-                ),
             )
         self.assertIn(
             member="^([0-9a-f]{24})?$",
@@ -1515,24 +1346,24 @@ class TestOpenTimeSeries(TestCase):
             container=str(e_seven.exception),
         )
 
-        # with self.assertRaises(PydanticValidationError) as e_eight:
-        #     OpenTimeSeries.from_arrays(
-        #         name="asset",
-        #         dates=[
-        #             "2017-05-29",
-        #             "2017-05-30",
-        #         ],
-        #         values=[
-        #             100.0,
-        #             100.0978,
-        #             100.2821,
-        #         ],
-        #     )
-        #
-        # self.assertIn(
-        #     member="Number of dates must match number of values",
-        #     container=str(e_eight.exception),
-        # )
+        with self.assertRaises(ValueError) as e_eight:
+            OpenTimeSeries.from_arrays(
+                name="asset",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                values=[
+                    100.0,
+                    100.0978,
+                    100.2821,
+                ],
+            )
+
+        self.assertIn(
+            member="Shape of passed values is (3, 1), indices imply (2, 1)",
+            container=str(e_eight.exception),
+        )
 
     def test_from_1d_rate_to_cumret(self: TestOpenTimeSeries) -> None:
         """Test from_1d_rate_to_cumret method."""
