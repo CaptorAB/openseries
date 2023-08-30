@@ -501,7 +501,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         OpenFrame
             The returns of the values in the series
         """
-        self.tsdf = self.tsdf.pct_change()
+        self.tsdf = self.tsdf.ffill().pct_change()
         self.tsdf.iloc[0] = 0
         new_labels = [ValueType.RTRN] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
