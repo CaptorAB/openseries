@@ -517,7 +517,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         """
         resdf = self.tsdf.copy()
         resdf.index = DatetimeIndex(resdf.index)
-        return float((resdf.resample("BM").last().pct_change().min()).iloc[0])
+        return float((resdf.resample("BM").last().ffill().pct_change().min()).iloc[0])
 
     def value_to_ret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
         """
@@ -528,7 +528,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         OpenTimeSeries
             The returns of the values in the series
         """
-        self.tsdf = self.tsdf.pct_change()
+        self.tsdf = self.tsdf.ffill().pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         self.tsdf.columns = [[self.label], [self.valuetype]]
@@ -794,7 +794,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
             returns_input = True
         else:
             values = [self.tsdf.iloc[0, 0]]
-            ra_df = self.tsdf.pct_change().copy()
+            ra_df = self.tsdf.ffill().pct_change().copy()
             returns_input = False
         ra_df = ra_df.dropna()
 

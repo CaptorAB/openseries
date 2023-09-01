@@ -487,7 +487,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         wdf = self.tsdf.copy()
         wdf.index = DatetimeIndex(wdf.index)
         return Series(
-            data=wdf.resample("BM").last().pct_change().min(),
+            data=wdf.resample("BM").last().ffill().pct_change().min(),
             name="Worst month",
             dtype="float64",
         )
@@ -792,7 +792,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         Pandas.DataFrame
             Correlation matrix
         """
-        corr_matrix = self.tsdf.pct_change().corr(method="pearson", min_periods=1)
+        corr_matrix = (
+            self.tsdf.ffill().pct_change().corr(method="pearson", min_periods=1)
+        )
         corr_matrix.columns = corr_matrix.columns.droplevel(level=1)
         corr_matrix.index = corr_matrix.index.droplevel(level=1)
         corr_matrix.index.name = "Correlation"
@@ -1008,7 +1010,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                     item,
                 ]
                 relative = 1.0 + longdf - shortdf
-                vol = float(relative.pct_change().std() * sqrt(time_factor))
+                vol = float(relative.ffill().pct_change().std() * sqrt(time_factor))
                 terrors.append(vol)
 
         return Series(
@@ -1091,8 +1093,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                     item,
                 ]
                 relative = 1.0 + longdf - shortdf
-                ret = float(relative.pct_change().mean() * time_factor)
-                vol = float(relative.pct_change().std() * sqrt(time_factor))
+                ret = float(relative.ffill().pct_change().mean() * time_factor)
+                vol = float(relative.ffill().pct_change().std() * sqrt(time_factor))
                 ratios.append(ret / vol)
 
         return Series(
@@ -1189,7 +1191,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                 ]
                 if ratio == "up":
                     uparray = (
-                        longdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
+                        longdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1197,7 +1200,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                         uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     )
                     upidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
+                        shortdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1207,7 +1211,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                     ratios.append(up_return / up_idx_return)
                 elif ratio == "down":
                     downarray = (
-                        longdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
+                        longdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1215,7 +1220,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
+                        shortdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1226,7 +1232,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                     ratios.append(down_return / down_idx_return)
                 elif ratio == "both":
                     uparray = (
-                        longdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
+                        longdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1234,7 +1241,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                         uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     )
                     upidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().to_numpy() > 0.0]
+                        shortdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1242,7 +1250,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     downarray = (
-                        longdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
+                        longdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1250,7 +1259,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change()[shortdf.pct_change().to_numpy() < 0.0]
+                        shortdf.ffill()
+                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
                         .add(1)
                         .to_numpy()
                     )
@@ -1464,7 +1474,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
             x == ValueType.RTRN
             for x in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
-            dframe = dframe.pct_change()
+            dframe = dframe.ffill().pct_change()
             dframe.iloc[0] = 0
         if weight_strat:
             if weight_strat == "eq_weights":
@@ -1546,11 +1556,14 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         )
 
         retdf = (
-            relative.pct_change().rolling(observations, min_periods=observations).sum()
+            relative.ffill()
+            .pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
         )
         retdf = retdf.dropna().to_frame()
 
-        voldf = relative.pct_change().rolling(
+        voldf = relative.ffill().pct_change().rolling(
             observations,
             min_periods=observations,
         ).std() * sqrt(time_factor)
@@ -1591,7 +1604,11 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         beta_label = f"{self.tsdf.iloc[:, asset_column].name[0]}" f" / {market_label}"
 
         rolling = self.tsdf.copy()
-        rolling = rolling.pct_change().rolling(observations, min_periods=observations)
+        rolling = (
+            rolling.ffill()
+            .pct_change()
+            .rolling(observations, min_periods=observations)
+        )
 
         rcov = rolling.cov()
         rcov = rcov.dropna()
@@ -1639,9 +1656,10 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         )
         corrdf = (
             self.tsdf.iloc[:, first_column]
+            .ffill()
             .pct_change()[1:]
             .rolling(observations, min_periods=observations)
-            .corr(self.tsdf.iloc[:, second_column].pct_change()[1:])
+            .corr(self.tsdf.iloc[:, second_column].ffill().pct_change()[1:])
         )
         corrdf = corrdf.dropna().to_frame()
         corrdf.columns = [[corr_label], ["Rolling correlation"]]

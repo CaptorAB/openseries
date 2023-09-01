@@ -764,7 +764,10 @@ class CommonModel:
             time_factor = how_many / fraction
 
         result = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().mean()
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
+            .pct_change()
+            .mean()
             * time_factor
         )
 
@@ -823,7 +826,7 @@ class CommonModel:
 
         result = self.tsdf.loc[
             cast(int, earlier) : cast(int, later)
-        ].pct_change().std() * sqrt(time_factor)
+        ].ffill().pct_change().std() * sqrt(time_factor)
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
@@ -988,9 +991,14 @@ class CommonModel:
         cvar_df = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy(deep=True)
         result = [
             cvar_df.loc[:, x]
+            .ffill()
             .pct_change()
             .sort_values()
-            .iloc[: int(ceil((1 - level) * cvar_df.loc[:, x].pct_change().count()))]
+            .iloc[
+                : int(
+                    ceil((1 - level) * cvar_df.loc[:, x].ffill().pct_change().count()),
+                )
+            ]
             .mean()
             for x in self.tsdf
         ]
@@ -1046,6 +1054,7 @@ class CommonModel:
         )
         how_many = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()
             .count(numeric_only=True)
         )
@@ -1057,6 +1066,7 @@ class CommonModel:
 
         dddf = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()
             .sub(min_accepted_return / time_factor)
         )
@@ -1160,6 +1170,7 @@ class CommonModel:
         )
         result = skew(
             a=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()
             .to_numpy(),
             bias=True,
@@ -1208,7 +1219,7 @@ class CommonModel:
             to_dt=to_date,
         )
         result = kurtosis(
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(),
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)].ffill().pct_change(),
             fisher=True,
             bias=True,
             nan_policy="omit",
@@ -1330,14 +1341,18 @@ class CommonModel:
         )
         pos = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()[1:][
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()[1:]
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .ffill()
+                .pct_change()[1:]
                 > 0.0
             ]
             .count()
         )
         tot = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()[1:]
             .count()
         )
@@ -1543,7 +1558,7 @@ class CommonModel:
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
-        result = vrdf.pct_change().copy()
+        result = vrdf.ffill().pct_change().copy()
         result = result.loc[period] + 1
         result = result.apply(cumprod, axis="index").iloc[-1] - 1
         result.name = period
@@ -1593,6 +1608,7 @@ class CommonModel:
         )
         result = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()
             .quantile(1 - level, interpolation=interpolation)
         )
@@ -1642,6 +1658,7 @@ class CommonModel:
         )
         result = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
             .sum()
@@ -1689,7 +1706,9 @@ class CommonModel:
             from_dt=from_date,
             to_dt=to_date,
         )
-        zscframe = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change()
+        zscframe = (
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)].ffill().pct_change()
+        )
         result = (zscframe.iloc[-1] - zscframe.mean()) / zscframe.std()
 
         if self.tsdf.shape[1] == 1:
@@ -1758,6 +1777,7 @@ class CommonModel:
         ret_label = self.tsdf.iloc[:, column].name[0]
         retdf = (
             self.tsdf.iloc[:, column]
+            .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
             .sum()
@@ -1835,7 +1855,7 @@ class CommonModel:
         else:
             time_factor = self.periods_in_a_year
         vol_label = self.tsdf.iloc[:, column].name[0]
-        dframe = self.tsdf.iloc[:, column].pct_change()
+        dframe = self.tsdf.iloc[:, column].ffill().pct_change()
         voldf = dframe.rolling(observations, min_periods=observations).std() * sqrt(
             time_factor,
         )
@@ -1914,15 +1934,20 @@ def _var_implied_vol_and_target_func(
     if drift_adjust:
         imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
             data.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()
             .quantile(1 - level, interpolation=interpolation)
-            - data.loc[cast(int, earlier) : cast(int, later)].pct_change().sum()
-            / len(data.loc[cast(int, earlier) : cast(int, later)].pct_change())
+            - data.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
+            .pct_change()
+            .sum()
+            / len(data.loc[cast(int, earlier) : cast(int, later)].ffill().pct_change())
         )
     else:
         imp_vol = (
             -sqrt(time_factor)
             * data.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
             .pct_change()
             .quantile(1 - level, interpolation=interpolation)
             / norm.ppf(level)

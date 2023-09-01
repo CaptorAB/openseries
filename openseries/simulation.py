@@ -104,7 +104,9 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         """
         return cast(
             float,
-            (self.results.pct_change().mean() * self.trading_days_in_year).iloc[0],
+            (
+                self.results.ffill().pct_change().mean() * self.trading_days_in_year
+            ).iloc[0],
         )
 
     @property
@@ -119,9 +121,10 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         """
         return cast(
             float,
-            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[
-                0
-            ],
+            (
+                self.results.ffill().pct_change().std()
+                * sqrt(self.trading_days_in_year)
+            ).iloc[0],
         )
 
     @classmethod
