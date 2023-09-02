@@ -29,12 +29,12 @@ To install:
 pip install openseries
 ```
 
-An overview of an OpenTimeSeries object is shown in the below example. It shows how to
-create an object from a constructing classmethod. The design aligns with how we within
-our fund company's code base have a subclass of OpenTimeSeries with class methods
-for our different data sources. Combined with some additional tools it allows us to
-efficiently present investment cases to clients. The example can be run if you paste
-the code snippet into a Python console. You will need to install yfinance first.
+An example of how to make use of the OpenTimeSeries is shown below. The design
+aligns with how we within our fund company's code base have a subclass of the
+OpenTimeSeries with class methods for our different data sources. Combined with some
+additional tools it allows us to efficiently present investment cases to clients.
+
+The code snippet can be pasted into a Python console to run it. Install yfinance first.
 
 ```python
 from openseries.series import OpenTimeSeries

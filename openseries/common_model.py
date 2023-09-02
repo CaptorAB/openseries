@@ -1550,7 +1550,7 @@ class CommonModel:
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
-        result = vrdf.ffill().pct_change().copy()
+        result = vrdf.ffill().pct_change()
         result = result.loc[period] + 1
         result = result.apply(cumprod, axis="index").iloc[-1] - 1
         result.name = period

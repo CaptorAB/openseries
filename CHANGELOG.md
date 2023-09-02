@@ -7,6 +7,10 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.9] - 2023-09-02
+
+Very minor due to still received FutureWarning downstream. Unclear if it helps.
+
 ## Version [1.2.8] - 2023-09-02
 
 Implemented missing adjustments to work with Pandas 2.1.0. Removed tsdf annotation from

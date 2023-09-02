@@ -793,7 +793,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
             returns_input = True
         else:
             values = [self.tsdf.iloc[0, 0]]
-            ra_df = self.tsdf.ffill().pct_change().copy()
+            ra_df = self.tsdf.ffill().pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
 
@@ -881,7 +881,6 @@ def timeseries_chain(
     """
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)
-    olddf = old.tsdf.copy()
     new = back.from_deepcopy()
     idx = 0
     first = new.tsdf.index[idx]
@@ -890,16 +889,18 @@ def timeseries_chain(
         old.last_idx >= first
     ), "Timeseries dates must overlap to allow them to be chained."
 
-    while first not in olddf.index:
+    while first not in old.tsdf.index:
         idx += 1
         first = new.tsdf.index[idx]
-        if first > olddf.index[-1]:
+        if first > old.tsdf.index[-1]:
             raise ValueError("Failed to find a matching date between series")
 
-    dates: list[str] = [x.strftime("%Y-%m-%d") for x in olddf.index if x < first]
+    dates: list[str] = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < first]
 
     values = old.tsdf.iloc[: len(dates), 0]
-    values = values.mul(new.tsdf.iloc[:, 0].loc[first] / olddf.iloc[:, 0].loc[first])
+    values = values.mul(
+        new.tsdf.iloc[:, 0].loc[first] / old.tsdf.iloc[:, 0].loc[first],
+    )
     values = append(values, new.tsdf.iloc[:, 0])
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
