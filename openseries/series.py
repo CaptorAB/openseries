@@ -52,10 +52,10 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
+class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
 
     """
-    Object of the class OpenTimeSeries.
+    Declare OpenTimeSeries.
 
     Parameters
     ----------
@@ -107,7 +107,6 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc]
         arbitrary_types_allowed=True,
         validate_assignment=True,
         revalidate_instances="always",
-        extra="allow",
     )
 
     @model_validator(mode="after")  # type: ignore[misc]

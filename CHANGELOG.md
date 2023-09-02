@@ -7,6 +7,11 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.2.8] - 2023-09-02
+
+Implemented missing adjustments to work with Pandas 2.1.0. Removed tsdf annotation from
+CommonModel to avoid override in OpenFrame and OpenTimeSeries.
+
 ## Version [1.2.7] - 2023-08-30
 
 New Pandas 2.1.0 released and in this version necessary adjustments to silence

@@ -33,16 +33,7 @@ TypeCommonModel = TypeVar("TypeCommonModel", bound="CommonModel")
 
 class CommonModel:
 
-    """
-    CommonModel declared.
-
-    Parameters
-    ----------
-    tsdf: pandas.DataFrame
-        Pandas object holding dates and values that can be altered via methods
-    """
-
-    tsdf: DataFrame
+    """Declare CommonModel."""
 
     @property
     def length(self: TypeCommonModel) -> int:
@@ -54,6 +45,7 @@ class CommonModel:
         int
             Number of observations
         """
+        self.tsdf: DataFrame
         return len(self.tsdf.index)
 
     @property

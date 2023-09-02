@@ -56,10 +56,10 @@ from openseries.types import (
 TypeOpenFrame = TypeVar("TypeOpenFrame", bound="OpenFrame")
 
 
-class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
+class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
 
     """
-    Object of the class OpenFrame.
+    Declare OpenFrame.
 
     Parameters
     ----------
@@ -84,7 +84,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc]
         revalidate_instances="always",
     )
 
-    @field_validator("constituents")  # type: ignore[misc]
+    @field_validator("constituents")  # type: ignore[misc, unused-ignore]
     def check_labels_unique(
         cls: TypeOpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],

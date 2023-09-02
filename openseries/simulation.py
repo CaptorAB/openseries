@@ -50,10 +50,10 @@ TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
-class ReturnSimulation(BaseModel):  # type: ignore[misc]
+class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
 
     """
-    Object of the class ReturnSimulation.
+    Declare ReturnSimulation.
 
     Parameters
     ----------
@@ -1019,10 +1019,10 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         return fdf
 
 
-class ModelParameters(BaseModel):  # type: ignore[misc]
+class ModelParameters(BaseModel):  # type: ignore[misc, unused-ignore]
 
     """
-    Object of the class ModelParameters.
+    Declare ModelParameters.
 
     Parameters
     ----------

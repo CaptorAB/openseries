@@ -31,7 +31,7 @@ class NewTimeSeries(OpenTimeSeries):
     extra_info: str = "cool"
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
     "valuetype",
     [ValueType.PRICE, "Price(Close)"],
 )
@@ -48,7 +48,10 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
     )
 
 
-@pytest.mark.parametrize("valuetype", [None, "Price", 12, 1.2])  # type: ignore[misc]
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    "valuetype",
+    [None, "Price", 12, 1.2],
+)
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     """Pytest on invalid valuetype as input."""
     with pytest.raises(PydanticValidationError) as e_invalid_valuetype:
@@ -63,7 +66,7 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     ) or "type=string_type" in str(e_invalid_valuetype.getrepr(style="short"))
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
     "currency",
     ["SE", True, "12", 1, None],
 )
@@ -82,7 +85,7 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
     ) or "type=string_type" in str(e_invalid_currency.getrepr(style="short"))
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
     "domestic",
     ["SE", True, "12", 1, None],
 )
@@ -100,7 +103,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
     ) or "type=string_type" in str(e_dom.getrepr(style="short"))
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
     "countries",
     ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []],
 )
