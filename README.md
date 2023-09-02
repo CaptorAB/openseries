@@ -181,20 +181,20 @@ make lint
 
 ### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
 
-| Property       | type            | Applies to       | Description                                                                                                                                  |
-|:---------------|:----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
+| Property        | type            | Applies to       | Description                                                                                                                                  |
+|:----------------|:----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
 | `timeseries_id` | `str`           | `OpenTimeSeries` | Placeholder for database identifier for the timeseries. Can be left as empty string.                                                         |
 | `instrument_id` | `str`           | `OpenTimeSeries` | Placeholder for database identifier for the instrument associated with the timeseries. Can be left as empty string.                          |
-| `dates`        | `list[str]`     | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
-| `values`       | `list[float]`   | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
-| `currency`     | `str`           | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                               |
-| `domestic`     | `str`           | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                 |
-| `local_ccy`    | `bool`          | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added. |
-| `name`         | `str`           | `OpenTimeSeries` | An identifier field.                                                                                                                         |
-| `isin`         | `str`           | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
-| `label`        | `str`           | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
-| `countries`    | `list` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used to generate business days.                                                    |
-| `valuetype`    | `ValueType`     | `OpenTimeSeries` | Field identifies the type of values in the series. ValueType is an Enum.                                                                     |
+| `dates`         | `list[str]`     | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
+| `values`        | `list[float]`   | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
+| `currency`      | `str`           | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                               |
+| `domestic`      | `str`           | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                 |
+| `local_ccy`     | `bool`          | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added. |
+| `name`          | `str`           | `OpenTimeSeries` | An identifier field.                                                                                                                         |
+| `isin`          | `str`           | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
+| `label`         | `str`           | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
+| `countries`     | `list` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used to generate business days.                                                    |
+| `valuetype`     | `ValueType`     | `OpenTimeSeries` | Field identifies the type of values in the series. ValueType is an Enum.                                                                     |
 
 ### Non-numerical or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
 
