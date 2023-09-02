@@ -1,4 +1,6 @@
 """Defining the CommonModel class."""
+from __future__ import annotations
+
 import datetime as dt
 from json import dump
 from math import ceil
@@ -35,6 +37,10 @@ class CommonModel:
 
     """Declare CommonModel."""
 
+    def __init__(self: CommonModel) -> None:
+        """CommonModel object."""
+        self.tsdf = DataFrame(dtype="float64")
+
     @property
     def length(self: TypeCommonModel) -> int:
         """
@@ -45,7 +51,6 @@ class CommonModel:
         int
             Number of observations
         """
-        self.tsdf: DataFrame
         return len(self.tsdf.index)
 
     @property
