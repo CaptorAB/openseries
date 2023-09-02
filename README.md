@@ -10,7 +10,7 @@ width="81" height="100" align="left" float="right"/><br/>
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
-[![Styling, Linting & Type checks](https://github.com/CaptorAB/OpenSeries/actions/workflows/checks.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/checks.yml)
+[![Styling, Linting & Type checks](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml)
 [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/index.html)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
@@ -33,13 +33,8 @@ An overview of an OpenTimeSeries object is shown in the below example. It shows 
 create an object from a constructing classmethod. The design aligns with how we within
 our fund company's code base have a subclass of OpenTimeSeries with class methods
 for our different data sources. Combined with some additional tools it allows us to
-efficiently present investment cases to clients.
-
-To make use of the tools available in the [Pandas](https://pandas.pydata.org/) library
-the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)
-and [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)
-classes have an attribute `tsdf`
-which is a DataFrame constructed from the raw data in the lists `dates` and `values`.
+efficiently present investment cases to clients. The example can be run if you paste
+the code snippet into a Python console. You will need to install yfinance first.
 
 ```python
 from openseries.series import OpenTimeSeries
@@ -104,6 +99,7 @@ on any attributes or methods inherited from this model.
 git clone https://github.com/CaptorAB/OpenSeries.git
 cd OpenSeries
 ./make.ps1 make
+
 ```
 
 ### Mac Terminal/Linux
