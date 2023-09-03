@@ -37,9 +37,7 @@ class CommonModel:
 
     """Declare CommonModel."""
 
-    def __init__(self: CommonModel) -> None:
-        """CommonModel object."""
-        self.tsdf = DataFrame(dtype="float64")
+    tsdf: DataFrame
 
     @property
     def length(self: TypeCommonModel) -> int:

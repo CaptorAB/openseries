@@ -35,6 +35,7 @@ repos:
         exclude: '^.test_durations'
       - id: trailing-whitespace
       - id: mixed-line-ending
+        args: [--fix=auto]
         exclude: '^.test_durations'
   - repo: https://github.com/python-poetry/poetry
     rev: 1.6.1
