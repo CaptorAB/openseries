@@ -6,7 +6,7 @@ import sys
 from io import StringIO
 from json import load, loads
 from os import path, remove
-from typing import Any, TypeVar, Union, cast
+from typing import TypeVar, Union, cast
 from unittest import TestCase
 
 import pytest
@@ -192,47 +192,117 @@ class TestOpenTimeSeries(TestCase):
 
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
         """Test invalid dates as input."""
-        invalid_dates = [
-            (["2023-01-01", None], PydanticValidationError),
-            (None, TypeError),
-            ("2023-01-01", TypeError),
-            (["2023-01-bb", "2023-01-02"], ValueError),
-        ]
-        for item in invalid_dates:
-            with self.assertRaises(
-                cast(Union[tuple[Any, Any], Any], item[1]),
-            ) as e_invalid:
-                OpenTimeSeries.from_arrays(
-                    name="Asset",
-                    dates=cast(list[str], item[0]),
-                    values=[1.0, 1.1],
-                )
-            self.assertIsInstance(
-                e_invalid.exception,
-                cast(Union[tuple[Any, Any], Any], item[1]),
+        with self.assertRaises(PydanticValidationError) as e_one:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=["2023-01-01", cast(str, None)],
+                values=[1.0, 1.1],
             )
+        self.assertIn(
+            member="Input should be a valid string",
+            container=str(e_one.exception),
+        )
+
+        with self.assertRaises(TypeError) as e_two:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=cast(list[str], None),
+                values=[1.0, 1.1],
+            )
+        self.assertIn(
+            member="must be called with a collection of some kind",
+            container=str(e_two.exception),
+        )
+
+        with self.assertRaises(TypeError) as e_three:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=cast(list[str], "2023-01-01"),
+                values=[1.0, 1.1],
+            )
+        self.assertIn(
+            member="must be called with a collection of some kind",
+            container=str(e_three.exception),
+        )
+
+        with self.assertRaises(ValueError) as e_four:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=["2023-01-bb", "2023-01-02"],
+                values=[1.0, 1.1],
+            )
+        self.assertIn(
+            member="Unknown datetime string format",
+            container=str(e_four.exception),
+        )
+
+        with self.assertRaises(ValueError) as e_five:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=[],
+                values=[1.0, 1.1],
+            )
+        self.assertIn(
+            member="Shape of passed values is (2, 1), indices imply (0, 1)",
+            container=str(e_five.exception),
+        )
 
     def test_invalid_values(self: TestOpenTimeSeries) -> None:
         """Test invalid values as input."""
-        invalid_values = [
-            ([1.0, None], PydanticValidationError),
-            (None, PydanticValidationError),
-            (1.0, PydanticValidationError),
-            ([1.0, "bb"], ValueError),
-        ]
-        for item in invalid_values:
-            with self.assertRaises(
-                cast(Union[tuple[Any, Any], Any], item[1]),
-            ) as e_invalid:
-                OpenTimeSeries.from_arrays(
-                    name="Asset",
-                    dates=["2023-01-01", "2023-01-02"],
-                    values=cast(list[float], item[0]),
-                )
-            self.assertIsInstance(
-                e_invalid.exception,
-                cast(Union[tuple[Any, Any], Any], item[1]),
+        with self.assertRaises(PydanticValidationError) as e_one:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=["2023-01-01", "2023-01-02"],
+                values=[1.0, cast(float, None)],
             )
+        self.assertIn(
+            member="Input should be a valid number",
+            container=str(e_one.exception),
+        )
+
+        with self.assertRaises(PydanticValidationError) as e_two:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=["2023-01-01", "2023-01-02"],
+                values=cast(list[float], None),
+            )
+        self.assertIn(
+            member="Input should be a valid list",
+            container=str(e_two.exception),
+        )
+
+        with self.assertRaises(PydanticValidationError) as e_three:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=["2023-01-01", "2023-01-02"],
+                values=cast(list[float], 1.0),
+            )
+        self.assertIn(
+            member="Input should be a valid list",
+            container=str(e_three.exception),
+        )
+
+        with self.assertRaises(ValueError) as e_four:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=["2023-01-01", "2023-01-02"],
+                values=[1.0, cast(float, "bb")],
+            )
+        self.assertIn(
+            member="could not convert string to float",
+            container=str(e_four.exception),
+        )
+
+        with self.assertRaises(PydanticValidationError) as e_five:
+            OpenTimeSeries.from_arrays(
+                name="Asset",
+                dates=["2023-01-01", "2023-01-02"],
+                values=[],
+            )
+        self.assertIn(
+            member="There must be at least 2 values",
+            container=str(e_five.exception),
+        )
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
         """Test duplicate handling."""

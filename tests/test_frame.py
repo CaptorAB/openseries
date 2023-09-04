@@ -820,7 +820,7 @@ class TestOpenFrame(TestCase):
             "running_adjustment",
             "set_new_label",
             "setup_class",
-            "check_dates_unique",
+            "dates_and_values_validate",
         ]
 
         frame_unique = [

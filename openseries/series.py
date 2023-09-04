@@ -110,12 +110,15 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
     )
 
     @model_validator(mode="after")  # type: ignore[misc]
-    def check_dates_unique(self: TypeOpenTimeSeries) -> OpenTimeSeries:
-        """Pydantic validator to ensure that the dates are unique."""
+    def dates_and_values_validate(self: TypeOpenTimeSeries) -> OpenTimeSeries:
+        """Pydantic validator to ensure dates and values are validated."""
+        values_list_length = len(self.values)
         dates_list_length = len(self.dates)
         dates_set_length = len(set(self.dates))
         if dates_list_length != dates_set_length:
             raise ValueError("Dates are not unique")
+        if values_list_length < 2:
+            raise ValueError("There must be at least 2 values")
         return self
 
     @classmethod
