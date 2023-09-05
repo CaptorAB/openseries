@@ -7,6 +7,11 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.0] - 2023-09-05
+
+Due to test redesign validation to not allow empty dates and values arrays had stopped.
+Reintroduced with this version.
+
 ## Version [1.2.9] - 2023-09-02
 
 Very minor due to still received FutureWarning downstream. Unclear if it helps.
