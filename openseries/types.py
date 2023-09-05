@@ -46,11 +46,11 @@ DateListType = Annotated[
     list[str],
     conlist(
         constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"),
-        min_length=2,
+        min_length=1,
     ),
 ]
 
-ValueListType = Annotated[list[float], conlist(float, min_length=2)]
+ValueListType = Annotated[list[float], conlist(float, min_length=1)]
 
 DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
 

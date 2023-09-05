@@ -117,8 +117,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         dates_set_length = len(set(self.dates))
         if dates_list_length != dates_set_length:
             raise ValueError("Dates are not unique")
-        if values_list_length < 2:
-            raise ValueError("There must be at least 2 values")
+        if values_list_length < 1:
+            raise ValueError("There must be at least 1 value")
         return self
 
     @classmethod

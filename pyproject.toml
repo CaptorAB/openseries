@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.3.0"
+version = "1.3.1"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -34,7 +34,7 @@ keywords = [
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
 ffn = "^0.3.7"
-holidays = "^0.31"
+holidays = "^0.32"
 numpy = "^1.25.2"
 openpyxl = "^3.1.2"
 pandas = "^2.0.3"
@@ -49,8 +49,8 @@ black = "23.7.0"
 coverage = {extras = ["toml"], version = "^7.3.0"}
 coverage-badge = "^1.1.0"
 mypy = "^1.5.1"
-pre-commit = "^3.3.3"
-pytest = "^7.4.0"
+pre-commit = "^3.4.0"
+pytest = "^7.4.1"
 pytest-split = "^0.8.1"
 ruff = "^0.0.287"
 toml = "^0.10.2"

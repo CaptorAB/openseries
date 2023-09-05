@@ -300,7 +300,7 @@ class TestOpenTimeSeries(TestCase):
                 values=[],
             )
         self.assertIn(
-            member="There must be at least 2 values",
+            member="There must be at least 1 value",
             container=str(e_five.exception),
         )
 
@@ -1293,6 +1293,14 @@ class TestOpenTimeSeries(TestCase):
         invalid_timeseries_id_one = "5813595971051506189ba41"
         invalid_timeseries_id_two = "5_13595971051506189ba416"
 
+        basecase = OpenTimeSeries.from_arrays(
+            name="asset",
+            dates=["2017-05-29"],
+            values=[100.0],
+        )
+        self.assertListEqual(basecase.dates, ["2017-05-29"])
+        self.assertListEqual(basecase.values, [100.0])
+
         with self.assertRaises(ValueError) as e_min_items:
             OpenTimeSeries.from_arrays(
                 name="asset",
@@ -1313,15 +1321,15 @@ class TestOpenTimeSeries(TestCase):
         with self.assertRaises(ValueError) as e_min_items_two:
             OpenTimeSeries.from_arrays(
                 name="asset",
-                dates=[],
-                values=[
-                    100.0,
-                    100.0978,
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
                 ],
+                values=[],
             )
 
         self.assertIn(
-            member="Shape of passed values is (2, 1), indices imply (0, 1)",
+            member="There must be at least 1 value",
             container=str(e_min_items_two.exception),
         )
 
