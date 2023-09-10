@@ -946,11 +946,14 @@ class TestOpenTimeSeries(TestCase):
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods."""
+        excel_geo_ret = (1.02447195802235 / 1.0102975774591) ** (
+            1 / ((dt.date(2019, 6, 28) - dt.date(2015, 6, 26)).days / 365.25)
+        ) - 1
         checks = {
             "arithmetic_ret_func": f"{0.00885255100:.11f}",
             "cvar_down_func": f"{-0.01331889836:.11f}",
             "downside_deviation_func": f"{0.07335125856:.11f}",
-            "geo_ret_func": f"{0.00605432007:.11f}",
+            "geo_ret_func": f"{excel_geo_ret:.11f}",
             "kurtosis_func": f"{-0.16164566028:.11f}",
             "max_drawdown_func": f"{-0.20565775282:.11f}",
             "positive_share_func": f"{0.50645481629:.11f}",
