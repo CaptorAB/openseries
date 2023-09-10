@@ -7,10 +7,17 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.2] - 2023-09-10
+
+Found a mistake in geo_ret_func that was made when it was consolidated into the common_model.py
+from frame.py and series.py. The function has worked as intended for any situations where no
+arguments were provided, and therefore the geo_ret property has not been compromised.
+
 ## Version [1.3.1] - 2023-09-05
 
 Validation of raw dates and values with a minimum of 2 items caused significant issues
-downstream in our fund company because the OpenTimeSeries subclass is used as a validator also for fetching single date price data to be used in some valuations.
+downstream in our fund company because the OpenTimeSeries subclass is used as a validator
+also for fetching single date price data to be used in some valuations.
 Because of this the validation now only requires 1 data point.
 
 ## Version [1.3.0] - 2023-09-05

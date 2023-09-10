@@ -1120,7 +1120,7 @@ class CommonModel:
                 "value being zero or a negative value.",
             )
 
-        result = (self.tsdf.iloc[-1] / self.tsdf.iloc[0]) ** (1 / fraction) - 1
+        result = (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
