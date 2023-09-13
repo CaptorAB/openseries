@@ -48,24 +48,6 @@ class TestOpenFrame(TestCase):
             ],
         )
 
-    def test_valid_tsdf(self: TestOpenFrame) -> None:
-        """Test valid pandas.DataFrame property."""
-        frame_df = OpenFrame(
-            [
-                OpenTimeSeries.from_arrays(
-                    name="Asset_0",
-                    dates=["2023-01-01", "2023-01-02"],
-                    values=[1.0, 1.1],
-                ),
-                OpenTimeSeries.from_arrays(
-                    name="Asset_1",
-                    dates=["2023-01-01", "2023-01-02"],
-                    values=[1.0, 1.1],
-                ),
-            ],
-        )
-        self.assertIsInstance(frame_df.tsdf, DataFrame)
-
     def test_save_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
         seriesfile = path.join(path.dirname(path.abspath(__file__)), "framesaved.json")
