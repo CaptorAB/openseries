@@ -81,6 +81,14 @@ jobs:
         with:
           tag_name: ${{ env.tag_version }}
 
+      - name: Sign GitHub release
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --import
+          git tag -s -m "Release v${{ github.event.release.tag_name }}" "${{ github.event.release.tag_name }}"
+          git push origin "${{ github.event.release.tag_name }}"
+
       - name: Build and Publish to Test PyPI
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
