@@ -5,6 +5,7 @@ import datetime as dt
 from typing import Union, cast
 from unittest import TestCase
 
+import pytest
 from numpy import datetime64
 from pandas import Timestamp
 
@@ -36,21 +37,23 @@ class TestDateFixer(TestCase):
         output = dt.date(2022, 7, 15)
 
         for fmt in formats:
-            self.assertEqual(output, date_fix(fmt))
+            if output != date_fix(fmt):
+                msg = f"Unknown date format {fmt!s} of type {type(fmt)!s} encountered"
+                raise TypeError(
+                    msg,
+                )
 
     def test_arg_type_error(self: TestDateFixer) -> None:
         """Test date_fix to raise TypeError when appropriate."""
-        with self.assertRaises(TypeError) as e_type:
-            digit = cast(str, 3)
-            _ = date_fix(digit)
+        with pytest.raises(TypeError):
+            _ = date_fix(cast(str, 3))
 
-        self.assertIsInstance(e_type.exception, TypeError)
-
-        with self.assertRaises(ValueError) as e_nonsense:
-            nonsense = "abcdef"
-            _ = date_fix(nonsense)
-
-        self.assertIsInstance(e_nonsense.exception, ValueError)
+        str_arg: str = "abcdef"
+        with pytest.raises(
+            ValueError,
+            match=f"time data '{str_arg!s}' does not match format '%Y-%m-%d'",
+        ):
+            _ = date_fix("abcdef")
 
     def test_get_previous_business_day_before_today(self: TestDateFixer) -> None:
         """Test get_previous_business_day_before_today function."""
@@ -67,9 +70,13 @@ class TestDateFixer(TestCase):
             today=day_after_se_nationalday,
             countries=["SE", "US"],
         )
-        self.assertEqual(dt.date(2022, 6, 3), se_dte_swehol)
-        self.assertEqual(dt.date(2022, 6, 6), us_dte_swehol)
-        self.assertEqual(dt.date(2022, 6, 3), se_us_dte_swehol)
+        for result, intention in zip(
+            [se_dte_swehol, us_dte_swehol, se_us_dte_swehol],
+            [dt.date(2022, 6, 3), dt.date(2022, 6, 6), dt.date(2022, 6, 3)],
+        ):
+            if result != intention:
+                msg = f"{result} does not equal {intention}"
+                raise ValueError(msg)
 
         day_after_us_independenceday = dt.date(2022, 7, 5)
         se_dte_usahol = get_previous_business_day_before_today(
@@ -84,21 +91,30 @@ class TestDateFixer(TestCase):
             today=day_after_us_independenceday,
             countries=["SE", "US"],
         )
-        self.assertEqual(dt.date(2022, 7, 4), se_dte_usahol)
-        self.assertEqual(dt.date(2022, 7, 1), us_dte_usahol)
-        self.assertEqual(dt.date(2022, 7, 1), se_us_dte_usahol)
+        for result, intention in zip(
+            [se_dte_usahol, us_dte_usahol, se_us_dte_usahol],
+            [dt.date(2022, 7, 4), dt.date(2022, 7, 1), dt.date(2022, 7, 1)],
+        ):
+            if result != intention:
+                msg = f"{result} does not equal {intention}"
+                raise ValueError(msg)
 
-        self.assertEqual(
-            get_previous_business_day_before_today(countries=["SE", "US"]),
-            date_offset_foll(
-                raw_date=dt.datetime.now(tz=dt.timezone.utc).date()
-                - dt.timedelta(days=1),
-                months_offset=0,
-                countries=["SE", "US"],
-                adjust=True,
-                following=False,
-            ),
+        before_today_one = get_previous_business_day_before_today(
+            countries=["SE", "US"],
         )
+        before_today_two = date_offset_foll(
+            raw_date=dt.datetime.now(tz=dt.timezone.utc).date() - dt.timedelta(days=1),
+            months_offset=0,
+            countries=["SE", "US"],
+            adjust=True,
+            following=False,
+        )
+        if before_today_one != before_today_two:
+            msg = (
+                "Inconsistent results from get_previous_business_day_before_today "
+                "and date_offset_foll methods."
+            )
+            raise ValueError(msg)
 
     def test_date_offset_foll(self: TestDateFixer) -> None:
         """Test date_offset_foll function."""
@@ -138,8 +154,16 @@ class TestDateFixer(TestCase):
                     adjust=True,
                     following=True,
                 )
-                self.assertEqual(earliers[counter], earlier)
-                self.assertEqual(laters[counter], later)
+                if earliers[counter] != earlier:
+                    msg = "Unintended result from date_offset_foll preceeding"
+                    raise ValueError(
+                        msg,
+                    )
+                if laters[counter] != later:
+                    msg = "Unintended result from date_offset_foll following"
+                    raise ValueError(
+                        msg,
+                    )
                 counter += 1
 
         static = date_offset_foll(
@@ -147,38 +171,41 @@ class TestDateFixer(TestCase):
             months_offset=0,
             adjust=False,
         )
-        self.assertEqual(originals[0], static)
+        if originals[0] != static:
+            msg = "Unintended result from date_offset_foll"
+            raise ValueError(msg)
 
         offset = date_offset_foll(
             raw_date=originals[0],
             months_offset=1,
             adjust=False,
         )
-        self.assertEqual(
-            dt.date(originals[0].year, originals[0].month + 1, originals[0].day),
-            offset,
-        )
+        if offset != dt.date(
+            originals[0].year,
+            originals[0].month + 1,
+            originals[0].day,
+        ):
+            msg = "Unintended result from date_offset_foll"
+            raise ValueError(msg)
 
-        nonsense = "abcdef"
-
-        with self.assertRaises(ValueError) as e_date:
+        nonsense: str = "abcdef"
+        with pytest.raises(
+            ValueError,
+            match=f"time data '{nonsense!s}' does not match format '%Y-%m-%d'",
+        ):
             _ = date_offset_foll(
                 raw_date=nonsense,
             )
 
-        self.assertIsInstance(e_date.exception, ValueError)
-
-        with self.assertRaises(Exception) as e_country:
+        with pytest.raises(
+            ValueError,
+            match="Argument countries must be a string country code",
+        ):
             _ = date_offset_foll(
                 raw_date=dt.datetime.now(tz=dt.timezone.utc).date(),
                 adjust=True,
                 countries="ZZ",
             )
-
-        self.assertIn(
-            member="Argument countries must be a string country code",
-            container=e_country.exception.args[0],
-        )
 
     def test_holiday_calendar(self: TestDateFixer) -> None:
         """Test holiday_calendar function."""
@@ -195,52 +222,58 @@ class TestDateFixer(TestCase):
         ]
         for start, end in zip([2023, 2024], [2023, 2022]):
             cdr = holiday_calendar(startyear=start, endyear=end, countries="SE")
-            check = all(
+            if not all(
                 date_str in list(cdr.holidays)
                 for date_str in twentytwentythreeholidays
-            )
-            self.assertTrue(check)
+            ):
+                msg = "holiday_calendar input invalid"
+                raise ValueError(msg)
 
     def test_holiday_calendar_with_custom_days(self: TestDateFixer) -> None:
         """Test holiday_calendar with custom input."""
+        year: int = 2021
         twentytwentyoneholidays = [
-            dt.date(2021, 1, 1),
-            dt.date(2021, 1, 6),
-            dt.date(2021, 4, 2),
-            dt.date(2021, 4, 5),
-            dt.date(2021, 5, 13),
-            dt.date(2021, 6, 25),
-            dt.date(2021, 12, 24),
-            dt.date(2021, 12, 31),
+            dt.date(year, 1, 1),
+            dt.date(year, 1, 6),
+            dt.date(year, 4, 2),
+            dt.date(year, 4, 5),
+            dt.date(year, 5, 13),
+            dt.date(year, 6, 25),
+            dt.date(year, 12, 24),
+            dt.date(year, 12, 31),
         ]
-        cdr_without = holiday_calendar(startyear=2021, endyear=2021, countries="SE")
+        cdr_without = holiday_calendar(startyear=year, endyear=year, countries="SE")
         hols_without = [
-            date_fix(d) for d in list(cdr_without.holidays) if date_fix(d).year == 2021
+            date_fix(d) for d in list(cdr_without.holidays) if date_fix(d).year == year
         ]
-        self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_without)
+        if twentytwentyoneholidays != hols_without:
+            msg = "Holidays not matching as intended"
+            raise ValueError(msg)
 
         jacks_birthday: HolidayType = {
-            "2021-02-12": "Jack's birthday",
+            f"{year}-02-12": "Jack's birthday",
         }
         cdr_with = holiday_calendar(
-            startyear=2021,
-            endyear=2021,
+            startyear=year,
+            endyear=year,
             countries="SE",
             custom_holidays=jacks_birthday,
         )
         hols_with = [
-            date_fix(d) for d in list(cdr_with.holidays) if date_fix(d).year == 2021
+            date_fix(d) for d in list(cdr_with.holidays) if date_fix(d).year == year
         ]
-
-        with self.assertRaises(AssertionError) as e_jack:
-            self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)
-        self.assertIsInstance(e_jack.exception, AssertionError)
+        compared = set(twentytwentyoneholidays).symmetric_difference(set(hols_with))
+        if len(compared) == 0:
+            msg = f"Holidays not the same are: {compared}"
+            raise ValueError(msg)
 
         jbirth = cast(dict[str, str], jacks_birthday)
         twentytwentyoneholidays.append(date_fix(next(iter(jbirth.keys()))))
         twentytwentyoneholidays.sort()
 
-        self.assertListEqual(list1=twentytwentyoneholidays, list2=hols_with)
+        if twentytwentyoneholidays != hols_with:
+            msg = "Holidays not matching as intended"
+            raise ValueError(msg)
 
     def test_offset_business_days(self: TestDateFixer) -> None:
         """Test offset_business_days function."""
@@ -257,13 +290,17 @@ class TestDateFixer(TestCase):
                 days=offset,
                 countries="SE",
             )
-            self.assertEqual(se_offsetdate, date[0])
+            if se_offsetdate != date[0]:
+                msg = "Unintended result from offset_business_days"
+                raise ValueError(msg)
             us_offsetdate = offset_business_days(
                 ddate=se_nationalday,
                 days=offset,
                 countries="US",
             )
-            self.assertEqual(us_offsetdate, date[1])
+            if us_offsetdate != date[1]:
+                msg = "Unintended result from offset_business_days"
+                raise ValueError(msg)
 
     def test_offset_business_days_calender_options(self: TestDateFixer) -> None:
         """Test offset_business_days function with different calendar combinations."""
@@ -273,19 +310,25 @@ class TestDateFixer(TestCase):
             days=-2,
             countries="SE",
         )
-        self.assertEqual(dt.date(2022, 6, 2), se_enddate)
+        if se_enddate != dt.date(2022, 6, 2):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
         us_enddate = offset_business_days(
             ddate=day_after_se_nationalday,
             days=-2,
             countries="US",
         )
-        self.assertEqual(dt.date(2022, 6, 3), us_enddate)
+        if us_enddate != dt.date(2022, 6, 3):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
         se_us_enddate = offset_business_days(
             ddate=day_after_se_nationalday,
             days=-2,
             countries=["SE", "US"],
         )
-        self.assertEqual(dt.date(2022, 6, 2), se_us_enddate)
+        if se_us_enddate != dt.date(2022, 6, 2):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
 
         day_after_us_independenceday = dt.date(2022, 7, 5)
         se_nddate = offset_business_days(
@@ -293,19 +336,25 @@ class TestDateFixer(TestCase):
             days=-2,
             countries="SE",
         )
-        self.assertEqual(dt.date(2022, 7, 1), se_nddate)
+        if se_nddate != dt.date(2022, 7, 1):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
         us_nddate = offset_business_days(
             ddate=day_after_us_independenceday,
             days=-2,
             countries="US",
         )
-        self.assertEqual(dt.date(2022, 6, 30), us_nddate)
+        if us_nddate != dt.date(2022, 6, 30):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
         se_us_nddate = offset_business_days(
             ddate=day_after_us_independenceday,
             days=-2,
             countries=["SE", "US"],
         )
-        self.assertEqual(dt.date(2022, 6, 30), se_us_nddate)
+        if se_us_nddate != dt.date(2022, 6, 30):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
 
     def test_offset_business_days_with_custom_days(self: TestDateFixer) -> None:
         """Test offset_business_days function with custom input."""
@@ -316,7 +365,9 @@ class TestDateFixer(TestCase):
             days=-2,
             countries=["SE", "US"],
         )
-        self.assertEqual(dt.date(2021, 2, 10), offsetdate_without)
+        if offsetdate_without != dt.date(2021, 2, 10):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
 
         offsetdate_with = offset_business_days(
             ddate=day_after_jacks_birthday,
@@ -324,7 +375,9 @@ class TestDateFixer(TestCase):
             countries=["SE", "US"],
             custom_holidays={"2021-02-12": "Jack's birthday"},
         )
-        self.assertEqual(dt.date(2021, 2, 9), offsetdate_with)
+        if offsetdate_with != dt.date(2021, 2, 9):
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
 
     def test_offset_business_days_many_days(self: TestDateFixer) -> None:
         """Test offset_business_days function with many days."""
@@ -339,46 +392,53 @@ class TestDateFixer(TestCase):
             days=forward,
             countries=["SE", "US"],
         )
-        self.assertEqual(offsetdate_forward, forwarddate)
+        if offsetdate_forward != forwarddate:
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
 
         offsetdate_backward = offset_business_days(
             ddate=startdate,
             days=backward,
             countries=["SE", "US"],
         )
-        self.assertEqual(offsetdate_backward, backwarddate)
+        if offsetdate_backward != backwarddate:
+            msg = "Unintended result from offset_business_days"
+            raise ValueError(msg)
 
     def test_generate_calender_date_range(self: TestDateFixer) -> None:
         """Test generate_calender_date_range function with wrong date input."""
         start = dt.date(2009, 6, 30)
-        trd_days = 506
+        trd_days: int = 506
         end = dt.date(2011, 6, 30)
 
         d_range = generate_calender_date_range(trading_days=trd_days, start=start)
 
-        self.assertEqual(len(d_range), 506)
-        self.assertEqual(d_range[-1], end)
+        if len(d_range) != trd_days:
+            msg = "Unintended result from generate_calender_date_range"
+            raise ValueError(msg)
 
-        with self.assertRaises(ValueError) as e_both:
+        if d_range[-1] != end:
+            msg = "Unintended result from generate_calender_date_range"
+            raise ValueError(msg)
+
+        with pytest.raises(
+            ValueError,
+            match=(
+                "Provide one of start or end date, but not both. "
+                "Date range is inferred from number of trading days."
+            ),
+        ):
             _ = generate_calender_date_range(
                 trading_days=trd_days,
                 start=start,
                 end=end,
             )
-        self.assertIn(
-            member=(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
-            ),
-            container=str(e_both.exception),
-        )
 
-        with self.assertRaises(ValueError) as e_none:
-            _ = generate_calender_date_range(trading_days=trd_days)
-        self.assertIn(
-            member=(
+        with pytest.raises(
+            ValueError,
+            match=(
                 "Provide one of start or end date, but not both. "
                 "Date range is inferred from number of trading days."
             ),
-            container=str(e_none.exception),
-        )
+        ):
+            _ = generate_calender_date_range(trading_days=trd_days)

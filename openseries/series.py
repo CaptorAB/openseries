@@ -116,9 +116,11 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         dates_list_length = len(self.dates)
         dates_set_length = len(set(self.dates))
         if dates_list_length != dates_set_length:
-            raise ValueError("Dates are not unique")
+            msg = "Dates are not unique"
+            raise ValueError(msg)
         if values_list_length < 1:
-            raise ValueError("There must be at least 1 value")
+            msg = "There must be at least 1 value"
+            raise ValueError(msg)
         return self
 
     @classmethod
@@ -142,34 +144,38 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         try:
             ccy_ok = ccy_pattern.match(domestic_ccy)
         except TypeError as exc:
+            msg = "domestic currency must be a code according to ISO 4217"
             raise ValueError(
-                "domestic currency must be a code according to ISO 4217",
+                msg,
             ) from exc
         if not ccy_ok:
-            raise ValueError("domestic currency must be a code according to ISO 4217")
+            msg = "domestic currency must be a code according to ISO 4217"
+            raise ValueError(msg)
         if isinstance(countries, str):
             if not ctry_pattern.match(countries):
+                msg = (
+                    "countries must be a country code according to ISO 3166-1 alpha-2"
+                )
                 raise ValueError(
-                    "countries must be a country code according to "
-                    "ISO 3166-1 alpha-2",
+                    msg,
                 )
         elif isinstance(countries, list):
             try:
                 all_ctries = all(ctry_pattern.match(ctry) for ctry in countries)
             except TypeError as exc:
-                raise ValueError(
-                    "countries must be a list of country codes "
-                    "according to ISO 3166-1 alpha-2",
+                msg = "countries must be a list of country codes according to ISO 3166-1 alpha-2"
+                raise TypeError(
+                    msg,
                 ) from exc
             if not all_ctries:
-                raise ValueError(
-                    "countries must be a list of country codes "
-                    "according to ISO 3166-1 alpha-2",
+                msg = "countries must be a list of country codes according to ISO 3166-1 alpha-2"
+                raise TypeError(
+                    msg,
                 )
         else:
-            raise ValueError(
-                "countries must be a (list of) country code(s) "
-                "according to ISO 3166-1 alpha-2",
+            msg = "countries must be a (list of) country code(s) according to ISO 3166-1 alpha-2"
+            raise TypeError(
+                msg,
             )
 
         cls.domestic = domestic_ccy
@@ -186,7 +192,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         instrument_id: DatabaseIdStringType = "",
         isin: Optional[str] = None,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,
+        local_ccy: bool = True,  # noqa: FBT001, FBT002
     ) -> TypeOpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
@@ -243,7 +249,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,
+        local_ccy: bool = True,  # noqa: FBT001, FBT002
     ) -> TypeOpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
@@ -329,7 +335,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,
+        local_ccy: bool = True,  # noqa: FBT001, FBT002
     ) -> TypeOpenTimeSeries:
         """
         Create series from values accruing with a given fixed rate return.
@@ -368,8 +374,9 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
                 [d.date() for d in date_range(periods=days, end=end_dt, freq="D")],
             )
         elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
+            msg = "If d_range is not provided both days and end_dt must be."
             raise ValueError(
-                "If d_range is not provided both days and end_dt must be.",
+                msg,
             )
 
         deltas = array(
@@ -823,7 +830,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         self: TypeOpenTimeSeries,
         lvl_zero: Optional[str] = None,
         lvl_one: Optional[ValueType] = None,
-        delete_lvl_one: bool = False,
+        delete_lvl_one: bool = False,  # noqa: FBT001, FBT002
     ) -> TypeOpenTimeSeries:
         """
         Set the column labels of the .tsdf Pandas Dataframe.
@@ -888,15 +895,16 @@ def timeseries_chain(
     idx = 0
     first = new.tsdf.index[idx]
 
-    assert (
-        old.last_idx >= first
-    ), "Timeseries dates must overlap to allow them to be chained."
+    if old.last_idx < first:
+        msg = "Timeseries dates must overlap to allow them to be chained."
+        raise ValueError(msg)
 
     while first not in old.tsdf.index:
         idx += 1
         first = new.tsdf.index[idx]
         if first > old.tsdf.index[-1]:
-            raise ValueError("Failed to find a matching date between series")
+            msg = "Failed to find a matching date between series"
+            raise ValueError(msg)
 
     dates: list[str] = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < first]
 

@@ -80,21 +80,29 @@ class TestSimulation(TestCase):
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")
 
-        self.assertListEqual(target_returns, returns)
-        self.assertListEqual(target_volatilities, volatilities)
+        if target_returns != returns:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
+        if target_volatilities != volatilities:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
 
     def test_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output."""
         days = 2512
         psim = copy(self.seriesim)
 
-        self.assertIsInstance(psim.results, DataFrame)
+        if psim.results.shape[0] != days:
+            msg = "Unexpected result"
+            raise ValueError(msg)
 
-        self.assertEqual(psim.results.shape[0], days)
+        if f"{psim.realized_mean_return:.9f}" != "0.009553952":
+            msg = "Unexpected result"
+            raise ValueError(msg)
 
-        self.assertEqual(f"{psim.realized_mean_return:.9f}", "0.009553952")
-
-        self.assertEqual(f"{psim.realized_vol:.9f}", "0.117099479")
+        if f"{psim.realized_vol:.9f}" != "0.117099479":
+            msg = "Unexpected result"
+            raise ValueError(msg)
 
     def test_assets(self: TestSimulation) -> None:
         """Test stoch processes output."""
@@ -160,8 +168,12 @@ class TestSimulation(TestCase):
         means = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
         deviations = [f"{v:.9f}" for v in cast(Series, frame.vol)]
 
-        self.assertListEqual(target_returns, means)
-        self.assertListEqual(target_volatilities, deviations)
+        if target_returns != means:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
+        if target_volatilities != deviations:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
 
     def test_cir_and_ou(self: TestSimulation) -> None:
         """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels."""
@@ -224,5 +236,5 @@ class TestSimulation(TestCase):
             seriesim.to_dataframe(name="Asset", start=start),
         )
 
-        self.assertEqual(ValueType.PRICE, startseries.valuetype)
-        self.assertEqual(ValueType.RTRN, returnseries.valuetype)
+        assert startseries.valuetype == ValueType.PRICE
+        assert returnseries.valuetype == ValueType.RTRN

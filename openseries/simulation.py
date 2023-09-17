@@ -307,11 +307,11 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         time = 0
         small_lamda = -(1.0 / param.jumps_lamda)
         jump_sizes: list[float] = []
-        for _ in range(0, param.all_time):
+        for _ in range(param.all_time):
             jump_sizes.append(0.0)
         while s_n < param.all_time:
             s_n += small_lamda * log(nprandom.uniform(0, 1))
-            for j in range(0, param.all_time):
+            for j in range(param.all_time):
                 if (
                     time * param.all_delta
                     <= s_n * param.all_delta

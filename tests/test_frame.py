@@ -3,11 +3,13 @@ from __future__ import annotations
 
 from datetime import date as dtdate
 from decimal import ROUND_HALF_UP, Decimal, localcontext
+from itertools import product as iter_product
 from json import loads
-from os import path, remove
-from typing import TypeVar, Union, cast
+from pathlib import Path
+from typing import Optional, TypeVar, Union, cast
 from unittest import TestCase
 
+import pytest
 from pandas import DataFrame, Series, date_range
 from pandas.testing import assert_frame_equal
 
@@ -50,45 +52,64 @@ class TestOpenFrame(TestCase):
 
     def test_save_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
-        seriesfile = path.join(path.dirname(path.abspath(__file__)), "framesaved.json")
+        seriesfile = Path(f"{Path(__file__).resolve().parent}/framesaved.json")
 
         jseries = self.randomframe.from_deepcopy()
-        data = jseries.to_json(filename=seriesfile)
+        data = jseries.to_json(filename=str(seriesfile))
 
-        self.assertListEqual(
-            [item.get("name") for item in data],
-            ["Asset_0", "Asset_1", "Asset_2", "Asset_3", "Asset_4"],
-        )
+        if [item.get("name") for item in data] != [
+            "Asset_0",
+            "Asset_1",
+            "Asset_2",
+            "Asset_3",
+            "Asset_4",
+        ]:
+            msg = "Unexpected data from json"
+            raise ValueError(msg)
 
-        self.assertTrue(path.exists(seriesfile))
+        if not Path(seriesfile).exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
 
-        remove(seriesfile)
+        seriesfile.unlink()
 
-        self.assertFalse(path.exists(seriesfile))
+        if Path(seriesfile).exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
 
     def test_save_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""
         xseries = self.randomframe.from_deepcopy()
-        seriesfile = xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo")
+        seriesfile = Path(
+            xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo"),
+        ).resolve()
 
-        self.assertTrue(path.exists(seriesfile))
-        remove(seriesfile)
+        if not Path(seriesfile).exists():
+            msg = "xlsx file not created"
+            raise FileNotFoundError(msg)
 
-        directory = path.dirname(path.abspath(__file__))
-        seriesfile = xseries.to_xlsx(filename="trial.xlsx", directory=directory)
+        seriesfile.unlink()
 
-        self.assertTrue(path.exists(seriesfile))
-        remove(seriesfile)
+        directory = Path(__file__).resolve().parent
+        seriesfile = Path(
+            xseries.to_xlsx(filename="trial.xlsx", directory=str(directory)),
+        ).resolve()
 
-        self.assertFalse(path.exists(seriesfile))
+        if not Path(seriesfile).exists():
+            msg = "xlsx file not created"
+            raise FileNotFoundError(msg)
 
-        with self.assertRaises(NameError) as wrong_end:
+        seriesfile.unlink()
+
+        if Path(seriesfile).exists():
+            msg = "xlsx file not deleted as intended"
+            raise FileExistsError(msg)
+
+        with pytest.raises(
+            expected_exception=NameError,
+            match="Filename must end with .xlsx",
+        ):
             _ = xseries.to_xlsx(filename="trial.pdf")
-
-        self.assertEqual(
-            str(wrong_end.exception),
-            "Filename must end with .xlsx",
-        )
 
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
@@ -98,61 +119,81 @@ class TestOpenFrame(TestCase):
         )
         rst, ren = crframe.calc_range()
 
-        self.assertListEqual(
-            [start, end],
-            [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")],
-        )
+        if [start, end] != [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]:
+            msg = "Unintended output from calc_range()"
+            raise ValueError(msg)
 
-        with self.assertRaises(AssertionError) as too_far:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Function calc_range returned earlier date < series start",
+        ):
             _, _ = crframe.calc_range(months_offset=125)
-        self.assertIsInstance(too_far.exception, AssertionError)
 
-        with self.assertRaises(AssertionError) as too_early:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Given from_dt date < series start",
+        ):
             _, _ = crframe.calc_range(from_dt=dtdate(2009, 5, 31))
-        self.assertIsInstance(too_early.exception, AssertionError)
 
-        with self.assertRaises(AssertionError) as too_late:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Given to_dt date > series end",
+        ):
             _, _ = crframe.calc_range(to_dt=dtdate(2019, 7, 31))
-        self.assertIsInstance(too_late.exception, AssertionError)
 
-        with self.assertRaises(AssertionError) as outside:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Given from_dt or to_dt dates outside series range",
+        ):
             _, _ = crframe.calc_range(
                 from_dt=dtdate(2009, 5, 31),
                 to_dt=dtdate(2019, 7, 31),
             )
-        self.assertIsInstance(outside.exception, AssertionError)
 
-        with self.assertRaises(AssertionError) as outside_end:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Given from_dt or to_dt dates outside series range",
+        ):
             _, _ = crframe.calc_range(
                 from_dt=dtdate(2009, 7, 31),
                 to_dt=dtdate(2019, 7, 31),
             )
-        self.assertIsInstance(outside_end.exception, AssertionError)
 
-        with self.assertRaises(AssertionError) as outside_start:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Given from_dt or to_dt dates outside series range",
+        ):
             _, _ = crframe.calc_range(
                 from_dt=dtdate(2009, 5, 31),
                 to_dt=dtdate(2019, 5, 31),
             )
-        self.assertIsInstance(outside_start.exception, AssertionError)
 
         nst, nen = crframe.calc_range(
             from_dt=dtdate(2009, 7, 3),
             to_dt=dtdate(2019, 6, 25),
         )
-        self.assertEqual(nst, dtdate(2009, 7, 3))
-        self.assertEqual(nen, dtdate(2019, 6, 25))
+        if nst != dtdate(2009, 7, 3):
+            msg = "Unintended output from calc_range()"
+            raise ValueError(msg)
+        if nen != dtdate(2019, 6, 25):
+            msg = "Unintended output from calc_range()"
+            raise ValueError(msg)
 
         crframe.resample()
 
         earlier_moved, _ = crframe.calc_range(from_dt=dtdate(2009, 8, 10))
-        self.assertEqual(earlier_moved, dtdate(2009, 7, 31))
+        if earlier_moved != dtdate(2009, 7, 31):
+            msg = "Unintended output from calc_range()"
+            raise ValueError(msg)
 
         _, later_moved = crframe.calc_range(to_dt=dtdate(2009, 8, 20))
-        self.assertEqual(later_moved, dtdate(2009, 8, 31))
+        if later_moved != dtdate(2009, 8, 31):
+            msg = "Unintended output from calc_range()"
+            raise ValueError(msg)
 
     def test_resample(self: TestOpenFrame) -> None:
         """Test resample method."""
+        expected: int = 121
         rs_frame = self.randomframe.from_deepcopy()
         rs_frame.to_cumret()
 
@@ -160,9 +201,14 @@ class TestOpenFrame(TestCase):
 
         rs_frame.resample(freq="BM")
 
-        self.assertEqual(121, rs_frame.length)
+        if rs_frame.length != expected:
+            msg = "resample() method generated unexpected result"
+            raise ValueError(msg)
+
         after = cast(Series, rs_frame.value_ret).to_dict()
-        self.assertDictEqual(before, after)
+        if before != after:
+            msg = "resample() method generated unexpected result"
+            raise ValueError(msg)
 
     def test_resample_to_business_period_ends(self: TestOpenFrame) -> None:
         """Test resample_to_business_period_ends method."""
@@ -184,17 +230,19 @@ class TestOpenFrame(TestCase):
         rsb_stubs_frame.resample_to_business_period_ends(freq="BM")
         new_stubs_dates = rsb_stubs_frame.tsdf.index.tolist()
 
-        self.assertListEqual(
-            new_stubs_dates,
-            [
-                dtdate(2023, 1, 15),
-                dtdate(2023, 1, 31),
-                dtdate(2023, 2, 28),
-                dtdate(2023, 3, 31),
-                dtdate(2023, 4, 28),
-                dtdate(2023, 5, 15),
-            ],
-        )
+        if new_stubs_dates != [
+            dtdate(2023, 1, 15),
+            dtdate(2023, 1, 31),
+            dtdate(2023, 2, 28),
+            dtdate(2023, 3, 31),
+            dtdate(2023, 4, 28),
+            dtdate(2023, 5, 15),
+        ]:
+            msg = (
+                "resample_to_business_period_ends() method "
+                "generated unexpected result"
+            )
+            raise ValueError(msg)
 
         rsb_frame = OpenFrame(
             [
@@ -214,31 +262,32 @@ class TestOpenFrame(TestCase):
         rsb_frame.resample_to_business_period_ends(freq="BM")
         new_dates = rsb_frame.tsdf.index.tolist()
 
-        self.assertListEqual(
-            new_dates,
-            [
-                dtdate(2023, 1, 31),
-                dtdate(2023, 2, 28),
-                dtdate(2023, 3, 31),
-                dtdate(2023, 4, 28),
-            ],
-        )
+        if new_dates != [
+            dtdate(2023, 1, 31),
+            dtdate(2023, 2, 28),
+            dtdate(2023, 3, 31),
+            dtdate(2023, 4, 28),
+        ]:
+            msg = (
+                "resample_to_business_period_ends() method "
+                "generated unexpected result"
+            )
+            raise ValueError(msg)
 
     def test_max_drawdown_date(self: TestOpenFrame) -> None:
         """Test max_drawdown_date method."""
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
 
-        self.assertListEqual(
-            [
-                dtdate(2018, 11, 8),
-                dtdate(2019, 6, 26),
-                dtdate(2018, 7, 13),
-                dtdate(2014, 11, 12),
-                dtdate(2019, 6, 17),
-            ],
-            cast(Series, mddframe.max_drawdown_date).tolist(),
-        )
+        if [
+            dtdate(2018, 11, 8),
+            dtdate(2019, 6, 26),
+            dtdate(2018, 7, 13),
+            dtdate(2014, 11, 12),
+            dtdate(2019, 6, 17),
+        ] != cast(Series, mddframe.max_drawdown_date).tolist():
+            msg = "max_drawdown_date property generated unexpected result"
+            raise ValueError(msg)
 
     def test_make_portfolio(self: TestOpenFrame) -> None:
         """Test make_portfolio method."""
@@ -277,22 +326,18 @@ class TestOpenFrame(TestCase):
 
         assert_frame_equal(true_tail, mptail, check_exact=True)
 
-        try:
+        with pytest.raises(expected_exception=AssertionError, match="are different"):
             assert_frame_equal(false_tail, mptail, check_exact=True)
-        except AssertionError as e_false:
-            self.assertTrue(isinstance(e_false, AssertionError))
 
         mpframe.weights = None
-        with self.assertRaises(Exception) as e_make:
-            _ = mpframe.make_portfolio(name=name)
-
-        self.assertEqual(
-            e_make.exception.args[0],
-            (
-                "OpenFrame weights property must be provided to run the "
-                "make_portfolio method."
+        with pytest.raises(
+            expected_exception=ValueError,
+            match=(
+                "OpenFrame weights property must be provided "
+                "to run the make_portfolio method."
             ),
-        )
+        ):
+            _ = mpframe.make_portfolio(name=name)
 
     def test_make_portfolio_weight_strat(self: TestOpenFrame) -> None:
         """Test make_portfolio method with weight_strat."""
@@ -301,10 +346,10 @@ class TestOpenFrame(TestCase):
         name = "portfolio"
 
         _ = mpframe.make_portfolio(name=name, weight_strat="eq_weights")
-        self.assertListEqual(
-            cast(list[float], mpframe.weights),
-            [0.2, 0.2, 0.2, 0.2, 0.2],
-        )
+        weights: Optional[list[float]] = [0.2, 0.2, 0.2, 0.2, 0.2]
+        if weights != mpframe.weights:
+            msg = "make_portfolio() equal weight strategy not working as intended."
+            ValueError(msg)
 
         with localcontext() as decimal_context:
             decimal_context.rounding = ROUND_HALF_UP
@@ -313,50 +358,54 @@ class TestOpenFrame(TestCase):
             eq_risk_weights = [
                 round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
-            self.assertListEqual(
-                eq_risk_weights,
-                [
-                    Decimal("0.206999"),
-                    Decimal("0.193416"),
-                    Decimal("0.198024"),
-                    Decimal("0.206106"),
-                    Decimal("0.195454"),
-                ],
-            )
+            if eq_risk_weights != [
+                Decimal("0.206999"),
+                Decimal("0.193416"),
+                Decimal("0.198024"),
+                Decimal("0.206106"),
+                Decimal("0.195454"),
+            ]:
+                msg = "make_portfolio() equal risk strategy not working as intended."
+                ValueError(msg)
 
             _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
             inv_vol_weights = [
                 round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
-            self.assertListEqual(
-                inv_vol_weights,
-                [
-                    Decimal("0.252280"),
-                    Decimal("0.163721"),
-                    Decimal("0.181780"),
-                    Decimal("0.230792"),
-                    Decimal("0.171427"),
-                ],
-            )
+            if inv_vol_weights != [
+                Decimal("0.252280"),
+                Decimal("0.163721"),
+                Decimal("0.181780"),
+                Decimal("0.230792"),
+                Decimal("0.171427"),
+            ]:
+                msg = "make_portfolio() inverse vol strategy not working as intended."
+                ValueError(msg)
 
             _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
             mean_var_weights = [
                 round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
-            self.assertListEqual(
-                mean_var_weights,
-                [
-                    Decimal("0.244100"),
-                    Decimal("0.000000"),
-                    Decimal("0.000000"),
-                    Decimal("0.755900"),
-                    Decimal("0.000000"),
-                ],
-            )
+            if mean_var_weights != [
+                Decimal("0.244100"),
+                Decimal("0.000000"),
+                Decimal("0.000000"),
+                Decimal("0.755900"),
+                Decimal("0.000000"),
+            ]:
+                msg = (
+                    "make_portfolio() mean variance strategy not working as intended."
+                )
+                ValueError(msg)
 
-        with self.assertRaises(NotImplementedError):
-            bogus = cast(LiteralPortfolioWeightings, "bogus")
-            _ = mpframe.make_portfolio(name=name, weight_strat=bogus)
+        with pytest.raises(
+            expected_exception=NotImplementedError,
+            match="Weight strategy not implemented",
+        ):
+            _ = mpframe.make_portfolio(
+                name=name,
+                weight_strat=cast(LiteralPortfolioWeightings, "bogus"),
+            )
 
     def test_add_timeseries(self: TestOpenFrame) -> None:
         """Test add_timeseries method."""
@@ -369,9 +418,15 @@ class TestOpenFrame(TestCase):
         seriesas.set_new_label("Asset_6")
         frameas.add_timeseries(seriesas)
 
-        self.assertEqual(items + 1, frameas.item_count)
-        self.assertEqual(nbr_cols + 1, len(frameas.columns_lvl_zero))
-        self.assertListEqual([*cols, "Asset_6"], frameas.columns_lvl_zero)
+        if items + 1 != frameas.item_count:
+            msg = "add_timeseries() method did not work as intended."
+            raise ValueError(msg)
+        if nbr_cols + 1 != len(frameas.columns_lvl_zero):
+            msg = "add_timeseries() method did not work as intended."
+            raise ValueError(msg)
+        if [*cols, "Asset_6"] != frameas.columns_lvl_zero:
+            msg = "add_timeseries() method did not work as intended."
+            raise ValueError(msg)
 
     def test_delete_timeseries(self: TestOpenFrame) -> None:
         """Test delete_timeseries method."""
@@ -382,8 +437,12 @@ class TestOpenFrame(TestCase):
         frame.delete_timeseries(lbl)
         labels = [ff.label for ff in frame.constituents]
 
-        self.assertListEqual(labels, ["Asset_0", "Asset_2", "Asset_3", "Asset_4"])
-        self.assertListEqual(frame.weights, [0.4, 0.2, 0.1, 0.2])
+        if labels != ["Asset_0", "Asset_2", "Asset_3", "Asset_4"]:
+            msg = "delete_timeseries() method did not work as intended."
+            raise ValueError(msg)
+        if frame.weights != [0.4, 0.2, 0.1, 0.2]:
+            msg = "delete_timeseries() method did not work as intended."
+            raise ValueError(msg)
 
     def test_risk_functions_same_as_opentimeseries(
         self: TestOpenFrame,
@@ -395,38 +454,32 @@ class TestOpenFrame(TestCase):
         riskseries.to_cumret()
         riskframe.to_cumret()
 
-        self.assertEqual(
-            riskseries.cvar_down,
-            cvar_down_calc(riskseries.tsdf.iloc[:, 0].tolist()),
-            msg="CVaR for OpenTimeSeries not equal",
-        )
-        self.assertEqual(
-            riskseries.var_down,
-            var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()),
-            msg="VaR for OpenTimeSeries not equal",
-        )
+        if riskseries.cvar_down != cvar_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
+            msg = "CVaR for OpenTimeSeries not equal"
+            raise ValueError(msg)
+        if riskseries.var_down != var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
+            msg = "VaR for OpenTimeSeries not equal"
+            raise ValueError(msg)
 
-        self.assertEqual(
-            cast(Series, riskframe.cvar_down).iloc[0],
-            cvar_down_calc(riskframe.tsdf.iloc[:, 0]),
-            msg="CVaR for OpenFrame not equal",
-        )
-        self.assertEqual(
-            cast(Series, riskframe.var_down).iloc[0],
-            var_down_calc(riskframe.tsdf.iloc[:, 0]),
-            msg="VaR for OpenFrame not equal",
-        )
+        if cast(Series, riskframe.cvar_down).iloc[0] != cvar_down_calc(
+            riskframe.tsdf.iloc[:, 0],
+        ):
+            msg = "CVaR for OpenFrame not equal"
+            raise ValueError(msg)
+        if cast(Series, riskframe.var_down).iloc[0] != var_down_calc(
+            riskframe.tsdf.iloc[:, 0],
+        ):
+            msg = "VaR for OpenFrame not equal"
+            raise ValueError(msg)
 
-        self.assertEqual(
-            cast(Series, riskframe.cvar_down).iloc[0],
-            cvar_down_calc(riskframe.tsdf),
-            msg="CVaR for OpenFrame not equal",
-        )
-        self.assertEqual(
-            cast(Series, riskframe.var_down).iloc[0],
-            var_down_calc(riskframe.tsdf),
-            msg="VaR for OpenFrame not equal",
-        )
+        if cast(Series, riskframe.cvar_down).iloc[0] != cvar_down_calc(riskframe.tsdf):
+            msg = "CVaR for OpenFrame not equal"
+            raise ValueError(msg)
+        if cast(Series, riskframe.var_down).iloc[0] != var_down_calc(
+            riskframe.tsdf,
+        ):
+            msg = "VaR for OpenFrame not equal"
+            raise ValueError(msg)
 
     def test_methods_same_as_opentimeseries(self: TestOpenFrame) -> None:
         """Test that method results align between OpenFrame and OpenTimeSeries."""
@@ -504,10 +557,15 @@ class TestOpenFrame(TestCase):
             "z_score_func",
         ]
         for method in methods_to_compare:
-            self.assertEqual(
-                f"{getattr(sames, method)(months_from_last=12):.11f}",
-                f"{float(getattr(samef, method)(months_from_last=12).iloc[0]):.11f}",
-            )
+            if (
+                f"{getattr(sames, method)(months_from_last=12):.11f}"
+                != f"{float(getattr(samef, method)(months_from_last=12).iloc[0]):.11f}"
+            ):
+                msg = (
+                    f"Calc method {method} not aligned between "
+                    "OpenTimeSeries and OpenFrame"
+                )
+                raise ValueError(msg)
 
     def test_ratio_methods_same_as_opentimeseries(
         self: TestOpenFrame,
@@ -523,19 +581,29 @@ class TestOpenFrame(TestCase):
             Series,
             samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12),
         ).iloc[0]
-        self.assertEqual(
-            f"{sames.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
-            f"{smf_vrf:.11f}",
-        )
+        if (
+            f"{sames.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}"
+            != f"{smf_vrf:.11f}"
+        ):
+            msg = (
+                "ret_vol_ratio_func() not aligned between "
+                "OpenTimeSeries and OpenFrame"
+            )
+            raise ValueError(msg)
 
         smf_srf = cast(
             Series,
             samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12),
         ).iloc[0]
-        self.assertEqual(
-            f"{sames.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}",
-            f"{smf_srf:.11f}",
-        )
+        if (
+            f"{sames.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12):.11f}"
+            != f"{smf_srf:.11f}"
+        ):
+            msg = (
+                "sortino_ratio_func() not aligned between "
+                "OpenTimeSeries and OpenFrame"
+            )
+            raise ValueError(msg)
 
     def test_measures_same_as_opentimeseries(self: TestOpenFrame) -> None:
         """Test that measure results align between OpenFrame and OpenTimeSeries."""
@@ -564,19 +632,19 @@ class TestOpenFrame(TestCase):
             "worst_month",
             "z_score",
         ]
-        series_measures = []
-        frame_measures = []
 
         for prop in common_calc_props:
             result = getattr(frame_0, prop).tolist()
             rounded = [f"{item:.10f}" for item in result]
-            frame_measures.append(rounded)
             roundmeasure = [
                 f"{getattr(serie, prop):.10f}" for serie in frame_0.constituents
             ]
-            series_measures.append(roundmeasure)
-
-        self.assertListEqual(series_measures, frame_measures)
+            if rounded != roundmeasure:
+                msg = (
+                    f"Property {prop} not aligned between "
+                    "OpenTimeSeries and OpenFrame"
+                )
+                raise ValueError(msg)
 
     def test_properties_same_as_opentimeseries(
         self: TestOpenFrame,
@@ -589,10 +657,12 @@ class TestOpenFrame(TestCase):
 
         common_props_to_compare = ["periods_in_a_year", "yearfrac"]
         for comnprop in common_props_to_compare:
-            self.assertEqual(
-                getattr(sameseries, comnprop),
-                getattr(sameframe, comnprop),
-            )
+            if getattr(sameseries, comnprop) != getattr(sameframe, comnprop):
+                msg = (
+                    f"Property {comnprop} not aligned between "
+                    "OpenTimeSeries and OpenFrame"
+                )
+                raise ValueError(msg)
 
     def test_keeping_attributes_aligned_vs_opentimeseries(
         self: TestOpenFrame,
@@ -685,10 +755,10 @@ class TestOpenFrame(TestCase):
                 + series_attributes,
             ),
         )
-        self.assertTrue(
-            len(series_compared) == 0,
-            msg=f"Difference is: {series_compared}",
-        )
+        if len(series_compared) != 0:
+            msg = f"Difference is: {series_compared}"
+            raise ValueError(msg)
+
         frame_props = [
             a
             for a in dir(sameframe)
@@ -704,10 +774,9 @@ class TestOpenFrame(TestCase):
                 + frame_calc_props,
             ),
         )
-        self.assertTrue(
-            len(frame_compared) == 0,
-            msg=f"Difference is: {frame_compared}",
-        )
+        if len(frame_compared) != 0:
+            msg = f"Difference is: {frame_compared}"
+            raise ValueError(msg)
 
     def test_keeping_methods_aligned_vs_opentimeseries(
         self: TestOpenFrame,
@@ -839,10 +908,9 @@ class TestOpenFrame(TestCase):
                 + series_unique,
             ),
         )
-        self.assertTrue(
-            len(series_compared) == 0,
-            msg=f"Difference is: {series_compared}",
-        )
+        if len(series_compared) != 0:
+            msg = f"Difference is: {series_compared}"
+            raise ValueError(msg)
 
         frame_methods = [
             a
@@ -857,10 +925,9 @@ class TestOpenFrame(TestCase):
                 + frame_unique,
             ),
         )
-        self.assertTrue(
-            len(frame_compared) == 0,
-            msg=f"Difference is: {frame_compared}",
-        )
+        if len(frame_compared) != 0:
+            msg = f"Difference is: {frame_compared}"
+            raise ValueError(msg)
 
     def test_value_to_log(self: TestOpenFrame) -> None:
         """Test value_to_log method."""
@@ -877,7 +944,9 @@ class TestOpenFrame(TestCase):
         eedict = ccframe.to_dict(orient="list")
         middle_log = [eedict[key] for key in eedict]
 
-        self.assertNotEqual(b4_log, middle_log)
+        if b4_log == middle_log:
+            msg = "Method value_to_log() did not work as intended."
+            raise ValueError(msg)
 
     def test_correl_matrix(self: TestOpenFrame) -> None:
         """Test correl_matrix method."""
@@ -922,7 +991,9 @@ class TestOpenFrame(TestCase):
             },
         }
 
-        self.assertDictEqual(dict1, dict2)
+        if dict1 != dict2:
+            msg = "Unexpected result(s) from method correl_matrix()"
+            raise ValueError(msg)
 
     def test_plot_series(self: TestOpenFrame) -> None:
         """Test plot_series method."""
@@ -935,7 +1006,9 @@ class TestOpenFrame(TestCase):
         for i in range(plotframe.item_count):
             rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
             fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
-            self.assertListEqual(rawdata, fig_data)
+            if rawdata != fig_data:
+                msg = "Unaligned data between original and data in Figure."
+                raise ValueError(msg)
 
         fig_last, _ = plotframe.plot_series(
             auto_open=False,
@@ -945,7 +1018,9 @@ class TestOpenFrame(TestCase):
         fig_last_json = loads(fig_last.to_json())
         rawlast = plotframe.tsdf.iloc[-1, -1]
         figlast = fig_last_json["data"][-1]["y"][0]
-        self.assertEqual(f"{figlast:.12f}", f"{rawlast:.12f}")
+        if f"{figlast:.12f}" != f"{rawlast:.12f}":
+            msg = "Unaligned data between original and data in Figure."
+            raise ValueError(msg)
 
         fig_last_fmt, _ = plotframe.plot_series(
             auto_open=False,
@@ -955,12 +1030,15 @@ class TestOpenFrame(TestCase):
         )
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
-        self.assertEqual(last_fmt, "Last 77.813%")
+        if last_fmt != "Last 77.813%":
+            msg = "Unaligned data between original and data in Figure."
+            raise ValueError(msg)
 
-        with self.assertRaises(AssertionError) as e_plot:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Must provide same number of labels as items in frame.",
+        ):
             _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
-
-        self.assertIsInstance(e_plot.exception, AssertionError)
 
     def test_plot_bars(self: TestOpenFrame) -> None:
         """Test plot_bars method."""
@@ -971,17 +1049,22 @@ class TestOpenFrame(TestCase):
         fig_json = loads(fig.to_json())
         made_fig_keys = list(fig_json["data"][0].keys())
         made_fig_keys.sort()
-        self.assertListEqual(made_fig_keys, fig_keys)
+        if made_fig_keys != fig_keys:
+            msg = "Data in Figure not as intended."
+            raise ValueError(msg)
 
         for i in range(plotframe.item_count):
             rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
             fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
-            self.assertListEqual(rawdata, fig_data)
+            if rawdata != fig_data:
+                msg = "Unaligned data between original and data in Figure."
+                raise ValueError(msg)
 
-        with self.assertRaises(AssertionError) as e_plot:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Must provide same number of labels as items in frame.",
+        ):
             _, _ = plotframe.plot_bars(auto_open=False, labels=["a", "b"])
-
-        self.assertIsInstance(e_plot.exception, AssertionError)
 
         overlayfig, _ = plotframe.plot_bars(
             auto_open=False,
@@ -991,19 +1074,17 @@ class TestOpenFrame(TestCase):
         overlayfig_json = loads(overlayfig.to_json())
 
         fig_keys.append("opacity")
-        self.assertListEqual(
-            sorted(overlayfig_json["data"][0].keys()),
-            sorted(fig_keys),
-        )
+        if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
+            msg = "Data in Figure not as intended."
+            raise ValueError(msg)
 
     def test_passed_empty_list(self: TestOpenFrame) -> None:
         """Test warning on object construct with empty list."""
         with self.assertLogs() as contextmgr:
             OpenFrame([])
-        self.assertListEqual(
-            contextmgr.output,
-            ["WARNING:root:OpenFrame() was passed an empty list."],
-        )
+        if contextmgr.output != ["WARNING:root:OpenFrame() was passed an empty list."]:
+            msg = "OpenFrame failed to log warning about empty input list."
+            raise ValueError(msg)
 
     def test_drawdown_details(self: TestOpenFrame) -> None:
         """Test drawdown_details method."""
@@ -1012,7 +1093,9 @@ class TestOpenFrame(TestCase):
             serie.to_cumret()
         ddframe.to_cumret()
         dds = ddframe.drawdown_details().loc["Days from start to bottom"].tolist()
-        self.assertListEqual([2317, 1797, 2439, 1024, 1278], dds)
+        if [2317, 1797, 2439, 1024, 1278] != dds:
+            msg = "Method drawdown_details() did not produce intended result."
+            raise ValueError(msg)
 
     def test_trunc_frame(self: TestOpenFrame) -> None:
         """Test trunc_frame method."""
@@ -1037,19 +1120,29 @@ class TestOpenFrame(TestCase):
             dtdate(2018, 6, 27),
         ]
 
-        self.assertNotEqual(firsts, frame.first_indices.tolist())
-        self.assertNotEqual(lasts, frame.last_indices.tolist())
+        if firsts == frame.first_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+        if lasts == frame.last_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
 
         frame.trunc_frame()
 
-        self.assertListEqual(firsts, frame.first_indices.tolist())
-        self.assertListEqual(lasts, frame.last_indices.tolist())
+        if firsts != frame.first_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+        if lasts != frame.last_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
 
         trunced = [dtdate(2017, 12, 29), dtdate(2018, 3, 29)]
 
         frame.trunc_frame(start_cut=trunced[0], end_cut=trunced[1])
 
-        self.assertListEqual(trunced, [frame.first_idx, frame.last_idx])
+        if trunced != [frame.first_idx, frame.last_idx]:
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
 
     def test_trunc_frame_start_fail(self: TestOpenFrame) -> None:
         """Test trunc_frame method start fail scenario."""
@@ -1111,13 +1204,12 @@ class TestOpenFrame(TestCase):
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
-        self.assertIn(
-            (
-                "WARNING:root:One or more constituents"
-                " still not truncated to same start dates."
-            ),
-            logs.output[0],
-        )
+        if (
+            "WARNING:root:One or more constituents "
+            "still not truncated to same start dates."
+        ) not in logs.output[0]:
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
 
     def test_trunc_frame_end_fail(self: TestOpenFrame) -> None:
         """Test trunc_frame method end fail scenario."""
@@ -1178,13 +1270,12 @@ class TestOpenFrame(TestCase):
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
-        self.assertIn(
-            (
-                "WARNING:root:One or more constituents"
-                " still not truncated to same end dates."
-            ),
-            logs.output[0],
-        )
+        if (
+            "WARNING:root:One or more constituents "
+            "still not truncated to same end dates."
+        ) not in logs.output[0]:
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
 
     def test_merge_series(self: TestOpenFrame) -> None:
         """Test merge_series method."""
@@ -1247,26 +1338,23 @@ class TestOpenFrame(TestCase):
 
         bframe.merge_series(how="inner")
         blist = [d.strftime("%Y-%m-%d") for d in bframe.tsdf.index]
-        self.assertListEqual(
-            blist,
-            [
-                "2022-07-11",
-                "2022-07-12",
-                "2022-07-13",
-                "2022-07-14",
-            ],
-        )
+        if blist != [
+            "2022-07-11",
+            "2022-07-12",
+            "2022-07-13",
+            "2022-07-14",
+        ]:
+            msg = "Method merge_series() did not work as intended."
+            raise ValueError(msg)
 
-        with self.assertRaises(Exception) as e_merged:
-            aframe.merge_series(how="inner")
-
-        self.assertEqual(
-            (
-                "Merging OpenTimeSeries DataFrames with argument how=inner produced "
-                "an empty DataFrame."
+        with pytest.raises(
+            expected_exception=Exception,
+            match=(
+                "Merging OpenTimeSeries DataFrames with argument "
+                "how=inner produced an empty DataFrame."
             ),
-            e_merged.exception.args[0],
-        )
+        ):
+            aframe.merge_series(how="inner")
 
     def test_all_properties(self: TestOpenFrame) -> None:
         """Test all_properties method."""
@@ -1299,7 +1387,11 @@ class TestOpenFrame(TestCase):
         apframe.to_cumret()
         result = apframe.all_properties()
         result_index = result.index.tolist()
-        self.assertTrue(set(prop_index) == set(result_index))
+
+        if set(prop_index) != set(result_index):
+            msg = "Method all_properties() output not as intended."
+            raise ValueError(msg)
+
         result_values = {}
         for value in result.index:
             if isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], float):
@@ -1314,8 +1406,9 @@ class TestOpenFrame(TestCase):
                     ("Asset_0", ValueType.PRICE),
                 ].strftime("%Y-%m-%d")
             else:
+                msg = f"all_properties returned unexpected type {type(value)}"
                 raise TypeError(
-                    f"all_properties returned unexpected type {type(value)}",
+                    msg,
                 )
         expected_values = {
             "Max Drawdown": "-0.4001162541",
@@ -1342,19 +1435,14 @@ class TestOpenFrame(TestCase):
             "Downside deviation": "0.0919572936",
             "Skew": "-6.9467990606",
         }
-        self.assertDictEqual(result_values, expected_values)
+        if result_values != expected_values:
+            msg = "Method all_properties() results not as expected."
+            raise ValueError(msg)
 
-        self.assertTrue(set(prop_index) == set(result_index))
-
-        props = apframe.all_properties(properties=["geo_ret", "vol"])
-        self.assertIsInstance(props, DataFrame)
-
-        with self.assertRaises(ValueError) as e_boo:
-            faulty_props = ["geo_ret", "boo"]
+        with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
             _ = apframe.all_properties(
-                properties=cast(list[LiteralFrameProps], faulty_props),
+                properties=cast(list[LiteralFrameProps], ["geo_ret", "boo"]),
             )
-        self.assertIn(member="Invalid string: boo", container=str(e_boo.exception))
 
     def test_align_index_to_local_cdays(self: TestOpenFrame) -> None:
         """Test align_index_to_local_cdays method."""
@@ -1371,10 +1459,14 @@ class TestOpenFrame(TestCase):
         aframe = OpenFrame([aseries, bseries])
 
         midsummer = dtdate(2022, 6, 6)
-        self.assertTrue(midsummer in d_range)
+        if midsummer not in d_range:
+            msg = "Midsummer not in date range"
+            raise ValueError(msg)
 
         aframe.align_index_to_local_cdays()
-        self.assertFalse(midsummer in aframe.tsdf.index)
+        if midsummer in aframe.tsdf.index:
+            msg = "Midsummer in date range"
+            raise ValueError(msg)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:
         """Test rolling_info_ratio method."""
@@ -1382,7 +1474,6 @@ class TestOpenFrame(TestCase):
         frame.to_cumret()
 
         simdata = frame.rolling_info_ratio(long_column=0, short_column=1)
-        simseries = OpenTimeSeries.from_df(simdata)
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
@@ -1393,8 +1484,9 @@ class TestOpenFrame(TestCase):
             "0.20346268143",
         ]
 
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method rolling_info_ratio() not as intended."
+            raise ValueError(msg)
 
         simdata_fxd_per_yr = frame.rolling_info_ratio(
             long_column=0,
@@ -1410,14 +1502,15 @@ class TestOpenFrame(TestCase):
             "0.19593703197",
             "0.20361342094",
         ]
-        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
+        if values_fxd_per_yr != checkdata_fxd_per_yr:
+            msg = "Result from method rolling_info_ratio() not as intended."
+            raise ValueError(msg)
 
     def test_rolling_beta(self: TestOpenFrame) -> None:
         """Test rolling_beta method."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
         simdata = frame.rolling_beta(asset_column=0, market_column=1)
-        simseries = OpenTimeSeries.from_df(simdata)
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
@@ -1428,8 +1521,9 @@ class TestOpenFrame(TestCase):
             "-0.08012220038",
         ]
 
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method rolling_info_ratio() not as intended."
+            raise ValueError(msg)
 
     def test_tracking_error_func(self: TestOpenFrame) -> None:
         """Test tracking_error_func method."""
@@ -1438,29 +1532,36 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.tracking_error_func(base_column=-1)
 
-        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.2462231908")
+        if f"{simdataa.iloc[0]:.10f}" != "0.2462231908":
+            msg = "Result from tracking_error_func() not as expected."
+            raise ValueError(msg)
 
         simdatab = frame.tracking_error_func(
             base_column=-1,
             periods_in_a_year_fixed=251,
         )
 
-        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.2460409063")
+        if f"{simdatab.iloc[0]:.10f}" != "0.2460409063":
+            msg = "Result from tracking_error_func() not as expected."
+            raise ValueError(msg)
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
-        self.assertEqual(f"{simdatac.iloc[0]:.10f}", "0.2462231908")
+        if f"{simdatac.iloc[0]:.10f}" != "0.2462231908":
+            msg = "Result from tracking_error_func() not as expected."
+            raise ValueError(msg)
 
-        self.assertEqual(f"{simdataa.iloc[0]:.10f}", f"{simdatac.iloc[0]:.10f}")
+        if f"{simdataa.iloc[0]:.10f}" != f"{simdatac.iloc[0]:.10f}":
+            msg = "Result from tracking_error_func() not as expected."
+            raise ValueError(msg)
 
-        with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = frame.tracking_error_func(base_column=str_col)
-
-        self.assertEqual(
-            e_func.exception.args[0],
-            "base_column should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="base_column should be a tuple",
+        ):
+            _ = frame.tracking_error_func(
+                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+            )
 
     def test_info_ratio_func(self: TestOpenFrame) -> None:
         """Test info_ratio_func method."""
@@ -1469,24 +1570,29 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.info_ratio_func(base_column=-1)
 
-        self.assertEqual(f"{simdataa.iloc[0]:.10f}", "0.2063067697")
+        if f"{simdataa.iloc[0]:.10f}" != "0.2063067697":
+            msg = "Result from info_ratio_func() not as expected."
+            raise ValueError(msg)
 
         simdatab = frame.info_ratio_func(base_column=-1, periods_in_a_year_fixed=251)
 
-        self.assertEqual(f"{simdatab.iloc[0]:.10f}", "0.2061540363")
+        if f"{simdatab.iloc[0]:.10f}" != "0.2061540363":
+            msg = "Result from info_ratio_func() not as expected."
+            raise ValueError(msg)
 
         simdatac = frame.info_ratio_func(base_column=("Asset_4", ValueType.PRICE))
 
-        self.assertEqual(f"{simdatac.iloc[0]:.10f}", "0.2063067697")
+        if f"{simdatac.iloc[0]:.10f}" != "0.2063067697":
+            msg = "Result from info_ratio_func() not as expected."
+            raise ValueError(msg)
 
-        with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = frame.info_ratio_func(base_column=str_col)
-
-        self.assertEqual(
-            e_func.exception.args[0],
-            "base_column should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="base_column should be a tuple",
+        ):
+            _ = frame.info_ratio_func(
+                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+            )
 
     def test_rolling_corr(self: TestOpenFrame) -> None:
         """Test rolling_corr method."""
@@ -1494,7 +1600,6 @@ class TestOpenFrame(TestCase):
         frame.to_cumret()
 
         simdata = frame.rolling_corr(first_column=0, second_column=1)
-        simseries = OpenTimeSeries.from_df(simdata)
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
@@ -1505,8 +1610,9 @@ class TestOpenFrame(TestCase):
             "-0.10634855725",
         ]
 
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method rolling_corr() not as intended."
+            raise ValueError(msg)
 
     def test_rolling_vol(self: TestOpenFrame) -> None:
         """Test rolling_vol method."""
@@ -1514,7 +1620,6 @@ class TestOpenFrame(TestCase):
         frame.to_cumret()
 
         simdata = frame.rolling_vol(column=0, observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
@@ -1525,8 +1630,9 @@ class TestOpenFrame(TestCase):
             "0.08300985872",
         ]
 
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method rolling_vol() not as intended."
+            raise ValueError(msg)
 
         simdata_fxd_per_yr = frame.rolling_vol(
             column=0,
@@ -1542,7 +1648,9 @@ class TestOpenFrame(TestCase):
             "0.08664850307",
             "0.08294840469",
         ]
-        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
+        if values_fxd_per_yr != checkdata_fxd_per_yr:
+            msg = "Result from method rolling_vol() not as intended."
+            raise ValueError(msg)
 
     def test_rolling_return(self: TestOpenFrame) -> None:
         """Test rolling_return method."""
@@ -1550,7 +1658,6 @@ class TestOpenFrame(TestCase):
         frame.to_cumret()
 
         simdata = frame.rolling_return(column=0, observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
@@ -1561,8 +1668,9 @@ class TestOpenFrame(TestCase):
             "-0.03592486809",
         ]
 
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method rolling_return() not as intended."
+            raise ValueError(msg)
 
     def test_rolling_cvar_down(self: TestOpenFrame) -> None:
         """Test rolling_cvar_down method."""
@@ -1570,7 +1678,6 @@ class TestOpenFrame(TestCase):
         frame.to_cumret()
 
         simdata = frame.rolling_cvar_down(column=0, observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
 
         values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
         checkdata = [
@@ -1581,8 +1688,9 @@ class TestOpenFrame(TestCase):
             "-0.01270193467",
         ]
 
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method rolling_cvar_down() not as intended."
+            raise ValueError(msg)
 
     def test_rolling_var_down(self: TestOpenFrame) -> None:
         """Test rolling_var_down method."""
@@ -1590,7 +1698,6 @@ class TestOpenFrame(TestCase):
         frame.to_cumret()
 
         simdata = frame.rolling_var_down(column=0, observations=21)
-        simseries = OpenTimeSeries.from_df(simdata)
 
         values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
         checkdata = [
@@ -1601,26 +1708,27 @@ class TestOpenFrame(TestCase):
             "-0.01342248045",
         ]
 
-        self.assertListEqual(values, checkdata)
-        self.assertIsInstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method rolling_var_down() not as intended."
+            raise ValueError(msg)
 
     def test_label_uniqueness(self: TestOpenFrame) -> None:
         """Test label uniqueness."""
         aseries = self.randomseries.from_deepcopy()
         bseries = self.randomseries.from_deepcopy()
 
-        with self.assertRaises(ValueError) as e_unique:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="TimeSeries names/labels must be unique",
+        ):
             OpenFrame([aseries, bseries])
-
-        self.assertIn(
-            member="TimeSeries names/labels must be unique",
-            container=str(e_unique.exception),
-        )
 
         bseries.set_new_label("other_name")
         uframe = OpenFrame([aseries, bseries])
 
-        self.assertEqual(len(set(uframe.columns_lvl_zero)), 2)
+        if uframe.columns_lvl_zero != ["Asset_0", "other_name"]:
+            msg = "Fix of non-unique labels unsuccessful."
+            raise ValueError(msg)
 
     def test_capture_ratio(self: TestOpenFrame) -> None:
         """
@@ -1755,31 +1863,47 @@ class TestOpenFrame(TestCase):
         down = cframe.capture_ratio_func(ratio="down")
         both = cframe.capture_ratio_func(ratio="both")
 
-        self.assertEqual(f"{upp.iloc[0]:.12f}", "1.063842457805")
-        self.assertEqual(f"{down.iloc[0]:.12f}", "0.922188852957")
-        self.assertEqual(f"{both.iloc[0]:.12f}", "1.153605852417")
+        if f"{upp.iloc[0]:.12f}" != "1.063842457805":
+            msg = "Result from capture_ratio_func() not as expected."
+            raise ValueError(msg)
+        if f"{down.iloc[0]:.12f}" != "0.922188852957":
+            msg = "Result from capture_ratio_func() not as expected."
+            raise ValueError(msg)
+        if f"{both.iloc[0]:.12f}" != "1.153605852417":
+            msg = "Result from capture_ratio_func() not as expected."
+            raise ValueError(msg)
 
         upfixed = cframe.capture_ratio_func(ratio="up", periods_in_a_year_fixed=12)
 
-        self.assertEqual(f"{upfixed.iloc[0]:.12f}", "1.063217236138")
-        self.assertAlmostEqual(upp.iloc[0], upfixed.iloc[0], places=2)
+        if f"{upfixed.iloc[0]:.12f}" != "1.063217236138":
+            msg = "Result from capture_ratio_func() not as expected."
+            raise ValueError(msg)
+
+        if f"{upp.iloc[0]:.2f}" != f"{upfixed.iloc[0]:.2f}":
+            msg = "Result from capture_ratio_func() not as expected."
+            raise ValueError(msg)
 
         uptuple = cframe.capture_ratio_func(
             ratio="up",
             base_column=("indxx", ValueType.PRICE),
         )
 
-        self.assertEqual(f"{uptuple.iloc[0]:.12f}", "1.063842457805")
-        self.assertEqual(f"{upp.iloc[0]:.12f}", f"{uptuple.iloc[0]:.12f}")
+        if f"{uptuple.iloc[0]:.12f}" != "1.063842457805":
+            msg = "Result from capture_ratio_func() not as expected."
+            raise ValueError(msg)
 
-        with self.assertRaises(Exception) as e_func:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = cframe.capture_ratio_func(ratio="up", base_column=str_col)
+        if f"{upp.iloc[0]:.12f}" != f"{uptuple.iloc[0]:.12f}":
+            msg = "Result from capture_ratio_func() not as expected."
+            raise ValueError(msg)
 
-        self.assertEqual(
-            e_func.exception.args[0],
-            "base_column should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="base_column should be a tuple",
+        ):
+            _ = cframe.capture_ratio_func(
+                ratio="up",
+                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+            )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
         """Test georet property raising exceptions on bad input data."""
@@ -1797,15 +1921,19 @@ class TestOpenFrame(TestCase):
                 ),
             ],
         )
-        self.assertListEqual(
-            [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)],
-            ["0.10007", "0.20015"],
-        )
+        if [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)] != [
+            "0.10007",
+            "0.20015",
+        ]:
+            msg = "Unexpected result from property geo_ret"
+            raise ValueError(msg)
 
-        self.assertListEqual(
-            [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret_func())],
-            ["0.10007", "0.20015"],
-        )
+        if [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret_func())] != [
+            "0.10007",
+            "0.20015",
+        ]:
+            msg = "Unexpected result from property geo_ret"
+            raise ValueError(msg)
 
         geoframe.add_timeseries(
             OpenTimeSeries.from_arrays(
@@ -1815,34 +1943,32 @@ class TestOpenFrame(TestCase):
             ),
         )
 
-        with self.assertRaises(Exception) as e_gr_zero:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match=(
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
+            ),
+        ):
             _ = geoframe.geo_ret
 
-        self.assertEqual(
-            e_gr_zero.exception.args[0],
-            (
-                "Geometric return cannot be calculated due to an initial value being "
-                "zero or a negative value."
+        with pytest.raises(
+            expected_exception=ValueError,
+            match=(
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
             ),
-        )
-
-        with self.assertRaises(Exception) as e_grf_zero:
+        ):
             _ = geoframe.geo_ret_func()
-
-        self.assertEqual(
-            e_grf_zero.exception.args[0],
-            (
-                "Geometric return cannot be calculated due to an initial value being "
-                "zero or a negative value."
-            ),
-        )
 
         geoframe.delete_timeseries(lvl_zero_item="geoseries3")
 
-        self.assertListEqual(
-            [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)],
-            ["0.10007", "0.20015"],
-        )
+        if [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)] != [
+            "0.10007",
+            "0.20015",
+        ]:
+            msg = "Unexpected result from property geo_ret"
+            raise ValueError(msg)
 
         geoframe.add_timeseries(
             OpenTimeSeries.from_arrays(
@@ -1851,27 +1977,23 @@ class TestOpenFrame(TestCase):
                 values=[1.0, -1.1],
             ),
         )
-        with self.assertRaises(Exception) as e_gr_neg:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match=(
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
+            ),
+        ):
             _ = geoframe.geo_ret
 
-        self.assertEqual(
-            e_gr_neg.exception.args[0],
-            (
-                "Geometric return cannot be calculated due to an initial value being "
-                "zero or a negative value."
+        with pytest.raises(
+            expected_exception=ValueError,
+            match=(
+                "Geometric return cannot be calculated due to an "
+                "initial value being zero or a negative value."
             ),
-        )
-
-        with self.assertRaises(Exception) as e_grf_neg:
+        ):
             _ = geoframe.geo_ret_func()
-
-        self.assertEqual(
-            e_grf_neg.exception.args[0],
-            (
-                "Geometric return cannot be calculated due to an initial value being "
-                "zero or a negative value."
-            ),
-        )
 
     def test_value_nan_handle(self: TestOpenFrame) -> None:
         """Test value_nan_handle method."""
@@ -1905,19 +2027,23 @@ class TestOpenFrame(TestCase):
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.value_nan_handle(method="drop")
-        self.assertListEqual([1.1, 1.0, 1.0], dropframe.tsdf.iloc[:, 0].tolist())
-        self.assertListEqual([2.1, 2.0, 2.0], dropframe.tsdf.iloc[:, 1].tolist())
+
+        if [1.1, 1.0, 1.0] != dropframe.tsdf.iloc[:, 0].tolist():
+            msg = "Method value_nan_handle() not working as intended"
+            raise ValueError(msg)
+        if [2.1, 2.0, 2.0] != dropframe.tsdf.iloc[:, 1].tolist():
+            msg = "Method value_nan_handle() not working as intended"
+            raise ValueError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.value_nan_handle(method="fill")
-        self.assertListEqual(
-            [1.1, 1.0, 1.0, 1.1, 1.0],
-            fillframe.tsdf.iloc[:, 0].tolist(),
-        )
-        self.assertListEqual(
-            [2.1, 2.0, 1.8, 1.8, 2.0],
-            fillframe.tsdf.iloc[:, 1].tolist(),
-        )
+
+        if [1.1, 1.0, 1.0, 1.1, 1.0] != fillframe.tsdf.iloc[:, 0].tolist():
+            msg = "Method value_nan_handle() not working as intended"
+            raise ValueError(msg)
+        if [2.1, 2.0, 1.8, 1.8, 2.0] != fillframe.tsdf.iloc[:, 1].tolist():
+            msg = "Method value_nan_handle() not working as intended"
+            raise ValueError(msg)
 
     def test_return_nan_handle(self: TestOpenFrame) -> None:
         """Test return_nan_handle method."""
@@ -1953,19 +2079,23 @@ class TestOpenFrame(TestCase):
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.return_nan_handle(method="drop")
-        self.assertListEqual([0.1, 0.05, 0.04], dropframe.tsdf.iloc[:, 0].tolist())
-        self.assertListEqual([0.01, 0.04, 0.06], dropframe.tsdf.iloc[:, 1].tolist())
+
+        if [0.1, 0.05, 0.04] != dropframe.tsdf.iloc[:, 0].tolist():
+            msg = "Method return_nan_handle() not working as intended"
+            raise ValueError(msg)
+        if [0.01, 0.04, 0.06] != dropframe.tsdf.iloc[:, 1].tolist():
+            msg = "Method return_nan_handle() not working as intended"
+            raise ValueError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.return_nan_handle(method="fill")
-        self.assertListEqual(
-            [0.1, 0.05, 0.0, 0.01, 0.04],
-            fillframe.tsdf.iloc[:, 0].tolist(),
-        )
-        self.assertListEqual(
-            [0.01, 0.04, 0.02, 0.0, 0.06],
-            fillframe.tsdf.iloc[:, 1].tolist(),
-        )
+
+        if [0.1, 0.05, 0.0, 0.01, 0.04] != fillframe.tsdf.iloc[:, 0].tolist():
+            msg = "Method return_nan_handle() not working as intended"
+            raise ValueError(msg)
+        if [0.01, 0.04, 0.02, 0.0, 0.06] != fillframe.tsdf.iloc[:, 1].tolist():
+            msg = "Method return_nan_handle() not working as intended"
+            raise ValueError(msg)
 
     def test_relative(self: TestOpenFrame) -> None:
         """Test relative method."""
@@ -1975,7 +2105,11 @@ class TestOpenFrame(TestCase):
         sframe.to_cumret()
 
         rframe.relative()
-        self.assertEqual("Asset_0_over_Asset_1", rframe.columns_lvl_zero[-1])
+
+        if rframe.columns_lvl_zero[-1] != "Asset_0_over_Asset_1":
+            msg = "Metod relative() not working as intended"
+            ValueError(msg)
+
         rframe.tsdf.iloc[:, -1] = rframe.tsdf.iloc[:, -1].add(1.0)
 
         sframe.relative(base_zero=False)
@@ -1983,7 +2117,9 @@ class TestOpenFrame(TestCase):
         rflist = [f"{rret:.11f}" for rret in rframe.tsdf.iloc[:, -1]]
         sflist = [f"{rret:.11f}" for rret in sframe.tsdf.iloc[:, -1]]
 
-        self.assertListEqual(rflist, sflist)
+        if rflist != sflist:
+            msg = "Metod relative() not working as intended"
+            ValueError(msg)
 
     def test_to_cumret(self: TestOpenFrame) -> None:
         """Test to_cumret method."""
@@ -2001,27 +2137,35 @@ class TestOpenFrame(TestCase):
         cframe = OpenFrame([cseries, ccseries])
         rframe = OpenFrame([rseries, rrseries])
 
-        self.assertListEqual([ValueType.RTRN, ValueType.PRICE], mframe.columns_lvl_one)
-        self.assertListEqual(
-            [ValueType.PRICE, ValueType.PRICE],
-            cframe.columns_lvl_one,
-        )
+        if [ValueType.RTRN, ValueType.PRICE] != mframe.columns_lvl_one:
+            msg = "Method to_cumret() not working as intended"
+            raise ValueError(msg)
+
+        if [ValueType.PRICE, ValueType.PRICE] != cframe.columns_lvl_one:
+            msg = "Method to_cumret() not working as intended"
+            raise ValueError(msg)
+
         cframe_lvl_one = list(cframe.columns_lvl_one)
-        self.assertListEqual([ValueType.RTRN, ValueType.RTRN], rframe.columns_lvl_one)
+
+        if [ValueType.RTRN, ValueType.RTRN] != rframe.columns_lvl_one:
+            msg = "Method to_cumret() not working as intended"
+            raise ValueError(msg)
 
         mframe.to_cumret()
         cframe.to_cumret()
         rframe.to_cumret()
 
-        self.assertListEqual(
-            [ValueType.PRICE, ValueType.PRICE],
-            mframe.columns_lvl_one,
-        )
-        self.assertListEqual(cframe_lvl_one, cframe.columns_lvl_one)
-        self.assertListEqual(
-            [ValueType.PRICE, ValueType.PRICE],
-            rframe.columns_lvl_one,
-        )
+        if [ValueType.PRICE, ValueType.PRICE] != mframe.columns_lvl_one:
+            msg = "Method to_cumret() not working as intended"
+            raise ValueError(msg)
+
+        if cframe_lvl_one != cframe.columns_lvl_one:
+            msg = "Method to_cumret() not working as intended"
+            raise ValueError(msg)
+
+        if [ValueType.PRICE, ValueType.PRICE] != rframe.columns_lvl_one:
+            msg = "Method to_cumret() not working as intended"
+            raise ValueError(msg)
 
         fmt = "{:.12f}"
 
@@ -2035,10 +2179,14 @@ class TestOpenFrame(TestCase):
         frame_1.tsdf = frame_1.tsdf.map(fmt.format)
         dict_toframe_1 = frame_1.tsdf.to_dict()
 
-        self.assertDictEqual(dict_toframe_0, dict_toframe_1)
+        if dict_toframe_0 != dict_toframe_1:
+            msg = "Method to_cumret() not working as intended"
+            raise ValueError(msg)
 
     def test_miscellaneous(self: TestOpenFrame) -> None:
         """Test miscellaneous methods."""
+        zero_str: str = "0"
+        zero_float: float = 0.0
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
 
@@ -2053,31 +2201,36 @@ class TestOpenFrame(TestCase):
             no_fixed = getattr(mframe, methd)()
             fixed = getattr(mframe, methd)(periods_in_a_year_fixed=252)
             for nofix, fix in zip(no_fixed, fixed):
-                self.assertAlmostEqual(nofix, fix, places=2)
-                self.assertNotAlmostEqual(nofix, fix, places=6)
+                if f"{100*abs(nofix-fix):.0f}" != zero_str:
+                    msg = (
+                        "Difference with or without "
+                        "fixed periods in year is too great"
+                    )
+                    raise ValueError(msg)
         for methd in methods:
             dated = getattr(mframe, methd)(
                 from_date=mframe.first_idx,
                 to_date=mframe.last_idx,
             )
-            undated = getattr(mframe, methd)(
-                from_date=mframe.first_idx,
-                to_date=mframe.last_idx,
-            )
+            undated = getattr(mframe, methd)()
             for ddat, undat in zip(dated, undated):
-                self.assertEqual(f"{ddat:.10f}", f"{undat:.10f}")
+                if f"{ddat:.10f}" != f"{undat:.10f}":
+                    msg = (
+                        f"Method {methd} with and without date "
+                        "arguments returned inconsistent results"
+                    )
+                    raise ValueError(msg)
 
         ret = [f"{rr:.9f}" for rr in cast(Series, mframe.value_ret_func())]
-        self.assertListEqual(
-            [
-                "0.024471958",
-                "-0.620625714",
-                "-0.399460961",
-                "0.245899647",
-                "-0.221870282",
-            ],
-            ret,
-        )
+        if ret != [
+            "0.024471958",
+            "-0.620625714",
+            "-0.399460961",
+            "0.245899647",
+            "-0.221870282",
+        ]:
+            msg = "Results from value_ret_func() not as expected"
+            raise ValueError(msg)
 
         impvol = [
             f"{iv:.11f}"
@@ -2088,44 +2241,38 @@ class TestOpenFrame(TestCase):
             for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=True))
         ]
 
-        self.assertListEqual(
-            impvol,
-            [
-                "0.10208932904",
-                "0.09911226523",
-                "0.09785296425",
-                "0.09587988606",
-                "0.09653565636",
-            ],
-        )
-        self.assertListEqual(
-            impvoldrifted,
-            [
-                "0.10245462160",
-                "0.09607641481",
-                "0.09644421046",
-                "0.09705532014",
-                "0.09619264015",
-            ],
-        )
+        if impvol != [
+            "0.10208932904",
+            "0.09911226523",
+            "0.09785296425",
+            "0.09587988606",
+            "0.09653565636",
+        ]:
+            msg = "Results from vol_from_var_func() not as expected"
+            raise ValueError(msg)
+        if impvoldrifted != [
+            "0.10245462160",
+            "0.09607641481",
+            "0.09644421046",
+            "0.09705532014",
+            "0.09619264015",
+        ]:
+            msg = "Results from vol_from_var_func() not as expected"
+            raise ValueError(msg)
 
-        mframe.tsdf.iloc[0, 2] = 0.0
+        mframe.tsdf.iloc[0, 2] = zero_float
 
-        with self.assertRaises(Exception) as e_vr:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Simple return cannot be calculated due to an",
+        ):
             _ = mframe.value_ret
 
-        self.assertIn(
-            member="Simple return cannot be calculated due to an",
-            container=str(e_vr.exception),
-        )
-
-        with self.assertRaises(Exception) as e_vrf:
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Simple return cannot be calculated due to an",
+        ):
             _ = mframe.value_ret_func()
-
-        self.assertIn(
-            member="Simple return cannot be calculated due to an",
-            container=str(e_vrf.exception),
-        )
 
     def test_value_ret_calendar_period(self: TestOpenFrame) -> None:
         """Test value_ret_calendar_period method."""
@@ -2148,8 +2295,13 @@ class TestOpenFrame(TestCase):
         vrvrcf_y = vrcframe.value_ret_calendar_period(year=2018)
         vrvrcfl_y = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_y)]
 
-        self.assertEqual(f"{vrfs_y:.11f}", f"{vrvrcs_y:.11f}")
-        self.assertListEqual(vrffl_y, vrvrcfl_y)
+        if f"{vrfs_y:.11f}" != f"{vrvrcs_y:.11f}":
+            msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
+            raise ValueError(msg)
+
+        if vrffl_y != vrvrcfl_y:
+            msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
+            raise ValueError(msg)
 
         vrfs_ym = vrcseries.value_ret_func(
             from_date=dtdate(2018, 4, 30),
@@ -2165,8 +2317,13 @@ class TestOpenFrame(TestCase):
         vrvrcf_ym = vrcframe.value_ret_calendar_period(year=2018, month=5)
         vrvrcfl_ym = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_ym)]
 
-        self.assertEqual(f"{vrfs_ym:.11f}", f"{vrvrcs_ym:.11f}")
-        self.assertListEqual(vrffl_ym, vrvrcfl_ym)
+        if f"{vrfs_ym:.11f}" != f"{vrvrcs_ym:.11f}":
+            msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
+            raise ValueError(msg)
+
+        if vrffl_ym != vrvrcfl_ym:
+            msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
+            raise ValueError(msg)
 
     def test_to_drawdown_series(self: TestOpenFrame) -> None:
         """Test to_drawdown_series method."""
@@ -2175,7 +2332,10 @@ class TestOpenFrame(TestCase):
         ddown = [f"{dmax:.11f}" for dmax in cast(Series, mframe.max_drawdown)]
         mframe.to_drawdown_series()
         ddownserie = [f"{dmax:.11f}" for dmax in mframe.tsdf.min()]
-        self.assertListEqual(ddown, ddownserie)
+
+        if ddown != ddownserie:
+            msg = "Method to_drawdown_series() not working as intended"
+            raise ValueError(msg)
 
     def test_ord_least_squares_fit(self: TestOpenFrame) -> None:
         """Test ord_least_squares_fit method."""
@@ -2186,8 +2346,14 @@ class TestOpenFrame(TestCase):
         fsframe = self.randomframe.from_deepcopy()
         fsframe.to_cumret()
         fsframe.ord_least_squares_fit(y_column=0, x_column=1, fitted_series=True)
-        self.assertEqual(fsframe.columns_lvl_zero[-1], oframe.columns_lvl_zero[0])
-        self.assertEqual(fsframe.columns_lvl_one[-1], oframe.columns_lvl_zero[1])
+
+        if fsframe.columns_lvl_zero[-1] != oframe.columns_lvl_zero[0]:
+            msg = "Method ord_least_squares_fit() not working as intended"
+            raise ValueError(msg)
+
+        if fsframe.columns_lvl_one[-1] != oframe.columns_lvl_zero[1]:
+            msg = "Method ord_least_squares_fit() not working as intended"
+            raise ValueError(msg)
 
         results = []
         for i in range(oframe.item_count):
@@ -2209,366 +2375,386 @@ class TestOpenFrame(TestCase):
                 )
                 results_tuple.append(f"{float(tmp.params.iloc[0]):.11f}")
 
-        self.assertListEqual(results, results_tuple)
-        self.assertListEqual(
-            results,
-            [
-                "1.00000000000",
-                "-0.09363759343",
-                "-0.16636507875",
-                "0.70835395893",
-                "0.35961222138",
-                "-0.60070110740",
-                "1.00000000000",
-                "1.79533271373",
-                "-1.39409950365",
-                "-1.80547164323",
-                "-0.24049715964",
-                "0.40456148704",
-                "1.00000000000",
-                "-0.61221397083",
-                "-0.68807137926",
-                "0.78819572733",
-                "-0.24180725905",
-                "-0.47123680764",
-                "1.00000000000",
-                "0.42517123248",
-                "0.26256460553",
-                "-0.20548693834",
-                "-0.34752611919",
-                "0.27898564658",
-                "1.00000000000",
-            ],
-        )
-        with self.assertRaises(Exception) as e_x:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
+        if results != results_tuple:
+            msg = "Method ord_least_squares_fit() not working as intended"
+            raise ValueError(msg)
+        if results != [
+            "1.00000000000",
+            "-0.09363759343",
+            "-0.16636507875",
+            "0.70835395893",
+            "0.35961222138",
+            "-0.60070110740",
+            "1.00000000000",
+            "1.79533271373",
+            "-1.39409950365",
+            "-1.80547164323",
+            "-0.24049715964",
+            "0.40456148704",
+            "1.00000000000",
+            "-0.61221397083",
+            "-0.68807137926",
+            "0.78819572733",
+            "-0.24180725905",
+            "-0.47123680764",
+            "1.00000000000",
+            "0.42517123248",
+            "0.26256460553",
+            "-0.20548693834",
+            "-0.34752611919",
+            "0.27898564658",
+            "1.00000000000",
+        ]:
+            msg = "Method ord_least_squares_fit() not working as intended"
+            raise ValueError(msg)
+
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="x_column should be a tuple",
+        ):
             _ = oframe.ord_least_squares_fit(
                 y_column=0,
-                x_column=str_col,
+                x_column=cast(Union[tuple[str, ValueType], int], "string"),
                 fitted_series=False,
             )
 
-        self.assertEqual(
-            e_x.exception.args[0],
-            "x_column should be a tuple[str, ValueType] or an integer.",
-        )
-
-        with self.assertRaises(Exception) as e_y:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="y_column should be a tuple",
+        ):
             _ = oframe.ord_least_squares_fit(
-                y_column=str_col,
+                y_column=cast(Union[tuple[str, ValueType], int], "string"),
                 x_column=1,
                 fitted_series=False,
             )
-
-        self.assertEqual(
-            e_y.exception.args[0],
-            "y_column should be a tuple[str, ValueType] or an integer.",
-        )
 
     def test_beta(self: TestOpenFrame) -> None:
         """Test beta method."""
         bframe = self.randomframe.from_deepcopy()
         bframe.to_cumret()
         bframe.resample("7D")
-        results = []
-        for i in range(bframe.item_count):
-            for j in range(bframe.item_count):
-                results.append(f"{bframe.beta(asset=i, market=j):.11f}")
+        results = [
+            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
+            for comb in iter_product(
+                range(bframe.item_count),
+                range(bframe.item_count),
+            )
+        ]
 
-        results_tuple = []
-        for i in bframe.tsdf:
-            for j in bframe.tsdf:
-                results_tuple.append(f"{bframe.beta(asset=i, market=j):.11f}")
+        results_tuple = [
+            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
+            for comb in iter_product(bframe.tsdf, bframe.tsdf)
+        ]
 
-        self.assertListEqual(results, results_tuple)
+        if results != results_tuple:
+            msg = "Unexpected results from method beta()"
+            raise ValueError(msg)
 
-        self.assertListEqual(
-            results,
-            [
-                "1.00000000000",
-                "0.28033485966",
-                "0.54925184505",
-                "0.51812697660",
-                "-0.31860438079",
-                "1.35008859840",
-                "1.00000000000",
-                "1.32115950219",
-                "0.02193497832",
-                "-0.40939945575",
-                "0.67189587260",
-                "0.33558345229",
-                "1.00000000000",
-                "0.06126647907",
-                "0.04825332968",
-                "0.45103333029",
-                "0.00396482915",
-                "0.04359783320",
-                "1.00000000000",
-                "-0.39479104514",
-                "-0.23399128905",
-                "-0.06243240197",
-                "0.02896975251",
-                "-0.33307559196",
-                "1.00000000000",
-            ],
-        )
-        with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = bframe.beta(asset=str_col, market=1)
+        if results != [
+            "1.00000000000",
+            "0.28033485966",
+            "0.54925184505",
+            "0.51812697660",
+            "-0.31860438079",
+            "1.35008859840",
+            "1.00000000000",
+            "1.32115950219",
+            "0.02193497832",
+            "-0.40939945575",
+            "0.67189587260",
+            "0.33558345229",
+            "1.00000000000",
+            "0.06126647907",
+            "0.04825332968",
+            "0.45103333029",
+            "0.00396482915",
+            "0.04359783320",
+            "1.00000000000",
+            "-0.39479104514",
+            "-0.23399128905",
+            "-0.06243240197",
+            "0.02896975251",
+            "-0.33307559196",
+            "1.00000000000",
+        ]:
+            msg = "Unexpected results from method beta()"
+            raise ValueError(msg)
 
-        self.assertEqual(
-            e_asset.exception.args[0],
-            "asset should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="asset should be a tuple",
+        ):
+            _ = bframe.beta(
+                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                market=1,
+            )
 
-        with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = bframe.beta(asset=0, market=str_col)
-
-        self.assertEqual(
-            e_market.exception.args[0],
-            "market should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="market should be a tuple",
+        ):
+            _ = bframe.beta(
+                asset=0,
+                market=cast(Union[tuple[str, ValueType], int], "string"),
+            )
 
     def test_beta_returns_input(self: TestOpenFrame) -> None:
         """Test beta method with returns input."""
         bframe = self.randomframe.from_deepcopy()
         bframe.resample("7D")
-        results = []
-        for i in range(bframe.item_count):
-            for j in range(bframe.item_count):
-                results.append(f"{bframe.beta(asset=i, market=j):.11f}")
+        results = [
+            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
+            for comb in iter_product(
+                range(bframe.item_count),
+                range(bframe.item_count),
+            )
+        ]
 
-        results_tuple = []
-        for i in bframe.tsdf:
-            for j in bframe.tsdf:
-                results_tuple.append(f"{bframe.beta(asset=i, market=j):.11f}")
+        results_tuple = [
+            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
+            for comb in iter_product(bframe.tsdf, bframe.tsdf)
+        ]
 
-        self.assertListEqual(results, results_tuple)
+        if results != results_tuple:
+            msg = "Unexpected results from method beta()"
+            raise ValueError(msg)
 
-        self.assertListEqual(
-            results,
-            [
-                "1.00000000000",
-                "0.00225511385",
-                "-0.04957426622",
-                "0.01312690613",
-                "0.02515147445",
-                "0.00589243239",
-                "1.00000000000",
-                "0.10533452453",
-                "-0.01266754819",
-                "0.03977607247",
-                "-0.04676333947",
-                "0.03802715426",
-                "1.00000000000",
-                "-0.00723248920",
-                "-0.03474759800",
-                "0.03520481606",
-                "-0.01300187928",
-                "-0.02056261152",
-                "1.00000000000",
-                "0.00042231402",
-                "0.10271570420",
-                "0.06216832423",
-                "-0.15043502549",
-                "0.00064308622",
-                "1.00000000000",
-            ],
-        )
-        with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = bframe.beta(asset=str_col, market=1)
+        if results != [
+            "1.00000000000",
+            "0.00225511385",
+            "-0.04957426622",
+            "0.01312690613",
+            "0.02515147445",
+            "0.00589243239",
+            "1.00000000000",
+            "0.10533452453",
+            "-0.01266754819",
+            "0.03977607247",
+            "-0.04676333947",
+            "0.03802715426",
+            "1.00000000000",
+            "-0.00723248920",
+            "-0.03474759800",
+            "0.03520481606",
+            "-0.01300187928",
+            "-0.02056261152",
+            "1.00000000000",
+            "0.00042231402",
+            "0.10271570420",
+            "0.06216832423",
+            "-0.15043502549",
+            "0.00064308622",
+            "1.00000000000",
+        ]:
+            msg = "Unexpected results from method beta()"
+            raise ValueError(msg)
 
-        self.assertEqual(
-            e_asset.exception.args[0],
-            "asset should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="asset should be a tuple",
+        ):
+            _ = bframe.beta(
+                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                market=1,
+            )
 
-        with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = bframe.beta(asset=0, market=str_col)
-
-        self.assertEqual(
-            e_market.exception.args[0],
-            "market should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="market should be a tuple",
+        ):
+            _ = bframe.beta(
+                asset=0,
+                market=cast(Union[tuple[str, ValueType], int], "string"),
+            )
 
     def test_jensen_alpha(self: TestOpenFrame) -> None:
         """Test jensen_alpha method."""
         jframe = self.randomframe.from_deepcopy()
         jframe.to_cumret()
         jframe.resample("7D")
-        results = []
-        for i in range(jframe.item_count):
-            for j in range(jframe.item_count):
-                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
+        results = [
+            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            for comb in iter_product(
+                range(jframe.item_count),
+                range(jframe.item_count),
+            )
+        ]
 
-        results_tuple = []
-        for i in jframe.tsdf:
-            for j in jframe.tsdf:
-                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
+        results_tuple = [
+            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            for comb in iter_product(jframe.tsdf, jframe.tsdf)
+        ]
 
-        self.assertListEqual(results, results_tuple)
-        self.assertListEqual(
-            results,
-            [
-                "0.000000000",
-                "0.027643279",
-                "0.029626538",
-                "-0.008368599",
-                "-0.005750392",
-                "-0.094690628",
-                "0.000000000",
-                "-0.025292179",
-                "-0.092734191",
-                "-0.101964705",
-                "-0.051910010",
-                "-0.019746745",
-                "0.000000000",
-                "-0.051921297",
-                "-0.049584293",
-                "0.018764935",
-                "0.019927858",
-                "0.021773289",
-                "0.000000000",
-                "0.010246959",
-                "-0.023181122",
-                "-0.029357400",
-                "-0.022125144",
-                "-0.017078985",
-                "0.000000000",
-            ],
-        )
-        with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = jframe.jensen_alpha(asset=str_col, market=1)
+        if results != results_tuple:
+            msg = "Unexpected results from method jensen_alpha()"
+            raise ValueError(msg)
 
-        self.assertEqual(
-            e_asset.exception.args[0],
-            "asset should be a tuple[str, ValueType] or an integer.",
-        )
+        if results != [
+            "0.000000000",
+            "0.027643279",
+            "0.029626538",
+            "-0.008368599",
+            "-0.005750392",
+            "-0.094690628",
+            "0.000000000",
+            "-0.025292179",
+            "-0.092734191",
+            "-0.101964705",
+            "-0.051910010",
+            "-0.019746745",
+            "0.000000000",
+            "-0.051921297",
+            "-0.049584293",
+            "0.018764935",
+            "0.019927858",
+            "0.021773289",
+            "0.000000000",
+            "0.010246959",
+            "-0.023181122",
+            "-0.029357400",
+            "-0.022125144",
+            "-0.017078985",
+            "0.000000000",
+        ]:
+            msg = "Unexpected results from method jensen_alpha()"
+            raise ValueError(msg)
 
-        with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = jframe.jensen_alpha(asset=0, market=str_col)
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="asset should be a tuple",
+        ):
+            _ = jframe.jensen_alpha(
+                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                market=1,
+            )
 
-        self.assertEqual(
-            e_market.exception.args[0],
-            "market should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="market should be a tuple",
+        ):
+            _ = jframe.jensen_alpha(
+                asset=0,
+                market=cast(Union[tuple[str, ValueType], int], "string"),
+            )
 
         ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
         shortframe = jframe.trunc_frame(start_cut=ninemth)
         shortframe.to_cumret()
-        sresults = []
-        for i in range(shortframe.item_count):
-            for j in range(shortframe.item_count):
-                sresults.append(f"{shortframe.jensen_alpha(asset=i, market=j):.9f}")
+        sresults = [
+            f"{shortframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            for comb in iter_product(
+                range(shortframe.item_count),
+                range(shortframe.item_count),
+            )
+        ]
 
-        sresults_tuple = []
-        for i in shortframe.tsdf:
-            for j in shortframe.tsdf:
-                sresults_tuple.append(
-                    f"{shortframe.jensen_alpha(asset=i, market=j):.9f}",
-                )
+        sresults_tuple = [
+            f"{shortframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            for comb in iter_product(shortframe.tsdf, shortframe.tsdf)
+        ]
 
-        self.assertListEqual(sresults, sresults_tuple)
-        self.assertListEqual(
-            sresults,
-            [
-                "0.000000000",
-                "-0.043721481",
-                "0.091725480",
-                "0.108780390",
-                "0.012244249",
-                "-0.078588038",
-                "0.000000000",
-                "-0.126003759",
-                "-0.137148953",
-                "-0.069468578",
-                "0.006395139",
-                "-0.050191011",
-                "0.000000000",
-                "0.018726894",
-                "-0.000440884",
-                "-0.018697252",
-                "-0.011027547",
-                "-0.013438783",
-                "0.000000000",
-                "-0.005692602",
-                "-0.119326162",
-                "0.056709768",
-                "-0.293744566",
-                "-0.274853038",
-                "0.000000000",
-            ],
-        )
+        if sresults != sresults_tuple:
+            msg = "Unexpected results from method jensen_alpha()"
+            raise ValueError(msg)
+
+        if sresults != [
+            "0.000000000",
+            "-0.043721481",
+            "0.091725480",
+            "0.108780390",
+            "0.012244249",
+            "-0.078588038",
+            "0.000000000",
+            "-0.126003759",
+            "-0.137148953",
+            "-0.069468578",
+            "0.006395139",
+            "-0.050191011",
+            "0.000000000",
+            "0.018726894",
+            "-0.000440884",
+            "-0.018697252",
+            "-0.011027547",
+            "-0.013438783",
+            "0.000000000",
+            "-0.005692602",
+            "-0.119326162",
+            "0.056709768",
+            "-0.293744566",
+            "-0.274853038",
+            "0.000000000",
+        ]:
+            msg = "Unexpected results from method jensen_alpha()"
+            raise ValueError(msg)
 
     def test_jensen_alpha_returns_input(self: TestOpenFrame) -> None:
         """Test jensen_alpha method with returns input."""
         jframe = self.randomframe.from_deepcopy()
         jframe.resample("7D")
-        results = []
-        for i in range(jframe.item_count):
-            for j in range(jframe.item_count):
-                results.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
+        results = [
+            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            for comb in iter_product(
+                range(jframe.item_count),
+                range(jframe.item_count),
+            )
+        ]
 
-        results_tuple = []
-        for i in jframe.tsdf:
-            for j in jframe.tsdf:
-                results_tuple.append(f"{jframe.jensen_alpha(asset=i, market=j):.9f}")
+        results_tuple = [
+            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            for comb in iter_product(jframe.tsdf, jframe.tsdf)
+        ]
 
-        self.assertListEqual(results, results_tuple)
+        if results != results_tuple:
+            msg = "Unexpected results from method jensen_alpha()"
+            raise ValueError(msg)
 
-        self.assertListEqual(
-            results,
-            [
-                "0.000000000",
-                "-0.000198851",
-                "-0.000187574",
-                "-0.000199182",
-                "-0.000186796",
-                "-0.000198987",
-                "0.000000000",
-                "-0.000225082",
-                "-0.000200278",
-                "-0.000180382",
-                "0.000227262",
-                "0.000244193",
-                "0.000000000",
-                "0.000236515",
-                "0.000219303",
-                "-0.000002178",
-                "-0.000011797",
-                "-0.000004329",
-                "0.000000000",
-                "-0.000008984",
-                "-0.000476795",
-                "-0.000484823",
-                "-0.000461676",
-                "-0.000497260",
-                "0.000000000",
-            ],
-        )
-        with self.assertRaises(Exception) as e_asset:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = jframe.jensen_alpha(asset=str_col, market=1)
+        if results != [
+            "0.000000000",
+            "-0.000198851",
+            "-0.000187574",
+            "-0.000199182",
+            "-0.000186796",
+            "-0.000198987",
+            "0.000000000",
+            "-0.000225082",
+            "-0.000200278",
+            "-0.000180382",
+            "0.000227262",
+            "0.000244193",
+            "0.000000000",
+            "0.000236515",
+            "0.000219303",
+            "-0.000002178",
+            "-0.000011797",
+            "-0.000004329",
+            "0.000000000",
+            "-0.000008984",
+            "-0.000476795",
+            "-0.000484823",
+            "-0.000461676",
+            "-0.000497260",
+            "0.000000000",
+        ]:
+            msg = "Unexpected results from method jensen_alpha()"
+            raise ValueError(msg)
 
-        self.assertEqual(
-            e_asset.exception.args[0],
-            "asset should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="asset should be a tuple",
+        ):
+            _ = jframe.jensen_alpha(
+                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                market=1,
+            )
 
-        with self.assertRaises(Exception) as e_market:
-            str_col = cast(Union[tuple[str, ValueType], int], "string")
-            _ = jframe.jensen_alpha(asset=0, market=str_col)
-
-        self.assertEqual(
-            e_market.exception.args[0],
-            "market should be a tuple[str, ValueType] or an integer.",
-        )
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="market should be a tuple",
+        ):
+            _ = jframe.jensen_alpha(
+                asset=0,
+                market=cast(Union[tuple[str, ValueType], int], "string"),
+            )
 
     def test_ewma_risk(self: TestOpenFrame) -> None:
         """Test ewma_risk method."""
@@ -2579,51 +2765,51 @@ class TestOpenFrame(TestCase):
         list_one = [f"{e:.11f}" for e in edf.head(10).iloc[:, 0]]
         list_two = [f"{e:.11f}" for e in edf.head(10).iloc[:, 1]]
         corr_one = [f"{e:.11f}" for e in edf.head(10).iloc[:, 2]]
-        self.assertListEqual(
-            list_one,
-            [
-                "0.07995872621",
-                "0.07801248670",
-                "0.07634125583",
-                "0.07552465738",
-                "0.07894138379",
-                "0.07989322216",
-                "0.07769398173",
-                "0.07806577815",
-                "0.07603008639",
-                "0.08171281006",
-            ],
-        )
-        self.assertListEqual(
-            list_two,
-            [
-                "0.10153833268",
-                "0.09869274051",
-                "0.09583812971",
-                "0.09483161937",
-                "0.09470601474",
-                "0.09210588859",
-                "0.11261673980",
-                "0.11113938828",
-                "0.11043515326",
-                "0.10817921616",
-            ],
-        )
-        self.assertListEqual(
-            corr_one,
-            [
-                "-0.00015294210",
-                "0.00380837753",
-                "0.00758444757",
-                "-0.01259265721",
-                "0.03346034482",
-                "0.02068245047",
-                "-0.00730691767",
-                "0.01757764619",
-                "0.02745689252",
-                "-0.00629004298",
-            ],
-        )
+
+        if list_one != [
+            "0.07995872621",
+            "0.07801248670",
+            "0.07634125583",
+            "0.07552465738",
+            "0.07894138379",
+            "0.07989322216",
+            "0.07769398173",
+            "0.07806577815",
+            "0.07603008639",
+            "0.08171281006",
+        ]:
+            msg = "Unexpected results from method ewma_risk()"
+            raise ValueError(msg)
+
+        if list_two != [
+            "0.10153833268",
+            "0.09869274051",
+            "0.09583812971",
+            "0.09483161937",
+            "0.09470601474",
+            "0.09210588859",
+            "0.11261673980",
+            "0.11113938828",
+            "0.11043515326",
+            "0.10817921616",
+        ]:
+            msg = "Unexpected results from method ewma_risk()"
+            raise ValueError(msg)
+
+        if corr_one != [
+            "-0.00015294210",
+            "0.00380837753",
+            "0.00758444757",
+            "-0.01259265721",
+            "0.03346034482",
+            "0.02068245047",
+            "-0.00730691767",
+            "0.01757764619",
+            "0.02745689252",
+            "-0.00629004298",
+        ]:
+            msg = "Unexpected results from method ewma_risk()"
+            raise ValueError(msg)
 
     def test_ewma_risk_set_columns(self: TestOpenFrame) -> None:
         """Test ewma_risk method on specified columns."""
@@ -2637,48 +2823,48 @@ class TestOpenFrame(TestCase):
         list_three = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 0]]
         list_four = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 1]]
         corr_two = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 2]]
-        self.assertListEqual(
-            list_three,
-            [
-                "0.07712206989",
-                "0.07942595349",
-                "0.08666330524",
-                "0.09336934376",
-                "0.09064864248",
-                "0.08834725868",
-                "0.08578870069",
-                "0.08372351448",
-                "0.08828894057",
-                "0.08718509958",
-            ],
-        )
-        self.assertListEqual(
-            list_four,
-            [
-                "0.07787841405",
-                "0.07727035322",
-                "0.07498769117",
-                "0.07273500879",
-                "0.07786226476",
-                "0.07880499823",
-                "0.08075244706",
-                "0.07832868687",
-                "0.07594379202",
-                "0.08107054465",
-            ],
-        )
-        self.assertListEqual(
-            corr_two,
-            [
-                "0.00068511835",
-                "-0.03519976419",
-                "-0.02124735579",
-                "-0.02555360096",
-                "-0.01204201129",
-                "0.00315017923",
-                "0.01198035018",
-                "0.01363505146",
-                "0.01369207054",
-                "0.05193595929",
-            ],
-        )
+
+        if list_three != [
+            "0.07712206989",
+            "0.07942595349",
+            "0.08666330524",
+            "0.09336934376",
+            "0.09064864248",
+            "0.08834725868",
+            "0.08578870069",
+            "0.08372351448",
+            "0.08828894057",
+            "0.08718509958",
+        ]:
+            msg = "Unexpected results from method ewma_risk()"
+            raise ValueError(msg)
+
+        if list_four != [
+            "0.07787841405",
+            "0.07727035322",
+            "0.07498769117",
+            "0.07273500879",
+            "0.07786226476",
+            "0.07880499823",
+            "0.08075244706",
+            "0.07832868687",
+            "0.07594379202",
+            "0.08107054465",
+        ]:
+            msg = "Unexpected results from method ewma_risk()"
+            raise ValueError(msg)
+
+        if corr_two != [
+            "0.00068511835",
+            "-0.03519976419",
+            "-0.02124735579",
+            "-0.02555360096",
+            "-0.01204201129",
+            "0.00315017923",
+            "0.01198035018",
+            "0.01363505146",
+            "0.01369207054",
+            "0.05193595929",
+        ]:
+            msg = "Unexpected results from method ewma_risk()"
+            raise ValueError(msg)

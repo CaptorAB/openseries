@@ -88,6 +88,7 @@ PlotlyLayoutType = dict[
 
 CaptorLogoType = dict[str, Union[str, float]]
 
+LiteralTrunc = Literal["before", "after", "both"]
 LiteralLinePlotMode = Literal[
     "lines",
     "markers",
@@ -232,11 +233,15 @@ class OpenTimeSeriesPropertiesList(list[str]):
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
+                msg = (
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                )
                 raise ValueError(
-                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}",
+                    msg,
                 )
             if item in seen:
-                raise ValueError(f"Duplicate string: {item}")
+                msg = f"Duplicate string: {item}"
+                raise ValueError(msg)
             seen.add(item)
 
 
@@ -285,11 +290,15 @@ class OpenFramePropertiesList(list[str]):
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
+                msg = (
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                )
                 raise ValueError(
-                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}",
+                    msg,
                 )
             if item in seen:
-                raise ValueError(f"Duplicate string: {item}")
+                msg = f"Duplicate string: {item}"
+                raise ValueError(msg)
             seen.add(item)
 
 

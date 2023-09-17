@@ -49,6 +49,7 @@ from openseries.types import (
     LiteralPandasResampleConvention,
     LiteralPortfolioWeightings,
     LiteralRiskParityMethod,
+    LiteralTrunc,
     OpenFramePropertiesList,
     ValueType,
 )
@@ -92,7 +93,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         """Pydantic validator ensuring that OpenFrame labels are unique."""
         labls = [x.label for x in tseries]
         if len(set(labls)) != len(labls):
-            raise ValueError("TimeSeries names/labels must be unique")
+            msg = "TimeSeries names/labels must be unique"
+            raise ValueError(msg)
         return tseries
 
     def __init__(
@@ -168,9 +170,12 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             [x.tsdf for x in self.constituents],
         )
         if self.tsdf.empty:
+            msg = (
+                "Merging OpenTimeSeries DataFrames with "
+                f"argument how={how} produced an empty DataFrame."
+            )
             raise ValueError(
-                f"Merging OpenTimeSeries DataFrames with "
-                f"argument how={how} produced an empty DataFrame.",
+                msg,
             )
         if how == "inner":
             for xerie in self.constituents:
@@ -201,8 +206,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             prop_list = [
                 getattr(self, x) for x in OpenFramePropertiesList.allowed_strings
             ]
-        results = concat(prop_list, axis="columns").T
-        return results
+        return concat(prop_list, axis="columns").T
 
     def calc_range(
         self: TypeOpenFrame,
@@ -355,7 +359,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             dtype=Int64Dtype(),
         )
 
-    def jensen_alpha(
+    def jensen_alpha(  # noqa: C901
         self: TypeOpenFrame,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
@@ -385,6 +389,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         float
             Jensen's alpha
         """
+        full_year: float = 1.0
         if all(
             x == ValueType.RTRN
             for x in self.tsdf.columns.get_level_values(1).to_numpy()
@@ -396,8 +401,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                 asset_log = self.tsdf.iloc[:, asset]
                 asset_cagr = asset_log.mean()
             else:
-                raise ValueError(
-                    "asset should be a tuple[str, ValueType] or an integer.",
+                msg = "asset should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
             if isinstance(market, tuple):
                 market_log = self.tsdf.loc[:, market]
@@ -406,15 +412,16 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                 market_log = self.tsdf.iloc[:, market]
                 market_cagr = market_log.mean()
             else:
-                raise ValueError(
-                    "market should be a tuple[str, ValueType] or an integer.",
+                msg = "market should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
         else:
             if isinstance(asset, tuple):
                 asset_log = log(
                     self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
                 )
-                if self.yearfrac > 1.0:
+                if self.yearfrac > full_year:
                     asset_cagr = (
                         self.tsdf.loc[:, asset].iloc[-1]
                         / self.tsdf.loc[:, asset].iloc[0]
@@ -427,7 +434,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                     )
             elif isinstance(asset, int):
                 asset_log = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
-                if self.yearfrac > 1.0:
+                if self.yearfrac > full_year:
                     asset_cagr = (
                         self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
                     ) ** (1 / self.yearfrac) - 1
@@ -436,14 +443,15 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                         self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
                     )
             else:
-                raise ValueError(
-                    "asset should be a tuple[str, ValueType] or an integer.",
+                msg = "asset should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
             if isinstance(market, tuple):
                 market_log = log(
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
                 )
-                if self.yearfrac > 1.0:
+                if self.yearfrac > full_year:
                     market_cagr = (
                         self.tsdf.loc[:, market].iloc[-1]
                         / self.tsdf.loc[:, market].iloc[0]
@@ -456,7 +464,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                     )
             elif isinstance(market, int):
                 market_log = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
-                if self.yearfrac > 1.0:
+                if self.yearfrac > full_year:
                     market_cagr = (
                         self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
                     ) ** (1 / self.yearfrac) - 1
@@ -465,8 +473,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                         self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
                     )
             else:
-                raise ValueError(
-                    "market should be a tuple[str, ValueType] or an integer.",
+                msg = "market should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
 
         covariance = cov(asset_log, market_log, ddof=1)
@@ -854,8 +863,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         self: TypeOpenFrame,
         start_cut: Optional[dt.date] = None,
         end_cut: Optional[dt.date] = None,
-        before: bool = True,
-        after: bool = True,
+        where: LiteralTrunc = "both",
     ) -> TypeOpenFrame:
         """
         Truncate DataFrame such that all timeseries have the same time span.
@@ -866,21 +874,18 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             New first date
         end_cut: datetime.date, optional
             New last date
-        before: bool, default: True
-            If True method will truncate to the common earliest start date also
-            when start_cut = None.
-        after: bool, default: True
-            If True method will truncate to the common latest end date also
-            when end_cut = None.
+        where: LiteralTrunc, default: both
+            Determines where dataframe is truncated also when start_cut
+            or end_cut is None.
 
         Returns
         -------
         OpenFrame
             An OpenFrame object
         """
-        if not start_cut and before:
+        if not start_cut and where in ["before", "both"]:
             start_cut = self.first_indices.max()
-        if not end_cut and after:
+        if not end_cut and where in ["after", "both"]:
             end_cut = self.last_indices.min()
         self.tsdf = self.tsdf.sort_index()
         self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
@@ -909,7 +914,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         self: TypeOpenFrame,
         long_column: int = 0,
         short_column: int = 1,
-        base_zero: bool = True,
+        base_zero: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
         """
         Calculate cumulative relative return between two series.
@@ -991,8 +996,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise ValueError(
-                "base_column should be a tuple[str, ValueType] or an integer.",
+            msg = "base_column should be a tuple[str, ValueType] or an integer."
+            raise TypeError(
+                msg,
             )
 
         if periods_in_a_year_fixed:
@@ -1074,8 +1080,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise ValueError(
-                "base_column should be a tuple[str, ValueType] or an integer.",
+            msg = "base_column should be a tuple[str, ValueType] or an integer."
+            raise TypeError(
+                msg,
             )
 
         if periods_in_a_year_fixed:
@@ -1104,7 +1111,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             dtype="float64",
         )
 
-    def capture_ratio_func(
+    def capture_ratio_func(  # noqa: C901
         self: TypeOpenFrame,
         ratio: LiteralCaptureRatio,
         base_column: Union[tuple[str, ValueType], int] = -1,
@@ -1147,12 +1154,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         Pandas.Series
             Capture Ratios
         """
-        assert ratio in [
-            "up",
-            "down",
-            "both",
-        ], "Ratio must be one of 'up', 'down' or 'both'."
-
+        loss_limit: float = 0.0
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
 
@@ -1171,8 +1173,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             short_item = self.tsdf.iloc[:, base_column].name
             short_label = self.tsdf.iloc[:, base_column].name[0]
         else:
-            raise ValueError(
-                "base_column should be a tuple[str, ValueType] or an integer.",
+            msg = "base_column should be a tuple[str, ValueType] or an integer."
+            raise TypeError(
+                msg,
             )
 
         if periods_in_a_year_fixed:
@@ -1192,7 +1195,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                 if ratio == "up":
                     uparray = (
                         longdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1201,7 +1206,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                     )
                     upidxarray = (
                         shortdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1212,7 +1219,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                 elif ratio == "down":
                     downarray = (
                         longdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1221,7 +1230,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                     )
                     downidxarray = (
                         shortdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1233,7 +1244,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                 elif ratio == "both":
                     uparray = (
                         longdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1242,7 +1255,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                     )
                     upidxarray = (
                         shortdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() > 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1251,7 +1266,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                     )
                     downarray = (
                         longdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1260,7 +1277,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                     )
                     downidxarray = (
                         shortdf.ffill()
-                        .pct_change()[shortdf.ffill().pct_change().to_numpy() < 0.0]
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        ]
                         .add(1)
                         .to_numpy()
                     )
@@ -1318,16 +1337,18 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             elif isinstance(asset, int):
                 y_value = self.tsdf.iloc[:, asset]
             else:
-                raise ValueError(
-                    "asset should be a tuple[str, ValueType] or an integer.",
+                msg = "asset should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
             if isinstance(market, tuple):
                 x_value = self.tsdf.loc[:, market]
             elif isinstance(market, int):
                 x_value = self.tsdf.iloc[:, market]
             else:
-                raise ValueError(
-                    "market should be a tuple[str, ValueType] or an integer.",
+                msg = "market should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
         else:
             if isinstance(asset, tuple):
@@ -1337,8 +1358,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             elif isinstance(asset, int):
                 y_value = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
             else:
-                raise ValueError(
-                    "asset should be a tuple[str, ValueType] or an integer.",
+                msg = "asset should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
             if isinstance(market, tuple):
                 x_value = log(
@@ -1347,8 +1369,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             elif isinstance(market, int):
                 x_value = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
             else:
-                raise ValueError(
-                    "market should be a tuple[str, ValueType] or an integer.",
+                msg = "market should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
                 )
 
         covariance = cov(y_value, x_value, ddof=1)
@@ -1360,7 +1383,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         self: TypeOpenFrame,
         y_column: Union[tuple[str, ValueType], int],
         x_column: Union[tuple[str, ValueType], int],
-        fitted_series: bool = True,
+        fitted_series: bool = True,  # noqa: FBT001, FBT002
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
     ) -> RegressionResults:
@@ -1396,8 +1419,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             y_value = self.tsdf.iloc[:, y_column]
             y_label = self.tsdf.iloc[:, y_column].name[0]
         else:
-            raise ValueError(
-                "y_column should be a tuple[str, ValueType] or an integer.",
+            msg = "y_column should be a tuple[str, ValueType] or an integer."
+            raise TypeError(
+                msg,
             )
 
         if isinstance(x_column, tuple):
@@ -1407,8 +1431,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             x_value = self.tsdf.iloc[:, x_column]
             x_label = self.tsdf.iloc[:, x_column].name[0]
         else:
-            raise ValueError(
-                "x_column should be a tuple[str, ValueType] or an integer.",
+            msg = "x_column should be a tuple[str, ValueType] or an integer."
+            raise TypeError(
+                msg,
             )
 
         results = sm.OLS(y_value, x_value).fit(method=method, cov_type=cov_type)
@@ -1465,9 +1490,12 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             A basket timeseries
         """
         if self.weights is None and weight_strat is None:
+            msg = (
+                "OpenFrame weights property must be provided "
+                "to run the make_portfolio method."
+            )
             raise ValueError(
-                "OpenFrame weights property must be provided to run the "
-                "make_portfolio method.",
+                msg,
             )
         dframe = self.tsdf.copy()
         if not any(
@@ -1506,7 +1534,8 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
                 )
                 self.weights = weight_calc
             else:
-                raise NotImplementedError("Weight strategy not implemented")
+                msg = "Weight strategy not implemented"
+                raise NotImplementedError(msg)
         portfolio = dframe.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
         portfolio.columns = [[name], [ValueType.PRICE]]
@@ -1601,7 +1630,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             Rolling Betas
         """
         market_label = self.tsdf.iloc[:, market_column].name[0]
-        beta_label = f"{self.tsdf.iloc[:, asset_column].name[0]}" f" / {market_label}"
+        beta_label = f"{self.tsdf.iloc[:, asset_column].name[0]} / {market_label}"
 
         rolling = self.tsdf.copy()
         rolling = (
