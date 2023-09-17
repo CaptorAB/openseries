@@ -160,7 +160,7 @@ class TestOpenTimeSeries(TestCase):
             OpenTimeSeries.setup_class(countries="12")
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=TypeError,
             match=(
                 "countries must be a list of country "
                 "codes according to ISO 3166-1 alpha-2"
@@ -169,7 +169,7 @@ class TestOpenTimeSeries(TestCase):
             OpenTimeSeries.setup_class(countries=["SE", cast(str, 12)])
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=TypeError,
             match=(
                 "countries must be a list of country "
                 "codes according to ISO 3166-1 alpha-2"
@@ -178,7 +178,7 @@ class TestOpenTimeSeries(TestCase):
             OpenTimeSeries.setup_class(countries=["SE", "12"])
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=TypeError,
             match="according to ISO 3166-1 alpha-2",
         ):
             OpenTimeSeries.setup_class(countries=cast(CountriesType, None))
