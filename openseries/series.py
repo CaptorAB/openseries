@@ -163,17 +163,26 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
             try:
                 all_ctries = all(ctry_pattern.match(ctry) for ctry in countries)
             except TypeError as exc:
-                msg = "countries must be a list of country codes according to ISO 3166-1 alpha-2"
+                msg = (
+                    "countries must be a list of country "
+                    "codes according to ISO 3166-1 alpha-2"
+                )
                 raise TypeError(
                     msg,
                 ) from exc
             if not all_ctries:
-                msg = "countries must be a list of country codes according to ISO 3166-1 alpha-2"
+                msg = (
+                    "countries must be a list of country "
+                    "codes according to ISO 3166-1 alpha-2"
+                )
                 raise TypeError(
                     msg,
                 )
         else:
-            msg = "countries must be a (list of) country code(s) according to ISO 3166-1 alpha-2"
+            msg = (
+                "countries must be a list of country "
+                "codes according to ISO 3166-1 alpha-2"
+            )
             raise TypeError(
                 msg,
             )

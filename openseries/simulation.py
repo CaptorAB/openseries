@@ -152,10 +152,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             Price series
         """
         returns = exp(log_returns)
-        # A sequence of prices starting with param.all_s0
         price_sequence: list[float] = [param.all_s0]
         for rtn in range(1, len(returns)):
-            # Add the price at t-1 * return at t
             price_sequence.append(price_sequence[rtn - 1] * returns[rtn - 1])
         return array(price_sequence)
 
@@ -215,7 +213,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         """
         return cls.convert_to_prices(
             param,
-            cls.brownian_motion_log_returns(param, seed=seed),
+            cls.brownian_motion_log_returns(param=param, seed=seed),
         )
 
     @classmethod
@@ -244,7 +242,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         NDArray[float64]
             Log returns of a Geometric Brownian Motion process
         """
-        wiener_process = array(cls.brownian_motion_log_returns(param, seed=seed))
+        wiener_process = array(cls.brownian_motion_log_returns(param=param, seed=seed))
         sigma_pow_mu_delta = (
             param.gbm_mu - 0.5 * mathpow(param.all_sigma, 2.0)
         ) * param.all_delta
@@ -273,7 +271,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         """
         return cls.convert_to_prices(
             param,
-            cls.geometric_brownian_motion_log_returns(param, seed=seed),
+            cls.geometric_brownian_motion_log_returns(param=param, seed=seed),
         )
 
     @classmethod
@@ -303,12 +301,11 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         """
         if seed is not None:
             nprandom.seed(seed)
+
         s_n = 0.0
         time = 0
         small_lamda = -(1.0 / param.jumps_lamda)
-        jump_sizes: list[float] = []
-        for _ in range(param.all_time):
-            jump_sizes.append(0.0)
+        jump_sizes = [0.0] * param.all_time
         while s_n < param.all_time:
             s_n += small_lamda * log(nprandom.uniform(0, 1))
             for j in range(param.all_time):
@@ -317,7 +314,10 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
                     <= s_n * param.all_delta
                     <= (j + 1) * param.all_delta
                 ):
-                    jump_sizes[j] += nprandom.normal(param.jumps_mu, param.jumps_sigma)
+                    jump_sizes[j] += nprandom.normal(
+                        param.jumps_mu,
+                        param.jumps_sigma,
+                    )
                     break
             time += 1
         return array(jump_sizes)
@@ -380,7 +380,9 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         """
         return cls.convert_to_prices(
             param,
-            cls.geometric_brownian_motion_jump_diffusion_log_returns(param, seed=seed),
+            cls.geometric_brownian_motion_jump_diffusion_log_returns(
+                param=param, seed=seed
+            ),
         )
 
     @classmethod
@@ -416,14 +418,16 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
 
         sqrt_delta = sqrt(param.all_delta)
 
-        brownian_motion_two = []
-        for npath in range(param.all_time - 1):
-            term_one = param.cir_rho * brownian_motion_one[npath]
-            term_two = sqrt(1 - mathpow(param.cir_rho, 2.0)) * nprandom.normal(
+        brownian_motion_two = [
+            param.cir_rho * brownian_motion_one[npath]
+            + sqrt(1 - mathpow(param.cir_rho, 2.0))
+            * nprandom.normal(
                 0,
                 sqrt_delta,
             )
-            brownian_motion_two.append(term_one + term_two)
+            for npath in range(param.all_time - 1)
+        ]
+
         return array(brownian_motion_one), array(brownian_motion_two)
 
     @classmethod
@@ -509,7 +513,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         tuple[NDArray[float64], NDArray[float64]]
             The prices for an asset following a Heston process
         """
-        brownian, cir_process = cls.cox_ingersoll_ross_heston(param, seed=seed)
+        brownian, cir_process = cls.cox_ingersoll_ross_heston(param=param, seed=seed)
         brownian, brownian_motion_market = cls.heston_construct_correlated_path(
             param,
             brownian,
@@ -560,7 +564,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         NDArray[float64]
             The interest rate levels for the CIR process
         """
-        brownian_motion = cls.brownian_motion_log_returns(param, seed=seed)
+        brownian_motion = cls.brownian_motion_log_returns(param=param, seed=seed)
 
         levels = array([param.all_r0])
         for hpath in range(1, param.all_time):
@@ -591,7 +595,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             The interest rate levels for the Ornstein Uhlenbeck process
         """
         ou_levels = array([param.all_r0])
-        brownian_motion_returns = cls.brownian_motion_log_returns(param, seed=seed)
+        brownian_motion_returns = cls.brownian_motion_log_returns(param=param, seed=seed)
         for hpath in range(1, param.all_time):
             drift = param.ou_a * (param.ou_mu - ou_levels[hpath - 1]) * param.all_delta
             randomness = brownian_motion_returns[hpath - 1]
@@ -634,6 +638,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         """
         if seed:
             nprandom.seed(seed)
+
         daily_returns = nprandom.normal(
             loc=mean_annual_return / trading_days_in_year,
             scale=mean_annual_vol / sqrt(trading_days_in_year),
@@ -684,6 +689,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         """
         if seed:
             nprandom.seed(seed)
+
         daily_returns = (
             nprandom.lognormal(
                 mean=mean_annual_return / trading_days_in_year,
@@ -738,9 +744,6 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ReturnSimulation
             Geometric Brownian Motion simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -748,11 +751,14 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             all_sigma=mean_annual_vol,
             gbm_mu=mean_annual_return,
         )
-        daily_returns = []
-        for _ in range(number_of_sims):
-            daily_returns.append(
-                cls.geometric_brownian_motion_log_returns(param=model_params),
+        daily_returns = [
+            cls.geometric_brownian_motion_log_returns(
+                param=model_params,
+                seed=seed,
             )
+            for _ in range(number_of_sims)
+        ]
+
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -805,9 +811,6 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ReturnSimulation
             Heston model simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -820,7 +823,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         )
         daily_returns = []
         for _ in range(number_of_sims):
-            aray = cls.heston_model_levels(model_params)[0]
+            aray = cls.heston_model_levels(param=model_params, seed=seed)[0]
             return_array = aray[1:] / aray[:-1] - 1
             return_array = insert(return_array, 0, 0.0)
             daily_returns.append(return_array)
@@ -873,9 +876,6 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ReturnSimulation
             Heston Vol model simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -888,7 +888,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         )
         daily_returns = []
         for _ in range(number_of_sims):
-            aray = cls.heston_model_levels(model_params)[1]
+            aray = cls.heston_model_levels(param=model_params, seed=seed)[1]
             return_array = aray[1:] / aray[:-1] - 1
             return_array = insert(return_array, 0, 0.0)
             daily_returns.append(return_array)
@@ -944,9 +944,6 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ReturnSimulation
             Merton Jump-Diffusion model simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -959,7 +956,10 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         )
         daily_returns = []
         for _ in range(number_of_sims):
-            aray = cls.geometric_brownian_motion_jump_diffusion_levels(model_params)
+            aray = cls.geometric_brownian_motion_jump_diffusion_levels(
+                param=model_params,
+                seed=seed,
+            )
             return_array = aray[1:] / aray[:-1] - 1
             return_array = insert(return_array, 0, 0.0)
             daily_returns.append(return_array)
