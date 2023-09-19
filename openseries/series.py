@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import datetime as dt
 from copy import deepcopy
+from logging import warning
 from re import compile as re_compile
 from typing import Any, Optional, TypeVar, Union, cast
 
@@ -293,20 +294,19 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
                 if check_if_none(
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
                 ):
-                    print(
-                        "checked item",
-                        dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
-                    )
                     label = "Series"
-                    print(f"label missing. Adding '{label}' as label")
+                    warning(msg=f"label missing. Adding '{label}' as label")
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
                 if check_if_none(
                     dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
                 ):
                     valuetype = ValueType.PRICE
-                    print(
-                        f"valuetype missing. Adding '{valuetype.value}' as valuetype",
+                    warning(
+                        msg=(
+                            "valuetype missing. Adding "
+                            f"'{valuetype.value}' as valuetype"
+                        ),
                     )
                 else:
                     valuetype = dframe.columns.get_level_values(1).to_numpy()[

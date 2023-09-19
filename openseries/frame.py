@@ -85,6 +85,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         revalidate_instances="always",
     )
 
+    # noinspection PyMethodParameters
     @field_validator("constituents")  # type: ignore[misc, unused-ignore]
     def check_labels_unique(
         cls: TypeOpenFrame,  # noqa: N805

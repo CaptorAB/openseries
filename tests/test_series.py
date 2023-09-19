@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 import datetime as dt
-import sys
-from io import StringIO
 from json import load, loads
-from os import path, remove
+from pathlib import Path
 from typing import TypeVar, Union, cast
 from unittest import TestCase
 
@@ -37,7 +35,7 @@ class NewTimeSeries(OpenTimeSeries):
 )
 def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
     """Pytest on valid valuetype as input."""
-    assert isinstance(
+    if not isinstance(
         OpenTimeSeries.from_arrays(
             name="Asset",
             dates=["2023-01-01", "2023-01-02"],
@@ -45,7 +43,9 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
             values=[1.0, 1.1],
         ),
         OpenTimeSeries,
-    )
+    ):
+        msg = "Valid valuetype input rendered unexpected error"
+        raise TypeError(msg)
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -54,16 +54,16 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
 )
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     """Pytest on invalid valuetype as input."""
-    with pytest.raises(PydanticValidationError) as e_invalid_valuetype:
+    with pytest.raises(
+        expected_exception=PydanticValidationError,
+        match="type=enum|type=string_type",
+    ):
         OpenTimeSeries.from_arrays(
             name="Asset",
             dates=["2023-01-01", "2023-01-02"],
             valuetype=valuetype,
             values=[1.0, 1.1],
         )
-    assert "type=enum" in str(
-        e_invalid_valuetype.getrepr(style="short"),
-    ) or "type=string_type" in str(e_invalid_valuetype.getrepr(style="short"))
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -72,7 +72,10 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
 )
 def test_opentimeseries_invalid_currency(currency: str) -> None:
     """Pytest on invalid currency code as input for currency."""
-    with pytest.raises(PydanticValidationError) as e_invalid_currency:
+    with pytest.raises(
+        expected_exception=PydanticValidationError,
+        match="type=string_too_short|type=string_type",
+    ):
         OpenTimeSeries.from_arrays(
             name="Asset",
             baseccy=currency,
@@ -80,9 +83,6 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
             valuetype=ValueType.PRICE,
             values=[1.0, 1.1],
         )
-    assert "type=string_too_short" in str(
-        e_invalid_currency.getrepr(style="short"),
-    ) or "type=string_type" in str(e_invalid_currency.getrepr(style="short"))
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -91,16 +91,16 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
 )
 def test_opentimeseries_invalid_domestic(domestic: str) -> None:
     """Pytest on invalid currency code as input for domestic."""
-    with pytest.raises(PydanticValidationError) as e_dom:
-        serie = OpenTimeSeries.from_arrays(
-            name="Asset",
-            dates=["2023-01-01", "2023-01-02"],
-            values=[1.0, 1.1],
-        )
+    serie = OpenTimeSeries.from_arrays(
+        name="Asset",
+        dates=["2023-01-01", "2023-01-02"],
+        values=[1.0, 1.1],
+    )
+    with pytest.raises(
+        expected_exception=PydanticValidationError,
+        match="type=string_too_short|type=string_type",
+    ):
         serie.domestic = domestic
-    assert "type=string_too_short" in str(
-        e_dom.getrepr(style="short"),
-    ) or "type=string_type" in str(e_dom.getrepr(style="short"))
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -109,16 +109,16 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
 )
 def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     """Pytest on invalid country codes as input."""
-    with pytest.raises(PydanticValidationError) as e_ctries:
-        serie = OpenTimeSeries.from_arrays(
-            name="Asset",
-            dates=["2023-01-01", "2023-01-02"],
-            values=[1.0, 1.1],
-        )
+    serie = OpenTimeSeries.from_arrays(
+        name="Asset",
+        dates=["2023-01-01", "2023-01-02"],
+        values=[1.0, 1.1],
+    )
+    with pytest.raises(
+        expected_exception=PydanticValidationError,
+        match="type=list_type|type=string_type",
+    ):
         serie.countries = countries
-    assert "type=list_type" in str(
-        e_ctries.getrepr(style="short"),
-    ) or "type=string_type" in str(e_ctries.getrepr(style="short"))
 
 
 class TestOpenTimeSeries(TestCase):
@@ -184,8 +184,12 @@ class TestOpenTimeSeries(TestCase):
             OpenTimeSeries.setup_class(countries=cast(CountriesType, None))
 
         OpenTimeSeries.setup_class(domestic_ccy="USD", countries="US")
-        assert OpenTimeSeries.domestic == "USD"
-        assert OpenTimeSeries.countries == "US"
+        if OpenTimeSeries.domestic != "USD":
+            msg = "Method setup_class() not working as intended"
+            raise ValueError(msg)
+        if OpenTimeSeries.countries != "US":
+            msg = "Method setup_class() not working as intended"
+            raise ValueError(msg)
 
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
         """Test invalid dates as input."""
@@ -293,8 +297,8 @@ class TestOpenTimeSeries(TestCase):
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
         """Test duplicate handling."""
-        json_file = path.join(path.dirname(path.abspath(__file__)), "series.json")
-        with open(json_file, encoding="utf-8") as jsonfile:
+        json_file = Path(__file__).resolve().parent.joinpath("series.json")
+        with Path.open(json_file, encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         dates = (
@@ -370,8 +374,9 @@ class TestOpenTimeSeries(TestCase):
         serie_data = {"tsdf": serie, **data}
 
         df_obj = OpenTimeSeries(**df_data)
-        self.assertListEqual(list(df_obj.tsdf.to_numpy()), df_obj.values)
-        assert isinstance(df_obj, OpenTimeSeries)
+        if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
+            msg = "Raw values and DataFrame values not matching"
+            raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=PydanticValidationError,
@@ -392,9 +397,11 @@ class TestOpenTimeSeries(TestCase):
             ],
             values=[1.0, 1.01, 0.99, 1.015, 1.003],
         )
-        assert isinstance(arrseries, OpenTimeSeries)
+        if not isinstance(arrseries, OpenTimeSeries):
+            msg = "Method from_arrays() not working as intended"
+            raise TypeError(msg)
 
-    def test_create_from_pandas_df(self: TestOpenTimeSeries) -> None:
+    def test_create_from_pandas_df(self: TestOpenTimeSeries) -> None:  # noqa: C901
         """Test construct from pandas.DataFrame."""
         serie = Series(
             data=[1.0, 1.01, 0.99, 1.015, 1.003],
@@ -480,53 +487,83 @@ class TestOpenTimeSeries(TestCase):
         df1series = OpenTimeSeries.from_df(dframe=df1, column_nmbr=1)
         df2series = OpenTimeSeries.from_df(dframe=df2, column_nmbr=0)
 
-        assert isinstance(seseries, OpenTimeSeries)
-        assert isinstance(senseries, OpenTimeSeries)
-        assert seseries.label == senseries.label
+        if not isinstance(seseries, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
+        if not isinstance(senseries, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
+        if seseries.label != senseries.label:
+            msg = "Method from_df() not working as intended"
+            raise ValueError(msg)
 
-        assert isinstance(df1series, OpenTimeSeries)
-        assert isinstance(df2series, OpenTimeSeries)
-        label_message = "label missing. Adding 'Series' as label"
-        type_message = "valuetype missing. Adding 'Price(Close)' as valuetype"
-        old_stdout = sys.stdout
-        new_stdout = StringIO()
-        sys.stdout = new_stdout
+        if not isinstance(df1series, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
+        if not isinstance(df2series, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
+
+        with self.assertLogs() as contextmgr:
+            _ = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
+
+        if contextmgr.output != [
+            "WARNING:root:label missing. Adding 'Series' as label",
+        ]:
+            msg = "OpenTimeSeries failed to log warning about label missing."
+            raise ValueError(msg)
+
+        with self.assertLogs() as contextmgr:
+            _ = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
+
+        if contextmgr.output != [
+            "WARNING:root:valuetype missing. Adding 'Price(Close)' as valuetype",
+        ]:
+            msg = "OpenTimeSeries failed to log warning about valuetype missing."
+            raise ValueError(msg)
 
         df3series = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
-        df3_output = new_stdout.getvalue()
         df4series = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
-        df4_output = new_stdout.getvalue()
 
-        sys.stdout = old_stdout
-        assert label_message in df3_output
-        assert type_message in df4_output
+        if not isinstance(df3series, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
+        if not isinstance(df4series, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
 
-        assert isinstance(df3series, OpenTimeSeries)
-        assert isinstance(df4series, OpenTimeSeries)
-
-        assert check_if_none(None)
-        assert not check_if_none(0.0)
+        if not check_if_none(None):
+            msg = "Method check_if_none() not working as intended"
+            raise ValueError(msg)
+        if check_if_none(0.0):
+            msg = "Method check_if_none() not working as intended"
+            raise ValueError(msg)
 
     def test_save_to_json(self: TestOpenTimeSeries) -> None:
         """Test to_json method."""
-        seriesfile = path.join(
-            path.dirname(path.abspath(__file__)),
-            "seriessaved.json",
-        )
+        directory = str(Path(__file__).resolve().parent)
+        seriesfile = Path(f"{directory}/framesaved.json")
 
         jseries = self.randomseries.from_deepcopy()
-        data = jseries.to_json(filename=seriesfile)
+        kwargs = [
+            {"filename": str(seriesfile)},
+            {"filename": str(seriesfile), "directory": directory},
+        ]
+        for kwarg in kwargs:
+            data = jseries.to_json(**kwarg)
+            if [item.get("name") for item in data] != ["Asset"]:
+                msg = "Unexpected data from json"
+                raise ValueError(msg)
 
-        self.assertListEqual(
-            [item.get("name") for item in data],
-            ["Asset"],
-        )
+            if not Path(seriesfile).exists():
+                msg = "json file not created"
+                raise FileNotFoundError(msg)
 
-        assert path.exists(seriesfile)
+            seriesfile.unlink()
 
-        remove(seriesfile)
-
-        assert not path.exists(seriesfile)
+            if Path(seriesfile).exists():
+                msg = "json file not deleted as intended"
+                raise FileExistsError(msg)
 
     def test_create_from_fixed_rate(self: TestOpenTimeSeries) -> None:
         """Test from_fixed_rate construct method."""
@@ -535,14 +572,18 @@ class TestOpenTimeSeries(TestCase):
             days=756,
             end_dt=dt.date(2019, 6, 30),
         )
-        assert isinstance(fixseries_one, OpenTimeSeries)
+        if not isinstance(fixseries_one, OpenTimeSeries):
+            msg = "Method from_fixed_rate() not working as intended"
+            raise TypeError(msg)
 
         rnd_series = self.randomseries.from_deepcopy()
         fixseries_two = OpenTimeSeries.from_fixed_rate(
             rate=0.03,
             d_range=DatetimeIndex(rnd_series.tsdf.index),
         )
-        assert isinstance(fixseries_two, OpenTimeSeries)
+        if not isinstance(fixseries_two, OpenTimeSeries):
+            msg = "Method from_fixed_rate() not working as intended"
+            raise TypeError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -562,19 +603,31 @@ class TestOpenTimeSeries(TestCase):
             (self.randomseries.last_idx - self.randomseries.first_idx).days / 365.25
         )
 
-        assert calc == self.randomseries.periods_in_a_year
-        assert (
+        if calc != self.randomseries.periods_in_a_year:
+            msg = "Property periods_in_a_year returned unexpected result"
+            raise ValueError(msg)
+        if (
             f"{251.3720547945205:.13f}"
-            == f"{self.randomseries.periods_in_a_year:.13f}"
-        )
+            != f"{self.randomseries.periods_in_a_year:.13f}"
+        ):
+            msg = "Property periods_in_a_year returned unexpected result"
+            raise ValueError(msg)
+
         all_prop = self.random_properties["periods_in_a_year"]
-        assert f"{all_prop:.13f}" == f"{self.randomseries.periods_in_a_year:.13f}"
+        if f"{all_prop:.13f}" != f"{self.randomseries.periods_in_a_year:.13f}":
+            msg = "Property periods_in_a_year returned unexpected result"
+            raise ValueError(msg)
 
     def test_yearfrac(self: TestOpenTimeSeries) -> None:
         """Test yearfrac property."""
-        assert f"{9.9931553730322:.13f}" == f"{self.randomseries.yearfrac:.13f}"
+        if f"{9.9931553730322:.13f}" != f"{self.randomseries.yearfrac:.13f}":
+            msg = "Property periods_in_a_year returned unexpected result"
+            raise ValueError(msg)
+
         all_prop = self.random_properties["yearfrac"]
-        assert f"{all_prop:.13f}" == f"{self.randomseries.yearfrac:.13f}"
+        if f"{all_prop:.13f}" != f"{self.randomseries.yearfrac:.13f}":
+            msg = "Property periods_in_a_year returned unexpected result"
+            raise ValueError(msg)
 
     def test_resample(self: TestOpenTimeSeries) -> None:
         """Test resample method."""
@@ -585,8 +638,13 @@ class TestOpenTimeSeries(TestCase):
 
         rs_series.resample(freq="BM")
 
-        assert rs_series.length == intended_length
-        assert before == rs_series.value_ret
+        if rs_series.length != intended_length:
+            msg = "Method resample() not working as intended"
+            raise ValueError(msg)
+
+        if before != rs_series.value_ret:
+            msg = "Method resample() not working as intended"
+            raise ValueError(msg)
 
     def test_resample_to_business_period_ends(
         self: TestOpenTimeSeries,
@@ -601,17 +659,16 @@ class TestOpenTimeSeries(TestCase):
         rsb_stubs_series.resample_to_business_period_ends(freq="BM")
         new_stubs_dates = rsb_stubs_series.tsdf.index.tolist()
 
-        self.assertListEqual(
-            new_stubs_dates,
-            [
-                dt.date(2023, 1, 15),
-                dt.date(2023, 1, 31),
-                dt.date(2023, 2, 28),
-                dt.date(2023, 3, 31),
-                dt.date(2023, 4, 28),
-                dt.date(2023, 5, 15),
-            ],
-        )
+        if new_stubs_dates != [
+            dt.date(2023, 1, 15),
+            dt.date(2023, 1, 31),
+            dt.date(2023, 2, 28),
+            dt.date(2023, 3, 31),
+            dt.date(2023, 4, 28),
+            dt.date(2023, 5, 15),
+        ]:
+            msg = "Method resample_to_business_period_ends() not working as intended"
+            raise ValueError(msg)
 
         rsb_series = OpenTimeSeries.from_fixed_rate(
             rate=0.01,
@@ -622,15 +679,14 @@ class TestOpenTimeSeries(TestCase):
         rsb_series.resample_to_business_period_ends(freq="BM")
         new_dates = rsb_series.tsdf.index.tolist()
 
-        self.assertListEqual(
-            new_dates,
-            [
-                dt.date(2023, 1, 31),
-                dt.date(2023, 2, 28),
-                dt.date(2023, 3, 31),
-                dt.date(2023, 4, 28),
-            ],
-        )
+        if new_dates != [
+            dt.date(2023, 1, 31),
+            dt.date(2023, 2, 28),
+            dt.date(2023, 3, 31),
+            dt.date(2023, 4, 28),
+        ]:
+            msg = "Method resample_to_business_period_ends() not working as intended"
+            raise ValueError(msg)
 
     def test_calc_range(self: TestOpenTimeSeries) -> None:
         """Test calc_range method."""
@@ -641,10 +697,9 @@ class TestOpenTimeSeries(TestCase):
 
         rst, ren = cseries.calc_range()
 
-        self.assertListEqual(
-            [start, end],
-            [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")],
-        )
+        if [start, end] != [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]:
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -695,16 +750,24 @@ class TestOpenTimeSeries(TestCase):
             from_dt=dt.date(2009, 7, 3),
             to_dt=dt.date(2019, 6, 25),
         )
-        assert nst == dt.date(2009, 7, 3)
-        assert nen == dt.date(2019, 6, 25)
+        if nst != dt.date(2009, 7, 3):
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
+        if nen != dt.date(2019, 6, 25):
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
 
         cseries.resample()
 
         earlier_moved, _ = cseries.calc_range(from_dt=dt.date(2009, 8, 10))
-        assert earlier_moved == dt.date(2009, 7, 31)
+        if earlier_moved != dt.date(2009, 7, 31):
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
 
         _, later_moved = cseries.calc_range(to_dt=dt.date(2009, 8, 20))
-        assert later_moved == dt.date(2009, 8, 31)
+        if later_moved != dt.date(2009, 8, 31):
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
 
     def test_calc_range_output(self: TestOpenTimeSeries) -> None:
         """Test output consistency after calc_range applied."""
@@ -712,16 +775,21 @@ class TestOpenTimeSeries(TestCase):
 
         dates = cseries.calc_range(months_offset=48)
 
-        self.assertListEqual(
-            ["2015-06-26", "2019-06-28"],
-            [dates[0].strftime("%Y-%m-%d"), dates[1].strftime("%Y-%m-%d")],
-        )
+        if ["2015-06-26", "2019-06-28"] != [
+            dates[0].strftime("%Y-%m-%d"),
+            dates[1].strftime("%Y-%m-%d"),
+        ]:
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
+
         dates = self.randomseries.calc_range(from_dt=dt.date(2016, 6, 30))
 
-        self.assertListEqual(
-            ["2016-06-30", "2019-06-28"],
-            [dates[0].strftime("%Y-%m-%d"), dates[1].strftime("%Y-%m-%d")],
-        )
+        if ["2016-06-30", "2019-06-28"] != [
+            dates[0].strftime("%Y-%m-%d"),
+            dates[1].strftime("%Y-%m-%d"),
+        ]:
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
 
         gr_0 = cseries.vol_func(months_from_last=48)
 
@@ -735,84 +803,75 @@ class TestOpenTimeSeries(TestCase):
 
         gr_1 = cseries.vol
 
-        assert f"{gr_0:.13f}" == f"{gr_1:.13f}"
+        if f"{gr_0:.13f}" != f"{gr_1:.13f}":
+            msg = "Method calc_range() not working as intended"
+            raise ValueError(msg)
 
     def test_value_to_diff(self: TestOpenTimeSeries) -> None:
         """Test value_to_diff method."""
         diffseries = self.randomseries.from_deepcopy()
         diffseries.value_to_diff()
-        are_bes = [f"{nn[0]:.12f}" for nn in diffseries.tsdf.to_numpy()[:15]]
-        should_bes = [
-            "0.000000000000",
-            "-0.002244525566",
-            "-0.002656444823",
-            "0.003856605762",
-            "0.007615942129",
-            "-0.005921701827",
-            "0.001555810865",
-            "-0.005275328842",
-            "-0.001848758036",
-            "0.009075607620",
-            "-0.004319311398",
-            "-0.008365867931",
-            "-0.010422707104",
-            "0.003626411898",
-            "-0.000274024491",
+        values = [f"{nn[0]:.10f}" for nn in diffseries.tsdf.to_numpy()[:10]]
+        checkdata = [
+            "0.0000000000",
+            "0.0034006536",
+            "0.0023631217",
+            "-0.0087838392",
+            "-0.0033945666",
+            "-0.0017399047",
+            "0.0048095006",
+            "0.0004634650",
+            "-0.0022933004",
+            "0.0025472170",
         ]
 
-        self.assertListEqual(are_bes, should_bes)
+        if values != checkdata:
+            msg = "Result from method value_to_diff() not as intended."
+            raise ValueError(msg)
 
     def test_value_to_ret(self: TestOpenTimeSeries) -> None:
         """Test value_to_ret method."""
         retseries = self.randomseries.from_deepcopy()
         retseries.value_to_ret()
-        are_bes = [f"{nn[0]:.12f}" for nn in retseries.tsdf.to_numpy()[:15]]
-        should_bes = [
-            "0.000000000000",
-            "-0.002244525566",
-            "-0.002662420694",
-            "0.003875599963",
-            "0.007623904265",
-            "-0.005883040967",
-            "0.001554800438",
-            "-0.005263718728",
-            "-0.001854450536",
-            "0.009120465722",
-            "-0.004301429464",
-            "-0.008367224292",
-            "-0.010512356183",
-            "0.003696462370",
-            "-0.000278289067",
+        values = [f"{nn[0]:.10f}" for nn in retseries.tsdf.to_numpy()[:10]]
+        checkdata = [
+            "0.0000000000",
+            "0.0034006536",
+            "0.0023551128",
+            "-0.0087335013",
+            "-0.0034048495",
+            "-0.0017511377",
+            "0.0048490423",
+            "0.0004650205",
+            "-0.0022999278",
+            "0.0025604670",
         ]
 
-        self.assertListEqual(are_bes, should_bes)
-
-        retseries.to_cumret()
+        if values != checkdata:
+            msg = "Result from method value_to_ret() not as intended."
+            raise ValueError(msg)
 
     def test_valute_to_log(self: TestOpenTimeSeries) -> None:
         """Test value_to_log method."""
         logseries = self.randomseries.from_deepcopy()
         logseries.value_to_log()
-        are_log = [f"{nn[0]:.12f}" for nn in logseries.tsdf.to_numpy()[:15]]
-        should_log = [
-            "0.000000000000",
-            "-0.002247048289",
-            "-0.004913019528",
-            "-0.001044910355",
-            "0.006550078823",
-            "0.000649664599",
-            "0.002203257585",
-            "-0.003074363317",
-            "-0.004930535474",
-            "0.004148589972",
-            "-0.000162117254",
-            "-0.008564543266",
-            "-0.019132544583",
-            "-0.015442897340",
-            "-0.015721225137",
+        values = [f"{nn[0]:.10f}" for nn in logseries.tsdf.to_numpy()[:10]]
+        checkdata = [
+            "0.0000000000",
+            "0.0033948844",
+            "0.0057472283",
+            "-0.0030246335",
+            "-0.0064352927",
+            "-0.0081879654",
+            "-0.0033506418",
+            "-0.0028857294",
+            "-0.0051883061",
+            "-0.0026311115",
         ]
 
-        self.assertListEqual(are_log, should_log)
+        if values != checkdata:
+            msg = "Result from method value_to_log() not as intended."
+            raise ValueError(msg)
 
     def test_all_properties(self: TestOpenTimeSeries) -> None:
         """Test all_properties method."""
@@ -846,8 +905,12 @@ class TestOpenTimeSeries(TestCase):
         apseries = self.randomseries.from_deepcopy()
         apseries.to_cumret()
         result = apseries.all_properties()
+
         result_index = result.index.tolist()
-        assert set(prop_index) == set(result_index)
+        if set(prop_index) != set(result_index):
+            msg = "Method all_properties() not working as intended"
+            raise ValueError(msg)
+
         result_values = {}
         for value in result.index:
             if isinstance(result.loc[value, ("Asset", ValueType.PRICE)], float):
@@ -867,36 +930,41 @@ class TestOpenTimeSeries(TestCase):
                     msg,
                 )
         expected_values = {
-            "positive_share": "0.4994026284",
-            "vol": "0.1169534915",
-            "worst_month": "-0.1916564407",
-            "ret_vol_ratio": "0.0814866231",
+            "sortino_ratio": "-0.1625299336",
+            "ret_vol_ratio": "-0.1351175671",
+            "arithmetic_ret": "-0.0169881347",
+            "worst": "-0.1833801800",
+            "vol_from_var": "0.0937379442",
+            "max_drawdown_cal_year": "-0.2834374358",
+            "kurtosis": "208.0369645588",
+            "max_drawdown": "-0.4577528079",
+            "positive_share": "0.5017921147",
+            "value_ret": "-0.2235962176",
+            "geo_ret": "-0.0250075875",
+            "cvar_down": "-0.0150413764",
             "last_idx": "2019-06-28",
-            "max_drawdown": "-0.4001162541",
-            "z_score": "1.2119535054",
-            "geo_ret": "0.0024223168",
-            "span_of_days": 3650,
             "yearfrac": "9.9931553730",
-            "length": 2512,
-            "first_idx": "2009-06-30",
-            "value_ret": "0.0244719580",
-            "skew": "-6.9467990606",
-            "kurtosis": "180.6335718351",
-            "max_drawdown_date": "2018-11-08",
-            "var_down": "-0.0105912961",
-            "max_drawdown_cal_year": "-0.2381116780",
-            "sortino_ratio": "0.1036366417",
-            "vol_from_var": "0.1020893290",
+            "vol": "0.1257285416",
+            "span_of_days": 3650,
+            "z_score": "-0.3646357403",
             "periods_in_a_year": "251.3720547945",
-            "arithmetic_ret": "0.0095301451",
-            "worst": "-0.1917423233",
-            "downside_deviation": "0.0919572936",
-            "cvar_down": "-0.0140207727",
+            "var_down": "-0.0097248785",
+            "length": 2512,
+            "worst_month": "-0.1961065251",
+            "first_idx": "2009-06-30",
+            "downside_deviation": "0.1045231133",
+            "max_drawdown_date": "2016-09-27",
+            "skew": "-9.1925124207",
         }
-        self.assertDictEqual(result_values, expected_values)
+
+        if result_values != expected_values:
+            msg = "Unexpected results from all_properties() method"
+            raise ValueError(msg)
 
         props = apseries.all_properties(properties=["geo_ret", "vol"])
-        assert isinstance(props, DataFrame)
+        if not isinstance(props, DataFrame):
+            msg = "Method all_properties() not working as intended"
+            raise TypeError(msg)
 
         with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
             _ = apseries.all_properties(
@@ -906,98 +974,134 @@ class TestOpenTimeSeries(TestCase):
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
         """Test all calculated properties."""
         checks = {
-            "arithmetic_ret": f"{0.00953014509:.11f}",
-            "cvar_down": f"{-0.01402077271:.11f}",
-            "downside_deviation": f"{0.09195729357:.11f}",
-            "geo_ret": f"{0.00242231676:.11f}",
-            "kurtosis": f"{180.63357183510:.11f}",
-            "max_drawdown": f"{-0.40011625413:.11f}",
-            "max_drawdown_cal_year": f"{-0.23811167802:.11f}",
-            "positive_share": f"{0.49940262843:.11f}",
-            "ret_vol_ratio": f"{0.08148662314:.11f}",
-            "skew": f"{-6.94679906059:.11f}",
-            "sortino_ratio": f"{0.10363664173:.11f}",
-            "value_ret": f"{0.02447195802:.11f}",
-            "var_down": f"{-0.01059129607:.11f}",
-            "vol": f"{0.11695349153:.11f}",
-            "vol_from_var": f"{0.10208932904:.11f}",
-            "worst": f"{-0.19174232326:.11f}",
-            "worst_month": f"{-0.19165644070:.11f}",
-            "z_score": f"{1.21195350537:.11f}",
+            "cvar_down": "-0.01504137642",
+            "downside_deviation": "0.10452311329",
+            "geo_ret": "-0.02500758746",
+            "kurtosis": "208.03696455875",
+            "max_drawdown": "-0.45775280786",
+            "max_drawdown_cal_year": "-0.28343743581",
+            "positive_share": "0.50179211470",
+            "ret_vol_ratio": "-0.13511756712",
+            "skew": "-9.19251242068",
+            "sortino_ratio": "-0.16252993362",
+            "value_ret": "-0.22359621761",
+            "var_down": "-0.00972487850",
+            "vol": "0.12572854165",
+            "vol_from_var": "0.09373794422",
+            "worst": "-0.18338018001",
+            "worst_month": "-0.19610652507",
+            "z_score": "-0.36463574030",
         }
         for c_key, c_value in checks.items():
-            assert (
-                c_value == f"{getattr(self.randomseries, c_key):.11f}"
-            ), f"Difference in: {c_key}"
-            assert (
+            if c_value != f"{getattr(self.randomseries, c_key):.11f}":
+                msg = (
+                    f"Difference in {c_key}: "
+                    f"'{getattr(self.randomseries, c_key):.11f}'"
+                )
+                raise ValueError(msg)
+            if (
                 f"{self.random_properties[c_key]:.11f}"
-                == f"{getattr(self.randomseries, c_key):.11f}"
-            ), f"Difference in: {c_key}"
+                != f"{getattr(self.randomseries, c_key):.11f}"
+            ):
+                msg = (
+                    f"Difference in {c_key}: "
+                    f"'{self.random_properties[c_key]:.11f}' versus "
+                    f"'{getattr(self.randomseries, c_key):.11f}'"
+                )
+                raise ValueError(msg)
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods."""
-        excel_geo_ret = (1.02447195802235 / 1.0102975774591) ** (
+        excel_geo_ret = (0.77640378239272 / 0.686013074173307) ** (
             1 / ((dt.date(2019, 6, 28) - dt.date(2015, 6, 26)).days / 365.25)
         ) - 1
         checks = {
-            "arithmetic_ret_func": f"{0.00885255100:.11f}",
-            "cvar_down_func": f"{-0.01331889836:.11f}",
-            "downside_deviation_func": f"{0.07335125856:.11f}",
+            "arithmetic_ret_func": "0.03590590654",
+            "cvar_down_func": "-0.01262001509",
+            "downside_deviation_func": "0.06869092315",
             "geo_ret_func": f"{excel_geo_ret:.11f}",
-            "kurtosis_func": f"{-0.16164566028:.11f}",
-            "max_drawdown_func": f"{-0.20565775282:.11f}",
-            "positive_share_func": f"{0.50645481629:.11f}",
-            "ret_vol_ratio_func": f"{0.08538041030:.11f}",
-            "skew_func": f"{-0.03615947531:.11f}",
-            "sortino_ratio_func": f"{0.12068710437:.11f}",
-            "value_ret_func": f"{0.01402990651:.11f}",
-            "var_down_func": f"{-0.01095830172:.11f}",
-            "vol_func": f"{0.10368363149:.11f}",
-            "vol_from_var_func": f"{0.10568642619:.11f}",
-            "worst_func": f"{-0.02063487245:.11f}",
-            "z_score_func": f"{1.36825335773:.11f}",
+            "kurtosis_func": "-0.07837511953",
+            "max_drawdown_func": "-0.13059174278",
+            "positive_share_func": "0.50546176763",
+            "ret_vol_ratio_func": "0.35984814074",
+            "skew_func": "0.05131889460",
+            "sortino_ratio_func": "0.52271690193",
+            "value_ret_func": "0.13176236959",
+            "var_down_func": "-0.01031636618",
+            "vol_func": "0.09978071990",
+            "vol_from_var_func": "0.09949533246",
+            "worst_func": "-0.01901777519",
+            "z_score_func": "-0.49314595984",
         }
         for c_key, c_value in checks.items():
-            assert (
+            if (
                 c_value
-                == f"{getattr(self.randomseries, c_key)(months_from_last=48):.11f}"
-            ), f"Difference in {c_key}"
+                != f"{getattr(self.randomseries, c_key)(months_from_last=48):.11f}"
+            ):
+                msg = (
+                    f"Difference in {c_key}: "
+                    f"'{getattr(self.randomseries, c_key)(months_from_last=48):.11f}'"
+                )
+                raise ValueError(msg)
 
         func = "value_ret_calendar_period"
-        assert (
-            f"{0.076502833914:.12f}"
-            == f"{getattr(self.randomseries, func)(year=2019):.12f}"
-        )
+        if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.049753822599":
+            msg = (
+                f"Unexpected result from method {func}(): "
+                f"'{getattr(self.randomseries, func)(year=2019):.12f}'"
+            )
+            raise ValueError(msg)
 
     def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
         """Test max_drawdown_date property."""
-        assert dt.date(2018, 11, 8) == self.randomseries.max_drawdown_date
+        if self.randomseries.max_drawdown_date != dt.date(2016, 9, 27):
+            msg = (
+                "Unexpected max_drawdown_date: "
+                f"'{self.randomseries.max_drawdown_date}'"
+            )
+            raise ValueError(msg)
+
         all_prop = self.random_properties["max_drawdown_date"]
-        assert all_prop == self.randomseries.max_drawdown_date
+        if self.randomseries.max_drawdown_date != all_prop:
+            msg = (
+                "Unexpected max_drawdown_date: "
+                f"'{self.randomseries.max_drawdown_date}'"
+            )
+            raise ValueError(msg)
 
     def test_running_adjustment(self: TestOpenTimeSeries) -> None:
         """Test running_adjustment method."""
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
-        assert (
-            f"{1.689055852583:.12f}"
-            == f"{float(adjustedseries.tsdf.iloc[-1, 0]):.12f}"
-        )
+        if f"{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.2800936502":
+            msg = (
+                "Unexpected result from running_adjustment(): "
+                f"'{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
+            )
+            raise ValueError(msg)
         adjustedseries_returns = self.randomseries.from_deepcopy()
         adjustedseries_returns.value_to_ret()
         adjustedseries_returns.running_adjustment(0.05)
 
-        assert (
-            f"{0.009114963334:.12f}"
-            == f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.12f}"
-        )
+        if f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}" != "-0.0028221714":
+            msg = (
+                "Unexpected result from running_adjustment(): "
+                f"'{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+            )
+            raise ValueError(msg)
 
         adjustedseries_returns.to_cumret()
-        assert (
-            f"{float(adjustedseries.tsdf.iloc[-1, 0]):.12f}"
-            == f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.12f}"
-        )
+        if (
+            f"{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}"
+            != f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
+        ):
+            msg = (
+                "Unexpected result from running_adjustment(): "
+                f"'{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
+                f"'{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+            )
+            raise ValueError(msg)
 
     def test_timeseries_chain(self: TestOpenTimeSeries) -> None:
         """Test timeseries_chain function."""
@@ -1015,8 +1119,13 @@ class TestOpenTimeSeries(TestCase):
         chained_series = timeseries_chain(front_series, back_series)
         chained_values = [f"{nn:.10f}" for nn in list(chained_series.values)]
 
-        self.assertListEqual(full_series.dates, chained_series.dates)
-        self.assertListEqual(full_values, chained_values)
+        if full_series.dates != chained_series.dates:
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
+
+        if full_values != chained_values:
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
 
         pushed_date = front_series.last_idx + dt.timedelta(days=10)
         no_overlap_series = OpenTimeSeries.from_df(
@@ -1031,14 +1140,21 @@ class TestOpenTimeSeries(TestCase):
         front_series_two = OpenTimeSeries.from_df(full_series.tsdf.iloc[:136])
         front_series_two.resample(freq="8D")
 
-        assert back_series.first_idx not in front_series_two.tsdf.index
+        if back_series.first_idx in front_series_two.tsdf.index:
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
+
         new_chained_series = timeseries_chain(front_series_two, back_series)
-        assert isinstance(new_chained_series, OpenTimeSeries)
+        if not isinstance(new_chained_series, OpenTimeSeries):
+            msg = "Function timeseries_chain() not working as intended"
+            raise TypeError(msg)
 
         front_series_three = OpenTimeSeries.from_df(full_series.tsdf.iloc[:136])
         front_series_three.resample(freq="10D")
 
-        assert back_series.first_idx not in front_series_three.tsdf.index
+        if back_series.first_idx in front_series_three.tsdf.index:
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -1083,49 +1199,88 @@ class TestOpenTimeSeries(TestCase):
                 1.011,
             ],
         )
-        assert sub_series_one.extra_info == "cool"
+        if sub_series_one.extra_info != "cool":
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
+
         new_base = timeseries_chain(front=base_series_one, back=base_series_two)
         new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
 
-        assert isinstance(new_base, OpenTimeSeries)
-        assert isinstance(new_sub, NewTimeSeries)
+        if not isinstance(new_base, OpenTimeSeries):
+            msg = "Function timeseries_chain() not working as intended"
+            raise TypeError(msg)
 
-        with pytest.raises(AssertionError):
-            assert isinstance(new_base, NewTimeSeries)
+        if not isinstance(new_sub, NewTimeSeries):
+            msg = "Function timeseries_chain() not working as intended"
+            raise TypeError(msg)
 
-        with pytest.raises(AssertionError):
-            assert new_sub.__class__.__subclasscheck__(OpenTimeSeries)
+        if isinstance(new_base, NewTimeSeries):
+            msg = "Function timeseries_chain() not working as intended"
+            raise TypeError(msg)
 
-        self.assertListEqual(list1=new_base.dates, list2=new_sub.dates)
-        self.assertListEqual(list1=new_base.values, list2=new_sub.values)
+        if new_sub.__class__.__subclasscheck__(OpenTimeSeries):
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
+
+        if new_base.dates != new_sub.dates:
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
+
+        if new_base.values != new_sub.values:  # noqa: PD011
+            msg = "Function timeseries_chain() not working as intended"
+            raise ValueError(msg)
 
     def test_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
         """Test that chained methods on subclass returns subclass and not baseclass."""
         cseries = self.randomseries.from_deepcopy()
-        assert isinstance(cseries, OpenTimeSeries)
+        if not isinstance(cseries, OpenTimeSeries):
+            msg = "chained methods on subclass not working as intended"
+            raise TypeError(msg)
 
         copyseries = NewTimeSeries.from_arrays(
             name="moo",
             dates=cseries.dates,
             values=list(cseries.tsdf.iloc[:, 0].to_numpy()),
         )
-        assert isinstance(copyseries, NewTimeSeries)
+        if not isinstance(copyseries, NewTimeSeries):
+            msg = "chained methods on subclass not working as intended"
+            raise TypeError(msg)
 
         copyseries.set_new_label("boo").running_adjustment(0.001).resample(
             "BM",
         ).value_to_ret()
-        assert isinstance(copyseries, NewTimeSeries)
+        if not isinstance(copyseries, NewTimeSeries):
+            msg = "chained methods on subclass not working as intended"
+            raise TypeError(msg)
 
     def test_plot_series(self: TestOpenTimeSeries) -> None:
         """Test plot_series method."""
         plotseries = self.randomseries.from_deepcopy()
-        rawdata = [f"{x:.11f}" for x in plotseries.tsdf.iloc[1:5, 0]]
+
+        directory = str(Path(__file__).resolve().parent)
+        kwargs = [
+            {"auto_open": False, "output_type": "file"},
+            {"auto_open": False, "output_type": "file", "directory": directory},
+        ]
+        for kwarg in kwargs:
+            _, figfile = plotseries.plot_series(**kwarg)  # type: ignore[arg-type]
+            plotfile = Path(figfile).resolve()
+            if not plotfile.exists():
+                msg = "json file not created"
+                raise FileNotFoundError(msg)
+
+            plotfile.unlink()
+            if plotfile.exists():
+                msg = "json file not deleted as intended"
+                raise FileExistsError(msg)
 
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
+        rawdata = [f"{x:.11f}" for x in plotseries.tsdf.iloc[1:5, 0]]
         fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
-
-        self.assertListEqual(rawdata, fig_data)
+        if rawdata != fig_data:
+            msg = "Unaligned data between original and data in Figure."
+            raise ValueError(msg)
 
         fig_last, _ = plotseries.plot_series(
             auto_open=False,
@@ -1134,7 +1289,9 @@ class TestOpenTimeSeries(TestCase):
         )
         fig_last_json = loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
-        assert f"{last:.12f}" == "1.024471958022"
+        if f"{last:.10f}" != "0.7764037824":
+            msg = f"Unaligned data between original and data in Figure: '{last:.10f}'"
+            raise ValueError(msg)
 
         fig_last_fmt, _ = plotseries.plot_series(
             auto_open=False,
@@ -1144,7 +1301,9 @@ class TestOpenTimeSeries(TestCase):
         )
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
-        assert last_fmt == "Last 102.447%"
+        if last_fmt != "Last 77.640%":
+            msg = f"Unaligned data between original and data in Figure: '{last_fmt}'"
+            raise ValueError(msg)
 
     def test_plot_bars(self: TestOpenTimeSeries) -> None:
         """Test plot_bars method."""
@@ -1152,31 +1311,100 @@ class TestOpenTimeSeries(TestCase):
         barseries.resample(freq="BM").value_to_ret()
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
+        directory = str(Path(__file__).resolve().parent)
+        kwargs = [
+            {"auto_open": False, "output_type": "file"},
+            {"auto_open": False, "output_type": "file", "directory": directory},
+        ]
+        for kwarg in kwargs:
+            _, figfile = barseries.plot_bars(**kwarg)  # type: ignore[arg-type]
+            plotfile = Path(figfile).resolve()
+            if not plotfile.exists():
+                msg = "json file not created"
+                raise FileNotFoundError(msg)
+
+            plotfile.unlink()
+            if plotfile.exists():
+                msg = "json file not deleted as intended"
+                raise FileExistsError(msg)
+
+        fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = barseries.plot_bars(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
         fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
+        if rawdata != fig_data:
+            msg = "Unaligned data between original and data in Figure."
+            raise ValueError(msg)
 
-        self.assertListEqual(rawdata, fig_data)
+        made_fig_keys = list(fig_json["data"][0].keys())
+        made_fig_keys.sort()
+        if made_fig_keys != fig_keys:
+            msg = "Data in Figure not as intended."
+            raise ValueError(msg)
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Must provide same number of labels as items in frame.",
+        ):
+            _, _ = barseries.plot_bars(auto_open=False, labels=["a", "b"])
+
+        overlayfig, _ = barseries.plot_bars(
+            auto_open=False,
+            output_type="div",
+            mode="overlay",
+        )
+        overlayfig_json = loads(overlayfig.to_json())
+
+        fig_keys.append("opacity")
+        if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
+            msg = "Data in Figure not as intended."
+            raise ValueError(msg)
 
     def test_drawdown_details(self: TestOpenTimeSeries) -> None:
         """Test drawdown_details method."""
+        days_from_start_to_bottom = 1747
         details = self.randomseries.drawdown_details()
-        assert f"{details.loc['Max Drawdown', 'Drawdown details']:7f}" == "-0.400116"
-        assert details.loc["Start of drawdown", "Drawdown details"] == dt.date(
-            2012,
-            7,
-            5,
-        )
-        assert details.loc["Date of bottom", "Drawdown details"] == dt.date(
-            2018,
-            11,
-            8,
-        )
-        assert details.loc["Days from start to bottom", "Drawdown details"] == 2317
-        assert (
+
+        if f"{details.loc['Max Drawdown', 'Drawdown details']:7f}" != "-0.457753":
+            msg = (
+                f"Unexpected result from drawdown_details(): "
+                f"'{details.loc['Max Drawdown', 'Drawdown details']:7f}'"
+            )
+            raise ValueError(msg)
+        if details.loc["Start of drawdown", "Drawdown details"] != dt.date(
+            2011,
+            12,
+            16,
+        ):
+            msg = (
+                f"Unexpected result from drawdown_details(): "
+                f"'{details.loc['Start of drawdown', 'Drawdown details']}'"
+            )
+            raise ValueError(msg)
+        if details.loc["Date of bottom", "Drawdown details"] != dt.date(2016, 9, 27):
+            msg = (
+                f"Unexpected result from drawdown_details(): "
+                f"'{details.loc['Date of bottom', 'Drawdown details']}'"
+            )
+            raise ValueError(msg)
+        if (
+            details.loc["Days from start to bottom", "Drawdown details"]
+            != days_from_start_to_bottom
+        ):
+            msg = (
+                f"Unexpected result from drawdown_details(): "
+                f"'{details.loc['Days from start to bottom', 'Drawdown details']}'"
+            )
+            raise ValueError(msg)
+        if (
             f"{details.loc['Average fall per day', 'Drawdown details']:.9f}"
-            == "-0.000172687"
-        )
+            != "-0.000262022"
+        ):
+            msg = (
+                f"Unexpected result from drawdown_details(): "
+                f"'{details.loc['Average fall per day', 'Drawdown details']:.9f}'"
+            )
+            raise ValueError(msg)
 
     def test_align_index_to_local_cdays(
         self: TestOpenTimeSeries,
@@ -1192,40 +1420,46 @@ class TestOpenTimeSeries(TestCase):
         aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
 
         midsummer = dt.date(2020, 6, 19)
-        assert midsummer in d_range
+        if midsummer not in d_range:
+            msg = "Date range generation not run as intended"
+            raise ValueError(msg)
 
         aseries.align_index_to_local_cdays()
-        assert midsummer not in aseries.tsdf.index
+        if midsummer in aseries.tsdf.index:
+            msg = "Method align_index_to_local_cdays() not working as intended"
+            raise ValueError(msg)
 
     def test_ewma_vol_func(self: TestOpenTimeSeries) -> None:
         """Test ewma_vol_func method."""
         simdata = self.randomseries.ewma_vol_func()
-        simseries = OpenTimeSeries.from_df(simdata, valuetype=ValueType.PRICE)
         values = [f"{v:.11f}" for v in simdata.iloc[:5]]
         checkdata = [
-            "0.07995872621",
-            "0.07801248670",
-            "0.07634125583",
-            "0.07552465738",
-            "0.07894138379",
+            "0.06122660096",
+            "0.06080791286",
+            "0.05965906881",
+            "0.06712801227",
+            "0.06641721467",
         ]
 
-        self.assertListEqual(values, checkdata)
-        assert isinstance(simseries, OpenTimeSeries)
+        if values != checkdata:
+            msg = "Result from method ewma_vol_func() not as intended."
+            raise ValueError(msg)
 
         simdata_fxd_per_yr = self.randomseries.ewma_vol_func(
             periods_in_a_year_fixed=251,
         )
-
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5]]
         checkdata_fxd_per_yr = [
-            "0.07989953100",
-            "0.07795473234",
-            "0.07628473871",
-            "0.07546874481",
-            "0.07888294174",
+            "0.06118127355",
+            "0.06076289542",
+            "0.05961490188",
+            "0.06707831592",
+            "0.06636804454",
         ]
-        self.assertListEqual(values_fxd_per_yr, checkdata_fxd_per_yr)
+
+        if values_fxd_per_yr != checkdata_fxd_per_yr:
+            msg = "Result from method ewma_vol_func() not as intended."
+            raise ValueError(msg)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
         """
@@ -1269,7 +1503,9 @@ class TestOpenTimeSeries(TestCase):
             periods_in_a_year_fixed=1,
         )
 
-        assert f"{downdev:.12f}" == "0.043333333333"
+        if f"{downdev:.12f}" != "0.043333333333":
+            msg = "Unexpected result from downside_deviation_func()"
+            raise ValueError(msg)
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
@@ -1285,8 +1521,12 @@ class TestOpenTimeSeries(TestCase):
             dates=["2017-05-29"],
             values=[100.0],
         )
-        self.assertListEqual(basecase.dates, ["2017-05-29"])
-        self.assertListEqual(basecase.values, [100.0])
+        if basecase.dates != ["2017-05-29"]:
+            msg = "Validations base case setup failed"
+            raise ValueError(msg)
+        if basecase.values != [100.0]:  # noqa: PD011
+            msg = "Validations base case setup failed"
+            raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -1454,12 +1694,16 @@ class TestOpenTimeSeries(TestCase):
             ],
         )
         ave_rate = f"{tms.tsdf.mean().iloc[0]:.5f}"
-        assert ave_rate == "0.02434"
+        if ave_rate != "0.02434":
+            msg = "from_1d_rate_to_cumret() base case setup failed"
+            raise ValueError(msg)
 
         tms.from_1d_rate_to_cumret()
 
         val_ret = f"{tms.value_ret:.5f}"
-        assert val_ret == "0.00093"
+        if val_ret != "0.00093":
+            msg = "Unexpected result from from_1d_rate_to_cumret()"
+            raise ValueError(msg)
 
     def test_geo_ret_value_ret_exceptions(
         self: TestOpenTimeSeries,
@@ -1473,8 +1717,13 @@ class TestOpenTimeSeries(TestCase):
                 1.1,
             ],
         )
-        assert f"{geoseries.geo_ret:.7f}" == "0.1000718"
-        assert f"{geoseries.geo_ret_func():.7f}" == "0.1000718"
+        if f"{geoseries.geo_ret:.7f}" != "0.1000718":
+            msg = "Property geo_ret base case setup failed"
+            raise ValueError(msg)
+
+        if f"{geoseries.geo_ret_func():.7f}" != "0.1000718":
+            msg = "Method geo_ret_func() base case setup failed"
+            raise ValueError(msg)
 
         zeroseries = OpenTimeSeries.from_arrays(
             name="asset",
@@ -1544,6 +1793,7 @@ class TestOpenTimeSeries(TestCase):
     def test_miscellaneous(self: TestOpenTimeSeries) -> None:
         """Test miscellaneous methods."""
         mseries = self.randomseries.from_deepcopy()
+        zero_str: str = "0"
 
         methods = [
             "arithmetic_ret_func",
@@ -1555,13 +1805,25 @@ class TestOpenTimeSeries(TestCase):
         for methd in methods:
             no_fixed = getattr(mseries, methd)()
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
-            self.assertAlmostEqual(no_fixed, fixed, places=2)
-            self.assertNotAlmostEqual(no_fixed, fixed, places=6)
+            if f"{100*abs(no_fixed-fixed):.0f}" != zero_str:
+                msg = "Difference with or without fixed periods in year is too great"
+                raise ValueError(msg)
 
         impvol = mseries.vol_from_var_func(drift_adjust=False)
-        assert f"{impvol:.12f}" == "0.102089329036"
+        if f"{impvol:.12f}" != "0.093737944219":
+            msg = (
+                "Unexpected result from method vol_from_var_func(): "
+                f"'{impvol:.12f}'"
+            )
+            raise ValueError(msg)
+
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
-        assert f"{impvoldrifted:.12f}" == "0.102454621604"
+        if f"{impvoldrifted:.12f}" != "0.093086785263":
+            msg = (
+                "Unexpected result from method vol_from_var_func(): "
+                f"'{impvoldrifted:.12f}'"
+            )
+            raise ValueError(msg)
 
     def test_value_ret_calendar_period(
         self: TestOpenTimeSeries,
@@ -1574,14 +1836,24 @@ class TestOpenTimeSeries(TestCase):
             to_date=dt.date(2018, 12, 28),
         )
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
-        assert f"{vrfs_y:.11f}" == f"{vrvrcs_y:.11f}"
+        if f"{vrfs_y:.11f}" != f"{vrvrcs_y:.11f}":
+            msg = (
+                "Results from value_ret_func() and value_ret_calendar_period() "
+                "not matching as expected"
+            )
+            raise ValueError(msg)
 
         vrfs_ym = vrcseries.value_ret_func(
             from_date=dt.date(2018, 4, 30),
             to_date=dt.date(2018, 5, 31),
         )
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
-        assert f"{vrfs_ym:.11f}" == f"{vrvrcs_ym:.11f}"
+        if f"{vrfs_ym:.11f}" != f"{vrvrcs_ym:.11f}":
+            msg = (
+                "Results from value_ret_func() and value_ret_calendar_period() "
+                "not matching as expected"
+            )
+            raise ValueError(msg)
 
     def test_to_drawdown_series(self: TestOpenTimeSeries) -> None:
         """Test to_drawdown_series method."""
@@ -1589,22 +1861,37 @@ class TestOpenTimeSeries(TestCase):
         ddvalue = mseries.max_drawdown
         mseries.to_drawdown_series()
         ddserievalue = float((mseries.tsdf.min()).iloc[0])
-        assert f"{ddvalue:.11f}" == f"{ddserievalue:.11f}"
+        if f"{ddvalue:.11f}" != f"{ddserievalue:.11f}":
+            msg = (
+                "Results from property max_drawdown and to_drawdown_series() "
+                "not matching as expected"
+            )
+            raise ValueError(msg)
 
     def test_set_new_label(self: TestOpenTimeSeries) -> None:
         """Test set_new_label method."""
         lseries = self.randomseries.from_deepcopy()
 
-        self.assertTupleEqual(lseries.tsdf.columns[0], ("Asset", ValueType.PRICE))
+        if lseries.tsdf.columns[0] != ("Asset", ValueType.PRICE):
+            msg = "set_new_label() base case not working as intended"
+            raise ValueError(msg)
 
         lseries.set_new_label(lvl_zero="zero")
-        self.assertTupleEqual(lseries.tsdf.columns[0], ("zero", ValueType.PRICE))
+        if lseries.tsdf.columns[0] != ("zero", ValueType.PRICE):
+            msg = "Method set_new_label() base case not working as intended"
+            raise ValueError(msg)
 
         lseries.set_new_label(lvl_one=ValueType.RTRN)
-        self.assertTupleEqual(lseries.tsdf.columns[0], ("zero", ValueType.RTRN))
+        if lseries.tsdf.columns[0] != ("zero", ValueType.RTRN):
+            msg = "Method set_new_label() base case not working as intended"
+            raise ValueError(msg)
 
         lseries.set_new_label(lvl_zero="two", lvl_one=ValueType.PRICE)
-        self.assertTupleEqual(lseries.tsdf.columns[0], ("two", ValueType.PRICE))
+        if lseries.tsdf.columns[0] != ("two", ValueType.PRICE):
+            msg = "Method set_new_label() base case not working as intended"
+            raise ValueError(msg)
 
         lseries.set_new_label(delete_lvl_one=True)
-        assert lseries.tsdf.columns[0] == "two"
+        if lseries.tsdf.columns[0] != "two":
+            msg = "Method set_new_label() base case not working as intended"
+            raise ValueError(msg)

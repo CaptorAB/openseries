@@ -457,13 +457,12 @@ class CommonModel:
             A list of dictionaries with the raw original data of the series
         """
         if directory:
-            directory = Path(directory).resolve()
+            dirpath = Path(directory).resolve()
         else:
-            directory = Path(__file__).resolve().parent
+            dirpath = Path(__file__).resolve().parent
 
         cleaner_list = ["label", "tsdf"]
-        data = self.__dict__
-
+        data = dict(self.__dict__)
         output = []
         if "label" in data:
             for item in cleaner_list:
@@ -471,19 +470,20 @@ class CommonModel:
             output.append(dict(data))
         else:
             series = [
-                serie.__dict__ for serie in cast(list[Any], data.get("constituents"))
+                dict(serie.__dict__)
+                for serie in cast(list[Any], data.get("constituents"))
             ]
-            for data in series:
+            for itemdata in series:
                 for item in cleaner_list:
-                    data.pop(item)
-                output.append(data)
+                    itemdata.pop(item)
+                output.append(dict(itemdata))
 
         with Path.open(
-            directory.joinpath(filename),
+            dirpath.joinpath(filename),
             "w",
             encoding="utf-8",
         ) as jsonfile:
-            dump(data, jsonfile, indent=2, sort_keys=False)
+            dump(output, jsonfile, indent=2, sort_keys=False)
 
         return output
 
@@ -514,10 +514,10 @@ class CommonModel:
             msg = "Filename must end with .xlsx"
             raise NameError(msg)
         if directory:
-            directory = Path(directory).resolve()
+            dirpath = Path(directory).resolve()
         else:
-            directory = Path(__file__).resolve().parent
-        sheetfile = Path(f"{directory}/{filename}")
+            dirpath = Path(__file__).resolve().parent
+        sheetfile = dirpath.joinpath(filename)
 
         wrkbook = Workbook()
         wrksheet = wrkbook.active
@@ -583,12 +583,12 @@ class CommonModel:
             labels = list(self.tsdf.columns.get_level_values(0))
 
         if directory:
-            directory = Path(directory).resolve()
+            dirpath = Path(directory).resolve()
         else:
-            directory = Path.home().joinpath("Documents")
+            dirpath = Path.home().joinpath("Documents")
         if not filename:
             filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
-        plotfile = directory.joinpath(filename)
+        plotfile = dirpath.joinpath(filename)
 
         opacity = 0.7 if mode == "overlay" else None
 
@@ -673,12 +673,12 @@ class CommonModel:
             labels = list(self.tsdf.columns.get_level_values(0))
 
         if directory:
-            directory = Path(directory).resolve()
+            dirpath = Path(directory).resolve()
         else:
-            directory = Path.home().joinpath("Documents")
+            dirpath = Path.home().joinpath("Documents")
         if not filename:
             filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
-        plotfile = directory.joinpath(filename)
+        plotfile = dirpath.joinpath(filename)
 
         fig, logo = load_plotly_dict()
         figure = Figure(fig)

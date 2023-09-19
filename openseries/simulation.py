@@ -50,13 +50,13 @@ TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
-def random_generator(seed: int) -> nprandom.BitGenerator:
+def random_generator(seed: Optional[int] = None) -> nprandom.BitGenerator:
     """
     Make a Numpy Random Generator object.
 
     Parameters
     ----------
-    seed: int
+    seed: int, optional
         Random seed
 
     Returns

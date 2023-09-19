@@ -52,30 +52,36 @@ class TestOpenFrame(TestCase):
 
     def test_save_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
-        seriesfile = Path(f"{Path(__file__).resolve().parent}/framesaved.json")
+        directory = str(Path(__file__).resolve().parent)
+        seriesfile = Path(f"{directory}/framesaved.json")
 
         jseries = self.randomframe.from_deepcopy()
-        data = jseries.to_json(filename=str(seriesfile))
+        directory = str(Path(__file__).resolve().parent)
+        kwargs = [
+            {"filename": str(seriesfile)},
+            {"filename": str(seriesfile), "directory": directory},
+        ]
+        for kwarg in kwargs:
+            data = jseries.to_json(**kwarg)
+            if [item.get("name") for item in data] != [
+                "Asset_0",
+                "Asset_1",
+                "Asset_2",
+                "Asset_3",
+                "Asset_4",
+            ]:
+                msg = "Unexpected data from json"
+                raise ValueError(msg)
 
-        if [item.get("name") for item in data] != [
-            "Asset_0",
-            "Asset_1",
-            "Asset_2",
-            "Asset_3",
-            "Asset_4",
-        ]:
-            msg = "Unexpected data from json"
-            raise ValueError(msg)
+            if not Path(seriesfile).exists():
+                msg = "json file not created"
+                raise FileNotFoundError(msg)
 
-        if not Path(seriesfile).exists():
-            msg = "json file not created"
-            raise FileNotFoundError(msg)
+            seriesfile.unlink()
 
-        seriesfile.unlink()
-
-        if Path(seriesfile).exists():
-            msg = "json file not deleted as intended"
-            raise FileExistsError(msg)
+            if Path(seriesfile).exists():
+                msg = "json file not deleted as intended"
+                raise FileExistsError(msg)
 
     def test_save_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""
@@ -999,6 +1005,23 @@ class TestOpenFrame(TestCase):
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
+        directory = str(Path(__file__).resolve().parent)
+        kwargs = [
+            {"auto_open": False, "output_type": "file"},
+            {"auto_open": False, "output_type": "file", "directory": directory},
+        ]
+        for kwarg in kwargs:
+            _, figfile = plotframe.plot_series(**kwarg)  # type: ignore[arg-type]
+            plotfile = Path(figfile).resolve()
+            if not plotfile.exists():
+                msg = "json file not created"
+                raise FileNotFoundError(msg)
+
+            plotfile.unlink()
+            if plotfile.exists():
+                msg = "json file not deleted as intended"
+                raise FileExistsError(msg)
+
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
 
@@ -1029,7 +1052,8 @@ class TestOpenFrame(TestCase):
         )
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
-        if last_fmt != "Last 77.813%":
+
+        if last_fmt != "Last 19.964%":
             msg = "Unaligned data between original and data in Figure."
             raise ValueError(msg)
 
@@ -1042,6 +1066,23 @@ class TestOpenFrame(TestCase):
     def test_plot_bars(self: TestOpenFrame) -> None:
         """Test plot_bars method."""
         plotframe = self.randomframe.from_deepcopy()
+
+        directory = str(Path(__file__).resolve().parent)
+        kwargs = [
+            {"auto_open": False, "output_type": "file"},
+            {"auto_open": False, "output_type": "file", "directory": directory},
+        ]
+        for kwarg in kwargs:
+            _, figfile = plotframe.plot_bars(**kwarg)  # type: ignore[arg-type]
+            plotfile = Path(figfile).resolve()
+            if not plotfile.exists():
+                msg = "json file not created"
+                raise FileNotFoundError(msg)
+
+            plotfile.unlink()
+            if plotfile.exists():
+                msg = "json file not deleted as intended"
+                raise FileExistsError(msg)
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = plotframe.plot_bars(auto_open=False, output_type="div")
@@ -1388,6 +1429,17 @@ class TestOpenFrame(TestCase):
         result = apframe.all_properties()
         result_index = result.index.tolist()
 
+        if not isinstance(result, DataFrame):
+            msg = "Method all_properties() not working as intended."
+            raise TypeError(msg)
+
+        result_arg = apframe.all_properties(
+            properties=cast(list[LiteralFrameProps], ["geo_ret"]),
+        )
+        if not isinstance(result_arg, DataFrame):
+            msg = "Method all_properties() not working as intended."
+            raise TypeError(msg)
+
         if set(prop_index) != set(result_index):
             msg = "Method all_properties() output not as intended."
             raise ValueError(msg)
@@ -1477,11 +1529,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.22029628522",
-            "0.16342938866",
-            "0.19954924433",
-            "0.19579197546",
-            "0.20346268143",
+            "0.06464266057",
+            "0.10895202629",
+            "0.05884671119",
+            "0.04300405194",
+            "-0.08603374575",
         ]
 
         if values != checkdata:
@@ -1496,12 +1548,13 @@ class TestOpenFrame(TestCase):
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
         checkdata_fxd_per_yr = [
-            "0.22045949626",
-            "0.16355046869",
-            "0.19969708449",
-            "0.19593703197",
-            "0.20361342094",
+            "0.06469055241",
+            "0.10903274564",
+            "0.05889030898",
+            "0.04303591238",
+            "-0.08609748562",
         ]
+
         if values_fxd_per_yr != checkdata_fxd_per_yr:
             msg = "Result from method rolling_info_ratio() not as intended."
             raise ValueError(msg)
@@ -1514,13 +1567,12 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "-0.05129437067",
-            "-0.07071418405",
-            "-0.05236923352",
-            "-0.04282093703",
-            "-0.08012220038",
+            "0.06064704174",
+            "0.05591653346",
+            "0.11041741881",
+            "0.08436822615",
+            "0.04771407242",
         ]
-
         if values != checkdata:
             msg = "Result from method rolling_info_ratio() not as intended."
             raise ValueError(msg)
@@ -1532,8 +1584,11 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.tracking_error_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.2462231908":
-            msg = "Result from tracking_error_func() not as expected."
+        if f"{simdataa.iloc[0]:.10f}" != "0.1047183258":
+            msg = (
+                "Result from tracking_error_func() not "
+                f"as expected: '{simdataa.iloc[0]:.10f}'"
+            )
             raise ValueError(msg)
 
         simdatab = frame.tracking_error_func(
@@ -1541,18 +1596,28 @@ class TestOpenFrame(TestCase):
             periods_in_a_year_fixed=251,
         )
 
-        if f"{simdatab.iloc[0]:.10f}" != "0.2460409063":
-            msg = "Result from tracking_error_func() not as expected."
+        if f"{simdatab.iloc[0]:.10f}" != "0.1046408005":
+            msg = (
+                "Result from tracking_error_func() not "
+                f"as expected: '{simdatab.iloc[0]:.10f}'"
+            )
             raise ValueError(msg)
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.2462231908":
-            msg = "Result from tracking_error_func() not as expected."
+        if f"{simdatac.iloc[0]:.10f}" != "0.1047183258":
+            msg = (
+                "Result from tracking_error_func() not "
+                f"as expected: '{simdatac.iloc[0]:.10f}'"
+            )
             raise ValueError(msg)
 
         if f"{simdataa.iloc[0]:.10f}" != f"{simdatac.iloc[0]:.10f}":
-            msg = "Result from tracking_error_func() not as expected."
+            msg = (
+                "Result from tracking_error_func() not "
+                f"as expected: '{simdataa.iloc[0]:.10f}' "
+                f"versus '{simdatac.iloc[0]:.10f}'"
+            )
             raise ValueError(msg)
 
         with pytest.raises(
@@ -1612,13 +1677,12 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "-0.06170179015",
-            "-0.08612430578",
-            "-0.06462318798",
-            "-0.05487880293",
-            "-0.10634855725",
+            "0.08034452787",
+            "0.07003512008",
+            "0.13680724381",
+            "0.10613002176",
+            "0.06652224599",
         ]
-
         if values != checkdata:
             msg = "Result from method rolling_corr() not as intended."
             raise ValueError(msg)
@@ -1632,11 +1696,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.08745000502",
-            "0.08809050608",
-            "0.08832329638",
-            "0.08671269840",
-            "0.08300985872",
+            "0.07189785661",
+            "0.07601706214",
+            "0.07690774674",
+            "0.07640509098",
+            "0.07534254420",
         ]
 
         if values != checkdata:
@@ -1651,12 +1715,13 @@ class TestOpenFrame(TestCase):
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
         checkdata_fxd_per_yr = [
-            "0.08738526385",
-            "0.08802529073",
-            "0.08825790869",
-            "0.08664850307",
-            "0.08294840469",
+            "0.07184462904",
+            "0.07596078503",
+            "0.07685081023",
+            "0.07634852661",
+            "0.07528676645",
         ]
+
         if values_fxd_per_yr != checkdata_fxd_per_yr:
             msg = "Result from method rolling_vol() not as intended."
             raise ValueError(msg)
@@ -1670,11 +1735,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "-0.01477558639",
-            "-0.01662326401",
-            "-0.01735881460",
-            "-0.02138743793",
-            "-0.03592486809",
+            "0.00312001031",
+            "0.00761489128",
+            "0.00155338654",
+            "0.00190827758",
+            "0.00562845778",
         ]
 
         if values != checkdata:
@@ -1690,13 +1755,12 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
         checkdata = [
-            "-0.01337460746",
-            "-0.01337460746",
-            "-0.01337460746",
-            "-0.01270193467",
-            "-0.01270193467",
+            "-0.01099453714",
+            "-0.01099453714",
+            "-0.01099453714",
+            "-0.01099453714",
+            "-0.01099453714",
         ]
-
         if values != checkdata:
             msg = "Result from method rolling_cvar_down() not as intended."
             raise ValueError(msg)
@@ -1710,11 +1774,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
         checkdata = [
-            "-0.01342248045",
-            "-0.01342248045",
-            "-0.01342248045",
-            "-0.01342248045",
-            "-0.01342248045",
+            "-0.01239751713",
+            "-0.01239751713",
+            "-0.01239751713",
+            "-0.01239751713",
+            "-0.01239751713",
         ]
 
         if values != checkdata:
@@ -2232,11 +2296,11 @@ class TestOpenFrame(TestCase):
 
         ret = [f"{rr:.9f}" for rr in cast(Series, mframe.value_ret_func())]
         if ret != [
-            "0.024471958",
-            "-0.620625714",
-            "-0.399460961",
-            "0.245899647",
-            "-0.221870282",
+            "-0.223596218",
+            "-0.244776630",
+            "1.229358191",
+            "0.370036823",
+            "-0.800357531",
         ]:
             msg = "Results from value_ret_func() not as expected"
             raise ValueError(msg)
@@ -2249,22 +2313,22 @@ class TestOpenFrame(TestCase):
             f"{iv:.11f}"
             for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=True))
         ]
-
         if impvol != [
-            "0.10208932904",
-            "0.09911226523",
-            "0.09785296425",
-            "0.09587988606",
-            "0.09653565636",
+            "0.09373794422",
+            "0.09452356706",
+            "0.09758852171",
+            "0.09902646305",
+            "0.10399391218",
         ]:
             msg = "Results from vol_from_var_func() not as expected"
             raise ValueError(msg)
+
         if impvoldrifted != [
-            "0.10245462160",
-            "0.09607641481",
-            "0.09644421046",
-            "0.09705532014",
-            "0.09619264015",
+            "0.09308678526",
+            "0.09383528130",
+            "0.10086118783",
+            "0.10057354052",
+            "0.09864366954",
         ]:
             msg = "Results from vol_from_var_func() not as expected"
             raise ValueError(msg)
@@ -2387,31 +2451,32 @@ class TestOpenFrame(TestCase):
         if results != results_tuple:
             msg = "Method ord_least_squares_fit() not working as intended"
             raise ValueError(msg)
+
         if results != [
             "1.00000000000",
-            "-0.09363759343",
-            "-0.16636507875",
-            "0.70835395893",
-            "0.35961222138",
-            "-0.60070110740",
+            "1.04260382009",
+            "-0.45683811180",
+            "-0.78552285510",
+            "0.16527540312",
+            "0.84475254880",
             "1.00000000000",
-            "1.79533271373",
-            "-1.39409950365",
-            "-1.80547164323",
-            "-0.24049715964",
-            "0.40456148704",
+            "-0.43186041740",
+            "-0.67734009898",
+            "0.15614783403",
+            "-1.72148183489",
+            "-2.00850685241",
             "1.00000000000",
-            "-0.61221397083",
-            "-0.68807137926",
-            "0.78819572733",
-            "-0.24180725905",
-            "-0.47123680764",
+            "1.55985343891",
+            "-0.37248169175",
+            "-0.71431469722",
+            "-0.76019909515",
+            "0.37642151527",
             "1.00000000000",
-            "0.42517123248",
-            "0.26256460553",
-            "-0.20548693834",
-            "-0.34752611919",
-            "0.27898564658",
+            "-0.14436264610",
+            "4.26473892687",
+            "4.97290302806",
+            "-2.55063925744",
+            "-4.09645603877",
             "1.00000000000",
         ]:
             msg = "Method ord_least_squares_fit() not working as intended"

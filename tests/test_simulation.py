@@ -56,20 +56,21 @@ class TestSimulation(TestCase):
             {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
         ]
         target_returns = [
-            "0.008917436",
-            "0.029000099",
-            "-0.011082564",
-            "0.067119310",
-            "0.101488620",
-            "-0.007388824",
+            "-0.005640734",
+            "0.013058925",
+            "-0.025640734",
+            "0.027163652",
+            "0.124437404",
+            "-0.043708800",
         ]
+
         target_volatilities = [
-            "0.200429415",
-            "0.200504640",
-            "0.200429415",
-            "0.263455329",
-            "0.440520211",
-            "0.210298179",
+            "0.193403252",
+            "0.193487832",
+            "0.193403252",
+            "0.198417705",
+            "0.447234514",
+            "0.209297219",
         ]
 
         returns = []
@@ -96,30 +97,31 @@ class TestSimulation(TestCase):
             msg = "Unexpected result"
             raise ValueError(msg)
 
-        if f"{psim.realized_mean_return:.9f}" != "0.009553952":
-            msg = "Unexpected result"
+        if f"{psim.realized_mean_return:.9f}" != "-0.017030572":
+            msg = f"Unexpected result: '{psim.realized_mean_return:.9f}'"
             raise ValueError(msg)
 
-        if f"{psim.realized_vol:.9f}" != "0.117099479":
-            msg = "Unexpected result"
+        if f"{psim.realized_vol:.9f}" != "0.125885483":
+            msg = f"Unexpected result: '{psim.realized_vol:.9f}'"
             raise ValueError(msg)
 
     def test_assets(self: TestSimulation) -> None:
         """Test stoch processes output."""
         days = 2520
-        target_returns = [
-            "-0.031826675",
-            "0.084180046",
-            "0.058456697",
-            "0.034909498",
-            "0.353642948",
+        intended_returns = [
+            "-0.054955955",
+            "0.061043422",
+            "0.009116732",
+            "0.126175407",
+            "0.397127475",
         ]
-        target_volatilities = [
-            "0.241393324",
-            "0.241469969",
-            "0.252469189",
-            "0.236601983",
-            "0.600404476",
+
+        intended_volatilities = [
+            "0.232908982",
+            "0.232982933",
+            "0.252075511",
+            "0.203895259",
+            "0.621810014",
         ]
 
         modelparams = ModelParameters(
@@ -148,7 +150,10 @@ class TestSimulation(TestCase):
 
         series = []
         for i, process, residx in zip(range(len(processes)), processes, res_indices):
-            modelresult = getattr(ReturnSimulation, process)(modelparams, seed=71)
+            modelresult = getattr(ReturnSimulation, process)(
+                param=modelparams,
+                seed=71,
+            )
             if isinstance(modelresult, tuple):
                 modelresult = modelresult[cast(int, residx)]
             d_range = [
@@ -168,10 +173,10 @@ class TestSimulation(TestCase):
         means = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
         deviations = [f"{v:.9f}" for v in cast(Series, frame.vol)]
 
-        if target_returns != means:
+        if intended_returns != means:
             msg = "Unexpected calculation result"
             raise ValueError(msg)
-        if target_volatilities != deviations:
+        if intended_volatilities != deviations:
             msg = "Unexpected calculation result"
             raise ValueError(msg)
 
@@ -179,8 +184,8 @@ class TestSimulation(TestCase):
         """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels."""
         series = []
         days = 2520
-        target_means = ["0.024184423", "0.019893950"]
-        target_deviations = ["0.003590473", "0.023333692"]
+        intended_returns = ["0.024059099", "0.019497031"]
+        intended_volatilities = ["0.003014102", "0.019346265"]
 
         modelparams = ModelParameters(
             all_s0=1.0,
@@ -220,8 +225,13 @@ class TestSimulation(TestCase):
         means = [f"{r:.9f}" for r in frame.tsdf.mean()]
         deviations = [f"{v:.9f}" for v in frame.tsdf.std()]
 
-        self.assertListEqual(target_means, means)
-        self.assertListEqual(target_deviations, deviations)
+        if intended_returns != means:
+            msg = "Unexpected results from method beta()"
+            raise ValueError(msg)
+
+        if intended_volatilities != deviations:
+            msg = "Unexpected results from cir or ou random processes()"
+            raise ValueError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:
         """Test method to_dataframe."""
@@ -236,5 +246,10 @@ class TestSimulation(TestCase):
             seriesim.to_dataframe(name="Asset", start=start),
         )
 
-        assert startseries.valuetype == ValueType.PRICE
-        assert returnseries.valuetype == ValueType.RTRN
+        if startseries.valuetype != ValueType.PRICE:
+            msg = "Method to_dataframe() not working as intended"
+            raise ValueError(msg)
+
+        if returnseries.valuetype != ValueType.RTRN:
+            msg = "Method to_dataframe() not working as intended"
+            raise ValueError(msg)
