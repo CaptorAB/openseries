@@ -68,11 +68,6 @@ jobs:
       - name: Report coverage
         run: poetry run coverage report
 
-      - name: Start GPG Agent
-        run: |
-          gpg-agent --daemon
-          export GPG_TTY=$(tty)
-
       - name: Create Git Tag with version from pyproject.toml
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
