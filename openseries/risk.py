@@ -120,8 +120,7 @@ def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series
     drawdown = drawdown.ffill()
     drawdown[isnan(drawdown)] = -Inf
     roll_max = maximum.accumulate(drawdown)
-    drawdown = drawdown / roll_max - 1.0
-    return drawdown
+    return drawdown / roll_max - 1.0
 
 
 def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> Series:
@@ -144,6 +143,7 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
         Days from start to bottom
         Average fall per day
     """
+    zero: float = 0.0
     mdd_date = (
         (prices / prices.expanding(min_periods=min_periods).max())
         .idxmin()
@@ -160,7 +160,7 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn = drwdwn.sort_index(ascending=False)
-    sdate = drwdwn[drwdwn == 0.0].idxmax().to_numpy()[0]
+    sdate = drwdwn[drwdwn == zero].idxmax().to_numpy()[0]
     sdate = (
         dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d")
         .replace(tzinfo=dt.timezone.utc)

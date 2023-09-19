@@ -29,9 +29,7 @@ from numpy import (
     insert,
     sqrt,
 )
-from numpy import (
-    random as nprandom,
-)
+from numpy.random import PCG64, Generator, SeedSequence
 from numpy.typing import NDArray
 from pandas import DataFrame, concat
 from pydantic import BaseModel, ConfigDict
@@ -48,6 +46,25 @@ from openseries.types import (
 
 TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
 TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
+
+
+def random_generator(seed: int) -> Generator:
+    """
+    Make a Numpy Random Generator object.
+
+    Parameters
+    ----------
+    seed: int
+        Random seed
+
+    Returns
+    -------
+    numpy.random.Generator
+        Numpy Generator
+    """
+    ss = SeedSequence(entropy=seed)
+    bg = PCG64(seed=ss)
+    return Generator(bit_generator=bg)
 
 
 class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
@@ -69,6 +86,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         Mean annual standard deviation of the distribution
     dframe: pandas.DataFrame
         Pandas DataFrame object holding the resulting values
+    randomizer: numpy.random.Generator
+        Random process generator
     """
 
     number_of_sims: SimCountType
@@ -77,6 +96,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
     mean_annual_return: float
     mean_annual_vol: VolatilityType
     dframe: DataFrame
+    randomizer: Generator
 
     model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True)
 
@@ -152,10 +172,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             Price series
         """
         returns = exp(log_returns)
-        # A sequence of prices starting with param.all_s0
         price_sequence: list[float] = [param.all_s0]
         for rtn in range(1, len(returns)):
-            # Add the price at t-1 * return at t
             price_sequence.append(price_sequence[rtn - 1] * returns[rtn - 1])
         return array(price_sequence)
 
@@ -163,7 +181,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
     def brownian_motion_log_returns(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Brownian Motion log returns.
@@ -176,27 +194,24 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         NDArray[float64]
             Brownian Motion log returns
         """
-        if seed is not None:
-            nprandom.seed(seed)
-
         sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
         return array(
-            nprandom.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time),
+            randomizer.normal(loc=0, scale=sqrt_delta_sigma, size=param.all_time),
         )
 
     @classmethod
     def brownian_motion_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Delivers a price sequence whose returns evolve as to a brownian motion.
@@ -205,8 +220,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
@@ -214,15 +229,18 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             Price sequence which follows a brownian motion
         """
         return cls.convert_to_prices(
-            param,
-            cls.brownian_motion_log_returns(param, seed=seed),
+            param=param,
+            log_returns=cls.brownian_motion_log_returns(
+                param=param,
+                randomizer=randomizer,
+            ),
         )
 
     @classmethod
     def geometric_brownian_motion_log_returns(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Log returns of a Geometric Brownian Motion process.
@@ -236,25 +254,32 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         NDArray[float64]
             Log returns of a Geometric Brownian Motion process
         """
-        wiener_process = array(cls.brownian_motion_log_returns(param, seed=seed))
+        wiener_process = array(
+            cls.brownian_motion_log_returns(
+                param=param,
+                randomizer=randomizer,
+            ),
+        )
+
         sigma_pow_mu_delta = (
             param.gbm_mu - 0.5 * mathpow(param.all_sigma, 2.0)
         ) * param.all_delta
+
         return wiener_process + sigma_pow_mu_delta
 
     @classmethod
     def geometric_brownian_motion_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Prices for an asset which evolves according to a geometric brownian motion.
@@ -263,8 +288,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
@@ -272,15 +297,18 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             Price levels for the asset
         """
         return cls.convert_to_prices(
-            param,
-            cls.geometric_brownian_motion_log_returns(param, seed=seed),
+            param=param,
+            log_returns=cls.geometric_brownian_motion_log_returns(
+                param=param,
+                randomizer=randomizer,
+            ),
         )
 
     @classmethod
     def jump_diffusion_process(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Jump sizes for each point in time (mostly zeroes if jumps are infrequent).
@@ -293,40 +321,41 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         NDArray[float64]
             Jump sizes for each point in time (mostly zeroes if jumps are infrequent)
         """
-        if seed is not None:
-            nprandom.seed(seed)
         s_n = 0.0
         time = 0
         small_lamda = -(1.0 / param.jumps_lamda)
-        jump_sizes: list[float] = []
-        for _ in range(0, param.all_time):
-            jump_sizes.append(0.0)
+        jump_sizes = [0.0] * param.all_time
+
         while s_n < param.all_time:
-            s_n += small_lamda * log(nprandom.uniform(0, 1))
-            for j in range(0, param.all_time):
+            s_n += small_lamda * log(randomizer.uniform(low=0.0, high=1.0))
+            for j in range(param.all_time):
                 if (
                     time * param.all_delta
                     <= s_n * param.all_delta
                     <= (j + 1) * param.all_delta
                 ):
-                    jump_sizes[j] += nprandom.normal(param.jumps_mu, param.jumps_sigma)
+                    jump_sizes[j] += randomizer.normal(
+                        loc=param.jumps_mu,
+                        scale=param.jumps_sigma,
+                    )
                     break
             time += 1
+
         return array(jump_sizes)
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_log_returns(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Geometric Brownian Motion process with jumps in it.
@@ -339,26 +368,31 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         NDArray[float64]
             Geometric Brownian Motion process with jumps in it
         """
-        jump_diffusion = cls.jump_diffusion_process(param, seed=seed)
-        geometric_brownian_motion = cls.geometric_brownian_motion_log_returns(
-            param,
-            seed=seed,
+        jump_diffusion = cls.jump_diffusion_process(
+            param=param,
+            randomizer=randomizer,
         )
+
+        geometric_brownian_motion = cls.geometric_brownian_motion_log_returns(
+            param=param,
+            randomizer=randomizer,
+        )
+
         return add(jump_diffusion, geometric_brownian_motion)
 
     @classmethod
     def geometric_brownian_motion_jump_diffusion_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Geometric Brownian Motion generated prices.
@@ -370,8 +404,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
@@ -379,8 +413,11 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             Geometric Brownian Motion generated prices
         """
         return cls.convert_to_prices(
-            param,
-            cls.geometric_brownian_motion_jump_diffusion_log_returns(param, seed=seed),
+            param=param,
+            log_returns=cls.geometric_brownian_motion_jump_diffusion_log_returns(
+                param=param,
+                randomizer=randomizer,
+            ),
         )
 
     @classmethod
@@ -388,7 +425,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
         brownian_motion_one: NDArray[float64],
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
         """
         Generate correlated Brownian Motion path.
@@ -403,34 +440,32 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             Model input
         brownian_motion_one: NDArray[float64]
             A first path to correlate against
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         tuple[NDArray[float64], NDArray[float64]]
             A correlated Brownian Motion path
         """
-        if seed is not None:
-            nprandom.seed(seed)
-
         sqrt_delta = sqrt(param.all_delta)
 
         brownian_motion_two = []
         for npath in range(param.all_time - 1):
             term_one = param.cir_rho * brownian_motion_one[npath]
-            term_two = sqrt(1 - mathpow(param.cir_rho, 2.0)) * nprandom.normal(
-                0,
-                sqrt_delta,
+            term_two = sqrt(1 - mathpow(param.cir_rho, 2.0)) * randomizer.normal(
+                loc=0,
+                scale=sqrt_delta,
             )
             brownian_motion_two.append(term_one + term_two)
+
         return array(brownian_motion_one), array(brownian_motion_two)
 
     @classmethod
     def cox_ingersoll_ross_heston(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
         """
         Generate interest rate levels for the CIR process.
@@ -446,20 +481,17 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         tuple[NDArray[float64], NDArray[float64]]
             The interest rate levels for the CIR process
         """
-        if seed is not None:
-            nprandom.seed(seed)
-
         sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
 
-        brownian_motion_volatility = nprandom.normal(
+        brownian_motion_volatility = randomizer.normal(
             loc=0,
             scale=sqrt_delta_sigma,
             size=param.all_time,
@@ -477,13 +509,14 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
                 * brownian_motion_volatility[hpath - 1]
             )
             volatilities.append(max(volatilities[-1], 0.05) + drift + randomness)
+
         return array(brownian_motion_volatility), array(volatilities)
 
     @classmethod
     def heston_model_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> tuple[NDArray[float64], NDArray[float64]]:
         """
         Generate prices for an asset following a Heston process.
@@ -501,19 +534,23 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         tuple[NDArray[float64], NDArray[float64]]
             The prices for an asset following a Heston process
         """
-        brownian, cir_process = cls.cox_ingersoll_ross_heston(param, seed=seed)
+        brownian, cir_process = cls.cox_ingersoll_ross_heston(
+            param=param,
+            randomizer=randomizer,
+        )
+
         brownian, brownian_motion_market = cls.heston_construct_correlated_path(
-            param,
-            brownian,
-            seed=seed,
+            param=param,
+            brownian_motion_one=brownian,
+            randomizer=randomizer,
         )
 
         heston_market_price_levels = array([param.all_s0])
@@ -530,13 +567,14 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
                 heston_market_price_levels,
                 heston_market_price_levels[hpath - 1] + drift + vol,
             )
+
         return array(heston_market_price_levels), array(cir_process)
 
     @classmethod
     def cox_ingersoll_ross_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Generate interest rate levels for the CIR process.
@@ -552,28 +590,32 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         NDArray[float64]
             The interest rate levels for the CIR process
         """
-        brownian_motion = cls.brownian_motion_log_returns(param, seed=seed)
+        brownian_motion = cls.brownian_motion_log_returns(
+            param=param,
+            randomizer=randomizer,
+        )
 
         levels = array([param.all_r0])
         for hpath in range(1, param.all_time):
             drift = param.cir_a * (param.cir_mu - levels[hpath - 1]) * param.all_delta
             randomness = sqrt(levels[hpath - 1]) * brownian_motion[hpath - 1]
             levels = append(levels, levels[hpath - 1] + drift + randomness)
+
         return array(levels)
 
     @classmethod
     def ornstein_uhlenbeck_levels(
         cls: type[TypeReturnSimulation],
         param: TypeModelParameters,
-        seed: Optional[int] = None,
+        randomizer: Generator,
     ) -> NDArray[float64]:
         """
         Generate rate levels of a mean-reverting Ornstein Uhlenbeck process.
@@ -582,8 +624,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         param: TypeModelParameters
             Model input
-        seed: int, optional
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
@@ -591,11 +633,16 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             The interest rate levels for the Ornstein Uhlenbeck process
         """
         ou_levels = array([param.all_r0])
-        brownian_motion_returns = cls.brownian_motion_log_returns(param, seed=seed)
+        brownian_motion_returns = cls.brownian_motion_log_returns(
+            param=param,
+            randomizer=randomizer,
+        )
+
         for hpath in range(1, param.all_time):
             drift = param.ou_a * (param.ou_mu - ou_levels[hpath - 1]) * param.all_delta
             randomness = brownian_motion_returns[hpath - 1]
             ou_levels = append(ou_levels, ou_levels[hpath - 1] + drift + randomness)
+
         return array(ou_levels)
 
     @classmethod
@@ -605,8 +652,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         mean_annual_return: float,
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
+        randomizer: Generator,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Simulate normally distributed prices.
@@ -624,21 +671,20 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
-        seed: Optional[int], default 71
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         ReturnSimulation
             Normally distributed prices
         """
-        if seed:
-            nprandom.seed(seed)
-        daily_returns = nprandom.normal(
+        daily_returns = randomizer.normal(
             loc=mean_annual_return / trading_days_in_year,
             scale=mean_annual_vol / sqrt(trading_days_in_year),
             size=(number_of_sims, trading_days),
         )
+
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -646,6 +692,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=daily_returns),
+            randomizer=randomizer,
         )
 
     @classmethod
@@ -655,8 +702,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         mean_annual_return: float,
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
+        randomizer: Generator,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Lognormal distribution simulation.
@@ -674,24 +721,23 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
-        seed: Optional[int], default 71
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         ReturnSimulation
             Lognormal distribution simulation
         """
-        if seed:
-            nprandom.seed(seed)
         daily_returns = (
-            nprandom.lognormal(
+            randomizer.lognormal(
                 mean=mean_annual_return / trading_days_in_year,
                 sigma=mean_annual_vol / sqrt(trading_days_in_year),
                 size=(number_of_sims, trading_days),
             )
             - 1
         )
+
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -699,6 +745,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=daily_returns),
+            randomizer=randomizer,
         )
 
     @classmethod
@@ -708,8 +755,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         mean_annual_return: float,
         mean_annual_vol: VolatilityType,
         trading_days: TradingDaysType,
+        randomizer: Generator,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Geometric Brownian Motion simulation.
@@ -730,17 +777,14 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
-        seed: Optional[int], default 71
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         ReturnSimulation
             Geometric Brownian Motion simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -748,11 +792,15 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             all_sigma=mean_annual_vol,
             gbm_mu=mean_annual_return,
         )
-        daily_returns = []
-        for _ in range(number_of_sims):
-            daily_returns.append(
-                cls.geometric_brownian_motion_log_returns(param=model_params),
+
+        daily_returns = [
+            cls.geometric_brownian_motion_log_returns(
+                param=model_params,
+                randomizer=randomizer,
             )
+            for _ in range(number_of_sims)
+        ]
+
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -760,6 +808,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=daily_returns),
+            randomizer=randomizer,
         )
 
     @classmethod
@@ -771,8 +820,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         mean_annual_vol: VolatilityType,
         heston_mu: VolatilityType,
         heston_a: float,
+        randomizer: Generator,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Heston model simulation.
@@ -797,17 +846,14 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
-        seed: Optional[int], default 71
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         ReturnSimulation
             Heston model simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -818,12 +864,17 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             heston_mu=heston_mu,
             heston_a=heston_a,
         )
+
         daily_returns = []
         for _ in range(number_of_sims):
-            aray = cls.heston_model_levels(model_params)[0]
+            aray = cls.heston_model_levels(
+                param=model_params,
+                randomizer=randomizer,
+            )[0]
             return_array = aray[1:] / aray[:-1] - 1
             return_array = insert(return_array, 0, 0.0)
             daily_returns.append(return_array)
+
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -831,6 +882,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=daily_returns),
+            randomizer=randomizer,
         )
 
     @classmethod
@@ -842,8 +894,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         mean_annual_vol: VolatilityType,
         heston_mu: VolatilityType,
         heston_a: float,
+        randomizer: Generator,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Heston Vol model simulation.
@@ -865,17 +917,14 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
-        seed: Optional[int], default 71
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         ReturnSimulation
             Heston Vol model simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -886,12 +935,17 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             heston_mu=heston_mu,
             heston_a=heston_a,
         )
+
         daily_returns = []
         for _ in range(number_of_sims):
-            aray = cls.heston_model_levels(model_params)[1]
+            aray = cls.heston_model_levels(
+                param=model_params,
+                randomizer=randomizer,
+            )[1]
             return_array = aray[1:] / aray[:-1] - 1
             return_array = insert(return_array, 0, 0.0)
             daily_returns.append(return_array)
+
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -899,6 +953,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=daily_returns),
+            randomizer=randomizer,
         )
 
     @classmethod
@@ -911,8 +966,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
         jumps_lamda: float,
         jumps_sigma: VolatilityType,
         jumps_mu: float,
+        randomizer: Generator,
         trading_days_in_year: DaysInYearType = 252,
-        seed: Optional[int] = 71,
     ) -> TypeReturnSimulation:
         """
         Merton Jump-Diffusion model simulation.
@@ -936,17 +991,14 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             This is the volatility of the jump size
         jumps_mu: float
             This is the average jump size
-        seed: Optional[int], default 71
-            Random seed going into numpy.random.seed()
+        randomizer: numpy.random.Generator
+            Random process generator
 
         Returns
         -------
         ReturnSimulation
             Merton Jump-Diffusion model simulation
         """
-        if seed:
-            nprandom.seed(seed)
-
         model_params = ModelParameters(
             all_s0=1,
             all_time=trading_days,
@@ -957,12 +1009,17 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             jumps_sigma=jumps_sigma,
             jumps_mu=jumps_mu,
         )
+
         daily_returns = []
         for _ in range(number_of_sims):
-            aray = cls.geometric_brownian_motion_jump_diffusion_levels(model_params)
+            aray = cls.geometric_brownian_motion_jump_diffusion_levels(
+                param=model_params,
+                randomizer=randomizer,
+            )
             return_array = aray[1:] / aray[:-1] - 1
             return_array = insert(return_array, 0, 0.0)
             daily_returns.append(return_array)
+
         return cls(
             number_of_sims=number_of_sims,
             trading_days=trading_days,
@@ -970,6 +1027,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc, unused-ignore]
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=daily_returns),
+            randomizer=randomizer,
         )
 
     def to_dataframe(

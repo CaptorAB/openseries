@@ -6,13 +6,14 @@ from datetime import date as dtdate
 from typing import TypeVar, Union, cast
 from unittest import TestCase
 
+from numpy.random import Generator
 from pandas import DataFrame, Series, date_range
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
-from openseries.simulation import ModelParameters, ReturnSimulation
+from openseries.simulation import ModelParameters, ReturnSimulation, random_generator
 from openseries.types import ValueType
-from tests.common_sim import FIVE_SIMS, ONE_SIM
+from tests.common_sim import FIVE_SIMS, ONE_SIM, SEED
 
 TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")
 
@@ -32,12 +33,12 @@ class TestSimulation(TestCase):
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""
-        args: dict[str, Union[int, float]] = {
+        args: dict[str, Union[int, float, Generator]] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
             "mean_annual_vol": 0.2,
-            "seed": 71,
+            "randomizer": random_generator(seed=SEED),
         }
         methods = [
             "from_normal",
@@ -55,63 +56,73 @@ class TestSimulation(TestCase):
             {"heston_mu": 0.35, "heston_a": 0.25},
             {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
         ]
-        target_returns = [
-            "0.008917436",
-            "0.029000099",
-            "-0.011082564",
-            "0.067119310",
-            "0.101488620",
-            "-0.007388824",
+        intended_returns = [
+            "-0.005640734",
+            "0.045394598",
+            "0.089770689",
+            "-0.012372613",
+            "0.207360639",
+            "-0.077096314",
         ]
-        target_volatilities = [
-            "0.200429415",
-            "0.200504640",
-            "0.200429415",
-            "0.263455329",
-            "0.440520211",
-            "0.210298179",
+
+        intended_volatilities = [
+            "0.193403252",
+            "0.194758690",
+            "0.201941372",
+            "0.387960485",
+            "0.485654264",
+            "0.232501922",
         ]
 
         returns = []
         volatilities = []
         for method, adding in zip(methods, added):
-            arguments: dict[str, Union[int, float]] = {**args, **adding}
+            arguments = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")
 
-        self.assertListEqual(target_returns, returns)
-        self.assertListEqual(target_volatilities, volatilities)
+        if intended_returns != returns:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
+        if intended_volatilities != volatilities:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
 
     def test_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output."""
         days = 2512
         psim = copy(self.seriesim)
 
-        self.assertIsInstance(psim.results, DataFrame)
+        if psim.results.shape[0] != days:
+            msg = "Unexpected result"
+            raise ValueError(msg)
 
-        self.assertEqual(psim.results.shape[0], days)
+        if f"{psim.realized_mean_return:.9f}" != "-0.017030572":
+            msg = f"Unexpected result: '{psim.realized_mean_return:.9f}'"
+            raise ValueError(msg)
 
-        self.assertEqual(f"{psim.realized_mean_return:.9f}", "0.009553952")
-
-        self.assertEqual(f"{psim.realized_vol:.9f}", "0.117099479")
+        if f"{psim.realized_vol:.9f}" != "0.125885483":
+            msg = f"Unexpected result: '{psim.realized_vol:.9f}'"
+            raise ValueError(msg)
 
     def test_assets(self: TestSimulation) -> None:
         """Test stoch processes output."""
         days = 2520
-        target_returns = [
-            "-0.031826675",
-            "0.084180046",
-            "0.058456697",
-            "0.034909498",
-            "0.353642948",
+        intended_returns = [
+            "-0.054955955",
+            "0.061043422",
+            "0.009116732",
+            "0.126175407",
+            "0.397127475",
         ]
-        target_volatilities = [
-            "0.241393324",
-            "0.241469969",
-            "0.252469189",
-            "0.236601983",
-            "0.600404476",
+
+        intended_volatilities = [
+            "0.232908982",
+            "0.232982933",
+            "0.252075511",
+            "0.203895259",
+            "0.621810014",
         ]
 
         modelparams = ModelParameters(
@@ -140,7 +151,10 @@ class TestSimulation(TestCase):
 
         series = []
         for i, process, residx in zip(range(len(processes)), processes, res_indices):
-            modelresult = getattr(ReturnSimulation, process)(modelparams, seed=71)
+            modelresult = getattr(ReturnSimulation, process)(
+                param=modelparams,
+                randomizer=random_generator(seed=SEED),
+            )
             if isinstance(modelresult, tuple):
                 modelresult = modelresult[cast(int, residx)]
             d_range = [
@@ -160,15 +174,19 @@ class TestSimulation(TestCase):
         means = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
         deviations = [f"{v:.9f}" for v in cast(Series, frame.vol)]
 
-        self.assertListEqual(target_returns, means)
-        self.assertListEqual(target_volatilities, deviations)
+        if intended_returns != means:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
+        if intended_volatilities != deviations:
+            msg = "Unexpected calculation result"
+            raise ValueError(msg)
 
     def test_cir_and_ou(self: TestSimulation) -> None:
         """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels."""
         series = []
         days = 2520
-        target_means = ["0.024184423", "0.019893950"]
-        target_deviations = ["0.003590473", "0.023333692"]
+        intended_returns = ["0.024059099", "0.019497031"]
+        intended_volatilities = ["0.003014102", "0.019346265"]
 
         modelparams = ModelParameters(
             all_s0=1.0,
@@ -192,7 +210,10 @@ class TestSimulation(TestCase):
 
         processes = ["cox_ingersoll_ross_levels", "ornstein_uhlenbeck_levels"]
         for process in processes:
-            onesim = getattr(ReturnSimulation, process)(modelparams, seed=71)
+            onesim = getattr(ReturnSimulation, process)(
+                param=modelparams,
+                randomizer=random_generator(seed=SEED),
+            )
             d_range = [
                 d.date()
                 for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
@@ -208,8 +229,13 @@ class TestSimulation(TestCase):
         means = [f"{r:.9f}" for r in frame.tsdf.mean()]
         deviations = [f"{v:.9f}" for v in frame.tsdf.std()]
 
-        self.assertListEqual(target_means, means)
-        self.assertListEqual(target_deviations, deviations)
+        if intended_returns != means:
+            msg = "Unexpected results from method beta()"
+            raise ValueError(msg)
+
+        if intended_volatilities != deviations:
+            msg = "Unexpected results from cir or ou random processes()"
+            raise ValueError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:
         """Test method to_dataframe."""
@@ -224,5 +250,10 @@ class TestSimulation(TestCase):
             seriesim.to_dataframe(name="Asset", start=start),
         )
 
-        self.assertEqual(ValueType.PRICE, startseries.valuetype)
-        self.assertEqual(ValueType.RTRN, returnseries.valuetype)
+        if startseries.valuetype != ValueType.PRICE:
+            msg = "Method to_dataframe() not working as intended"
+            raise ValueError(msg)
+
+        if returnseries.valuetype != ValueType.RTRN:
+            msg = "Method to_dataframe() not working as intended"
+            raise ValueError(msg)

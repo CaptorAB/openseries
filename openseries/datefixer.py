@@ -69,9 +69,12 @@ def holiday_calendar(
             countryholidays += list(staging)
         hols = array(sorted(set(countryholidays)), dtype="datetime64[D]")
     else:
+        msg = (
+            "Argument countries must be a string country code or "
+            "a list of string country codes according to ISO 3166-1 alpha-2."
+        )
         raise ValueError(
-            "Argument countries must be a string country code or a list "
-            "of string country codes according to ISO 3166-1 alpha-2.",
+            msg,
         )
 
     return busdaycalendar(holidays=hols)
@@ -109,17 +112,17 @@ def date_fix(
             .replace(tzinfo=dt.timezone.utc)
             .date()
         )
+    msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
     raise TypeError(
-        f"Unknown date format {fixerdate!s} of "
-        f"type {type(fixerdate)!s} encountered",
+        msg,
     )
 
 
 def date_offset_foll(
     raw_date: DateType,
     months_offset: int = 12,
-    adjust: bool = False,
-    following: bool = True,
+    adjust: bool = False,  # noqa: FBT001, FBT002
+    following: bool = True,  # noqa: FBT001, FBT002
     countries: CountriesType = "SE",
     custom_holidays: Optional[HolidayType] = None,
 ) -> dt.date:
@@ -150,10 +153,7 @@ def date_offset_foll(
     raw_date = date_fix(raw_date)
     month_delta = relativedelta(months=months_offset)
 
-    if following:
-        day_delta = relativedelta(days=1)
-    else:
-        day_delta = relativedelta(days=-1)
+    day_delta = relativedelta(days=1) if following else relativedelta(days=-1)
 
     new_date = raw_date + month_delta
 
@@ -345,9 +345,12 @@ def generate_calender_date_range(
             )
         ]
 
-    raise ValueError(
+    msg = (
         "Provide one of start or end date, but not both. "
-        "Date range is inferred from number of trading days.",
+        "Date range is inferred from number of trading days."
+    )
+    raise ValueError(
+        msg,
     )
 
 
@@ -454,11 +457,10 @@ def do_resample_to_business_period_ends(
         ]
         + [data.index[-1]],
     )
-    dates = dates.drop_duplicates()
-    return dates
+    return dates.drop_duplicates()
 
 
-def get_calc_range(
+def get_calc_range(  # noqa: C901
     data: DataFrame,
     months_offset: Optional[int] = None,
     from_dt: Optional[dt.date] = None,
@@ -485,7 +487,7 @@ def get_calc_range(
         Start and end date of the chosen date range
     """
     earlier, later = data.index[0], data.index[-1]
-    if months_offset is not None or from_dt is not None or to_dt is not None:
+    if any([months_offset, from_dt, to_dt]):
         if months_offset is not None:
             earlier = date_offset_foll(
                 raw_date=data.index[-1],
@@ -493,26 +495,29 @@ def get_calc_range(
                 adjust=False,
                 following=True,
             )
-            assert (
-                earlier >= data.index[0]
-            ), "Function calc_range returned earlier date < series start"
+            if earlier < data.index[0]:
+                msg = "Function calc_range returned earlier date < series start"
+                raise ValueError(
+                    msg,
+                )
             later = data.index[-1]
-        else:
-            if from_dt is not None and to_dt is None:
-                assert (
-                    from_dt >= data.index[0]
-                ), "Function calc_range returned earlier date < series start"
-                earlier, later = from_dt, data.index[-1]
-            elif from_dt is None and to_dt is not None:
-                assert (
-                    to_dt <= data.index[-1]
-                ), "Function calc_range returned later date > series end"
-                earlier, later = data.index[0], to_dt
-            elif from_dt is not None and to_dt is not None:
-                assert (
-                    to_dt <= data.index[-1] and from_dt >= data.index[0]
-                ), "Function calc_range returned dates outside series range"
-                earlier, later = from_dt, to_dt
+        elif from_dt is not None and to_dt is None:
+            if from_dt < data.index[0]:
+                msg = "Given from_dt date < series start"
+                raise ValueError(msg)
+            earlier, later = from_dt, data.index[-1]
+        elif from_dt is None and to_dt is not None:
+            if to_dt > data.index[-1]:
+                msg = "Given to_dt date > series end"
+                raise ValueError(msg)
+            earlier, later = data.index[0], to_dt
+        elif from_dt is not None and to_dt is not None:
+            if to_dt > data.index[-1] or from_dt < data.index[0]:
+                msg = "Given from_dt or to_dt dates outside series range"
+                raise ValueError(
+                    msg,
+                )
+            earlier, later = from_dt, to_dt
         while earlier not in data.index.tolist():
             earlier -= dt.timedelta(days=1)
         while later not in data.index.tolist():

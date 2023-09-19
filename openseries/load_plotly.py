@@ -2,13 +2,13 @@
 from __future__ import annotations
 
 from json import load
-from os.path import abspath, dirname, join
+from pathlib import Path
 
 from openseries.types import CaptorLogoType, PlotlyLayoutType
 
 
 def load_plotly_dict(
-    responsive: bool = True,
+    responsive: bool = True,  # noqa: FBT001, FBT002
 ) -> tuple[PlotlyLayoutType, CaptorLogoType]:
     """
     Load Plotly defaults.
@@ -23,13 +23,13 @@ def load_plotly_dict(
     tuple[PlotlyLayoutType, CaptorLogoType]
         A dictionary with the Plotly config and layout template
     """
-    project_root = dirname(dirname(abspath(__file__)))
-    layoutfile = join(abspath(project_root), "openseries", "plotly_layouts.json")
-    logofile = join(abspath(project_root), "openseries", "plotly_captor_logo.json")
+    project_root = Path(__file__).resolve().parent.parent
+    layoutfile = project_root.joinpath("openseries").joinpath("plotly_layouts.json")
+    logofile = project_root.joinpath("openseries").joinpath("plotly_captor_logo.json")
 
-    with open(layoutfile, encoding="utf-8") as layout_file:
+    with Path.open(layoutfile, encoding="utf-8") as layout_file:
         fig = load(layout_file)
-    with open(logofile, encoding="utf-8") as logo_file:
+    with Path.open(logofile, encoding="utf-8") as logo_file:
         logo = load(logo_file)
 
     fig["config"].update({"responsive": responsive})

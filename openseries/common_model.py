@@ -4,7 +4,6 @@ from __future__ import annotations
 import datetime as dt
 from json import dump
 from math import ceil
-from os import path
 from pathlib import Path
 from random import choices
 from string import ascii_letters
@@ -457,12 +456,13 @@ class CommonModel:
         list[Dict[str, Union[str, bool, ValueType, list[str], list[float]]]]
             A list of dictionaries with the raw original data of the series
         """
-        if not directory:
-            directory = path.dirname(path.abspath(__file__))
+        if directory:
+            dirpath = Path(directory).resolve()
+        else:
+            dirpath = Path(__file__).resolve().parent
 
         cleaner_list = ["label", "tsdf"]
-        data = self.__dict__
-
+        data = dict(self.__dict__)
         output = []
         if "label" in data:
             for item in cleaner_list:
@@ -470,15 +470,20 @@ class CommonModel:
             output.append(dict(data))
         else:
             series = [
-                serie.__dict__ for serie in cast(list[Any], data.get("constituents"))
+                dict(serie.__dict__)
+                for serie in cast(list[Any], data.get("constituents"))
             ]
-            for data in series:
+            for itemdata in series:
                 for item in cleaner_list:
-                    data.pop(item)
-                output.append(data)
+                    itemdata.pop(item)
+                output.append(dict(itemdata))
 
-        with open(path.join(directory, filename), "w", encoding="utf-8") as jsonfile:
-            dump(data, jsonfile, indent=2, sort_keys=False)
+        with Path.open(
+            dirpath.joinpath(filename),
+            "w",
+            encoding="utf-8",
+        ) as jsonfile:
+            dump(output, jsonfile, indent=2, sort_keys=False)
 
         return output
 
@@ -506,12 +511,13 @@ class CommonModel:
             The Excel file path
         """
         if filename[-5:].lower() != ".xlsx":
-            raise NameError("Filename must end with .xlsx")
+            msg = "Filename must end with .xlsx"
+            raise NameError(msg)
         if directory:
-            sheetfile = path.join(directory, filename)
+            dirpath = Path(directory).resolve()
         else:
-            script_path = path.abspath(__file__)
-            sheetfile = path.join(path.dirname(script_path), filename)
+            dirpath = Path(__file__).resolve().parent
+        sheetfile = dirpath.joinpath(filename)
 
         wrkbook = Workbook()
         wrksheet = wrkbook.active
@@ -524,7 +530,7 @@ class CommonModel:
 
         wrkbook.save(sheetfile)
 
-        return sheetfile
+        return str(sheetfile)
 
     def plot_bars(
         self: TypeCommonModel,
@@ -533,8 +539,8 @@ class CommonModel:
         filename: Optional[str] = None,
         directory: Optional[str] = None,
         labels: Optional[list[str]] = None,
-        auto_open: bool = True,
-        add_logo: bool = True,
+        auto_open: bool = True,  # noqa: FBT001, FBT002
+        add_logo: bool = True,  # noqa: FBT001, FBT002
         output_type: LiteralPlotlyOutput = "file",
     ) -> tuple[Figure, str]:
         """
@@ -568,21 +574,23 @@ class CommonModel:
             Plotly Figure and html filename with location
         """
         if labels:
-            assert (
-                len(labels) == self.tsdf.shape[1]
-            ), "Must provide same number of labels as items in frame."
+            if len(labels) != self.tsdf.shape[1]:
+                msg = "Must provide same number of labels as items in frame."
+                raise ValueError(
+                    msg,
+                )
         else:
             labels = list(self.tsdf.columns.get_level_values(0))
-        if not directory:
-            directory = path.join(str(Path.home()), "Documents")
-        if not filename:
-            filename = "".join(choices(ascii_letters, k=6)) + ".html"
-        plotfile = path.join(path.abspath(directory), filename)
 
-        if mode == "overlay":
-            opacity = 0.7
+        if directory:
+            dirpath = Path(directory).resolve()
         else:
-            opacity = None
+            dirpath = Path.home().joinpath("Documents")
+        if not filename:
+            filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
+        plotfile = dirpath.joinpath(filename)
+
+        opacity = 0.7 if mode == "overlay" else None
 
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
@@ -601,7 +609,7 @@ class CommonModel:
 
         plot(
             figure,
-            filename=plotfile,
+            filename=str(plotfile),
             auto_open=auto_open,
             link_text="",
             include_plotlyjs="cdn",
@@ -609,7 +617,7 @@ class CommonModel:
             output_type=output_type,
         )
 
-        return figure, plotfile
+        return figure, str(plotfile)
 
     def plot_series(
         self: TypeCommonModel,
@@ -618,9 +626,9 @@ class CommonModel:
         filename: Optional[str] = None,
         directory: Optional[str] = None,
         labels: Optional[list[str]] = None,
-        auto_open: bool = True,
-        add_logo: bool = True,
-        show_last: bool = False,
+        auto_open: bool = True,  # noqa: FBT001, FBT002
+        add_logo: bool = True,  # noqa: FBT001, FBT002
+        show_last: bool = False,  # noqa: FBT001, FBT002
         output_type: LiteralPlotlyOutput = "file",
     ) -> tuple[Figure, str]:
         """
@@ -656,16 +664,21 @@ class CommonModel:
             Plotly Figure and html filename with location
         """
         if labels:
-            assert (
-                len(labels) == self.tsdf.shape[1]
-            ), "Must provide same number of labels as items in frame."
+            if len(labels) != self.tsdf.shape[1]:
+                msg = "Must provide same number of labels as items in frame."
+                raise ValueError(
+                    msg,
+                )
         else:
             labels = list(self.tsdf.columns.get_level_values(0))
-        if not directory:
-            directory = path.join(str(Path.home()), "Documents")
+
+        if directory:
+            dirpath = Path(directory).resolve()
+        else:
+            dirpath = Path.home().joinpath("Documents")
         if not filename:
-            filename = "".join(choices(ascii_letters, k=6)) + ".html"
-        plotfile = path.join(path.abspath(directory), filename)
+            filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
+        plotfile = dirpath.joinpath(filename)
 
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
@@ -684,10 +697,7 @@ class CommonModel:
             figure.add_layout_image(logo)
 
         if show_last is True:
-            if tick_fmt:
-                txt = f"Last {{:{tick_fmt}}}"
-            else:
-                txt = "Last {}"
+            txt = f"Last {{:{tick_fmt}}}" if tick_fmt else "Last {}"
 
             for item in range(self.tsdf.shape[1]):
                 figure.add_scatter(
@@ -704,7 +714,7 @@ class CommonModel:
 
         plot(
             figure,
-            filename=plotfile,
+            filename=str(plotfile),
             auto_open=auto_open,
             link_text="",
             include_plotlyjs="cdn",
@@ -712,7 +722,7 @@ class CommonModel:
             output_type=output_type,
         )
 
-        return figure, plotfile
+        return figure, str(plotfile)
 
     def arithmetic_ret_func(
         self: TypeCommonModel,
@@ -839,7 +849,7 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,
+        drift_adjust: bool = False,  # noqa: FBT001, FBT002
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
         """
@@ -894,7 +904,7 @@ class CommonModel:
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,
+        drift_adjust: bool = False,  # noqa: FBT001, FBT002
         periods_in_a_year_fixed: Optional[int] = None,
     ) -> Union[float, Series]:
         """
@@ -1041,6 +1051,7 @@ class CommonModel:
         Union[float, Pandas.Series]
             Downside deviation
         """
+        zero: float = 0.0
         earlier, later = get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
@@ -1066,7 +1077,9 @@ class CommonModel:
             .sub(min_accepted_return / time_factor)
         )
 
-        result = sqrt((dddf[dddf < 0.0] ** 2).sum() / how_many) * sqrt(time_factor)
+        result = sqrt((dddf[dddf < zero] ** 2).sum() / how_many) * sqrt(
+            time_factor,
+        )
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
@@ -1103,6 +1116,7 @@ class CommonModel:
         Union[float, Pandas.Series]
             Compounded Annual Growth Rate (CAGR)
         """
+        zero: float = 0.0
         earlier, later = get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
@@ -1112,12 +1126,15 @@ class CommonModel:
         fraction = (later - earlier).days / 365.25
 
         if (
-            0.0 in self.tsdf.loc[earlier].tolist()
+            zero in self.tsdf.loc[earlier].tolist()
             or self.tsdf.loc[[earlier, later]].lt(0.0).any().any()
         ):
+            msg = (
+                "Geometric return cannot be calculated due to "
+                "an initial value being zero or a negative value."
+            )
             raise ValueError(
-                "Geometric return cannot be calculated due to an initial "
-                "value being zero or a negative value.",
+                msg,
             )
 
         result = (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
@@ -1328,6 +1345,7 @@ class CommonModel:
         Union[float, Pandas.Series]
             Calculate share of percentage changes that are greater than zero
         """
+        zero: float = 0.0
         earlier, later = get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
@@ -1341,7 +1359,7 @@ class CommonModel:
                 self.tsdf.loc[cast(int, earlier) : cast(int, later)]
                 .ffill()
                 .pct_change()[1:]
-                > 0.0
+                > zero
             ]
             .count()
         )
@@ -1414,8 +1432,7 @@ class CommonModel:
         if self.tsdf.shape[1] == 1:
             return cast(float, ratio)
         ratio.name = "Return vol ratio"
-        ratio = ratio.astype("float64")
-        return ratio
+        return ratio.astype("float64")
 
     def sortino_ratio_func(
         self: TypeCommonModel,
@@ -1477,8 +1494,7 @@ class CommonModel:
         if self.tsdf.shape[1] == 1:
             return cast(float, ratio)
         ratio.name = "Sortino ratio"
-        ratio = ratio.astype("float64")
-        return ratio
+        return ratio.astype("float64")
 
     def value_ret_func(
         self: TypeCommonModel,
@@ -1504,16 +1520,20 @@ class CommonModel:
         Union[float, Pandas.Series]
             Calculate simple return
         """
+        zero: float = 0.0
         earlier, later = get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
         )
-        if 0.0 in self.tsdf.iloc[0].tolist():
+        if zero in self.tsdf.iloc[0].tolist():
+            msg = (
+                "Simple return cannot be calculated due to "
+                f"an initial value being zero. ({self.tsdf.head(3)})"
+            )
             raise ValueError(
-                f"Simple return cannot be calculated due to an "
-                f"initial value being zero. ({self.tsdf.head(3)})",
+                msg,
             )
 
         result = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
@@ -1870,7 +1890,7 @@ def _var_implied_vol_and_target_func(
     from_date: Optional[dt.date] = None,
     to_date: Optional[dt.date] = None,
     interpolation: LiteralQuantileInterp = "lower",
-    drift_adjust: bool = False,
+    drift_adjust: bool = False,  # noqa: FBT001, FBT002
     periods_in_a_year_fixed: Optional[int] = None,
 ) -> Union[float, Series]:
     """
