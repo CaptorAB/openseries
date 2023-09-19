@@ -69,10 +69,13 @@ jobs:
         run: poetry run coverage report
 
       - name: Create Git Tag with version from pyproject.toml
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --import
           version=$(poetry run python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
-          git tag "$version"
+          git tag -s -a "$version" -m "Release v$version"
           git push origin "$version"
           echo "tag_version=$version" >> "$GITHUB_ENV"
 
@@ -80,14 +83,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.tag_version }}
-
-      - name: Sign GitHub release
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --import
-          git tag -s -m "Release v${{ github.event.release.tag_name }}" "${{ github.event.release.tag_name }}"
-          git push origin "${{ github.event.release.tag_name }}"
 
       - name: Build and Publish to Test PyPI
         run: |
