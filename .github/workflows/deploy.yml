@@ -72,6 +72,7 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
+          export GPG_TTY=$(tty)
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           version=$(poetry run python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
