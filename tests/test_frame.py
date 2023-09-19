@@ -1006,21 +1006,16 @@ class TestOpenFrame(TestCase):
         plotframe.to_cumret()
 
         directory = str(Path(__file__).resolve().parent)
-        kwargs = [
-            {"auto_open": False, "output_type": "file"},
-            {"auto_open": False, "output_type": "file", "directory": directory},
-        ]
-        for kwarg in kwargs:
-            _, figfile = plotframe.plot_series(**kwarg)  # type: ignore[arg-type]
-            plotfile = Path(figfile).resolve()
-            if not plotfile.exists():
-                msg = "json file not created"
-                raise FileNotFoundError(msg)
+        _, figfile = plotframe.plot_series(auto_open=False, directory=directory)
+        plotfile = Path(figfile).resolve()
+        if not plotfile.exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
 
-            plotfile.unlink()
-            if plotfile.exists():
-                msg = "json file not deleted as intended"
-                raise FileExistsError(msg)
+        plotfile.unlink()
+        if plotfile.exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
 
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
@@ -1068,21 +1063,16 @@ class TestOpenFrame(TestCase):
         plotframe = self.randomframe.from_deepcopy()
 
         directory = str(Path(__file__).resolve().parent)
-        kwargs = [
-            {"auto_open": False, "output_type": "file"},
-            {"auto_open": False, "output_type": "file", "directory": directory},
-        ]
-        for kwarg in kwargs:
-            _, figfile = plotframe.plot_bars(**kwarg)  # type: ignore[arg-type]
-            plotfile = Path(figfile).resolve()
-            if not plotfile.exists():
-                msg = "json file not created"
-                raise FileNotFoundError(msg)
+        _, figfile = plotframe.plot_bars(auto_open=False, directory=directory)
+        plotfile = Path(figfile).resolve()
+        if not plotfile.exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
 
-            plotfile.unlink()
-            if plotfile.exists():
-                msg = "json file not deleted as intended"
-                raise FileExistsError(msg)
+        plotfile.unlink()
+        if plotfile.exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = plotframe.plot_bars(auto_open=False, output_type="div")

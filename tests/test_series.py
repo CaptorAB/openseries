@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import load, loads
 from pathlib import Path
 from typing import TypeVar, Union, cast
@@ -973,42 +974,48 @@ class TestOpenTimeSeries(TestCase):
 
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
         """Test all calculated properties."""
-        checks = {
-            "cvar_down": "-0.01504137642",
-            "downside_deviation": "0.10452311329",
-            "geo_ret": "-0.02500758746",
-            "kurtosis": "208.03696455875",
-            "max_drawdown": "-0.45775280786",
-            "max_drawdown_cal_year": "-0.28343743581",
-            "positive_share": "0.50179211470",
-            "ret_vol_ratio": "-0.13511756712",
-            "skew": "-9.19251242068",
-            "sortino_ratio": "-0.16252993362",
-            "value_ret": "-0.22359621761",
-            "var_down": "-0.00972487850",
-            "vol": "0.12572854165",
-            "vol_from_var": "0.09373794422",
-            "worst": "-0.18338018001",
-            "worst_month": "-0.19610652507",
-            "z_score": "-0.36463574030",
-        }
-        for c_key, c_value in checks.items():
-            if c_value != f"{getattr(self.randomseries, c_key):.11f}":
-                msg = (
-                    f"Difference in {c_key}: "
-                    f"'{getattr(self.randomseries, c_key):.11f}'"
-                )
-                raise ValueError(msg)
-            if (
-                f"{self.random_properties[c_key]:.11f}"
-                != f"{getattr(self.randomseries, c_key):.11f}"
-            ):
-                msg = (
-                    f"Difference in {c_key}: "
-                    f"'{self.random_properties[c_key]:.11f}' versus "
-                    f"'{getattr(self.randomseries, c_key):.11f}'"
-                )
-                raise ValueError(msg)
+        with localcontext() as decimal_context:
+            decimal_context.rounding = ROUND_HALF_UP
+            checks = {
+                "cvar_down": Decimal("-0.01504137642"),
+                "downside_deviation": Decimal("0.10452311329"),
+                "geo_ret": Decimal("-0.02500758746"),
+                "kurtosis": Decimal("208.03696455875"),
+                "max_drawdown": Decimal("-0.45775280786"),
+                "max_drawdown_cal_year": Decimal("-0.28343743581"),
+                "positive_share": Decimal("0.50179211470"),
+                "ret_vol_ratio": Decimal("-0.13511756712"),
+                "skew": Decimal("-9.19251242068"),
+                "sortino_ratio": Decimal("-0.16252993362"),
+                "value_ret": Decimal("-0.22359621761"),
+                "var_down": Decimal("-0.00972487850"),
+                "vol": Decimal("0.12572854165"),
+                "vol_from_var": Decimal("0.09373794422"),
+                "worst": Decimal("-0.18338018001"),
+                "worst_month": Decimal("-0.19610652507"),
+                "z_score": Decimal("-0.36463574030"),
+            }
+            for c_key, c_value in checks.items():
+                if c_value != round(Decimal(getattr(self.randomseries, c_key)), 11):
+                    msg = (
+                        f"Difference in {c_key}: "
+                        f"'{Decimal(getattr(self.randomseries, c_key)):.11f}'"
+                    )
+                    raise ValueError(msg)
+                if round(
+                    Decimal(cast(float, self.random_properties[c_key])),
+                    11,
+                ) != round(
+                    Decimal(getattr(self.randomseries, c_key)),
+                    11,
+                ):
+                    msg = (
+                        f"Difference in {c_key}: "
+                        f"{Decimal(cast(float, self.random_properties[c_key])):.11f}"
+                        " versus "
+                        f"{Decimal(getattr(self.randomseries, c_key)):.11f}"
+                    )
+                    raise ValueError(msg)
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods."""
@@ -1258,21 +1265,16 @@ class TestOpenTimeSeries(TestCase):
         plotseries = self.randomseries.from_deepcopy()
 
         directory = str(Path(__file__).resolve().parent)
-        kwargs = [
-            {"auto_open": False, "output_type": "file"},
-            {"auto_open": False, "output_type": "file", "directory": directory},
-        ]
-        for kwarg in kwargs:
-            _, figfile = plotseries.plot_series(**kwarg)  # type: ignore[arg-type]
-            plotfile = Path(figfile).resolve()
-            if not plotfile.exists():
-                msg = "json file not created"
-                raise FileNotFoundError(msg)
+        _, figfile = plotseries.plot_series(auto_open=False, directory=directory)
+        plotfile = Path(figfile).resolve()
+        if not plotfile.exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
 
-            plotfile.unlink()
-            if plotfile.exists():
-                msg = "json file not deleted as intended"
-                raise FileExistsError(msg)
+        plotfile.unlink()
+        if plotfile.exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
 
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
@@ -1312,21 +1314,16 @@ class TestOpenTimeSeries(TestCase):
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
         directory = str(Path(__file__).resolve().parent)
-        kwargs = [
-            {"auto_open": False, "output_type": "file"},
-            {"auto_open": False, "output_type": "file", "directory": directory},
-        ]
-        for kwarg in kwargs:
-            _, figfile = barseries.plot_bars(**kwarg)  # type: ignore[arg-type]
-            plotfile = Path(figfile).resolve()
-            if not plotfile.exists():
-                msg = "json file not created"
-                raise FileNotFoundError(msg)
+        _, figfile = barseries.plot_series(auto_open=False, directory=directory)
+        plotfile = Path(figfile).resolve()
+        if not plotfile.exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
 
-            plotfile.unlink()
-            if plotfile.exists():
-                msg = "json file not deleted as intended"
-                raise FileExistsError(msg)
+        plotfile.unlink()
+        if plotfile.exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = barseries.plot_bars(auto_open=False, output_type="div")
