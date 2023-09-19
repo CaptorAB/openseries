@@ -77,7 +77,7 @@ jobs:
           echo "Version: $version"
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR_EMAIL}"
-          git config --global user.signingkey 03BE0D766CA0CF9852B592D5BBE8A9CD2E275A01
+          git config --global user.signingkey AA3F8D7ABF6AC0297D645AFB8BC8B63663FC4343
           git config --global gpg.program gpg
           git tag -s -a "$version" -m "Release v$version"
           git push origin "$version"
