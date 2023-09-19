@@ -75,6 +75,8 @@ jobs:
           echo "$GPG_PRIVATE_KEY" | gpg --import
           version=$(poetry run python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR_EMAIL}"
           git tag -s -a "$version" -m "Release v$version"
           git push origin "$version"
           echo "tag_version=$version" >> "$GITHUB_ENV"
