@@ -608,7 +608,7 @@ class CommonModel:
             figure.add_layout_image(logo)
 
         plot(
-            figure,
+            figure_or_data=figure,
             filename=str(plotfile),
             auto_open=auto_open,
             link_text="",
@@ -713,7 +713,7 @@ class CommonModel:
                 )
 
         plot(
-            figure,
+            figure_or_data=figure,
             filename=str(plotfile),
             auto_open=auto_open,
             link_text="",
