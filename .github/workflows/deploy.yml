@@ -68,11 +68,16 @@ jobs:
       - name: Report coverage
         run: poetry run coverage report
 
+      - name: Start GPG Agent
+        run: |
+          gpg-agent --daemon
+          export GPG_TTY=$(tty)
+
       - name: Create Git Tag with version from pyproject.toml
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --import
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           version=$(poetry run python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
           git config --global user.name "${GITHUB_ACTOR}"
