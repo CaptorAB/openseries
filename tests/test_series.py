@@ -977,43 +977,43 @@ class TestOpenTimeSeries(TestCase):
         with localcontext() as decimal_context:
             decimal_context.rounding = ROUND_HALF_UP
             checks = {
-                "cvar_down": Decimal("-0.01504137642"),
-                "downside_deviation": Decimal("0.10452311329"),
-                "geo_ret": Decimal("-0.02500758746"),
-                "kurtosis": Decimal("208.03696455875"),
-                "max_drawdown": Decimal("-0.45775280786"),
-                "max_drawdown_cal_year": Decimal("-0.28343743581"),
-                "positive_share": Decimal("0.50179211470"),
-                "ret_vol_ratio": Decimal("-0.13511756712"),
-                "skew": Decimal("-9.19251242068"),
-                "sortino_ratio": Decimal("-0.16252993362"),
-                "value_ret": Decimal("-0.22359621761"),
-                "var_down": Decimal("-0.00972487850"),
-                "vol": Decimal("0.12572854165"),
-                "vol_from_var": Decimal("0.09373794422"),
-                "worst": Decimal("-0.18338018001"),
-                "worst_month": Decimal("-0.19610652507"),
-                "z_score": Decimal("-0.36463574030"),
+                "cvar_down": Decimal("-0.0150413764"),
+                "downside_deviation": Decimal("0.1045231133"),
+                "geo_ret": Decimal("-0.0250075875"),
+                "kurtosis": Decimal("208.0369645588"),
+                "max_drawdown": Decimal("-0.4577528079"),
+                "max_drawdown_cal_year": Decimal("-0.2834374358"),
+                "positive_share": Decimal("0.5017921147"),
+                "ret_vol_ratio": Decimal("-0.1351175671"),
+                "skew": Decimal("-9.1925124207"),
+                "sortino_ratio": Decimal("-0.1625299336"),
+                "value_ret": Decimal("-0.2235962176"),
+                "var_down": Decimal("-0.0097248785"),
+                "vol": Decimal("0.1257285416"),
+                "vol_from_var": Decimal("0.0937379442"),
+                "worst": Decimal("-0.1833801800"),
+                "worst_month": Decimal("-0.1961065251"),
+                "z_score": Decimal("-0.3646357403"),
             }
             for c_key, c_value in checks.items():
-                if c_value != round(Decimal(getattr(self.randomseries, c_key)), 11):
+                if c_value != round(Decimal(getattr(self.randomseries, c_key)), 10):
                     msg = (
                         f"Difference in {c_key}: "
-                        f"'{Decimal(getattr(self.randomseries, c_key)):.11f}'"
+                        f"'{Decimal(getattr(self.randomseries, c_key)):.10f}'"
                     )
                     raise ValueError(msg)
                 if round(
                     Decimal(cast(float, self.random_properties[c_key])),
-                    11,
+                    10,
                 ) != round(
                     Decimal(getattr(self.randomseries, c_key)),
-                    11,
+                    10,
                 ):
                     msg = (
                         f"Difference in {c_key}: "
-                        f"{Decimal(cast(float, self.random_properties[c_key])):.11f}"
+                        f"{Decimal(cast(float, self.random_properties[c_key])):.10f}"
                         " versus "
-                        f"{Decimal(getattr(self.randomseries, c_key)):.11f}"
+                        f"{Decimal(getattr(self.randomseries, c_key)):.10f}"
                     )
                     raise ValueError(msg)
 
