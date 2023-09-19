@@ -73,7 +73,7 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
           export GPG_TTY=$(tty)
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --pinentry-mode loopback --import
           version=$(poetry run python -c "import toml; print(toml.load('pyproject.toml')['tool']['poetry']['version'])")
           echo "Version: $version"
           git config --global user.name "${GITHUB_ACTOR}"
