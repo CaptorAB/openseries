@@ -6,13 +6,14 @@ from datetime import date as dtdate
 from typing import TypeVar, Union, cast
 from unittest import TestCase
 
+from numpy.random import Generator
 from pandas import DataFrame, Series, date_range
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
-from openseries.simulation import ModelParameters, ReturnSimulation
+from openseries.simulation import ModelParameters, ReturnSimulation, random_generator
 from openseries.types import ValueType
-from tests.common_sim import FIVE_SIMS, ONE_SIM
+from tests.common_sim import FIVE_SIMS, ONE_SIM, SEED
 
 TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")
 
@@ -32,12 +33,12 @@ class TestSimulation(TestCase):
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""
-        args: dict[str, Union[int, float]] = {
+        args: dict[str, Union[int, float, Generator]] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
             "mean_annual_vol": 0.2,
-            "seed": 71,
+            "randomizer": random_generator(seed=SEED),
         }
         methods = [
             "from_normal",
@@ -55,36 +56,36 @@ class TestSimulation(TestCase):
             {"heston_mu": 0.35, "heston_a": 0.25},
             {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
         ]
-        target_returns = [
+        intended_returns = [
             "-0.005640734",
-            "0.013058925",
-            "-0.025640734",
-            "0.027163652",
-            "0.124437404",
-            "-0.043708800",
+            "0.045394598",
+            "0.089770689",
+            "-0.012372613",
+            "0.207360639",
+            "-0.077096314",
         ]
 
-        target_volatilities = [
+        intended_volatilities = [
             "0.193403252",
-            "0.193487832",
-            "0.193403252",
-            "0.198417705",
-            "0.447234514",
-            "0.209297219",
+            "0.194758690",
+            "0.201941372",
+            "0.387960485",
+            "0.485654264",
+            "0.232501922",
         ]
 
         returns = []
         volatilities = []
         for method, adding in zip(methods, added):
-            arguments: dict[str, Union[int, float]] = {**args, **adding}
+            arguments = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
             volatilities.append(f"{onesim.realized_vol:.9f}")
 
-        if target_returns != returns:
+        if intended_returns != returns:
             msg = "Unexpected calculation result"
             raise ValueError(msg)
-        if target_volatilities != volatilities:
+        if intended_volatilities != volatilities:
             msg = "Unexpected calculation result"
             raise ValueError(msg)
 
@@ -152,7 +153,7 @@ class TestSimulation(TestCase):
         for i, process, residx in zip(range(len(processes)), processes, res_indices):
             modelresult = getattr(ReturnSimulation, process)(
                 param=modelparams,
-                seed=71,
+                randomizer=random_generator(seed=SEED),
             )
             if isinstance(modelresult, tuple):
                 modelresult = modelresult[cast(int, residx)]
@@ -209,7 +210,10 @@ class TestSimulation(TestCase):
 
         processes = ["cox_ingersoll_ross_levels", "ornstein_uhlenbeck_levels"]
         for process in processes:
-            onesim = getattr(ReturnSimulation, process)(modelparams, seed=71)
+            onesim = getattr(ReturnSimulation, process)(
+                param=modelparams,
+                randomizer=random_generator(seed=SEED),
+            )
             d_range = [
                 d.date()
                 for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")

@@ -7,6 +7,10 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.3] - 2023-09-19
+
+Improved ruff code coverage by setting the configuration to select ALL.
+
 ## Version [1.3.2] - 2023-09-10
 
 Found a mistake in geo_ret_func that was made when it was consolidated into the common_model.py
