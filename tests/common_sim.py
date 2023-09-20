@@ -1,6 +1,6 @@
 """Defining simulated data used in test suite."""
 
-from openseries.simulation import ReturnSimulation, random_generator
+from openseries.simulation import ReturnSimulation
 
 SEED: int = 71
 
@@ -13,7 +13,7 @@ ONE_SIM = ReturnSimulation.from_merton_jump_gbm(
     jumps_sigma=0.001,
     jumps_mu=-0.2,
     trading_days_in_year=252,
-    randomizer=random_generator(seed=SEED),
+    seed=SEED,
 )
 
 FIVE_SIMS = ReturnSimulation.from_merton_jump_gbm(
@@ -25,5 +25,5 @@ FIVE_SIMS = ReturnSimulation.from_merton_jump_gbm(
     jumps_sigma=0.001,
     jumps_mu=-0.2,
     trading_days_in_year=252,
-    randomizer=random_generator(seed=SEED),
+    seed=SEED,
 )

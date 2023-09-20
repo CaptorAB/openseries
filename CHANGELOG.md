@@ -7,6 +7,10 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.4] - 2023-09-20
+
+Simplified ReturnSimulation to make it easier to use. The change will not affect users of OpenTimeSeries and OpenFrame.
+
 ## Version [1.3.3] - 2023-09-19
 
 Improved ruff code coverage by setting the configuration to select ALL.
