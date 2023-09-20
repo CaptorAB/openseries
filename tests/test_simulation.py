@@ -11,7 +11,17 @@ from pandas import DataFrame, Series, date_range
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
-from openseries.simulation import ModelParameters, ReturnSimulation, random_generator
+from openseries.simulation import (
+    ModelParameters,
+    ReturnSimulation,
+    brownian_motion_levels,
+    cox_ingersoll_ross_levels,
+    geometric_brownian_motion_jump_diffusion_levels,
+    geometric_brownian_motion_levels,
+    heston_model_levels,
+    ornstein_uhlenbeck_levels,
+    random_generator,
+)
 from openseries.types import ValueType
 from tests.common_sim import FIVE_SIMS, ONE_SIM, SEED
 
@@ -31,6 +41,34 @@ class TestSimulation(TestCase):
         cls.seriesim = ONE_SIM
         cls.framesim = FIVE_SIMS
 
+    def test_init_with_without_randomizer(self: TestSimulation) -> None:
+        """Test instantiating ReturnSimulation with & without random generator."""
+        sim_without = ReturnSimulation(
+            number_of_sims=1,
+            trading_days=2512,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            trading_days_in_year=252,
+            dframe=DataFrame(),
+            seed=SEED,
+        )
+        if not isinstance(sim_without, ReturnSimulation):
+            msg = "ReturnSimulation object not instantiated as expected"
+            raise TypeError(msg)
+
+        sim_with = ReturnSimulation(
+            number_of_sims=1,
+            trading_days=2512,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            trading_days_in_year=252,
+            dframe=DataFrame(),
+            randomizer=random_generator(seed=SEED),
+        )
+        if not isinstance(sim_with, ReturnSimulation):
+            msg = "ReturnSimulation object not instantiated as expected"
+            raise TypeError(msg)
+
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""
         args: dict[str, Union[int, float, Generator]] = {
@@ -38,7 +76,7 @@ class TestSimulation(TestCase):
             "trading_days": 2520,
             "mean_annual_return": 0.05,
             "mean_annual_vol": 0.2,
-            "randomizer": random_generator(seed=SEED),
+            "seed": SEED,
         }
         methods = [
             "from_normal",
@@ -58,20 +96,20 @@ class TestSimulation(TestCase):
         ]
         intended_returns = [
             "-0.005640734",
-            "0.045394598",
-            "0.089770689",
-            "-0.012372613",
-            "0.207360639",
-            "-0.077096314",
+            "0.013058925",
+            "-0.025640734",
+            "0.027163652",
+            "0.124437404",
+            "-0.043708800",
         ]
 
         intended_volatilities = [
             "0.193403252",
-            "0.194758690",
-            "0.201941372",
-            "0.387960485",
-            "0.485654264",
-            "0.232501922",
+            "0.193487832",
+            "0.193403252",
+            "0.198417705",
+            "0.447234514",
+            "0.209297219",
         ]
 
         returns = []
@@ -141,17 +179,17 @@ class TestSimulation(TestCase):
         )
 
         processes = [
-            "brownian_motion_levels",
-            "geometric_brownian_motion_levels",
-            "geometric_brownian_motion_jump_diffusion_levels",
-            "heston_model_levels",
-            "heston_model_levels",
+            brownian_motion_levels,
+            geometric_brownian_motion_levels,
+            geometric_brownian_motion_jump_diffusion_levels,
+            heston_model_levels,
+            heston_model_levels,
         ]
         res_indices = [None, None, None, 0, 1]
 
         series = []
         for i, process, residx in zip(range(len(processes)), processes, res_indices):
-            modelresult = getattr(ReturnSimulation, process)(
+            modelresult = process(
                 param=modelparams,
                 randomizer=random_generator(seed=SEED),
             )
@@ -208,12 +246,9 @@ class TestSimulation(TestCase):
             heston_vol0=0.06125,
         )
 
-        processes = ["cox_ingersoll_ross_levels", "ornstein_uhlenbeck_levels"]
+        processes = [cox_ingersoll_ross_levels, ornstein_uhlenbeck_levels]
         for process in processes:
-            onesim = getattr(ReturnSimulation, process)(
-                param=modelparams,
-                randomizer=random_generator(seed=SEED),
-            )
+            onesim = process(param=modelparams, randomizer=random_generator(seed=SEED))
             d_range = [
                 d.date()
                 for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
@@ -221,7 +256,7 @@ class TestSimulation(TestCase):
             sdf = DataFrame(
                 data=onesim,
                 index=d_range,
-                columns=[[f"Asset_{process[:-7]}"], [ValueType.PRICE]],
+                columns=[[f"Asset_{str(process)[:-7]}"], [ValueType.PRICE]],
             )
             series.append(OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE))
 
