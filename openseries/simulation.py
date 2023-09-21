@@ -558,7 +558,37 @@ def ornstein_uhlenbeck_levels(
 
 class ReturnSimulation:
 
-    """Declare ReturnSimulation."""
+    """
+    Object of the class ReturnSimulation.
+
+    Parameters
+    ----------
+    number_of_sims : SimCountType
+        Number of simulations to generate
+    trading_days: TradingDaysType
+        Total number of days to simulate
+    trading_days_in_year : DaysInYearType
+        Number of trading days used to annualize
+    mean_annual_return : float
+        Mean annual return of the distribution
+    mean_annual_vol : VolatilityType
+        Mean annual standard deviation of the distribution
+    dframe: pandas.DataFrame
+        Pandas DataFrame object holding the resulting values
+    seed: int, optional
+        Seed for random process initiation
+    randomizer: numpy.random.Generator, optional
+        Random process generator
+    """
+
+    number_of_sims: SimCountType
+    trading_days: TradingDaysType
+    trading_days_in_year: DaysInYearType
+    mean_annual_return: float
+    mean_annual_vol: VolatilityType
+    dframe: DataFrame
+    seed: Optional[int]
+    randomizer: Optional[Generator]
 
     def __init__(
         self: ReturnSimulation,
@@ -588,9 +618,9 @@ class ReturnSimulation:
             Mean annual standard deviation of the distribution
         dframe: pandas.DataFrame
             Pandas DataFrame object holding the resulting values
-        seed: int
+        seed: int, optional
             Seed for random process initiation
-        randomizer: numpy.random.Generator
+        randomizer: numpy.random.Generator, optional
             Random process generator
 
         Returns
