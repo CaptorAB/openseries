@@ -6,7 +6,6 @@ from datetime import date as dtdate
 from typing import TypeVar, Union, cast
 from unittest import TestCase
 
-from numpy.random import Generator
 from pandas import DataFrame, Series, date_range
 
 from openseries.frame import OpenFrame
@@ -71,7 +70,7 @@ class TestSimulation(TestCase):
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""
-        args: dict[str, Union[int, float, Generator]] = {
+        args: dict[str, Union[int, float]] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
