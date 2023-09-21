@@ -44,7 +44,6 @@ jobs:
         run: |
           poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
           poetry config --list
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
