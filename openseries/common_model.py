@@ -829,9 +829,9 @@ class CommonModel:
             )
             time_factor = how_many / fraction
 
-        result = self.tsdf.loc[
-            cast(int, earlier) : cast(int, later)
-        ].ffill().pct_change().std() * sqrt(time_factor)
+        result = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+        result = result.ffill()
+        result = result.pct_change().std() * sqrt(time_factor)
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
