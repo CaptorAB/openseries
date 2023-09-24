@@ -71,8 +71,12 @@ path = "venv"
 no-pip = true
 
 [tool.pytest.ini_options]
-# https://github.com/pydata/pandas-datareader/issues/960
-filterwarnings = ["error", "ignore::DeprecationWarning:pandas_datareader.*:"]
+filterwarnings = [
+    "error",
+    "ignore:The default fill_method:FutureWarning::",
+    # https://github.com/pydata/pandas-datareader/issues/960
+    "ignore::DeprecationWarning:pandas_datareader.*:"
+]
 
 [tool.black]
 line-length = 87

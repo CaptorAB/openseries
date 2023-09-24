@@ -3,8 +3,10 @@ from __future__ import annotations
 
 from typing import cast
 from unittest import TestCase
+from warnings import catch_warnings, simplefilter
 
 import pytest
+from pandas import DataFrame
 
 from openseries.types import (
     LiteralFrameProps,
@@ -59,3 +61,24 @@ class TestTypes(TestCase):
                     ["z_score", "skew", "skew", "positive_share"],
                 ),
             )
+
+    def test_pandas_futurewarning_handling(self: TestTypes) -> None:
+        """Test that Pandas FutureWarning is handled appropriately."""
+        arrays_a = [
+            [1, 101],
+            [2, 102],
+            [3, None],
+            [4, 104],
+            [5, 105],
+        ]
+        dfa = DataFrame(arrays_a)
+
+        with catch_warnings():
+            simplefilter("error")
+            with pytest.raises(
+                expected_exception=FutureWarning,
+                match="Call ffill before calling pct_change",
+            ):
+                _ = dfa.pct_change()
+
+        _ = dfa.pct_change()
