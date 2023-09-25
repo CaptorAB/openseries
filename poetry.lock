@@ -1982,13 +1982,13 @@ files = [
 
 [[package]]
 name = "yfinance"
-version = "0.2.29"
+version = "0.2.30"
 description = "Download market data from Yahoo! Finance API"
 optional = false
 python-versions = "*"
 files = [
-    {file = "yfinance-0.2.29-py2.py3-none-any.whl", hash = "sha256:9be003a9216ea927faf52231ad15f683b0a52c4e450a2b05f429a0b928110161"},
-    {file = "yfinance-0.2.29.tar.gz", hash = "sha256:1c89a3b7b79ace22a07b3032eedcc50c93189024f025435f82c85e95faaa4140"},
+    {file = "yfinance-0.2.30-py2.py3-none-any.whl", hash = "sha256:bf310002e2523a08148118b61f442bc2eb3467e5244e31e4cfefe6bb575dd02e"},
+    {file = "yfinance-0.2.30.tar.gz", hash = "sha256:9b980cfb20beb903c4e3dee212de305f3d6fea96e5c571bf424239da974970fe"},
 ]
 
 [package.dependencies]
