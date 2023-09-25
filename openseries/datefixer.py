@@ -9,6 +9,7 @@ from holidays import country_holidays, list_supported_countries
 from numpy import array, busdaycalendar, datetime64, is_busday, where
 from pandas import DataFrame, DatetimeIndex, Series, Timestamp, concat, date_range
 from pandas.tseries.offsets import CustomBusinessDay
+from pydantic import PositiveInt
 
 from openseries.types import (
     CountriesType,
@@ -16,7 +17,6 @@ from openseries.types import (
     HolidayType,
     LiteralBizDayFreq,
     LiteralPandasResampleConvention,
-    TradingDaysType,
 )
 
 
@@ -285,7 +285,7 @@ def offset_business_days(
 
 
 def generate_calender_date_range(
-    trading_days: TradingDaysType,
+    trading_days: PositiveInt,
     start: Optional[dt.date] = None,
     end: Optional[dt.date] = None,
     countries: CountriesType = "SE",
@@ -295,7 +295,7 @@ def generate_calender_date_range(
 
     Parameters
     ----------
-    trading_days: TradingDaysType
+    trading_days: PositiveInt
         Number of days to generate
     start: datetime.date, optional
         Date when the range starts

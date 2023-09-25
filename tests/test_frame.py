@@ -799,6 +799,7 @@ class TestOpenFrame(TestCase):
             "model_rebuild",
             "model_dump_json",
             "model_validate_json",
+            "model_validate_strings",
             "model_copy",
             "model_dump",
             "model_validate",

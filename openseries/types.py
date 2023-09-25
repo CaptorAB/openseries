@@ -7,7 +7,7 @@ from typing import Annotated, ClassVar, Literal, TypeVar, Union
 
 from numpy import datetime64
 from pandas import Timestamp
-from pydantic import StringConstraints, confloat, conint, conlist, constr
+from pydantic import StringConstraints, conint, conlist, constr
 
 CountryStringType = Annotated[
     str,
@@ -55,12 +55,6 @@ ValueListType = Annotated[list[float], conlist(float, min_length=1)]
 DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
 
 DaysInYearType = Annotated[int, conint(strict=True, ge=1, le=366)]
-
-TradingDaysType = Annotated[int, conint(strict=True, gt=1)]
-
-SimCountType = Annotated[int, conint(strict=True, ge=1)]
-
-VolatilityType = Annotated[float, confloat(strict=True, gt=0.0)]
 
 DateType = Union[str, dt.date, dt.datetime, datetime64, Timestamp]
 
