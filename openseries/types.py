@@ -7,11 +7,12 @@ from typing import Annotated, ClassVar, Literal, TypeVar, Union
 
 from numpy import datetime64
 from pandas import Timestamp
-from pydantic import StringConstraints, conint, conlist, constr
+from pydantic import Field, StringConstraints, conlist
 
 CountryStringType = Annotated[
     str,
     StringConstraints(
+        strip_whitespace=True,
         pattern=r"^[A-Z]{2}$",
         to_upper=True,
         min_length=2,
@@ -20,13 +21,7 @@ CountryStringType = Annotated[
     ),
 ]
 CountryListType = conlist(
-    constr(
-        pattern=r"^[A-Z]{2}$",
-        to_upper=True,
-        min_length=2,
-        max_length=2,
-        strict=True,
-    ),
+    CountryStringType,
     min_length=1,
 )
 CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]
@@ -45,7 +40,12 @@ CurrencyStringType = Annotated[
 DateListType = Annotated[
     list[str],
     conlist(
-        constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"),
+        Annotated[
+            str,
+            StringConstraints(
+                pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$",
+            ),
+        ],
         min_length=1,
     ),
 ]
@@ -54,7 +54,7 @@ ValueListType = Annotated[list[float], conlist(float, min_length=1)]
 
 DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
 
-DaysInYearType = Annotated[int, conint(strict=True, ge=1, le=366)]
+DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 
 DateType = Union[str, dt.date, dt.datetime, datetime64, Timestamp]
 
