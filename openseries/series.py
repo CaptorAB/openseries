@@ -438,13 +438,10 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         """
         dframe = DataFrame(
             data=self.values,
-            index=self.dates,
+            index=[d.date() for d in DatetimeIndex(self.dates)],
             columns=[[self.label], [self.valuetype]],
             dtype="float64",
         )
-        dframe.index = [d.date() for d in DatetimeIndex(dframe.index)]
-
-        dframe = dframe.sort_index()
         self.tsdf = dframe
 
         return self
@@ -625,7 +622,12 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
         self.values = list(arr)
         self.valuetype = ValueType.PRICE
-        self.pandas_df()
+        self.tsdf = DataFrame(
+            data=self.values,
+            index=[d.date() for d in DatetimeIndex(self.dates)],
+            columns=[[self.label], [self.valuetype]],
+            dtype="float64",
+        )
 
         return self
 
