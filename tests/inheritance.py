@@ -13,7 +13,7 @@ TypeLeftMulti = TypeVar("TypeLeftMulti", bound="LeftMulti")
 TypeRightMulti = TypeVar("TypeRightMulti", bound="RightMulti")
 
 
-class TopSingle(BaseModel):  # type: ignore[misc]
+class TopSingle(BaseModel):  # type: ignore[misc, unused-ignore]
 
     """
     Declare TopSingle.
@@ -112,7 +112,7 @@ class TopMulti:
     a: int
 
 
-class LeftMulti(BaseModel, TopMulti):  # type: ignore[misc]
+class LeftMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
 
     """
     Declare LeftMulti.
