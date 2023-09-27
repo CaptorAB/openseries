@@ -1,16 +1,9 @@
 """Investigating how to remove multiple inheritance structure."""
 from __future__ import annotations
 
-from typing import TypeVar
+from logging import warning
 
-from pydantic import BaseModel
-
-TypeTopSingle = TypeVar("TypeTopSingle", bound="TopSingle")
-TypeLeftSingle = TypeVar("TypeLeftSingle", bound="LeftSingle")
-TypeRightSingle = TypeVar("TypeRightSingle", bound="RightSingle")
-TypeTopMulti = TypeVar("TypeTopMulti", bound="TopMulti")
-TypeLeftMulti = TypeVar("TypeLeftMulti", bound="LeftMulti")
-TypeRightMulti = TypeVar("TypeRightMulti", bound="RightMulti")
+from pydantic import BaseModel, ValidationError
 
 
 class TopSingle(BaseModel):  # type: ignore[misc, unused-ignore]
@@ -71,7 +64,7 @@ class RightSingle(TopSingle):
     """
 
     a: int
-    c: tuple[int, int]
+    c: tuple[int, int] = (1, 2)
 
     def __init__(self: RightSingle, a: int) -> None:
         """
@@ -134,10 +127,10 @@ class LeftMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
     b: int
 
 
-class RightMulti(BaseModel, TopSingle):  # type: ignore[misc]
+class RightMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
 
     """
-    Declare TopMulti.
+    Declare RightMulti.
 
     Parameters
     ----------
@@ -146,16 +139,16 @@ class RightMulti(BaseModel, TopSingle):  # type: ignore[misc]
 
     Returns
     -------
-    TopMulti
-        Object of the class TopMulti
+    RightMulti
+        Object of the class RightMulti
     """
 
     a: int
-    c: tuple[int, int]
+    c: tuple[int, int] = (1, 2)
 
     def __init__(self: RightMulti, a: int) -> None:
         """
-        Declare TopMulti.
+        Declare RightMulti.
 
         Parameters
         ----------
@@ -164,14 +157,25 @@ class RightMulti(BaseModel, TopSingle):  # type: ignore[misc]
 
         Returns
         -------
-        TopMulti
-            Object of the class TopMulti
+        RightMulti
+            Object of the class RightMulti
         """
-        super().__init__()
-
+        super().__init__(a=a)
         self.a = a
         self.c = (1, 2)
 
 
 if __name__ == "__main__":
-    pass
+    ts1 = TopSingle(a=1)
+    ls1 = LeftSingle(a=1, b=2)
+    try:
+        rs1 = RightSingle(a=1)
+    except ValidationError as exc:
+        warning(str(exc))
+
+    tm1 = TopMulti()
+    lm1 = LeftMulti(a=1, b=2)
+    try:
+        rm1 = RightMulti(a=1)
+    except ValidationError as exc:
+        warning(str(exc))
