@@ -5,7 +5,7 @@ import datetime as dt
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import load, loads
 from pathlib import Path
-from typing import TypeVar, Union, cast
+from typing import Union, cast
 from unittest import TestCase
 
 import pytest
@@ -19,8 +19,6 @@ from openseries.series import (
 )
 from openseries.types import CountriesType, LiteralSeriesProps, ValueType
 from tests.common_sim import ONE_SIM
-
-TypeTestOpenTimeSeries = TypeVar("TypeTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
 
 class NewTimeSeries(OpenTimeSeries):
@@ -130,7 +128,7 @@ class TestOpenTimeSeries(TestCase):
     random_properties: dict[str, Union[dt.date, int, float]]
 
     @classmethod
-    def setUpClass(cls: type[TypeTestOpenTimeSeries]) -> None:
+    def setUpClass(cls: type[TestOpenTimeSeries]) -> None:
         """SetUpClass for the TestOpenTimeSeries class."""
         cls.randomseries = OpenTimeSeries.from_df(
             ONE_SIM.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
@@ -1212,7 +1210,10 @@ class TestOpenTimeSeries(TestCase):
                 1.011,
             ],
         )
-        if sub_series_one.extra_info != "cool":
+        if (
+            sub_series_one.extra_info  # type: ignore[attr-defined, unused-ignore]
+            != "cool"
+        ):
             msg = "Function timeseries_chain() not working as intended"
             raise ValueError(msg)
 

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from logging import warning
+from typing import Optional
 
 from pydantic import BaseModel, ValidationError
 
@@ -64,7 +65,7 @@ class RightSingle(TopSingle):
     """
 
     a: int
-    c: tuple[int, int] = (1, 2)
+    c: Optional[tuple[int, int]] = None
 
     def __init__(self: RightSingle, a: int) -> None:
         """
@@ -83,7 +84,11 @@ class RightSingle(TopSingle):
         super().__init__(a=a)
 
         self.a = a
-        self.c = (1, 2)
+        self.set_c()
+
+    def set_c(self: RightSingle) -> None:
+        """Set the attribute c."""
+        self.c = (self.a, 2 * self.a)
 
 
 class TopMulti:
@@ -144,7 +149,7 @@ class RightMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
     """
 
     a: int
-    c: tuple[int, int] = (1, 2)
+    c: Optional[tuple[int, int]] = None
 
     def __init__(self: RightMulti, a: int) -> None:
         """
@@ -162,20 +167,34 @@ class RightMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
         """
         super().__init__(a=a)
         self.a = a
-        self.c = (1, 2)
+        self.set_c()
+
+    def set_c(self: RightMulti) -> None:
+        """Set the attribute c."""
+        self.c = (self.a, 2 * self.a)
 
 
 if __name__ == "__main__":
     ts1 = TopSingle(a=1)
+    print("TopSingle", ts1)  # noqa: T201
+
     ls1 = LeftSingle(a=1, b=2)
+    print("LeftSingle", ls1)  # noqa: T201
+
     try:
         rs1 = RightSingle(a=1)
+        print("RightSingle", rs1)  # noqa: T201
     except ValidationError as exc:
         warning(str(exc))
 
     tm1 = TopMulti()
+    print("TopMulti", tm1)  # noqa: T201
+
     lm1 = LeftMulti(a=1, b=2)
+    print("LeftMulti", lm1)  # noqa: T201
+
     try:
         rm1 = RightMulti(a=1)
+        print("RightMulti", rm1)  # noqa: T201
     except ValidationError as exc:
         warning(str(exc))

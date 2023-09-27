@@ -110,8 +110,8 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         revalidate_instances="always",
     )
 
-    @model_validator(mode="after")  # type: ignore[misc]
-    def dates_and_values_validate(self: TypeOpenTimeSeries) -> OpenTimeSeries:
+    @model_validator(mode="after")  # type: ignore[misc, unused-ignore]
+    def dates_and_values_validate(self: OpenTimeSeries) -> OpenTimeSeries:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)
         dates_list_length = len(self.dates)
@@ -126,7 +126,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
 
     @classmethod
     def setup_class(
-        cls: type[TypeOpenTimeSeries],
+        cls: type[OpenTimeSeries],
         domestic_ccy: CurrencyStringType = "SEK",
         countries: CountriesType = "SE",
     ) -> None:
@@ -193,7 +193,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
 
     @classmethod
     def from_arrays(
-        cls: type[TypeOpenTimeSeries],
+        cls: type[OpenTimeSeries],
         name: str,
         dates: DateListType,
         values: ValueListType,
@@ -203,7 +203,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         isin: Optional[str] = None,
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,  # noqa: FBT001, FBT002
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
 
@@ -254,13 +254,13 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
 
     @classmethod
     def from_df(
-        cls: type[TypeOpenTimeSeries],
+        cls: type[OpenTimeSeries],
         dframe: Union[DataFrame, Series],
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,  # noqa: FBT001, FBT002
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
 
@@ -336,7 +336,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
 
     @classmethod
     def from_fixed_rate(
-        cls: type[TypeOpenTimeSeries],
+        cls: type[OpenTimeSeries],
         rate: float,
         d_range: Optional[DatetimeIndex] = None,
         days: Optional[int] = None,
@@ -345,7 +345,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         local_ccy: bool = True,  # noqa: FBT001, FBT002
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Create series from values accruing with a given fixed rate return.
 
@@ -416,7 +416,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
             ),
         )
 
-    def from_deepcopy(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
+    def from_deepcopy(self: OpenTimeSeries) -> OpenTimeSeries:
         """
         Create copy of OpenTimeSeries object.
 
@@ -427,7 +427,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         """
         return deepcopy(self)
 
-    def pandas_df(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
+    def pandas_df(self: OpenTimeSeries) -> OpenTimeSeries:
         """
         Populate .tsdf Pandas DataFrame from the .dates and .values lists.
 
@@ -447,7 +447,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return self
 
     def calc_range(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         months_offset: Optional[int] = None,
         from_dt: Optional[dt.date] = None,
         to_dt: Optional[dt.date] = None,
@@ -477,7 +477,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
             to_dt=to_dt,
         )
 
-    def align_index_to_local_cdays(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
+    def align_index_to_local_cdays(self: OpenTimeSeries) -> OpenTimeSeries:
         """
         Align the index .tsdf with local calendar business days.
 
@@ -493,7 +493,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return self
 
     def all_properties(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         properties: Optional[list[LiteralSeriesProps]] = None,
     ) -> DataFrame:
         """
@@ -521,7 +521,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return pdf
 
     @property
-    def worst_month(self: TypeOpenTimeSeries) -> float:
+    def worst_month(self: OpenTimeSeries) -> float:
         """
         Most negative month.
 
@@ -534,7 +534,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         resdf.index = DatetimeIndex(resdf.index)
         return float((resdf.resample("BM").last().ffill().pct_change().min()).iloc[0])
 
-    def value_to_ret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
+    def value_to_ret(self: OpenTimeSeries) -> OpenTimeSeries:
         """
         Convert series of values into series of returns.
 
@@ -550,9 +550,9 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return self
 
     def value_to_diff(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         periods: int = 1,
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Convert series of values to series of their period differences.
 
@@ -573,7 +573,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         self.tsdf.columns = [[self.label], [self.valuetype]]
         return self
 
-    def to_cumret(self: TypeOpenTimeSeries) -> TypeOpenTimeSeries:
+    def to_cumret(self: OpenTimeSeries) -> OpenTimeSeries:
         """
         Convert series of returns into cumulative series of values.
 
@@ -595,10 +595,10 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return self
 
     def from_1d_rate_to_cumret(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         days_in_year: int = 365,
         divider: float = 1.0,
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Convert series of 1-day rates into series of cumulative values.
 
@@ -632,9 +632,9 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return self
 
     def resample(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         freq: Union[LiteralBizDayFreq, str] = "BM",
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Resamples the timeseries frequency.
 
@@ -655,11 +655,11 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return self
 
     def resample_to_business_period_ends(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         freq: LiteralBizDayFreq = "BM",
         convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Resamples timeseries frequency to the business calendar month end dates.
 
@@ -692,7 +692,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         return self
 
-    def drawdown_details(self: TypeOpenTimeSeries) -> DataFrame:
+    def drawdown_details(self: OpenTimeSeries) -> DataFrame:
         """
         Details of the maximum drawdown.
 
@@ -707,7 +707,7 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return drawdown_details(dddf).to_frame()
 
     def ewma_vol_func(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
@@ -784,10 +784,10 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return data.loc[:, (self.label, ValueType.EWMA)]
 
     def running_adjustment(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         adjustment: float,
         days_in_year: int = 365,
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Add or subtract a fee from the timeseries return.
 
@@ -838,11 +838,11 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
         return self
 
     def set_new_label(
-        self: TypeOpenTimeSeries,
+        self: OpenTimeSeries,
         lvl_zero: Optional[str] = None,
         lvl_one: Optional[ValueType] = None,
         delete_lvl_one: bool = False,  # noqa: FBT001, FBT002
-    ) -> TypeOpenTimeSeries:
+    ) -> OpenTimeSeries:
         """
         Set the column labels of the .tsdf Pandas Dataframe.
 

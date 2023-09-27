@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import datetime as dt
 from enum import Enum
-from typing import Annotated, ClassVar, Literal, TypeVar, Union
+from typing import Annotated, ClassVar, Literal, Union
 
 from numpy import datetime64
 from pandas import Timestamp
@@ -177,11 +177,6 @@ LiteralFrameProps = Literal[
     "span_of_days_all",
 ]
 
-TypeOpenTimeSeriesPropertiesList = TypeVar(
-    "TypeOpenTimeSeriesPropertiesList",
-    bound="OpenTimeSeriesPropertiesList",
-)
-
 
 class OpenTimeSeriesPropertiesList(list[str]):
 
@@ -216,14 +211,14 @@ class OpenTimeSeriesPropertiesList(list[str]):
     }
 
     def __init__(
-        self: TypeOpenTimeSeriesPropertiesList,
+        self: OpenTimeSeriesPropertiesList,
         *args: LiteralSeriesProps,
     ) -> None:
         """Property arguments for the OpenTimeSeries class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self: TypeOpenTimeSeriesPropertiesList) -> None:
+    def _validate(self: OpenTimeSeriesPropertiesList) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
@@ -237,12 +232,6 @@ class OpenTimeSeriesPropertiesList(list[str]):
                 msg = f"Duplicate string: {item}"
                 raise ValueError(msg)
             seen.add(item)
-
-
-TypeOpenFramePropertiesList = TypeVar(
-    "TypeOpenFramePropertiesList",
-    bound="OpenFramePropertiesList",
-)
 
 
 class OpenFramePropertiesList(list[str]):
@@ -275,12 +264,12 @@ class OpenFramePropertiesList(list[str]):
         "span_of_days_all",
     }
 
-    def __init__(self: TypeOpenFramePropertiesList, *args: LiteralFrameProps) -> None:
+    def __init__(self: OpenFramePropertiesList, *args: LiteralFrameProps) -> None:
         """Property arguments for the OpenFrame class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self: TypeOpenFramePropertiesList) -> None:
+    def _validate(self: OpenFramePropertiesList) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:

@@ -6,7 +6,7 @@ from decimal import ROUND_HALF_UP, Decimal, localcontext
 from itertools import product as iter_product
 from json import loads
 from pathlib import Path
-from typing import Optional, TypeVar, Union, cast
+from typing import Optional, Union, cast
 from unittest import TestCase
 
 import pytest
@@ -24,8 +24,6 @@ from openseries.types import (
 )
 from tests.common_sim import FIVE_SIMS
 
-TypeTestOpenFrame = TypeVar("TypeTestOpenFrame", bound="TestOpenFrame")
-
 
 class TestOpenFrame(TestCase):
 
@@ -35,7 +33,7 @@ class TestOpenFrame(TestCase):
     randomseries: OpenTimeSeries
 
     @classmethod
-    def setUpClass(cls: type[TypeTestOpenFrame]) -> None:
+    def setUpClass(cls: type[TestOpenFrame]) -> None:
         """SetUpClass for the TestOpenFrame class."""
         cls.randomseries = OpenTimeSeries.from_df(
             FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
@@ -897,6 +895,7 @@ class TestOpenFrame(TestCase):
             "relative",
             "rolling_corr",
             "rolling_beta",
+            "set_tsdf",
             "trunc_frame",
         ]
 
