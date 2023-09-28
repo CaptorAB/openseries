@@ -12,70 +12,11 @@ env:
   POETRY_VER: 1.6.1
 
 jobs:
-  stage_python:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-      - name: Check out GitHub repository ${{ github.repository }}
-        uses: actions/checkout@v3
-
-      - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
-        id: setup_python
-        with:
-          python-version-file: '.python-version'
-
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        id: restore_cache
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
-
-      - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: snok/install-poetry@v1
-        with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-in-project: true
-          virtualenvs-path: ./.venv
-
-      - name: Configure Poetry ${{ env.POETRY_VER }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: |
-          poetry config cache-dir ~/.local
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          poetry config --list
-
-      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: poetry install --no-root --with dev
-
-      - name: Save cache
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
-
   run_tests:
-    needs: stage_python
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        group: [ 1, 2, 3, 4, 5 ]
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
@@ -85,96 +26,21 @@ jobs:
         uses: actions/setup-python@v4
         id: setup_python
         with:
-          python-version-file: '.python-version'
+          python-version: '3.10'
 
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        id: restore_cache
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
+      - name: Update pip
+        run: pip install --upgrade pip
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: snok/install-poetry@v1
+        uses: abatilo/actions-poetry@v2
         with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-in-project: true
-          virtualenvs-path: ./.venv
-
-      - name: Configure Poetry ${{ env.POETRY_VER }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: |
-          poetry config cache-dir ~/.local
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          poetry config --list
+          poetry-version: ${{ env.POETRY_VER }}
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: poetry install --no-root --with dev
 
       - name: Tests with Pytest
-        run: poetry run coverage run -m pytest --verbose --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
-
-      - name: Upload coverage
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage${{ matrix.group }}
-          path: .coverage
-
-  report_coverage:
-    needs: run_tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-      - name: Check out GitHub repository ${{ github.repository }}
-        uses: actions/checkout@v3
-
-      - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
-        id: setup_python
-        with:
-          python-version-file: '.python-version'
-
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        id: restore_cache
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
-
-      - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: snok/install-poetry@v1
-        with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-in-project: true
-          virtualenvs-path: ./.venv
-
-      - name: Configure Poetry ${{ env.POETRY_VER }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: |
-          poetry config cache-dir ~/.local
-          poetry config virtualenvs.options.no-pip true
-          poetry config virtualenvs.options.no-setuptools true
-          poetry config --list
-
-      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: poetry install --no-root --with dev
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        run: poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
-        run: |
-          poetry run coverage combine coverage*/.coverage*
-          poetry run coverage report
+        run: poetry run coverage report

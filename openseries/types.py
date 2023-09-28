@@ -3,15 +3,16 @@ from __future__ import annotations
 
 import datetime as dt
 from enum import Enum
-from typing import Annotated, ClassVar, Literal, TypeVar, Union
+from typing import Annotated, ClassVar, Literal, Union
 
 from numpy import datetime64
 from pandas import Timestamp
-from pydantic import StringConstraints, confloat, conint, conlist, constr
+from pydantic import Field, StringConstraints, conlist
 
 CountryStringType = Annotated[
     str,
     StringConstraints(
+        strip_whitespace=True,
         pattern=r"^[A-Z]{2}$",
         to_upper=True,
         min_length=2,
@@ -20,13 +21,7 @@ CountryStringType = Annotated[
     ),
 ]
 CountryListType = conlist(
-    constr(
-        pattern=r"^[A-Z]{2}$",
-        to_upper=True,
-        min_length=2,
-        max_length=2,
-        strict=True,
-    ),
+    CountryStringType,
     min_length=1,
 )
 CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]
@@ -45,7 +40,12 @@ CurrencyStringType = Annotated[
 DateListType = Annotated[
     list[str],
     conlist(
-        constr(pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"),
+        Annotated[
+            str,
+            StringConstraints(
+                pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$",
+            ),
+        ],
         min_length=1,
     ),
 ]
@@ -54,13 +54,7 @@ ValueListType = Annotated[list[float], conlist(float, min_length=1)]
 
 DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
 
-DaysInYearType = Annotated[int, conint(strict=True, ge=1, le=366)]
-
-TradingDaysType = Annotated[int, conint(strict=True, gt=1)]
-
-SimCountType = Annotated[int, conint(strict=True, ge=1)]
-
-VolatilityType = Annotated[float, confloat(strict=True, gt=0.0)]
+DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 
 DateType = Union[str, dt.date, dt.datetime, datetime64, Timestamp]
 
@@ -183,11 +177,6 @@ LiteralFrameProps = Literal[
     "span_of_days_all",
 ]
 
-TypeOpenTimeSeriesPropertiesList = TypeVar(
-    "TypeOpenTimeSeriesPropertiesList",
-    bound="OpenTimeSeriesPropertiesList",
-)
-
 
 class OpenTimeSeriesPropertiesList(list[str]):
 
@@ -222,14 +211,14 @@ class OpenTimeSeriesPropertiesList(list[str]):
     }
 
     def __init__(
-        self: TypeOpenTimeSeriesPropertiesList,
+        self: OpenTimeSeriesPropertiesList,
         *args: LiteralSeriesProps,
     ) -> None:
         """Property arguments for the OpenTimeSeries class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self: TypeOpenTimeSeriesPropertiesList) -> None:
+    def _validate(self: OpenTimeSeriesPropertiesList) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
@@ -243,12 +232,6 @@ class OpenTimeSeriesPropertiesList(list[str]):
                 msg = f"Duplicate string: {item}"
                 raise ValueError(msg)
             seen.add(item)
-
-
-TypeOpenFramePropertiesList = TypeVar(
-    "TypeOpenFramePropertiesList",
-    bound="OpenFramePropertiesList",
-)
 
 
 class OpenFramePropertiesList(list[str]):
@@ -281,12 +264,12 @@ class OpenFramePropertiesList(list[str]):
         "span_of_days_all",
     }
 
-    def __init__(self: TypeOpenFramePropertiesList, *args: LiteralFrameProps) -> None:
+    def __init__(self: OpenFramePropertiesList, *args: LiteralFrameProps) -> None:
         """Property arguments for the OpenFrame class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self: TypeOpenFramePropertiesList) -> None:
+    def _validate(self: OpenFramePropertiesList) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:

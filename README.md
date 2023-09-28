@@ -87,7 +87,6 @@ last indices                                         2023-04-05                 
 
 These instructions assume that you have a compatible Python version installed on
 your machine and that you are OK to install this project in a virtual environment.
-If not, feel free to do it your own way.
 
 The OpenTimeSeries and OpenFrame classes are both subclasses of
 the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/). Please refer to its documentation for information

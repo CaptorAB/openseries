@@ -18,7 +18,7 @@ from __future__ import annotations
 import datetime as dt
 from math import log
 from math import pow as mathpow
-from typing import Optional, TypeVar, cast
+from typing import Optional, cast
 
 from numpy import (
     add,
@@ -32,20 +32,14 @@ from numpy import (
 from numpy.random import PCG64, Generator, SeedSequence
 from numpy.typing import NDArray
 from pandas import DataFrame, concat
-from pydantic import BaseModel
+from pydantic import BaseModel, PositiveFloat, PositiveInt
 
 from openseries.datefixer import generate_calender_date_range
 from openseries.types import (
     CountriesType,
     DaysInYearType,
-    SimCountType,
-    TradingDaysType,
     ValueType,
-    VolatilityType,
 )
-
-TypeModelParameters = TypeVar("TypeModelParameters", bound="ModelParameters")
-TypeReturnSimulation = TypeVar("TypeReturnSimulation", bound="ReturnSimulation")
 
 
 def random_generator(seed: Optional[int]) -> Generator:
@@ -68,7 +62,7 @@ def random_generator(seed: Optional[int]) -> Generator:
 
 
 def convert_to_prices(
-    param: TypeModelParameters,
+    param: ModelParameters,
     log_returns: NDArray[float64],
 ) -> NDArray[float64]:
     """
@@ -79,7 +73,7 @@ def convert_to_prices(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     log_returns: NDArray[float64]
         Log returns to exponentiate
@@ -97,7 +91,7 @@ def convert_to_prices(
 
 
 def brownian_motion_log_returns(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -109,7 +103,7 @@ def brownian_motion_log_returns(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -130,7 +124,7 @@ def brownian_motion_log_returns(
 
 
 def brownian_motion_levels(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -138,7 +132,7 @@ def brownian_motion_levels(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -158,7 +152,7 @@ def brownian_motion_levels(
 
 
 def geometric_brownian_motion_log_returns(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -171,7 +165,7 @@ def geometric_brownian_motion_log_returns(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -196,7 +190,7 @@ def geometric_brownian_motion_log_returns(
 
 
 def geometric_brownian_motion_levels(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -204,7 +198,7 @@ def geometric_brownian_motion_levels(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -224,7 +218,7 @@ def geometric_brownian_motion_levels(
 
 
 def jump_diffusion_process(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -236,7 +230,7 @@ def jump_diffusion_process(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -272,7 +266,7 @@ def jump_diffusion_process(
 
 
 def geometric_brownian_motion_jump_diffusion_log_returns(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -284,7 +278,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -308,7 +302,7 @@ def geometric_brownian_motion_jump_diffusion_log_returns(
 
 
 def geometric_brownian_motion_jump_diffusion_levels(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -319,7 +313,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -339,7 +333,7 @@ def geometric_brownian_motion_jump_diffusion_levels(
 
 
 def heston_construct_correlated_path(
-    param: TypeModelParameters,
+    param: ModelParameters,
     brownian_motion_one: NDArray[float64],
     randomizer: Generator,
 ) -> tuple[NDArray[float64], NDArray[float64]]:
@@ -352,7 +346,7 @@ def heston_construct_correlated_path(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     brownian_motion_one: NDArray[float64]
         A first path to correlate against
@@ -379,7 +373,7 @@ def heston_construct_correlated_path(
 
 
 def cox_ingersoll_ross_heston(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> tuple[NDArray[float64], NDArray[float64]]:
     """
@@ -394,7 +388,7 @@ def cox_ingersoll_ross_heston(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -429,7 +423,7 @@ def cox_ingersoll_ross_heston(
 
 
 def heston_model_levels(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> tuple[NDArray[float64], NDArray[float64]]:
     """
@@ -446,7 +440,7 @@ def heston_model_levels(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -484,7 +478,7 @@ def heston_model_levels(
 
 
 def cox_ingersoll_ross_levels(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -499,7 +493,7 @@ def cox_ingersoll_ross_levels(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -524,7 +518,7 @@ def cox_ingersoll_ross_levels(
 
 
 def ornstein_uhlenbeck_levels(
-    param: TypeModelParameters,
+    param: ModelParameters,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -532,7 +526,7 @@ def ornstein_uhlenbeck_levels(
 
     Parameters
     ----------
-    param: TypeModelParameters
+    param: ModelParameters
         Model input
     randomizer: numpy.random.Generator
         Random process generator
@@ -558,15 +552,45 @@ def ornstein_uhlenbeck_levels(
 
 class ReturnSimulation:
 
-    """Declare ReturnSimulation."""
+    """
+    Object of the class ReturnSimulation.
+
+    Parameters
+    ----------
+    number_of_sims : PositiveInt
+        Number of simulations to generate
+    trading_days: PositiveInt
+        Total number of days to simulate
+    trading_days_in_year : DaysInYearType
+        Number of trading days used to annualize
+    mean_annual_return : float
+        Mean annual return of the distribution
+    mean_annual_vol : PositiveFloat
+        Mean annual standard deviation of the distribution
+    dframe: pandas.DataFrame
+        Pandas DataFrame object holding the resulting values
+    seed: int, optional
+        Seed for random process initiation
+    randomizer: numpy.random.Generator, optional
+        Random process generator
+    """
+
+    number_of_sims: PositiveInt
+    trading_days: PositiveInt
+    trading_days_in_year: DaysInYearType
+    mean_annual_return: float
+    mean_annual_vol: PositiveFloat
+    dframe: DataFrame
+    seed: Optional[int]
+    randomizer: Optional[Generator]
 
     def __init__(
         self: ReturnSimulation,
-        number_of_sims: SimCountType,
-        trading_days: TradingDaysType,
+        number_of_sims: PositiveInt,
+        trading_days: PositiveInt,
         trading_days_in_year: DaysInYearType,
         mean_annual_return: float,
-        mean_annual_vol: VolatilityType,
+        mean_annual_vol: PositiveFloat,
         dframe: DataFrame,
         seed: Optional[int] = None,
         randomizer: Optional[Generator] = None,
@@ -576,21 +600,21 @@ class ReturnSimulation:
 
         Parameters
         ----------
-        number_of_sims : SimCountType
+        number_of_sims : PositiveInt
             Number of simulations to generate
-        trading_days: TradingDaysType
+        trading_days: PositiveInt
             Total number of days to simulate
         trading_days_in_year : DaysInYearType
             Number of trading days used to annualize
         mean_annual_return : float
             Mean annual return of the distribution
-        mean_annual_vol : VolatilityType
+        mean_annual_vol : PositiveFloat
             Mean annual standard deviation of the distribution
         dframe: pandas.DataFrame
             Pandas DataFrame object holding the resulting values
-        seed: int
+        seed: int, optional
             Seed for random process initiation
-        randomizer: numpy.random.Generator
+        randomizer: numpy.random.Generator, optional
             Random process generator
 
         Returns
@@ -613,7 +637,7 @@ class ReturnSimulation:
         self.seed = seed
 
     @property
-    def results(self: TypeReturnSimulation) -> DataFrame:
+    def results(self: ReturnSimulation) -> DataFrame:
         """
         Simulation data.
 
@@ -625,7 +649,7 @@ class ReturnSimulation:
         return self.dframe.add(1.0).cumprod(axis="columns").T
 
     @property
-    def realized_mean_return(self: TypeReturnSimulation) -> float:
+    def realized_mean_return(self: ReturnSimulation) -> float:
         """
         Annualized arithmetic mean of returns.
 
@@ -642,7 +666,7 @@ class ReturnSimulation:
         )
 
     @property
-    def realized_vol(self: TypeReturnSimulation) -> float:
+    def realized_vol(self: ReturnSimulation) -> float:
         """
         Annualized volatility.
 
@@ -661,26 +685,26 @@ class ReturnSimulation:
 
     @classmethod
     def from_normal(
-        cls: type[TypeReturnSimulation],
-        number_of_sims: SimCountType,
+        cls: type[ReturnSimulation],
+        number_of_sims: PositiveInt,
         mean_annual_return: float,
-        mean_annual_vol: VolatilityType,
-        trading_days: TradingDaysType,
+        mean_annual_vol: PositiveFloat,
+        trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-    ) -> TypeReturnSimulation:
+    ) -> ReturnSimulation:
         """
         Simulate normally distributed prices.
 
         Parameters
         ----------
-        number_of_sims: SimCountType
+        number_of_sims: PositiveInt
             Number of simulations to generate
-        trading_days: TradingDaysType
+        trading_days: PositiveInt
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: VolatilityType
+        mean_annual_vol: PositiveFloat
             Mean standard deviation
         seed: int
             Seed for random process initiation
@@ -713,26 +737,26 @@ class ReturnSimulation:
 
     @classmethod
     def from_lognormal(
-        cls: type[TypeReturnSimulation],
-        number_of_sims: SimCountType,
+        cls: type[ReturnSimulation],
+        number_of_sims: PositiveInt,
         mean_annual_return: float,
-        mean_annual_vol: VolatilityType,
-        trading_days: TradingDaysType,
+        mean_annual_vol: PositiveFloat,
+        trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-    ) -> TypeReturnSimulation:
+    ) -> ReturnSimulation:
         """
         Lognormal distribution simulation.
 
         Parameters
         ----------
-        number_of_sims: SimCountType
+        number_of_sims: PositiveInt
             Number of simulations to generate
-        trading_days: TradingDaysType
+        trading_days: PositiveInt
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: VolatilityType
+        mean_annual_vol: PositiveFloat
             Mean standard deviation
         seed: int
             Seed for random process initiation
@@ -768,14 +792,14 @@ class ReturnSimulation:
 
     @classmethod
     def from_gbm(
-        cls: type[TypeReturnSimulation],
-        number_of_sims: SimCountType,
+        cls: type[ReturnSimulation],
+        number_of_sims: PositiveInt,
         mean_annual_return: float,
-        mean_annual_vol: VolatilityType,
-        trading_days: TradingDaysType,
+        mean_annual_vol: PositiveFloat,
+        trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-    ) -> TypeReturnSimulation:
+    ) -> ReturnSimulation:
         """
         Geometric Brownian Motion simulation.
 
@@ -784,13 +808,13 @@ class ReturnSimulation:
 
         Parameters
         ----------
-        number_of_sims: SimCountType
+        number_of_sims: PositiveInt
             Number of simulations to generate
-        trading_days: TradingDaysType
+        trading_days: PositiveInt
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: VolatilityType
+        mean_annual_vol: PositiveFloat
             Mean standard deviation
         seed: int
             Seed for random process initiation
@@ -833,16 +857,16 @@ class ReturnSimulation:
 
     @classmethod
     def from_heston(
-        cls: type[TypeReturnSimulation],
-        number_of_sims: SimCountType,
-        trading_days: TradingDaysType,
+        cls: type[ReturnSimulation],
+        number_of_sims: PositiveInt,
+        trading_days: PositiveInt,
         mean_annual_return: float,
-        mean_annual_vol: VolatilityType,
-        heston_mu: VolatilityType,
+        mean_annual_vol: PositiveFloat,
+        heston_mu: PositiveFloat,
         heston_a: float,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-    ) -> TypeReturnSimulation:
+    ) -> ReturnSimulation:
         """
         Heston model simulation.
 
@@ -851,15 +875,15 @@ class ReturnSimulation:
 
         Parameters
         ----------
-        number_of_sims: SimCountType
+        number_of_sims: PositiveInt
             Number of simulations to generate
-        trading_days: TradingDaysType
+        trading_days: PositiveInt
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: VolatilityType
+        mean_annual_vol: PositiveFloat
             Mean standard deviation
-        heston_mu: VolatilityType
+        heston_mu: PositiveFloat
             This is the long run average volatility for the Heston model
         heston_a: float
             This is the rate of mean reversion for volatility in the Heston model
@@ -909,30 +933,30 @@ class ReturnSimulation:
 
     @classmethod
     def from_heston_vol(
-        cls: type[TypeReturnSimulation],
-        number_of_sims: SimCountType,
-        trading_days: TradingDaysType,
+        cls: type[ReturnSimulation],
+        number_of_sims: PositiveInt,
+        trading_days: PositiveInt,
         mean_annual_return: float,
-        mean_annual_vol: VolatilityType,
-        heston_mu: VolatilityType,
+        mean_annual_vol: PositiveFloat,
+        heston_mu: PositiveFloat,
         heston_a: float,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-    ) -> TypeReturnSimulation:
+    ) -> ReturnSimulation:
         """
         Heston Vol model simulation.
 
         Parameters
         ----------
-        number_of_sims: SimCountType
+        number_of_sims: PositiveInt
             Number of simulations to generate
-        trading_days: TradingDaysType
+        trading_days: PositiveInt
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: VolatilityType
+        mean_annual_vol: PositiveFloat
             Mean standard deviation
-        heston_mu: VolatilityType
+        heston_mu: PositiveFloat
             This is the long run average volatility for the Heston model
         heston_a: float
             This is the rate of mean reversion for volatility in the Heston model
@@ -982,33 +1006,33 @@ class ReturnSimulation:
 
     @classmethod
     def from_merton_jump_gbm(
-        cls: type[TypeReturnSimulation],
-        number_of_sims: SimCountType,
-        trading_days: TradingDaysType,
+        cls: type[ReturnSimulation],
+        number_of_sims: PositiveInt,
+        trading_days: PositiveInt,
         mean_annual_return: float,
-        mean_annual_vol: VolatilityType,
+        mean_annual_vol: PositiveFloat,
         jumps_lamda: float,
-        jumps_sigma: VolatilityType,
+        jumps_sigma: PositiveFloat,
         jumps_mu: float,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-    ) -> TypeReturnSimulation:
+    ) -> ReturnSimulation:
         """
         Merton Jump-Diffusion model simulation.
 
         Parameters
         ----------
-        number_of_sims: SimCountType
+        number_of_sims: PositiveInt
             Number of simulations to generate
-        trading_days: TradingDaysType
+        trading_days: PositiveInt
             Number of trading days to simulate
         mean_annual_return: float
             Mean return
-        mean_annual_vol: VolatilityType
+        mean_annual_vol: PositiveFloat
             Mean standard deviation
         jumps_lamda: float
             This is the probability of a jump happening at each point in time
-        jumps_sigma: VolatilityType
+        jumps_sigma: PositiveFloat
             This is the volatility of the jump size
         jumps_mu: float
             This is the average jump size
@@ -1057,7 +1081,7 @@ class ReturnSimulation:
         )
 
     def to_dataframe(
-        self: TypeReturnSimulation,
+        self: ReturnSimulation,
         name: str,
         start: Optional[dt.date] = None,
         end: Optional[dt.date] = None,
@@ -1112,11 +1136,11 @@ class ModelParameters(BaseModel):  # type: ignore[misc, unused-ignore]
     ----------
     all_s0: float
         Starting asset value
-    all_time: TradingDaysType
+    all_time: PositiveInt
         Amount of time to simulate for
     all_delta: float
         Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
-    all_sigma: VolatilityType
+    all_sigma: PositiveFloat
         Volatility of the stochastic processes
     all_r0: float, default: 0.0
         Starting interest rate value
@@ -1124,7 +1148,7 @@ class ModelParameters(BaseModel):  # type: ignore[misc, unused-ignore]
         Annual drift factor for geometric brownian motion
     jumps_lamda: float, default: 0.0
         Probability of a jump happening at each point in time
-    jumps_sigma: VolatilityType, default: 0.0
+    jumps_sigma: PositiveFloat, default: 0.0
         Volatility of the jump size
     jumps_mu: float, default: 0.0
         Average jump size
@@ -1140,19 +1164,19 @@ class ModelParameters(BaseModel):  # type: ignore[misc, unused-ignore]
         Long run average interest rate for Ornstein Uhlenbeck
     heston_a: float, default: 0.0
         Rate of mean reversion for volatility in the Heston model
-    heston_mu: VolatilityType, default: 0.0
+    heston_mu: PositiveFloat, default: 0.0
         Long run average volatility for the Heston model
-    heston_vol0: VolatilityType, default: 0.0
+    heston_vol0: PositiveFloat, default: 0.0
         Starting volatility value for the Heston vol model
     """
 
     all_s0: float
-    all_time: TradingDaysType
+    all_time: PositiveInt
     all_delta: float
-    all_sigma: VolatilityType
+    all_sigma: PositiveFloat
     gbm_mu: float
     jumps_lamda: float = 0.0
-    jumps_sigma: VolatilityType = 0.0
+    jumps_sigma: PositiveFloat = 0.0
     jumps_mu: float = 0.0
     cir_a: float = 0.0
     cir_mu: float = 0.0
@@ -1161,5 +1185,5 @@ class ModelParameters(BaseModel):  # type: ignore[misc, unused-ignore]
     ou_a: float = 0.0
     ou_mu: float = 0.0
     heston_a: float = 0.0
-    heston_mu: VolatilityType = 0.0
-    heston_vol0: VolatilityType = 0.0
+    heston_mu: PositiveFloat = 0.0
+    heston_vol0: PositiveFloat = 0.0

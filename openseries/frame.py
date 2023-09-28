@@ -5,7 +5,7 @@ import datetime as dt
 from copy import deepcopy
 from functools import reduce
 from logging import warning
-from typing import Optional, TypeVar, Union, cast
+from typing import Optional, Union, cast
 
 import statsmodels.api as sm
 from ffn.core import calc_erc_weights, calc_mean_var_weights
@@ -19,7 +19,7 @@ from pandas import (
     concat,
     merge,
 )
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import field_validator
 
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
@@ -54,10 +54,8 @@ from openseries.types import (
     ValueType,
 )
 
-TypeOpenFrame = TypeVar("TypeOpenFrame", bound="OpenFrame")
 
-
-class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
+class OpenFrame(CommonModel):  # type: ignore[misc, unused-ignore]
 
     """
     Declare OpenFrame.
@@ -76,19 +74,13 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
     """
 
     constituents: list[OpenTimeSeries]
-    tsdf: DataFrame = DataFrame()
+    tsdf: DataFrame = DataFrame(dtype="float64")
     weights: Optional[list[float]] = None
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        validate_assignment=True,
-        revalidate_instances="always",
-    )
 
     # noinspection PyMethodParameters
     @field_validator("constituents")  # type: ignore[misc, unused-ignore]
     def check_labels_unique(
-        cls: TypeOpenFrame,  # noqa: N805
+        cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique."""
@@ -118,13 +110,18 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         OpenFrame
             Object of the class OpenFrame
         """
-        super().__init__(constituents=constituents, weights=weights)
+        super().__init__(  # type: ignore[call-arg, unused-ignore]
+            constituents=constituents,
+            weights=weights,
+        )
 
         self.constituents = constituents
-        self.tsdf = DataFrame(dtype="float64")
         self.weights = weights
+        self.set_tsdf()
 
-        if constituents is not None and len(constituents) != 0:
+    def set_tsdf(self: OpenFrame) -> None:
+        """Set the tsdf DataFrame."""
+        if self.constituents is not None and len(self.constituents) != 0:
             self.tsdf = reduce(
                 lambda left, right: concat([left, right], axis="columns", sort=True),
                 [x.tsdf for x in self.constituents],
@@ -132,7 +129,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         else:
             warning("OpenFrame() was passed an empty list.")
 
-    def from_deepcopy(self: TypeOpenFrame) -> TypeOpenFrame:
+    def from_deepcopy(self: OpenFrame) -> OpenFrame:
         """
         Create copy of the OpenFrame object.
 
@@ -144,9 +141,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return deepcopy(self)
 
     def merge_series(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         how: LiteralHowMerge = "outer",
-    ) -> TypeOpenFrame:
+    ) -> OpenFrame:
         """
         Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
 
@@ -184,7 +181,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return self
 
     def all_properties(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         properties: Optional[list[LiteralFrameProps]] = None,
     ) -> DataFrame:
         """
@@ -210,7 +207,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return concat(prop_list, axis="columns").T
 
     def calc_range(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         months_offset: Optional[int] = None,
         from_dt: Optional[dt.date] = None,
         to_dt: Optional[dt.date] = None,
@@ -241,9 +238,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         )
 
     def align_index_to_local_cdays(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         countries: CountriesType = "SE",
-    ) -> TypeOpenFrame:
+    ) -> OpenFrame:
         """
         Align the index of .tsdf with local calendar business days.
 
@@ -256,7 +253,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return self
 
     @property
-    def lengths_of_items(self: TypeOpenFrame) -> Series:
+    def lengths_of_items(self: OpenFrame) -> Series:
         """
         Number of observations of all constituents.
 
@@ -273,7 +270,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         )
 
     @property
-    def item_count(self: TypeOpenFrame) -> int:
+    def item_count(self: OpenFrame) -> int:
         """
         Number of constituents.
 
@@ -285,7 +282,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return len(self.constituents)
 
     @property
-    def columns_lvl_zero(self: TypeOpenFrame) -> list[str]:
+    def columns_lvl_zero(self: OpenFrame) -> list[str]:
         """
         Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
@@ -297,7 +294,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return list(self.tsdf.columns.get_level_values(0))
 
     @property
-    def columns_lvl_one(self: TypeOpenFrame) -> list[str]:
+    def columns_lvl_one(self: OpenFrame) -> list[str]:
         """
         Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
@@ -309,7 +306,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return list(self.tsdf.columns.get_level_values(1))
 
     @property
-    def first_indices(self: TypeOpenFrame) -> Series:
+    def first_indices(self: OpenFrame) -> Series:
         """
         The first dates in the timeseries of all constituents.
 
@@ -326,7 +323,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         ).dt.date
 
     @property
-    def last_indices(self: TypeOpenFrame) -> Series:
+    def last_indices(self: OpenFrame) -> Series:
         """
         The last dates in the timeseries of all constituents.
 
@@ -343,7 +340,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         ).dt.date
 
     @property
-    def span_of_days_all(self: TypeOpenFrame) -> Series:
+    def span_of_days_all(self: OpenFrame) -> Series:
         """
         Number of days from the first date to the last for all items in the frame.
 
@@ -361,7 +358,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         )
 
     def jensen_alpha(  # noqa: C901
-        self: TypeOpenFrame,
+        self: OpenFrame,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
@@ -485,7 +482,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     @property
-    def worst_month(self: TypeOpenFrame) -> Series:
+    def worst_month(self: OpenFrame) -> Series:
         """
         Most negative month.
 
@@ -502,7 +499,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             dtype="float64",
         )
 
-    def value_to_ret(self: TypeOpenFrame) -> TypeOpenFrame:
+    def value_to_ret(self: OpenFrame) -> OpenFrame:
         """
         Convert series of values into series of returns.
 
@@ -518,7 +515,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_diff(self: TypeOpenFrame, periods: int = 1) -> TypeOpenFrame:
+    def value_to_diff(self: OpenFrame, periods: int = 1) -> OpenFrame:
         """
         Convert series of values to series of their period differences.
 
@@ -540,7 +537,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def to_cumret(self: TypeOpenFrame) -> TypeOpenFrame:
+    def to_cumret(self: OpenFrame) -> OpenFrame:
         """
         Convert series of returns into cumulative series of values.
 
@@ -563,9 +560,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return self
 
     def resample(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         freq: Union[LiteralBizDayFreq, str] = "BM",
-    ) -> TypeOpenFrame:
+    ) -> OpenFrame:
         """
         Resample the timeseries frequency.
 
@@ -593,12 +590,12 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return self
 
     def resample_to_business_period_ends(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         freq: LiteralBizDayFreq = "BM",
         countries: CountriesType = "SE",
         convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
-    ) -> TypeOpenFrame:
+    ) -> OpenFrame:
         """
         Resamples timeseries frequency to the business calendar month end dates.
 
@@ -639,7 +636,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             )
         return self
 
-    def drawdown_details(self: TypeOpenFrame, min_periods: int = 1) -> DataFrame:
+    def drawdown_details(self: OpenFrame, min_periods: int = 1) -> DataFrame:
         """
         Details of the maximum drawdown.
 
@@ -667,7 +664,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return mxdwndf
 
     def ewma_risk(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
@@ -793,7 +790,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         ).T
 
     @property
-    def correl_matrix(self: TypeOpenFrame) -> DataFrame:
+    def correl_matrix(self: OpenFrame) -> DataFrame:
         """
         Correlation matrix.
 
@@ -811,9 +808,9 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return corr_matrix
 
     def add_timeseries(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         new_series: OpenTimeSeries,
-    ) -> TypeOpenFrame:
+    ) -> OpenFrame:
         """
         To add an OpenTimeSeries object.
 
@@ -831,7 +828,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
-    def delete_timeseries(self: TypeOpenFrame, lvl_zero_item: str) -> TypeOpenFrame:
+    def delete_timeseries(self: OpenFrame, lvl_zero_item: str) -> OpenFrame:
         """
         To delete an OpenTimeSeries object.
 
@@ -861,11 +858,11 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return self
 
     def trunc_frame(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         start_cut: Optional[dt.date] = None,
         end_cut: Optional[dt.date] = None,
         where: LiteralTrunc = "both",
-    ) -> TypeOpenFrame:
+    ) -> OpenFrame:
         """
         Truncate DataFrame such that all timeseries have the same time span.
 
@@ -912,7 +909,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return self
 
     def relative(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         long_column: int = 0,
         short_column: int = 1,
         base_zero: bool = True,  # noqa: FBT001, FBT002
@@ -945,7 +942,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
             )
 
     def tracking_error_func(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1028,7 +1025,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         )
 
     def info_ratio_func(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1113,7 +1110,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         )
 
     def capture_ratio_func(  # noqa: C901
-        self: TypeOpenFrame,
+        self: OpenFrame,
         ratio: LiteralCaptureRatio,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
@@ -1307,7 +1304,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         )
 
     def beta(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
     ) -> float:
@@ -1381,7 +1378,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return float(beta)
 
     def ord_least_squares_fit(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         y_column: Union[tuple[str, ValueType], int],
         x_column: Union[tuple[str, ValueType], int],
         fitted_series: bool = True,  # noqa: FBT001, FBT002
@@ -1444,7 +1441,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return results
 
     def make_portfolio(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         name: str,
         weight_strat: Optional[LiteralPortfolioWeightings] = None,
         initial_weights: Optional[list[float]] = None,
@@ -1543,7 +1540,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return portfolio
 
     def rolling_info_ratio(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
@@ -1605,7 +1602,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return ratiodf
 
     def rolling_beta(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         asset_column: int = 0,
         market_column: int = 1,
         observations: int = 21,
@@ -1654,7 +1651,7 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         return rollbeta
 
     def rolling_corr(
-        self: TypeOpenFrame,
+        self: OpenFrame,
         first_column: int = 0,
         second_column: int = 1,
         observations: int = 21,

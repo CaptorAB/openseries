@@ -5,7 +5,7 @@ import datetime as dt
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import load, loads
 from pathlib import Path
-from typing import TypeVar, Union, cast
+from typing import Union, cast
 from unittest import TestCase
 
 import pytest
@@ -19,8 +19,6 @@ from openseries.series import (
 )
 from openseries.types import CountriesType, LiteralSeriesProps, ValueType
 from tests.common_sim import ONE_SIM
-
-TypeTestOpenTimeSeries = TypeVar("TypeTestOpenTimeSeries", bound="TestOpenTimeSeries")
 
 
 class NewTimeSeries(OpenTimeSeries):
@@ -130,7 +128,7 @@ class TestOpenTimeSeries(TestCase):
     random_properties: dict[str, Union[dt.date, int, float]]
 
     @classmethod
-    def setUpClass(cls: type[TypeTestOpenTimeSeries]) -> None:
+    def setUpClass(cls: type[TestOpenTimeSeries]) -> None:
         """SetUpClass for the TestOpenTimeSeries class."""
         cls.randomseries = OpenTimeSeries.from_df(
             ONE_SIM.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
@@ -402,32 +400,8 @@ class TestOpenTimeSeries(TestCase):
             msg = "Method from_arrays() not working as intended"
             raise TypeError(msg)
 
-    def test_create_from_pandas_df(self: TestOpenTimeSeries) -> None:  # noqa: C901
+    def test_create_from_pd_dataframe(self: TestOpenTimeSeries) -> None:
         """Test construct from pandas.DataFrame."""
-        serie = Series(
-            data=[1.0, 1.01, 0.99, 1.015, 1.003],
-            index=[
-                "2019-06-24",
-                "2019-06-25",
-                "2019-06-26",
-                "2019-06-27",
-                "2019-06-28",
-            ],
-            name="Asset_0",
-            dtype="float64",
-        )
-        sen = Series(
-            data=[1.0, 1.01, 0.99, 1.015, 1.003],
-            index=[
-                "2019-06-24",
-                "2019-06-25",
-                "2019-06-26",
-                "2019-06-27",
-                "2019-06-28",
-            ],
-            name=("Asset_0", ValueType.PRICE),
-            dtype="float64",
-        )
         df1 = DataFrame(
             data=[
                 [1.0, 1.0],
@@ -483,20 +457,8 @@ class TestOpenTimeSeries(TestCase):
             dtype="float64",
         )
 
-        seseries = OpenTimeSeries.from_df(dframe=serie)
-        senseries = OpenTimeSeries.from_df(dframe=sen)
         df1series = OpenTimeSeries.from_df(dframe=df1, column_nmbr=1)
         df2series = OpenTimeSeries.from_df(dframe=df2, column_nmbr=0)
-
-        if not isinstance(seseries, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
-            raise TypeError(msg)
-        if not isinstance(senseries, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
-            raise TypeError(msg)
-        if seseries.label != senseries.label:
-            msg = "Method from_df() not working as intended"
-            raise ValueError(msg)
 
         if not isinstance(df1series, OpenTimeSeries):
             msg = "Method from_df() not working as intended"
@@ -533,6 +495,48 @@ class TestOpenTimeSeries(TestCase):
             msg = "Method from_df() not working as intended"
             raise TypeError(msg)
 
+    def test_create_from_pd_series(self: TestOpenTimeSeries) -> None:
+        """Test construct from pandas.Series."""
+        serie = Series(
+            data=[1.0, 1.01, 0.99, 1.015, 1.003],
+            index=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            name="Asset_0",
+            dtype="float64",
+        )
+        sen = Series(
+            data=[1.0, 1.01, 0.99, 1.015, 1.003],
+            index=[
+                "2019-06-24",
+                "2019-06-25",
+                "2019-06-26",
+                "2019-06-27",
+                "2019-06-28",
+            ],
+            name=("Asset_0", ValueType.PRICE),
+            dtype="float64",
+        )
+
+        seseries = OpenTimeSeries.from_df(dframe=serie)
+        senseries = OpenTimeSeries.from_df(dframe=sen)
+
+        if not isinstance(seseries, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
+        if not isinstance(senseries, OpenTimeSeries):
+            msg = "Method from_df() not working as intended"
+            raise TypeError(msg)
+        if seseries.label != senseries.label:
+            msg = "Method from_df() not working as intended"
+            raise ValueError(msg)
+
+    def test_check_if_none(self: TestOpenTimeSeries) -> None:
+        """Test check_if_none function."""
         if not check_if_none(None):
             msg = "Method check_if_none() not working as intended"
             raise ValueError(msg)
@@ -1206,7 +1210,10 @@ class TestOpenTimeSeries(TestCase):
                 1.011,
             ],
         )
-        if sub_series_one.extra_info != "cool":
+        if (
+            sub_series_one.extra_info  # type: ignore[attr-defined, unused-ignore]
+            != "cool"
+        ):
             msg = "Function timeseries_chain() not working as intended"
             raise ValueError(msg)
 

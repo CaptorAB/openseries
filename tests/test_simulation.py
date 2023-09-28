@@ -3,10 +3,9 @@ from __future__ import annotations
 
 from copy import copy
 from datetime import date as dtdate
-from typing import TypeVar, Union, cast
+from typing import Union, cast
 from unittest import TestCase
 
-from numpy.random import Generator
 from pandas import DataFrame, Series, date_range
 
 from openseries.frame import OpenFrame
@@ -25,8 +24,6 @@ from openseries.simulation import (
 from openseries.types import ValueType
 from tests.common_sim import FIVE_SIMS, ONE_SIM, SEED
 
-TypeTestSimulation = TypeVar("TypeTestSimulation", bound="TestSimulation")
-
 
 class TestSimulation(TestCase):
 
@@ -36,7 +33,7 @@ class TestSimulation(TestCase):
     framesim: ReturnSimulation
 
     @classmethod
-    def setUpClass(cls: type[TypeTestSimulation]) -> None:
+    def setUpClass(cls: type[TestSimulation]) -> None:
         """SetUpClass for the TestSimulation class."""
         cls.seriesim = ONE_SIM
         cls.framesim = FIVE_SIMS
@@ -71,7 +68,7 @@ class TestSimulation(TestCase):
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""
-        args: dict[str, Union[int, float, Generator]] = {
+        args: dict[str, Union[int, float]] = {
             "number_of_sims": 1,
             "trading_days": 2520,
             "mean_annual_return": 0.05,
