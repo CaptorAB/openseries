@@ -27,45 +27,21 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        id: restore_cache
-        with:
-          path: |
-            ${{ env.pythonLocation }}
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
+          cache: 'poetry'
+          cache-dependency-path: '**/pyproject.toml'
 
       - name: Update pip
         run: pip install --upgrade pip
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.setup_python.outputs.cache-hit != 'true'
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ env.POETRY_VER }}
 
-      - name: Configure Poetry ${{ env.POETRY_VER }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: |
-          poetry config virtualenvs.path ./.venv
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config --list
-
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
+        if: steps.setup_python.outputs.cache-hit != 'true'
         run: poetry install --no-root --with dev
-
-      - name: Save cache
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            ${{ env.pythonLocation }}
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
   run_tests:
     needs: stage_python
@@ -87,35 +63,20 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        id: restore_cache
-        with:
-          path: |
-            ${{ env.pythonLocation }}
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
+          cache: 'poetry'
+          cache-dependency-path: '**/pyproject.toml'
 
       - name: Update pip
         run: pip install --upgrade pip
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.setup_python.outputs.cache-hit != 'true'
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ env.POETRY_VER }}
 
-      - name: Configure Poetry ${{ env.POETRY_VER }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: |
-          poetry config virtualenvs.path ./.venv
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config --list
-
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
+        if: steps.setup_python.outputs.cache-hit != 'true'
         run: poetry install --no-root --with dev
 
       - name: Tests with Pytest
@@ -143,35 +104,20 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        id: restore_cache
-        with:
-          path: |
-            ${{ env.pythonLocation }}
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
+          cache: 'poetry'
+          cache-dependency-path: '**/pyproject.toml'
 
       - name: Update pip
         run: pip install --upgrade pip
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
+        if: steps.setup_python.outputs.cache-hit != 'true'
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ env.POETRY_VER }}
 
-      - name: Configure Poetry ${{ env.POETRY_VER }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: |
-          poetry config virtualenvs.path ./.venv
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          poetry config virtualenvs.options.no-pip true
-          poetry config --list
-
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
+        if: steps.setup_python.outputs.cache-hit != 'true'
         run: poetry install --no-root --with dev
 
       - name: Download all artifacts
