@@ -32,7 +32,9 @@ jobs:
         uses: actions/cache/restore@v3
         id: restore_cache
         with:
-          path: ${{ env.pythonLocation }}
+          path: |
+            ~/.local
+            ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
@@ -41,11 +43,12 @@ jobs:
         with:
           version: ${{ env.POETRY_VER }}
           virtualenvs-in-project: true
-          virtualenvs-path: ${{ env.pythonLocation }}
+          virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
+          poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
           poetry config --list
 
@@ -57,7 +60,9 @@ jobs:
         if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
-          path: ${{ env.pythonLocation }}
+          path: |
+            ~/.local
+            ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
   run_tests:
@@ -85,7 +90,9 @@ jobs:
         uses: actions/cache/restore@v3
         id: restore_cache
         with:
-          path: ${{ env.pythonLocation }}
+          path: |
+            ~/.local
+            ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
@@ -94,11 +101,12 @@ jobs:
         with:
           version: ${{ env.POETRY_VER }}
           virtualenvs-in-project: true
-          virtualenvs-path: ${{ env.pythonLocation }}
+          virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
+          poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
           poetry config --list
 
@@ -136,7 +144,9 @@ jobs:
         uses: actions/cache/restore@v3
         id: restore_cache
         with:
-          path: ${{ env.pythonLocation }}
+          path: |
+            ~/.local
+            ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/test.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
@@ -145,11 +155,12 @@ jobs:
         with:
           version: ${{ env.POETRY_VER }}
           virtualenvs-in-project: true
-          virtualenvs-path: ${{ env.pythonLocation }}
+          virtualenvs-path: ./.venv
 
       - name: Configure Poetry ${{ env.POETRY_VER }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
+          poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
           poetry config --list
 
