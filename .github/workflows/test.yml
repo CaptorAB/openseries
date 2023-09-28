@@ -17,10 +17,6 @@ jobs:
     defaults:
       run:
         shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        group: [ 1, 2, 3, 4, 5 ]
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
@@ -44,38 +40,7 @@ jobs:
         run: poetry install --no-root --with dev
 
       - name: Tests with Pytest
-        run: poetry run coverage run -m pytest --verbose --splits 5 --group ${{ matrix.group }} --splitting-algorithm least_duration ./
-
-      - name: Upload coverage
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage${{ matrix.group }}
-          path: .coverage
-
-  report_coverage:
-    needs: run_tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-      - name: Check out GitHub repository ${{ github.repository }}
-        uses: actions/checkout@v3
-
-      - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
-        id: setup_python
-        with:
-          python-version-file: '.python-version'
-
-      - name: Install coverage on Python ${{ steps.setup_python.outputs.python-version }}
-        run: pip install coverage
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        run: poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
-        run: |
-          coverage combine coverage*/.coverage*
-          coverage report
+        run: poetry run coverage report
