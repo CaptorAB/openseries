@@ -34,7 +34,6 @@ jobs:
         with:
           path: |
             ${{ env.pythonLocation }}
-            ~/.local
             ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/check.yml') }}-${{ hashFiles('**/pyproject.toml') }}
 
@@ -49,9 +48,9 @@ jobs:
       - name: Configure Poetry ${{ env.POETRY_VER }}
         if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
+          poetry config virtualenvs.path ./.venv
           poetry config virtualenvs.create true
           poetry config virtualenvs.in-project true
-          poetry config cache-dir ~/.local
           poetry config virtualenvs.options.no-pip true
           poetry config --list
 
@@ -76,6 +75,5 @@ jobs:
         with:
           path: |
             ${{ env.pythonLocation }}
-            ~/.local
             ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/check.yml') }}-${{ hashFiles('**/pyproject.toml') }}
