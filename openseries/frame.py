@@ -19,7 +19,7 @@ from pandas import (
     concat,
     merge,
 )
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import field_validator
 
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import RegressionResults
@@ -55,7 +55,7 @@ from openseries.types import (
 )
 
 
-class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
+class OpenFrame(CommonModel):  # type: ignore[misc, unused-ignore]
 
     """
     Declare OpenFrame.
@@ -76,12 +76,6 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
     constituents: list[OpenTimeSeries]
     tsdf: DataFrame = DataFrame(dtype="float64")
     weights: Optional[list[float]] = None
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        validate_assignment=True,
-        revalidate_instances="always",
-    )
 
     # noinspection PyMethodParameters
     @field_validator("constituents")  # type: ignore[misc, unused-ignore]
@@ -116,7 +110,10 @@ class OpenFrame(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
         OpenFrame
             Object of the class OpenFrame
         """
-        super().__init__(constituents=constituents, weights=weights)
+        super().__init__(  # type: ignore[call-arg, unused-ignore]
+            constituents=constituents,
+            weights=weights,
+        )
 
         self.constituents = constituents
         self.weights = weights

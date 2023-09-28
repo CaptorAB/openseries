@@ -23,7 +23,7 @@ from pandas import (
     Series,
     date_range,
 )
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import model_validator
 
 from openseries.common_model import CommonModel
 from openseries.datefixer import (
@@ -53,7 +53,7 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignore]
+class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
 
     """
     Declare OpenTimeSeries.
@@ -103,12 +103,6 @@ class OpenTimeSeries(BaseModel, CommonModel):  # type: ignore[misc, unused-ignor
     countries: CountriesType = "SE"
     isin: Optional[str] = None
     label: Optional[str] = None
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        validate_assignment=True,
-        revalidate_instances="always",
-    )
 
     @model_validator(mode="after")  # type: ignore[misc, unused-ignore]
     def dates_and_values_validate(self: OpenTimeSeries) -> OpenTimeSeries:

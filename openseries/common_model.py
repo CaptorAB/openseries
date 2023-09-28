@@ -15,6 +15,7 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from pandas import DataFrame, DatetimeIndex, Series
 from plotly.graph_objs import Figure
 from plotly.offline import plot
+from pydantic import BaseModel, ConfigDict
 from scipy.stats import kurtosis, norm, skew
 
 from openseries.datefixer import get_calc_range
@@ -30,11 +31,17 @@ from openseries.types import (
 )
 
 
-class CommonModel:
+class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
 
     """Declare CommonModel."""
 
-    tsdf: DataFrame
+    tsdf: DataFrame = DataFrame(dtype="float64")
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
+        revalidate_instances="always",
+    )
 
     @property
     def length(self: CommonModel) -> int:

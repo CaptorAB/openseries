@@ -7,6 +7,11 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.5] - 2023-09-28
+
+Removed multiple inheritance on OpenTimeSeries and OpenFrame by inheriting CommonModel from the Pydantic BaseModel.
+Also removed unnecessary TypeVar throughout.
+
 ## Version [1.3.4] - 2023-09-20
 
 Simplified ReturnSimulation to make it easier to use. The change will not affect users of OpenTimeSeries and OpenFrame.
