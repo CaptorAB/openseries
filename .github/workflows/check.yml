@@ -33,6 +33,7 @@ jobs:
         id: restore_cache
         with:
           path: |
+            ${{ env.pythonLocation }}
             ~/.local
             ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/check.yml') }}-${{ hashFiles('**/pyproject.toml') }}
@@ -74,6 +75,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: |
+            ${{ env.pythonLocation }}
             ~/.local
             ./.venv
           key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/check.yml') }}-${{ hashFiles('**/pyproject.toml') }}
