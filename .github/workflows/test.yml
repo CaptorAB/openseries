@@ -28,7 +28,10 @@ jobs:
         with:
           python-version-file: '.python-version'
           cache: 'poetry'
-          cache-dependency-path: '**/pyproject.toml'
+          cache-dependency-path: |
+            '**/.github/workflows/test.yml'
+            '**/pyproject.toml'
+      - run: echo '${{ steps.setup_python.outputs.cache-hit }}'
 
       - name: Update pip
         run: pip install --upgrade pip
@@ -64,7 +67,10 @@ jobs:
         with:
           python-version-file: '.python-version'
           cache: 'poetry'
-          cache-dependency-path: '**/pyproject.toml'
+          cache-dependency-path: |
+            '**/.github/workflows/test.yml'
+            '**/pyproject.toml'
+      - run: echo '${{ steps.setup_python.outputs.cache-hit }}'
 
       - name: Update pip
         run: pip install --upgrade pip
@@ -105,7 +111,10 @@ jobs:
         with:
           python-version-file: '.python-version'
           cache: 'poetry'
-          cache-dependency-path: '**/pyproject.toml'
+          cache-dependency-path: |
+            '**/.github/workflows/test.yml'
+            '**/pyproject.toml'
+      - run: echo '${{ steps.setup_python.outputs.cache-hit }}'
 
       - name: Update pip
         run: pip install --upgrade pip
