@@ -12,42 +12,7 @@ env:
   POETRY_VER: 1.6.1
 
 jobs:
-  stage_python:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-      - name: Check out GitHub repository ${{ github.repository }}
-        uses: actions/checkout@v3
-
-      - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
-        id: setup_python
-        with:
-          python-version-file: '.python-version'
-          cache: 'poetry'
-          cache-dependency-path: |
-            '**/.github/workflows/test.yml'
-            '**/pyproject.toml'
-      - run: echo '${{ steps.setup_python.outputs.cache-hit }}'
-
-      - name: Update pip
-        run: pip install --upgrade pip
-
-      - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.setup_python.outputs.cache-hit != 'true'
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: ${{ env.POETRY_VER }}
-
-      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.setup_python.outputs.cache-hit != 'true'
-        run: poetry install --no-root --with dev
-
   run_tests:
-    needs: stage_python
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -66,23 +31,16 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-          cache: 'poetry'
-          cache-dependency-path: |
-            '**/.github/workflows/test.yml'
-            '**/pyproject.toml'
-      - run: echo '${{ steps.setup_python.outputs.cache-hit }}'
 
       - name: Update pip
         run: pip install --upgrade pip
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.setup_python.outputs.cache-hit != 'true'
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ env.POETRY_VER }}
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.setup_python.outputs.cache-hit != 'true'
         run: poetry install --no-root --with dev
 
       - name: Tests with Pytest
@@ -110,29 +68,14 @@ jobs:
         id: setup_python
         with:
           python-version-file: '.python-version'
-          cache: 'poetry'
-          cache-dependency-path: |
-            '**/.github/workflows/test.yml'
-            '**/pyproject.toml'
-      - run: echo '${{ steps.setup_python.outputs.cache-hit }}'
 
-      - name: Update pip
-        run: pip install --upgrade pip
-
-      - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.setup_python.outputs.cache-hit != 'true'
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: ${{ env.POETRY_VER }}
-
-      - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.setup_python.outputs.cache-hit != 'true'
-        run: poetry install --no-root --with dev
+      - name: Install coverage on Python ${{ steps.setup_python.outputs.python-version }}
+        run: pip install coverage
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
 
       - name: Report coverage
         run: |
-          poetry run coverage combine coverage*/.coverage*
-          poetry run coverage report
+          coverage combine coverage*/.coverage*
+          coverage report
