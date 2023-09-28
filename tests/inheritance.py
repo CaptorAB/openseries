@@ -14,8 +14,8 @@ class TopSingle(BaseModel):  # type: ignore[misc, unused-ignore]
 
     Parameters
     ----------
-    a: int
-        a attribute
+    tsdf: int
+        tsdf attribute
 
     Returns
     -------
@@ -23,7 +23,7 @@ class TopSingle(BaseModel):  # type: ignore[misc, unused-ignore]
         Object of the class TopSingle
     """
 
-    a: int
+    tsdf: int
 
 
 class LeftSingle(TopSingle):
@@ -33,10 +33,10 @@ class LeftSingle(TopSingle):
 
     Parameters
     ----------
-    a: int
-        a attribute
-    b: int
-        b attribute
+    tsdf: int
+        tsdf attribute
+    length: int
+        length attribute
 
     Returns
     -------
@@ -44,51 +44,49 @@ class LeftSingle(TopSingle):
         Object of the class LeftSingle
     """
 
-    a: int
-    b: int
+    tsdf: int
+    length: int
 
 
 class RightSingle(TopSingle):
 
-    """
-    Declare RightSingle.
+    """Declare RightSingle."""
 
-    Parameters
-    ----------
-    a: int
-        a attribute
+    tsdf: int
+    constituents: tuple[int, int]
+    weights: Optional[int] = None
 
-    Returns
-    -------
-    RightSingle
-        Object of the class RightSingle
-    """
-
-    a: int
-    c: Optional[tuple[int, int]] = None
-
-    def __init__(self: RightSingle, a: int) -> None:
+    def __init__(
+        self: RightSingle,
+        constituents: tuple[int, int],
+        weights: Optional[int] = None,
+    ) -> None:
         """
         Declare RightSingle.
 
         Parameters
         ----------
-        a: int
-            a attribute
+        constituents: tuple[int, int]
+            constituents attribute
+        weights: int, optional
+            weights attribute
 
         Returns
         -------
         RightSingle
             Object of the class RightSingle
         """
-        super().__init__(a=a)
+        super().__init__(  # type: ignore[call-arg, unused-ignore]
+            constituents=constituents,
+            weights=weights,
+        )
+        self.constituents = constituents
+        self.weights = weights
+        self.set_tsdf()
 
-        self.a = a
-        self.set_c()
-
-    def set_c(self: RightSingle) -> None:
-        """Set the attribute c."""
-        self.c = (self.a, 2 * self.a)
+    def set_tsdf(self: RightSingle) -> None:
+        """Set the attribute tsdf."""
+        self.tsdf = self.constituents[0]
 
 
 class TopMulti:
@@ -98,8 +96,8 @@ class TopMulti:
 
     Parameters
     ----------
-    a: int
-        a attribute
+    tsdf: int
+        tsdf attribute
 
     Returns
     -------
@@ -107,7 +105,7 @@ class TopMulti:
         Object of the class TopMulti
     """
 
-    a: int
+    tsdf: int
 
 
 class LeftMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
@@ -117,10 +115,10 @@ class LeftMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
 
     Parameters
     ----------
-    a: int
-        a attribute
-    b: int
-        b attribute
+    tsdf: int
+        tsdf attribute
+    length: int
+        length attribute
 
     Returns
     -------
@@ -128,61 +126,57 @@ class LeftMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
         Object of the class LeftMulti
     """
 
-    a: int
-    b: int
+    tsdf: int
+    length: int
 
 
 class RightMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
 
-    """
-    Declare RightMulti.
+    """Declare RightMulti."""
 
-    Parameters
-    ----------
-    a: int
-        a attribute
+    tsdf: int
+    constituents: tuple[int, int]
+    weights: Optional[int] = None
 
-    Returns
-    -------
-    RightMulti
-        Object of the class RightMulti
-    """
-
-    a: int
-    c: Optional[tuple[int, int]] = None
-
-    def __init__(self: RightMulti, a: int) -> None:
+    def __init__(
+        self: RightMulti,
+        constituents: tuple[int, int],
+        weights: Optional[int] = None,
+    ) -> None:
         """
         Declare RightMulti.
 
         Parameters
         ----------
-        a: int
-            a attribute
+        constituents: tuple[int, int]
+            constituents attribute
+        weights: int, optional
+            weights attribute
 
         Returns
         -------
         RightMulti
             Object of the class RightMulti
         """
-        super().__init__(a=a)
-        self.a = a
-        self.set_c()
+        super().__init__(constituents=constituents, weights=weights)
+        self.constituents = constituents
+        self.weights = weights
+        self.set_tsdf()
 
-    def set_c(self: RightMulti) -> None:
-        """Set the attribute c."""
-        self.c = (self.a, 2 * self.a)
+    def set_tsdf(self: RightMulti) -> None:
+        """Set the attribute tsdf."""
+        self.tsdf = self.constituents[0]
 
 
 if __name__ == "__main__":
-    ts1 = TopSingle(a=1)
+    ts1 = TopSingle(tsdf=1)
     print("TopSingle", ts1)  # noqa: T201
 
-    ls1 = LeftSingle(a=1, b=2)
+    ls1 = LeftSingle(tsdf=1, length=2)
     print("LeftSingle", ls1)  # noqa: T201
 
     try:
-        rs1 = RightSingle(a=1)
+        rs1 = RightSingle(constituents=(1, 2))
         print("RightSingle", rs1)  # noqa: T201
     except ValidationError as exc:
         warning(str(exc))
@@ -190,11 +184,11 @@ if __name__ == "__main__":
     tm1 = TopMulti()
     print("TopMulti", tm1)  # noqa: T201
 
-    lm1 = LeftMulti(a=1, b=2)
+    lm1 = LeftMulti(tsdf=1, length=2)
     print("LeftMulti", lm1)  # noqa: T201
 
     try:
-        rm1 = RightMulti(a=1)
+        rm1 = RightMulti(constituents=(1, 2))
         print("RightMulti", rm1)  # noqa: T201
     except ValidationError as exc:
         warning(str(exc))
