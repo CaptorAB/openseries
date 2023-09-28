@@ -52,9 +52,9 @@ class RightSingle(TopSingle):
 
     """Declare RightSingle."""
 
-    tsdf: int
     constituents: tuple[int, int]
     weights: Optional[int] = None
+    tsdf: int = 10
 
     def __init__(
         self: RightSingle,
@@ -86,7 +86,8 @@ class RightSingle(TopSingle):
 
     def set_tsdf(self: RightSingle) -> None:
         """Set the attribute tsdf."""
-        self.tsdf = self.constituents[0]
+        if self.constituents is not None and len(self.constituents) != 0:
+            self.tsdf = self.constituents[0]
 
 
 class TopMulti:
@@ -134,9 +135,9 @@ class RightMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
 
     """Declare RightMulti."""
 
-    tsdf: int
     constituents: tuple[int, int]
     weights: Optional[int] = None
+    tsdf: int = 10
 
     def __init__(
         self: RightMulti,
@@ -165,7 +166,8 @@ class RightMulti(BaseModel, TopMulti):  # type: ignore[misc, unused-ignore]
 
     def set_tsdf(self: RightMulti) -> None:
         """Set the attribute tsdf."""
-        self.tsdf = self.constituents[0]
+        if self.constituents is not None and len(self.constituents) != 0:
+            self.tsdf = self.constituents[0]
 
 
 if __name__ == "__main__":

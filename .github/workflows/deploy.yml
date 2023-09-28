@@ -20,34 +20,17 @@ jobs:
         uses: actions/setup-python@v4
         id: setup_python
         with:
-          python-version-file: '.python-version'
+          python-version: '.3.10'
 
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        id: restore_cache
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('**/pyproject.toml') }}
+      - name: Update pip
+        run: pip install --upgrade pip
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: snok/install-poetry@v1
+        uses: abatilo/actions-poetry@v2
         with:
-          version: ${{ env.POETRY_VER }}
-          virtualenvs-in-project: true
-          virtualenvs-path: ./.venv
-
-      - name: Configure Poetry ${{ env.POETRY_VER }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        run: |
-          poetry config cache-dir ~/.local
-          poetry config virtualenvs.options.no-pip true
-          poetry config --list
+          poetry-version: ${{ env.POETRY_VER }}
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
-        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: poetry install --no-root --with dev
 
       - name: Check and fix with Ruff
@@ -102,12 +85,3 @@ jobs:
           poetry build --format=wheel
           poetry check
           poetry publish
-
-      - name: Save cache
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            ~/.local
-            ./.venv
-          key: venv-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.github/workflows/deploy.yml') }}-${{ hashFiles('**/pyproject.toml') }}
