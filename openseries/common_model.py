@@ -15,7 +15,7 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from pandas import DataFrame, DatetimeIndex, Series
 from plotly.graph_objs import Figure
 from plotly.offline import plot
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import kurtosis, norm, skew
 
 from openseries.datefixer import get_calc_range
@@ -442,7 +442,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
     def to_json(
         self: CommonModel,
         filename: str,
-        directory: Optional[str] = None,
+        directory: Optional[DirectoryPath] = None,
     ) -> list[dict[str, Union[str, bool, ValueType, list[str], list[float]]]]:
         """
         Dump timeseries data into a json file.
@@ -453,7 +453,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         ----------
         filename: str
             Filename including filetype
-        directory: str, optional
+        directory: DirectoryPath, optional
             File folder location
 
         Returns
@@ -496,7 +496,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         self: CommonModel,
         filename: str,
         sheet_title: Optional[str] = None,
-        directory: Optional[str] = None,
+        directory: Optional[DirectoryPath] = None,
     ) -> str:
         """
         Save .tsdf DataFrame to an Excel spreadsheet file.
@@ -507,7 +507,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             Filename that should include .xlsx
         sheet_title: str, optional
             Name of the sheet in the Excel file
-        directory: str, optional
+        directory: DirectoryPath, optional
             The file directory where the Excel file is saved.
 
         Returns
@@ -542,7 +542,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         mode: LiteralBarPlotMode = "group",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
-        directory: Optional[str] = None,
+        directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
         auto_open: bool = True,  # noqa: FBT001, FBT002
         add_logo: bool = True,  # noqa: FBT001, FBT002
@@ -561,7 +561,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             None, '%', '.1%' depending on number of decimals to show
         filename: str, optional
             Name of the Plotly html file
-        directory: str, optional
+        directory: DirectoryPath, optional
             Directory where Plotly html file is saved
         labels: list[str], optional
             A list of labels to manually override using the names of
@@ -629,7 +629,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         mode: LiteralLinePlotMode = "lines",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
-        directory: Optional[str] = None,
+        directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
         auto_open: bool = True,  # noqa: FBT001, FBT002
         add_logo: bool = True,  # noqa: FBT001, FBT002
@@ -649,7 +649,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             None, '%', '.1%' depending on number of decimals to show
         filename: str, optional
             Name of the Plotly html file
-        directory: str, optional
+        directory: DirectoryPath, optional
             Directory where Plotly html file is saved
         labels: list[str], optional
             A list of labels to manually override using the names of

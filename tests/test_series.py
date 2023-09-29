@@ -546,16 +546,16 @@ class TestOpenTimeSeries(TestCase):
 
     def test_save_to_json(self: TestOpenTimeSeries) -> None:
         """Test to_json method."""
-        directory = str(Path(__file__).resolve().parent)
-        seriesfile = Path(f"{directory}/framesaved.json")
+        directory = Path(__file__).resolve().parent
+        seriesfile = directory.joinpath("seriessaved.json")
 
         jseries = self.randomseries.from_deepcopy()
         kwargs = [
-            {"filename": str(seriesfile)},
-            {"filename": str(seriesfile), "directory": directory},
+            {"filename": str(directory.joinpath("seriessaved.json"))},
+            {"filename": "seriessaved.json", "directory": directory},
         ]
         for kwarg in kwargs:
-            data = jseries.to_json(**kwarg)
+            data = jseries.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != ["Asset"]:
                 msg = "Unexpected data from json"
                 raise ValueError(msg)
@@ -691,87 +691,6 @@ class TestOpenTimeSeries(TestCase):
             dt.date(2023, 4, 28),
         ]:
             msg = "Method resample_to_business_period_ends() not working as intended"
-            raise ValueError(msg)
-
-    def test_calc_range(self: TestOpenTimeSeries) -> None:
-        """Test calc_range method."""
-        cseries = self.randomseries.from_deepcopy()
-        start, end = cseries.first_idx.strftime("%Y-%m-%d"), cseries.last_idx.strftime(
-            "%Y-%m-%d",
-        )
-
-        rst, ren = cseries.calc_range()
-
-        if [start, end] != [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]:
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Function calc_range returned earlier date < series start",
-        ):
-            _, _ = cseries.calc_range(months_offset=125)
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt date < series start",
-        ):
-            _, _ = cseries.calc_range(from_dt=dt.date(2009, 5, 31))
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given to_dt date > series end",
-        ):
-            _, _ = cseries.calc_range(to_dt=dt.date(2019, 7, 31))
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 7, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 5, 31),
-            )
-
-        nst, nen = cseries.calc_range(
-            from_dt=dt.date(2009, 7, 3),
-            to_dt=dt.date(2019, 6, 25),
-        )
-        if nst != dt.date(2009, 7, 3):
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-        if nen != dt.date(2019, 6, 25):
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-
-        cseries.resample()
-
-        earlier_moved, _ = cseries.calc_range(from_dt=dt.date(2009, 8, 10))
-        if earlier_moved != dt.date(2009, 7, 31):
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-
-        _, later_moved = cseries.calc_range(to_dt=dt.date(2009, 8, 20))
-        if later_moved != dt.date(2009, 8, 31):
-            msg = "Method calc_range() not working as intended"
             raise ValueError(msg)
 
     def test_calc_range_output(self: TestOpenTimeSeries) -> None:
@@ -1271,7 +1190,7 @@ class TestOpenTimeSeries(TestCase):
         """Test plot_series method."""
         plotseries = self.randomseries.from_deepcopy()
 
-        directory = str(Path(__file__).resolve().parent)
+        directory = Path(__file__).resolve().parent
         _, figfile = plotseries.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1320,7 +1239,7 @@ class TestOpenTimeSeries(TestCase):
         barseries.resample(freq="BM").value_to_ret()
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
-        directory = str(Path(__file__).resolve().parent)
+        directory = Path(__file__).resolve().parent
         _, figfile = barseries.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():

@@ -50,17 +50,16 @@ class TestOpenFrame(TestCase):
 
     def test_save_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
-        directory = str(Path(__file__).resolve().parent)
-        seriesfile = Path(f"{directory}/framesaved.json")
+        directory = Path(__file__).resolve().parent
+        framefile = directory.joinpath("framesaved.json")
 
-        jseries = self.randomframe.from_deepcopy()
-        directory = str(Path(__file__).resolve().parent)
+        jframe = self.randomframe.from_deepcopy()
         kwargs = [
-            {"filename": str(seriesfile)},
-            {"filename": str(seriesfile), "directory": directory},
+            {"filename": str(directory.joinpath("framesaved.json"))},
+            {"filename": "framesaved.json", "directory": directory},
         ]
         for kwarg in kwargs:
-            data = jseries.to_json(**kwarg)
+            data = jframe.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != [
                 "Asset_0",
                 "Asset_1",
@@ -71,13 +70,13 @@ class TestOpenFrame(TestCase):
                 msg = "Unexpected data from json"
                 raise ValueError(msg)
 
-            if not Path(seriesfile).exists():
+            if not Path(framefile).exists():
                 msg = "json file not created"
                 raise FileNotFoundError(msg)
 
-            seriesfile.unlink()
+            framefile.unlink()
 
-            if Path(seriesfile).exists():
+            if Path(framefile).exists():
                 msg = "json file not deleted as intended"
                 raise FileExistsError(msg)
 
@@ -96,7 +95,7 @@ class TestOpenFrame(TestCase):
 
         directory = Path(__file__).resolve().parent
         seriesfile = Path(
-            xseries.to_xlsx(filename="trial.xlsx", directory=str(directory)),
+            xseries.to_xlsx(filename="trial.xlsx", directory=directory),
         ).resolve()
 
         if not Path(seriesfile).exists():
@@ -1005,7 +1004,7 @@ class TestOpenFrame(TestCase):
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
-        directory = str(Path(__file__).resolve().parent)
+        directory = Path(__file__).resolve().parent
         _, figfile = plotframe.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1062,7 +1061,7 @@ class TestOpenFrame(TestCase):
         """Test plot_bars method."""
         plotframe = self.randomframe.from_deepcopy()
 
-        directory = str(Path(__file__).resolve().parent)
+        directory = Path(__file__).resolve().parent
         _, figfile = plotframe.plot_bars(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
