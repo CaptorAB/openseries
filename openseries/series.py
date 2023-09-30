@@ -4,7 +4,6 @@ from __future__ import annotations
 import datetime as dt
 from copy import deepcopy
 from logging import warning
-from re import compile as re_compile
 from typing import Any, Optional, TypeVar, Union, cast
 
 from numpy import (
@@ -37,7 +36,9 @@ from openseries.risk import (
     ewma_calc,
 )
 from openseries.types import (
+    Countries,
     CountriesType,
+    Currency,
     CurrencyStringType,
     DatabaseIdStringType,
     DateListType,
@@ -134,53 +135,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         """
-        ccy_pattern = re_compile(r"^[A-Z]{3}$")
-        ctry_pattern = re_compile(r"^[A-Z]{2}$")
-        try:
-            ccy_ok = ccy_pattern.match(domestic_ccy)
-        except TypeError as exc:
-            msg = "domestic currency must be a code according to ISO 4217"
-            raise ValueError(
-                msg,
-            ) from exc
-        if not ccy_ok:
-            msg = "domestic currency must be a code according to ISO 4217"
-            raise ValueError(msg)
-        if isinstance(countries, str):
-            if not ctry_pattern.match(countries):
-                msg = (
-                    "countries must be a country code according to ISO 3166-1 alpha-2"
-                )
-                raise ValueError(
-                    msg,
-                )
-        elif isinstance(countries, list):
-            try:
-                all_ctries = all(ctry_pattern.match(ctry) for ctry in countries)
-            except TypeError as exc:
-                msg = (
-                    "countries must be a list of country "
-                    "codes according to ISO 3166-1 alpha-2"
-                )
-                raise TypeError(
-                    msg,
-                ) from exc
-            if not all_ctries:
-                msg = (
-                    "countries must be a list of country "
-                    "codes according to ISO 3166-1 alpha-2"
-                )
-                raise TypeError(
-                    msg,
-                )
-        else:
-            msg = (
-                "countries must be a list of country "
-                "codes according to ISO 3166-1 alpha-2"
-            )
-            raise TypeError(
-                msg,
-            )
+        _ = Currency(ccy=domestic_ccy)
+        _ = Countries(countryinput=countries)
 
         cls.domestic = domestic_ccy
         cls.countries = countries

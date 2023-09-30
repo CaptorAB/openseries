@@ -7,7 +7,7 @@ from typing import Annotated, ClassVar, Literal, Union
 
 from numpy import datetime64
 from pandas import Timestamp
-from pydantic import Field, StringConstraints, conlist
+from pydantic import BaseModel, Field, StringConstraints, conlist
 
 CountryStringType = Annotated[
     str,
@@ -26,6 +26,14 @@ CountryListType = conlist(
 )
 CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]
 
+
+class Countries(BaseModel):
+
+    """Declare Countries."""
+
+    countryinput: CountriesType
+
+
 CurrencyStringType = Annotated[
     str,
     StringConstraints(
@@ -34,8 +42,17 @@ CurrencyStringType = Annotated[
         min_length=3,
         max_length=3,
         strict=True,
+        strip_whitespace=True,
     ),
 ]
+
+
+class Currency(BaseModel):
+
+    """Declare Currency."""
+
+    ccy: CurrencyStringType
+
 
 DateListType = Annotated[
     list[str],

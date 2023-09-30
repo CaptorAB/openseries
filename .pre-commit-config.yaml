@@ -13,7 +13,9 @@ repos:
     rev: v1.5.1
     hooks:
       - id: mypy
-        additional_dependencies: [types-all]
+        additional_dependencies:
+        - types-all
+        - pydantic>=2.4.2
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:

@@ -10,7 +10,7 @@ from unittest import TestCase
 
 import pytest
 from pandas import DataFrame, DatetimeIndex, Series, date_range
-from pydantic import ValidationError as PydanticValidationError
+from pydantic import ValidationError
 
 from openseries.series import (
     OpenTimeSeries,
@@ -54,7 +54,7 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     """Pytest on invalid valuetype as input."""
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=enum|type=string_type",
     ):
         OpenTimeSeries.from_arrays(
@@ -72,7 +72,7 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
 def test_opentimeseries_invalid_currency(currency: str) -> None:
     """Pytest on invalid currency code as input for currency."""
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=string_too_short|type=string_type",
     ):
         OpenTimeSeries.from_arrays(
@@ -96,7 +96,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
         values=[1.0, 1.1],
     )
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=string_too_short|type=string_type",
     ):
         serie.domestic = domestic
@@ -114,7 +114,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         values=[1.0, 1.1],
     )
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=list_type|type=string_type",
     ):
         serie.countries = countries
@@ -141,44 +141,38 @@ class TestOpenTimeSeries(TestCase):
     def test_setup_class(self: TestOpenTimeSeries) -> None:
         """Test setup_class method."""
         with pytest.raises(
-            expected_exception=ValueError,
-            match="domestic currency must be a code according to ISO 4217",
+            expected_exception=ValidationError,
+            match="String should have at least 3 characters",
         ):
             OpenTimeSeries.setup_class(domestic_ccy="12")
 
         with pytest.raises(
-            expected_exception=ValueError,
-            match="domestic currency must be a code according to ISO 4217",
+            expected_exception=ValidationError,
+            match="Input should be a valid string",
         ):
             OpenTimeSeries.setup_class(domestic_ccy=cast(str, 12))
 
         with pytest.raises(
-            expected_exception=ValueError,
-            match="according to ISO 3166-1 alpha-2",
+            expected_exception=ValidationError,
+            match="Input should be a valid list|String should match pattern",
         ):
             OpenTimeSeries.setup_class(countries="12")
 
         with pytest.raises(
-            expected_exception=TypeError,
-            match=(
-                "countries must be a list of country "
-                "codes according to ISO 3166-1 alpha-2"
-            ),
+            expected_exception=ValidationError,
+            match="Input should be a valid string",
         ):
             OpenTimeSeries.setup_class(countries=["SE", cast(str, 12)])
 
         with pytest.raises(
-            expected_exception=TypeError,
-            match=(
-                "countries must be a list of country "
-                "codes according to ISO 3166-1 alpha-2"
-            ),
+            expected_exception=ValidationError,
+            match="2 validation errors for Countries",
         ):
             OpenTimeSeries.setup_class(countries=["SE", "12"])
 
         with pytest.raises(
-            expected_exception=TypeError,
-            match="according to ISO 3166-1 alpha-2",
+            expected_exception=ValidationError,
+            match="2 validation errors for Countries",
         ):
             OpenTimeSeries.setup_class(countries=cast(CountriesType, None))
 
@@ -186,6 +180,7 @@ class TestOpenTimeSeries(TestCase):
         if OpenTimeSeries.domestic != "USD":
             msg = "Method setup_class() not working as intended"
             raise ValueError(msg)
+
         if OpenTimeSeries.countries != "US":
             msg = "Method setup_class() not working as intended"
             raise ValueError(msg)
@@ -193,7 +188,7 @@ class TestOpenTimeSeries(TestCase):
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
         """Test invalid dates as input."""
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid string",
         ):
             OpenTimeSeries.from_arrays(
@@ -245,7 +240,7 @@ class TestOpenTimeSeries(TestCase):
     def test_invalid_values(self: TestOpenTimeSeries) -> None:
         """Test invalid values as input."""
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid number",
         ):
             OpenTimeSeries.from_arrays(
@@ -255,7 +250,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
@@ -265,7 +260,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
@@ -285,7 +280,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="There must be at least 1 value",
         ):
             OpenTimeSeries.from_arrays(
@@ -317,7 +312,7 @@ class TestOpenTimeSeries(TestCase):
         output.update({"dates": dates, "values": values})
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Dates are not unique",
         ):
             _ = OpenTimeSeries.from_arrays(
@@ -378,7 +373,7 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be an instance of DataFrame",
         ):
             OpenTimeSeries(**serie_data)
@@ -1480,7 +1475,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1498,7 +1493,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1516,7 +1511,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1534,7 +1529,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1552,7 +1547,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Dates are not unique",
         ):
             OpenTimeSeries.from_arrays(
