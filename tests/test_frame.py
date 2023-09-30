@@ -2092,7 +2092,9 @@ class TestOpenFrame(TestCase):
                 ),
             ],
         )
+        # noinspection PyTypeChecker
         nanframe.tsdf.iloc[2, 0] = None
+        # noinspection PyTypeChecker
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.value_nan_handle(method="drop")
@@ -2144,7 +2146,9 @@ class TestOpenFrame(TestCase):
                 ),
             ],
         )
+        # noinspection PyTypeChecker
         nanframe.tsdf.iloc[2, 0] = None
+        # noinspection PyTypeChecker
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.return_nan_handle(method="drop")
@@ -2329,6 +2333,7 @@ class TestOpenFrame(TestCase):
             msg = "Results from vol_from_var_func() not as expected"
             raise ValueError(msg)
 
+        # noinspection PyTypeChecker
         mframe.tsdf.iloc[0, 2] = zero_float
 
         with pytest.raises(

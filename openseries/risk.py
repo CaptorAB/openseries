@@ -98,7 +98,7 @@ def var_down_calc(
 
 def drawdown_series(
     prices: Union[DataFrame, Series],
-) -> NDArray[float64] | Series:
+) -> DataFrame:
     """
     Convert series into a maximum drawdown series.
 
@@ -116,14 +116,14 @@ def drawdown_series(
 
     Returns
     -------
-    Union[DataFrame, Series]
+    DataFrame
         A drawdown timeserie
     """
     drawdown = prices.copy()
     drawdown = drawdown.ffill()
     drawdown[isnan(drawdown)] = -Inf
     roll_max = maximum.accumulate(drawdown)
-    return drawdown / roll_max - 1.0
+    return DataFrame(drawdown / roll_max - 1.0)
 
 
 def drawdown_details(
@@ -163,9 +163,9 @@ def drawdown_details(
         (prices / prices.expanding(min_periods=min_periods).max()).min() - 1
     ).iloc[0]
     ddata = prices.copy()
-    drwdwn = cast(Series, drawdown_series(ddata)).loc[: cast(int, mdate)]
+    drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn = drwdwn.sort_index(ascending=False)
-    sdate = cast(Series, drwdwn[drwdwn == zero].idxmax()).to_numpy()[0]
+    sdate = Series(drwdwn[drwdwn == zero].idxmax()).to_numpy()[0]
     sdate = (
         dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d")
         .replace(tzinfo=dt.timezone.utc)

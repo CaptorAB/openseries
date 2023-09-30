@@ -1611,10 +1611,15 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         Pandas.DataFrame
             Rolling Information Ratios
         """
-        ratio_label = (
-            f"{self.tsdf.iloc[:, long_column].name[0]}"  # type: ignore[index]
-            f" / {self.tsdf.iloc[:, short_column].name[0]}"
-        )
+        long_label = cast(
+            tuple[str, str],
+            self.tsdf.iloc[:, long_column].name,  # type: ignore[index]
+        )[0]
+        short_label = cast(
+            tuple[str, str],
+            self.tsdf.iloc[:, short_column].name,  # type: ignore[index]
+        )[0]
+        ratio_label = f"{long_label} / {short_label}"
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
