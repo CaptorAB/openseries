@@ -1,4 +1,5 @@
 """Test suite for the openseries/frame.py module."""
+# mypy: disable-error-code="operator,type-arg,unused-ignore"
 from __future__ import annotations
 
 from datetime import date as dtdate
@@ -6,7 +7,7 @@ from decimal import ROUND_HALF_UP, Decimal, localcontext
 from itertools import product as iter_product
 from json import loads
 from pathlib import Path
-from typing import Optional, Union, cast
+from typing import Hashable, Optional, Union, cast
 from unittest import TestCase
 
 import pytest
@@ -1134,7 +1135,10 @@ class TestOpenFrame(TestCase):
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast(int, dtdate(2017, 6, 27)) : cast(int, dtdate(2018, 6, 27)),
+                cast(int, dtdate(2017, 6, 27)) : cast(  # type: ignore[index]
+                    int,
+                    dtdate(2018, 6, 27),
+                ),
                 ("Asset_0", ValueType.PRICE),
             ],
         )
@@ -1440,9 +1444,12 @@ class TestOpenFrame(TestCase):
                     value
                 ] = f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
-                result_values[value] = result.loc[value, ("Asset_0", ValueType.PRICE)]
+                result_values[value] = cast(
+                    str,
+                    result.loc[value, ("Asset_0", ValueType.PRICE)],
+                )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dtdate):
-                result_values[value] = result.loc[
+                result_values[value] = result.loc[  # type: ignore[union-attr]
                     value,
                     ("Asset_0", ValueType.PRICE),
                 ].strftime("%Y-%m-%d")
@@ -2428,11 +2435,13 @@ class TestOpenFrame(TestCase):
                 results.append(f"{float(tmp.params.iloc[0]):.11f}")
 
         results_tuple = []
-        for i in oframe.tsdf:
-            for j in oframe.tsdf:
+        k_tuple: Hashable
+        l_tuple: Hashable
+        for k_tuple in oframe.tsdf:
+            for l_tuple in oframe.tsdf:
                 tmp = oframe.ord_least_squares_fit(
-                    y_column=i,
-                    x_column=j,
+                    y_column=cast(tuple[str, ValueType], k_tuple),
+                    x_column=cast(tuple[str, ValueType], l_tuple),
                     fitted_series=False,
                 )
                 results_tuple.append(f"{float(tmp.params.iloc[0]):.11f}")
@@ -2503,11 +2512,13 @@ class TestOpenFrame(TestCase):
                 range(bframe.item_count),
             )
         ]
-
-        results_tuple = [
-            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
-            for comb in iter_product(bframe.tsdf, bframe.tsdf)
-        ]
+        results_tuple = []
+        for comb in iter_product(bframe.tsdf, bframe.tsdf):
+            beta = bframe.beta(
+                asset=comb[0],  # type: ignore[arg-type]
+                market=comb[1],  # type: ignore[arg-type]
+            )
+            results_tuple.append(f"{beta:.11f}")
 
         if results != results_tuple:
             msg = "Unexpected results from method beta()"
@@ -2573,10 +2584,13 @@ class TestOpenFrame(TestCase):
             )
         ]
 
-        results_tuple = [
-            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
-            for comb in iter_product(bframe.tsdf, bframe.tsdf)
-        ]
+        results_tuple = []
+        for comb in iter_product(bframe.tsdf, bframe.tsdf):
+            beta = bframe.beta(
+                asset=comb[0],  # type: ignore[arg-type]
+                market=comb[1],  # type: ignore[arg-type]
+            )
+            results_tuple.append(f"{beta:.11f}")
 
         if results != results_tuple:
             msg = "Unexpected results from method beta()"
@@ -2643,10 +2657,13 @@ class TestOpenFrame(TestCase):
             )
         ]
 
-        results_tuple = [
-            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
-            for comb in iter_product(jframe.tsdf, jframe.tsdf)
-        ]
+        results_tuple = []
+        for comb in iter_product(jframe.tsdf, jframe.tsdf):
+            alpha = jframe.jensen_alpha(
+                asset=comb[0],  # type: ignore[arg-type]
+                market=comb[1],  # type: ignore[arg-type]
+            )
+            results_tuple.append(f"{alpha:.9f}")
 
         if results != results_tuple:
             msg = "Unexpected results from method jensen_alpha()"
@@ -2711,10 +2728,13 @@ class TestOpenFrame(TestCase):
             )
         ]
 
-        sresults_tuple = [
-            f"{shortframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
-            for comb in iter_product(shortframe.tsdf, shortframe.tsdf)
-        ]
+        sresults_tuple: list[str] = []
+        for comb in iter_product(shortframe.tsdf, shortframe.tsdf):
+            alpha = shortframe.jensen_alpha(
+                asset=comb[0],  # type: ignore[arg-type]
+                market=comb[1],  # type: ignore[arg-type]
+            )
+            sresults_tuple.append(f"{alpha:.9f}")
 
         if sresults != sresults_tuple:
             msg = "Unexpected results from method jensen_alpha()"
@@ -2762,10 +2782,13 @@ class TestOpenFrame(TestCase):
             )
         ]
 
-        results_tuple = [
-            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
-            for comb in iter_product(jframe.tsdf, jframe.tsdf)
-        ]
+        results_tuple = []
+        for comb in iter_product(jframe.tsdf, jframe.tsdf):
+            alpha = jframe.jensen_alpha(
+                asset=comb[0],  # type: ignore[arg-type]
+                market=comb[1],  # type: ignore[arg-type]
+            )
+            results_tuple.append(f"{alpha:.9f}")
 
         if results != results_tuple:
             msg = "Unexpected results from method jensen_alpha()"

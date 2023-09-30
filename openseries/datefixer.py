@@ -1,4 +1,5 @@
 """Date related utilities."""
+# mypy: disable-error-code="type-arg"
 from __future__ import annotations
 
 import datetime as dt
@@ -384,8 +385,8 @@ def align_dataframe_to_local_cdays(
     d_range = [
         d.date()
         for d in date_range(
-            start=data.first_valid_index(),
-            end=data.last_valid_index(),
+            start=cast(dt.date, data.first_valid_index()),
+            end=cast(dt.date, data.last_valid_index()),
             freq=CustomBusinessDay(calendar=calendar),
         )
     ]
@@ -426,18 +427,20 @@ def do_resample_to_business_period_ends(
     Pandas.DatetimeIndex
         A date range aligned to business period ends
     """
-    head = head.to_frame().T
-    tail = tail.to_frame().T
+    newhead = head.to_frame().T
+    newtail = tail.to_frame().T
     data.index = DatetimeIndex(data.index)
     data = data.resample(rule=freq, convention=convention).last()
     data = data.drop(index=data.index[-1])
-    data.index = [d.date() for d in DatetimeIndex(data.index)]
+    data.index = [  # type: ignore[assignment,unused-ignore]
+        d.date() for d in DatetimeIndex(data.index)
+    ]
 
-    if head.index[0] not in data.index:
-        data = concat([data, head])
+    if newhead.index[0] not in data.index:
+        data = concat([data, newhead])
 
-    if tail.index[0] not in data.index:
-        data = concat([data, tail])
+    if newtail.index[0] not in data.index:
+        data = concat([data, newtail])
 
     data = data.sort_index()
 

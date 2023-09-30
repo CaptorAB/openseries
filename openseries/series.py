@@ -1,4 +1,5 @@
 """Defining the OpenTimeSeries class."""
+# mypy: disable-error-code="type-arg,unused-ignore"
 from __future__ import annotations
 
 import datetime as dt
@@ -54,7 +55,7 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
+class OpenTimeSeries(CommonModel):  # type: ignore[misc]
 
     """
     Declare OpenTimeSeries.
@@ -239,7 +240,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
                 label = dframe.name
             values = dframe.to_numpy().tolist()
         else:
-            values = dframe.iloc[:, column_nmbr].tolist()
+            values = cast(DataFrame, dframe).iloc[:, column_nmbr].tolist()
             if isinstance(dframe.columns, MultiIndex):
                 if check_if_none(
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
@@ -346,13 +347,13 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
             ],
         )
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
-        d_range = [d.strftime("%Y-%m-%d") for d in cast(DatetimeIndex, d_range)]
+        dates = [d.strftime("%Y-%m-%d") for d in cast(DatetimeIndex, d_range)]
 
         return cls(
             timeseries_id="",
             instrument_id="",
             currency=baseccy,
-            dates=d_range,
+            dates=dates,
             name=label,
             label=label,
             valuetype=valuetype,
@@ -360,7 +361,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
             local_ccy=local_ccy,
             tsdf=DataFrame(
                 data=arr,
-                index=[d.date() for d in DatetimeIndex(d_range)],
+                index=[d.date() for d in DatetimeIndex(dates)],
                 columns=[[label], [valuetype]],
                 dtype="float64",
             ),
@@ -496,7 +497,10 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         self.tsdf = self.tsdf.ffill().pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
-        self.tsdf.columns = [[self.label], [self.valuetype]]
+        self.tsdf.columns = [  # type: ignore[assignment]
+            [self.label],
+            [self.valuetype],
+        ]
         return self
 
     def value_to_diff(
@@ -520,7 +524,10 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
-        self.tsdf.columns = [[self.label], [self.valuetype]]
+        self.tsdf.columns = [  # type: ignore[assignment]
+            [self.label],
+            [self.valuetype],
+        ]
         return self
 
     def to_cumret(self: OpenTimeSeries) -> OpenTimeSeries:
@@ -541,7 +548,10 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
         self.valuetype = ValueType.PRICE
-        self.tsdf.columns = [[self.label], [self.valuetype]]
+        self.tsdf.columns = [  # type: ignore[assignment]
+            [self.label],
+            [self.valuetype],
+        ]
         return self
 
     def from_1d_rate_to_cumret(
@@ -601,7 +611,9 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
+        self.tsdf.index = [  # type: ignore[assignment]
+            d.date() for d in DatetimeIndex(self.tsdf.index)
+        ]
         return self
 
     def resample_to_business_period_ends(
@@ -665,7 +677,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[int] = None,
-    ) -> Series:
+    ) -> DataFrame:
         """
         Exponentially Weighted Moving Average Model for Volatility.
 
@@ -712,26 +724,28 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         )
 
         rawdata = [
-            data.loc[:, (self.label, "Returns")]
+            data.loc[:, (self.label, "Returns")]  # type: ignore[index]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, (self.label, "Returns")].iloc[1:]:
+        for item in data.loc[:, (self.label, "Returns")].iloc[  # type: ignore[index]
+            1:
+        ]:
             previous = rawdata[-1]
             rawdata.append(
                 ewma_calc(
-                    reeturn=item,
+                    reeturn=cast(float, item),
                     prev_ewma=previous,
                     time_factor=time_factor,
                     lmbda=lmbda,
                 ),
             )
 
-        data.loc[:, (self.label, ValueType.EWMA)] = rawdata
+        data.loc[:, (self.label, ValueType.EWMA)] = rawdata  # type: ignore[index]
 
-        return data.loc[:, (self.label, ValueType.EWMA)]
+        return data.loc[:, (self.label, ValueType.EWMA)]  # type: ignore[index]
 
     def running_adjustment(
         self: OpenTimeSeries,
@@ -763,7 +777,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
             values = [1.0]
             returns_input = True
         else:
-            values = [self.tsdf.iloc[0, 0]]
+            values = [cast(float, self.tsdf.iloc[0, 0])]
             ra_df = self.tsdf.ffill().pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
@@ -772,7 +786,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
         idx: dt.date
         dates: list[dt.date] = [prev]
 
-        for idx, row in ra_df.iterrows():
+        for idx, row in ra_df.iterrows():  # type: ignore[assignment]
             dates.append(idx)
             values.append(
                 values[-1]
@@ -781,8 +795,13 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc, unused-ignore]
             prev = idx
         self.tsdf = DataFrame(data=values, index=dates)
         self.valuetype = ValueType.PRICE
-        self.tsdf.columns = [[self.label], [self.valuetype]]
-        self.tsdf.index = [d.date() for d in DatetimeIndex(self.tsdf.index)]
+        self.tsdf.columns = [  # type: ignore[assignment]
+            [self.label],
+            [self.valuetype],
+        ]
+        self.tsdf.index = [  # type: ignore[assignment]
+            d.date() for d in DatetimeIndex(self.tsdf.index)
+        ]
         if returns_input:
             self.value_to_ret()
         return self
@@ -873,7 +892,7 @@ def timeseries_chain(
     values = values.mul(
         new.tsdf.iloc[:, 0].loc[first] / old.tsdf.iloc[:, 0].loc[first],
     )
-    values = append(values, new.tsdf.iloc[:, 0])
+    values = cast(Series, append(values, new.tsdf.iloc[:, 0]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 

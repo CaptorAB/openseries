@@ -4,6 +4,7 @@ Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
+# mypy: disable-error-code="type-arg"
 from __future__ import annotations
 
 import datetime as dt
@@ -95,7 +96,9 @@ def var_down_calc(
     return cast(float, quantile(ret, 1 - level, method=interpolation))
 
 
-def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series]:
+def drawdown_series(
+    prices: Union[DataFrame, Series],
+) -> NDArray[float64] | Series:
     """
     Convert series into a maximum drawdown series.
 
@@ -123,7 +126,10 @@ def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series
     return drawdown / roll_max - 1.0
 
 
-def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> Series:
+def drawdown_details(
+    prices: Union[DataFrame, Series],
+    min_periods: int = 1,
+) -> Series:
     """
     Details of the maximum drawdown.
 
@@ -144,11 +150,10 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
         Average fall per day
     """
     zero: float = 0.0
-    mdd_date = (
-        (prices / prices.expanding(min_periods=min_periods).max())
-        .idxmin()
-        .to_numpy()[0]
-    )
+    mdd_date = cast(
+        Series,
+        (prices / prices.expanding(min_periods=min_periods).max()).idxmin(),
+    ).to_numpy()[0]
     mdate = (
         dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d")
         .replace(tzinfo=dt.timezone.utc)
@@ -158,9 +163,9 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
         (prices / prices.expanding(min_periods=min_periods).max()).min() - 1
     ).iloc[0]
     ddata = prices.copy()
-    drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
+    drwdwn = cast(Series, drawdown_series(ddata)).loc[: cast(int, mdate)]
     drwdwn = drwdwn.sort_index(ascending=False)
-    sdate = drwdwn[drwdwn == zero].idxmax().to_numpy()[0]
+    sdate = cast(Series, drwdwn[drwdwn == zero].idxmax()).to_numpy()[0]
     sdate = (
         dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d")
         .replace(tzinfo=dt.timezone.utc)

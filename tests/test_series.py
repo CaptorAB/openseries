@@ -367,7 +367,7 @@ class TestOpenTimeSeries(TestCase):
         df_data = {"tsdf": dframe, **data}
         serie_data = {"tsdf": serie, **data}
 
-        df_obj = OpenTimeSeries(**df_data)
+        df_obj = OpenTimeSeries(**df_data)  # type: ignore[arg-type,unused-ignore]
         if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
             msg = "Raw values and DataFrame values not matching"
             raise ValueError(msg)
@@ -376,7 +376,7 @@ class TestOpenTimeSeries(TestCase):
             expected_exception=ValidationError,
             match="Input should be an instance of DataFrame",
         ):
-            OpenTimeSeries(**serie_data)
+            OpenTimeSeries(**serie_data)  # type: ignore[arg-type,unused-ignore]
 
     def test_create_from_arrays(self: TestOpenTimeSeries) -> None:
         """Test from_arrays construct method."""
@@ -837,12 +837,20 @@ class TestOpenTimeSeries(TestCase):
                     value
                 ] = f"{result.loc[value, ('Asset', ValueType.PRICE)]:.10f}"
             elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], int):
-                result_values[value] = result.loc[value, ("Asset", ValueType.PRICE)]
-            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
-                result_values[value] = result.loc[
+                result_values[
+                    value
+                ] = result.loc[  # type: ignore[assignment,unused-ignore]
                     value,
                     ("Asset", ValueType.PRICE),
-                ].strftime("%Y-%m-%d")
+                ]
+            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
+                result_values[value] = cast(
+                    dt.date,
+                    result.loc[
+                        value,
+                        ("Asset", ValueType.PRICE),
+                    ],
+                ).strftime("%Y-%m-%d")
             else:
                 msg = f"all_properties returned unexpected type {type(value)}"
                 raise TypeError(
@@ -999,32 +1007,35 @@ class TestOpenTimeSeries(TestCase):
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
-        if f"{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.2800936502":
+        if f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.2800936502":
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
         adjustedseries_returns = self.randomseries.from_deepcopy()
         adjustedseries_returns.value_to_ret()
         adjustedseries_returns.running_adjustment(0.05)
 
-        if f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}" != "-0.0028221714":
+        if (
+            f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
+            != "-0.0028221714"
+        ):
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
 
         adjustedseries_returns.to_cumret()
         if (
-            f"{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}"
-            != f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
+            f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}"
+            != f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
         ):
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
-                f"'{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
+                f"'{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
 
@@ -1790,22 +1801,25 @@ class TestOpenTimeSeries(TestCase):
         """Test set_new_label method."""
         lseries = self.randomseries.from_deepcopy()
 
-        if lseries.tsdf.columns[0] != ("Asset", ValueType.PRICE):
+        if cast(tuple[str, str], lseries.tsdf.columns[0]) != (
+            "Asset",
+            ValueType.PRICE,
+        ):
             msg = "set_new_label() base case not working as intended"
             raise ValueError(msg)
 
         lseries.set_new_label(lvl_zero="zero")
-        if lseries.tsdf.columns[0] != ("zero", ValueType.PRICE):
+        if lseries.tsdf.columns[0][0] != "zero":
             msg = "Method set_new_label() base case not working as intended"
             raise ValueError(msg)
 
         lseries.set_new_label(lvl_one=ValueType.RTRN)
-        if lseries.tsdf.columns[0] != ("zero", ValueType.RTRN):
+        if lseries.tsdf.columns[0][1] != ValueType.RTRN:
             msg = "Method set_new_label() base case not working as intended"
             raise ValueError(msg)
 
         lseries.set_new_label(lvl_zero="two", lvl_one=ValueType.PRICE)
-        if lseries.tsdf.columns[0] != ("two", ValueType.PRICE):
+        if cast(tuple[str, str], lseries.tsdf.columns[0]) != ("two", ValueType.PRICE):
             msg = "Method set_new_label() base case not working as intended"
             raise ValueError(msg)
 

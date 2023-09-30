@@ -1,4 +1,5 @@
 """Defining the CommonModel class."""
+# mypy: disable-error-code="type-arg,unused-ignore"
 from __future__ import annotations
 
 import datetime as dt
@@ -9,14 +10,14 @@ from random import choices
 from string import ascii_letters
 from typing import Any, Optional, Union, cast
 
-from numpy import cumprod, log, sqrt
+from numpy import log, sqrt
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from pandas import DataFrame, DatetimeIndex, Series
-from plotly.graph_objs import Figure
-from plotly.offline import plot
+from plotly.graph_objs import Figure  # type: ignore[import]
+from plotly.offline import plot  # type: ignore[import]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
-from scipy.stats import kurtosis, norm, skew
+from scipy.stats import kurtosis, norm, skew  # type: ignore[import]
 
 from openseries.datefixer import get_calc_range
 from openseries.load_plotly import load_plotly_dict
@@ -31,7 +32,7 @@ from openseries.types import (
 )
 
 
-class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
+class CommonModel(BaseModel):  # type: ignore[misc]
 
     """Declare CommonModel."""
 
@@ -436,7 +437,9 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             An object of the same class
         """
         for serie in self.tsdf:
-            self.tsdf.loc[:, serie] = drawdown_series(self.tsdf.loc[:, serie])
+            self.tsdf.loc[:, serie] = drawdown_series(  # type: ignore[index]
+                prices=self.tsdf.loc[:, serie],  # type: ignore[index]
+            )
         return self
 
     def to_json(
@@ -528,10 +531,10 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         wrksheet = wrkbook.active
 
         if sheet_title:
-            wrksheet.title = sheet_title
+            wrksheet.title = sheet_title  # type: ignore[union-attr]
 
         for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
-            wrksheet.append(row)
+            wrksheet.append(row)  # type: ignore[union-attr]
 
         wrkbook.save(sheetfile)
 
@@ -1000,13 +1003,19 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         )
         cvar_df = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy(deep=True)
         result = [
-            cvar_df.loc[:, x]
+            cvar_df.loc[:, x]  # type: ignore[call-overload,index]
             .ffill()
             .pct_change()
             .sort_values()
             .iloc[
                 : int(
-                    ceil((1 - level) * cvar_df.loc[:, x].ffill().pct_change().count()),
+                    ceil(
+                        (1 - level)
+                        * cvar_df.loc[:, x]  # type: ignore[index]
+                        .ffill()
+                        .pct_change()
+                        .count(),
+                    ),
                 )
             ]
             .mean()
@@ -1073,7 +1082,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             time_factor = periods_in_a_year_fixed
         else:
             fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
+            time_factor = how_many / fraction  # type: ignore[assignment]
 
         dddf = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
@@ -1302,7 +1311,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         )
 
     @property
-    def max_drawdown_date(self: CommonModel) -> Union[dt.date, Series]:
+    def max_drawdown_date(self: CommonModel) -> Union[dt.date, Series[dt.date]]:
         """
         Date when the maximum drawdown occurred.
 
@@ -1419,7 +1428,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility or, if risk-free return provided, Sharpe ratio
         """
-        ratio: Series = (
+        ratio = (
             self.arithmetic_ret_func(
                 months_from_last=months_from_last,
                 from_date=from_date,
@@ -1436,8 +1445,8 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
 
         if self.tsdf.shape[1] == 1:
             return cast(float, ratio)
-        ratio.name = "Return vol ratio"
-        return ratio.astype("float64")
+        cast(Series, ratio).name = "Return vol ratio"
+        return cast(Series, ratio).astype("float64")
 
     def sortino_ratio_func(
         self: CommonModel,
@@ -1480,7 +1489,7 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             Sortino ratio calculated as ( return - riskfree return ) /
             downside deviation (std dev of returns below MAR)
         """
-        ratio: Series = (
+        ratio = (
             self.arithmetic_ret_func(
                 months_from_last=months_from_last,
                 from_date=from_date,
@@ -1498,8 +1507,8 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
 
         if self.tsdf.shape[1] == 1:
             return cast(float, ratio)
-        ratio.name = "Sortino ratio"
-        return ratio.astype("float64")
+        cast(Series, ratio).name = "Sortino ratio"
+        return cast(Series, ratio).astype("float64")
 
     def value_ret_func(
         self: CommonModel,
@@ -1578,9 +1587,9 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
-        result = vrdf.ffill().pct_change()
-        result = result.loc[period] + 1
-        result = result.apply(cumprod, axis="index").iloc[-1] - 1
+        resultdf = DataFrame(vrdf.ffill().pct_change())
+        result = resultdf.loc[period] + 1
+        result = result.cumprod(axis="index").iloc[-1] - 1
         result.name = period
         result = result.astype("float64")
         if self.tsdf.shape[1] == 1:
@@ -1763,14 +1772,14 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         Pandas.DataFrame
             Calculate rolling annualized downside CVaR
         """
-        cvar_label = self.tsdf.iloc[:, column].name[0]
-        cvardf = (
+        cvar_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
+        cvarseries = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
             .apply(lambda x: cvar_down_calc(x, level=level))
         )
-        cvardf = cvardf.dropna().to_frame()
-        cvardf.columns = [[cvar_label], ["Rolling CVaR"]]
+        cvardf = cvarseries.dropna().to_frame()
+        cvardf.columns = [[cvar_label], ["Rolling CVaR"]]  # type: ignore[assignment]
 
         return cvardf
 
@@ -1794,16 +1803,16 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         Pandas.DataFrame
             Calculate rolling returns
         """
-        ret_label = self.tsdf.iloc[:, column].name[0]
-        retdf = (
+        ret_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
+        retseries = (
             self.tsdf.iloc[:, column]
             .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
             .sum()
         )
-        retdf = retdf.dropna().to_frame()
-        retdf.columns = [[ret_label], ["Rolling returns"]]
+        retdf = retseries.dropna().to_frame()
+        retdf.columns = [[ret_label], ["Rolling returns"]]  # type: ignore[assignment]
 
         return retdf
 
@@ -1833,16 +1842,16 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
         Pandas.DataFrame
            Calculate rolling annualized downside Value At Risk "VaR"
         """
-        var_label = self.tsdf.iloc[:, column].name[0]
-        vardf = (
+        var_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
+        varseries = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
             .apply(
                 lambda x: var_down_calc(x, level=level, interpolation=interpolation),
             )
         )
-        vardf = vardf.dropna().to_frame()
-        vardf.columns = [[var_label], ["Rolling VaR"]]
+        vardf = varseries.dropna().to_frame()
+        vardf.columns = [[var_label], ["Rolling VaR"]]  # type: ignore[assignment]
 
         return vardf
 
@@ -1874,15 +1883,21 @@ class CommonModel(BaseModel):  # type: ignore[misc, unused-ignore]
             time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
-        vol_label = self.tsdf.iloc[:, column].name[0]
+        vol_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
         dframe = self.tsdf.iloc[:, column].ffill().pct_change()
-        voldf = dframe.rolling(observations, min_periods=observations).std() * sqrt(
+        volseries = dframe.rolling(
+            observations,
+            min_periods=observations,
+        ).std() * sqrt(
             time_factor,
         )
-        voldf = voldf.dropna().to_frame()
-        voldf.columns = [[vol_label], ["Rolling volatility"]]
+        voldf = volseries.dropna().to_frame()
+        voldf.columns = [
+            [vol_label],
+            ["Rolling volatility"],
+        ]
 
-        return voldf
+        return DataFrame(voldf)
 
 
 def _var_implied_vol_and_target_func(

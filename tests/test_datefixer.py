@@ -17,7 +17,7 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
-from openseries.types import HolidayType
+from openseries.types import DateType, HolidayType
 
 
 class TestDateFixer(TestCase):
@@ -37,7 +37,7 @@ class TestDateFixer(TestCase):
         output = dt.date(2022, 7, 15)
 
         for fmt in formats:
-            if output != date_fix(fmt):
+            if output != date_fix(cast(DateType, fmt)):
                 msg = f"Unknown date format {fmt!s} of type {type(fmt)!s} encountered"
                 raise TypeError(
                     msg,
