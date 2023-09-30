@@ -106,7 +106,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
     isin: Optional[str] = None
     label: Optional[str] = None
 
-    @model_validator(mode="after")  # type: ignore[misc, unused-ignore]
+    @model_validator(mode="after")  # type: ignore[misc]
     def dates_and_values_validate(self: OpenTimeSeries) -> OpenTimeSeries:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)

@@ -81,7 +81,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
     weights: Optional[list[float]] = None
 
     # noinspection PyMethodParameters
-    @field_validator("constituents")  # type: ignore[misc, unused-ignore]
+    @field_validator("constituents")  # type: ignore[misc]
     def check_labels_unique(
         cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
@@ -113,7 +113,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         OpenFrame
             Object of the class OpenFrame
         """
-        super().__init__(  # type: ignore[call-arg, unused-ignore]
+        super().__init__(  # type: ignore[call-arg]
             constituents=constituents,
             weights=weights,
         )
