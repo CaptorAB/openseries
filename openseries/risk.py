@@ -4,7 +4,6 @@ Value-at-Risk, Conditional-Value-at-Risk and drawdown functions.
 Source:
 https://github.com/pmorissette/ffn/blob/master/ffn/core.py
 """
-# mypy: disable-error-code="type-arg"
 from __future__ import annotations
 
 import datetime as dt
@@ -34,7 +33,7 @@ from openseries.types import LiteralQuantileInterp
 
 
 def cvar_down_calc(
-    data: Union[DataFrame, Series, list[float]],
+    data: Union[DataFrame, Series[type[float]], list[float]],
     level: float = 0.95,
 ) -> float:
     """
@@ -44,7 +43,7 @@ def cvar_down_calc(
 
     Parameters
     ----------
-    data: Union[DataFrame, Series, list[float]]
+    data: Union[DataFrame, Series[type[float]], list[float]]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought CVaR level
@@ -64,7 +63,7 @@ def cvar_down_calc(
 
 
 def var_down_calc(
-    data: Union[DataFrame, Series, list[float]],
+    data: Union[DataFrame, Series[type[float]], list[float]],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
@@ -76,7 +75,7 @@ def var_down_calc(
 
     Parameters
     ----------
-    data: Union[DataFrame, Series, list[float]]
+    data: Union[DataFrame, Series[type[float]], list[float]]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
@@ -97,7 +96,7 @@ def var_down_calc(
 
 
 def drawdown_series(
-    prices: Union[DataFrame, Series],
+    prices: Union[DataFrame, Series[type[float]]],
 ) -> DataFrame:
     """
     Convert series into a maximum drawdown series.
@@ -111,7 +110,7 @@ def drawdown_series(
 
     Parameters
     ----------
-    prices: Union[DataFrame, Series]
+    prices: Union[DataFrame, Series[type[float]]]
         A timeserie of dates and values
 
     Returns
@@ -127,22 +126,22 @@ def drawdown_series(
 
 
 def drawdown_details(
-    prices: Union[DataFrame, Series],
+    prices: Union[DataFrame, Series[type[float]]],
     min_periods: int = 1,
-) -> Series:
+) -> Series[type[float]]:
     """
     Details of the maximum drawdown.
 
     Parameters
     ----------
-    prices: Union[DataFrame, Series]
+    prices: Union[DataFrame, Series[type[float]]]
         A timeserie of dates and values
     min_periods: int, default: 1
         Smallest number of observations to use to find the maximum drawdown
 
     Returns
     -------
-    Series
+    Series[type[float]]
         Max Drawdown
         Start of drawdown
         Date of bottom
@@ -151,7 +150,7 @@ def drawdown_details(
     """
     zero: float = 0.0
     mdd_date = cast(
-        Series,
+        Series,  # type: ignore[type-arg]
         (prices / prices.expanding(min_periods=min_periods).max()).idxmin(),
     ).to_numpy()[0]
     mdate = (

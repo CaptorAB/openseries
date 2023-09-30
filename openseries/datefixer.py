@@ -1,5 +1,4 @@
 """Date related utilities."""
-# mypy: disable-error-code="type-arg"
 from __future__ import annotations
 
 import datetime as dt
@@ -395,8 +394,8 @@ def align_dataframe_to_local_cdays(
 
 def do_resample_to_business_period_ends(
     data: DataFrame,
-    head: Series,
-    tail: Series,
+    head: Series[type[float]],
+    tail: Series[type[float]],
     freq: LiteralBizDayFreq,
     countries: CountriesType,
     convention: LiteralPandasResampleConvention,

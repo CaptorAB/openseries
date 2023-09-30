@@ -1,5 +1,5 @@
 """Defining the OpenTimeSeries class."""
-# mypy: disable-error-code="type-arg,unused-ignore"
+# mypy: disable-error-code="unused-ignore"
 from __future__ import annotations
 
 import datetime as dt
@@ -206,7 +206,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
     @classmethod
     def from_df(
         cls: type[OpenTimeSeries],
-        dframe: Union[DataFrame, Series],
+        dframe: Union[DataFrame, Series[float]],
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -217,7 +217,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
 
         Parameters
         ----------
-        dframe: Union[DataFrame, Series]
+        dframe: Union[DataFrame, Series[type[float]]]
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
@@ -264,7 +264,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
                         column_nmbr
                     ]
             else:
-                label = dframe.columns.to_numpy()[column_nmbr]
+                label = cast(MultiIndex, dframe.columns).to_numpy()[column_nmbr]
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
 
         return cls(
@@ -892,7 +892,7 @@ def timeseries_chain(
     values = values.mul(
         new.tsdf.iloc[:, 0].loc[first] / old.tsdf.iloc[:, 0].loc[first],
     )
-    values = cast(Series, append(values, new.tsdf.iloc[:, 0]))
+    values = append(values, new.tsdf.iloc[:, 0])  # type: ignore[assignment]
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
