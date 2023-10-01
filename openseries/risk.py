@@ -33,7 +33,7 @@ from openseries.types import LiteralQuantileInterp
 
 
 def cvar_down_calc(
-    data: Union[DataFrame, Series, list[float]],
+    data: Union[DataFrame, Series[type[float]], list[float]],
     level: float = 0.95,
 ) -> float:
     """
@@ -43,7 +43,7 @@ def cvar_down_calc(
 
     Parameters
     ----------
-    data: Union[DataFrame, Series, list[float]]
+    data: Union[DataFrame, Series[type[float]], list[float]]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought CVaR level
@@ -63,7 +63,7 @@ def cvar_down_calc(
 
 
 def var_down_calc(
-    data: Union[DataFrame, Series, list[float]],
+    data: Union[DataFrame, Series[type[float]], list[float]],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
@@ -75,7 +75,7 @@ def var_down_calc(
 
     Parameters
     ----------
-    data: Union[DataFrame, Series, list[float]]
+    data: Union[DataFrame, Series[type[float]], list[float]]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
@@ -95,7 +95,9 @@ def var_down_calc(
     return cast(float, quantile(ret, 1 - level, method=interpolation))
 
 
-def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series]:
+def drawdown_series(
+    prices: Union[DataFrame, Series[type[float]]],
+) -> DataFrame:
     """
     Convert series into a maximum drawdown series.
 
@@ -108,35 +110,38 @@ def drawdown_series(prices: Union[DataFrame, Series]) -> Union[DataFrame, Series
 
     Parameters
     ----------
-    prices: Union[DataFrame, Series]
+    prices: Union[DataFrame, Series[type[float]]]
         A timeserie of dates and values
 
     Returns
     -------
-    Union[DataFrame, Series]
+    DataFrame
         A drawdown timeserie
     """
     drawdown = prices.copy()
     drawdown = drawdown.ffill()
     drawdown[isnan(drawdown)] = -Inf
     roll_max = maximum.accumulate(drawdown)
-    return drawdown / roll_max - 1.0
+    return DataFrame(drawdown / roll_max - 1.0)
 
 
-def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> Series:
+def drawdown_details(
+    prices: Union[DataFrame, Series[type[float]]],
+    min_periods: int = 1,
+) -> Series[type[float]]:
     """
     Details of the maximum drawdown.
 
     Parameters
     ----------
-    prices: Union[DataFrame, Series]
+    prices: Union[DataFrame, Series[type[float]]]
         A timeserie of dates and values
     min_periods: int, default: 1
         Smallest number of observations to use to find the maximum drawdown
 
     Returns
     -------
-    Series
+    Series[type[float]]
         Max Drawdown
         Start of drawdown
         Date of bottom
@@ -144,11 +149,10 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
         Average fall per day
     """
     zero: float = 0.0
-    mdd_date = (
-        (prices / prices.expanding(min_periods=min_periods).max())
-        .idxmin()
-        .to_numpy()[0]
-    )
+    mdd_date = cast(
+        Series,  # type: ignore[type-arg]
+        (prices / prices.expanding(min_periods=min_periods).max()).idxmin(),
+    ).to_numpy()[0]
     mdate = (
         dt.datetime.strptime(str(mdd_date)[:10], "%Y-%m-%d")
         .replace(tzinfo=dt.timezone.utc)
@@ -160,7 +164,7 @@ def drawdown_details(prices: Union[DataFrame, Series], min_periods: int = 1) -> 
     ddata = prices.copy()
     drwdwn = drawdown_series(ddata).loc[: cast(int, mdate)]
     drwdwn = drwdwn.sort_index(ascending=False)
-    sdate = drwdwn[drwdwn == zero].idxmax().to_numpy()[0]
+    sdate = Series(drwdwn[drwdwn == zero].idxmax()).to_numpy()[0]
     sdate = (
         dt.datetime.strptime(str(sdate)[:10], "%Y-%m-%d")
         .replace(tzinfo=dt.timezone.utc)

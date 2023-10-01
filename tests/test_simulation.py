@@ -1,4 +1,5 @@
 """Test suite for the openseries/simulation.py module."""
+# mypy: disable-error-code="type-arg"
 from __future__ import annotations
 
 from copy import copy
@@ -196,7 +197,7 @@ class TestSimulation(TestCase):
                 d.date()
                 for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
             ]
-            sdf = DataFrame(
+            sdf = DataFrame(  # type: ignore[call-overload,unused-ignore]
                 data=modelresult,
                 index=d_range,
                 columns=[f"Simulation_{i}"],

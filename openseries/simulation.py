@@ -1115,14 +1115,20 @@ class ReturnSimulation:
 
         if self.number_of_sims == 1:
             sdf = self.dframe.iloc[0].T.to_frame()
-            sdf.index = d_range
-            sdf.columns = [[name], [ValueType.RTRN]]
+            sdf.index = d_range  # type: ignore[assignment,unused-ignore]
+            sdf.columns = [  # type: ignore[assignment,unused-ignore]
+                [name],
+                [ValueType.RTRN],
+            ]
             return sdf
         fdf = DataFrame()
         for item in range(self.number_of_sims):
             sdf = self.dframe.iloc[item].T.to_frame()
-            sdf.index = d_range
-            sdf.columns = [[f"Asset_{item}"], [ValueType.RTRN]]
+            sdf.index = d_range  # type: ignore[assignment,unused-ignore]
+            sdf.columns = [  # type: ignore[assignment,unused-ignore]
+                [f"Asset_{item}"],
+                [ValueType.RTRN],
+            ]
             fdf = concat([fdf, sdf], axis="columns", sort=True)
         return fdf
 

@@ -32,6 +32,8 @@ elseif ($task -eq "lint") {
 }
 elseif ($task -eq "clean") {
     # remove virtual environment and lock file to start over
+    pre-commit uninstall
+    deactivate
     Remove-Item -Path ".\venv" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -Path 'poetry.lock' -Force -ErrorAction SilentlyContinue
 }

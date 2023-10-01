@@ -7,6 +7,11 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.6] - 2023-10-01
+
+Implemented mypy type checking more strictly. Many in-line ignores that will remain until Pandas
+typing is more developed.
+
 ## Version [1.3.5] - 2023-09-28
 
 Removed multiple inheritance on OpenTimeSeries and OpenFrame by inheriting CommonModel from the Pydantic BaseModel.
