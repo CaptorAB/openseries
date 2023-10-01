@@ -20,6 +20,5 @@ lint:
 	poetry run mypy .
 
 clean:
-	pre-commit uninstall
 	rm -rf venv
 	rm -f poetry.lock
