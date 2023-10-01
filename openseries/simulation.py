@@ -1126,7 +1126,7 @@ class ReturnSimulation:
             sdf = self.dframe.iloc[item].T.to_frame()
             sdf.index = d_range  # type: ignore[assignment,unused-ignore]
             sdf.columns = [  # type: ignore[assignment,unused-ignore]
-                [f"Asset_{item}"],
+                [f"{name}_{item}"],
                 [ValueType.RTRN],
             ]
             fdf = concat([fdf, sdf], axis="columns", sort=True)

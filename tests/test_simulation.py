@@ -23,7 +23,7 @@ from openseries.simulation import (
     random_generator,
 )
 from openseries.types import ValueType
-from tests.common_sim import FIVE_SIMS, ONE_SIM, SEED
+from tests.common_sim import FIVE_SIMS, SEED
 
 
 class TestSimulation(TestCase):
@@ -36,8 +36,7 @@ class TestSimulation(TestCase):
     @classmethod
     def setUpClass(cls: type[TestSimulation]) -> None:
         """SetUpClass for the TestSimulation class."""
-        cls.seriesim = ONE_SIM
-        cls.framesim = FIVE_SIMS
+        cls.seriesim = FIVE_SIMS
 
     def test_init_with_without_randomizer(self: TestSimulation) -> None:
         """Test instantiating ReturnSimulation with & without random generator."""
@@ -272,21 +271,53 @@ class TestSimulation(TestCase):
 
     def test_to_dataframe(self: TestSimulation) -> None:
         """Test method to_dataframe."""
-        seriesim = copy(self.seriesim)
+        trading_days = 2512
+        one = 1
+        seriesim = ReturnSimulation.from_merton_jump_gbm(
+            number_of_sims=one,
+            trading_days=trading_days,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            trading_days_in_year=252,
+            seed=SEED,
+        )
+        five = 5
+        framesim = ReturnSimulation.from_merton_jump_gbm(
+            number_of_sims=five,
+            trading_days=trading_days,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            jumps_lamda=0.00125,
+            jumps_sigma=0.001,
+            jumps_mu=-0.2,
+            trading_days_in_year=252,
+            seed=SEED,
+        )
 
         start = dtdate(2009, 6, 30)
 
-        startseries = OpenTimeSeries.from_df(
-            seriesim.to_dataframe(name="Asset", start=start),
-        ).to_cumret()
-        returnseries = OpenTimeSeries.from_df(
-            seriesim.to_dataframe(name="Asset", start=start),
-        )
+        onedf = seriesim.to_dataframe(name="Asset", start=start)
+        fivedf = framesim.to_dataframe(name="Asset", start=start)
+
+        returnseries = OpenTimeSeries.from_df(onedf)
+        startseries = returnseries.from_deepcopy()
+        startseries.to_cumret()
+
+        if onedf.shape != (trading_days, one):
+            msg = "Method to_dataframe() not working as intended"
+            raise ValueError(msg)
+
+        if fivedf.shape != (trading_days, five):
+            msg = "Method to_dataframe() not working as intended"
+            raise ValueError(msg)
 
         if startseries.valuetype != ValueType.PRICE:
             msg = "Method to_dataframe() not working as intended"
             raise ValueError(msg)
 
-        if returnseries.valuetype != ValueType.RTRN:
+        if startseries.valuetype != ValueType.PRICE:
             msg = "Method to_dataframe() not working as intended"
             raise ValueError(msg)

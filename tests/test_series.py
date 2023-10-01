@@ -18,7 +18,7 @@ from openseries.series import (
     timeseries_chain,
 )
 from openseries.types import CountriesType, LiteralSeriesProps, ValueType
-from tests.common_sim import ONE_SIM
+from tests.common_sim import FIVE_SIMS
 
 
 class NewTimeSeries(OpenTimeSeries):
@@ -131,11 +131,11 @@ class TestOpenTimeSeries(TestCase):
     def setUpClass(cls: type[TestOpenTimeSeries]) -> None:
         """SetUpClass for the TestOpenTimeSeries class."""
         cls.randomseries = OpenTimeSeries.from_df(
-            ONE_SIM.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
+            FIVE_SIMS.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
         ).to_cumret()
 
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
-            ("Asset", ValueType.PRICE)
+            ("Asset_0", ValueType.PRICE)
         ]
 
     def test_setup_class(self: TestOpenTimeSeries) -> None:
@@ -192,7 +192,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid string",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", cast(str, None)],
                 values=[1.0, 1.1],
             )
@@ -202,7 +202,7 @@ class TestOpenTimeSeries(TestCase):
             match="must be called with a collection of some kind",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=cast(list[str], None),
                 values=[1.0, 1.1],
             )
@@ -212,7 +212,7 @@ class TestOpenTimeSeries(TestCase):
             match="must be called with a collection of some kind",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=cast(list[str], "2023-01-01"),
                 values=[1.0, 1.1],
             )
@@ -222,7 +222,7 @@ class TestOpenTimeSeries(TestCase):
             match="Unknown datetime string format",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-bb", "2023-01-02"],
                 values=[1.0, 1.1],
             )
@@ -232,7 +232,7 @@ class TestOpenTimeSeries(TestCase):
             match="Shape of passed values is",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=[],
                 values=[1.0, 1.1],
             )
@@ -244,7 +244,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid number",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=[1.0, cast(float, None)],
             )
@@ -254,7 +254,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=cast(list[float], None),
             )
@@ -264,7 +264,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=cast(list[float], 1.0),
             )
@@ -274,7 +274,7 @@ class TestOpenTimeSeries(TestCase):
             match="could not convert string to float",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=[1.0, cast(float, "bb")],
             )
@@ -284,7 +284,7 @@ class TestOpenTimeSeries(TestCase):
             match="There must be at least 1 value",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=[],
             )
@@ -551,7 +551,7 @@ class TestOpenTimeSeries(TestCase):
         ]
         for kwarg in kwargs:
             data = jseries.to_json(**kwarg)  # type: ignore[arg-type]
-            if [item.get("name") for item in data] != ["Asset"]:
+            if [item.get("name") for item in data] != ["Asset_0"]:
                 msg = "Unexpected data from json"
                 raise ValueError(msg)
 
@@ -832,23 +832,23 @@ class TestOpenTimeSeries(TestCase):
 
         result_values = {}
         for value in result.index:
-            if isinstance(result.loc[value, ("Asset", ValueType.PRICE)], float):
+            if isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], float):
                 result_values[
                     value
-                ] = f"{result.loc[value, ('Asset', ValueType.PRICE)]:.10f}"
-            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], int):
+                ] = f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
+            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
                 result_values[
                     value
                 ] = result.loc[  # type: ignore[assignment,unused-ignore]
                     value,
-                    ("Asset", ValueType.PRICE),
+                    ("Asset_0", ValueType.PRICE),
                 ]
-            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
+            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
                     dt.date,
                     result.loc[
                         value,
-                        ("Asset", ValueType.PRICE),
+                        ("Asset_0", ValueType.PRICE),
                     ],
                 ).strftime("%Y-%m-%d")
             else:
@@ -1344,7 +1344,7 @@ class TestOpenTimeSeries(TestCase):
         adf = DataFrame(
             data=asim,
             index=d_range,
-            columns=[["Asset"], [ValueType.PRICE]],
+            columns=[["Asset_0"], [ValueType.PRICE]],
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
 
@@ -1802,7 +1802,7 @@ class TestOpenTimeSeries(TestCase):
         lseries = self.randomseries.from_deepcopy()
 
         if cast(tuple[str, str], lseries.tsdf.columns[0]) != (
-            "Asset",
+            "Asset_0",
             ValueType.PRICE,
         ):
             msg = "set_new_label() base case not working as intended"
