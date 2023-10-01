@@ -10,7 +10,7 @@ from unittest import TestCase
 
 import pytest
 from pandas import DataFrame, DatetimeIndex, Series, date_range
-from pydantic import ValidationError as PydanticValidationError
+from pydantic import ValidationError
 
 from openseries.series import (
     OpenTimeSeries,
@@ -54,7 +54,7 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
 def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     """Pytest on invalid valuetype as input."""
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=enum|type=string_type",
     ):
         OpenTimeSeries.from_arrays(
@@ -72,7 +72,7 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
 def test_opentimeseries_invalid_currency(currency: str) -> None:
     """Pytest on invalid currency code as input for currency."""
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=string_too_short|type=string_type",
     ):
         OpenTimeSeries.from_arrays(
@@ -96,7 +96,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
         values=[1.0, 1.1],
     )
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=string_too_short|type=string_type",
     ):
         serie.domestic = domestic
@@ -114,7 +114,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         values=[1.0, 1.1],
     )
     with pytest.raises(
-        expected_exception=PydanticValidationError,
+        expected_exception=ValidationError,
         match="type=list_type|type=string_type",
     ):
         serie.countries = countries
@@ -141,44 +141,38 @@ class TestOpenTimeSeries(TestCase):
     def test_setup_class(self: TestOpenTimeSeries) -> None:
         """Test setup_class method."""
         with pytest.raises(
-            expected_exception=ValueError,
-            match="domestic currency must be a code according to ISO 4217",
+            expected_exception=ValidationError,
+            match="String should have at least 3 characters",
         ):
             OpenTimeSeries.setup_class(domestic_ccy="12")
 
         with pytest.raises(
-            expected_exception=ValueError,
-            match="domestic currency must be a code according to ISO 4217",
+            expected_exception=ValidationError,
+            match="Input should be a valid string",
         ):
             OpenTimeSeries.setup_class(domestic_ccy=cast(str, 12))
 
         with pytest.raises(
-            expected_exception=ValueError,
-            match="according to ISO 3166-1 alpha-2",
+            expected_exception=ValidationError,
+            match="Input should be a valid list|String should match pattern",
         ):
             OpenTimeSeries.setup_class(countries="12")
 
         with pytest.raises(
-            expected_exception=TypeError,
-            match=(
-                "countries must be a list of country "
-                "codes according to ISO 3166-1 alpha-2"
-            ),
+            expected_exception=ValidationError,
+            match="Input should be a valid string",
         ):
             OpenTimeSeries.setup_class(countries=["SE", cast(str, 12)])
 
         with pytest.raises(
-            expected_exception=TypeError,
-            match=(
-                "countries must be a list of country "
-                "codes according to ISO 3166-1 alpha-2"
-            ),
+            expected_exception=ValidationError,
+            match="2 validation errors for Countries",
         ):
             OpenTimeSeries.setup_class(countries=["SE", "12"])
 
         with pytest.raises(
-            expected_exception=TypeError,
-            match="according to ISO 3166-1 alpha-2",
+            expected_exception=ValidationError,
+            match="2 validation errors for Countries",
         ):
             OpenTimeSeries.setup_class(countries=cast(CountriesType, None))
 
@@ -186,6 +180,7 @@ class TestOpenTimeSeries(TestCase):
         if OpenTimeSeries.domestic != "USD":
             msg = "Method setup_class() not working as intended"
             raise ValueError(msg)
+
         if OpenTimeSeries.countries != "US":
             msg = "Method setup_class() not working as intended"
             raise ValueError(msg)
@@ -193,7 +188,7 @@ class TestOpenTimeSeries(TestCase):
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
         """Test invalid dates as input."""
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid string",
         ):
             OpenTimeSeries.from_arrays(
@@ -245,7 +240,7 @@ class TestOpenTimeSeries(TestCase):
     def test_invalid_values(self: TestOpenTimeSeries) -> None:
         """Test invalid values as input."""
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid number",
         ):
             OpenTimeSeries.from_arrays(
@@ -255,7 +250,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
@@ -265,7 +260,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
@@ -285,7 +280,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="There must be at least 1 value",
         ):
             OpenTimeSeries.from_arrays(
@@ -317,7 +312,7 @@ class TestOpenTimeSeries(TestCase):
         output.update({"dates": dates, "values": values})
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Dates are not unique",
         ):
             _ = OpenTimeSeries.from_arrays(
@@ -372,16 +367,16 @@ class TestOpenTimeSeries(TestCase):
         df_data = {"tsdf": dframe, **data}
         serie_data = {"tsdf": serie, **data}
 
-        df_obj = OpenTimeSeries(**df_data)
+        df_obj = OpenTimeSeries(**df_data)  # type: ignore[arg-type,unused-ignore]
         if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
             msg = "Raw values and DataFrame values not matching"
             raise ValueError(msg)
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Input should be an instance of DataFrame",
         ):
-            OpenTimeSeries(**serie_data)
+            OpenTimeSeries(**serie_data)  # type: ignore[arg-type,unused-ignore]
 
     def test_create_from_arrays(self: TestOpenTimeSeries) -> None:
         """Test from_arrays construct method."""
@@ -546,16 +541,16 @@ class TestOpenTimeSeries(TestCase):
 
     def test_save_to_json(self: TestOpenTimeSeries) -> None:
         """Test to_json method."""
-        directory = str(Path(__file__).resolve().parent)
-        seriesfile = Path(f"{directory}/framesaved.json")
+        directory = Path(__file__).resolve().parent
+        seriesfile = directory.joinpath("seriessaved.json")
 
         jseries = self.randomseries.from_deepcopy()
         kwargs = [
-            {"filename": str(seriesfile)},
-            {"filename": str(seriesfile), "directory": directory},
+            {"filename": str(directory.joinpath("seriessaved.json"))},
+            {"filename": "seriessaved.json", "directory": directory},
         ]
         for kwarg in kwargs:
-            data = jseries.to_json(**kwarg)
+            data = jseries.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != ["Asset"]:
                 msg = "Unexpected data from json"
                 raise ValueError(msg)
@@ -691,87 +686,6 @@ class TestOpenTimeSeries(TestCase):
             dt.date(2023, 4, 28),
         ]:
             msg = "Method resample_to_business_period_ends() not working as intended"
-            raise ValueError(msg)
-
-    def test_calc_range(self: TestOpenTimeSeries) -> None:
-        """Test calc_range method."""
-        cseries = self.randomseries.from_deepcopy()
-        start, end = cseries.first_idx.strftime("%Y-%m-%d"), cseries.last_idx.strftime(
-            "%Y-%m-%d",
-        )
-
-        rst, ren = cseries.calc_range()
-
-        if [start, end] != [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]:
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Function calc_range returned earlier date < series start",
-        ):
-            _, _ = cseries.calc_range(months_offset=125)
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt date < series start",
-        ):
-            _, _ = cseries.calc_range(from_dt=dt.date(2009, 5, 31))
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given to_dt date > series end",
-        ):
-            _, _ = cseries.calc_range(to_dt=dt.date(2019, 7, 31))
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 7, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = cseries.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 5, 31),
-            )
-
-        nst, nen = cseries.calc_range(
-            from_dt=dt.date(2009, 7, 3),
-            to_dt=dt.date(2019, 6, 25),
-        )
-        if nst != dt.date(2009, 7, 3):
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-        if nen != dt.date(2019, 6, 25):
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-
-        cseries.resample()
-
-        earlier_moved, _ = cseries.calc_range(from_dt=dt.date(2009, 8, 10))
-        if earlier_moved != dt.date(2009, 7, 31):
-            msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
-
-        _, later_moved = cseries.calc_range(to_dt=dt.date(2009, 8, 20))
-        if later_moved != dt.date(2009, 8, 31):
-            msg = "Method calc_range() not working as intended"
             raise ValueError(msg)
 
     def test_calc_range_output(self: TestOpenTimeSeries) -> None:
@@ -923,12 +837,20 @@ class TestOpenTimeSeries(TestCase):
                     value
                 ] = f"{result.loc[value, ('Asset', ValueType.PRICE)]:.10f}"
             elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], int):
-                result_values[value] = result.loc[value, ("Asset", ValueType.PRICE)]
-            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
-                result_values[value] = result.loc[
+                result_values[
+                    value
+                ] = result.loc[  # type: ignore[assignment,unused-ignore]
                     value,
                     ("Asset", ValueType.PRICE),
-                ].strftime("%Y-%m-%d")
+                ]
+            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
+                result_values[value] = cast(
+                    dt.date,
+                    result.loc[
+                        value,
+                        ("Asset", ValueType.PRICE),
+                    ],
+                ).strftime("%Y-%m-%d")
             else:
                 msg = f"all_properties returned unexpected type {type(value)}"
                 raise TypeError(
@@ -1085,32 +1007,35 @@ class TestOpenTimeSeries(TestCase):
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
-        if f"{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.2800936502":
+        if f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.2800936502":
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
         adjustedseries_returns = self.randomseries.from_deepcopy()
         adjustedseries_returns.value_to_ret()
         adjustedseries_returns.running_adjustment(0.05)
 
-        if f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}" != "-0.0028221714":
+        if (
+            f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
+            != "-0.0028221714"
+        ):
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
 
         adjustedseries_returns.to_cumret()
         if (
-            f"{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}"
-            != f"{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
+            f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}"
+            != f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
         ):
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{float(adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
-                f"'{float(adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
+                f"'{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
 
@@ -1271,7 +1196,7 @@ class TestOpenTimeSeries(TestCase):
         """Test plot_series method."""
         plotseries = self.randomseries.from_deepcopy()
 
-        directory = str(Path(__file__).resolve().parent)
+        directory = Path(__file__).resolve().parent
         _, figfile = plotseries.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1320,7 +1245,7 @@ class TestOpenTimeSeries(TestCase):
         barseries.resample(freq="BM").value_to_ret()
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
-        directory = str(Path(__file__).resolve().parent)
+        directory = Path(__file__).resolve().parent
         _, figfile = barseries.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1561,7 +1486,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1579,7 +1504,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1597,7 +1522,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1615,7 +1540,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="String should match pattern",
         ):
             OpenTimeSeries.from_arrays(
@@ -1633,7 +1558,7 @@ class TestOpenTimeSeries(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=PydanticValidationError,
+            expected_exception=ValidationError,
             match="Dates are not unique",
         ):
             OpenTimeSeries.from_arrays(
@@ -1876,22 +1801,25 @@ class TestOpenTimeSeries(TestCase):
         """Test set_new_label method."""
         lseries = self.randomseries.from_deepcopy()
 
-        if lseries.tsdf.columns[0] != ("Asset", ValueType.PRICE):
+        if cast(tuple[str, str], lseries.tsdf.columns[0]) != (
+            "Asset",
+            ValueType.PRICE,
+        ):
             msg = "set_new_label() base case not working as intended"
             raise ValueError(msg)
 
         lseries.set_new_label(lvl_zero="zero")
-        if lseries.tsdf.columns[0] != ("zero", ValueType.PRICE):
+        if lseries.tsdf.columns[0][0] != "zero":
             msg = "Method set_new_label() base case not working as intended"
             raise ValueError(msg)
 
         lseries.set_new_label(lvl_one=ValueType.RTRN)
-        if lseries.tsdf.columns[0] != ("zero", ValueType.RTRN):
+        if lseries.tsdf.columns[0][1] != ValueType.RTRN:
             msg = "Method set_new_label() base case not working as intended"
             raise ValueError(msg)
 
         lseries.set_new_label(lvl_zero="two", lvl_one=ValueType.PRICE)
-        if lseries.tsdf.columns[0] != ("two", ValueType.PRICE):
+        if cast(tuple[str, str], lseries.tsdf.columns[0]) != ("two", ValueType.PRICE):
             msg = "Method set_new_label() base case not working as intended"
             raise ValueError(msg)
 
