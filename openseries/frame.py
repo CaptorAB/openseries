@@ -916,15 +916,19 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             )
         if len(set(self.first_indices)) != 1:
             warning(
-                f"One or more constituents still not truncated to same "
-                f"start dates.\n"
-                f"{self.tsdf.head()}",
+                msg=(
+                    "One or more constituents still "
+                    "not truncated to same start dates."
+                ),
+                extra={"tsdf.head": self.tsdf.head()},
             )
         if len(set(self.last_indices)) != 1:
             warning(
-                f"One or more constituents still not truncated to same "
-                f"end dates.\n"
-                f"{self.tsdf.tail()}",
+                msg=(
+                    "One or more constituents still "
+                    "not truncated to same end dates."
+                ),
+                extra={"tsdf.tail": self.tsdf.tail()},
             )
         return self
 
