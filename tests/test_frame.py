@@ -1238,10 +1238,12 @@ class TestOpenFrame(TestCase):
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
-        if (
-            "WARNING:root:One or more constituents "
-            "still not truncated to same start dates."
-        ) not in logs.output[0]:
+        if logs.output != [
+            (
+                "WARNING:root:One or more constituents "
+                "still not truncated to same start dates."
+            ),
+        ]:
             msg = "Method trunc_frame() did not work as intended."
             raise ValueError(msg)
 
@@ -1304,10 +1306,12 @@ class TestOpenFrame(TestCase):
         )
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
-        if (
-            "WARNING:root:One or more constituents "
-            "still not truncated to same end dates."
-        ) not in logs.output[0]:
+        if logs.output != [
+            (
+                "WARNING:root:One or more constituents "
+                "still not truncated to same end dates."
+            ),
+        ]:
             msg = "Method trunc_frame() did not work as intended."
             raise ValueError(msg)
 
