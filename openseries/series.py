@@ -58,7 +58,10 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 class OpenTimeSeries(CommonModel):  # type: ignore[misc]
 
     """
-    Declare OpenTimeSeries.
+    OpenTimeSeries objects are at the core of the openseries package.
+
+    The intended use is to allow analyses of financial timeseries.
+    It is only intended for daily or less frequent data samples.
 
     Parameters
     ----------

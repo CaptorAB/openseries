@@ -61,7 +61,9 @@ from openseries.types import (
 class OpenFrame(CommonModel):  # type: ignore[misc]
 
     """
-    Declare OpenFrame.
+    OpenFrame objects hold OpenTimeSeries in the list constituents.
+
+    The intended use is to allow comparisons across these timeseries.
 
     Parameters
     ----------
@@ -99,7 +101,9 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         weights: Optional[list[float]] = None,
     ) -> None:
         """
-        Object of the class OpenFrame.
+        OpenFrame objects hold OpenTimeSeries in the list constituents.
+
+        The intended use is to allow comparisons across these timeseries.
 
         Parameters
         ----------
