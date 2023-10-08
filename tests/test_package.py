@@ -1,12 +1,12 @@
 """Test suite for the openseries package."""
 from __future__ import annotations
 
+from importlib.metadata import metadata
 from pathlib import Path
 from unittest import TestCase
 from warnings import catch_warnings, simplefilter
 
 import pytest
-from importlib_metadata import metadata, version
 from pandas import DataFrame
 from toml import load as tomlload
 
@@ -34,7 +34,7 @@ class TestPackage(TestCase):
         expected_values = [
             "openseries",
             "Package for simple financial time series analysis.",
-            version("openseries"),
+            package_metadata["Version"],
             toml_version,
             "https://github.com/CaptorAB/OpenSeries",
             "BSD-3-Clause",
@@ -47,10 +47,10 @@ class TestPackage(TestCase):
                 )
                 raise ValueError(msg)
 
-        if package_metadata.get(name="requires-python") != ">=3.9,<3.12":
+        if package_metadata["requires-python"] != ">=3.9,<3.12":
             msg = (
                 "Package metadata requires-python not as "
-                f"expected: {package_metadata.get(name='requires-python')}"
+                f"expected: {package_metadata['requires-python']}"
             )
             raise ValueError(msg)
 
