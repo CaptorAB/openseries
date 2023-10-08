@@ -121,6 +121,13 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         if values_list_length < 1:
             msg = "There must be at least 1 value"
             raise ValueError(msg)
+        if (
+            (dates_list_length != values_list_length)
+            or (len(self.tsdf.index) != self.tsdf.shape[0])
+            or (self.tsdf.shape[1] != 1)
+        ):
+            msg = "Number of dates and values passed do not match"
+            raise ValueError(msg)
         return self
 
     @classmethod

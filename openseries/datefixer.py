@@ -26,7 +26,7 @@ from openseries.types import (
 def holiday_calendar(
     startyear: int,
     endyear: int,
-    countries: CountriesType = "SE",
+    countries: CountriesType,
     custom_holidays: Optional[HolidayType] = None,
 ) -> busdaycalendar:
     """

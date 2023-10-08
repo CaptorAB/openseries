@@ -115,7 +115,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     )
     with pytest.raises(
         expected_exception=ValidationError,
-        match="type=list_type|type=string_type",
+        match="type=set_type|type=string_type",
     ):
         serie.countries = countries
 
@@ -287,6 +287,70 @@ class TestOpenTimeSeries(TestCase):
                 name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=[],
+            )
+
+    def test_dates_values_length_mismatch(self: TestOpenTimeSeries) -> None:
+        """Test dates and values input."""
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="Number of dates and values passed do not match",
+        ):
+            OpenTimeSeries(
+                name="Asset_0",
+                timeseries_id="",
+                instrument_id="",
+                valuetype=ValueType.PRICE,
+                currency="SEK",
+                local_ccy=True,
+                dates=["2023-01-01", "2023-01-02"],
+                values=[1.0, 1.1, 1.05],
+                tsdf=DataFrame(
+                    data=[1.0, 1.1],
+                    index=[
+                        deyt.date()
+                        for deyt in DatetimeIndex(["2023-01-01", "2023-01-02"])
+                    ],
+                    columns=[["Asset_0"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
+            )
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="Number of dates and values passed do not match",
+        ):
+            OpenTimeSeries(
+                name="Asset_0",
+                timeseries_id="",
+                instrument_id="",
+                valuetype=ValueType.PRICE,
+                currency="SEK",
+                local_ccy=True,
+                dates=["2023-01-01", "2023-01-02", "2023-01-03"],
+                values=[1.0, 1.1],
+                tsdf=DataFrame(
+                    data=[1.0, 1.1],
+                    index=[
+                        deyt.date()
+                        for deyt in DatetimeIndex(["2023-01-01", "2023-01-02"])
+                    ],
+                    columns=[["Asset_0"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
+            )
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="Number of dates and values passed do not match",
+        ):
+            OpenTimeSeries(
+                name="Asset_0",
+                timeseries_id="",
+                instrument_id="",
+                valuetype=ValueType.PRICE,
+                currency="SEK",
+                local_ccy=True,
+                dates=["2023-01-01", "2023-01-02"],
+                values=[1.0, 1.1],
+                tsdf=DataFrame(),
             )
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
