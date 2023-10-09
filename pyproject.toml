@@ -81,6 +81,7 @@ filterwarnings = [
 
 [tool.black]
 line-length = 87
+target-version = ["py39", "py310", "py311"]
 
 [tool.coverage.run]
 omit = ["venv/*"]

@@ -21,7 +21,7 @@ CountryStringType = Annotated[
     ),
 ]
 CountryListType = conset(
-    CountryStringType,
+    item_type=CountryStringType,
     min_length=1,
 )
 CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]

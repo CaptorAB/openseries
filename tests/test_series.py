@@ -1408,6 +1408,10 @@ class TestOpenTimeSeries(TestCase):
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
 
+        if aseries.countries != "SE":
+            msg = "Base case test_align_index_to_local_cdays not set up as intended"
+            raise ValueError(msg)
+
         midsummer = dt.date(2020, 6, 19)
         if midsummer not in d_range:
             msg = "Date range generation not run as intended"
@@ -1513,7 +1517,18 @@ class TestOpenTimeSeries(TestCase):
         if basecase.dates != ["2017-05-29"]:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
+
         if basecase.values != [100.0]:  # noqa: PD011
+            msg = "Validations base case setup failed"
+            raise ValueError(msg)
+
+        basecase.countries = ["SE", "US"]
+        if basecase.countries != {"SE", "US"}:
+            msg = "Validations base case setup failed"
+            raise ValueError(msg)
+
+        basecase.countries = ["SE", "SE"]
+        if basecase.countries != {"SE"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
