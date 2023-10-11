@@ -5,7 +5,7 @@ import datetime as dt
 from typing import Optional, Union, cast
 
 from dateutil.relativedelta import relativedelta
-from holidays import (  # type: ignore[import,unused-ignore]
+from holidays import (  # type: ignore[import-untyped,unused-ignore]
     country_holidays,
     list_supported_countries,
 )

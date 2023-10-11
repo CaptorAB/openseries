@@ -8,8 +8,11 @@ from functools import reduce
 from logging import warning
 from typing import Optional, Union, cast
 
-import statsmodels.api as sm  # type: ignore[import]
-from ffn.core import calc_erc_weights, calc_mean_var_weights  # type: ignore[import]
+import statsmodels.api as sm  # type: ignore[import-untyped]
+from ffn.core import (  # type: ignore[import-untyped]
+    calc_erc_weights,
+    calc_mean_var_weights,
+)
 from numpy import cov, cumprod, log, sqrt
 from pandas import (
     DataFrame,
@@ -23,7 +26,7 @@ from pandas import (
 from pydantic import field_validator
 
 # noinspection PyProtectedMember
-from statsmodels.regression.linear_model import (  # type: ignore[import]
+from statsmodels.regression.linear_model import (  # type: ignore[import-untyped]
     RegressionResults,
 )
 
