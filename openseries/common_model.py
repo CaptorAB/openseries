@@ -598,15 +598,22 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
         plotfile = dirpath.joinpath(filename)
 
-        opacity = 0.7 if mode == "overlay" else None
-
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
+
+        opacity = 0.7 if mode == "overlay" else None
+
+        hovertemplate = (
+            f"%{{y:{tick_fmt}}}<br>%{{x|{'%Y-%m-%d'}}}"
+            if tick_fmt
+            else "%{y}<br>%{x|%Y-%m-%d}"
+        )
+
         for item in range(self.tsdf.shape[1]):
             figure.add_bar(
                 x=self.tsdf.index,
                 y=self.tsdf.iloc[:, item],
-                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+                hovertemplate=hovertemplate,
                 name=labels[item],
                 opacity=opacity,
             )
@@ -690,11 +697,18 @@ class CommonModel(BaseModel):  # type: ignore[misc]
 
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
+
+        hovertemplate = (
+            f"%{{y:{tick_fmt}}}<br>%{{x|{'%Y-%m-%d'}}}"
+            if tick_fmt
+            else "%{y}<br>%{x|%Y-%m-%d}"
+        )
+
         for item in range(self.tsdf.shape[1]):
             figure.add_scatter(
                 x=self.tsdf.index,
                 y=self.tsdf.iloc[:, item],
-                hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+                hovertemplate=hovertemplate,
                 line={"width": 2.5, "dash": "solid"},
                 mode=mode,
                 name=labels[item],
@@ -713,7 +727,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
                     y=[self.tsdf.iloc[-1, item]],
                     mode="markers + text",
                     marker={"color": "red", "size": 12},
-                    hovertemplate="%{y}<br>%{x|%Y-%m-%d}",
+                    hovertemplate=hovertemplate,
                     showlegend=False,
                     name=labels[item],
                     text=[txt.format(self.tsdf.iloc[-1, item])],

@@ -1283,8 +1283,13 @@ class TestOpenTimeSeries(TestCase):
         )
         fig_last_json = loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
+
         if f"{last:.10f}" != "0.7764037824":
             msg = f"Unaligned data between original and data in Figure: '{last:.10f}'"
+            raise ValueError(msg)
+
+        if fig_last_json["data"][-1]["hovertemplate"] != "%{y}<br>%{x|%Y-%m-%d}":
+            msg = "plot_series hovertemplate not as expected"
             raise ValueError(msg)
 
         fig_last_fmt, _ = plotseries.plot_series(
@@ -1295,8 +1300,16 @@ class TestOpenTimeSeries(TestCase):
         )
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
+
         if last_fmt != "Last 77.640%":
             msg = f"Unaligned data between original and data in Figure: '{last_fmt}'"
+            raise ValueError(msg)
+
+        if (
+            fig_last_fmt_json["data"][-1]["hovertemplate"]
+            != "%{y:.3%}<br>%{x|%Y-%m-%d}"
+        ):
+            msg = "plot_series hovertemplate not as expected"
             raise ValueError(msg)
 
     def test_plot_bars(self: TestOpenTimeSeries) -> None:
