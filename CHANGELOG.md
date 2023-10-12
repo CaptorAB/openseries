@@ -7,6 +7,16 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.7] - 2023-10-12
+
+- makefile fix
+- consolidated simulations for tests
+- updated ruff for dev tools
+- improved doc strings for OpenTimeSeries and OpenFrame
+- added tests on package metadata
+- updated mypy for dev tools
+- added tick format argument to hovertemplate in plots
+
 ## Version [1.3.6] - 2023-10-01
 
 Implemented mypy type checking more strictly. Many in-line ignores that will remain until Pandas
