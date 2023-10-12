@@ -18,7 +18,7 @@ from openseries.series import (
     timeseries_chain,
 )
 from openseries.types import CountriesType, LiteralSeriesProps, ValueType
-from tests.common_sim import ONE_SIM
+from tests.common_sim import FIVE_SIMS
 
 
 class NewTimeSeries(OpenTimeSeries):
@@ -115,7 +115,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     )
     with pytest.raises(
         expected_exception=ValidationError,
-        match="type=list_type|type=string_type",
+        match="type=set_type|type=string_type",
     ):
         serie.countries = countries
 
@@ -131,11 +131,11 @@ class TestOpenTimeSeries(TestCase):
     def setUpClass(cls: type[TestOpenTimeSeries]) -> None:
         """SetUpClass for the TestOpenTimeSeries class."""
         cls.randomseries = OpenTimeSeries.from_df(
-            ONE_SIM.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
+            FIVE_SIMS.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
         ).to_cumret()
 
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
-            ("Asset", ValueType.PRICE)
+            ("Asset_0", ValueType.PRICE)
         ]
 
     def test_setup_class(self: TestOpenTimeSeries) -> None:
@@ -192,7 +192,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid string",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", cast(str, None)],
                 values=[1.0, 1.1],
             )
@@ -202,7 +202,7 @@ class TestOpenTimeSeries(TestCase):
             match="must be called with a collection of some kind",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=cast(list[str], None),
                 values=[1.0, 1.1],
             )
@@ -212,7 +212,7 @@ class TestOpenTimeSeries(TestCase):
             match="must be called with a collection of some kind",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=cast(list[str], "2023-01-01"),
                 values=[1.0, 1.1],
             )
@@ -222,7 +222,7 @@ class TestOpenTimeSeries(TestCase):
             match="Unknown datetime string format",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-bb", "2023-01-02"],
                 values=[1.0, 1.1],
             )
@@ -232,7 +232,7 @@ class TestOpenTimeSeries(TestCase):
             match="Shape of passed values is",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=[],
                 values=[1.0, 1.1],
             )
@@ -244,7 +244,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid number",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=[1.0, cast(float, None)],
             )
@@ -254,7 +254,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=cast(list[float], None),
             )
@@ -264,7 +264,7 @@ class TestOpenTimeSeries(TestCase):
             match="Input should be a valid list",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=cast(list[float], 1.0),
             )
@@ -274,7 +274,7 @@ class TestOpenTimeSeries(TestCase):
             match="could not convert string to float",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=[1.0, cast(float, "bb")],
             )
@@ -284,9 +284,73 @@ class TestOpenTimeSeries(TestCase):
             match="There must be at least 1 value",
         ):
             OpenTimeSeries.from_arrays(
-                name="Asset",
+                name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
                 values=[],
+            )
+
+    def test_dates_values_length_mismatch(self: TestOpenTimeSeries) -> None:
+        """Test dates and values input."""
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="Number of dates and values passed do not match",
+        ):
+            OpenTimeSeries(
+                name="Asset_0",
+                timeseries_id="",
+                instrument_id="",
+                valuetype=ValueType.PRICE,
+                currency="SEK",
+                local_ccy=True,
+                dates=["2023-01-01", "2023-01-02"],
+                values=[1.0, 1.1, 1.05],
+                tsdf=DataFrame(
+                    data=[1.0, 1.1],
+                    index=[
+                        deyt.date()
+                        for deyt in DatetimeIndex(["2023-01-01", "2023-01-02"])
+                    ],
+                    columns=[["Asset_0"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
+            )
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="Number of dates and values passed do not match",
+        ):
+            OpenTimeSeries(
+                name="Asset_0",
+                timeseries_id="",
+                instrument_id="",
+                valuetype=ValueType.PRICE,
+                currency="SEK",
+                local_ccy=True,
+                dates=["2023-01-01", "2023-01-02", "2023-01-03"],
+                values=[1.0, 1.1],
+                tsdf=DataFrame(
+                    data=[1.0, 1.1],
+                    index=[
+                        deyt.date()
+                        for deyt in DatetimeIndex(["2023-01-01", "2023-01-02"])
+                    ],
+                    columns=[["Asset_0"], [ValueType.PRICE]],
+                    dtype="float64",
+                ),
+            )
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="Number of dates and values passed do not match",
+        ):
+            OpenTimeSeries(
+                name="Asset_0",
+                timeseries_id="",
+                instrument_id="",
+                valuetype=ValueType.PRICE,
+                currency="SEK",
+                local_ccy=True,
+                dates=["2023-01-01", "2023-01-02"],
+                values=[1.0, 1.1],
+                tsdf=DataFrame(),
             )
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
@@ -465,18 +529,14 @@ class TestOpenTimeSeries(TestCase):
         with self.assertLogs() as contextmgr:
             _ = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
 
-        if contextmgr.output != [
-            "WARNING:root:label missing. Adding 'Series' as label",
-        ]:
+        if contextmgr.output != ["WARNING:root:Label missing. Adding:"]:
             msg = "OpenTimeSeries failed to log warning about label missing."
             raise ValueError(msg)
 
         with self.assertLogs() as contextmgr:
             _ = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
 
-        if contextmgr.output != [
-            "WARNING:root:valuetype missing. Adding 'Price(Close)' as valuetype",
-        ]:
+        if contextmgr.output != ["WARNING:root:valuetype missing. Adding: "]:
             msg = "OpenTimeSeries failed to log warning about valuetype missing."
             raise ValueError(msg)
 
@@ -551,7 +611,7 @@ class TestOpenTimeSeries(TestCase):
         ]
         for kwarg in kwargs:
             data = jseries.to_json(**kwarg)  # type: ignore[arg-type]
-            if [item.get("name") for item in data] != ["Asset"]:
+            if [item.get("name") for item in data] != ["Asset_0"]:
                 msg = "Unexpected data from json"
                 raise ValueError(msg)
 
@@ -832,23 +892,23 @@ class TestOpenTimeSeries(TestCase):
 
         result_values = {}
         for value in result.index:
-            if isinstance(result.loc[value, ("Asset", ValueType.PRICE)], float):
+            if isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], float):
                 result_values[
                     value
-                ] = f"{result.loc[value, ('Asset', ValueType.PRICE)]:.10f}"
-            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], int):
+                ] = f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
+            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
                 result_values[
                     value
                 ] = result.loc[  # type: ignore[assignment,unused-ignore]
                     value,
-                    ("Asset", ValueType.PRICE),
+                    ("Asset_0", ValueType.PRICE),
                 ]
-            elif isinstance(result.loc[value, ("Asset", ValueType.PRICE)], dt.date):
+            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
                     dt.date,
                     result.loc[
                         value,
-                        ("Asset", ValueType.PRICE),
+                        ("Asset_0", ValueType.PRICE),
                     ],
                 ).strftime("%Y-%m-%d")
             else:
@@ -1223,8 +1283,13 @@ class TestOpenTimeSeries(TestCase):
         )
         fig_last_json = loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
+
         if f"{last:.10f}" != "0.7764037824":
             msg = f"Unaligned data between original and data in Figure: '{last:.10f}'"
+            raise ValueError(msg)
+
+        if fig_last_json["data"][-1]["hovertemplate"] != "%{y}<br>%{x|%Y-%m-%d}":
+            msg = "plot_series hovertemplate not as expected"
             raise ValueError(msg)
 
         fig_last_fmt, _ = plotseries.plot_series(
@@ -1235,8 +1300,16 @@ class TestOpenTimeSeries(TestCase):
         )
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
+
         if last_fmt != "Last 77.640%":
             msg = f"Unaligned data between original and data in Figure: '{last_fmt}'"
+            raise ValueError(msg)
+
+        if (
+            fig_last_fmt_json["data"][-1]["hovertemplate"]
+            != "%{y:.3%}<br>%{x|%Y-%m-%d}"
+        ):
+            msg = "plot_series hovertemplate not as expected"
             raise ValueError(msg)
 
     def test_plot_bars(self: TestOpenTimeSeries) -> None:
@@ -1344,9 +1417,13 @@ class TestOpenTimeSeries(TestCase):
         adf = DataFrame(
             data=asim,
             index=d_range,
-            columns=[["Asset"], [ValueType.PRICE]],
+            columns=[["Asset_0"], [ValueType.PRICE]],
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+
+        if aseries.countries != "SE":
+            msg = "Base case test_align_index_to_local_cdays not set up as intended"
+            raise ValueError(msg)
 
         midsummer = dt.date(2020, 6, 19)
         if midsummer not in d_range:
@@ -1453,7 +1530,18 @@ class TestOpenTimeSeries(TestCase):
         if basecase.dates != ["2017-05-29"]:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
+
         if basecase.values != [100.0]:  # noqa: PD011
+            msg = "Validations base case setup failed"
+            raise ValueError(msg)
+
+        basecase.countries = ["SE", "US"]
+        if basecase.countries != {"SE", "US"}:
+            msg = "Validations base case setup failed"
+            raise ValueError(msg)
+
+        basecase.countries = ["SE", "SE"]
+        if basecase.countries != {"SE"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
@@ -1802,7 +1890,7 @@ class TestOpenTimeSeries(TestCase):
         lseries = self.randomseries.from_deepcopy()
 
         if cast(tuple[str, str], lseries.tsdf.columns[0]) != (
-            "Asset",
+            "Asset_0",
             ValueType.PRICE,
         ):
             msg = "set_new_label() base case not working as intended"

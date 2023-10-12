@@ -58,7 +58,10 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 class OpenTimeSeries(CommonModel):  # type: ignore[misc]
 
     """
-    Declare OpenTimeSeries.
+    OpenTimeSeries objects are at the core of the openseries package.
+
+    The intended use is to allow analyses of financial timeseries.
+    It is only intended for daily or less frequent data samples.
 
     Parameters
     ----------
@@ -117,6 +120,13 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
             raise ValueError(msg)
         if values_list_length < 1:
             msg = "There must be at least 1 value"
+            raise ValueError(msg)
+        if (
+            (dates_list_length != values_list_length)
+            or (len(self.tsdf.index) != self.tsdf.shape[0])
+            or (self.tsdf.shape[1] != 1)
+        ):
+            msg = "Number of dates and values passed do not match"
             raise ValueError(msg)
         return self
 
@@ -246,7 +256,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
                 ):
                     label = "Series"
-                    warning(msg=f"label missing. Adding '{label}' as label")
+                    warning(msg="Label missing. Adding:", extra={"label": label})
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
                 if check_if_none(
@@ -254,10 +264,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
                 ):
                     valuetype = ValueType.PRICE
                     warning(
-                        msg=(
-                            "valuetype missing. Adding "
-                            f"'{valuetype.value}' as valuetype"
-                        ),
+                        msg="valuetype missing. Adding: ",
+                        extra={"valuetype": valuetype.value},
                     )
                 else:
                     valuetype = dframe.columns.get_level_values(1).to_numpy()[

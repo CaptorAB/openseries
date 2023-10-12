@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.291'
+    rev: 'v0.0.292'
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
@@ -16,7 +16,7 @@ repos:
         additional_dependencies:
         - types-all
         - pydantic>=2.4.2
-        - types-openpyxl>=3.1.0.20
+        - types-openpyxl>=3.1.0.21
         - pandas-stubs>=2.1.1.230928
         - types-python-dateutil>=2.8.19.14
   - repo: https://github.com/pre-commit/pygrep-hooks

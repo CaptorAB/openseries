@@ -5,7 +5,10 @@ import datetime as dt
 from typing import Optional, Union, cast
 
 from dateutil.relativedelta import relativedelta
-from holidays import country_holidays, list_supported_countries
+from holidays import (  # type: ignore[import-untyped,unused-ignore]
+    country_holidays,
+    list_supported_countries,
+)
 from numpy import array, busdaycalendar, datetime64, is_busday, where
 from pandas import DataFrame, DatetimeIndex, Series, Timestamp, concat, date_range
 from pandas.tseries.offsets import CustomBusinessDay

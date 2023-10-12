@@ -7,7 +7,7 @@ from typing import Annotated, ClassVar, Literal, Union
 
 from numpy import datetime64
 from pandas import Timestamp
-from pydantic import BaseModel, Field, StringConstraints, conlist
+from pydantic import BaseModel, Field, StringConstraints, conlist, conset
 
 CountryStringType = Annotated[
     str,
@@ -20,8 +20,8 @@ CountryStringType = Annotated[
         strict=True,
     ),
 ]
-CountryListType = conlist(
-    CountryStringType,
+CountryListType = conset(
+    item_type=CountryStringType,
     min_length=1,
 )
 CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]
@@ -56,11 +56,15 @@ class Currency(BaseModel):
 
 DateListType = Annotated[
     list[str],
-    conlist(
+    conset(
         Annotated[
             str,
             StringConstraints(
                 pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$",
+                strip_whitespace=True,
+                strict=True,
+                min_length=10,
+                max_length=10,
             ),
         ],
         min_length=1,
@@ -69,7 +73,15 @@ DateListType = Annotated[
 
 ValueListType = Annotated[list[float], conlist(float, min_length=1)]
 
-DatabaseIdStringType = Annotated[str, StringConstraints(pattern=r"^([0-9a-f]{24})?$")]
+DatabaseIdStringType = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"^([0-9a-f]{24})?$",
+        strict=True,
+        strip_whitespace=True,
+        max_length=24,
+    ),
+]
 
 DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 

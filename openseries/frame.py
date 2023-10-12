@@ -8,8 +8,11 @@ from functools import reduce
 from logging import warning
 from typing import Optional, Union, cast
 
-import statsmodels.api as sm  # type: ignore[import]
-from ffn.core import calc_erc_weights, calc_mean_var_weights  # type: ignore[import]
+import statsmodels.api as sm  # type: ignore[import-untyped]
+from ffn.core import (  # type: ignore[import-untyped]
+    calc_erc_weights,
+    calc_mean_var_weights,
+)
 from numpy import cov, cumprod, log, sqrt
 from pandas import (
     DataFrame,
@@ -23,7 +26,7 @@ from pandas import (
 from pydantic import field_validator
 
 # noinspection PyProtectedMember
-from statsmodels.regression.linear_model import (  # type: ignore[import]
+from statsmodels.regression.linear_model import (  # type: ignore[import-untyped]
     RegressionResults,
 )
 
@@ -61,7 +64,9 @@ from openseries.types import (
 class OpenFrame(CommonModel):  # type: ignore[misc]
 
     """
-    Declare OpenFrame.
+    OpenFrame objects hold OpenTimeSeries in the list constituents.
+
+    The intended use is to allow comparisons across these timeseries.
 
     Parameters
     ----------
@@ -99,7 +104,9 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         weights: Optional[list[float]] = None,
     ) -> None:
         """
-        Object of the class OpenFrame.
+        OpenFrame objects hold OpenTimeSeries in the list constituents.
+
+        The intended use is to allow comparisons across these timeseries.
 
         Parameters
         ----------
@@ -916,15 +923,19 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             )
         if len(set(self.first_indices)) != 1:
             warning(
-                f"One or more constituents still not truncated to same "
-                f"start dates.\n"
-                f"{self.tsdf.head()}",
+                msg=(
+                    "One or more constituents still "
+                    "not truncated to same start dates."
+                ),
+                extra={"tsdf.head": self.tsdf.head()},
             )
         if len(set(self.last_indices)) != 1:
             warning(
-                f"One or more constituents still not truncated to same "
-                f"end dates.\n"
-                f"{self.tsdf.tail()}",
+                msg=(
+                    "One or more constituents still "
+                    "not truncated to same end dates."
+                ),
+                extra={"tsdf.tail": self.tsdf.tail()},
             )
         return self
 
