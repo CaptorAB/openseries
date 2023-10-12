@@ -24,35 +24,28 @@ class TestPackage(TestCase):
         toml_version = tomlload(pyproject_file)["tool"]["poetry"]["version"]
 
         attribute_names = [
-            "name",
-            "summary",
-            "version",
-            "version",
-            "home_page",
-            "license",
+            "Name",
+            "Summary",
+            "Version",
+            "Home-page",
+            "License",
+            "Requires-Python",
         ]
         expected_values = [
             "openseries",
             "Package for simple financial time series analysis.",
-            package_metadata["Version"],
             toml_version,
             "https://github.com/CaptorAB/OpenSeries",
             "BSD-3-Clause",
+            ">=3.9,<3.12",
         ]
         for name, value in zip(attribute_names, expected_values):
-            if package_metadata.json.get(name) != value:
+            if package_metadata[name] != value:
                 msg = (
                     f"Package metadata {name} not as "
-                    f"expected: {package_metadata.json.get(name)}"
+                    f"expected: {package_metadata[name]}"
                 )
                 raise ValueError(msg)
-
-        if package_metadata["requires-python"] != ">=3.9,<3.12":
-            msg = (
-                "Package metadata requires-python not as "
-                f"expected: {package_metadata['requires-python']}"
-            )
-            raise ValueError(msg)
 
     def test_pandas_futurewarning_handling(self: TestPackage) -> None:
         """Test that Pandas FutureWarning is handled appropriately."""
