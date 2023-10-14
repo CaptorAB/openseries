@@ -922,21 +922,19 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
                 copy=False,
             )
         if len(set(self.first_indices)) != 1:
-            warning(
-                msg=(
-                    "One or more constituents still "
-                    "not truncated to same start dates."
-                ),
-                extra={"tsdf.head": self.tsdf.head()},
+            msg = (
+                f"One or more constituents still "
+                f"not truncated to same start dates.\n"
+                f"{self.tsdf.head()}"
             )
+            warning(msg=msg)
         if len(set(self.last_indices)) != 1:
-            warning(
-                msg=(
-                    "One or more constituents still "
-                    "not truncated to same end dates."
-                ),
-                extra={"tsdf.tail": self.tsdf.tail()},
+            msg = (
+                f"One or more constituents still "
+                f"not truncated to same end dates.\n"
+                f"{self.tsdf.tail()}"
             )
+            warning(msg=msg)
         return self
 
     def relative(
