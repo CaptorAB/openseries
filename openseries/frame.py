@@ -971,6 +971,9 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             self.tsdf[rel_label, ValueType.RELRTRN] = (
                 1.0 + self.tsdf.iloc[:, long_column] - self.tsdf.iloc[:, short_column]
             )
+        self.constituents += [
+            OpenTimeSeries.from_df(self.tsdf.iloc[:, -1]),
+        ]
 
     def tracking_error_func(
         self: OpenFrame,

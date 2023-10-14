@@ -2180,8 +2180,26 @@ class TestOpenFrame(TestCase):
         rframe.to_cumret()
         sframe = self.randomframe.from_deepcopy()
         sframe.to_cumret()
+        series_before = 5
+        series_after = 6
+
+        if rframe.item_count != series_before:
+            msg = "Metod relative() base case not as intended"
+            raise ValueError(msg)
 
         rframe.relative()
+
+        if rframe.item_count != series_after:
+            msg = "Metod relative() not working as intended"
+            raise ValueError(msg)
+
+        if rframe.tsdf.shape[1] != series_after:
+            msg = "Metod relative() not working as intended"
+            raise ValueError(msg)
+
+        if rframe.constituents[-1].label != "Asset_0_over_Asset_1":
+            msg = "Metod relative() not working as intended"
+            ValueError(msg)
 
         if rframe.columns_lvl_zero[-1] != "Asset_0_over_Asset_1":
             msg = "Metod relative() not working as intended"
