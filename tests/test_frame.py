@@ -9,13 +9,16 @@ from json import loads
 from pathlib import Path
 from typing import Hashable, Optional, Union, cast
 from unittest import TestCase
+from unittest.mock import patch
 
 import pytest
-from pandas import DataFrame, Series, date_range
+from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
+from requests.exceptions import ConnectionError
 
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
+from openseries.load_plotly import load_plotly_dict
 from openseries.risk import cvar_down_calc, var_down_calc
 from openseries.series import OpenTimeSeries
 from openseries.types import (
@@ -49,15 +52,23 @@ class TestOpenFrame(TestCase):
             ],
         )
 
-    def test_save_to_json(self: TestOpenFrame) -> None:
+    def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
-        directory = Path(__file__).resolve().parent
-        framefile = directory.joinpath("framesaved.json")
-
         jframe = self.randomframe.from_deepcopy()
+
+        filename = "framesaved.json"
+        if Path.home().joinpath("Documents").exists():
+            framefile = Path.home().joinpath("Documents").joinpath(filename)
+        else:
+            framefile = Path(__file__).resolve().parent.joinpath(filename)
+
+        if Path(framefile).exists():
+            msg = "test_save_to_json test case setup failed."
+            raise FileExistsError(msg)
+
         kwargs = [
-            {"filename": str(directory.joinpath("framesaved.json"))},
-            {"filename": "framesaved.json", "directory": directory},
+            {"filename": str(framefile)},
+            {"filename": "framesaved.json", "directory": str(framefile.parent)},
         ]
         for kwarg in kwargs:
             data = jframe.to_json(**kwarg)  # type: ignore[arg-type]
@@ -81,12 +92,45 @@ class TestOpenFrame(TestCase):
                 msg = "json file not deleted as intended"
                 raise FileExistsError(msg)
 
-    def test_save_to_xlsx(self: TestOpenFrame) -> None:
+        localfile = Path(__file__).resolve().parent.joinpath(filename)
+
+        with patch("pathlib.Path.exists") as mock_doesnotexist:
+            mock_doesnotexist.return_value = False
+            data = jframe.to_json(filename=filename)
+
+        if [item.get("name") for item in data] != [
+            "Asset_0",
+            "Asset_1",
+            "Asset_2",
+            "Asset_3",
+            "Asset_4",
+        ]:
+            msg = "Unexpected data from json"
+            raise ValueError(msg)
+
+        localfile.unlink()
+
+    def test_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""
         xseries = self.randomframe.from_deepcopy()
+
+        filename = "trial.xlsx"
+        if Path.home().joinpath("Documents").exists():
+            basefile = Path.home().joinpath("Documents").joinpath(filename)
+        else:
+            basefile = Path(__file__).resolve().parent.joinpath(filename)
+
+        if Path(basefile).exists():
+            msg = "test_save_to_xlsx test case setup failed."
+            raise FileExistsError(msg)
+
         seriesfile = Path(
-            xseries.to_xlsx(filename="trial.xlsx", sheet_title="boo"),
+            xseries.to_xlsx(filename=filename, sheet_title="boo"),
         ).resolve()
+
+        if basefile != seriesfile:
+            msg = "test_save_to_xlsx test case setup failed."
+            raise ValueError(msg)
 
         if not Path(seriesfile).exists():
             msg = "xlsx file not created"
@@ -114,6 +158,48 @@ class TestOpenFrame(TestCase):
             match="Filename must end with .xlsx",
         ):
             _ = xseries.to_xlsx(filename="trial.pdf")
+
+        with Path.open(basefile, "w") as fakefile:
+            fakefile.write("Hello world")
+
+        with pytest.raises(
+            expected_exception=FileExistsError,
+            match=f"{filename} already exists.",
+        ):
+            _ = xseries.to_xlsx(filename=filename, overwrite=False)
+
+        basefile.unlink()
+
+        localfile = Path(__file__).resolve().parent.joinpath(filename)
+        with patch("pathlib.Path.exists") as mock_doesnotexist:
+            mock_doesnotexist.return_value = False
+            seriesfile = Path(xseries.to_xlsx(filename=filename)).resolve()
+
+        if localfile != seriesfile:
+            msg = "test_save_to_xlsx test case setup failed."
+            raise ValueError(msg)
+
+        dframe = read_excel(
+            io=seriesfile,
+            header=0,
+            index_col=0,
+            usecols="A:F",
+            skiprows=[1, 2],
+            engine="openpyxl",
+        )
+
+        df_index = [dejt.date().strftime("%Y-%m-%d") for dejt in dframe.head().index]
+        if df_index != [
+            "2009-06-30",
+            "2009-07-01",
+            "2009-07-02",
+            "2009-07-03",
+            "2009-07-06",
+        ]:
+            msg = "save_to_xlsx not working as intended."
+            raise ValueError(msg)
+
+        seriesfile.unlink()
 
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
@@ -1058,6 +1144,18 @@ class TestOpenFrame(TestCase):
         ):
             _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
 
+        _, logo = load_plotly_dict()
+
+        fig_logo, _ = plotframe.plot_series(auto_open=False, add_logo=True)
+        if fig_logo["layout"]["images"][0]["source"] != logo["source"]:
+            msg = "plot_series add_logo argument not setup correctly"
+            raise ValueError(msg)
+
+        fig_nologo, _ = plotframe.plot_series(auto_open=False, add_logo=False)
+        if len(fig_nologo["layout"]["images"]) != 0:
+            msg = "plot_series add_logo argument not setup correctly"
+            raise ValueError(msg)
+
     def test_plot_bars(self: TestOpenFrame) -> None:
         """Test plot_bars method."""
         plotframe = self.randomframe.from_deepcopy()
@@ -1107,6 +1205,86 @@ class TestOpenFrame(TestCase):
         if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
             msg = "Data in Figure not as intended."
             raise ValueError(msg)
+
+        _, logo = load_plotly_dict()
+
+        fig_logo, _ = plotframe.plot_bars(auto_open=False, add_logo=True)
+        if fig_logo["layout"]["images"][0]["source"] != logo["source"]:
+            msg = "plot_bars add_logo argument not setup correctly"
+            raise ValueError(msg)
+
+        fig_nologo, _ = plotframe.plot_bars(auto_open=False, add_logo=False)
+        if len(fig_nologo["layout"]["images"]) != 0:
+            msg = "plot_bars add_logo argument not setup correctly"
+            raise ValueError(msg)
+
+    def test_plot_methods_mock_logo_url_fail(self: TestOpenFrame) -> None:
+        """Test plot_series and plot_bars methods with mock logo file URL fail."""
+        plotframe = self.randomframe.from_deepcopy()
+
+        with patch("requests.head") as mock_conn_error:
+            mock_conn_error.side_effect = ConnectionError()
+
+            seriesfig, _ = plotframe.plot_series(auto_open=False, add_logo=True)
+            if seriesfig["layout"]["images"][0]["source"]:
+                msg = "plot_series add_logo argument not setup correctly"
+                raise ValueError(msg)
+
+            barfig, _ = plotframe.plot_bars(auto_open=False, add_logo=True)
+            if barfig["layout"]["images"][0]["source"]:
+                msg = "plot_bars add_logo argument not setup correctly"
+                raise ValueError(msg)
+
+            with self.assertLogs() as plotseries_context:
+                _, _ = plotframe.plot_series(auto_open=False)
+            if (
+                "WARNING:root:Failed to add logo image from URL"
+                not in plotseries_context.output[0]
+            ):
+                msg = (
+                    "plot_series() method did not warn as "
+                    "expected when logo URL not working"
+                )
+                raise ValueError(msg)
+
+            with self.assertLogs() as plotbars_context:
+                _, _ = plotframe.plot_bars(auto_open=False)
+            if (
+                "WARNING:root:Failed to add logo image from URL"
+                not in plotbars_context.output[0]
+            ):
+                msg = (
+                    "plot_bars() method did not warn as "
+                    "expected when logo URL not working"
+                )
+                raise ValueError(msg)
+
+        with patch("requests.head") as mock_statuscode:
+            mock_statuscode.return_value.status_code = 400
+
+            with self.assertLogs() as plotseries_context:
+                _, _ = plotframe.plot_series(auto_open=False)
+            if (
+                "WARNING:root:Failed to add logo image from URL"
+                not in plotseries_context.output[0]
+            ):
+                msg = (
+                    "plot_series() method did not warn as "
+                    "expected when logo URL not working"
+                )
+                raise ValueError(msg)
+
+            with self.assertLogs() as plotbars_context:
+                _, _ = plotframe.plot_bars(auto_open=False)
+            if (
+                "WARNING:root:Failed to add logo image from URL"
+                not in plotbars_context.output[0]
+            ):
+                msg = (
+                    "plot_bars() method did not warn as "
+                    "expected when logo URL not working"
+                )
+                raise ValueError(msg)
 
     def test_passed_empty_list(self: TestOpenFrame) -> None:
         """Test warning on object construct with empty list."""

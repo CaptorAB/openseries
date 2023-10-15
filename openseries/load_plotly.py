@@ -2,9 +2,37 @@
 from __future__ import annotations
 
 from json import load
+from logging import warning
 from pathlib import Path
 
+import requests
+
 from openseries.types import CaptorLogoType, PlotlyLayoutType
+
+
+def check_remote_file_existence(url: str) -> bool:
+    """
+    Check if remote file exists.
+
+    Parameters
+    ----------
+    url: str
+        Path to remote file
+
+    Returns
+    -------
+    bool
+        True if url is valid and False otherwise
+    """
+    ok_code = 200
+
+    try:
+        response = requests.head(url, timeout=30)
+        if response.status_code != ok_code:
+            return False
+    except requests.exceptions.ConnectionError:
+        return False
+    return True
 
 
 def load_plotly_dict(
@@ -31,6 +59,11 @@ def load_plotly_dict(
         fig = load(layout_file)
     with Path.open(logofile, encoding="utf-8") as logo_file:
         logo = load(logo_file)
+
+    if check_remote_file_existence(url=logo["source"]) is False:
+        msg = f"Failed to add logo image from URL {logo['source']}"
+        warning(msg)
+        logo = {}
 
     fig["config"].update({"responsive": responsive})
 
