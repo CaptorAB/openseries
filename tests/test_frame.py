@@ -1266,7 +1266,7 @@ class TestOpenFrame(TestCase):
                 raise ValueError(msg)
 
             with self.assertLogs() as plotseries_context:
-                _, _ = plotframe.plot_series(auto_open=False)
+                _, _ = plotframe.plot_series(auto_open=False, output_type="div")
             if (
                 "WARNING:root:Failed to add logo image from URL"
                 not in plotseries_context.output[0]
@@ -1278,7 +1278,7 @@ class TestOpenFrame(TestCase):
                 raise ValueError(msg)
 
             with self.assertLogs() as plotbars_context:
-                _, _ = plotframe.plot_bars(auto_open=False)
+                _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
             if (
                 "WARNING:root:Failed to add logo image from URL"
                 not in plotbars_context.output[0]
@@ -1293,7 +1293,7 @@ class TestOpenFrame(TestCase):
             mock_statuscode.return_value.status_code = 400
 
             with self.assertLogs() as plotseries_context:
-                _, _ = plotframe.plot_series(auto_open=False)
+                _, _ = plotframe.plot_series(auto_open=False, output_type="div")
             if (
                 "WARNING:root:Failed to add logo image from URL"
                 not in plotseries_context.output[0]
@@ -1305,7 +1305,7 @@ class TestOpenFrame(TestCase):
                 raise ValueError(msg)
 
             with self.assertLogs() as plotbars_context:
-                _, _ = plotframe.plot_bars(auto_open=False)
+                _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
             if (
                 "WARNING:root:Failed to add logo image from URL"
                 not in plotbars_context.output[0]
