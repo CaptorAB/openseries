@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from inspect import stack
 from json import dump
 from math import ceil
 from pathlib import Path
@@ -466,8 +467,10 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         """
         if directory:
             dirpath = Path(directory).resolve()
+        elif Path.home().joinpath("Documents").exists():
+            dirpath = Path.home().joinpath("Documents")
         else:
-            dirpath = Path(__file__).resolve().parent
+            dirpath = Path(stack()[1].filename).parent
 
         cleaner_list = ["label", "tsdf"]
         data = dict(self.__dict__)
@@ -500,6 +503,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         filename: str,
         sheet_title: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
+        overwrite: bool = True,  # noqa: FBT001, FBT002
     ) -> str:
         """
         Save .tsdf DataFrame to an Excel spreadsheet file.
@@ -512,6 +516,8 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Name of the sheet in the Excel file
         directory: DirectoryPath, optional
             The file directory where the Excel file is saved.
+        overwrite: bool, default: True
+            Flag whether to overwrite an existing file
 
         Returns
         -------
@@ -521,10 +527,14 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         if filename[-5:].lower() != ".xlsx":
             msg = "Filename must end with .xlsx"
             raise NameError(msg)
+
         if directory:
             dirpath = Path(directory).resolve()
+        elif Path.home().joinpath("Documents").exists():
+            dirpath = Path.home().joinpath("Documents")
         else:
-            dirpath = Path(__file__).resolve().parent
+            dirpath = Path(stack()[1].filename).parent
+
         sheetfile = dirpath.joinpath(filename)
 
         wrkbook = Workbook()
@@ -535,6 +545,10 @@ class CommonModel(BaseModel):  # type: ignore[misc]
 
         for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
             wrksheet.append(row)  # type: ignore[union-attr]
+
+        if not overwrite and Path(sheetfile).exists():
+            msg = f"{sheetfile!s} already exists."
+            raise FileExistsError(msg)
 
         wrkbook.save(sheetfile)
 

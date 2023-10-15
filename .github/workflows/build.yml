@@ -28,7 +28,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Update pip
-        run: pip install --upgrade pip
+        run: |
+          if ${{ matrix.os == 'windows-latest' }}; then
+            python.exe -m pip install --upgrade pip
+          else
+            pip install --upgrade pip
+          fi
 
       - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
         uses: abatilo/actions-poetry@v2

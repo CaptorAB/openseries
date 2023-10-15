@@ -256,17 +256,16 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
                 ):
                     label = "Series"
-                    warning(msg="Label missing. Adding:", extra={"label": label})
+                    msg = f"Label missing. Adding: {label}"
+                    warning(msg=msg)
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
                 if check_if_none(
                     dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
                 ):
                     valuetype = ValueType.PRICE
-                    warning(
-                        msg="valuetype missing. Adding: ",
-                        extra={"valuetype": valuetype.value},
-                    )
+                    msg = f"valuetype missing. Adding: {valuetype.value}"
+                    warning(msg=msg)
                 else:
                     valuetype = dframe.columns.get_level_values(1).to_numpy()[
                         column_nmbr
