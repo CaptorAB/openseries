@@ -1095,12 +1095,12 @@ class TestOpenFrame(TestCase):
         _, figfile = plotframe.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
-            msg = "json file not created"
+            msg = "html file not created"
             raise FileNotFoundError(msg)
 
         plotfile.unlink()
         if plotfile.exists():
-            msg = "json file not deleted as intended"
+            msg = "html file not deleted as intended"
             raise FileExistsError(msg)
 
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
@@ -1146,13 +1146,23 @@ class TestOpenFrame(TestCase):
 
         _, logo = load_plotly_dict()
 
-        fig_logo, _ = plotframe.plot_series(auto_open=False, add_logo=True)
-        if fig_logo["layout"]["images"][0]["source"] != logo["source"]:
+        fig_logo, _ = plotframe.plot_series(
+            auto_open=False,
+            add_logo=True,
+            output_type="div",
+        )
+        fig_logo_json = loads(fig_logo.to_json())
+        if fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_series add_logo argument not setup correctly"
             raise ValueError(msg)
 
-        fig_nologo, _ = plotframe.plot_series(auto_open=False, add_logo=False)
-        if len(fig_nologo["layout"]["images"]) != 0:
+        fig_nologo, _ = plotframe.plot_series(
+            auto_open=False,
+            add_logo=False,
+            output_type="div",
+        )
+        fig_nologo_json = loads(fig_nologo.to_json())
+        if fig_nologo_json["layout"].get("images", None):
             msg = "plot_series add_logo argument not setup correctly"
             raise ValueError(msg)
 
@@ -1164,12 +1174,12 @@ class TestOpenFrame(TestCase):
         _, figfile = plotframe.plot_bars(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
-            msg = "json file not created"
+            msg = "html file not created"
             raise FileNotFoundError(msg)
 
         plotfile.unlink()
         if plotfile.exists():
-            msg = "json file not deleted as intended"
+            msg = "html file not deleted as intended"
             raise FileExistsError(msg)
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
@@ -1208,13 +1218,23 @@ class TestOpenFrame(TestCase):
 
         _, logo = load_plotly_dict()
 
-        fig_logo, _ = plotframe.plot_bars(auto_open=False, add_logo=True)
-        if fig_logo["layout"]["images"][0]["source"] != logo["source"]:
+        fig_logo, _ = plotframe.plot_bars(
+            auto_open=False,
+            add_logo=True,
+            output_type="div",
+        )
+        fig_logo_json = loads(fig_logo.to_json())
+        if fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_bars add_logo argument not setup correctly"
             raise ValueError(msg)
 
-        fig_nologo, _ = plotframe.plot_bars(auto_open=False, add_logo=False)
-        if len(fig_nologo["layout"]["images"]) != 0:
+        fig_nologo, _ = plotframe.plot_bars(
+            auto_open=False,
+            add_logo=False,
+            output_type="div",
+        )
+        fig_nologo_json = loads(fig_nologo.to_json())
+        if fig_nologo_json["layout"].get("images", None):
             msg = "plot_bars add_logo argument not setup correctly"
             raise ValueError(msg)
 
@@ -1225,13 +1245,23 @@ class TestOpenFrame(TestCase):
         with patch("requests.head") as mock_conn_error:
             mock_conn_error.side_effect = ConnectionError()
 
-            seriesfig, _ = plotframe.plot_series(auto_open=False, add_logo=True)
-            if seriesfig["layout"]["images"][0]["source"]:
+            seriesfig, _ = plotframe.plot_series(
+                auto_open=False,
+                add_logo=True,
+                output_type="div",
+            )
+            seriesfig_json = loads(seriesfig.to_json())
+            if seriesfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_series add_logo argument not setup correctly"
                 raise ValueError(msg)
 
-            barfig, _ = plotframe.plot_bars(auto_open=False, add_logo=True)
-            if barfig["layout"]["images"][0]["source"]:
+            barfig, _ = plotframe.plot_bars(
+                auto_open=False,
+                add_logo=True,
+                output_type="div",
+            )
+            barfig_json = loads(barfig.to_json())
+            if barfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_bars add_logo argument not setup correctly"
                 raise ValueError(msg)
 
