@@ -7,6 +7,13 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.8] - 2023-10-15
+
+- tightened .to_json() and .to_xlsx() methods. File path now defaults to homepath/Documents and if it does not exist it will save in the directory of the calling function
+- added handing for the evant the the remote Captor logo file is not present.
+- improved scenario coverage in test suite for both of the above changes.
+- fixed .relative() function that previously did not add new dataframe column as item in constituents.
+
 ## Version [1.3.7] - 2023-10-12
 
 - makefile fix
