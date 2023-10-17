@@ -2388,25 +2388,25 @@ class TestOpenFrame(TestCase):
         series_after = 6
 
         if rframe.item_count != series_before:
-            msg = "Metod relative() base case not as intended"
+            msg = "Method relative() base case not as intended"
             raise ValueError(msg)
 
         rframe.relative()
 
         if rframe.item_count != series_after:
-            msg = "Metod relative() not working as intended"
+            msg = "Method relative() not working as intended"
             raise ValueError(msg)
 
         if rframe.tsdf.shape[1] != series_after:
-            msg = "Metod relative() not working as intended"
+            msg = "Method relative() not working as intended"
             raise ValueError(msg)
 
         if rframe.constituents[-1].label != "Asset_0_over_Asset_1":
-            msg = "Metod relative() not working as intended"
+            msg = "Method relative() not working as intended"
             ValueError(msg)
 
         if rframe.columns_lvl_zero[-1] != "Asset_0_over_Asset_1":
-            msg = "Metod relative() not working as intended"
+            msg = "Method relative() not working as intended"
             ValueError(msg)
 
         rframe.tsdf.iloc[:, -1] = rframe.tsdf.iloc[:, -1].add(1.0)
@@ -2417,7 +2417,7 @@ class TestOpenFrame(TestCase):
         sflist = [f"{rret:.11f}" for rret in sframe.tsdf.iloc[:, -1]]
 
         if rflist != sflist:
-            msg = "Metod relative() not working as intended"
+            msg = "Method relative() not working as intended"
             ValueError(msg)
 
     def test_to_cumret(self: TestOpenFrame) -> None:

@@ -163,7 +163,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         instrument_id: DatabaseIdStringType = "",
         isin: Optional[str] = None,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,  # noqa: FBT001, FBT002
+        *,
+        local_ccy: bool = True,
     ) -> OpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
@@ -220,7 +221,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,  # noqa: FBT001, FBT002
+        *,
+        local_ccy: bool = True,
     ) -> OpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
@@ -302,7 +304,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,  # noqa: FBT001, FBT002
+        *,
+        local_ccy: bool = True,
     ) -> OpenTimeSeries:
         """
         Create series from values accruing with a given fixed rate return.
@@ -726,18 +729,18 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
 
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
-        data[self.label, "Returns"] = (
+        data[self.label, ValueType.RTRN] = (
             data.loc[:, self.tsdf.columns.to_numpy()[0]].apply(log).diff()
         )
 
         rawdata = [
-            data.loc[:, (self.label, "Returns")]  # type: ignore[index]
+            data.loc[:, (self.label, ValueType.RTRN)]  # type: ignore[index]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, (self.label, "Returns")].iloc[  # type: ignore[index]
+        for item in data.loc[:, (self.label, ValueType.RTRN)].iloc[  # type: ignore[index]
             1:
         ]:
             previous = rawdata[-1]
@@ -817,7 +820,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         self: OpenTimeSeries,
         lvl_zero: Optional[str] = None,
         lvl_one: Optional[ValueType] = None,
-        delete_lvl_one: bool = False,  # noqa: FBT001, FBT002
+        *,
+        delete_lvl_one: bool = False,
     ) -> OpenTimeSeries:
         """
         Set the column labels of the .tsdf Pandas Dataframe.

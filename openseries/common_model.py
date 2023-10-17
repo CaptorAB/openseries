@@ -503,7 +503,8 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         filename: str,
         sheet_title: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
-        overwrite: bool = True,  # noqa: FBT001, FBT002
+        *,
+        overwrite: bool = True,
     ) -> str:
         """
         Save .tsdf DataFrame to an Excel spreadsheet file.
@@ -561,9 +562,10 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         filename: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
-        auto_open: bool = True,  # noqa: FBT001, FBT002
-        add_logo: bool = True,  # noqa: FBT001, FBT002
         output_type: LiteralPlotlyOutput = "file",
+        *,
+        auto_open: bool = True,
+        add_logo: bool = True,
     ) -> tuple[Figure, str]:
         """
         Create a Plotly Bar Figure.
@@ -583,12 +585,12 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
+        output_type: LiteralPlotlyOutput, default: "file"
+            Determines output type
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
 
         Returns
         -------
@@ -655,10 +657,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         filename: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
-        auto_open: bool = True,  # noqa: FBT001, FBT002
-        add_logo: bool = True,  # noqa: FBT001, FBT002
-        show_last: bool = False,  # noqa: FBT001, FBT002
         output_type: LiteralPlotlyOutput = "file",
+        *,
+        auto_open: bool = True,
+        add_logo: bool = True,
+        show_last: bool = False,
     ) -> tuple[Figure, str]:
         """
         Create a Plotly Scatter Figure.
@@ -678,14 +681,14 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
+        output_type: LiteralPlotlyOutput, default: "file"
+            Determines output type
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
         show_last: bool, default: False
             If True the last self.tsdf point is highlighted as red dot with a label
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
 
         Returns
         -------
@@ -885,8 +888,9 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,  # noqa: FBT001, FBT002
         periods_in_a_year_fixed: Optional[int] = None,
+        *,
+        drift_adjust: bool = False,
     ) -> Union[float, Series[type[float]]]:
         """
         Implied annualized volatility.
@@ -907,11 +911,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
+        drift_adjust: bool, default: False
+            An adjustment to remove the bias implied by the average return
 
         Returns
         -------
@@ -940,8 +944,9 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,  # noqa: FBT001, FBT002
         periods_in_a_year_fixed: Optional[int] = None,
+        *,
+        drift_adjust: bool = False,
     ) -> Union[float, Series[type[float]]]:
         """
         Target weight from VaR.
@@ -968,11 +973,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
         periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
+        drift_adjust: bool, default: False
+            An adjustment to remove the bias implied by the average return
 
         Returns
         -------
@@ -1940,8 +1945,9 @@ def _var_implied_vol_and_target_func(
     from_date: Optional[dt.date] = None,
     to_date: Optional[dt.date] = None,
     interpolation: LiteralQuantileInterp = "lower",
-    drift_adjust: bool = False,  # noqa: FBT001, FBT002
     periods_in_a_year_fixed: Optional[int] = None,
+    *,
+    drift_adjust: bool = False,
 ) -> Union[float, Series[type[float]]]:
     """
     Volatility implied from VaR or Target Weight.
@@ -1972,11 +1978,11 @@ def _var_implied_vol_and_target_func(
         Specific to date
     interpolation: LiteralQuantileInterp, default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
-    drift_adjust: bool, default: False
-        An adjustment to remove the bias implied by the average return
     periods_in_a_year_fixed : int, optional
         Allows locking the periods-in-a-year to simplify test cases and
         comparisons
+    drift_adjust: bool, default: False
+        An adjustment to remove the bias implied by the average return
 
     Returns
     -------

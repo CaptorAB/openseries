@@ -753,30 +753,30 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         for rtn in cols:
-            data[rtn, "Returns"] = (
+            data[rtn, ValueType.RTRN] = (
                 data.loc[:, (rtn, ValueType.PRICE)]  # type: ignore[index]
                 .apply(log)
                 .diff()
             )
 
         raw_one = [
-            data.loc[:, (cols[0], "Returns")]  # type: ignore[index]
+            data.loc[:, (cols[0], ValueType.RTRN)]  # type: ignore[index]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_two = [
-            data.loc[:, (cols[1], "Returns")]  # type: ignore[index]
+            data.loc[:, (cols[1], ValueType.RTRN)]  # type: ignore[index]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_cov = [
             cov(
-                m=data.loc[:, (cols[0], "Returns")]  # type: ignore[index]
+                m=data.loc[:, (cols[0], ValueType.RTRN)]  # type: ignore[index]
                 .iloc[1:day_chunk]
                 .to_numpy(),
-                y=data.loc[:, (cols[1], "Returns")]  # type: ignore[index]
+                y=data.loc[:, (cols[1], ValueType.RTRN)]  # type: ignore[index]
                 .iloc[1:day_chunk]
                 .to_numpy(),
                 ddof=dlta_degr_freedms,
@@ -786,20 +786,20 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         for _, row in data.iloc[1:].iterrows():
             tmp_raw_one = ewma_calc(
-                reeturn=row.loc[cols[0], "Returns"],
+                reeturn=row.loc[cols[0], ValueType.RTRN],
                 prev_ewma=raw_one[-1],
                 time_factor=time_factor,
                 lmbda=lmbda,
             )
             tmp_raw_two = ewma_calc(
-                reeturn=row.loc[cols[1], "Returns"],
+                reeturn=row.loc[cols[1], ValueType.RTRN],
                 prev_ewma=raw_two[-1],
                 time_factor=time_factor,
                 lmbda=lmbda,
             )
             tmp_raw_cov = (
-                row.loc[cols[0], "Returns"]
-                * row.loc[cols[1], "Returns"]
+                row.loc[cols[0], ValueType.RTRN]
+                * row.loc[cols[1], ValueType.RTRN]
                 * time_factor
                 * (1 - lmbda)
                 + raw_cov[-1] * lmbda
@@ -941,7 +941,8 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         self: OpenFrame,
         long_column: int = 0,
         short_column: int = 1,
-        base_zero: bool = True,  # noqa: FBT001, FBT002
+        *,
+        base_zero: bool = True,
     ) -> None:
         """
         Calculate cumulative relative return between two series.
@@ -1430,9 +1431,10 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         self: OpenFrame,
         y_column: Union[tuple[str, ValueType], int],
         x_column: Union[tuple[str, ValueType], int],
-        fitted_series: bool = True,  # noqa: FBT001, FBT002
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
+        *,
+        fitted_series: bool = True,
     ) -> RegressionResults:
         """
         Ordinary Least Squares fit.
@@ -1447,12 +1449,12 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             The column level values of the dependent variable y
         x_column: Union[tuple[str, ValueType], int]
             The column level values of the exogenous variable x
-        fitted_series: bool, default: True
-            If True the fit is added as a new column in the .tsdf Pandas.DataFrame
         method: LiteralOlsFitMethod, default: pinv
             Method to solve least squares problem
         cov_type: LiteralOlsFitCovType, default: nonrobust
             Covariance estimator
+        fitted_series: bool, default: True
+            If True the fit is added as a new column in the .tsdf Pandas.DataFrame
 
         Returns
         -------
