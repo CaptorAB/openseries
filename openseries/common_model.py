@@ -12,8 +12,9 @@ from string import ascii_letters
 from typing import Any, Optional, Union, cast
 
 from numpy import log, sqrt
-from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.workbook.workbook import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 from pandas import DataFrame, DatetimeIndex, Series
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
@@ -542,10 +543,10 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         wrksheet = wrkbook.active
 
         if sheet_title:
-            wrksheet.title = sheet_title  # type: ignore[union-attr]
+            cast(Worksheet, wrksheet).title = sheet_title
 
         for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
-            wrksheet.append(row)  # type: ignore[union-attr]
+            cast(Worksheet, wrksheet).append(row)
 
         if not overwrite and Path(sheetfile).exists():
             msg = f"{sheetfile!s} already exists."
