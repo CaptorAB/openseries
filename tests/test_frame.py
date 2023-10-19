@@ -1657,10 +1657,10 @@ class TestOpenFrame(TestCase):
                     result.loc[value, ("Asset_0", ValueType.PRICE)],
                 )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dtdate):
-                result_values[value] = result.loc[  # type: ignore[union-attr]
-                    value,
-                    ("Asset_0", ValueType.PRICE),
-                ].strftime("%Y-%m-%d")
+                result_values[value] = cast(
+                    dtdate,
+                    result.loc[value, ("Asset_0", ValueType.PRICE)],
+                ).strftime("%Y-%m-%d")
             else:
                 msg = f"all_properties returned unexpected type {type(value)}"
                 raise TypeError(
