@@ -23,7 +23,7 @@ from openseries.simulation import (
     random_generator,
 )
 from openseries.types import ValueType
-from tests.common_sim import FIVE_SIMS, SEED
+from tests.common_sim import SEED, SIMS
 
 
 class TestSimulation(TestCase):
@@ -36,7 +36,7 @@ class TestSimulation(TestCase):
     @classmethod
     def setUpClass(cls: type[TestSimulation]) -> None:
         """SetUpClass for the TestSimulation class."""
-        cls.seriesim = FIVE_SIMS
+        cls.seriesim = SIMS
 
     def test_init_with_without_randomizer(self: TestSimulation) -> None:
         """Test instantiating ReturnSimulation with & without random generator."""

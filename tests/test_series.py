@@ -18,7 +18,7 @@ from openseries.series import (
     timeseries_chain,
 )
 from openseries.types import CountriesType, LiteralSeriesProps, ValueType
-from tests.common_sim import FIVE_SIMS
+from tests.common_sim import SIMSERIES
 
 
 class NewTimeSeries(OpenTimeSeries):
@@ -130,9 +130,7 @@ class TestOpenTimeSeries(TestCase):
     @classmethod
     def setUpClass(cls: type[TestOpenTimeSeries]) -> None:
         """SetUpClass for the TestOpenTimeSeries class."""
-        cls.randomseries = OpenTimeSeries.from_df(
-            FIVE_SIMS.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
-        ).to_cumret()
+        cls.randomseries = SIMSERIES.from_deepcopy()
 
         cls.random_properties = cls.randomseries.all_properties().to_dict()[
             ("Asset_0", ValueType.PRICE)

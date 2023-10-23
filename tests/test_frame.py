@@ -26,7 +26,7 @@ from openseries.types import (
     LiteralPortfolioWeightings,
     ValueType,
 )
-from tests.common_sim import FIVE_SIMS
+from tests.common_sim import SIMFRAME, SIMSERIES
 
 
 class TestOpenFrame(TestCase):
@@ -39,18 +39,8 @@ class TestOpenFrame(TestCase):
     @classmethod
     def setUpClass(cls: type[TestOpenFrame]) -> None:
         """SetUpClass for the TestOpenFrame class."""
-        cls.randomseries = OpenTimeSeries.from_df(
-            FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
-        ).to_cumret()
-        cls.randomframe = OpenFrame(
-            [
-                OpenTimeSeries.from_df(
-                    FIVE_SIMS.to_dataframe(name="Asset", end=dtdate(2019, 6, 30)),
-                    column_nmbr=serie,
-                )
-                for serie in range(FIVE_SIMS.number_of_sims)
-            ],
-        )
+        cls.randomseries = SIMSERIES.from_deepcopy()
+        cls.randomframe = SIMFRAME.from_deepcopy()
 
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
