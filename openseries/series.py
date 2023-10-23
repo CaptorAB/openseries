@@ -43,6 +43,7 @@ from openseries.types import (
     CurrencyStringType,
     DatabaseIdStringType,
     DateListType,
+    DaysInYearType,
     LiteralBizDayFreq,
     LiteralPandasReindexMethod,
     LiteralPandasResampleConvention,
@@ -686,7 +687,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
         """
         Exponentially Weighted Moving Average Model for Volatility.
@@ -708,7 +709,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns
@@ -830,7 +831,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         ----------
         lvl_zero: str, optional
             New level zero label
-        lvl_one: str, optional
+        lvl_one: ValueType, optional
             New level one label
         delete_lvl_one: bool, default: False
             If True the level one label is deleted
@@ -872,7 +873,7 @@ def timeseries_chain(
         Earlier series to chain with
     back: TypeOpenTimeSeries
         Later series to chain with
-    old_fee: bool, default: False
+    old_fee: float, default: 0.0
         Fee to apply to earlier series
 
     Returns

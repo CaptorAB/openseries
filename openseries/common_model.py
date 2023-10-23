@@ -25,6 +25,7 @@ from openseries.datefixer import get_calc_range
 from openseries.load_plotly import load_plotly_dict
 from openseries.risk import cvar_down_calc, drawdown_series, var_down_calc
 from openseries.types import (
+    DaysInYearType,
     LiteralBarPlotMode,
     LiteralLinePlotMode,
     LiteralNanMethod,
@@ -769,7 +770,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         https://www.investopedia.com/terms/a/arithmeticmean.asp.
@@ -783,7 +784,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -829,8 +830,8 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> Union[float, Series]:  # type: ignore[type-arg]
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+    ) -> Union[float, Series[type[float]]]:
         """
         Annualized volatility.
 
@@ -846,7 +847,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns
@@ -869,9 +870,9 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             )
             time_factor = how_many / fraction
 
-        result = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-        result = result.ffill()
-        result = result.pct_change().std() * sqrt(time_factor)
+        data = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+        data = data.ffill()
+        result = data.pct_change().std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
@@ -889,7 +890,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
         *,
         drift_adjust: bool = False,
     ) -> Union[float, Series[type[float]]]:
@@ -912,7 +913,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -945,7 +946,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
         *,
         drift_adjust: bool = False,
     ) -> Union[float, Series[type[float]]]:
@@ -974,7 +975,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -1070,7 +1071,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         Downside Deviation.
@@ -1090,7 +1091,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1430,7 +1431,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         Ratio between arithmetic mean of returns and annualized volatility.
@@ -1452,7 +1453,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1490,7 +1491,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         Sortino Ratio.
@@ -1514,7 +1515,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1895,7 +1896,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         self: CommonModel,
         column: int = 0,
         observations: int = 21,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
         """
         Calculate rolling annualised volatilities.
@@ -1906,7 +1907,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Position as integer of column to calculate
         observations: int, default: 21
             Number of observations in the overlapping window.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1946,7 +1947,7 @@ def _var_implied_vol_and_target_func(
     from_date: Optional[dt.date] = None,
     to_date: Optional[dt.date] = None,
     interpolation: LiteralQuantileInterp = "lower",
-    periods_in_a_year_fixed: Optional[int] = None,
+    periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     *,
     drift_adjust: bool = False,
 ) -> Union[float, Series[type[float]]]:
@@ -1979,7 +1980,7 @@ def _var_implied_vol_and_target_func(
         Specific to date
     interpolation: LiteralQuantileInterp, default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
-    periods_in_a_year_fixed : int, optional
+    periods_in_a_year_fixed : DaysInYearType, optional
         Allows locking the periods-in-a-year to simplify test cases and
         comparisons
     drift_adjust: bool, default: False
