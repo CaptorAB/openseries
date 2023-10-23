@@ -12,7 +12,7 @@ env:
   POETRY_VER: 1.6.1
 
 jobs:
-  codecheck:
+  run_checks:
     runs-on: ubuntu-latest
     defaults:
       run:
