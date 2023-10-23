@@ -2,7 +2,7 @@
 # mypy: disable-error-code="operator,type-arg,unused-ignore"
 from __future__ import annotations
 
-from datetime import date as dtdate
+import datetime as dt
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from itertools import product as iter_product
 from json import loads
@@ -213,21 +213,21 @@ class TestOpenFrame(TestCase):
             expected_exception=ValueError,
             match="Given from_dt date < series start",
         ):
-            _, _ = crframe.calc_range(from_dt=dtdate(2009, 5, 31))
+            _, _ = crframe.calc_range(from_dt=dt.date(2009, 5, 31))
 
         with pytest.raises(
             expected_exception=ValueError,
             match="Given to_dt date > series end",
         ):
-            _, _ = crframe.calc_range(to_dt=dtdate(2019, 7, 31))
+            _, _ = crframe.calc_range(to_dt=dt.date(2019, 7, 31))
 
         with pytest.raises(
             expected_exception=ValueError,
             match="Given from_dt or to_dt dates outside series range",
         ):
             _, _ = crframe.calc_range(
-                from_dt=dtdate(2009, 5, 31),
-                to_dt=dtdate(2019, 7, 31),
+                from_dt=dt.date(2009, 5, 31),
+                to_dt=dt.date(2019, 7, 31),
             )
 
         with pytest.raises(
@@ -235,8 +235,8 @@ class TestOpenFrame(TestCase):
             match="Given from_dt or to_dt dates outside series range",
         ):
             _, _ = crframe.calc_range(
-                from_dt=dtdate(2009, 7, 31),
-                to_dt=dtdate(2019, 7, 31),
+                from_dt=dt.date(2009, 7, 31),
+                to_dt=dt.date(2019, 7, 31),
             )
 
         with pytest.raises(
@@ -244,30 +244,30 @@ class TestOpenFrame(TestCase):
             match="Given from_dt or to_dt dates outside series range",
         ):
             _, _ = crframe.calc_range(
-                from_dt=dtdate(2009, 5, 31),
-                to_dt=dtdate(2019, 5, 31),
+                from_dt=dt.date(2009, 5, 31),
+                to_dt=dt.date(2019, 5, 31),
             )
 
         nst, nen = crframe.calc_range(
-            from_dt=dtdate(2009, 7, 3),
-            to_dt=dtdate(2019, 6, 25),
+            from_dt=dt.date(2009, 7, 3),
+            to_dt=dt.date(2019, 6, 25),
         )
-        if nst != dtdate(2009, 7, 3):
+        if nst != dt.date(2009, 7, 3):
             msg = "Unintended output from calc_range()"
             raise ValueError(msg)
-        if nen != dtdate(2019, 6, 25):
+        if nen != dt.date(2019, 6, 25):
             msg = "Unintended output from calc_range()"
             raise ValueError(msg)
 
         crframe.resample()
 
-        earlier_moved, _ = crframe.calc_range(from_dt=dtdate(2009, 8, 10))
-        if earlier_moved != dtdate(2009, 7, 31):
+        earlier_moved, _ = crframe.calc_range(from_dt=dt.date(2009, 8, 10))
+        if earlier_moved != dt.date(2009, 7, 31):
             msg = "Unintended output from calc_range()"
             raise ValueError(msg)
 
-        _, later_moved = crframe.calc_range(to_dt=dtdate(2009, 8, 20))
-        if later_moved != dtdate(2009, 8, 31):
+        _, later_moved = crframe.calc_range(to_dt=dt.date(2009, 8, 20))
+        if later_moved != dt.date(2009, 8, 31):
             msg = "Unintended output from calc_range()"
             raise ValueError(msg)
 
@@ -297,12 +297,12 @@ class TestOpenFrame(TestCase):
                 OpenTimeSeries.from_fixed_rate(
                     rate=0.01,
                     days=121,
-                    end_dt=dtdate(2023, 5, 15),
+                    end_dt=dt.date(2023, 5, 15),
                 ).set_new_label("A"),
                 OpenTimeSeries.from_fixed_rate(
                     rate=0.01,
                     days=123,
-                    end_dt=dtdate(2023, 5, 16),
+                    end_dt=dt.date(2023, 5, 16),
                 ).set_new_label("B"),
             ],
         )
@@ -311,12 +311,12 @@ class TestOpenFrame(TestCase):
         new_stubs_dates = rsb_stubs_frame.tsdf.index.tolist()
 
         if new_stubs_dates != [
-            dtdate(2023, 1, 15),
-            dtdate(2023, 1, 31),
-            dtdate(2023, 2, 28),
-            dtdate(2023, 3, 31),
-            dtdate(2023, 4, 28),
-            dtdate(2023, 5, 15),
+            dt.date(2023, 1, 15),
+            dt.date(2023, 1, 31),
+            dt.date(2023, 2, 28),
+            dt.date(2023, 3, 31),
+            dt.date(2023, 4, 28),
+            dt.date(2023, 5, 15),
         ]:
             msg = (
                 "resample_to_business_period_ends() method "
@@ -329,12 +329,12 @@ class TestOpenFrame(TestCase):
                 OpenTimeSeries.from_fixed_rate(
                     rate=0.01,
                     days=88,
-                    end_dt=dtdate(2023, 4, 28),
+                    end_dt=dt.date(2023, 4, 28),
                 ).set_new_label("A"),
                 OpenTimeSeries.from_fixed_rate(
                     rate=0.01,
                     days=8,
-                    end_dt=dtdate(2023, 4, 28),
+                    end_dt=dt.date(2023, 4, 28),
                 ).set_new_label("B"),
             ],
         )
@@ -343,10 +343,10 @@ class TestOpenFrame(TestCase):
         new_dates = rsb_frame.tsdf.index.tolist()
 
         if new_dates != [
-            dtdate(2023, 1, 31),
-            dtdate(2023, 2, 28),
-            dtdate(2023, 3, 31),
-            dtdate(2023, 4, 28),
+            dt.date(2023, 1, 31),
+            dt.date(2023, 2, 28),
+            dt.date(2023, 3, 31),
+            dt.date(2023, 4, 28),
         ]:
             msg = (
                 "resample_to_business_period_ends() method "
@@ -359,11 +359,11 @@ class TestOpenFrame(TestCase):
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
         if [
-            dtdate(2016, 9, 27),
-            dtdate(2016, 9, 22),
-            dtdate(2015, 7, 8),
-            dtdate(2017, 2, 6),
-            dtdate(2018, 10, 19),
+            dt.date(2016, 9, 27),
+            dt.date(2016, 9, 22),
+            dt.date(2015, 7, 8),
+            dt.date(2017, 2, 6),
+            dt.date(2018, 10, 19),
         ] != cast(Series, mddframe.max_drawdown_date).tolist():
             msg = "max_drawdown_date property generated unexpected result"
             raise ValueError(msg)
@@ -383,22 +383,22 @@ class TestOpenFrame(TestCase):
         true_tail = DataFrame(
             columns=[[name], [ValueType.PRICE]],
             index=[
-                dtdate(2019, 6, 24),
-                dtdate(2019, 6, 25),
-                dtdate(2019, 6, 26),
-                dtdate(2019, 6, 27),
-                dtdate(2019, 6, 28),
+                dt.date(2019, 6, 24),
+                dt.date(2019, 6, 25),
+                dt.date(2019, 6, 26),
+                dt.date(2019, 6, 27),
+                dt.date(2019, 6, 28),
             ],
             data=correct,
         )
         false_tail = DataFrame(
             columns=[[name], [ValueType.PRICE]],
             index=[
-                dtdate(2019, 6, 24),
-                dtdate(2019, 6, 25),
-                dtdate(2019, 6, 26),
-                dtdate(2019, 6, 27),
-                dtdate(2019, 6, 28),
+                dt.date(2019, 6, 24),
+                dt.date(2019, 6, 25),
+                dt.date(2019, 6, 26),
+                dt.date(2019, 6, 27),
+                dt.date(2019, 6, 28),
             ],
             data=wrong,
         )
@@ -1333,9 +1333,9 @@ class TestOpenFrame(TestCase):
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast(int, dtdate(2017, 6, 27)) : cast(  # type: ignore[index]
+                cast(int, dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
                     int,
-                    dtdate(2018, 6, 27),
+                    dt.date(2018, 6, 27),
                 ),
                 ("Asset_0", ValueType.PRICE),
             ],
@@ -1344,12 +1344,12 @@ class TestOpenFrame(TestCase):
         frame = OpenFrame([series_long, series_short])
 
         firsts = [
-            dtdate(2017, 6, 27),
-            dtdate(2017, 6, 27),
+            dt.date(2017, 6, 27),
+            dt.date(2017, 6, 27),
         ]
         lasts = [
-            dtdate(2018, 6, 27),
-            dtdate(2018, 6, 27),
+            dt.date(2018, 6, 27),
+            dt.date(2018, 6, 27),
         ]
 
         if firsts == frame.first_indices.tolist():
@@ -1368,7 +1368,7 @@ class TestOpenFrame(TestCase):
             msg = "Method trunc_frame() did not work as intended."
             raise ValueError(msg)
 
-        trunced = [dtdate(2017, 12, 29), dtdate(2018, 3, 29)]
+        trunced = [dt.date(2017, 12, 29), dt.date(2018, 3, 29)]
 
         frame.trunc_frame(start_cut=trunced[0], end_cut=trunced[1])
 
@@ -1646,9 +1646,9 @@ class TestOpenFrame(TestCase):
                     str,
                     result.loc[value, ("Asset_0", ValueType.PRICE)],
                 )
-            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dtdate):
+            elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
-                    dtdate,
+                    dt.date,
                     result.loc[value, ("Asset_0", ValueType.PRICE)],
                 ).strftime("%Y-%m-%d")
             else:
@@ -1704,7 +1704,7 @@ class TestOpenFrame(TestCase):
         bseries.set_new_label("Asset_b")
         aframe = OpenFrame([aseries, bseries])
 
-        midsummer = dtdate(2022, 6, 6)
+        midsummer = dt.date(2022, 6, 6)
         if midsummer not in d_range:
             msg = "Midsummer not in date range"
             raise ValueError(msg)
@@ -2572,12 +2572,12 @@ class TestOpenFrame(TestCase):
         vrcframe.to_cumret()
 
         vrfs_y = vrcseries.value_ret_func(
-            from_date=dtdate(2017, 12, 29),
-            to_date=dtdate(2018, 12, 28),
+            from_date=dt.date(2017, 12, 29),
+            to_date=dt.date(2018, 12, 28),
         )
         vrff_y = vrcframe.value_ret_func(
-            from_date=dtdate(2017, 12, 29),
-            to_date=dtdate(2018, 12, 28),
+            from_date=dt.date(2017, 12, 29),
+            to_date=dt.date(2018, 12, 28),
         )
         vrffl_y = [f"{rr:.11f}" for rr in cast(Series, vrff_y)]
 
@@ -2594,12 +2594,12 @@ class TestOpenFrame(TestCase):
             raise ValueError(msg)
 
         vrfs_ym = vrcseries.value_ret_func(
-            from_date=dtdate(2018, 4, 30),
-            to_date=dtdate(2018, 5, 31),
+            from_date=dt.date(2018, 4, 30),
+            to_date=dt.date(2018, 5, 31),
         )
         vrff_ym = vrcframe.value_ret_func(
-            from_date=dtdate(2018, 4, 30),
-            to_date=dtdate(2018, 5, 31),
+            from_date=dt.date(2018, 4, 30),
+            to_date=dt.date(2018, 5, 31),
         )
         vrffl_ym = [f"{rr:.11f}" for rr in cast(Series, vrff_ym)]
 

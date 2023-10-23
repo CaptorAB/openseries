@@ -2,8 +2,8 @@
 # mypy: disable-error-code="type-arg"
 from __future__ import annotations
 
+import datetime as dt
 from copy import copy
-from datetime import date as dtdate
 from typing import Union, cast
 from unittest import TestCase
 
@@ -194,7 +194,7 @@ class TestSimulation(TestCase):
                 modelresult = modelresult[cast(int, residx)]
             d_range = [
                 d.date()
-                for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
+                for d in date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
             ]
             sdf = DataFrame(  # type: ignore[call-overload,unused-ignore]
                 data=modelresult,
@@ -248,7 +248,7 @@ class TestSimulation(TestCase):
             onesim = process(param=modelparams, randomizer=random_generator(seed=SEED))
             d_range = [
                 d.date()
-                for d in date_range(periods=days, end=dtdate(2019, 6, 30), freq="D")
+                for d in date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
             ]
             sdf = DataFrame(
                 data=onesim,
@@ -297,7 +297,7 @@ class TestSimulation(TestCase):
             seed=SEED,
         )
 
-        start = dtdate(2009, 6, 30)
+        start = dt.date(2009, 6, 30)
 
         onedf = seriesim.to_dataframe(name="Asset", start=start)
         fivedf = framesim.to_dataframe(name="Asset", start=start)
