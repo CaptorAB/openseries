@@ -818,8 +818,7 @@ class ReturnSimulation:
             Mean standard deviation
         seed: int
             Seed for random process initiation
-        trading_days_in_year: DaysInYearType,
-            default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
 
         Returns
@@ -889,8 +888,7 @@ class ReturnSimulation:
             This is the rate of mean reversion for volatility in the Heston model
         seed: int
             Seed for random process initiation
-        trading_days_in_year: DaysInYearType,
-            default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
 
         Returns
@@ -962,8 +960,7 @@ class ReturnSimulation:
             This is the rate of mean reversion for volatility in the Heston model
         seed: int
             Seed for random process initiation
-        trading_days_in_year: DaysInYearType,
-            default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
 
         Returns
@@ -1038,8 +1035,7 @@ class ReturnSimulation:
             This is the average jump size
         seed: int
             Seed for random process initiation
-        trading_days_in_year: DaysInYearType,
-            default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
 
         Returns

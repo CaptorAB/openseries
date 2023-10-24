@@ -7,6 +7,11 @@ this log will cover all changes, and I will not attempt to go back very far in h
 At some point I will also start documenting changes in release documentation instead.
 
 
+## Version [1.3.9] - 2023-10-24
+
+- Mainly type/mypy and docstring cleanup
+- Updated numpy and pandas which may affect users downstream
+
 ## Version [1.3.8] - 2023-10-15
 
 - tightened .to_json() and .to_xlsx() methods. File path now defaults to homepath/Documents and if it does not exist it will save in the directory of the calling function

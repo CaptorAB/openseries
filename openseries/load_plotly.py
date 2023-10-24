@@ -36,7 +36,8 @@ def check_remote_file_existence(url: str) -> bool:
 
 
 def load_plotly_dict(
-    responsive: bool = True,  # noqa: FBT001, FBT002
+    *,
+    responsive: bool = True,
 ) -> tuple[PlotlyLayoutType, CaptorLogoType]:
     """
     Load Plotly defaults.

@@ -12,8 +12,9 @@ from string import ascii_letters
 from typing import Any, Optional, Union, cast
 
 from numpy import log, sqrt
-from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.workbook.workbook import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 from pandas import DataFrame, DatetimeIndex, Series
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
@@ -24,6 +25,7 @@ from openseries.datefixer import get_calc_range
 from openseries.load_plotly import load_plotly_dict
 from openseries.risk import cvar_down_calc, drawdown_series, var_down_calc
 from openseries.types import (
+    DaysInYearType,
     LiteralBarPlotMode,
     LiteralLinePlotMode,
     LiteralNanMethod,
@@ -503,7 +505,8 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         filename: str,
         sheet_title: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
-        overwrite: bool = True,  # noqa: FBT001, FBT002
+        *,
+        overwrite: bool = True,
     ) -> str:
         """
         Save .tsdf DataFrame to an Excel spreadsheet file.
@@ -541,10 +544,10 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         wrksheet = wrkbook.active
 
         if sheet_title:
-            wrksheet.title = sheet_title  # type: ignore[union-attr]
+            cast(Worksheet, wrksheet).title = sheet_title
 
         for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
-            wrksheet.append(row)  # type: ignore[union-attr]
+            cast(Worksheet, wrksheet).append(row)
 
         if not overwrite and Path(sheetfile).exists():
             msg = f"{sheetfile!s} already exists."
@@ -561,9 +564,10 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         filename: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
-        auto_open: bool = True,  # noqa: FBT001, FBT002
-        add_logo: bool = True,  # noqa: FBT001, FBT002
         output_type: LiteralPlotlyOutput = "file",
+        *,
+        auto_open: bool = True,
+        add_logo: bool = True,
     ) -> tuple[Figure, str]:
         """
         Create a Plotly Bar Figure.
@@ -583,12 +587,12 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
+        output_type: LiteralPlotlyOutput, default: "file"
+            Determines output type
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
 
         Returns
         -------
@@ -655,10 +659,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         filename: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
-        auto_open: bool = True,  # noqa: FBT001, FBT002
-        add_logo: bool = True,  # noqa: FBT001, FBT002
-        show_last: bool = False,  # noqa: FBT001, FBT002
         output_type: LiteralPlotlyOutput = "file",
+        *,
+        auto_open: bool = True,
+        add_logo: bool = True,
+        show_last: bool = False,
     ) -> tuple[Figure, str]:
         """
         Create a Plotly Scatter Figure.
@@ -678,14 +683,14 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
+        output_type: LiteralPlotlyOutput, default: "file"
+            Determines output type
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
         show_last: bool, default: False
             If True the last self.tsdf point is highlighted as red dot with a label
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
 
         Returns
         -------
@@ -765,7 +770,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         https://www.investopedia.com/terms/a/arithmeticmean.asp.
@@ -779,7 +784,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -825,8 +830,8 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
-    ) -> Union[float, Series]:  # type: ignore[type-arg]
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+    ) -> Union[float, Series[type[float]]]:
         """
         Annualized volatility.
 
@@ -842,7 +847,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns
@@ -865,9 +870,9 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             )
             time_factor = how_many / fraction
 
-        result = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-        result = result.ffill()
-        result = result.pct_change().std() * sqrt(time_factor)
+        data = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+        data = data.ffill()
+        result = data.pct_change().std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
@@ -885,8 +890,9 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,  # noqa: FBT001, FBT002
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        *,
+        drift_adjust: bool = False,
     ) -> Union[float, Series[type[float]]]:
         """
         Implied annualized volatility.
@@ -907,11 +913,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
+        drift_adjust: bool, default: False
+            An adjustment to remove the bias implied by the average return
 
         Returns
         -------
@@ -940,8 +946,9 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-        drift_adjust: bool = False,  # noqa: FBT001, FBT002
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        *,
+        drift_adjust: bool = False,
     ) -> Union[float, Series[type[float]]]:
         """
         Target weight from VaR.
@@ -968,11 +975,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
+        drift_adjust: bool, default: False
+            An adjustment to remove the bias implied by the average return
 
         Returns
         -------
@@ -1064,7 +1071,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         Downside Deviation.
@@ -1084,7 +1091,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1424,7 +1431,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         Ratio between arithmetic mean of returns and annualized volatility.
@@ -1446,7 +1453,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1484,7 +1491,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Union[float, Series[type[float]]]:
         """
         Sortino Ratio.
@@ -1508,7 +1515,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1889,7 +1896,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         self: CommonModel,
         column: int = 0,
         observations: int = 21,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
         """
         Calculate rolling annualised volatilities.
@@ -1900,7 +1907,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Position as integer of column to calculate
         observations: int, default: 21
             Number of observations in the overlapping window.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1940,8 +1947,9 @@ def _var_implied_vol_and_target_func(
     from_date: Optional[dt.date] = None,
     to_date: Optional[dt.date] = None,
     interpolation: LiteralQuantileInterp = "lower",
-    drift_adjust: bool = False,  # noqa: FBT001, FBT002
-    periods_in_a_year_fixed: Optional[int] = None,
+    periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+    *,
+    drift_adjust: bool = False,
 ) -> Union[float, Series[type[float]]]:
     """
     Volatility implied from VaR or Target Weight.
@@ -1972,11 +1980,11 @@ def _var_implied_vol_and_target_func(
         Specific to date
     interpolation: LiteralQuantileInterp, default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
-    drift_adjust: bool, default: False
-        An adjustment to remove the bias implied by the average return
-    periods_in_a_year_fixed : int, optional
+    periods_in_a_year_fixed : DaysInYearType, optional
         Allows locking the periods-in-a-year to simplify test cases and
         comparisons
+    drift_adjust: bool, default: False
+        An adjustment to remove the bias implied by the average return
 
     Returns
     -------

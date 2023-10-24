@@ -124,10 +124,11 @@ def date_fix(
 def date_offset_foll(
     raw_date: DateType,
     months_offset: int = 12,
-    adjust: bool = False,  # noqa: FBT001, FBT002
-    following: bool = True,  # noqa: FBT001, FBT002
     countries: CountriesType = "SE",
     custom_holidays: Optional[HolidayType] = None,
+    *,
+    adjust: bool = False,
+    following: bool = True,
 ) -> dt.date:
     """
     Offset dates according to a given calendar.
@@ -138,15 +139,15 @@ def date_offset_foll(
         The date to offset from
     months_offset: int, default: 12
         Number of months as integer
-    adjust: bool, default: False
-        Determines if offset should adjust for business days
-    following: bool, default: True
-        Determines if days should be offset forward (following) or backward
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: HolidayType, optional
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
+    adjust: bool, default: False
+        Determines if offset should adjust for business days
+    following: bool, default: True
+        Determines if days should be offset forward (following) or backward
 
     Returns
     -------

@@ -44,6 +44,7 @@ from openseries.risk import (
 from openseries.series import OpenTimeSeries
 from openseries.types import (
     CountriesType,
+    DaysInYearType,
     LiteralBizDayFreq,
     LiteralCaptureRatio,
     LiteralCovMethod,
@@ -70,7 +71,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
     Parameters
     ----------
-    constituents: list[TypeOpenTimeSeries]
+    constituents: list[OpenTimeSeries]
         List of objects of Class OpenTimeSeries
     weights: list[float], optional
         List of weights in float format.
@@ -110,7 +111,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         Parameters
         ----------
-        constituents: list[TypeOpenTimeSeries]
+        constituents: list[OpenTimeSeries]
             List of objects of Class OpenTimeSeries
         weights: list[float], optional
             List of weights in float format.
@@ -254,6 +255,11 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         """
         Align the index of .tsdf with local calendar business days.
 
+        Parameters
+        ----------
+        countries: CountriesType, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
+
         Returns
         -------
         OpenFrame
@@ -307,13 +313,13 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         return list(self.tsdf.columns.get_level_values(0))
 
     @property
-    def columns_lvl_one(self: OpenFrame) -> list[str]:
+    def columns_lvl_one(self: OpenFrame) -> list[ValueType]:
         """
         Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns
         -------
-        list[str]
+        list[ValueType]
             Level 1 values of the MultiIndex columns in the .tsdf DataFrame
         """
         return list(self.tsdf.columns.get_level_values(1))
@@ -589,7 +595,6 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         ----------
         freq: Union[LiteralBizDayFreq, str], default "BM"
             The date offset string that sets the resampled frequency
-            Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 
         Returns
         -------
@@ -624,7 +629,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq, default BM
+        freq: LiteralBizDayFreq, default "BM"
             The date offset string that sets the resampled frequency
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
@@ -694,7 +699,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
         """
         Exponentially Weighted Moving Average Volatilities and Correlation.
@@ -721,7 +726,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -753,30 +758,30 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
         for rtn in cols:
-            data[rtn, "Returns"] = (
+            data[rtn, ValueType.RTRN] = (
                 data.loc[:, (rtn, ValueType.PRICE)]  # type: ignore[index]
                 .apply(log)
                 .diff()
             )
 
         raw_one = [
-            data.loc[:, (cols[0], "Returns")]  # type: ignore[index]
+            data.loc[:, (cols[0], ValueType.RTRN)]  # type: ignore[index]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_two = [
-            data.loc[:, (cols[1], "Returns")]  # type: ignore[index]
+            data.loc[:, (cols[1], ValueType.RTRN)]  # type: ignore[index]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_cov = [
             cov(
-                m=data.loc[:, (cols[0], "Returns")]  # type: ignore[index]
+                m=data.loc[:, (cols[0], ValueType.RTRN)]  # type: ignore[index]
                 .iloc[1:day_chunk]
                 .to_numpy(),
-                y=data.loc[:, (cols[1], "Returns")]  # type: ignore[index]
+                y=data.loc[:, (cols[1], ValueType.RTRN)]  # type: ignore[index]
                 .iloc[1:day_chunk]
                 .to_numpy(),
                 ddof=dlta_degr_freedms,
@@ -786,20 +791,20 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         for _, row in data.iloc[1:].iterrows():
             tmp_raw_one = ewma_calc(
-                reeturn=row.loc[cols[0], "Returns"],
+                reeturn=row.loc[cols[0], ValueType.RTRN],
                 prev_ewma=raw_one[-1],
                 time_factor=time_factor,
                 lmbda=lmbda,
             )
             tmp_raw_two = ewma_calc(
-                reeturn=row.loc[cols[1], "Returns"],
+                reeturn=row.loc[cols[1], ValueType.RTRN],
                 prev_ewma=raw_two[-1],
                 time_factor=time_factor,
                 lmbda=lmbda,
             )
             tmp_raw_cov = (
-                row.loc[cols[0], "Returns"]
-                * row.loc[cols[1], "Returns"]
+                row.loc[cols[0], ValueType.RTRN]
+                * row.loc[cols[1], ValueType.RTRN]
                 * time_factor
                 * (1 - lmbda)
                 + raw_cov[-1] * lmbda
@@ -941,7 +946,8 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         self: OpenFrame,
         long_column: int = 0,
         short_column: int = 1,
-        base_zero: bool = True,  # noqa: FBT001, FBT002
+        *,
+        base_zero: bool = True,
     ) -> None:
         """
         Calculate cumulative relative return between two series.
@@ -979,7 +985,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Series[type[float]]:
         """
         Tracking Error.
@@ -999,7 +1005,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1064,7 +1070,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Series[type[float]]:
         """
         Information Ratio.
@@ -1085,7 +1091,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1158,7 +1164,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Series[type[float]]:
         """
         Capture Ratio.
@@ -1185,7 +1191,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1430,9 +1436,10 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         self: OpenFrame,
         y_column: Union[tuple[str, ValueType], int],
         x_column: Union[tuple[str, ValueType], int],
-        fitted_series: bool = True,  # noqa: FBT001, FBT002
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
+        *,
+        fitted_series: bool = True,
     ) -> RegressionResults:
         """
         Ordinary Least Squares fit.
@@ -1447,12 +1454,12 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             The column level values of the dependent variable y
         x_column: Union[tuple[str, ValueType], int]
             The column level values of the exogenous variable x
-        fitted_series: bool, default: True
-            If True the fit is added as a new column in the .tsdf Pandas.DataFrame
         method: LiteralOlsFitMethod, default: pinv
             Method to solve least squares problem
         cov_type: LiteralOlsFitCovType, default: nonrobust
             Covariance estimator
+        fitted_series: bool, default: True
+            If True the fit is added as a new column in the .tsdf Pandas.DataFrame
 
         Returns
         -------
@@ -1599,7 +1606,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
         """
         Calculate rolling Information Ratio.
@@ -1616,7 +1623,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             Column of timeseries that is the denominator in the ratio.
         observations: int, default: 21
             The length of the rolling window to use is set as number of observations.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns

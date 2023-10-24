@@ -43,6 +43,7 @@ from openseries.types import (
     CurrencyStringType,
     DatabaseIdStringType,
     DateListType,
+    DaysInYearType,
     LiteralBizDayFreq,
     LiteralPandasReindexMethod,
     LiteralPandasResampleConvention,
@@ -163,7 +164,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         instrument_id: DatabaseIdStringType = "",
         isin: Optional[str] = None,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,  # noqa: FBT001, FBT002
+        *,
+        local_ccy: bool = True,
     ) -> OpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
@@ -220,7 +222,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,  # noqa: FBT001, FBT002
+        *,
+        local_ccy: bool = True,
     ) -> OpenTimeSeries:
         """
         Create series from a Pandas DataFrame or Series.
@@ -302,7 +305,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
-        local_ccy: bool = True,  # noqa: FBT001, FBT002
+        *,
+        local_ccy: bool = True,
     ) -> OpenTimeSeries:
         """
         Create series from values accruing with a given fixed rate return.
@@ -683,7 +687,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[int] = None,
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
         """
         Exponentially Weighted Moving Average Model for Volatility.
@@ -705,7 +709,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns
@@ -726,18 +730,18 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
 
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
 
-        data[self.label, "Returns"] = (
+        data[self.label, ValueType.RTRN] = (
             data.loc[:, self.tsdf.columns.to_numpy()[0]].apply(log).diff()
         )
 
         rawdata = [
-            data.loc[:, (self.label, "Returns")]  # type: ignore[index]
+            data.loc[:, (self.label, ValueType.RTRN)]  # type: ignore[index]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, (self.label, "Returns")].iloc[  # type: ignore[index]
+        for item in data.loc[:, (self.label, ValueType.RTRN)].iloc[  # type: ignore[index]
             1:
         ]:
             previous = rawdata[-1]
@@ -817,7 +821,8 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         self: OpenTimeSeries,
         lvl_zero: Optional[str] = None,
         lvl_one: Optional[ValueType] = None,
-        delete_lvl_one: bool = False,  # noqa: FBT001, FBT002
+        *,
+        delete_lvl_one: bool = False,
     ) -> OpenTimeSeries:
         """
         Set the column labels of the .tsdf Pandas Dataframe.
@@ -826,7 +831,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         ----------
         lvl_zero: str, optional
             New level zero label
-        lvl_one: str, optional
+        lvl_one: ValueType, optional
             New level one label
         delete_lvl_one: bool, default: False
             If True the level one label is deleted
@@ -868,7 +873,7 @@ def timeseries_chain(
         Earlier series to chain with
     back: TypeOpenTimeSeries
         Later series to chain with
-    old_fee: bool, default: False
+    old_fee: float, default: 0.0
         Fee to apply to earlier series
 
     Returns
