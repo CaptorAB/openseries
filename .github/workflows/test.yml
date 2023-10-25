@@ -40,7 +40,7 @@ jobs:
         run: poetry install --with dev
 
       - name: Tests with Pytest
-        run: poetry run coverage run -m pytest --verbose
+        run: poetry run coverage run -m pytest --verbose --capture=no
 
       - name: Report coverage
-        run: poetry run coverage report
+        run: poetry run coverage report -m
