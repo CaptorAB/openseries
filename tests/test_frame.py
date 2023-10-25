@@ -9,7 +9,7 @@ from json import loads
 from pathlib import Path
 from typing import Hashable, Optional, Union, cast
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pandas import DataFrame, Series, date_range, read_excel
@@ -100,8 +100,11 @@ class TestOpenFrame(TestCase):
 
         localfile.unlink()
 
-        with patch("pathlib.Path.exists") as mock_doesnotexist:
+        with patch("pathlib.Path.exists") as mock_doesnotexist, patch(
+            "pathlib.Path.open",
+        ) as mock_donotopen:
             mock_doesnotexist.return_value = True
+            mock_donotopen.side_effect = MagicMock()
             data2 = jframe.to_json(filename=filename)
 
         if [item.get("name") for item in data2] != [
@@ -113,10 +116,6 @@ class TestOpenFrame(TestCase):
         ]:
             msg = "Unexpected data from json"
             raise ValueError(msg)
-
-        framefile = Path.home().joinpath("Documents").joinpath(filename)
-        if framefile.exists():
-            framefile.unlink()
 
     def test_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""
