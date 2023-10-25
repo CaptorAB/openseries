@@ -100,6 +100,24 @@ class TestOpenFrame(TestCase):
 
         localfile.unlink()
 
+        with patch("pathlib.Path.exists") as mock_doesnotexist:
+            mock_doesnotexist.return_value = True
+            data2 = jframe.to_json(filename=filename)
+
+        if [item.get("name") for item in data2] != [
+            "Asset_0",
+            "Asset_1",
+            "Asset_2",
+            "Asset_3",
+            "Asset_4",
+        ]:
+            msg = "Unexpected data from json"
+            raise ValueError(msg)
+
+        framefile = Path.home().joinpath("Documents").joinpath(filename)
+        if framefile.exists():
+            framefile.unlink()
+
     def test_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""
         xseries = self.randomframe.from_deepcopy()
