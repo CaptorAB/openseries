@@ -208,6 +208,17 @@ class TestOpenFrame(TestCase):
 
         seriesfile.unlink()
 
+        with patch("pathlib.Path.exists") as mock_doesnotexist, patch(
+            "openpyxl.workbook.workbook.Workbook.save",
+        ) as mock_donotopen:
+            mock_doesnotexist.return_value = True
+            mock_donotopen.side_effect = MagicMock()
+            seriesfile2 = Path(xseries.to_xlsx(filename=filename)).resolve()
+
+        if seriesfile2.parts[-2:] != ("Documents", "trial.xlsx"):
+            msg = "save_to_xlsx not working as intended."
+            raise ValueError(msg)
+
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
         crframe = self.randomframe.from_deepcopy()
