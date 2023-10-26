@@ -610,8 +610,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
 
         if directory:
             dirpath = Path(directory).resolve()
-        else:
+        elif Path.home().joinpath("Documents").exists():
             dirpath = Path.home().joinpath("Documents")
+        else:
+            dirpath = Path(stack()[1].filename).parent
+
         if not filename:
             filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
         plotfile = dirpath.joinpath(filename)
@@ -708,8 +711,11 @@ class CommonModel(BaseModel):  # type: ignore[misc]
 
         if directory:
             dirpath = Path(directory).resolve()
-        else:
+        elif Path.home().joinpath("Documents").exists():
             dirpath = Path.home().joinpath("Documents")
+        else:
+            dirpath = Path(stack()[1].filename).parent
+
         if not filename:
             filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
         plotfile = dirpath.joinpath(filename)

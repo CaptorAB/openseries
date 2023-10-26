@@ -1109,18 +1109,6 @@ class TestOpenFrame(TestCase):
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
-        directory = Path(__file__).resolve().parent
-        _, figfile = plotframe.plot_series(auto_open=False, directory=directory)
-        plotfile = Path(figfile).resolve()
-        if not plotfile.exists():
-            msg = "html file not created"
-            raise FileNotFoundError(msg)
-
-        plotfile.unlink()
-        if plotfile.exists():
-            msg = "html file not deleted as intended"
-            raise FileExistsError(msg)
-
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
         fig_json = loads(fig.to_json())
 
@@ -1184,12 +1172,13 @@ class TestOpenFrame(TestCase):
             msg = "plot_series add_logo argument not setup correctly"
             raise ValueError(msg)
 
-    def test_plot_bars(self: TestOpenFrame) -> None:
-        """Test plot_bars method."""
+    def test_plot_series_filefolders(self: TestOpenFrame) -> None:
+        """Test plot_series method with different file folder options."""
         plotframe = self.randomframe.from_deepcopy()
+        plotframe.to_cumret()
 
         directory = Path(__file__).resolve().parent
-        _, figfile = plotframe.plot_bars(auto_open=False, directory=directory)
+        _, figfile = plotframe.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
             msg = "html file not created"
@@ -1199,6 +1188,24 @@ class TestOpenFrame(TestCase):
         if plotfile.exists():
             msg = "html file not deleted as intended"
             raise FileExistsError(msg)
+
+        with patch("pathlib.Path.exists") as mock_userfolderexists:
+            mock_userfolderexists.return_value = False
+            _, mockfile = plotframe.plot_series(
+                filename="seriesfile.html",
+                auto_open=False,
+            )
+            mockfilepath = Path(mockfile).resolve()
+
+        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+            msg = "plot_series method not working as intended"
+            raise ValueError(msg)
+
+        mockfilepath.unlink()
+
+    def test_plot_bars(self: TestOpenFrame) -> None:
+        """Test plot_bars method."""
+        plotframe = self.randomframe.from_deepcopy()
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = plotframe.plot_bars(auto_open=False, output_type="div")
@@ -1255,6 +1262,36 @@ class TestOpenFrame(TestCase):
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_bars add_logo argument not setup correctly"
             raise ValueError(msg)
+
+    def test_plot_bars_filefolders(self: TestOpenFrame) -> None:
+        """Test plot_bars method with different file folder options."""
+        plotframe = self.randomframe.from_deepcopy()
+
+        directory = Path(__file__).resolve().parent
+        _, figfile = plotframe.plot_bars(auto_open=False, directory=directory)
+        plotfile = Path(figfile).resolve()
+        if not plotfile.exists():
+            msg = "html file not created"
+            raise FileNotFoundError(msg)
+
+        plotfile.unlink()
+        if plotfile.exists():
+            msg = "html file not deleted as intended"
+            raise FileExistsError(msg)
+
+        with patch("pathlib.Path.exists") as mock_userfolderexists:
+            mock_userfolderexists.return_value = False
+            _, mockfile = plotframe.plot_bars(
+                filename="barfile.html",
+                auto_open=False,
+            )
+            mockfilepath = Path(mockfile).resolve()
+
+        if mockfilepath.parts[-2:] != ("tests", "barfile.html"):
+            msg = "plot_bars method not working as intended"
+            raise ValueError(msg)
+
+        mockfilepath.unlink()
 
     def test_plot_methods_mock_logo_url_fail(self: TestOpenFrame) -> None:
         """Test plot_series and plot_bars methods with mock logo file URL fail."""
