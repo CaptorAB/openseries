@@ -62,7 +62,7 @@ from openseries.types import (
 )
 
 
-class OpenFrame(CommonModel):  # type: ignore[misc]
+class OpenFrame(CommonModel):
 
     """
     OpenFrame objects hold OpenTimeSeries in the list constituents.

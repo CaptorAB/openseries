@@ -10,7 +10,15 @@ from holidays import (  # type: ignore[import-untyped,unused-ignore]
     list_supported_countries,
 )
 from numpy import array, busdaycalendar, datetime64, is_busday, where
-from pandas import DataFrame, DatetimeIndex, Series, Timestamp, concat, date_range
+from pandas import (
+    DataFrame,
+    DatetimeIndex,
+    Index,
+    Series,
+    Timestamp,
+    concat,
+    date_range,
+)
 from pandas.tseries.offsets import CustomBusinessDay
 from pydantic import PositiveInt
 
@@ -435,9 +443,7 @@ def do_resample_to_business_period_ends(
     data.index = DatetimeIndex(data.index)
     data = data.resample(rule=freq, convention=convention).last()
     data = data.drop(index=data.index[-1])
-    data.index = [  # type: ignore[assignment,unused-ignore]
-        d.date() for d in DatetimeIndex(data.index)
-    ]
+    data.index = Index(d.date() for d in DatetimeIndex(data.index))
 
     if newhead.index[0] not in data.index:
         data = concat([data, newhead])
