@@ -19,6 +19,7 @@ from numpy import (
 from pandas import (
     DataFrame,
     DatetimeIndex,
+    Index,
     MultiIndex,
     Series,
     date_range,
@@ -56,7 +57,7 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class OpenTimeSeries(CommonModel):  # type: ignore[misc]
+class OpenTimeSeries(CommonModel):
 
     """
     OpenTimeSeries objects are at the core of the openseries package.
@@ -508,10 +509,12 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         self.tsdf = self.tsdf.ffill().pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
-        self.tsdf.columns = [  # type: ignore[assignment]
-            [self.label],
-            [self.valuetype],
-        ]
+        self.tsdf.columns = MultiIndex.from_arrays(
+            [
+                [self.label],
+                [self.valuetype],
+            ],
+        )
         return self
 
     def value_to_diff(
@@ -535,10 +538,12 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
-        self.tsdf.columns = [  # type: ignore[assignment]
-            [self.label],
-            [self.valuetype],
-        ]
+        self.tsdf.columns = MultiIndex.from_arrays(
+            [
+                [self.label],
+                [self.valuetype],
+            ],
+        )
         return self
 
     def to_cumret(self: OpenTimeSeries) -> OpenTimeSeries:
@@ -559,10 +564,12 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
         self.valuetype = ValueType.PRICE
-        self.tsdf.columns = [  # type: ignore[assignment]
-            [self.label],
-            [self.valuetype],
-        ]
+        self.tsdf.columns = MultiIndex.from_arrays(
+            [
+                [self.label],
+                [self.valuetype],
+            ],
+        )
         return self
 
     def from_1d_rate_to_cumret(
@@ -622,9 +629,7 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [  # type: ignore[assignment]
-            d.date() for d in DatetimeIndex(self.tsdf.index)
-        ]
+        self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
         return self
 
     def resample_to_business_period_ends(
@@ -794,25 +799,28 @@ class OpenTimeSeries(CommonModel):  # type: ignore[misc]
         ra_df = ra_df.dropna()
 
         prev = self.first_idx
-        idx: dt.date
         dates: list[dt.date] = [prev]
 
-        for idx, row in ra_df.iterrows():  # type: ignore[assignment]
-            dates.append(idx)
+        for idx, row in ra_df.iterrows():
+            dates.append(cast(dt.date, idx))
             values.append(
                 values[-1]
-                * (1 + row.iloc[0] + adjustment * (idx - prev).days / days_in_year),
+                * (
+                    1
+                    + row.iloc[0]
+                    + adjustment * (cast(dt.date, idx) - prev).days / days_in_year
+                ),
             )
-            prev = idx
+            prev = cast(dt.date, idx)
         self.tsdf = DataFrame(data=values, index=dates)
         self.valuetype = ValueType.PRICE
-        self.tsdf.columns = [  # type: ignore[assignment]
-            [self.label],
-            [self.valuetype],
-        ]
-        self.tsdf.index = [  # type: ignore[assignment]
-            d.date() for d in DatetimeIndex(self.tsdf.index)
-        ]
+        self.tsdf.columns = MultiIndex.from_arrays(
+            [
+                [self.label],
+                [self.valuetype],
+            ],
+        )
+        self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
         if returns_input:
             self.value_to_ret()
         return self
@@ -904,7 +912,7 @@ def timeseries_chain(
     values = values.mul(
         new.tsdf.iloc[:, 0].loc[first] / old.tsdf.iloc[:, 0].loc[first],
     )
-    values = append(values, new.tsdf.iloc[:, 0])  # type: ignore[assignment]
+    values = Series(append(values, new.tsdf.iloc[:, 0]))
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 

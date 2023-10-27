@@ -62,7 +62,7 @@ class TestPackage(TestCase):
             simplefilter("error")
             with pytest.raises(
                 expected_exception=FutureWarning,
-                match="Call ffill before calling pct_change",
+                match="fill_method='pad' in DataFrame.pct_change is deprecated",
             ):
                 _ = dfa.pct_change()
 

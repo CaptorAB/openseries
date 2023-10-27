@@ -1,5 +1,5 @@
 """Defining the OpenFrame class."""
-# mypy: disable-error-code="operator,call-overload,unused-ignore"
+# mypy: disable-error-code="operator,call-overload,unused-ignore,index,assignment"
 from __future__ import annotations
 
 import datetime as dt
@@ -17,6 +17,7 @@ from numpy import cov, cumprod, log, sqrt
 from pandas import (
     DataFrame,
     DatetimeIndex,
+    Index,
     Int64Dtype,
     MultiIndex,
     Series,
@@ -62,7 +63,7 @@ from openseries.types import (
 )
 
 
-class OpenFrame(CommonModel):  # type: ignore[misc]
+class OpenFrame(CommonModel):
 
     """
     OpenFrame objects hold OpenTimeSeries in the list constituents.
@@ -269,20 +270,17 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         return self
 
     @property
-    def lengths_of_items(self: OpenFrame) -> Series[type[float]]:
+    def lengths_of_items(self: OpenFrame) -> Series[int]:
         """
         Number of observations of all constituents.
 
         Returns
         -------
-        Pandas.Series[type[float]]
+        Pandas.Series[int]
             Number of observations of all constituents
         """
         return Series(
-            data=[
-                self.tsdf.loc[:, d].count()  # type: ignore[index,misc]
-                for d in self.tsdf
-            ],
+            data=[int(self.tsdf.loc[:, d].count()) for d in self.tsdf],
             index=self.tsdf.columns,
             name="observations",
             dtype=Int64Dtype(),
@@ -412,10 +410,10 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             for x in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
             if isinstance(asset, tuple):
-                asset_log = self.tsdf.loc[:, asset]  # type: ignore[index]
+                asset_log = self.tsdf.loc[:, asset]
                 asset_cagr = asset_log.mean()
             elif isinstance(asset, int):
-                asset_log = self.tsdf.iloc[:, asset]  # type: ignore[assignment]
+                asset_log = self.tsdf.iloc[:, asset]
                 asset_cagr = asset_log.mean()
             else:
                 msg = "asset should be a tuple[str, ValueType] or an integer."
@@ -423,10 +421,10 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
                     msg,
                 )
             if isinstance(market, tuple):
-                market_log = self.tsdf.loc[:, market]  # type: ignore[index]
+                market_log = self.tsdf.loc[:, market]
                 market_cagr = market_log.mean()
             elif isinstance(market, int):
-                market_log = self.tsdf.iloc[:, market]  # type: ignore[assignment]
+                market_log = self.tsdf.iloc[:, market]
                 market_cagr = market_log.mean()
             else:
                 msg = "market should be a tuple[str, ValueType] or an integer."
@@ -436,31 +434,28 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         else:
             if isinstance(asset, tuple):
                 asset_log = log(
-                    self.tsdf.loc[:, asset]  # type: ignore[index]
-                    / self.tsdf.loc[:, asset].iloc[0],  # type: ignore[index]
+                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
                 )
                 if self.yearfrac > full_year:
                     asset_cagr = (
-                        self.tsdf.loc[:, asset].iloc[-1]  # type: ignore[index]
-                        / self.tsdf.loc[:, asset].iloc[0]  # type: ignore[index]
+                        self.tsdf.loc[:, asset].iloc[-1]
+                        / self.tsdf.loc[:, asset].iloc[0]
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     asset_cagr = (
-                        self.tsdf.loc[:, asset].iloc[-1]  # type: ignore[index]
-                        / self.tsdf.loc[:, asset].iloc[0]  # type: ignore[index]
+                        self.tsdf.loc[:, asset].iloc[-1]
+                        / self.tsdf.loc[:, asset].iloc[0]
                         - 1
                     )
             elif isinstance(asset, int):
                 asset_log = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
                 if self.yearfrac > full_year:
-                    asset_cagr = (  # type: ignore[assignment]
+                    asset_cagr = (
                         self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     asset_cagr = (
-                        self.tsdf.iloc[-1, asset]  # type: ignore[assignment]
-                        / self.tsdf.iloc[0, asset]
-                        - 1
+                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
                     )
             else:
                 msg = "asset should be a tuple[str, ValueType] or an integer."
@@ -469,31 +464,28 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
                 )
             if isinstance(market, tuple):
                 market_log = log(
-                    self.tsdf.loc[:, market]  # type: ignore[index]
-                    / self.tsdf.loc[:, market].iloc[0],  # type: ignore[index]
+                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
                 )
                 if self.yearfrac > full_year:
                     market_cagr = (
-                        self.tsdf.loc[:, market].iloc[-1]  # type: ignore[index]
-                        / self.tsdf.loc[:, market].iloc[0]  # type: ignore[index]
+                        self.tsdf.loc[:, market].iloc[-1]
+                        / self.tsdf.loc[:, market].iloc[0]
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     market_cagr = (
-                        self.tsdf.loc[:, market].iloc[-1]  # type: ignore[index]
-                        / self.tsdf.loc[:, market].iloc[0]  # type: ignore[index]
+                        self.tsdf.loc[:, market].iloc[-1]
+                        / self.tsdf.loc[:, market].iloc[0]
                         - 1
                     )
             elif isinstance(market, int):
                 market_log = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
                 if self.yearfrac > full_year:
-                    market_cagr = (  # type: ignore[assignment]
+                    market_cagr = (
                         self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     market_cagr = (
-                        self.tsdf.iloc[-1, market]  # type: ignore[assignment]
-                        / self.tsdf.iloc[0, market]
-                        - 1
+                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
                     )
             else:
                 msg = "market should be a tuple[str, ValueType] or an integer."
@@ -603,15 +595,13 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [  # type: ignore[assignment]
-            d.date() for d in DatetimeIndex(self.tsdf.index)
-        ]
+        self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
         for xerie in self.constituents:
             xerie.tsdf.index = DatetimeIndex(xerie.tsdf.index)
             xerie.tsdf = xerie.tsdf.resample(freq).last()
-            xerie.tsdf.index = [  # type: ignore[assignment]
+            xerie.tsdf.index = Index(
                 dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)
-            ]
+            )
 
         return self
 
@@ -759,31 +749,25 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         for rtn in cols:
             data[rtn, ValueType.RTRN] = (
-                data.loc[:, (rtn, ValueType.PRICE)]  # type: ignore[index]
-                .apply(log)
-                .diff()
+                data.loc[:, (rtn, ValueType.PRICE)].apply(log).diff()
             )
 
         raw_one = [
-            data.loc[:, (cols[0], ValueType.RTRN)]  # type: ignore[index]
+            data.loc[:, (cols[0], ValueType.RTRN)]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_two = [
-            data.loc[:, (cols[1], ValueType.RTRN)]  # type: ignore[index]
+            data.loc[:, (cols[1], ValueType.RTRN)]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_cov = [
             cov(
-                m=data.loc[:, (cols[0], ValueType.RTRN)]  # type: ignore[index]
-                .iloc[1:day_chunk]
-                .to_numpy(),
-                y=data.loc[:, (cols[1], ValueType.RTRN)]  # type: ignore[index]
-                .iloc[1:day_chunk]
-                .to_numpy(),
+                m=data.loc[:, (cols[0], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
+                y=data.loc[:, (cols[1], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
                 ddof=dlta_degr_freedms,
             )[0][1],
         ]
@@ -1019,16 +1003,20 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                :,  # type: ignore[index]
+                :,
                 base_column,
             ]
             short_item = base_column
-            short_label = self.tsdf.loc[:, base_column].name[0]  # type: ignore[index]
+            short_label = cast(
+                tuple[str, ValueType],
+                self.tsdf.loc[:, base_column].name,
+            )[0]
         elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[  # type: ignore[assignment]
-                cast(int, earlier) : cast(int, later)
-            ].iloc[:, base_column]
-            short_item = self.tsdf.iloc[  # type: ignore[assignment]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
+                :,
+                base_column,
+            ]
+            short_item = self.tsdf.iloc[
                 :,
                 base_column,
             ].name
@@ -1040,9 +1028,9 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             )
 
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = shortdf.count() / fraction  # type: ignore[assignment]
+            time_factor = float(shortdf.count() / fraction)
 
         terrors = []
         for item in self.tsdf:
@@ -1050,7 +1038,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
                 terrors.append(0.0)
             else:
                 longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                    :,  # type: ignore[index]
+                    :,
                     item,
                 ]
                 relative = 1.0 + longdf - shortdf
@@ -1105,22 +1093,20 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                :,  # type: ignore[index]
+                :,
                 base_column,
             ]
             short_item = base_column
             short_label = cast(
                 tuple[str, str],
-                self.tsdf.loc[:, base_column].name,  # type: ignore[index]
+                self.tsdf.loc[:, base_column].name,
             )[0]
         elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later)  # type: ignore[assignment]
-            ].iloc[
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
                 :,
                 base_column,
             ]
-            short_item = self.tsdf.iloc[  # type: ignore[assignment]
+            short_item = self.tsdf.iloc[
                 :,
                 base_column,
             ].name
@@ -1132,9 +1118,9 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             )
 
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = shortdf.count() / fraction  # type: ignore[assignment]
+            time_factor = float(shortdf.count() / fraction)
 
         ratios = []
         for item in self.tsdf:
@@ -1142,7 +1128,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
                 ratios.append(0.0)
             else:
                 longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                    :,  # type: ignore[index]
+                    :,
                     item,
                 ]
                 relative = 1.0 + longdf - shortdf
@@ -1206,22 +1192,23 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                :,  # type: ignore[index]
+                :,
                 base_column,
             ]
             short_item = base_column
             short_label = cast(
                 tuple[str, str],
-                self.tsdf.loc[:, base_column].name,  # type: ignore[index]
+                self.tsdf.loc[:, base_column].name,
             )[0]
         elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later)  # type: ignore[assignment]
-            ].iloc[:, base_column]
+            shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].iloc[
+                :,
+                base_column,
+            ]
             short_item = self.tsdf.iloc[
                 :,
                 base_column,
-            ].name  # type: ignore[assignment]
+            ].name
             short_label = cast(tuple[str, str], self.tsdf.iloc[:, base_column].name)[0]
         else:
             msg = "base_column should be a tuple[str, ValueType] or an integer."
@@ -1230,9 +1217,9 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             )
 
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = shortdf.count() / fraction  # type: ignore[assignment]
+            time_factor = float(shortdf.count() / fraction)
 
         ratios = []
         for item in self.tsdf:
@@ -1240,7 +1227,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
                 ratios.append(0.0)
             else:
                 longdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
-                    :,  # type: ignore[index]
+                    :,
                     item,
                 ]
                 if ratio == "up":
@@ -1384,18 +1371,18 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             for x_value in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
             if isinstance(asset, tuple):
-                y_value = self.tsdf.loc[:, asset]  # type: ignore[index]
+                y_value = self.tsdf.loc[:, asset]
             elif isinstance(asset, int):
-                y_value = self.tsdf.iloc[:, asset]  # type: ignore[assignment]
+                y_value = self.tsdf.iloc[:, asset]
             else:
                 msg = "asset should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
             if isinstance(market, tuple):
-                x_value = self.tsdf.loc[:, market]  # type: ignore[index]
+                x_value = self.tsdf.loc[:, market]
             elif isinstance(market, int):
-                x_value = self.tsdf.iloc[:, market]  # type: ignore[assignment]
+                x_value = self.tsdf.iloc[:, market]
             else:
                 msg = "market should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
@@ -1404,8 +1391,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         else:
             if isinstance(asset, tuple):
                 y_value = log(
-                    self.tsdf.loc[:, asset]  # type: ignore[index]
-                    / self.tsdf.loc[:, asset].iloc[0],  # type: ignore[index]
+                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
                 )
             elif isinstance(asset, int):
                 y_value = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
@@ -1416,8 +1402,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
                 )
             if isinstance(market, tuple):
                 x_value = log(
-                    self.tsdf.loc[:, market]  # type: ignore[index]
-                    / self.tsdf.loc[:, market].iloc[0],  # type: ignore[index]
+                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
                 )
             elif isinstance(market, int):
                 x_value = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
@@ -1467,13 +1452,13 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             The Statsmodels regression output
         """
         if isinstance(y_column, tuple):
-            y_value = self.tsdf.loc[:, y_column]  # type: ignore[index]
+            y_value = self.tsdf.loc[:, y_column]
             y_label = cast(
                 tuple[str, str],
-                self.tsdf.loc[:, y_column].name,  # type: ignore[index]
+                self.tsdf.loc[:, y_column].name,
             )[0]
         elif isinstance(y_column, int):
-            y_value = self.tsdf.iloc[:, y_column]  # type: ignore[assignment]
+            y_value = self.tsdf.iloc[:, y_column]
             y_label = cast(tuple[str, str], self.tsdf.iloc[:, y_column].name)[0]
         else:
             msg = "y_column should be a tuple[str, ValueType] or an integer."
@@ -1482,13 +1467,13 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             )
 
         if isinstance(x_column, tuple):
-            x_value = self.tsdf.loc[:, x_column]  # type: ignore[index]
+            x_value = self.tsdf.loc[:, x_column]
             x_label = cast(
                 tuple[str, str],
-                self.tsdf.loc[:, x_column].name,  # type: ignore[index]
+                self.tsdf.loc[:, x_column].name,
             )[0]
         elif isinstance(x_column, int):
-            x_value = self.tsdf.iloc[:, x_column]  # type: ignore[assignment]
+            x_value = self.tsdf.iloc[:, x_column]
             x_label = cast(tuple[str, str], self.tsdf.iloc[:, x_column].name)[0]
         else:
             msg = "x_column should be a tuple[str, ValueType] or an integer."
@@ -1633,11 +1618,11 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         """
         long_label = cast(
             tuple[str, str],
-            self.tsdf.iloc[:, long_column].name,  # type: ignore[index]
+            self.tsdf.iloc[:, long_column].name,
         )[0]
         short_label = cast(
             tuple[str, str],
-            self.tsdf.iloc[:, short_column].name,  # type: ignore[index]
+            self.tsdf.iloc[:, short_column].name,
         )[0]
         ratio_label = f"{long_label} / {short_label}"
         if periods_in_a_year_fixed:
@@ -1700,7 +1685,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
 
         rolling = self.tsdf.copy()
         rolling = (
-            rolling.ffill()  # type: ignore[assignment]
+            rolling.ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
         )
@@ -1720,7 +1705,7 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
         )
         rollbeta = rollbetaseries.to_frame()
         rollbeta.index = rollbeta.index.droplevel(level=1)
-        rollbeta.columns = [[beta_label], ["Beta"]]  # type: ignore[assignment]
+        rollbeta.columns = MultiIndex.from_arrays([[beta_label], ["Beta"]])
 
         return rollbeta
 
@@ -1763,9 +1748,11 @@ class OpenFrame(CommonModel):  # type: ignore[misc]
             .corr(self.tsdf.iloc[:, second_column].ffill().pct_change()[1:])
         )
         corrdf = corrseries.dropna().to_frame()
-        corrdf.columns = [  # type: ignore[assignment]
-            [corr_label],
-            ["Rolling correlation"],
-        ]
+        corrdf.columns = MultiIndex.from_arrays(
+            [
+                [corr_label],
+                ["Rolling correlation"],
+            ],
+        )
 
         return DataFrame(corrdf)

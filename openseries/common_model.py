@@ -7,7 +7,7 @@ from inspect import stack
 from json import dump
 from math import ceil
 from pathlib import Path
-from random import choices
+from secrets import choice
 from string import ascii_letters
 from typing import Any, Optional, Union, cast
 
@@ -15,7 +15,7 @@ from numpy import log, sqrt
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from pandas import DataFrame, DatetimeIndex, Series
+from pandas import DataFrame, DatetimeIndex, MultiIndex, Series
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
@@ -35,7 +35,7 @@ from openseries.types import (
 )
 
 
-class CommonModel(BaseModel):  # type: ignore[misc]
+class CommonModel(BaseModel):
 
     """Declare CommonModel."""
 
@@ -610,10 +610,13 @@ class CommonModel(BaseModel):  # type: ignore[misc]
 
         if directory:
             dirpath = Path(directory).resolve()
-        else:
+        elif Path.home().joinpath("Documents").exists():
             dirpath = Path.home().joinpath("Documents")
+        else:
+            dirpath = Path(stack()[1].filename).parent
+
         if not filename:
-            filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
+            filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
         plotfile = dirpath.joinpath(filename)
 
         fig, logo = load_plotly_dict()
@@ -708,10 +711,13 @@ class CommonModel(BaseModel):  # type: ignore[misc]
 
         if directory:
             dirpath = Path(directory).resolve()
-        else:
+        elif Path.home().joinpath("Documents").exists():
             dirpath = Path.home().joinpath("Documents")
+        else:
+            dirpath = Path(stack()[1].filename).parent
+
         if not filename:
-            filename = "".join(choices(ascii_letters, k=6)) + ".html"  # noqa: S311
+            filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
         plotfile = dirpath.joinpath(filename)
 
         fig, logo = load_plotly_dict()
@@ -1114,10 +1120,14 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             .count(numeric_only=True)
         )
         if periods_in_a_year_fixed:
-            time_factor = periods_in_a_year_fixed
+            time_factor = Series(
+                data=[float(periods_in_a_year_fixed)] * how_many.shape[0],
+                index=self.tsdf.columns,
+                dtype="float64",
+            )
         else:
             fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction  # type: ignore[assignment]
+            time_factor = how_many.div(fraction)
 
         dddf = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
@@ -1418,12 +1428,15 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             .pct_change()[1:]
             .count()
         )
-        result = pos / tot
-        result.name = "Positive Share"
-        result = result.astype("float64")
+        share = pos / tot
         if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return result  # type: ignore[return-value]
+            return float(share.iloc[0])
+        return Series(
+            data=share,
+            index=self.tsdf.columns,
+            name="Positive Share",
+            dtype="float64",
+        )
 
     def ret_vol_ratio_func(
         self: CommonModel,
@@ -1463,26 +1476,29 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility or, if risk-free return provided, Sharpe ratio
         """
-        ratio = (
+        ratio = Series(
             self.arithmetic_ret_func(
                 months_from_last=months_from_last,
                 from_date=from_date,
                 to_date=to_date,
                 periods_in_a_year_fixed=periods_in_a_year_fixed,
             )
-            - riskfree_rate
+            - riskfree_rate,
         ) / self.vol_func(
             months_from_last=months_from_last,
             from_date=from_date,
             to_date=to_date,
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
-        result = Series(ratio)
-        result = result.astype("float64")
-        result.name = "Return vol ratio"
+
         if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return result  # type: ignore[return-value]
+            return float(ratio.iloc[0])
+        return Series(
+            data=ratio,
+            index=self.tsdf.columns,
+            name="Return vol ratio",
+            dtype="float64",
+        )
 
     def sortino_ratio_func(
         self: CommonModel,
@@ -1525,14 +1541,14 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             Sortino ratio calculated as ( return - riskfree return ) /
             downside deviation (std dev of returns below MAR)
         """
-        ratio = (
+        ratio = Series(
             self.arithmetic_ret_func(
                 months_from_last=months_from_last,
                 from_date=from_date,
                 to_date=to_date,
                 periods_in_a_year_fixed=periods_in_a_year_fixed,
             )
-            - riskfree_rate
+            - riskfree_rate,
         ) / self.downside_deviation_func(
             min_accepted_return=min_accepted_return,
             months_from_last=months_from_last,
@@ -1540,12 +1556,15 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             to_date=to_date,
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
-        result = Series(ratio)
-        result = result.astype("float64")
-        result.name = "Sortino ratio"
+
         if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return result  # type: ignore[return-value]
+            return float(ratio.iloc[0])
+        return Series(
+            data=ratio,
+            index=self.tsdf.columns,
+            name="Sortino ratio",
+            dtype="float64",
+        )
 
     def value_ret_func(
         self: CommonModel,
@@ -1626,12 +1645,15 @@ class CommonModel(BaseModel):  # type: ignore[misc]
         vrdf.index = DatetimeIndex(vrdf.index)
         resultdf = DataFrame(vrdf.ffill().pct_change())
         result = resultdf.loc[period] + 1
-        result = result.cumprod(axis="index").iloc[-1] - 1
-        result.name = period
-        result = result.astype("float64")
+        cal_period = result.cumprod(axis="index").iloc[-1] - 1
         if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return result  # type: ignore[return-value]
+            return float(cal_period.iloc[0])
+        return Series(
+            data=cal_period,
+            index=self.tsdf.columns,
+            name=period,
+            dtype="float64",
+        )
 
     def var_down_func(
         self: CommonModel,
@@ -1816,7 +1838,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             .apply(lambda x: cvar_down_calc(x, level=level))
         )
         cvardf = cvarseries.dropna().to_frame()
-        cvardf.columns = [[cvar_label], ["Rolling CVaR"]]  # type: ignore[assignment]
+        cvardf.columns = MultiIndex.from_arrays([[cvar_label], ["Rolling CVaR"]])
 
         return cvardf
 
@@ -1849,7 +1871,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             .sum()
         )
         retdf = retseries.dropna().to_frame()
-        retdf.columns = [[ret_label], ["Rolling returns"]]  # type: ignore[assignment]
+        retdf.columns = MultiIndex.from_arrays([[ret_label], ["Rolling returns"]])
 
         return retdf
 
@@ -1888,7 +1910,7 @@ class CommonModel(BaseModel):  # type: ignore[misc]
             )
         )
         vardf = varseries.dropna().to_frame()
-        vardf.columns = [[var_label], ["Rolling VaR"]]  # type: ignore[assignment]
+        vardf.columns = MultiIndex.from_arrays([[var_label], ["Rolling VaR"]])
 
         return vardf
 

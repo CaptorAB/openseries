@@ -8,11 +8,11 @@ Without an x next to a version below you can assume that it works as intended.
 
 | Version | Supported          |
 |---------|--------------------|
+| 1.4.0   | :white_check_mark: |
 | 1.3.9   | :white_check_mark: |
 | 1.3.8   | :white_check_mark: |
 | 1.3.7   | :white_check_mark: |
-| 1.3.6   | :white_check_mark: |
-| < 1.3.6 | :x:                |
+| < 1.3.7 | :x:                |
 
 ## Reporting a Vulnerability
 

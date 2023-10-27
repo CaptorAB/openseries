@@ -1,11 +1,13 @@
 # Changelog
 
-For a long time I have not kept a log of the changes implemented in the different versions
-of the openseries package. In this file I am attempting to rectify this somewhat.
-However, unfortunately I do not have the resources to issue any form of guarantee that
-this log will cover all changes, and I will not attempt to go back very far in history.
-At some point I will also start documenting changes in release documentation instead.
+At some point we will start documenting changes in release documentation instead.
+For now this is the only place where we log summary descriptions.
 
+## Version [1.4.0] - 2023-10-27
+
+- More type/mypy cleanup
+- Fixed file folder behaviour in plot methods and added test coverage for it
+- Updated pandas again
 
 ## Version [1.3.9] - 2023-10-24
 
