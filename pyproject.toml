@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.3.9"
+version = "1.4.0"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -68,9 +68,6 @@ build-backend = "poetry.core.masonry.api"
 [poetry.virtualenvs]
 in-project = true
 path = "venv"
-
-[poetry.virtualenvs.options]
-no-pip = true
 
 [tool.pytest.ini_options]
 filterwarnings = [

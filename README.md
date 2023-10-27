@@ -34,7 +34,8 @@ aligns with how we within our fund company's code base have a subclass of the
 OpenTimeSeries with class methods for our different data sources. Combined with some
 additional tools it allows us to efficiently present investment cases to clients.
 
-The code snippet can be pasted into a Python console to run it. Install yfinance first.
+The code snippet can be pasted into a Python console to run it.
+Install openseries and yfinance first.
 
 ```python
 from openseries.series import OpenTimeSeries
