@@ -131,7 +131,7 @@ class CommonModel(BaseModel):
             Maximum drawdown in a single calendar year.
         """
         years = [d.year for d in self.tsdf.index]
-        result = (
+        mddc = (
             self.tsdf.groupby(years)
             .apply(
                 lambda prices: (prices / prices.expanding(min_periods=1).max()).min()
@@ -139,11 +139,14 @@ class CommonModel(BaseModel):
             )
             .min()
         )
-        result.name = "Max Drawdown in cal yr"
-        result = result.astype("float64")
         if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(result)
+            return float(mddc.iloc[0])
+        return Series(
+            data=mddc,
+            index=self.tsdf.columns,
+            name="Max Drawdown in cal yr",
+            dtype="float64",
+        )
 
     @property
     def geo_ret(self: CommonModel) -> Union[float, Series[type[float]]]:
