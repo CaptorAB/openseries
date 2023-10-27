@@ -4,10 +4,7 @@ from __future__ import annotations
 from importlib.metadata import metadata
 from pathlib import Path
 from unittest import TestCase
-from warnings import catch_warnings, simplefilter
 
-import pytest
-from pandas import DataFrame
 from toml import load as tomlload
 
 
@@ -46,24 +43,3 @@ class TestPackage(TestCase):
                     f"expected: {package_metadata[name]}"
                 )
                 raise ValueError(msg)
-
-    def test_pandas_futurewarning_handling(self: TestPackage) -> None:
-        """Test that Pandas FutureWarning is handled appropriately."""
-        arrays_a = [
-            [1, 101],
-            [2, 102],
-            [3, None],
-            [4, 104],
-            [5, 105],
-        ]
-        dfa = DataFrame(arrays_a)
-
-        with catch_warnings():
-            simplefilter("error")
-            with pytest.raises(
-                expected_exception=FutureWarning,
-                match="fill_method='pad' in DataFrame.pct_change is deprecated",
-            ):
-                _ = dfa.pct_change()
-
-        _ = dfa.pct_change()

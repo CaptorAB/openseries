@@ -119,7 +119,6 @@ def drawdown_series(
         A drawdown timeserie
     """
     drawdown = prices.copy()
-    drawdown = drawdown.ffill()
     drawdown[isnan(drawdown)] = -Inf
     roll_max = maximum.accumulate(drawdown)
     return DataFrame(drawdown / roll_max - 1.0)
