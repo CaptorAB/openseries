@@ -509,10 +509,12 @@ class OpenTimeSeries(CommonModel):
         self.tsdf = self.tsdf.ffill().pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
-        self.tsdf.columns = [  # type: ignore[assignment]
-            [self.label],
-            [self.valuetype],
-        ]
+        self.tsdf.columns = MultiIndex.from_arrays(
+            [
+                [self.label],
+                [self.valuetype],
+            ],
+        )
         return self
 
     def value_to_diff(
@@ -797,16 +799,19 @@ class OpenTimeSeries(CommonModel):
         ra_df = ra_df.dropna()
 
         prev = self.first_idx
-        idx: dt.date
         dates: list[dt.date] = [prev]
 
-        for idx, row in ra_df.iterrows():  # type: ignore[assignment]
-            dates.append(idx)
+        for idx, row in ra_df.iterrows():
+            dates.append(cast(dt.date, idx))
             values.append(
                 values[-1]
-                * (1 + row.iloc[0] + adjustment * (idx - prev).days / days_in_year),
+                * (
+                    1
+                    + row.iloc[0]
+                    + adjustment * (cast(dt.date, idx) - prev).days / days_in_year
+                ),
             )
-            prev = idx
+            prev = cast(dt.date, idx)
         self.tsdf = DataFrame(data=values, index=dates)
         self.valuetype = ValueType.PRICE
         self.tsdf.columns = MultiIndex.from_arrays(

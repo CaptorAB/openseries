@@ -17,6 +17,7 @@ from numpy import cov, cumprod, log, sqrt
 from pandas import (
     DataFrame,
     DatetimeIndex,
+    Index,
     Int64Dtype,
     MultiIndex,
     Series,
@@ -603,15 +604,13 @@ class OpenFrame(CommonModel):
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = [  # type: ignore[assignment]
-            d.date() for d in DatetimeIndex(self.tsdf.index)
-        ]
+        self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
         for xerie in self.constituents:
             xerie.tsdf.index = DatetimeIndex(xerie.tsdf.index)
             xerie.tsdf = xerie.tsdf.resample(freq).last()
-            xerie.tsdf.index = [  # type: ignore[assignment]
+            xerie.tsdf.index = Index(
                 dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)
-            ]
+            )
 
         return self
 
@@ -1720,7 +1719,7 @@ class OpenFrame(CommonModel):
         )
         rollbeta = rollbetaseries.to_frame()
         rollbeta.index = rollbeta.index.droplevel(level=1)
-        rollbeta.columns = [[beta_label], ["Beta"]]  # type: ignore[assignment]
+        rollbeta.columns = MultiIndex.from_arrays([[beta_label], ["Beta"]])
 
         return rollbeta
 
@@ -1763,9 +1762,11 @@ class OpenFrame(CommonModel):
             .corr(self.tsdf.iloc[:, second_column].ffill().pct_change()[1:])
         )
         corrdf = corrseries.dropna().to_frame()
-        corrdf.columns = [  # type: ignore[assignment]
-            [corr_label],
-            ["Rolling correlation"],
-        ]
+        corrdf.columns = MultiIndex.from_arrays(
+            [
+                [corr_label],
+                ["Rolling correlation"],
+            ],
+        )
 
         return DataFrame(corrdf)

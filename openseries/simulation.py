@@ -31,7 +31,7 @@ from numpy import (
 )
 from numpy.random import PCG64, Generator, SeedSequence
 from numpy.typing import NDArray
-from pandas import DataFrame, concat
+from pandas import DataFrame, Index, MultiIndex, concat
 from pydantic import BaseModel, PositiveFloat, PositiveInt
 
 from openseries.datefixer import generate_calender_date_range
@@ -1111,20 +1111,24 @@ class ReturnSimulation:
 
         if self.number_of_sims == 1:
             sdf = self.dframe.iloc[0].T.to_frame()
-            sdf.index = d_range  # type: ignore[assignment,unused-ignore]
-            sdf.columns = [  # type: ignore[assignment,unused-ignore]
-                [name],
-                [ValueType.RTRN],
-            ]
+            sdf.index = Index(d_range)
+            sdf.columns = MultiIndex.from_arrays(
+                [
+                    [name],
+                    [ValueType.RTRN],
+                ],
+            )
             return sdf
         fdf = DataFrame()
         for item in range(self.number_of_sims):
             sdf = self.dframe.iloc[item].T.to_frame()
-            sdf.index = d_range  # type: ignore[assignment,unused-ignore]
-            sdf.columns = [  # type: ignore[assignment,unused-ignore]
-                [f"{name}_{item}"],
-                [ValueType.RTRN],
-            ]
+            sdf.index = Index(d_range)
+            sdf.columns = MultiIndex.from_arrays(
+                [
+                    [f"{name}_{item}"],
+                    [ValueType.RTRN],
+                ],
+            )
             fdf = concat([fdf, sdf], axis="columns", sort=True)
         return fdf
 
