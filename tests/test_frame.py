@@ -1191,17 +1191,15 @@ class TestOpenFrame(TestCase):
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True
-            mockhomefig, mockhomefile = plotframe.plot_series(
+            mockhomefig, _ = plotframe.plot_series(
                 auto_open=False,
+                output_type="div",
             )
             mockhomefig_json = loads(mockhomefig.to_json())
-            mockhomefilepath = Path(mockhomefile).resolve()
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_series method not working as intended"
             raise ValueError(msg)
-
-        mockhomefilepath.unlink()
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = False
@@ -1295,17 +1293,15 @@ class TestOpenFrame(TestCase):
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True
-            mockhomefig, mockhomefile = plotframe.plot_bars(
+            mockhomefig, _ = plotframe.plot_bars(
                 auto_open=False,
+                output_type="div",
             )
             mockhomefig_json = loads(mockhomefig.to_json())
-            mockhomefilepath = Path(mockhomefile).resolve()
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_bars method not working as intended"
             raise ValueError(msg)
-
-        mockhomefilepath.unlink()
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = False
