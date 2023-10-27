@@ -1190,6 +1190,20 @@ class TestOpenFrame(TestCase):
             raise FileExistsError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
+            mock_userfolderexists.return_value = True
+            _, mockhomefile = plotframe.plot_series(
+                filename="seriesfile.html",
+                auto_open=False,
+            )
+            mockhomefilepath = Path(mockhomefile).resolve()
+
+        if mockhomefilepath.parts[-2:] != ("Documents", "seriesfile.html"):
+            msg = "plot_series method not working as intended"
+            raise ValueError(msg)
+
+        mockhomefilepath.unlink()
+
+        with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = False
             _, mockfile = plotframe.plot_series(
                 filename="seriesfile.html",
@@ -1278,6 +1292,20 @@ class TestOpenFrame(TestCase):
         if plotfile.exists():
             msg = "html file not deleted as intended"
             raise FileExistsError(msg)
+
+        with patch("pathlib.Path.exists") as mock_userfolderexists:
+            mock_userfolderexists.return_value = True
+            _, mockhomefile = plotframe.plot_bars(
+                filename="barfile.html",
+                auto_open=False,
+            )
+            mockhomefilepath = Path(mockhomefile).resolve()
+
+        if mockhomefilepath.parts[-2:] != ("Documents", "barfile.html"):
+            msg = "plot_bars method not working as intended"
+            raise ValueError(msg)
+
+        mockhomefilepath.unlink()
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = False
