@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.0"
+version = "1.4.1"
 description = "Package for simple financial time series analysis."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -72,7 +72,6 @@ path = "venv"
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    "ignore:The default fill_method:FutureWarning::",
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]
