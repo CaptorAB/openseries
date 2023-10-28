@@ -3,13 +3,11 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
-## Version [1.4.1] - 2023-10-28
+## Version [1.4.2] - 2023-10-28
 
+- Fixed error in timeseries_chain introduced in version 1.4.0. Because of this versions 1.4.0 & 1.4.1 was deleted
 - Removed ignore on FutureWarning from pandas.pct_change
 - Also removed as I deem them unnecessary pandas.ffill() before pct_change
-
-## Version [1.4.0] - 2023-10-27
-
 - More type/mypy cleanup
 - Fixed file folder behaviour in plot methods and added test coverage for it
 - Updated pandas again

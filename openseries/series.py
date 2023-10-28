@@ -908,11 +908,11 @@ def timeseries_chain(
 
     dates: list[str] = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < first]
 
-    values = old.tsdf.iloc[: len(dates), 0]
-    values = values.mul(
+    old_values = old.tsdf.iloc[: len(dates), 0]
+    old_values = old_values.mul(
         new.tsdf.iloc[:, 0].loc[first] / old.tsdf.iloc[:, 0].loc[first],
     )
-    values = Series(append(values, new.tsdf.iloc[:, 0]))
+    values = append(old_values, new.tsdf.iloc[:, 0])
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
