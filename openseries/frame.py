@@ -357,13 +357,13 @@ class OpenFrame(CommonModel):
         ).dt.date
 
     @property
-    def span_of_days_all(self: OpenFrame) -> Series[type[float]]:
+    def span_of_days_all(self: OpenFrame) -> Series[int]:
         """
         Number of days from the first date to the last for all items in the frame.
 
         Returns
         -------
-        Pandas.Series[type[float]]
+        Pandas.Series[int]
             Number of days from the first date to the last for all
             items in the frame.
         """
@@ -499,13 +499,13 @@ class OpenFrame(CommonModel):
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     @property
-    def worst_month(self: OpenFrame) -> Series[type[float]]:
+    def worst_month(self: OpenFrame) -> Series[float]:
         """
         Most negative month.
 
         Returns
         -------
-        Pandas.Series[type[float]]
+        Pandas.Series[float]
             Most negative month
         """
         wdf = self.tsdf.copy()
@@ -968,7 +968,7 @@ class OpenFrame(CommonModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Series[type[float]]:
+    ) -> Series[float]:
         """
         Tracking Error.
 
@@ -993,7 +993,7 @@ class OpenFrame(CommonModel):
 
         Returns
         -------
-        Pandas.Series[type[float]]
+        Pandas.Series[float]
             Tracking Errors
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1057,7 +1057,7 @@ class OpenFrame(CommonModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Series[type[float]]:
+    ) -> Series[float]:
         """
         Information Ratio.
 
@@ -1083,7 +1083,7 @@ class OpenFrame(CommonModel):
 
         Returns
         -------
-        Pandas.Series[type[float]]
+        Pandas.Series[float]
             Information Ratios
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1149,7 +1149,7 @@ class OpenFrame(CommonModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Series[type[float]]:
+    ) -> Series[float]:
         """
         Capture Ratio.
 
@@ -1181,7 +1181,7 @@ class OpenFrame(CommonModel):
 
         Returns
         -------
-        Pandas.Series[type[float]]
+        Pandas.Series[float]
             Capture Ratios
         """
         loss_limit: float = 0.0

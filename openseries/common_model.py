@@ -15,7 +15,7 @@ from numpy import log, sqrt
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from pandas import DataFrame, DatetimeIndex, MultiIndex, Series
+from pandas import DataFrame, DatetimeIndex, Index, MultiIndex, Series
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
@@ -121,16 +121,16 @@ class CommonModel(BaseModel):
         return self.length / self.yearfrac
 
     @property
-    def max_drawdown_cal_year(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def max_drawdown_cal_year(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Maximum drawdown in a single calendar year.
         """
-        years = [d.year for d in self.tsdf.index]
+        years = Index(d.year for d in self.tsdf.index)
         mddc = (
             self.tsdf.groupby(years)
             .apply(
@@ -149,43 +149,43 @@ class CommonModel(BaseModel):
         )
 
     @property
-    def geo_ret(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def geo_ret(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/c/cagr.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Compounded Annual Growth Rate (CAGR)
         """
         return self.geo_ret_func()
 
     @property
-    def arithmetic_ret(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def arithmetic_ret(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Annualized arithmetic mean of returns
         """
         return self.arithmetic_ret_func()
 
     @property
-    def value_ret(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def value_ret(self: CommonModel) -> Union[float, Series[float]]:
         """
         Simple return.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Simple return
         """
         return self.value_ret_func()
 
     @property
-    def vol(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def vol(self: CommonModel) -> Union[float, Series[float]]:
         """
         Annualized volatility.
 
@@ -194,13 +194,13 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Annualized volatility
         """
         return self.vol_func()
 
     @property
-    def downside_deviation(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def downside_deviation(self: CommonModel) -> Union[float, Series[float]]:
         """
         Downside Deviation.
 
@@ -210,20 +210,20 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Downside deviation
         """
         min_accepted_return: float = 0.0
         return self.downside_deviation_func(min_accepted_return=min_accepted_return)
 
     @property
-    def ret_vol_ratio(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def ret_vol_ratio(self: CommonModel) -> Union[float, Series[float]]:
         """
         Ratio of annualized arithmetic mean of returns and annualized volatility.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility.
         """
@@ -231,13 +231,13 @@ class CommonModel(BaseModel):
         return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
-    def sortino_ratio(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def sortino_ratio(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
@@ -250,93 +250,93 @@ class CommonModel(BaseModel):
         )
 
     @property
-    def z_score(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def z_score(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/z/zscore.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Z-score as (last return - mean return) / standard deviation of returns.
         """
         return self.z_score_func()
 
     @property
-    def max_drawdown(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def max_drawdown(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Maximum drawdown without any limit on date range
         """
         return self.max_drawdown_func()
 
     @property
-    def worst(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def worst(self: CommonModel) -> Union[float, Series[float]]:
         """
         Most negative percentage change.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Most negative percentage change
         """
         observations: int = 1
         return self.worst_func(observations=observations)
 
     @property
-    def positive_share(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def positive_share(self: CommonModel) -> Union[float, Series[float]]:
         """
         The share of percentage changes that are greater than zero.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             The share of percentage changes that are greater than zero
         """
         return self.positive_share_func()
 
     @property
-    def skew(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def skew(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/s/skewness.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Skew of the return distribution
         """
         return self.skew_func()
 
     @property
-    def kurtosis(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def kurtosis(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Kurtosis of the return distribution
         """
         return self.kurtosis_func()
 
     @property
-    def cvar_down(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def cvar_down(self: CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Downside 95% Conditional Value At Risk "CVaR"
         """
         level: float = 0.95
         return self.cvar_down_func(level=level)
 
     @property
-    def var_down(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def var_down(self: CommonModel) -> Union[float, Series[float]]:
         """
         Downside 95% Value At Risk (VaR).
 
@@ -345,7 +345,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Downside 95% Value At Risk (VaR)
         """
         level: float = 0.95
@@ -353,7 +353,7 @@ class CommonModel(BaseModel):
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
-    def vol_from_var(self: CommonModel) -> Union[float, Series[type[float]]]:
+    def vol_from_var(self: CommonModel) -> Union[float, Series[float]]:
         """
         Implied annualized volatility from Downside 95% Value at Risk.
 
@@ -361,7 +361,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Implied annualized volatility from the Downside 95% VaR using the
             assumption that returns are normally distributed.
         """
@@ -780,7 +780,7 @@ class CommonModel(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
@@ -799,7 +799,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Annualized arithmetic mean of returns
         """
         earlier, later = get_calc_range(
@@ -837,7 +837,7 @@ class CommonModel(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Annualized volatility.
 
@@ -858,7 +858,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Annualized volatility
         """
         earlier, later = get_calc_range(
@@ -898,7 +898,7 @@ class CommonModel(BaseModel):
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
         *,
         drift_adjust: bool = False,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Implied annualized volatility.
 
@@ -926,7 +926,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
         """
@@ -954,7 +954,7 @@ class CommonModel(BaseModel):
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
         *,
         drift_adjust: bool = False,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Target weight from VaR.
 
@@ -988,7 +988,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             A position weight multiplier from the ratio between a VaR implied
             volatility and a given target volatility. Multiplier = 1.0 -> target met
         """
@@ -1012,7 +1012,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Downside Conditional Value At Risk "CVaR".
 
@@ -1032,7 +1032,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Downside Conditional Value At Risk "CVaR"
         """
         earlier, later = get_calc_range(
@@ -1075,7 +1075,7 @@ class CommonModel(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Downside Deviation.
 
@@ -1100,7 +1100,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Downside deviation
         """
         zero: float = 0.0
@@ -1149,7 +1149,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Compounded Annual Growth Rate (CAGR).
 
@@ -1167,7 +1167,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Compounded Annual Growth Rate (CAGR)
         """
         zero: float = 0.0
@@ -1207,7 +1207,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Skew of the return distribution.
 
@@ -1225,7 +1225,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Skew of the return distribution
         """
         earlier, later = get_calc_range(
@@ -1256,7 +1256,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Kurtosis of the return distribution.
 
@@ -1274,7 +1274,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Kurtosis of the return distribution
         """
         earlier, later = get_calc_range(
@@ -1305,7 +1305,7 @@ class CommonModel(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         min_periods: int = 1,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Maximum drawdown without any limit on date range.
 
@@ -1325,7 +1325,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Maximum drawdown without any limit on date range
         """
         earlier, later = get_calc_range(
@@ -1379,7 +1379,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Calculate share of percentage changes that are greater than zero.
 
@@ -1395,7 +1395,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Calculate share of percentage changes that are greater than zero
         """
         zero: float = 0.0
@@ -1435,7 +1435,7 @@ class CommonModel(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Ratio between arithmetic mean of returns and annualized volatility.
 
@@ -1462,7 +1462,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility or, if risk-free return provided, Sharpe ratio
         """
@@ -1498,7 +1498,7 @@ class CommonModel(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Sortino Ratio.
 
@@ -1527,7 +1527,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Sortino ratio calculated as ( return - riskfree return ) /
             downside deviation (std dev of returns below MAR)
         """
@@ -1561,7 +1561,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Calculate simple return.
 
@@ -1577,7 +1577,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Calculate simple return
         """
         zero: float = 0.0
@@ -1611,7 +1611,7 @@ class CommonModel(BaseModel):
         self: CommonModel,
         year: int,
         month: Optional[int] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Calculate simple return for a specific calendar period.
 
@@ -1624,7 +1624,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Calculate simple return for a specific calendar period
         """
         if month is None:
@@ -1652,7 +1652,7 @@ class CommonModel(BaseModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         interpolation: LiteralQuantileInterp = "lower",
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Downside Value At Risk, "VaR".
 
@@ -1675,7 +1675,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Downside Value At Risk
         """
         earlier, later = get_calc_range(
@@ -1705,7 +1705,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Most negative percentage change over a rolling number of observations.
 
@@ -1723,7 +1723,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Most negative percentage change over a rolling number of observations
             within a chosen date range
         """
@@ -1755,7 +1755,7 @@ class CommonModel(BaseModel):
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[type[float]]]:
+    ) -> Union[float, Series[float]]:
         """
         Z-score as (last return - mean return) / standard deviation of returns.
 
@@ -1773,7 +1773,7 @@ class CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[type[float]]]
+        Union[float, Pandas.Series[float]]
             Z-score as (last return - mean return) / standard deviation of returns
         """
         earlier, later = get_calc_range(
@@ -1959,7 +1959,7 @@ def _var_implied_vol_and_target_func(
     periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     *,
     drift_adjust: bool = False,
-) -> Union[float, Series[type[float]]]:
+) -> Union[float, Series[float]]:
     """
     Volatility implied from VaR or Target Weight.
 
@@ -1997,7 +1997,7 @@ def _var_implied_vol_and_target_func(
 
     Returns
     -------
-    Union[float, Pandas.Series[type[float]]]
+    Union[float, Pandas.Series[float]]
         Target volatility if target_vol is provided otherwise the VaR
         implied volatility.
     """

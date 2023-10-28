@@ -231,7 +231,7 @@ class OpenTimeSeries(CommonModel):
 
         Parameters
         ----------
-        dframe: Union[DataFrame, Series[type[float]]]
+        dframe: Union[DataFrame, Series[float]]
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column

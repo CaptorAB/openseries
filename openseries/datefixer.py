@@ -406,8 +406,8 @@ def align_dataframe_to_local_cdays(
 
 def do_resample_to_business_period_ends(
     data: DataFrame,
-    head: Series[type[float]],
-    tail: Series[type[float]],
+    head: Series[float],
+    tail: Series[float],
     freq: LiteralBizDayFreq,
     countries: CountriesType,
     convention: LiteralPandasResampleConvention,
@@ -421,9 +421,9 @@ def do_resample_to_business_period_ends(
     ----------
     data: pandas.DataFrame
         The timeseries data
-    head: pandas:Series
+    head: pandas:Series[float]
         Data point at maximum first date of all series
-    tail: pandas:Series
+    tail: pandas:Series[float]
         Data point at minimum last date of all series
     freq: LiteralBizDayFreq
         The date offset string that sets the resampled frequency
