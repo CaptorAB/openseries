@@ -1318,7 +1318,7 @@ class TestOpenTimeSeries(TestCase):
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
         directory = Path(__file__).resolve().parent
-        _, figfile = barseries.plot_series(auto_open=False, directory=directory)
+        _, figfile = barseries.plot_bars(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
             msg = "json file not created"
