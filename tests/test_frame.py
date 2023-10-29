@@ -1158,7 +1158,12 @@ class TestOpenFrame(TestCase):
             output_type="div",
         )
         fig_logo_json = loads(fig_logo.to_json())
-        if fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
+
+        if logo == {}:
+            if fig_logo_json["layout"]["images"][0] != logo:
+                msg = "plot_series add_logo argument not setup correctly"
+                raise ValueError(msg)
+        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_series add_logo argument not setup correctly"
             raise ValueError(msg)
 
@@ -1261,7 +1266,12 @@ class TestOpenFrame(TestCase):
             output_type="div",
         )
         fig_logo_json = loads(fig_logo.to_json())
-        if fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
+
+        if logo == {}:
+            if fig_logo_json["layout"]["images"][0] != logo:
+                msg = "plot_bars add_logo argument not setup correctly"
+                raise ValueError(msg)
+        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_bars add_logo argument not setup correctly"
             raise ValueError(msg)
 
