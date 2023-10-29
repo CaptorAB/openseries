@@ -1,5 +1,4 @@
 """Defining the CommonModel class."""
-# mypy: disable-error-code="unused-ignore"
 from __future__ import annotations
 
 import datetime as dt
@@ -16,11 +15,15 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pandas import DataFrame, DatetimeIndex, Index, MultiIndex, Series
-from plotly.graph_objs import Figure  # type: ignore[import-untyped]
-from plotly.io import to_html  # type: ignore[import-untyped]
-from plotly.offline import plot  # type: ignore[import-untyped]
+from plotly.graph_objs import Figure  # type: ignore[import-untyped,unused-ignore]
+from plotly.io import to_html  # type: ignore[import-untyped,unused-ignore]
+from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
-from scipy.stats import kurtosis, norm, skew  # type: ignore[import-untyped]
+from scipy.stats import (  # type: ignore[import-untyped,unused-ignore]
+    kurtosis,
+    norm,
+    skew,
+)
 
 from openseries.datefixer import get_calc_range
 from openseries.load_plotly import load_plotly_dict

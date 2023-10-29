@@ -374,130 +374,6 @@ class OpenFrame(CommonModel):
             dtype=Int64Dtype(),
         )
 
-    def jensen_alpha(  # noqa: C901
-        self: OpenFrame,
-        asset: Union[tuple[str, ValueType], int],
-        market: Union[tuple[str, ValueType], int],
-        riskfree_rate: float = 0.0,
-    ) -> float:
-        """
-        Jensen's alpha.
-
-        The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
-        measure that represents the average return on a portfolio or investment,
-        above or below that predicted by the capital asset pricing model (CAPM),
-        given the portfolio's or investment's beta and the average market return.
-        This metric is also commonly referred to as simply alpha.
-        https://www.investopedia.com/terms/j/jensensmeasure.asp.
-
-        Parameters
-        ----------
-        asset: Union[tuple[str, ValueType], int]
-            The column of the asset
-        market: Union[tuple[str, ValueType], int]
-            The column of the market against which Jensen's alpha is measured
-        riskfree_rate : float, default: 0.0
-            The return of the zero volatility riskfree asset
-
-        Returns
-        -------
-        float
-            Jensen's alpha
-        """
-        full_year: float = 1.0
-        if all(
-            x == ValueType.RTRN
-            for x in self.tsdf.columns.get_level_values(1).to_numpy()
-        ):
-            if isinstance(asset, tuple):
-                asset_log = self.tsdf.loc[:, asset]
-                asset_cagr = asset_log.mean()
-            elif isinstance(asset, int):
-                asset_log = self.tsdf.iloc[:, asset]
-                asset_cagr = asset_log.mean()
-            else:
-                msg = "asset should be a tuple[str, ValueType] or an integer."
-                raise TypeError(
-                    msg,
-                )
-            if isinstance(market, tuple):
-                market_log = self.tsdf.loc[:, market]
-                market_cagr = market_log.mean()
-            elif isinstance(market, int):
-                market_log = self.tsdf.iloc[:, market]
-                market_cagr = market_log.mean()
-            else:
-                msg = "market should be a tuple[str, ValueType] or an integer."
-                raise TypeError(
-                    msg,
-                )
-        else:
-            if isinstance(asset, tuple):
-                asset_log = log(
-                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
-                )
-                if self.yearfrac > full_year:
-                    asset_cagr = (
-                        self.tsdf.loc[:, asset].iloc[-1]
-                        / self.tsdf.loc[:, asset].iloc[0]
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    asset_cagr = (
-                        self.tsdf.loc[:, asset].iloc[-1]
-                        / self.tsdf.loc[:, asset].iloc[0]
-                        - 1
-                    )
-            elif isinstance(asset, int):
-                asset_log = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
-                if self.yearfrac > full_year:
-                    asset_cagr = (
-                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    asset_cagr = (
-                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
-                    )
-            else:
-                msg = "asset should be a tuple[str, ValueType] or an integer."
-                raise TypeError(
-                    msg,
-                )
-            if isinstance(market, tuple):
-                market_log = log(
-                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
-                )
-                if self.yearfrac > full_year:
-                    market_cagr = (
-                        self.tsdf.loc[:, market].iloc[-1]
-                        / self.tsdf.loc[:, market].iloc[0]
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    market_cagr = (
-                        self.tsdf.loc[:, market].iloc[-1]
-                        / self.tsdf.loc[:, market].iloc[0]
-                        - 1
-                    )
-            elif isinstance(market, int):
-                market_log = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
-                if self.yearfrac > full_year:
-                    market_cagr = (
-                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    market_cagr = (
-                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
-                    )
-            else:
-                msg = "market should be a tuple[str, ValueType] or an integer."
-                raise TypeError(
-                    msg,
-                )
-
-        covariance = cov(asset_log, market_log, ddof=1)
-        beta = covariance[0, 1] / covariance[1, 1]
-
-        return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
-
     @property
     def worst_month(self: OpenFrame) -> Series[float]:
         """
@@ -1476,6 +1352,130 @@ class OpenFrame(CommonModel):
             self.tsdf[y_label, x_label] = results.predict(x_value)
 
         return results
+
+    def jensen_alpha(  # noqa: C901
+        self: OpenFrame,
+        asset: Union[tuple[str, ValueType], int],
+        market: Union[tuple[str, ValueType], int],
+        riskfree_rate: float = 0.0,
+    ) -> float:
+        """
+        Jensen's alpha.
+
+        The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
+        measure that represents the average return on a portfolio or investment,
+        above or below that predicted by the capital asset pricing model (CAPM),
+        given the portfolio's or investment's beta and the average market return.
+        This metric is also commonly referred to as simply alpha.
+        https://www.investopedia.com/terms/j/jensensmeasure.asp.
+
+        Parameters
+        ----------
+        asset: Union[tuple[str, ValueType], int]
+            The column of the asset
+        market: Union[tuple[str, ValueType], int]
+            The column of the market against which Jensen's alpha is measured
+        riskfree_rate : float, default: 0.0
+            The return of the zero volatility riskfree asset
+
+        Returns
+        -------
+        float
+            Jensen's alpha
+        """
+        full_year: float = 1.0
+        if all(
+            x == ValueType.RTRN
+            for x in self.tsdf.columns.get_level_values(1).to_numpy()
+        ):
+            if isinstance(asset, tuple):
+                asset_log = self.tsdf.loc[:, asset]
+                asset_cagr = asset_log.mean()
+            elif isinstance(asset, int):
+                asset_log = self.tsdf.iloc[:, asset]
+                asset_cagr = asset_log.mean()
+            else:
+                msg = "asset should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
+                )
+            if isinstance(market, tuple):
+                market_log = self.tsdf.loc[:, market]
+                market_cagr = market_log.mean()
+            elif isinstance(market, int):
+                market_log = self.tsdf.iloc[:, market]
+                market_cagr = market_log.mean()
+            else:
+                msg = "market should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
+                )
+        else:
+            if isinstance(asset, tuple):
+                asset_log = log(
+                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
+                )
+                if self.yearfrac > full_year:
+                    asset_cagr = (
+                        self.tsdf.loc[:, asset].iloc[-1]
+                        / self.tsdf.loc[:, asset].iloc[0]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    asset_cagr = (
+                        self.tsdf.loc[:, asset].iloc[-1]
+                        / self.tsdf.loc[:, asset].iloc[0]
+                        - 1
+                    )
+            elif isinstance(asset, int):
+                asset_log = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                if self.yearfrac > full_year:
+                    asset_cagr = (
+                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    asset_cagr = (
+                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
+                    )
+            else:
+                msg = "asset should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
+                )
+            if isinstance(market, tuple):
+                market_log = log(
+                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
+                )
+                if self.yearfrac > full_year:
+                    market_cagr = (
+                        self.tsdf.loc[:, market].iloc[-1]
+                        / self.tsdf.loc[:, market].iloc[0]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    market_cagr = (
+                        self.tsdf.loc[:, market].iloc[-1]
+                        / self.tsdf.loc[:, market].iloc[0]
+                        - 1
+                    )
+            elif isinstance(market, int):
+                market_log = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                if self.yearfrac > full_year:
+                    market_cagr = (
+                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
+                    ) ** (1 / self.yearfrac) - 1
+                else:
+                    market_cagr = (
+                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
+                    )
+            else:
+                msg = "market should be a tuple[str, ValueType] or an integer."
+                raise TypeError(
+                    msg,
+                )
+
+        covariance = cov(asset_log, market_log, ddof=1)
+        beta = covariance[0, 1] / covariance[1, 1]
+
+        return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     def make_portfolio(
         self: OpenFrame,
