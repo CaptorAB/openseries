@@ -1198,12 +1198,7 @@ class TestOpenFrame(TestCase):
             msg = "plot_series method not working as intended"
             raise ValueError(msg)
 
-        _, divstring = plotframe.plot_series(
-            auto_open=False,
-            output_type="div",
-            directory=directory,
-        )
-
+        _, divstring = plotframe.plot_series(auto_open=False, output_type="div")
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
             raise ValueError(msg)
@@ -1319,12 +1314,7 @@ class TestOpenFrame(TestCase):
             msg = "plot_bars method not working as intended"
             raise ValueError(msg)
 
-        _, divstring = plotframe.plot_bars(
-            auto_open=False,
-            output_type="div",
-            directory=directory,
-        )
-
+        _, divstring = plotframe.plot_bars(auto_open=False, output_type="div")
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
             raise ValueError(msg)
