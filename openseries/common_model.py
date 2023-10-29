@@ -17,7 +17,7 @@ from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pandas import DataFrame, DatetimeIndex, Index, MultiIndex, Series
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
-from plotly.io import write_html  # type: ignore[import-untyped]
+from plotly.io import to_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import kurtosis, norm, skew  # type: ignore[import-untyped]
@@ -647,33 +647,32 @@ class CommonModel(BaseModel):
         if add_logo:
             figure.add_layout_image(logo)
 
-        plot(
-            figure_or_data=figure,
-            filename=str(plotfile),
-            auto_open=auto_open,
-            link_text="",
-            include_plotlyjs="cdn",
-            config=fig["config"],
-            output_type=output_type,
-        )
-
-        if output_type == "div":
+        if output_type == "file":
+            plot(
+                figure_or_data=figure,
+                filename=str(plotfile),
+                auto_open=auto_open,
+                auto_play=False,
+                link_text="",
+                include_plotlyjs="cdn",
+                config=fig["config"],
+                output_type=output_type,
+            )
+            string_output = str(plotfile)
+        else:
             div_id = filename.split(sep=".")[0]
-            write_html(
+            string_output = to_html(
                 fig=figure,
-                file=plotfile,
-                auto_open=False,
+                config=fig["config"],
+                auto_play=False,
+                include_plotlyjs=True,
                 full_html=False,
                 div_id=div_id,
             )
-            with Path.open(plotfile, encoding="utf-8") as div_file:
-                stringoutput = div_file.read()
-        else:
-            stringoutput = str(plotfile)
 
-        return figure, stringoutput
+        return figure, string_output
 
-    def plot_series(
+    def plot_series(  # noqa: C901
         self: CommonModel,
         mode: LiteralLinePlotMode = "lines",
         tick_fmt: Optional[str] = None,
@@ -758,9 +757,6 @@ class CommonModel(BaseModel):
             )
         figure.update_layout(yaxis={"tickformat": tick_fmt})
 
-        if add_logo:
-            figure.add_layout_image(logo)
-
         if show_last is True:
             txt = f"Last {{:{tick_fmt}}}" if tick_fmt else "Last {}"
 
@@ -777,31 +773,33 @@ class CommonModel(BaseModel):
                     textposition="top center",
                 )
 
-        plot(
-            figure_or_data=figure,
-            filename=str(plotfile),
-            auto_open=auto_open,
-            link_text="",
-            include_plotlyjs="cdn",
-            config=fig["config"],
-            output_type=output_type,
-        )
+        if add_logo:
+            figure.add_layout_image(logo)
 
-        if output_type == "div":
+        if output_type == "file":
+            plot(
+                figure_or_data=figure,
+                filename=str(plotfile),
+                auto_open=auto_open,
+                auto_play=False,
+                link_text="",
+                include_plotlyjs="cdn",
+                config=fig["config"],
+                output_type=output_type,
+            )
+            string_output = str(plotfile)
+        else:
             div_id = filename.split(sep=".")[0]
-            write_html(
+            string_output = to_html(
                 fig=figure,
-                file=plotfile,
-                auto_open=False,
+                config=fig["config"],
+                auto_play=False,
+                include_plotlyjs=True,
                 full_html=False,
                 div_id=div_id,
             )
-            with Path.open(plotfile, encoding="utf-8") as div_file:
-                stringoutput = div_file.read()
-        else:
-            stringoutput = str(plotfile)
 
-        return figure, stringoutput
+        return figure, string_output
 
     def arithmetic_ret_func(
         self: CommonModel,

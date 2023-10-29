@@ -1196,22 +1196,17 @@ class TestOpenFrame(TestCase):
 
         if figfile[:5] == "<div>":
             msg = "plot_series method not working as intended"
-            raise FileNotFoundError(msg)
+            raise ValueError(msg)
 
-        filename = "trial.html"
-        divfile = directory.joinpath(filename)
         _, divstring = plotframe.plot_series(
             auto_open=False,
             output_type="div",
-            filename=filename,
             directory=directory,
         )
 
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
-            raise FileNotFoundError(msg)
-
-        divfile.unlink()
+            raise ValueError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True
@@ -1322,22 +1317,17 @@ class TestOpenFrame(TestCase):
 
         if figfile[:5] == "<div>":
             msg = "plot_bars method not working as intended"
-            raise FileNotFoundError(msg)
+            raise ValueError(msg)
 
-        filename = "trial.html"
-        divfile = directory.joinpath(filename)
         _, divstring = plotframe.plot_bars(
             auto_open=False,
             output_type="div",
-            filename=filename,
             directory=directory,
         )
 
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
-            raise FileNotFoundError(msg)
-
-        divfile.unlink()
+            raise ValueError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True

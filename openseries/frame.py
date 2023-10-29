@@ -1141,7 +1141,7 @@ class OpenFrame(CommonModel):
             dtype="float64",
         )
 
-    def capture_ratio_func(
+    def capture_ratio_func(  # noqa: C901
         self: OpenFrame,
         ratio: LiteralCaptureRatio,
         base_column: Union[tuple[str, ValueType], int] = -1,
