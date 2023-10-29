@@ -1189,6 +1189,15 @@ class TestOpenFrame(TestCase):
             msg = "html file not created"
             raise FileNotFoundError(msg)
 
+        if figfile[:5] == "<div>":
+            msg = "plot_series method not working as intended"
+            raise FileNotFoundError(msg)
+
+        _, divstring = plotframe.plot_series(auto_open=False, output_type="div")
+        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+            msg = "Html div section not created"
+            raise FileNotFoundError(msg)
+
         plotfile.unlink()
         if plotfile.exists():
             msg = "html file not deleted as intended"
@@ -1294,6 +1303,15 @@ class TestOpenFrame(TestCase):
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
             msg = "html file not created"
+            raise FileNotFoundError(msg)
+
+        if figfile[:5] == "<div>":
+            msg = "plot_bars method not working as intended"
+            raise FileNotFoundError(msg)
+
+        _, divstring = plotframe.plot_bars(auto_open=False, output_type="div")
+        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+            msg = "Html div section not created"
             raise FileNotFoundError(msg)
 
         plotfile.unlink()

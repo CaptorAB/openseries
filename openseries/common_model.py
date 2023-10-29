@@ -17,6 +17,7 @@ from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pandas import DataFrame, DatetimeIndex, Index, MultiIndex, Series
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
+from plotly.io import write_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import kurtosis, norm, skew  # type: ignore[import-untyped]
@@ -656,7 +657,21 @@ class CommonModel(BaseModel):
             output_type=output_type,
         )
 
-        return figure, str(plotfile)
+        if output_type == "div":
+            div_id = filename.split(sep=".")[0]
+            write_html(
+                fig=figure,
+                file=plotfile,
+                auto_open=False,
+                full_html=False,
+                div_id=div_id,
+            )
+            with Path.open(plotfile, encoding="utf-8") as div_file:
+                stringoutput = div_file.read()
+        else:
+            stringoutput = str(plotfile)
+
+        return figure, stringoutput
 
     def plot_series(
         self: CommonModel,
@@ -772,7 +787,21 @@ class CommonModel(BaseModel):
             output_type=output_type,
         )
 
-        return figure, str(plotfile)
+        if output_type == "div":
+            div_id = filename.split(sep=".")[0]
+            write_html(
+                fig=figure,
+                file=plotfile,
+                auto_open=False,
+                full_html=False,
+                div_id=div_id,
+            )
+            with Path.open(plotfile, encoding="utf-8") as div_file:
+                stringoutput = div_file.read()
+        else:
+            stringoutput = str(plotfile)
+
+        return figure, stringoutput
 
     def arithmetic_ret_func(
         self: CommonModel,
