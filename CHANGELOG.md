@@ -3,6 +3,11 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.4] - 2023-10-30
+
+- Fixed two pct_change() methods missing fill_method.
+- Allowed for setting plotly include_plotlyjs argument controlling how to include plotly.js
+
 ## Version [1.4.3] - 2023-10-30
 
 - Fixed plot tests and fixed test that relied on internet connection
