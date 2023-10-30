@@ -1158,7 +1158,12 @@ class TestOpenFrame(TestCase):
             output_type="div",
         )
         fig_logo_json = loads(fig_logo.to_json())
-        if fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
+
+        if logo == {}:
+            if fig_logo_json["layout"]["images"][0] != logo:
+                msg = "plot_series add_logo argument not setup correctly"
+                raise ValueError(msg)
+        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_series add_logo argument not setup correctly"
             raise ValueError(msg)
 
@@ -1188,6 +1193,15 @@ class TestOpenFrame(TestCase):
         if plotfile.exists():
             msg = "html file not deleted as intended"
             raise FileExistsError(msg)
+
+        if figfile[:5] == "<div>":
+            msg = "plot_series method not working as intended"
+            raise ValueError(msg)
+
+        _, divstring = plotframe.plot_series(auto_open=False, output_type="div")
+        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+            msg = "Html div section not created"
+            raise ValueError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True
@@ -1261,7 +1275,12 @@ class TestOpenFrame(TestCase):
             output_type="div",
         )
         fig_logo_json = loads(fig_logo.to_json())
-        if fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
+
+        if logo == {}:
+            if fig_logo_json["layout"]["images"][0] != logo:
+                msg = "plot_bars add_logo argument not setup correctly"
+                raise ValueError(msg)
+        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_bars add_logo argument not setup correctly"
             raise ValueError(msg)
 
@@ -1290,6 +1309,15 @@ class TestOpenFrame(TestCase):
         if plotfile.exists():
             msg = "html file not deleted as intended"
             raise FileExistsError(msg)
+
+        if figfile[:5] == "<div>":
+            msg = "plot_bars method not working as intended"
+            raise ValueError(msg)
+
+        _, divstring = plotframe.plot_bars(auto_open=False, output_type="div")
+        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+            msg = "Html div section not created"
+            raise ValueError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True

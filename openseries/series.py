@@ -1,5 +1,4 @@
 """Defining the OpenTimeSeries class."""
-# mypy: disable-error-code="unused-ignore"
 from __future__ import annotations
 
 import datetime as dt
@@ -111,7 +110,7 @@ class OpenTimeSeries(CommonModel):
     isin: Optional[str] = None
     label: Optional[str] = None
 
-    @model_validator(mode="after")  # type: ignore[misc]
+    @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
     def dates_and_values_validate(self: OpenTimeSeries) -> OpenTimeSeries:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)
@@ -231,7 +230,7 @@ class OpenTimeSeries(CommonModel):
 
         Parameters
         ----------
-        dframe: Union[DataFrame, Series[type[float]]]
+        dframe: Union[DataFrame, Series[float]]
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
