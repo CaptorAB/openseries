@@ -3,6 +3,13 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.3] - 2023-10-30
+
+- Fixed plot tests and fixed test that relied on internet connection
+- Made plots with output type div more meaningful by explicitly returning div section string
+- pd.Series typing cleanup and a bunch of other cleanups in mypy
+- Added fill_method to deal with pandas FutureWarning .pct_change(fill_method=cast(str, None)). May need to be reverted when pandas is updated from 2.1.2
+
 ## Version [1.4.2] - 2023-10-28
 
 - Fixed error in timeseries_chain introduced in version 1.4.0. Because of this versions 1.4.0 & 1.4.1 was deleted
