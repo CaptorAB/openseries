@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.3"
-description = "Package for simple financial time series analysis."
+version = "1.4.4"
+description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
 license = "BSD-3-Clause"

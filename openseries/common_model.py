@@ -33,6 +33,7 @@ from openseries.types import (
     LiteralBarPlotMode,
     LiteralLinePlotMode,
     LiteralNanMethod,
+    LiteralPlotlyJSlib,
     LiteralPlotlyOutput,
     LiteralQuantileInterp,
     ValueType,
@@ -572,6 +573,7 @@ class CommonModel(BaseModel):
         directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
         output_type: LiteralPlotlyOutput = "file",
+        include_plotlyjs: LiteralPlotlyJSlib = "cdn",
         *,
         auto_open: bool = True,
         add_logo: bool = True,
@@ -596,6 +598,8 @@ class CommonModel(BaseModel):
             the input self.tsdf
         output_type: LiteralPlotlyOutput, default: "file"
             Determines output type
+        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
+            Determines how the plotly.js library is included in the output
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
@@ -657,7 +661,7 @@ class CommonModel(BaseModel):
                 auto_open=auto_open,
                 auto_play=False,
                 link_text="",
-                include_plotlyjs="cdn",
+                include_plotlyjs=include_plotlyjs,
                 config=fig["config"],
                 output_type=output_type,
             )
@@ -668,7 +672,7 @@ class CommonModel(BaseModel):
                 fig=figure,
                 config=fig["config"],
                 auto_play=False,
-                include_plotlyjs=True,
+                include_plotlyjs=include_plotlyjs,
                 full_html=False,
                 div_id=div_id,
             )
@@ -683,6 +687,7 @@ class CommonModel(BaseModel):
         directory: Optional[DirectoryPath] = None,
         labels: Optional[list[str]] = None,
         output_type: LiteralPlotlyOutput = "file",
+        include_plotlyjs: LiteralPlotlyJSlib = "cdn",
         *,
         auto_open: bool = True,
         add_logo: bool = True,
@@ -708,6 +713,8 @@ class CommonModel(BaseModel):
             the input self.tsdf
         output_type: LiteralPlotlyOutput, default: "file"
             Determines output type
+        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
+            Determines how the plotly.js library is included in the output
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
@@ -786,7 +793,7 @@ class CommonModel(BaseModel):
                 auto_open=auto_open,
                 auto_play=False,
                 link_text="",
-                include_plotlyjs="cdn",
+                include_plotlyjs=include_plotlyjs,
                 config=fig["config"],
                 output_type=output_type,
             )
@@ -797,7 +804,7 @@ class CommonModel(BaseModel):
                 fig=figure,
                 config=fig["config"],
                 auto_play=False,
-                include_plotlyjs=True,
+                include_plotlyjs=include_plotlyjs,
                 full_html=False,
                 div_id=div_id,
             )
@@ -1671,7 +1678,7 @@ class CommonModel(BaseModel):
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
-        resultdf = DataFrame(vrdf.pct_change())
+        resultdf = DataFrame(vrdf.pct_change(fill_method=cast(str, None)))
         result = resultdf.loc[period] + 1
         cal_period = result.cumprod(axis="index").iloc[-1] - 1
         if self.tsdf.shape[1] == 1:
@@ -2061,7 +2068,11 @@ def _var_implied_vol_and_target_func(
             - data.loc[cast(int, earlier) : cast(int, later)]
             .pct_change(fill_method=cast(str, None))
             .sum()
-            / len(data.loc[cast(int, earlier) : cast(int, later)].pct_change())
+            / len(
+                data.loc[cast(int, earlier) : cast(int, later)].pct_change(
+                    fill_method=cast(str, None),
+                ),
+            )
         )
     else:
         imp_vol = (
