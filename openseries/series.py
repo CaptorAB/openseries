@@ -494,7 +494,14 @@ class OpenTimeSeries(CommonModel):
         """
         resdf = self.tsdf.copy()
         resdf.index = DatetimeIndex(resdf.index)
-        return float((resdf.resample("BM").last().pct_change().min()).iloc[0])
+        return float(
+            (
+                resdf.resample("BM")
+                .last()
+                .pct_change(fill_method=cast(str, None))
+                .min()
+            ).iloc[0],
+        )
 
     def value_to_ret(self: OpenTimeSeries) -> OpenTimeSeries:
         """
@@ -505,7 +512,7 @@ class OpenTimeSeries(CommonModel):
         OpenTimeSeries
             The returns of the values in the series
         """
-        self.tsdf = self.tsdf.pct_change()
+        self.tsdf = self.tsdf.pct_change(fill_method=cast(str, None))
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         self.tsdf.columns = MultiIndex.from_arrays(
@@ -793,7 +800,7 @@ class OpenTimeSeries(CommonModel):
             returns_input = True
         else:
             values = [cast(float, self.tsdf.iloc[0, 0])]
-            ra_df = self.tsdf.pct_change()
+            ra_df = self.tsdf.pct_change(fill_method=cast(str, None))
             returns_input = False
         ra_df = ra_df.dropna()
 

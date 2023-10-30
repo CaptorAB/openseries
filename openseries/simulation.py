@@ -57,7 +57,7 @@ def random_generator(seed: Optional[int]) -> Generator:
         Numpy random process generator
     """
     ss = SeedSequence(entropy=seed)
-    bg = PCG64(seed=ss)
+    bg = PCG64(seed=cast(Optional[int], ss))
     return Generator(bit_generator=bg)
 
 
@@ -660,7 +660,10 @@ class ReturnSimulation:
         """
         return cast(
             float,
-            (self.results.pct_change().mean() * self.trading_days_in_year).iloc[0],
+            (
+                self.results.pct_change(fill_method=cast(str, None)).mean()
+                * self.trading_days_in_year
+            ).iloc[0],
         )
 
     @property
@@ -675,9 +678,10 @@ class ReturnSimulation:
         """
         return cast(
             float,
-            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[
-                0
-            ],
+            (
+                self.results.pct_change(fill_method=cast(str, None)).std()
+                * sqrt(self.trading_days_in_year)
+            ).iloc[0],
         )
 
     @classmethod
