@@ -866,6 +866,7 @@ class CommonModel(BaseModel):
             return float(result.iloc[0])
         return Series(
             data=result,
+            index=self.tsdf.columns,
             name="Arithmetic return",
             dtype="float64",
         )
