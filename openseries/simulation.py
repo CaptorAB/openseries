@@ -236,11 +236,16 @@ def jump_diffusion_process(
     NDArray[float64]
         Jump sizes for each point in time (mostly zeroes if jumps are infrequent)
     """
-    s_n = 0.0
-    time = 0
-    small_lamda = -(1.0 / param.jumps_lamda)
+    jump_intensity_zero = 0.0
     jump_sizes = array([0.0] * param.all_time)
 
+    if param.jumps_lamda == jump_intensity_zero:
+        return jump_sizes
+
+    small_lamda = -(1.0 / param.jumps_lamda)
+
+    s_n = 0.0
+    time = 0
     while s_n < param.all_time:
         s_n += small_lamda * log(
             randomizer.uniform(low=0.0, high=1.0),
@@ -776,13 +781,13 @@ class ModelParameters(BaseModel):
         Starting asset value
     all_time: PositiveInt
         Amount of time to simulate for
-    all_delta: float
+    all_delta: PositiveFloat
         Delta, the rate of time e.g. 1/252 = daily, 1/12 = monthly
     all_sigma: PositiveFloat
         Volatility of the stochastic processes
-    gbm_mu: float
+    gbm_mu: float, default: 0.0
         Annual drift factor for geometric brownian motion
-    jumps_lamda: float, default: 0.0
+    jumps_lamda: PositiveFloat, default: 0.0
         Probability of a jump happening at each point in time
     jumps_sigma: PositiveFloat, default: 0.0
         Volatility of the jump size
@@ -792,9 +797,9 @@ class ModelParameters(BaseModel):
 
     all_s0: float
     all_time: PositiveInt
-    all_delta: float
+    all_delta: PositiveFloat
     all_sigma: PositiveFloat
-    gbm_mu: float
-    jumps_lamda: float = 0.0
+    gbm_mu: float = 0.0
+    jumps_lamda: PositiveFloat = 0.0
     jumps_sigma: PositiveFloat = 0.0
     jumps_mu: float = 0.0
