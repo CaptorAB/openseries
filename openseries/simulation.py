@@ -29,7 +29,7 @@ from numpy import (
 from numpy.random import PCG64, Generator, SeedSequence
 from numpy.typing import NDArray
 from pandas import DataFrame, Index, MultiIndex, concat
-from pydantic import BaseModel, PositiveFloat, PositiveInt
+from pydantic import BaseModel, NonNegativeFloat, PositiveFloat, PositiveInt
 
 from openseries.datefixer import generate_calender_date_range
 from openseries.types import (
@@ -645,10 +645,10 @@ class ReturnSimulation:
         trading_days: PositiveInt,
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
-        jumps_lamda: float,
-        jumps_sigma: PositiveFloat,
-        jumps_mu: float,
         seed: int,
+        jumps_lamda: float,
+        jumps_sigma: PositiveFloat = 0.0,
+        jumps_mu: float = 0.0,
         trading_days_in_year: DaysInYearType = 252,
     ) -> ReturnSimulation:
         """
@@ -664,14 +664,14 @@ class ReturnSimulation:
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        jumps_lamda: float
-            This is the probability of a jump happening at each point in time
-        jumps_sigma: PositiveFloat
-            This is the volatility of the jump size
-        jumps_mu: float
-            This is the average jump size
         seed: int
             Seed for random process initiation
+        jumps_lamda: float
+            This is the probability of a jump happening at each point in time
+        jumps_sigma: PositiveFloat, default: 0.0
+            This is the volatility of the jump size
+        jumps_mu: float, default: 0.0
+            This is the average jump size
         trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
 
@@ -787,9 +787,9 @@ class ModelParameters(BaseModel):
         Volatility of the stochastic processes
     gbm_mu: float, default: 0.0
         Annual drift factor for geometric brownian motion
-    jumps_lamda: PositiveFloat, default: 0.0
+    jumps_lamda: NonNegativeFloat, default: 0.0
         Probability of a jump happening at each point in time
-    jumps_sigma: PositiveFloat, default: 0.0
+    jumps_sigma: NonNegativeFloat, default: 0.0
         Volatility of the jump size
     jumps_mu: float, default: 0.0
         Average jump size
@@ -800,6 +800,6 @@ class ModelParameters(BaseModel):
     all_delta: PositiveFloat
     all_sigma: PositiveFloat
     gbm_mu: float = 0.0
-    jumps_lamda: PositiveFloat = 0.0
-    jumps_sigma: PositiveFloat = 0.0
+    jumps_lamda: NonNegativeFloat = 0.0
+    jumps_sigma: NonNegativeFloat = 0.0
     jumps_mu: float = 0.0

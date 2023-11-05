@@ -77,18 +77,21 @@ class TestSimulation(TestCase):
             "from_lognormal",
             "from_gbm",
             "from_merton_jump_gbm",
+            "from_merton_jump_gbm",
         ]
         added: list[dict[str, Union[int, float]]] = [
             {},
             {},
             {},
             {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
+            {"jumps_lamda": 0.0},
         ]
         intended_returns = [
             "-0.005640734",
             "0.013058925",
             "-0.025640734",
             "-0.043708800",
+            "-0.007903904",
         ]
 
         intended_volatilities = [
@@ -96,6 +99,7 @@ class TestSimulation(TestCase):
             "0.193487832",
             "0.193403252",
             "0.209297219",
+            "0.193444733",
         ]
 
         returns = []
