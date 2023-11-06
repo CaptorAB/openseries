@@ -1597,7 +1597,7 @@ class OpenFrame(CommonModel):
         portfolio = dframe.dot(self.weights)
         portfolio = portfolio.add(1.0).cumprod().to_frame()
         portfolio.columns = [[name], [ValueType.PRICE]]
-        return DataFrame(portfolio)
+        return DataFrame(data=portfolio, dtype="float64")
 
     def rolling_info_ratio(
         self: OpenFrame,

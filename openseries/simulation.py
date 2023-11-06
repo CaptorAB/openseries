@@ -13,17 +13,14 @@ Processes that can be simulated in this module are:
 from __future__ import annotations
 
 import datetime as dt
-from math import log
 from math import pow as mathpow
 from typing import Optional, cast
 
 from numpy import (
-    add,
-    append,
-    array,
-    exp,
+    cumprod,
     float64,
     insert,
+    multiply,
     sqrt,
 )
 from numpy.random import PCG64, Generator, SeedSequence
@@ -58,44 +55,39 @@ def random_generator(seed: Optional[int]) -> Generator:
     return Generator(bit_generator=bg)
 
 
-def convert_to_prices(
+def convert_returns_to_values(
     param: ModelParameters,
-    log_returns: NDArray[float64],
+    returns: NDArray[float64],
 ) -> NDArray[float64]:
     """
-    Price series.
+    Value series.
 
-    Converts a sequence of log returns into normal returns (exponentiation)
-    and then computes a price sequence given a starting price, param.all_s0.
+    Converts a sequence of returns into a price sequence
+    given a starting price, param.all_s0.
 
     Parameters
     ----------
     param: ModelParameters
         Model input
-    log_returns: NDArray[float64]
-        Log returns to exponentiate
+    returns: NDArray[float64]
+        Returns to convert
 
     Returns
     -------
     NDArray[float64]
-        Price series
+        Value series
     """
-    returns = exp(log_returns)
-    price_sequence = array([param.all_s0])
-    for rtn in range(1, len(returns)):
-        price_sequence = append(
-            price_sequence,
-            price_sequence[rtn - 1] * returns[rtn - 1],
-        )
-    return price_sequence
+    return_array = insert(arr=returns + 1.0, obj=0, values=param.all_s0, axis=1)
+    return cumprod(a=return_array, axis=1)  # type: ignore[return-value]
 
 
-def brownian_motion_log_returns(
+def wiener_process(
     param: ModelParameters,
+    number_of_sims: PositiveInt,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Brownian Motion log returns.
+    Random Wiener process.
 
     Method returns a Wiener process. The Wiener process is also called
     Brownian motion. For more information about the Wiener process check out
@@ -105,33 +97,38 @@ def brownian_motion_log_returns(
     ----------
     param: ModelParameters
         Model input
+    number_of_sims: PositiveInt
+        Number of simulations to generate
     randomizer: numpy.random.Generator
         Random process generator
 
     Returns
     -------
     NDArray[float64]
-        Brownian Motion log returns
+        Wiener process / Brownian motion
     """
     sqrt_delta_sigma = sqrt(param.all_delta) * param.all_sigma
     return randomizer.normal(
         loc=0,
         scale=sqrt_delta_sigma,
-        size=param.all_time,
+        size=(number_of_sims, param.all_time),
     )
 
 
-def brownian_motion_levels(
+def brownian_motion_series(
     param: ModelParameters,
+    number_of_sims: PositiveInt,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Delivers a price sequence whose returns evolve as to a brownian motion.
+    Delivers a price sequence based on returns of a brownian motion.
 
     Parameters
     ----------
     param: ModelParameters
         Model input
+    number_of_sims: PositiveInt
+        Number of simulations to generate
     randomizer: numpy.random.Generator
         Random process generator
 
@@ -140,23 +137,25 @@ def brownian_motion_levels(
     NDArray[float64]
         Price sequence which follows a brownian motion
     """
-    return convert_to_prices(
+    return convert_returns_to_values(
         param=param,
-        log_returns=brownian_motion_log_returns(
+        returns=wiener_process(
             param=param,
+            number_of_sims=number_of_sims,
             randomizer=randomizer,
         ),
     )
 
 
-def geometric_brownian_motion_log_returns(
+def geometric_brownian_motion_returns(
     param: ModelParameters,
+    number_of_sims: PositiveInt,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Log returns of a Geometric Brownian Motion process.
+    Geometric Brownian Motion process returns.
 
-    Method constructs a sequence of log returns which, when
+    Method constructs a sequence of returns which, when
     exponentiated, produce a random Geometric Brownian Motion (GBM).
     GBM is the stochastic process underlying the Black Scholes
     options pricing formula.
@@ -165,28 +164,30 @@ def geometric_brownian_motion_log_returns(
     ----------
     param: ModelParameters
         Model input
+    number_of_sims: PositiveInt
+        Number of simulations to generate
     randomizer: numpy.random.Generator
         Random process generator
 
     Returns
     -------
     NDArray[float64]
-        Log returns of a Geometric Brownian Motion process
+        Returns of a Geometric Brownian Motion process
     """
-    wiener_process = brownian_motion_log_returns(
+    wiener = wiener_process(
         param=param,
+        number_of_sims=number_of_sims,
         randomizer=randomizer,
     )
 
-    sigma_pow_mu_delta = (
-        param.gbm_mu - 0.5 * mathpow(param.all_sigma, 2.0)
-    ) * param.all_delta
+    drift = (param.gbm_mu - 0.5 * mathpow(param.all_sigma, 2.0)) * param.all_delta
 
-    return wiener_process + sigma_pow_mu_delta
+    return wiener + drift
 
 
-def geometric_brownian_motion_levels(
+def geometric_brownian_motion_series(
     param: ModelParameters,
+    number_of_sims: PositiveInt,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
@@ -196,6 +197,8 @@ def geometric_brownian_motion_levels(
     ----------
     param: ModelParameters
         Model input
+    number_of_sims: PositiveInt
+        Number of simulations to generate
     randomizer: numpy.random.Generator
         Random process generator
 
@@ -204,130 +207,97 @@ def geometric_brownian_motion_levels(
     NDArray[float64]
         Price levels for the asset
     """
-    return convert_to_prices(
+    return convert_returns_to_values(
         param=param,
-        log_returns=geometric_brownian_motion_log_returns(
+        returns=geometric_brownian_motion_returns(
             param=param,
+            number_of_sims=number_of_sims,
             randomizer=randomizer,
         ),
     )
 
 
-def jump_diffusion_process(
+def merton_jump_model_returns(
     param: ModelParameters,
+    number_of_sims: PositiveInt,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Jump sizes for each point in time (mostly zeroes if jumps are infrequent).
+    Merton Jump-Diffusion model returns.
 
-    Method produces a sequence of Jump Sizes which represent a jump
-    diffusion process. These jumps are combined with a geometric brownian
-    motion (log returns) to produce the Merton model.
+    Method constructs a sequence of returns which, when
+    exponentiated, produce a random Geometric Brownian Motion (GBM).
+    GBM is the stochastic process underlying the Black Scholes
+    options pricing formula.
 
     Parameters
     ----------
     param: ModelParameters
         Model input
+    number_of_sims: PositiveInt
+        Number of simulations to generate
     randomizer: numpy.random.Generator
         Random process generator
 
     Returns
     -------
     NDArray[float64]
-        Jump sizes for each point in time (mostly zeroes if jumps are infrequent)
+        Returns of a Geometric Brownian Motion process
     """
-    jump_intensity_zero = 0.0
-    jump_sizes = array([0.0] * param.all_time)
-
-    if param.jumps_lamda == jump_intensity_zero:
-        return jump_sizes
-
-    small_lamda = -(1.0 / param.jumps_lamda)
-
-    s_n = 0.0
-    time = 0
-    while s_n < param.all_time:
-        s_n += small_lamda * log(
-            randomizer.uniform(low=0.0, high=1.0),
-        )
-        for j in range(param.all_time):
-            if (
-                time * param.all_delta
-                <= s_n * param.all_delta
-                <= (j + 1) * param.all_delta
-            ):
-                jump_sizes[j] += randomizer.normal(
-                    loc=param.jumps_mu,
-                    scale=param.jumps_sigma,
-                )
-                break
-        time += 1
-
-    return jump_sizes
-
-
-def geometric_brownian_motion_jump_diffusion_log_returns(
-    param: ModelParameters,
-    randomizer: Generator,
-) -> NDArray[float64]:
-    """
-    Geometric Brownian Motion process with jumps in it.
-
-    Method constructs combines a geometric brownian motion process
-    (log returns) with a jump diffusion process (log returns) to produce a
-    sequence of gbm jump returns.
-
-    Parameters
-    ----------
-    param: ModelParameters
-        Model input
-    randomizer: numpy.random.Generator
-        Random process generator
-
-    Returns
-    -------
-    NDArray[float64]
-        Geometric Brownian Motion process with jumps in it
-    """
-    jump_diffusion = jump_diffusion_process(
+    wiener = wiener_process(
         param=param,
+        number_of_sims=number_of_sims,
         randomizer=randomizer,
     )
 
-    geometric_brownian_motion = geometric_brownian_motion_log_returns(
-        param=param,
-        randomizer=randomizer,
+    poi_rv = multiply(
+        randomizer.poisson(
+            lam=param.jumps_lamda * param.all_delta,
+            size=(number_of_sims, param.all_time),
+        ),
+        randomizer.normal(
+            loc=param.jumps_mu,
+            scale=param.jumps_sigma,
+            size=(number_of_sims, param.all_time),
+        ),
     )
 
-    return add(jump_diffusion, geometric_brownian_motion)
+    geo = (
+        param.gbm_mu
+        - 0.5 * mathpow(param.all_sigma, 2.0)
+        - param.jumps_lamda * (param.jumps_mu + mathpow(param.jumps_sigma, 2.0))
+    ) * param.all_delta + wiener
+
+    return poi_rv + geo  # type: ignore[no-any-return]
 
 
-def geometric_brownian_motion_jump_diffusion_levels(
+def merton_jump_model_series(
     param: ModelParameters,
+    number_of_sims: PositiveInt,
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Geometric Brownian Motion generated prices.
-
-    Converts returns generated with a Geometric Brownian Motion process
-    with jumps into prices.
+    Prices for an asset which evolves according to Mertons Jump-Diffusion model.
 
     Parameters
     ----------
     param: ModelParameters
         Model input
+    number_of_sims: PositiveInt
+        Number of simulations to generate
     randomizer: numpy.random.Generator
         Random process generator
 
     Returns
     -------
     NDArray[float64]
-        Geometric Brownian Motion generated prices
+        Price levels for the asset
     """
-    return convert_to_prices(
+    return convert_returns_to_values(
         param=param,
-        log_returns=geometric_brownian_motion_jump_diffusion_log_returns(
+        returns=merton_jump_model_returns(
             param=param,
+            number_of_sims=number_of_sims,
             randomizer=randomizer,
         ),
     )
@@ -619,13 +589,11 @@ class ReturnSimulation:
         )
 
         cls.randomizer = random_generator(seed=seed)
-        daily_returns = [
-            geometric_brownian_motion_log_returns(
-                param=model_params,
-                randomizer=cls.randomizer,
-            )
-            for _ in range(number_of_sims)
-        ]
+        daily_returns = geometric_brownian_motion_returns(
+            param=model_params,
+            number_of_sims=number_of_sims,
+            randomizer=cls.randomizer,
+        )
 
         return cls(
             number_of_sims=number_of_sims,
@@ -692,15 +660,11 @@ class ReturnSimulation:
         )
 
         cls.randomizer = random_generator(seed=seed)
-        daily_returns = []
-        for _ in range(number_of_sims):
-            aray = geometric_brownian_motion_jump_diffusion_levels(
-                param=model_params,
-                randomizer=cls.randomizer,
-            )
-            return_array = aray[1:] / aray[:-1] - 1
-            return_array = insert(return_array, 0, 0.0)
-            daily_returns.append(return_array)
+        daily_returns = merton_jump_model_returns(
+            param=model_params,
+            number_of_sims=number_of_sims,
+            randomizer=cls.randomizer,
+        )
 
         return cls(
             number_of_sims=number_of_sims,

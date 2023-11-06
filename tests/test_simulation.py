@@ -14,9 +14,9 @@ from openseries.series import OpenTimeSeries
 from openseries.simulation import (
     ModelParameters,
     ReturnSimulation,
-    brownian_motion_levels,
-    geometric_brownian_motion_jump_diffusion_levels,
-    geometric_brownian_motion_levels,
+    brownian_motion_series,
+    geometric_brownian_motion_series,
+    merton_jump_model_series,
     random_generator,
 )
 from openseries.types import ValueType
@@ -83,23 +83,23 @@ class TestSimulation(TestCase):
             {},
             {},
             {},
-            {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
             {"jumps_lamda": 0.0},
+            {"jumps_lamda": 0.3, "jumps_sigma": 0.2, "jumps_mu": -0.2},
         ]
         intended_returns = [
             "-0.005640734",
             "0.013058925",
             "-0.025640734",
-            "-0.043708800",
-            "-0.007903904",
+            "-0.025640734",
+            "-0.011505208",
         ]
 
         intended_volatilities = [
             "0.193403252",
             "0.193487832",
             "0.193403252",
-            "0.209297219",
-            "0.193444733",
+            "0.193403252",
+            "0.211446536",
         ]
 
         returns = []
@@ -126,29 +126,17 @@ class TestSimulation(TestCase):
             msg = "Unexpected result"
             raise ValueError(msg)
 
-        if f"{psim.realized_mean_return:.9f}" != "-0.017030572":
+        if f"{psim.realized_mean_return:.9f}" != "0.014773538":
             msg = f"Unexpected result: '{psim.realized_mean_return:.9f}'"
             raise ValueError(msg)
 
-        if f"{psim.realized_vol:.9f}" != "0.125885483":
+        if f"{psim.realized_vol:.9f}" != "0.096761956":
             msg = f"Unexpected result: '{psim.realized_vol:.9f}'"
             raise ValueError(msg)
 
     def test_assets(self: TestSimulation) -> None:
         """Test stoch processes output."""
-        days = 2520
-        intended_returns = [
-            "-0.054955955",
-            "0.061043422",
-            "0.009116732",
-        ]
-
-        intended_volatilities = [
-            "0.232908982",
-            "0.232982933",
-            "0.252075511",
-        ]
-
+        days = 2512
         modelparams = ModelParameters(
             all_s0=1.0,
             all_time=days,
@@ -161,23 +149,28 @@ class TestSimulation(TestCase):
         )
 
         processes = [
-            brownian_motion_levels,
-            geometric_brownian_motion_levels,
-            geometric_brownian_motion_jump_diffusion_levels,
+            brownian_motion_series,
+            geometric_brownian_motion_series,
+            merton_jump_model_series,
         ]
 
         series = []
         for i, process in zip(range(len(processes)), processes):
             modelresult = process(
                 param=modelparams,
+                number_of_sims=1,
                 randomizer=random_generator(seed=SEED),
             )
             d_range = [
                 d.date()
-                for d in date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
+                for d in date_range(
+                    periods=days + 1,
+                    end=dt.date(2019, 6, 30),
+                    freq="D",
+                )
             ]
             sdf = DataFrame(  # type: ignore[call-overload,unused-ignore]
-                data=modelresult,
+                data=modelresult.T,
                 index=d_range,
                 columns=[f"Simulation_{i}"],
             )
@@ -185,14 +178,18 @@ class TestSimulation(TestCase):
                 OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE).to_cumret(),
             )
 
-        frame = OpenFrame(series)
-        means = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
-        deviations = [f"{v:.9f}" for v in cast(Series, frame.vol)]
+        intended_returns = ["-0.088256155", "0.027742385", "0.028104879"]
 
-        if intended_returns != means:
+        intended_volatilities = ["0.232986005", "0.232986005", "0.232986005"]
+
+        frame = OpenFrame(series)
+        returns = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
+        volatilities = [f"{v:.9f}" for v in cast(Series, frame.vol)]
+
+        if intended_returns != returns:
             msg = "Unexpected calculation result"
             raise ValueError(msg)
-        if intended_volatilities != deviations:
+        if intended_volatilities != volatilities:
             msg = "Unexpected calculation result"
             raise ValueError(msg)
 

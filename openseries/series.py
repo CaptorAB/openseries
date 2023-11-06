@@ -725,7 +725,7 @@ class OpenTimeSeries(CommonModel):
 
         Returns
         -------
-        Pandas.Series
+        Pandas.Series[float]
             Series EWMA volatility
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
