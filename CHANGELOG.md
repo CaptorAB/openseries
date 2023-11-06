@@ -3,6 +3,13 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.5] - 2023-11-06
+
+- Cleaned up function for exponentially weighted moving average "EWMA" volatility
+- Some dev dependency updates such as ruff and Poetry
+- Major cleanup of simulation module. Removed Heston CIR & OU models as I have never checked them. Also rewrote Merton JDM from scratch to make it consisten with GBM model.
+- Rewrite of simulation required update of many calculation result tests
+
 ## Version [1.4.4] - 2023-10-30
 
 - Fixed two pct_change() methods missing fill_method.

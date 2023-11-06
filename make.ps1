@@ -16,7 +16,7 @@ elseif ($task -eq "make") {
     pip install poetry==1.7.0
     Remove-Item -Path 'poetry.lock' -Force -ErrorAction SilentlyContinue
     poetry install --with dev
-    pre-commit install
+    poetry run pre-commit install
 }
 elseif ($task -eq "test") {
     # run tests and report coverage

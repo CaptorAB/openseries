@@ -585,13 +585,13 @@ files = [
 
 [[package]]
 name = "holidays"
-version = "0.35"
+version = "0.36"
 description = "Generate and work with holidays in Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "holidays-0.35-py3-none-any.whl", hash = "sha256:3e179ff248f86dee813160c92e2c4babe3bb3c732287499430d1e3ee90c15f16"},
-    {file = "holidays-0.35.tar.gz", hash = "sha256:e62b797ca3ba2366093458cda0cde33d65e7168be8104815b4149afd4ea4a9ed"},
+    {file = "holidays-0.36-py3-none-any.whl", hash = "sha256:8f5c7b9db8710d492d1571f79d8b5fb847ae60442ed83eb7000aeed3dc29fe9f"},
+    {file = "holidays-0.36.tar.gz", hash = "sha256:54bbaba40adcfb39cd182fb29a1f96114129ff13778342c7ad12bb9fbccef973"},
 ]
 
 [package.dependencies]
@@ -2064,4 +2064,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "ccb56e551a49ec9cf2c86d1fa0d530b8af183902af62d08c94ce492d4efd92bd"
+content-hash = "e46bccd73677b023f86ac5e70cd41eaea8e0d69f972dfcf676250c8b40ed88fd"
