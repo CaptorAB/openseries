@@ -268,7 +268,10 @@ def merton_jump_model_returns(
         - param.jumps_lamda * (param.jumps_mu + mathpow(param.jumps_sigma, 2.0))
     ) * param.all_delta + wiener
 
-    return poi_rv + geo  # type: ignore[no-any-return]
+    output = poi_rv + geo
+    output[:, 0] = 0.0
+
+    return output  # type: ignore[no-any-return]
 
 
 def merton_jump_model_series(

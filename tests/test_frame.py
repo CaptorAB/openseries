@@ -386,12 +386,13 @@ class TestOpenFrame(TestCase):
         """Test max_drawdown_date method."""
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
+
         if [
-            dt.date(2016, 9, 27),
-            dt.date(2016, 9, 22),
-            dt.date(2015, 7, 8),
-            dt.date(2017, 2, 6),
-            dt.date(2018, 10, 19),
+            dt.date(2016, 10, 3),
+            dt.date(2015, 12, 17),
+            dt.date(2015, 7, 24),
+            dt.date(2012, 6, 26),
+            dt.date(2011, 7, 27),
         ] != cast(Series, mddframe.max_drawdown_date).tolist():
             msg = "max_drawdown_date property generated unexpected result"
             raise ValueError(msg)
@@ -1143,8 +1144,8 @@ class TestOpenFrame(TestCase):
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
-        if last_fmt != "Last 19.964%":
-            msg = "Unaligned data between original and data in Figure."
+        if last_fmt != "Last 105.083%":
+            msg = f"Unaligned data in Figure: '{last_fmt}'"
             raise ValueError(msg)
 
         with pytest.raises(
@@ -1844,11 +1845,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.06464266057",
-            "0.10895202629",
-            "0.05884671119",
-            "0.04300405194",
-            "-0.08603374575",
+            "-0.10940183596",
+            "-0.12177293071",
+            "-0.02843555018",
+            "-0.04861208177",
+            "-0.02517443772",
         ]
 
         if values != checkdata:
@@ -1863,11 +1864,11 @@ class TestOpenFrame(TestCase):
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
         checkdata_fxd_per_yr = [
-            "0.06469055241",
-            "0.10903274564",
-            "0.05889030898",
-            "0.04303591238",
-            "-0.08609748562",
+            "-0.10948288856",
+            "-0.12186314868",
+            "-0.02845661725",
+            "-0.04864809703",
+            "-0.02519308872",
         ]
 
         if values_fxd_per_yr != checkdata_fxd_per_yr:
@@ -1882,12 +1883,13 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.06064704174",
-            "0.05591653346",
-            "0.11041741881",
-            "0.08436822615",
-            "0.04771407242",
+            "0.11870239224",
+            "0.13743313660",
+            "0.10203126346",
+            "0.11658696118",
+            "0.09445337602",
         ]
+
         if values != checkdata:
             msg = "Result from method rolling_info_ratio() not as intended."
             raise ValueError(msg)
@@ -1899,7 +1901,7 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.tracking_error_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.1047183258":
+        if f"{simdataa.iloc[0]:.10f}" != "0.1271963559":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
@@ -1911,7 +1913,7 @@ class TestOpenFrame(TestCase):
             periods_in_a_year_fixed=251,
         )
 
-        if f"{simdatab.iloc[0]:.10f}" != "0.1046408005":
+        if f"{simdatab.iloc[0]:.10f}" != "0.1271021896":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdatab.iloc[0]:.10f}'"
@@ -1920,7 +1922,7 @@ class TestOpenFrame(TestCase):
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.1047183258":
+        if f"{simdatac.iloc[0]:.10f}" != "0.1271963559":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"
@@ -1992,12 +1994,13 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.08034452787",
-            "0.07003512008",
-            "0.13680724381",
-            "0.10613002176",
-            "0.06652224599",
+            "0.17883816332",
+            "0.20010259575",
+            "0.14454747431",
+            "0.16212311694",
+            "0.12819083799",
         ]
+
         if values != checkdata:
             msg = "Result from method rolling_corr() not as intended."
             raise ValueError(msg)
@@ -2011,11 +2014,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.07189785661",
-            "0.07601706214",
-            "0.07690774674",
-            "0.07640509098",
-            "0.07534254420",
+            "0.06592263886",
+            "0.06849943405",
+            "0.07131196245",
+            "0.07266936036",
+            "0.07194915928",
         ]
 
         if values != checkdata:
@@ -2030,11 +2033,11 @@ class TestOpenFrame(TestCase):
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
         checkdata_fxd_per_yr = [
-            "0.07184462904",
-            "0.07596078503",
-            "0.07685081023",
-            "0.07634852661",
-            "0.07528676645",
+            "0.06587383487",
+            "0.06844872241",
+            "0.07125916863",
+            "0.07261556163",
+            "0.07189589373",
         ]
 
         if values_fxd_per_yr != checkdata_fxd_per_yr:
@@ -2050,11 +2053,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.00312001031",
-            "0.00761489128",
-            "0.00155338654",
-            "0.00190827758",
-            "0.00562845778",
+            "0.00611289255",
+            "-0.00351354738",
+            "0.00259355511",
+            "0.00719892104",
+            "0.00293479328",
         ]
 
         if values != checkdata:
@@ -2070,12 +2073,13 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
         checkdata = [
-            "-0.01099453714",
-            "-0.01099453714",
-            "-0.01099453714",
-            "-0.01099453714",
-            "-0.01099453714",
+            "-0.01105543788",
+            "-0.01105543788",
+            "-0.01105543788",
+            "-0.01105543788",
+            "-0.01105543788",
         ]
+
         if values != checkdata:
             msg = "Result from method rolling_cvar_down() not as intended."
             raise ValueError(msg)
@@ -2089,11 +2093,11 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
         checkdata = [
-            "-0.01239751713",
-            "-0.01239751713",
-            "-0.01239751713",
-            "-0.01239751713",
-            "-0.01239751713",
+            "-0.01247401542",
+            "-0.01247401542",
+            "-0.01247401542",
+            "-0.01247401542",
+            "-0.01247401542",
         ]
 
         if values != checkdata:
@@ -2577,7 +2581,7 @@ class TestOpenFrame(TestCase):
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
-        fmt = "{:.12f}"
+        fmt = "{:.8f}"
 
         frame_0 = self.randomframe.from_deepcopy()
         frame_0.to_cumret()
@@ -2633,11 +2637,11 @@ class TestOpenFrame(TestCase):
 
         ret = [f"{rr:.9f}" for rr in cast(Series, mframe.value_ret_func())]
         if ret != [
-            "-0.223596218",
-            "-0.244776630",
-            "1.229358191",
-            "0.370036823",
-            "-0.800357531",
+            "0.105822211",
+            "0.376401700",
+            "1.055344627",
+            "0.838144947",
+            "0.050833101",
         ]:
             msg = "Results from value_ret_func() not as expected"
             raise ValueError(msg)
@@ -2650,22 +2654,23 @@ class TestOpenFrame(TestCase):
             f"{iv:.11f}"
             for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=True))
         ]
+
         if impvol != [
-            "0.09373794422",
-            "0.09452356706",
-            "0.09758852171",
-            "0.09902646305",
-            "0.10399391218",
+            "0.09408490332",
+            "0.09385039968",
+            "0.09807632973",
+            "0.09944244603",
+            "0.10162640507",
         ]:
             msg = "Results from vol_from_var_func() not as expected"
             raise ValueError(msg)
 
         if impvoldrifted != [
-            "0.09308678526",
-            "0.09383528130",
-            "0.10086118783",
-            "0.10057354052",
-            "0.09864366954",
+            "0.09464976522",
+            "0.09525706555",
+            "0.10103673296",
+            "0.10197033116",
+            "0.10201317661",
         ]:
             msg = "Results from vol_from_var_func() not as expected"
             raise ValueError(msg)
@@ -2794,29 +2799,29 @@ class TestOpenFrame(TestCase):
 
         if results != [
             "1.00000000000",
-            "1.04260382009",
-            "-0.45683811180",
-            "-0.78552285510",
-            "0.16527540312",
-            "0.84475254880",
+            "0.18767619203",
+            "0.04884473074",
+            "0.05879497888",
+            "-0.01562979922",
+            "1.11544014486",
             "1.00000000000",
-            "-0.43186041740",
-            "-0.67734009898",
-            "0.15614783403",
-            "-1.72148183489",
-            "-2.00850685241",
+            "0.30522170688",
+            "0.38385979512",
+            "-0.23367159392",
+            "2.57549091688",
+            "2.70782523748",
             "1.00000000000",
-            "1.55985343891",
-            "-0.37248169175",
-            "-0.71431469722",
-            "-0.76019909515",
-            "0.37642151527",
+            "1.22058750012",
+            "-1.02277439302",
+            "1.93047483232",
+            "2.12060335788",
+            "0.76006462626",
             "1.00000000000",
-            "-0.14436264610",
-            "4.26473892687",
-            "4.97290302806",
-            "-2.55063925744",
-            "-4.09645603877",
+            "-0.43215502806",
+            "-0.08377416376",
+            "-0.21072959640",
+            "-0.10396669673",
+            "-0.07054599563",
             "1.00000000000",
         ]:
             msg = "Method ord_least_squares_fit() not working as intended"

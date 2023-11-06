@@ -178,19 +178,19 @@ class TestSimulation(TestCase):
                 OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE).to_cumret(),
             )
 
-        intended_returns = ["-0.088256155", "0.027742385", "0.028104879"]
+        intended_returns = ["-0.088256155", "0.027742385", "0.027969270"]
 
-        intended_volatilities = ["0.232986005", "0.232986005", "0.232986005"]
+        intended_volatilities = ["0.232986005", "0.232986005", "0.232985779"]
 
         frame = OpenFrame(series)
         returns = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
         volatilities = [f"{v:.9f}" for v in cast(Series, frame.vol)]
 
         if intended_returns != returns:
-            msg = "Unexpected calculation result"
+            msg = f"Unexpected returns result\n {returns}"
             raise ValueError(msg)
         if intended_volatilities != volatilities:
-            msg = "Unexpected calculation result"
+            msg = f"Unexpected volatilities result\n {volatilities}"
             raise ValueError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:
