@@ -1,9 +1,10 @@
 """
 Defining the ReturnSimulation class and ModelParameters used by it.
 
-Source:
+Sources:
 http://www.turingfinance.com/random-walks-down-wall-street-stochastic-processes-in-python/
 https://github.com/StuartGordonReid/Python-Notebooks/blob/master/Stochastic%20Process%20Algorithms.ipynb
+https://www.codearmo.com/python-tutorial/merton-jump-diffusion-model-python
 
 Processes that can be simulated in this module are:
 - Brownian Motion
@@ -121,7 +122,7 @@ def brownian_motion_series(
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Delivers a price sequence based on returns of a brownian motion.
+    Delivers a price sequence based on returns of a Brownian motion.
 
     Parameters
     ----------
@@ -135,7 +136,7 @@ def brownian_motion_series(
     Returns
     -------
     NDArray[float64]
-        Price sequence which follows a brownian motion
+        Price sequence which follows a Brownian motion
     """
     return convert_returns_to_values(
         param=param,
@@ -155,8 +156,7 @@ def geometric_brownian_motion_returns(
     """
     Geometric Brownian Motion process returns.
 
-    Method constructs a sequence of returns which, when
-    exponentiated, produce a random Geometric Brownian Motion (GBM).
+    Method produces returns from a Geometric Brownian Motion (GBM).
     GBM is the stochastic process underlying the Black Scholes
     options pricing formula.
 
@@ -223,12 +223,12 @@ def merton_jump_model_returns(
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Merton Jump-Diffusion model returns.
+    Simulate stock returns using Merton's jump diffusion model.
 
-    Method constructs a sequence of returns which, when
-    exponentiated, produce a random Geometric Brownian Motion (GBM).
-    GBM is the stochastic process underlying the Black Scholes
-    options pricing formula.
+    Merton's jump diffusion model combines continuous
+    price changes with occasional jumps to account
+    for asset price dynamics.
+    https://dspace.mit.edu/handle/1721.1/1899
 
     Parameters
     ----------
@@ -242,7 +242,7 @@ def merton_jump_model_returns(
     Returns
     -------
     NDArray[float64]
-        Returns of a Geometric Brownian Motion process
+        Merton Jump-Diffusion model
     """
     wiener = wiener_process(
         param=param,
@@ -280,7 +280,13 @@ def merton_jump_model_series(
     randomizer: Generator,
 ) -> NDArray[float64]:
     """
-    Prices for an asset which evolves according to Mertons Jump-Diffusion model.
+    Simulate stock prices using Merton's jump diffusion model.
+
+    Merton's jump diffusion model combines continuous
+    price changes with occasional jumps to account
+    for asset price dynamics.
+    https://dspace.mit.edu/handle/1721.1/1899
+
 
     Parameters
     ----------
@@ -559,9 +565,6 @@ class ReturnSimulation:
     ) -> ReturnSimulation:
         """
         Geometric Brownian Motion simulation.
-
-        Method constructs a sequence of log returns which, when
-        exponentiated, produce a random Geometric Brownian Motion (GBM).
 
         Parameters
         ----------
