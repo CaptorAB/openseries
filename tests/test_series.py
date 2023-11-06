@@ -792,15 +792,15 @@ class TestOpenTimeSeries(TestCase):
         values = [f"{nn[0]:.10f}" for nn in diffseries.tsdf.to_numpy()[:10]]
         checkdata = [
             "0.0000000000",
-            "0.0034006536",
-            "0.0023631217",
-            "-0.0087838392",
-            "-0.0033945666",
-            "-0.0017399047",
-            "0.0048095006",
-            "0.0004634650",
-            "-0.0022933004",
-            "0.0025472170",
+            "0.0034436868",
+            "-0.0005157676",
+            "-0.0003824129",
+            "0.0033535538",
+            "0.0034159090",
+            "0.0023752572",
+            "-0.0088734032",
+            "-0.0034192716",
+            "-0.0017506253",
         ]
 
         if values != checkdata:
@@ -814,15 +814,15 @@ class TestOpenTimeSeries(TestCase):
         values = [f"{nn[0]:.10f}" for nn in retseries.tsdf.to_numpy()[:10]]
         checkdata = [
             "0.0000000000",
-            "0.0034006536",
-            "0.0023551128",
-            "-0.0087335013",
-            "-0.0034048495",
-            "-0.0017511377",
-            "0.0048490423",
-            "0.0004650205",
-            "-0.0022999278",
-            "0.0025604670",
+            "0.0034436868",
+            "-0.0005139975",
+            "-0.0003812965",
+            "0.0033450389",
+            "0.0033958765",
+            "0.0023533359",
+            "-0.0087708698",
+            "-0.0034096671",
+            "-0.0017516806",
         ]
 
         if values != checkdata:
@@ -836,15 +836,15 @@ class TestOpenTimeSeries(TestCase):
         values = [f"{nn[0]:.10f}" for nn in logseries.tsdf.to_numpy()[:10]]
         checkdata = [
             "0.0000000000",
-            "0.0033948844",
-            "0.0057472283",
-            "-0.0030246335",
-            "-0.0064352927",
-            "-0.0081879654",
-            "-0.0033506418",
-            "-0.0028857294",
-            "-0.0051883061",
-            "-0.0026311115",
+            "0.0034377709",
+            "0.0029236412",
+            "0.0025422720",
+            "0.0058817287",
+            "0.0092718523",
+            "0.0116224234",
+            "0.0028128632",
+            "-0.0006026301",
+            "-0.0023558468",
         ]
 
         if values != checkdata:
@@ -916,31 +916,31 @@ class TestOpenTimeSeries(TestCase):
                     msg,
                 )
         expected_values = {
-            "sortino_ratio": "-0.1625299336",
-            "ret_vol_ratio": "-0.1351175671",
-            "arithmetic_ret": "-0.0169881347",
-            "worst": "-0.1833801800",
-            "vol_from_var": "0.0937379442",
-            "max_drawdown_cal_year": "-0.2834374358",
-            "kurtosis": "208.0369645588",
-            "max_drawdown": "-0.4577528079",
-            "positive_share": "0.5017921147",
-            "value_ret": "-0.2235962176",
-            "geo_ret": "-0.0250075875",
-            "cvar_down": "-0.0150413764",
-            "last_idx": "2019-06-28",
-            "yearfrac": "9.9931553730",
-            "vol": "0.1257285416",
-            "span_of_days": 3650,
-            "z_score": "-0.3646357403",
-            "periods_in_a_year": "251.3720547945",
-            "var_down": "-0.0097248785",
+            "skew": "0.0605186816",
             "length": 2512,
-            "worst_month": "-0.1961065251",
+            "geo_ret": "0.0101166343",
+            "vol": "0.0966413232",
+            "last_idx": "2019-06-28",
+            "value_ret": "0.1058222108",
+            "ret_vol_ratio": "0.1524888492",
+            "periods_in_a_year": "251.3720547945",
+            "span_of_days": 3650,
+            "z_score": "0.5671118938",
+            "var_down": "-0.0097608739",
+            "kurtosis": "0.0210174054",
+            "worst_month": "-0.0588900820",
+            "arithmetic_ret": "0.0147367242",
+            "yearfrac": "9.9931553730",
+            "positive_share": "0.5025886101",
+            "max_drawdown_date": "2016-10-03",
+            "max_drawdown": "-0.2086370147",
+            "max_drawdown_cal_year": "-0.1372730654",
+            "vol_from_var": "0.0940849033",
+            "downside_deviation": "0.0671435174",
             "first_idx": "2009-06-30",
-            "downside_deviation": "0.1045231133",
-            "max_drawdown_date": "2016-09-27",
-            "skew": "-9.1925124207",
+            "cvar_down": "-0.0124230016",
+            "sortino_ratio": "0.2194809674",
+            "worst": "-0.0191999470",
         }
 
         if result_values != expected_values:
@@ -962,23 +962,23 @@ class TestOpenTimeSeries(TestCase):
         with localcontext() as decimal_context:
             decimal_context.rounding = ROUND_HALF_UP
             checks = {
-                "cvar_down": Decimal("-0.0150413764"),
-                "downside_deviation": Decimal("0.1045231133"),
-                "geo_ret": Decimal("-0.0250075875"),
-                "kurtosis": Decimal("208.0369645588"),
-                "max_drawdown": Decimal("-0.4577528079"),
-                "max_drawdown_cal_year": Decimal("-0.2834374358"),
-                "positive_share": Decimal("0.5017921147"),
-                "ret_vol_ratio": Decimal("-0.1351175671"),
-                "skew": Decimal("-9.1925124207"),
-                "sortino_ratio": Decimal("-0.1625299336"),
-                "value_ret": Decimal("-0.2235962176"),
-                "var_down": Decimal("-0.0097248785"),
-                "vol": Decimal("0.1257285416"),
-                "vol_from_var": Decimal("0.0937379442"),
-                "worst": Decimal("-0.1833801800"),
-                "worst_month": Decimal("-0.1961065251"),
-                "z_score": Decimal("-0.3646357403"),
+                "cvar_down": Decimal("-0.0124230016"),
+                "downside_deviation": Decimal("0.0671435174"),
+                "geo_ret": Decimal("0.0101166343"),
+                "kurtosis": Decimal("0.0210174054"),
+                "max_drawdown": Decimal("-0.2086370147"),
+                "max_drawdown_cal_year": Decimal("-0.1372730654"),
+                "positive_share": Decimal("0.5025886101"),
+                "ret_vol_ratio": Decimal("0.1524888492"),
+                "skew": Decimal("0.0605186816"),
+                "sortino_ratio": Decimal("0.2194809674"),
+                "value_ret": Decimal("0.1058222108"),
+                "var_down": Decimal("-0.0097608739"),
+                "vol": Decimal("0.0966413232"),
+                "vol_from_var": Decimal("0.0940849033"),
+                "worst": Decimal("-0.0191999470"),
+                "worst_month": Decimal("-0.0588900820"),
+                "z_score": Decimal("0.5671118938"),
             }
             for c_key, c_value in checks.items():
                 if c_value != round(Decimal(getattr(self.randomseries, c_key)), 10):
@@ -1004,26 +1004,26 @@ class TestOpenTimeSeries(TestCase):
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods."""
-        excel_geo_ret = (0.77640378239272 / 0.686013074173307) ** (
+        excel_geo_ret = (1.10582221080 / 1.01262875085) ** (
             1 / ((dt.date(2019, 6, 28) - dt.date(2015, 6, 26)).days / 365.25)
         ) - 1
         checks = {
-            "arithmetic_ret_func": "0.03590590654",
-            "cvar_down_func": "-0.01262001509",
-            "downside_deviation_func": "0.06869092315",
+            "arithmetic_ret_func": "0.02697125480",
+            "cvar_down_func": "-0.01270136518",
+            "downside_deviation_func": "0.06909856465",
             "geo_ret_func": f"{excel_geo_ret:.11f}",
-            "kurtosis_func": "-0.07837511953",
-            "max_drawdown_func": "-0.13059174278",
-            "positive_share_func": "0.50546176763",
-            "ret_vol_ratio_func": "0.35984814074",
-            "skew_func": "0.05131889460",
-            "sortino_ratio_func": "0.52271690193",
-            "value_ret_func": "0.13176236959",
-            "var_down_func": "-0.01031636618",
-            "vol_func": "0.09978071990",
-            "vol_from_var_func": "0.09949533246",
-            "worst_func": "-0.01901777519",
-            "z_score_func": "-0.49314595984",
+            "kurtosis_func": "-0.07991363073",
+            "max_drawdown_func": "-0.13570275011",
+            "positive_share_func": "0.50446871897",
+            "ret_vol_ratio_func": "0.27039659569",
+            "skew_func": "0.03894541564",
+            "sortino_ratio_func": "0.39033017454",
+            "value_ret_func": "0.09203122059",
+            "var_down_func": "-0.01036895666",
+            "vol_func": "0.09974702060",
+            "vol_from_var_func": "0.10000253699",
+            "worst_func": "-0.01919994698",
+            "z_score_func": "0.54204277867",
         }
         for c_key, c_value in checks.items():
             if (
@@ -1037,7 +1037,7 @@ class TestOpenTimeSeries(TestCase):
                 raise ValueError(msg)
 
         func = "value_ret_calendar_period"
-        if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.049753822599":
+        if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.034493612016":
             msg = (
                 f"Unexpected result from method {func}(): "
                 f"'{getattr(self.randomseries, func)(year=2019):.12f}'"
@@ -1046,7 +1046,7 @@ class TestOpenTimeSeries(TestCase):
 
     def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
         """Test max_drawdown_date property."""
-        if self.randomseries.max_drawdown_date != dt.date(2016, 9, 27):
+        if self.randomseries.max_drawdown_date != dt.date(2016, 10, 3):
             msg = (
                 "Unexpected max_drawdown_date: "
                 f"'{self.randomseries.max_drawdown_date}'"
@@ -1066,7 +1066,7 @@ class TestOpenTimeSeries(TestCase):
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
-        if f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.2800936502":
+        if f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.8230275116":
             msg = (
                 "Unexpected result from running_adjustment(): "
                 f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
@@ -1078,7 +1078,7 @@ class TestOpenTimeSeries(TestCase):
 
         if (
             f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
-            != "-0.0028221714"
+            != "0.0036524025"
         ):
             msg = (
                 "Unexpected result from running_adjustment(): "
@@ -1283,7 +1283,7 @@ class TestOpenTimeSeries(TestCase):
         fig_last_json = loads(fig_last.to_json())
         last = fig_last_json["data"][-1]["y"][0]
 
-        if f"{last:.10f}" != "0.7764037824":
+        if f"{last:.10f}" != "1.1058222108":
             msg = f"Unaligned data between original and data in Figure: '{last:.10f}'"
             raise ValueError(msg)
 
@@ -1300,7 +1300,7 @@ class TestOpenTimeSeries(TestCase):
         fig_last_fmt_json = loads(fig_last_fmt.to_json())
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
-        if last_fmt != "Last 77.640%":
+        if last_fmt != "Last 110.582%":
             msg = f"Unaligned data between original and data in Figure: '{last_fmt}'"
             raise ValueError(msg)
 
@@ -1366,7 +1366,7 @@ class TestOpenTimeSeries(TestCase):
         days_from_start_to_bottom = 1747
         details = self.randomseries.drawdown_details()
 
-        if f"{details.loc['Max Drawdown', 'Drawdown details']:7f}" != "-0.457753":
+        if f"{details.loc['Max Drawdown', 'Drawdown details']:7f}" != "-0.208637":
             msg = (
                 f"Unexpected result from drawdown_details(): "
                 f"'{details.loc['Max Drawdown', 'Drawdown details']:7f}'"
@@ -1375,14 +1375,14 @@ class TestOpenTimeSeries(TestCase):
         if details.loc["Start of drawdown", "Drawdown details"] != dt.date(
             2011,
             12,
-            16,
+            22,
         ):
             msg = (
                 f"Unexpected result from drawdown_details(): "
                 f"'{details.loc['Start of drawdown', 'Drawdown details']}'"
             )
             raise ValueError(msg)
-        if details.loc["Date of bottom", "Drawdown details"] != dt.date(2016, 9, 27):
+        if details.loc["Date of bottom", "Drawdown details"] != dt.date(2016, 10, 3):
             msg = (
                 f"Unexpected result from drawdown_details(): "
                 f"'{details.loc['Date of bottom', 'Drawdown details']}'"
@@ -1399,7 +1399,7 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
         if (
             f"{details.loc['Average fall per day', 'Drawdown details']:.9f}"
-            != "-0.000262022"
+            != "-0.000119426"
         ):
             msg = (
                 f"Unexpected result from drawdown_details(): "
@@ -1439,11 +1439,11 @@ class TestOpenTimeSeries(TestCase):
         simdata = self.randomseries.ewma_vol_func()
         values = [f"{v:.11f}" for v in simdata.iloc[:5]]
         checkdata = [
-            "0.06122660096",
-            "0.06080791286",
-            "0.05965906881",
-            "0.06712801227",
-            "0.06641721467",
+            "0.06250698830",
+            "0.06205596764",
+            "0.06019861487",
+            "0.05838351179",
+            "0.05807162835",
         ]
 
         if values != checkdata:
@@ -1455,11 +1455,11 @@ class TestOpenTimeSeries(TestCase):
         )
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5]]
         checkdata_fxd_per_yr = [
-            "0.06118127355",
-            "0.06076289542",
-            "0.05961490188",
-            "0.06707831592",
-            "0.06636804454",
+            "0.06246071300",
+            "0.06201002623",
+            "0.06015404851",
+            "0.05834028919",
+            "0.05802863664",
         ]
 
         if values_fxd_per_yr != checkdata_fxd_per_yr:
@@ -1826,7 +1826,7 @@ class TestOpenTimeSeries(TestCase):
                 raise ValueError(msg)
 
         impvol = mseries.vol_from_var_func(drift_adjust=False)
-        if f"{impvol:.12f}" != "0.093737944219":
+        if f"{impvol:.12f}" != "0.094084903324":
             msg = (
                 "Unexpected result from method vol_from_var_func(): "
                 f"'{impvol:.12f}'"
@@ -1834,7 +1834,7 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
-        if f"{impvoldrifted:.12f}" != "0.093086785263":
+        if f"{impvoldrifted:.12f}" != "0.094649765217":
             msg = (
                 "Unexpected result from method vol_from_var_func(): "
                 f"'{impvoldrifted:.12f}'"

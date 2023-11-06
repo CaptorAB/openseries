@@ -699,7 +699,7 @@ class OpenTimeSeries(CommonModel):
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> DataFrame:
+    ) -> Series[float]:
         """
         Exponentially Weighted Moving Average Model for Volatility.
 
@@ -725,7 +725,7 @@ class OpenTimeSeries(CommonModel):
 
         Returns
         -------
-        Pandas.DataFrame
+        Pandas.Series[float]
             Series EWMA volatility
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -765,9 +765,12 @@ class OpenTimeSeries(CommonModel):
                 ),
             )
 
-        data.loc[:, (self.label, ValueType.EWMA)] = rawdata  # type: ignore[index]
-
-        return data.loc[:, (self.label, ValueType.EWMA)]  # type: ignore[index]
+        return Series(
+            data=rawdata,
+            index=data.index,
+            name=(self.label, ValueType.EWMA),
+            dtype="float64",
+        )
 
     def running_adjustment(
         self: OpenTimeSeries,

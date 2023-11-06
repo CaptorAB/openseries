@@ -14,12 +14,9 @@ from openseries.series import OpenTimeSeries
 from openseries.simulation import (
     ModelParameters,
     ReturnSimulation,
-    brownian_motion_levels,
-    cox_ingersoll_ross_levels,
-    geometric_brownian_motion_jump_diffusion_levels,
-    geometric_brownian_motion_levels,
-    heston_model_levels,
-    ornstein_uhlenbeck_levels,
+    brownian_motion_series,
+    geometric_brownian_motion_series,
+    merton_jump_model_series,
     random_generator,
 )
 from openseries.types import ValueType
@@ -79,34 +76,30 @@ class TestSimulation(TestCase):
             "from_normal",
             "from_lognormal",
             "from_gbm",
-            "from_heston",
-            "from_heston_vol",
+            "from_merton_jump_gbm",
             "from_merton_jump_gbm",
         ]
         added: list[dict[str, Union[int, float]]] = [
             {},
             {},
             {},
-            {"heston_mu": 0.35, "heston_a": 0.25},
-            {"heston_mu": 0.35, "heston_a": 0.25},
-            {"jumps_lamda": 0.00125, "jumps_sigma": 0.001, "jumps_mu": -0.2},
+            {"jumps_lamda": 0.0},
+            {"jumps_lamda": 0.3, "jumps_sigma": 0.2, "jumps_mu": -0.2},
         ]
         intended_returns = [
             "-0.005640734",
             "0.013058925",
             "-0.025640734",
-            "0.027163652",
-            "0.124437404",
-            "-0.043708800",
+            "-0.025640734",
+            "-0.011505208",
         ]
 
         intended_volatilities = [
             "0.193403252",
             "0.193487832",
             "0.193403252",
-            "0.198417705",
-            "0.447234514",
-            "0.209297219",
+            "0.193403252",
+            "0.211446536",
         ]
 
         returns = []
@@ -133,36 +126,19 @@ class TestSimulation(TestCase):
             msg = "Unexpected result"
             raise ValueError(msg)
 
-        if f"{psim.realized_mean_return:.9f}" != "-0.017030572":
+        if f"{psim.realized_mean_return:.9f}" != "0.014773538":
             msg = f"Unexpected result: '{psim.realized_mean_return:.9f}'"
             raise ValueError(msg)
 
-        if f"{psim.realized_vol:.9f}" != "0.125885483":
+        if f"{psim.realized_vol:.9f}" != "0.096761956":
             msg = f"Unexpected result: '{psim.realized_vol:.9f}'"
             raise ValueError(msg)
 
     def test_assets(self: TestSimulation) -> None:
         """Test stoch processes output."""
-        days = 2520
-        intended_returns = [
-            "-0.054955955",
-            "0.061043422",
-            "0.009116732",
-            "0.126175407",
-            "0.397127475",
-        ]
-
-        intended_volatilities = [
-            "0.232908982",
-            "0.232982933",
-            "0.252075511",
-            "0.203895259",
-            "0.621810014",
-        ]
-
+        days = 2512
         modelparams = ModelParameters(
             all_s0=1.0,
-            all_r0=0.05,
             all_time=days,
             all_delta=1.0 / 252,
             all_sigma=0.2,
@@ -170,34 +146,31 @@ class TestSimulation(TestCase):
             jumps_lamda=0.00125,
             jumps_sigma=0.001,
             jumps_mu=-0.2,
-            heston_a=0.25,
-            heston_mu=0.35,
-            heston_vol0=0.06125,
         )
 
         processes = [
-            brownian_motion_levels,
-            geometric_brownian_motion_levels,
-            geometric_brownian_motion_jump_diffusion_levels,
-            heston_model_levels,
-            heston_model_levels,
+            brownian_motion_series,
+            geometric_brownian_motion_series,
+            merton_jump_model_series,
         ]
-        res_indices = [None, None, None, 0, 1]
 
         series = []
-        for i, process, residx in zip(range(len(processes)), processes, res_indices):
+        for i, process in zip(range(len(processes)), processes):
             modelresult = process(
                 param=modelparams,
+                number_of_sims=1,
                 randomizer=random_generator(seed=SEED),
             )
-            if isinstance(modelresult, tuple):
-                modelresult = modelresult[cast(int, residx)]
             d_range = [
                 d.date()
-                for d in date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
+                for d in date_range(
+                    periods=days + 1,
+                    end=dt.date(2019, 6, 30),
+                    freq="D",
+                )
             ]
             sdf = DataFrame(  # type: ignore[call-overload,unused-ignore]
-                data=modelresult,
+                data=modelresult.T,
                 index=d_range,
                 columns=[f"Simulation_{i}"],
             )
@@ -205,68 +178,19 @@ class TestSimulation(TestCase):
                 OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE).to_cumret(),
             )
 
-        frame = OpenFrame(series)
-        means = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
-        deviations = [f"{v:.9f}" for v in cast(Series, frame.vol)]
+        intended_returns = ["-0.088256155", "0.027742385", "0.027969270"]
 
-        if intended_returns != means:
-            msg = "Unexpected calculation result"
-            raise ValueError(msg)
-        if intended_volatilities != deviations:
-            msg = "Unexpected calculation result"
-            raise ValueError(msg)
-
-    def test_cir_and_ou(self: TestSimulation) -> None:
-        """Test output of cox_ingersoll_ross_levels & ornstein_uhlenbeck_levels."""
-        series = []
-        days = 2520
-        intended_returns = ["0.024059099", "0.019497031"]
-        intended_volatilities = ["0.003014102", "0.019346265"]
-
-        modelparams = ModelParameters(
-            all_s0=1.0,
-            all_r0=0.025,
-            all_time=days,
-            all_delta=1.0 / 252,
-            all_sigma=0.06,
-            gbm_mu=0.01,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            cir_a=3.0,
-            cir_mu=0.025,
-            cir_rho=0.1,
-            ou_a=3.0,
-            ou_mu=0.025,
-            heston_a=0.25,
-            heston_mu=0.35,
-            heston_vol0=0.06125,
-        )
-
-        processes = [cox_ingersoll_ross_levels, ornstein_uhlenbeck_levels]
-        for process in processes:
-            onesim = process(param=modelparams, randomizer=random_generator(seed=SEED))
-            d_range = [
-                d.date()
-                for d in date_range(periods=days, end=dt.date(2019, 6, 30), freq="D")
-            ]
-            sdf = DataFrame(
-                data=onesim,
-                index=d_range,
-                columns=[[f"Asset_{str(process)[:-7]}"], [ValueType.PRICE]],
-            )
-            series.append(OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE))
+        intended_volatilities = ["0.232986005", "0.232986005", "0.232985779"]
 
         frame = OpenFrame(series)
-        means = [f"{r:.9f}" for r in frame.tsdf.mean()]
-        deviations = [f"{v:.9f}" for v in frame.tsdf.std()]
+        returns = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
+        volatilities = [f"{v:.9f}" for v in cast(Series, frame.vol)]
 
-        if intended_returns != means:
-            msg = "Unexpected results from method beta()"
+        if intended_returns != returns:
+            msg = f"Unexpected returns result\n {returns}"
             raise ValueError(msg)
-
-        if intended_volatilities != deviations:
-            msg = "Unexpected results from cir or ou random processes()"
+        if intended_volatilities != volatilities:
+            msg = f"Unexpected volatilities result\n {volatilities}"
             raise ValueError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:
