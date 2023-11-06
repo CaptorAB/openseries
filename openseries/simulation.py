@@ -78,7 +78,7 @@ def convert_returns_to_values(
         Value series
     """
     return_array = insert(arr=returns + 1.0, obj=0, values=param.all_s0, axis=1)
-    return cumprod(a=return_array, axis=1)  # type: ignore[return-value]
+    return cast(NDArray[float64], cumprod(a=return_array, axis=1))
 
 
 def wiener_process(
@@ -271,7 +271,7 @@ def merton_jump_model_returns(
     output = poi_rv + geo
     output[:, 0] = 0.0
 
-    return output  # type: ignore[no-any-return]
+    return cast(NDArray[float64], output)
 
 
 def merton_jump_model_series(
