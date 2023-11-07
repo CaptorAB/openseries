@@ -1,5 +1,5 @@
 """Defining the OpenFrame class."""
-# mypy: disable-error-code="operator,call-overload,unused-ignore,index,assignment"
+# mypy: disable-error-code="index,assignment"
 from __future__ import annotations
 
 import datetime as dt
@@ -8,12 +8,12 @@ from functools import reduce
 from logging import warning
 from typing import Optional, Union, cast
 
-import statsmodels.api as sm  # type: ignore[import-untyped]
-from ffn.core import (  # type: ignore[import-untyped]
+import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
+from ffn.core import (  # type: ignore[import-untyped,unused-ignore]
     calc_erc_weights,
     calc_mean_var_weights,
 )
-from numpy import cov, cumprod, log, sqrt
+from numpy import array, cov, cumprod, log, sqrt
 from pandas import (
     DataFrame,
     DatetimeIndex,
@@ -27,7 +27,7 @@ from pandas import (
 from pydantic import field_validator
 
 # noinspection PyProtectedMember
-from statsmodels.regression.linear_model import (  # type: ignore[import-untyped]
+from statsmodels.regression.linear_model import (  # type: ignore[import-untyped,unused-ignore]
     RegressionResults,
 )
 
@@ -1283,7 +1283,9 @@ class OpenFrame(CommonModel):
                     self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
                 )
             elif isinstance(asset, int):
-                y_value = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                y_value = log(
+                    self.tsdf.iloc[:, asset] / cast(float, self.tsdf.iloc[0, asset]),
+                )
             else:
                 msg = "asset should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
@@ -1294,7 +1296,9 @@ class OpenFrame(CommonModel):
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
                 )
             elif isinstance(market, int):
-                x_value = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                x_value = log(
+                    self.tsdf.iloc[:, market] / cast(float, self.tsdf.iloc[0, market]),
+                )
             else:
                 msg = "market should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
@@ -1406,7 +1410,7 @@ class OpenFrame(CommonModel):
         float
             Jensen's alpha
         """
-        full_year: float = 1.0
+        full_year = 1.0
         if all(
             x == ValueType.RTRN
             for x in self.tsdf.columns.get_level_values(1).to_numpy()
@@ -1450,14 +1454,19 @@ class OpenFrame(CommonModel):
                         - 1
                     )
             elif isinstance(asset, int):
-                asset_log = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                asset_log = log(
+                    self.tsdf.iloc[:, asset] / cast(float, self.tsdf.iloc[0, asset]),
+                )
                 if self.yearfrac > full_year:
                     asset_cagr = (
-                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
+                        cast(float, self.tsdf.iloc[-1, asset])
+                        / cast(float, self.tsdf.iloc[0, asset])
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     asset_cagr = (
-                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
+                        cast(float, self.tsdf.iloc[-1, asset])
+                        / cast(float, self.tsdf.iloc[0, asset])
+                        - 1
                     )
             else:
                 msg = "asset should be a tuple[str, ValueType] or an integer."
@@ -1480,14 +1489,19 @@ class OpenFrame(CommonModel):
                         - 1
                     )
             elif isinstance(market, int):
-                market_log = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                market_log = log(
+                    self.tsdf.iloc[:, market] / cast(float, self.tsdf.iloc[0, market]),
+                )
                 if self.yearfrac > full_year:
                     market_cagr = (
-                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
+                        cast(float, self.tsdf.iloc[-1, market])
+                        / cast(float, self.tsdf.iloc[0, market])
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     market_cagr = (
-                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
+                        cast(float, self.tsdf.iloc[-1, market])
+                        / cast(float, self.tsdf.iloc[0, market])
+                        - 1
                     )
             else:
                 msg = "market should be a tuple[str, ValueType] or an integer."
@@ -1594,10 +1608,12 @@ class OpenFrame(CommonModel):
             else:
                 msg = "Weight strategy not implemented"
                 raise NotImplementedError(msg)
-        portfolio = dframe.dot(self.weights)
-        portfolio = portfolio.add(1.0).cumprod().to_frame()
-        portfolio.columns = [[name], [ValueType.PRICE]]
-        return DataFrame(data=portfolio, dtype="float64")
+        return DataFrame(
+            data=dframe.dot(other=array(self.weights)).add(1.0).cumprod(),
+            index=self.tsdf.index,
+            columns=[[name], [ValueType.PRICE]],
+            dtype="float64",
+        )
 
     def rolling_info_ratio(
         self: OpenFrame,
