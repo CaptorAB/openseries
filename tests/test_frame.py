@@ -26,7 +26,7 @@ from openseries.types import (
     LiteralPortfolioWeightings,
     ValueType,
 )
-from tests.common_sim import SIMFRAME, SIMSERIES
+from tests.test_common_sim import SIMFRAME, SIMSERIES
 
 
 class TestOpenFrame(TestCase):

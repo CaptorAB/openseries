@@ -1,9 +1,9 @@
 {
-  "source": "https://sales.captor.se/captor_logo_sv_1600_icketransparent.png",
-  "xref": "paper",
-  "yref": "paper",
-  "x": 0.01,
-  "y": 1.11,
   "sizex": 0.1,
-  "sizey": 0.1
+  "sizey": 0.1,
+  "source": "https://sales.captor.se/captor_logo_sv_1600_icketransparent.png",
+  "x": 0.01,
+  "xref": "paper",
+  "y": 1.11,
+  "yref": "paper"
 }

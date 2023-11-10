@@ -20,7 +20,7 @@ from openseries.simulation import (
     random_generator,
 )
 from openseries.types import ValueType
-from tests.common_sim import SEED, SIMS
+from tests.test_common_sim import SEED, SIMS
 
 
 class TestSimulation(TestCase):

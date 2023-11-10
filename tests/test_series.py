@@ -18,7 +18,7 @@ from openseries.series import (
     timeseries_chain,
 )
 from openseries.types import CountriesType, LiteralSeriesProps, ValueType
-from tests.common_sim import SIMSERIES
+from tests.test_common_sim import SIMSERIES
 
 
 class NewTimeSeries(OpenTimeSeries):

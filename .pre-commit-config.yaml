@@ -41,10 +41,14 @@ repos:
       - id: check-json
       - id: check-toml
       - id: check-yaml
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
       - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: name-tests-test
+        args: [--pytest-test-first]
       - id: no-commit-to-branch
+      - id: pretty-format-json
+        args: [--autofix]
+      - id: trailing-whitespace
       - id: mixed-line-ending
         args: [--fix=auto]
       - id: fix-byte-order-marker
