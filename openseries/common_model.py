@@ -490,11 +490,8 @@ class CommonModel(BaseModel):
                 data.pop(item)
             output.append(dict(data))
         else:
-            series = [
-                dict(serie.__dict__)
-                for serie in cast(list[Any], data.get("constituents"))
-            ]
-            for itemdata in series:
+            for serie in cast(list[Any], data.get("constituents")):
+                itemdata = dict(serie.__dict__)
                 for item in cleaner_list:
                     itemdata.pop(item)
                 output.append(dict(itemdata))
