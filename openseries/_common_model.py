@@ -683,7 +683,7 @@ class _CommonModel(BaseModel):
         Returns
         -------
         tuple[plotly.go.Figure, str]
-            Plotly Figure and html filename with location
+            Plotly Figure and a div section or a html filename with location
         """
         if labels:
             if len(labels) != self.tsdf.shape[1]:
@@ -800,7 +800,7 @@ class _CommonModel(BaseModel):
         Returns
         -------
         tuple[plotly.go.Figure, str]
-            Plotly Figure and html filename with location
+            Plotly Figure and a div section or a html filename with location
         """
         if labels:
             if len(labels) != self.tsdf.shape[1]:
