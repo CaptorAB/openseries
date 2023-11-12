@@ -25,11 +25,11 @@ from pandas import (
 )
 from pydantic import model_validator
 
+from openseries._common_model import _CommonModel
 from openseries._risk import (
     _drawdown_details,
     _ewma_calc,
 )
-from openseries.common_model import CommonModel
 from openseries.datefixer import (
     _get_calc_range,
     align_dataframe_to_local_cdays,
@@ -56,7 +56,7 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class OpenTimeSeries(CommonModel):
+class OpenTimeSeries(_CommonModel):
 
     """
     OpenTimeSeries objects are at the core of the openseries package.

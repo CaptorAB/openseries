@@ -31,12 +31,12 @@ from statsmodels.regression.linear_model import (  # type: ignore[import-untyped
     RegressionResults,
 )
 
+from openseries._common_model import _CommonModel
 from openseries._risk import (
     _calc_inv_vol_weights,
     _drawdown_details,
     _ewma_calc,
 )
-from openseries.common_model import CommonModel
 from openseries.datefixer import (
     _get_calc_range,
     align_dataframe_to_local_cdays,
@@ -63,7 +63,7 @@ from openseries.types import (
 )
 
 
-class OpenFrame(CommonModel):
+class OpenFrame(_CommonModel):
 
     """
     OpenFrame objects hold OpenTimeSeries in the list constituents.

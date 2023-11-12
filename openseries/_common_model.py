@@ -1,4 +1,4 @@
-"""Defining the CommonModel class."""
+"""Defining the _CommonModel class."""
 from __future__ import annotations
 
 import datetime as dt
@@ -44,9 +44,9 @@ from openseries.types import (
 )
 
 
-class CommonModel(BaseModel):
+class _CommonModel(BaseModel):
 
-    """Declare CommonModel."""
+    """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
 
@@ -57,7 +57,7 @@ class CommonModel(BaseModel):
     )
 
     @property
-    def length(self: CommonModel) -> int:
+    def length(self: _CommonModel) -> int:
         """
         Number of observations.
 
@@ -69,7 +69,7 @@ class CommonModel(BaseModel):
         return len(self.tsdf.index)
 
     @property
-    def first_idx(self: CommonModel) -> dt.date:
+    def first_idx(self: _CommonModel) -> dt.date:
         """
         The first date in the timeseries.
 
@@ -81,7 +81,7 @@ class CommonModel(BaseModel):
         return cast(dt.date, self.tsdf.index[0])
 
     @property
-    def last_idx(self: CommonModel) -> dt.date:
+    def last_idx(self: _CommonModel) -> dt.date:
         """
         The last date in the timeseries.
 
@@ -93,7 +93,7 @@ class CommonModel(BaseModel):
         return cast(dt.date, self.tsdf.index[-1])
 
     @property
-    def span_of_days(self: CommonModel) -> int:
+    def span_of_days(self: _CommonModel) -> int:
         """
         Number of days from the first date to the last.
 
@@ -105,7 +105,7 @@ class CommonModel(BaseModel):
         return (self.last_idx - self.first_idx).days
 
     @property
-    def yearfrac(self: CommonModel) -> float:
+    def yearfrac(self: _CommonModel) -> float:
         """
         Length of series expressed in years assuming all years have 365.25 days.
 
@@ -118,7 +118,7 @@ class CommonModel(BaseModel):
         return self.span_of_days / 365.25
 
     @property
-    def periods_in_a_year(self: CommonModel) -> float:
+    def periods_in_a_year(self: _CommonModel) -> float:
         """
         The average number of observations per year.
 
@@ -130,7 +130,7 @@ class CommonModel(BaseModel):
         return self.length / self.yearfrac
 
     @property
-    def max_drawdown_cal_year(self: CommonModel) -> Union[float, Series[float]]:
+    def max_drawdown_cal_year(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
@@ -158,7 +158,7 @@ class CommonModel(BaseModel):
         )
 
     @property
-    def geo_ret(self: CommonModel) -> Union[float, Series[float]]:
+    def geo_ret(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/c/cagr.asp.
 
@@ -170,7 +170,7 @@ class CommonModel(BaseModel):
         return self.geo_ret_func()
 
     @property
-    def arithmetic_ret(self: CommonModel) -> Union[float, Series[float]]:
+    def arithmetic_ret(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
@@ -182,7 +182,7 @@ class CommonModel(BaseModel):
         return self.arithmetic_ret_func()
 
     @property
-    def value_ret(self: CommonModel) -> Union[float, Series[float]]:
+    def value_ret(self: _CommonModel) -> Union[float, Series[float]]:
         """
         Simple return.
 
@@ -194,7 +194,7 @@ class CommonModel(BaseModel):
         return self.value_ret_func()
 
     @property
-    def vol(self: CommonModel) -> Union[float, Series[float]]:
+    def vol(self: _CommonModel) -> Union[float, Series[float]]:
         """
         Annualized volatility.
 
@@ -209,7 +209,7 @@ class CommonModel(BaseModel):
         return self.vol_func()
 
     @property
-    def downside_deviation(self: CommonModel) -> Union[float, Series[float]]:
+    def downside_deviation(self: _CommonModel) -> Union[float, Series[float]]:
         """
         Downside Deviation.
 
@@ -226,7 +226,7 @@ class CommonModel(BaseModel):
         return self.downside_deviation_func(min_accepted_return=min_accepted_return)
 
     @property
-    def ret_vol_ratio(self: CommonModel) -> Union[float, Series[float]]:
+    def ret_vol_ratio(self: _CommonModel) -> Union[float, Series[float]]:
         """
         Ratio of annualized arithmetic mean of returns and annualized volatility.
 
@@ -240,7 +240,7 @@ class CommonModel(BaseModel):
         return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
-    def sortino_ratio(self: CommonModel) -> Union[float, Series[float]]:
+    def sortino_ratio(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/s/sortinoratio.asp.
 
@@ -259,7 +259,7 @@ class CommonModel(BaseModel):
         )
 
     @property
-    def z_score(self: CommonModel) -> Union[float, Series[float]]:
+    def z_score(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/z/zscore.asp.
 
@@ -271,7 +271,7 @@ class CommonModel(BaseModel):
         return self.z_score_func()
 
     @property
-    def max_drawdown(self: CommonModel) -> Union[float, Series[float]]:
+    def max_drawdown(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
@@ -283,7 +283,7 @@ class CommonModel(BaseModel):
         return self.max_drawdown_func()
 
     @property
-    def max_drawdown_date(self: CommonModel) -> Union[dt.date, Series[dt.date]]:
+    def max_drawdown_date(self: _CommonModel) -> Union[dt.date, Series[dt.date]]:
         """
         Date when the maximum drawdown occurred.
 
@@ -308,7 +308,7 @@ class CommonModel(BaseModel):
         ).dt.date
 
     @property
-    def worst(self: CommonModel) -> Union[float, Series[float]]:
+    def worst(self: _CommonModel) -> Union[float, Series[float]]:
         """
         Most negative percentage change.
 
@@ -321,7 +321,7 @@ class CommonModel(BaseModel):
         return self.worst_func(observations=observations)
 
     @property
-    def positive_share(self: CommonModel) -> Union[float, Series[float]]:
+    def positive_share(self: _CommonModel) -> Union[float, Series[float]]:
         """
         The share of percentage changes that are greater than zero.
 
@@ -333,7 +333,7 @@ class CommonModel(BaseModel):
         return self.positive_share_func()
 
     @property
-    def skew(self: CommonModel) -> Union[float, Series[float]]:
+    def skew(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/s/skewness.asp.
 
@@ -345,7 +345,7 @@ class CommonModel(BaseModel):
         return self.skew_func()
 
     @property
-    def kurtosis(self: CommonModel) -> Union[float, Series[float]]:
+    def kurtosis(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/k/kurtosis.asp.
 
@@ -357,7 +357,7 @@ class CommonModel(BaseModel):
         return self.kurtosis_func()
 
     @property
-    def cvar_down(self: CommonModel) -> Union[float, Series[float]]:
+    def cvar_down(self: _CommonModel) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
@@ -370,7 +370,7 @@ class CommonModel(BaseModel):
         return self.cvar_down_func(level=level)
 
     @property
-    def var_down(self: CommonModel) -> Union[float, Series[float]]:
+    def var_down(self: _CommonModel) -> Union[float, Series[float]]:
         """
         Downside 95% Value At Risk (VaR).
 
@@ -387,7 +387,7 @@ class CommonModel(BaseModel):
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
-    def vol_from_var(self: CommonModel) -> Union[float, Series[float]]:
+    def vol_from_var(self: _CommonModel) -> Union[float, Series[float]]:
         """
         Implied annualized volatility from Downside 95% Value at Risk.
 
@@ -403,7 +403,7 @@ class CommonModel(BaseModel):
         interpolation: LiteralQuantileInterp = "lower"
         return self.vol_from_var_func(level=level, interpolation=interpolation)
 
-    def value_to_log(self: CommonModel) -> CommonModel:
+    def value_to_log(self: _CommonModel) -> _CommonModel:  # noqa: PYI019
         """
         Series of values converted into logarithmic weighted series.
 
@@ -422,9 +422,9 @@ class CommonModel(BaseModel):
         return self
 
     def value_nan_handle(
-        self: CommonModel,
+        self: _CommonModel,
         method: LiteralNanMethod = "fill",
-    ) -> CommonModel:
+    ) -> _CommonModel:  # noqa: PYI019
         """
         Handle missing values in a valueseries.
 
@@ -445,9 +445,9 @@ class CommonModel(BaseModel):
         return self
 
     def return_nan_handle(
-        self: CommonModel,
+        self: _CommonModel,
         method: LiteralNanMethod = "fill",
-    ) -> CommonModel:
+    ) -> _CommonModel:  # noqa: PYI019
         """
         Handle missing values in a returnseries.
 
@@ -467,7 +467,7 @@ class CommonModel(BaseModel):
             self.tsdf = self.tsdf.dropna()
         return self
 
-    def to_drawdown_series(self: CommonModel) -> CommonModel:
+    def to_drawdown_series(self: _CommonModel) -> _CommonModel:  # noqa: PYI019
         """
         Convert timeseries into a drawdown series.
 
@@ -483,7 +483,7 @@ class CommonModel(BaseModel):
         return self
 
     def to_json(
-        self: CommonModel,
+        self: _CommonModel,
         filename: str,
         directory: Optional[DirectoryPath] = None,
     ) -> list[dict[str, Union[str, bool, ValueType, list[str], list[float]]]]:
@@ -535,7 +535,7 @@ class CommonModel(BaseModel):
         return output
 
     def to_xlsx(
-        self: CommonModel,
+        self: _CommonModel,
         filename: str,
         sheet_title: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
@@ -592,7 +592,7 @@ class CommonModel(BaseModel):
         return str(sheetfile)
 
     def plot_bars(
-        self: CommonModel,
+        self: _CommonModel,
         mode: LiteralBarPlotMode = "group",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
@@ -706,7 +706,7 @@ class CommonModel(BaseModel):
         return figure, string_output
 
     def plot_series(  # noqa: C901
-        self: CommonModel,
+        self: _CommonModel,
         mode: LiteralLinePlotMode = "lines",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
@@ -838,7 +838,7 @@ class CommonModel(BaseModel):
         return figure, string_output
 
     def arithmetic_ret_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -898,7 +898,7 @@ class CommonModel(BaseModel):
         )
 
     def vol_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -957,7 +957,7 @@ class CommonModel(BaseModel):
         )
 
     def vol_from_var_func(
-        self: CommonModel,
+        self: _CommonModel,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1010,7 +1010,7 @@ class CommonModel(BaseModel):
         )
 
     def target_weight_from_var(
-        self: CommonModel,
+        self: _CommonModel,
         target_vol: float = 0.175,
         level: float = 0.95,
         min_leverage_local: float = 0.0,
@@ -1075,7 +1075,7 @@ class CommonModel(BaseModel):
         )
 
     def cvar_down_func(
-        self: CommonModel,
+        self: _CommonModel,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1137,7 +1137,7 @@ class CommonModel(BaseModel):
         )
 
     def downside_deviation_func(
-        self: CommonModel,
+        self: _CommonModel,
         min_accepted_return: float = 0.0,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1213,7 +1213,7 @@ class CommonModel(BaseModel):
         )
 
     def geo_ret_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1271,7 +1271,7 @@ class CommonModel(BaseModel):
         )
 
     def skew_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1320,7 +1320,7 @@ class CommonModel(BaseModel):
         )
 
     def kurtosis_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1370,7 +1370,7 @@ class CommonModel(BaseModel):
         )
 
     def max_drawdown_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1420,7 +1420,7 @@ class CommonModel(BaseModel):
         )
 
     def positive_share_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1476,7 +1476,7 @@ class CommonModel(BaseModel):
         )
 
     def ret_vol_ratio_func(
-        self: CommonModel,
+        self: _CommonModel,
         riskfree_rate: float = 0.0,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1538,7 +1538,7 @@ class CommonModel(BaseModel):
         )
 
     def sortino_ratio_func(
-        self: CommonModel,
+        self: _CommonModel,
         riskfree_rate: float = 0.0,
         min_accepted_return: float = 0.0,
         months_from_last: Optional[int] = None,
@@ -1604,7 +1604,7 @@ class CommonModel(BaseModel):
         )
 
     def value_ret_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1655,7 +1655,7 @@ class CommonModel(BaseModel):
         )
 
     def value_ret_calendar_period(
-        self: CommonModel,
+        self: _CommonModel,
         year: int,
         month: Optional[int] = None,
     ) -> Union[float, Series[float]]:
@@ -1693,7 +1693,7 @@ class CommonModel(BaseModel):
         )
 
     def var_down_func(
-        self: CommonModel,
+        self: _CommonModel,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1747,7 +1747,7 @@ class CommonModel(BaseModel):
         )
 
     def worst_func(
-        self: CommonModel,
+        self: _CommonModel,
         observations: int = 1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1798,7 +1798,7 @@ class CommonModel(BaseModel):
         )
 
     def z_score_func(
-        self: CommonModel,
+        self: _CommonModel,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1844,7 +1844,7 @@ class CommonModel(BaseModel):
         )
 
     def rolling_cvar_down(
-        self: CommonModel,
+        self: _CommonModel,
         column: int = 0,
         level: float = 0.95,
         observations: int = 252,
@@ -1878,7 +1878,7 @@ class CommonModel(BaseModel):
         return cvardf
 
     def rolling_return(
-        self: CommonModel,
+        self: _CommonModel,
         column: int = 0,
         observations: int = 21,
     ) -> DataFrame:
@@ -1910,7 +1910,7 @@ class CommonModel(BaseModel):
         return retdf
 
     def rolling_var_down(
-        self: CommonModel,
+        self: _CommonModel,
         column: int = 0,
         level: float = 0.95,
         observations: int = 252,
@@ -1949,7 +1949,7 @@ class CommonModel(BaseModel):
         return vardf
 
     def rolling_vol(
-        self: CommonModel,
+        self: _CommonModel,
         column: int = 0,
         observations: int = 21,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
