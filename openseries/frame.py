@@ -737,9 +737,9 @@ class OpenFrame(_CommonModel):
         Parameters
         ----------
         long_column: int, default: 0
-            Column # of timeseries bought
+            Column number of timeseries bought
         short_column: int, default: 1
-            Column # of timeseries sold
+            Column number of timeseries sold
         base_zero: bool, default: True
             If set to False 1.0 is added to allow for a capital base and
             to allow a volatility calculation

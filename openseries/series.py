@@ -678,15 +678,13 @@ class OpenTimeSeries(_CommonModel):
         )
 
         rawdata = [
-            data.loc[:, (self.label, ValueType.RTRN)]  # type: ignore[index]
+            data.loc[:, cast(int, (self.label, ValueType.RTRN))]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, (self.label, ValueType.RTRN)].iloc[  # type: ignore[index]
-            1:
-        ]:
+        for item in data.loc[:, cast(int, (self.label, ValueType.RTRN))].iloc[1:]:
             previous = rawdata[-1]
             rawdata.append(
                 _ewma_calc(
