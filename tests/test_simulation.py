@@ -11,6 +11,8 @@ from pandas import DataFrame, Series, date_range
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
+
+# noinspection PyProtectedMember
 from openseries.simulation import (
     ModelParameters,
     ReturnSimulation,

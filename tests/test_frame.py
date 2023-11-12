@@ -16,6 +16,7 @@ from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
 from requests.exceptions import ConnectionError
 
+# noinspection PyProtectedMember
 from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
