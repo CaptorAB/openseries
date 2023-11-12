@@ -30,11 +30,11 @@ from pydantic import field_validator
 from statsmodels.regression.linear_model import (  # type: ignore[import-untyped,unused-ignore]
     RegressionResults,
 )
+from typing_extensions import Self
 
 from openseries._common_model import _CommonModel
 from openseries._risk import (
     _calc_inv_vol_weights,
-    _drawdown_details,
     _ewma_calc,
 )
 from openseries.datefixer import (
@@ -101,7 +101,7 @@ class OpenFrame(_CommonModel):
         return tseries
 
     def __init__(
-        self: OpenFrame,
+        self: Self,
         constituents: list[OpenTimeSeries],
         weights: Optional[list[float]] = None,
     ) -> None:
@@ -131,7 +131,7 @@ class OpenFrame(_CommonModel):
         self.weights = weights
         self._set_tsdf()
 
-    def _set_tsdf(self: OpenFrame) -> None:
+    def _set_tsdf(self: Self) -> None:
         """Set the tsdf DataFrame."""
         if self.constituents is not None and len(self.constituents) != 0:
             self.tsdf = reduce(
@@ -141,7 +141,7 @@ class OpenFrame(_CommonModel):
         else:
             warning("OpenFrame() was passed an empty list.")
 
-    def from_deepcopy(self: OpenFrame) -> OpenFrame:
+    def from_deepcopy(self: Self) -> Self:
         """
         Create copy of the OpenFrame object.
 
@@ -153,9 +153,9 @@ class OpenFrame(_CommonModel):
         return deepcopy(self)
 
     def merge_series(
-        self: OpenFrame,
+        self: Self,
         how: LiteralHowMerge = "outer",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
 
@@ -193,7 +193,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def all_properties(
-        self: OpenFrame,
+        self: Self,
         properties: Optional[list[LiteralFrameProps]] = None,
     ) -> DataFrame:
         """
@@ -219,7 +219,7 @@ class OpenFrame(_CommonModel):
         return concat(prop_list, axis="columns").T
 
     def calc_range(
-        self: OpenFrame,
+        self: Self,
         months_offset: Optional[int] = None,
         from_dt: Optional[dt.date] = None,
         to_dt: Optional[dt.date] = None,
@@ -250,9 +250,9 @@ class OpenFrame(_CommonModel):
         )
 
     def align_index_to_local_cdays(
-        self: OpenFrame,
+        self: Self,
         countries: CountriesType = "SE",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Align the index of .tsdf with local calendar business days.
 
@@ -270,7 +270,7 @@ class OpenFrame(_CommonModel):
         return self
 
     @property
-    def lengths_of_items(self: OpenFrame) -> Series[int]:
+    def lengths_of_items(self: Self) -> Series[int]:
         """
         Number of observations of all constituents.
 
@@ -287,7 +287,7 @@ class OpenFrame(_CommonModel):
         )
 
     @property
-    def item_count(self: OpenFrame) -> int:
+    def item_count(self: Self) -> int:
         """
         Number of constituents.
 
@@ -299,7 +299,7 @@ class OpenFrame(_CommonModel):
         return len(self.constituents)
 
     @property
-    def columns_lvl_zero(self: OpenFrame) -> list[str]:
+    def columns_lvl_zero(self: Self) -> list[str]:
         """
         Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
@@ -311,7 +311,7 @@ class OpenFrame(_CommonModel):
         return list(self.tsdf.columns.get_level_values(0))
 
     @property
-    def columns_lvl_one(self: OpenFrame) -> list[ValueType]:
+    def columns_lvl_one(self: Self) -> list[ValueType]:
         """
         Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
@@ -323,7 +323,7 @@ class OpenFrame(_CommonModel):
         return list(self.tsdf.columns.get_level_values(1))
 
     @property
-    def first_indices(self: OpenFrame) -> Series[dt.date]:
+    def first_indices(self: Self) -> Series[dt.date]:
         """
         The first dates in the timeseries of all constituents.
 
@@ -340,7 +340,7 @@ class OpenFrame(_CommonModel):
         ).dt.date
 
     @property
-    def last_indices(self: OpenFrame) -> Series[dt.date]:
+    def last_indices(self: Self) -> Series[dt.date]:
         """
         The last dates in the timeseries of all constituents.
 
@@ -357,7 +357,7 @@ class OpenFrame(_CommonModel):
         ).dt.date
 
     @property
-    def span_of_days_all(self: OpenFrame) -> Series[int]:
+    def span_of_days_all(self: Self) -> Series[int]:
         """
         Number of days from the first date to the last for all items in the frame.
 
@@ -375,7 +375,7 @@ class OpenFrame(_CommonModel):
         )
 
     @property
-    def worst_month(self: OpenFrame) -> Series[float]:
+    def worst_month(self: Self) -> Series[float]:
         """
         Most negative month.
 
@@ -395,7 +395,7 @@ class OpenFrame(_CommonModel):
             dtype="float64",
         )
 
-    def value_to_ret(self: OpenFrame) -> OpenFrame:
+    def value_to_ret(self: Self) -> Self:
         """
         Convert series of values into series of returns.
 
@@ -411,7 +411,7 @@ class OpenFrame(_CommonModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_diff(self: OpenFrame, periods: int = 1) -> OpenFrame:
+    def value_to_diff(self: Self, periods: int = 1) -> Self:
         """
         Convert series of values to series of their period differences.
 
@@ -433,7 +433,7 @@ class OpenFrame(_CommonModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def to_cumret(self: OpenFrame) -> OpenFrame:
+    def to_cumret(self: Self) -> Self:
         """
         Convert series of returns into cumulative series of values.
 
@@ -456,9 +456,9 @@ class OpenFrame(_CommonModel):
         return self
 
     def resample(
-        self: OpenFrame,
+        self: Self,
         freq: Union[LiteralBizDayFreq, str] = "BM",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Resample the timeseries frequency.
 
@@ -485,12 +485,12 @@ class OpenFrame(_CommonModel):
         return self
 
     def resample_to_business_period_ends(
-        self: OpenFrame,
+        self: Self,
         freq: LiteralBizDayFreq = "BM",
         countries: CountriesType = "SE",
         convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Resamples timeseries frequency to the business calendar month end dates.
 
@@ -531,35 +531,8 @@ class OpenFrame(_CommonModel):
             )
         return self
 
-    def drawdown_details(self: OpenFrame, min_periods: int = 1) -> DataFrame:
-        """
-        Details of the maximum drawdown.
-
-        Parameters
-        ----------
-        min_periods: int, default: 1
-            Smallest number of observations to use to find the maximum drawdown
-
-        Returns
-        -------
-        Pandas.DataFrame
-            Max Drawdown
-            Start of drawdown
-            Date of bottom
-            Days from start to bottom
-            Average fall per day
-        """
-        mxdwndf = DataFrame()
-        for i in self.constituents:
-            tmpdf = i.tsdf.copy()
-            tmpdf.index = DatetimeIndex(tmpdf.index)
-            ddown = _drawdown_details(prices=tmpdf, min_periods=min_periods)
-            ddown.name = i.label
-            mxdwndf = concat([mxdwndf, ddown], axis="columns")
-        return mxdwndf
-
     def ewma_risk(
-        self: OpenFrame,
+        self: Self,
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
@@ -685,7 +658,7 @@ class OpenFrame(_CommonModel):
         ).T
 
     @property
-    def correl_matrix(self: OpenFrame) -> DataFrame:
+    def correl_matrix(self: Self) -> DataFrame:
         """
         Correlation matrix.
 
@@ -704,9 +677,9 @@ class OpenFrame(_CommonModel):
         return corr_matrix
 
     def add_timeseries(
-        self: OpenFrame,
+        self: Self,
         new_series: OpenTimeSeries,
-    ) -> OpenFrame:
+    ) -> Self:
         """
         To add an OpenTimeSeries object.
 
@@ -724,7 +697,7 @@ class OpenFrame(_CommonModel):
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
-    def delete_timeseries(self: OpenFrame, lvl_zero_item: str) -> OpenFrame:
+    def delete_timeseries(self: Self, lvl_zero_item: str) -> Self:
         """
         To delete an OpenTimeSeries object.
 
@@ -754,11 +727,11 @@ class OpenFrame(_CommonModel):
         return self
 
     def trunc_frame(
-        self: OpenFrame,
+        self: Self,
         start_cut: Optional[dt.date] = None,
         end_cut: Optional[dt.date] = None,
         where: LiteralTrunc = "both",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Truncate DataFrame such that all timeseries have the same time span.
 
@@ -807,7 +780,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def relative(
-        self: OpenFrame,
+        self: Self,
         long_column: int = 0,
         short_column: int = 1,
         *,
@@ -844,7 +817,7 @@ class OpenFrame(_CommonModel):
         ]
 
     def tracking_error_func(
-        self: OpenFrame,
+        self: Self,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -936,7 +909,7 @@ class OpenFrame(_CommonModel):
         )
 
     def info_ratio_func(
-        self: OpenFrame,
+        self: Self,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1033,7 +1006,7 @@ class OpenFrame(_CommonModel):
         )
 
     def capture_ratio_func(  # noqa: C901
-        self: OpenFrame,
+        self: Self,
         ratio: LiteralCaptureRatio,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
@@ -1233,7 +1206,7 @@ class OpenFrame(_CommonModel):
         )
 
     def beta(
-        self: OpenFrame,
+        self: Self,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
     ) -> float:
@@ -1311,7 +1284,7 @@ class OpenFrame(_CommonModel):
         return float(beta)
 
     def ord_least_squares_fit(
-        self: OpenFrame,
+        self: Self,
         y_column: Union[tuple[str, ValueType], int],
         x_column: Union[tuple[str, ValueType], int],
         method: LiteralOlsFitMethod = "pinv",
@@ -1381,7 +1354,7 @@ class OpenFrame(_CommonModel):
         return results
 
     def jensen_alpha(  # noqa: C901
-        self: OpenFrame,
+        self: Self,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
@@ -1515,7 +1488,7 @@ class OpenFrame(_CommonModel):
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     def make_portfolio(
-        self: OpenFrame,
+        self: Self,
         name: str,
         weight_strat: Optional[LiteralPortfolioWeightings] = None,
         initial_weights: Optional[list[float]] = None,
@@ -1616,7 +1589,7 @@ class OpenFrame(_CommonModel):
         )
 
     def rolling_info_ratio(
-        self: OpenFrame,
+        self: Self,
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
@@ -1682,7 +1655,7 @@ class OpenFrame(_CommonModel):
         return DataFrame(ratiodf)
 
     def rolling_beta(
-        self: OpenFrame,
+        self: Self,
         asset_column: int = 0,
         market_column: int = 1,
         observations: int = 21,
@@ -1737,7 +1710,7 @@ class OpenFrame(_CommonModel):
         return rollbeta
 
     def rolling_corr(
-        self: OpenFrame,
+        self: Self,
         first_column: int = 0,
         second_column: int = 1,
         observations: int = 21,

@@ -951,7 +951,6 @@ class TestOpenFrame(TestCase):
             "align_index_to_local_cdays",
             "all_properties",
             "calc_range",
-            "drawdown_details",
             "from_deepcopy",
             "plot_bars",
             "plot_series",
@@ -1435,18 +1434,6 @@ class TestOpenFrame(TestCase):
             OpenFrame([])
         if contextmgr.output != ["WARNING:root:OpenFrame() was passed an empty list."]:
             msg = "OpenFrame failed to log warning about empty input list."
-            raise ValueError(msg)
-
-    def test_drawdown_details(self: TestOpenFrame) -> None:
-        """Test drawdown_details method."""
-        ddframe = self.randomframe.from_deepcopy()
-        for serie in ddframe.constituents:
-            serie.to_cumret()
-        ddframe.to_cumret()
-        dds = ddframe.drawdown_details().loc["Days from start to bottom"].tolist()
-
-        if [1747, 315, 128, 746, 736] != dds:
-            msg = "Method drawdown_details() did not produce intended result."
             raise ValueError(msg)
 
     def test_trunc_frame(self: TestOpenFrame) -> None:

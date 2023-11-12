@@ -27,7 +27,6 @@ from pydantic import model_validator
 
 from openseries._common_model import _CommonModel
 from openseries._risk import (
-    _drawdown_details,
     _ewma_calc,
 )
 from openseries.datefixer import (
@@ -675,20 +674,6 @@ class OpenTimeSeries(_CommonModel):
         )
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         return self
-
-    def drawdown_details(self: OpenTimeSeries) -> DataFrame:
-        """
-        Details of the maximum drawdown.
-
-        Returns
-        -------
-        Pandas.DataFrame
-            Calculates 'Max Drawdown', 'Start of drawdown', 'Date of bottom',
-            'Days from start to bottom', & 'Average fall per day'
-        """
-        dddf = self.tsdf.copy()
-        dddf.index = DatetimeIndex(dddf.index)
-        return _drawdown_details(dddf).to_frame()
 
     def ewma_vol_func(
         self: OpenTimeSeries,

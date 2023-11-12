@@ -1361,52 +1361,6 @@ class TestOpenTimeSeries(TestCase):
             msg = "Data in Figure not as intended."
             raise ValueError(msg)
 
-    def test_drawdown_details(self: TestOpenTimeSeries) -> None:
-        """Test _drawdown_details method."""
-        days_from_start_to_bottom = 1747
-        details = self.randomseries.drawdown_details()
-
-        if f"{details.loc['Max Drawdown', 'Drawdown details']:7f}" != "-0.208637":
-            msg = (
-                f"Unexpected result from _drawdown_details(): "
-                f"'{details.loc['Max Drawdown', 'Drawdown details']:7f}'"
-            )
-            raise ValueError(msg)
-        if details.loc["Start of drawdown", "Drawdown details"] != dt.date(
-            2011,
-            12,
-            22,
-        ):
-            msg = (
-                f"Unexpected result from _drawdown_details(): "
-                f"'{details.loc['Start of drawdown', 'Drawdown details']}'"
-            )
-            raise ValueError(msg)
-        if details.loc["Date of bottom", "Drawdown details"] != dt.date(2016, 10, 3):
-            msg = (
-                f"Unexpected result from _drawdown_details(): "
-                f"'{details.loc['Date of bottom', 'Drawdown details']}'"
-            )
-            raise ValueError(msg)
-        if (
-            details.loc["Days from start to bottom", "Drawdown details"]
-            != days_from_start_to_bottom
-        ):
-            msg = (
-                f"Unexpected result from _drawdown_details(): "
-                f"'{details.loc['Days from start to bottom', 'Drawdown details']}'"
-            )
-            raise ValueError(msg)
-        if (
-            f"{details.loc['Average fall per day', 'Drawdown details']:.9f}"
-            != "-0.000119426"
-        ):
-            msg = (
-                f"Unexpected result from _drawdown_details(): "
-                f"'{details.loc['Average fall per day', 'Drawdown details']:.9f}'"
-            )
-            raise ValueError(msg)
-
     def test_align_index_to_local_cdays(
         self: TestOpenTimeSeries,
     ) -> None:
