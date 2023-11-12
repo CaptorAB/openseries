@@ -30,9 +30,10 @@ from openseries._risk import (
     _var_down_calc,
     _var_implied_vol_and_target_func,
 )
-from openseries.datefixer import _get_calc_range
+from openseries.datefixer import _align_dataframe_to_local_cdays, _get_calc_range
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
+    CountriesType,
     DaysInYearType,
     LiteralBarPlotMode,
     LiteralLinePlotMode,
@@ -402,6 +403,60 @@ class _CommonModel(BaseModel):
         level: float = 0.95
         interpolation: LiteralQuantileInterp = "lower"
         return self.vol_from_var_func(level=level, interpolation=interpolation)
+
+    def calc_range(
+        self: Self,
+        months_offset: Optional[int] = None,
+        from_dt: Optional[dt.date] = None,
+        to_dt: Optional[dt.date] = None,
+    ) -> tuple[dt.date, dt.date]:
+        """
+        Create user defined date range.
+
+        Parameters
+        ----------
+        months_offset: int, optional
+            Number of months offset as positive integer. Overrides use of from_date
+            and to_date
+        from_dt: datetime.date, optional
+            Specific from date
+        to_dt: datetime.date, optional
+            Specific from date
+
+        Returns
+        -------
+        (datetime.date, datetime.date)
+            Start and end date of the chosen date range
+        """
+        return _get_calc_range(
+            data=self.tsdf,
+            months_offset=months_offset,
+            from_dt=from_dt,
+            to_dt=to_dt,
+        )
+
+    def align_index_to_local_cdays(
+        self: Self,
+        countries: CountriesType = "SE",
+    ) -> Self:
+        """
+        Align the index of .tsdf with local calendar business days.
+
+        Parameters
+        ----------
+        countries: CountriesType, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+        self.tsdf = _align_dataframe_to_local_cdays(
+            data=self.tsdf,
+            countries=countries,
+        )
+        return self
 
     def value_to_log(self: Self) -> Self:
         """

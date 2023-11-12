@@ -37,11 +37,7 @@ from openseries._risk import (
     _calc_inv_vol_weights,
     _ewma_calc,
 )
-from openseries.datefixer import (
-    _get_calc_range,
-    align_dataframe_to_local_cdays,
-    do_resample_to_business_period_ends,
-)
+from openseries.datefixer import do_resample_to_business_period_ends
 from openseries.series import OpenTimeSeries
 from openseries.types import (
     CountriesType,
@@ -217,57 +213,6 @@ class OpenFrame(_CommonModel):
                 getattr(self, x) for x in OpenFramePropertiesList.allowed_strings
             ]
         return concat(prop_list, axis="columns").T
-
-    def calc_range(
-        self: Self,
-        months_offset: Optional[int] = None,
-        from_dt: Optional[dt.date] = None,
-        to_dt: Optional[dt.date] = None,
-    ) -> tuple[dt.date, dt.date]:
-        """
-        Create user defined date range.
-
-        Parameters
-        ----------
-        months_offset: int, optional
-            Number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_dt: datetime.date, optional
-            Specific from date
-        to_dt: datetime.date, optional
-            Specific from date
-
-        Returns
-        -------
-        tuple[datetime.date, datetime.date]
-            Start and end date of the chosen date range
-        """
-        return _get_calc_range(
-            data=self.tsdf,
-            months_offset=months_offset,
-            from_dt=from_dt,
-            to_dt=to_dt,
-        )
-
-    def align_index_to_local_cdays(
-        self: Self,
-        countries: CountriesType = "SE",
-    ) -> Self:
-        """
-        Align the index of .tsdf with local calendar business days.
-
-        Parameters
-        ----------
-        countries: CountriesType, default: "SE"
-            (List of) country code(s) according to ISO 3166-1 alpha-2
-
-        Returns
-        -------
-        OpenFrame
-            An OpenFrame object
-        """
-        self.tsdf = align_dataframe_to_local_cdays(data=self.tsdf, countries=countries)
-        return self
 
     @property
     def lengths_of_items(self: Self) -> Series[int]:

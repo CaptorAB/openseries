@@ -366,7 +366,7 @@ def generate_calender_date_range(
     )
 
 
-def align_dataframe_to_local_cdays(
+def _align_dataframe_to_local_cdays(
     data: DataFrame,
     countries: CountriesType = "SE",
 ) -> DataFrame:
