@@ -1,5 +1,5 @@
 """Defining the OpenFrame class."""
-# mypy: disable-error-code="operator,call-overload,unused-ignore,index,assignment"
+# mypy: disable-error-code="index,assignment"
 from __future__ import annotations
 
 import datetime as dt
@@ -8,12 +8,12 @@ from functools import reduce
 from logging import warning
 from typing import Optional, Union, cast
 
-import statsmodels.api as sm  # type: ignore[import-untyped]
-from ffn.core import (  # type: ignore[import-untyped]
+import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
+from ffn.core import (  # type: ignore[import-untyped,unused-ignore]
     calc_erc_weights,
     calc_mean_var_weights,
 )
-from numpy import cov, cumprod, log, sqrt
+from numpy import array, cov, cumprod, log, sqrt
 from pandas import (
     DataFrame,
     DatetimeIndex,
@@ -27,21 +27,17 @@ from pandas import (
 from pydantic import field_validator
 
 # noinspection PyProtectedMember
-from statsmodels.regression.linear_model import (  # type: ignore[import-untyped]
+from statsmodels.regression.linear_model import (  # type: ignore[import-untyped,unused-ignore]
     RegressionResults,
 )
+from typing_extensions import Self
 
-from openseries.common_model import CommonModel
-from openseries.datefixer import (
-    align_dataframe_to_local_cdays,
-    do_resample_to_business_period_ends,
-    get_calc_range,
+from openseries._common_model import _CommonModel
+from openseries._risk import (
+    _calc_inv_vol_weights,
+    _ewma_calc,
 )
-from openseries.risk import (
-    calc_inv_vol_weights,
-    drawdown_details,
-    ewma_calc,
-)
+from openseries.datefixer import do_resample_to_business_period_ends
 from openseries.series import OpenTimeSeries
 from openseries.types import (
     CountriesType,
@@ -63,7 +59,7 @@ from openseries.types import (
 )
 
 
-class OpenFrame(CommonModel):
+class OpenFrame(_CommonModel):
 
     """
     OpenFrame objects hold OpenTimeSeries in the list constituents.
@@ -89,7 +85,7 @@ class OpenFrame(CommonModel):
 
     # noinspection PyMethodParameters
     @field_validator("constituents")  # type: ignore[misc]
-    def check_labels_unique(
+    def _check_labels_unique(
         cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:
@@ -101,7 +97,7 @@ class OpenFrame(CommonModel):
         return tseries
 
     def __init__(
-        self: OpenFrame,
+        self: Self,
         constituents: list[OpenTimeSeries],
         weights: Optional[list[float]] = None,
     ) -> None:
@@ -129,9 +125,9 @@ class OpenFrame(CommonModel):
 
         self.constituents = constituents
         self.weights = weights
-        self.set_tsdf()
+        self._set_tsdf()
 
-    def set_tsdf(self: OpenFrame) -> None:
+    def _set_tsdf(self: Self) -> None:
         """Set the tsdf DataFrame."""
         if self.constituents is not None and len(self.constituents) != 0:
             self.tsdf = reduce(
@@ -141,7 +137,7 @@ class OpenFrame(CommonModel):
         else:
             warning("OpenFrame() was passed an empty list.")
 
-    def from_deepcopy(self: OpenFrame) -> OpenFrame:
+    def from_deepcopy(self: Self) -> Self:
         """
         Create copy of the OpenFrame object.
 
@@ -153,9 +149,9 @@ class OpenFrame(CommonModel):
         return deepcopy(self)
 
     def merge_series(
-        self: OpenFrame,
+        self: Self,
         how: LiteralHowMerge = "outer",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
 
@@ -193,7 +189,7 @@ class OpenFrame(CommonModel):
         return self
 
     def all_properties(
-        self: OpenFrame,
+        self: Self,
         properties: Optional[list[LiteralFrameProps]] = None,
     ) -> DataFrame:
         """
@@ -218,59 +214,8 @@ class OpenFrame(CommonModel):
             ]
         return concat(prop_list, axis="columns").T
 
-    def calc_range(
-        self: OpenFrame,
-        months_offset: Optional[int] = None,
-        from_dt: Optional[dt.date] = None,
-        to_dt: Optional[dt.date] = None,
-    ) -> tuple[dt.date, dt.date]:
-        """
-        Create user defined date range.
-
-        Parameters
-        ----------
-        months_offset: int, optional
-            Number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_dt: datetime.date, optional
-            Specific from date
-        to_dt: datetime.date, optional
-            Specific from date
-
-        Returns
-        -------
-        tuple[datetime.date, datetime.date]
-            Start and end date of the chosen date range
-        """
-        return get_calc_range(
-            data=self.tsdf,
-            months_offset=months_offset,
-            from_dt=from_dt,
-            to_dt=to_dt,
-        )
-
-    def align_index_to_local_cdays(
-        self: OpenFrame,
-        countries: CountriesType = "SE",
-    ) -> OpenFrame:
-        """
-        Align the index of .tsdf with local calendar business days.
-
-        Parameters
-        ----------
-        countries: CountriesType, default: "SE"
-            (List of) country code(s) according to ISO 3166-1 alpha-2
-
-        Returns
-        -------
-        OpenFrame
-            An OpenFrame object
-        """
-        self.tsdf = align_dataframe_to_local_cdays(data=self.tsdf, countries=countries)
-        return self
-
     @property
-    def lengths_of_items(self: OpenFrame) -> Series[int]:
+    def lengths_of_items(self: Self) -> Series[int]:
         """
         Number of observations of all constituents.
 
@@ -287,7 +232,7 @@ class OpenFrame(CommonModel):
         )
 
     @property
-    def item_count(self: OpenFrame) -> int:
+    def item_count(self: Self) -> int:
         """
         Number of constituents.
 
@@ -299,7 +244,7 @@ class OpenFrame(CommonModel):
         return len(self.constituents)
 
     @property
-    def columns_lvl_zero(self: OpenFrame) -> list[str]:
+    def columns_lvl_zero(self: Self) -> list[str]:
         """
         Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
@@ -311,7 +256,7 @@ class OpenFrame(CommonModel):
         return list(self.tsdf.columns.get_level_values(0))
 
     @property
-    def columns_lvl_one(self: OpenFrame) -> list[ValueType]:
+    def columns_lvl_one(self: Self) -> list[ValueType]:
         """
         Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
@@ -323,7 +268,7 @@ class OpenFrame(CommonModel):
         return list(self.tsdf.columns.get_level_values(1))
 
     @property
-    def first_indices(self: OpenFrame) -> Series[dt.date]:
+    def first_indices(self: Self) -> Series[dt.date]:
         """
         The first dates in the timeseries of all constituents.
 
@@ -340,7 +285,7 @@ class OpenFrame(CommonModel):
         ).dt.date
 
     @property
-    def last_indices(self: OpenFrame) -> Series[dt.date]:
+    def last_indices(self: Self) -> Series[dt.date]:
         """
         The last dates in the timeseries of all constituents.
 
@@ -357,7 +302,7 @@ class OpenFrame(CommonModel):
         ).dt.date
 
     @property
-    def span_of_days_all(self: OpenFrame) -> Series[int]:
+    def span_of_days_all(self: Self) -> Series[int]:
         """
         Number of days from the first date to the last for all items in the frame.
 
@@ -375,7 +320,7 @@ class OpenFrame(CommonModel):
         )
 
     @property
-    def worst_month(self: OpenFrame) -> Series[float]:
+    def worst_month(self: Self) -> Series[float]:
         """
         Most negative month.
 
@@ -395,7 +340,7 @@ class OpenFrame(CommonModel):
             dtype="float64",
         )
 
-    def value_to_ret(self: OpenFrame) -> OpenFrame:
+    def value_to_ret(self: Self) -> Self:
         """
         Convert series of values into series of returns.
 
@@ -411,7 +356,7 @@ class OpenFrame(CommonModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def value_to_diff(self: OpenFrame, periods: int = 1) -> OpenFrame:
+    def value_to_diff(self: Self, periods: int = 1) -> Self:
         """
         Convert series of values to series of their period differences.
 
@@ -433,7 +378,7 @@ class OpenFrame(CommonModel):
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
-    def to_cumret(self: OpenFrame) -> OpenFrame:
+    def to_cumret(self: Self) -> Self:
         """
         Convert series of returns into cumulative series of values.
 
@@ -456,9 +401,9 @@ class OpenFrame(CommonModel):
         return self
 
     def resample(
-        self: OpenFrame,
+        self: Self,
         freq: Union[LiteralBizDayFreq, str] = "BM",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Resample the timeseries frequency.
 
@@ -485,12 +430,12 @@ class OpenFrame(CommonModel):
         return self
 
     def resample_to_business_period_ends(
-        self: OpenFrame,
+        self: Self,
         freq: LiteralBizDayFreq = "BM",
         countries: CountriesType = "SE",
         convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Resamples timeseries frequency to the business calendar month end dates.
 
@@ -531,35 +476,8 @@ class OpenFrame(CommonModel):
             )
         return self
 
-    def drawdown_details(self: OpenFrame, min_periods: int = 1) -> DataFrame:
-        """
-        Details of the maximum drawdown.
-
-        Parameters
-        ----------
-        min_periods: int, default: 1
-            Smallest number of observations to use to find the maximum drawdown
-
-        Returns
-        -------
-        Pandas.DataFrame
-            Max Drawdown
-            Start of drawdown
-            Date of bottom
-            Days from start to bottom
-            Average fall per day
-        """
-        mxdwndf = DataFrame()
-        for i in self.constituents:
-            tmpdf = i.tsdf.copy()
-            tmpdf.index = DatetimeIndex(tmpdf.index)
-            ddown = drawdown_details(prices=tmpdf, min_periods=min_periods)
-            ddown.name = i.label
-            mxdwndf = concat([mxdwndf, ddown], axis="columns")
-        return mxdwndf
-
     def ewma_risk(
-        self: OpenFrame,
+        self: Self,
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
@@ -653,13 +571,13 @@ class OpenFrame(CommonModel):
         raw_corr = [raw_cov[0] / (2 * raw_one[0] * raw_two[0])]
 
         for _, row in data.iloc[1:].iterrows():
-            tmp_raw_one = ewma_calc(
+            tmp_raw_one = _ewma_calc(
                 reeturn=row.loc[cols[0], ValueType.RTRN],
                 prev_ewma=raw_one[-1],
                 time_factor=time_factor,
                 lmbda=lmbda,
             )
-            tmp_raw_two = ewma_calc(
+            tmp_raw_two = _ewma_calc(
                 reeturn=row.loc[cols[1], ValueType.RTRN],
                 prev_ewma=raw_two[-1],
                 time_factor=time_factor,
@@ -685,7 +603,7 @@ class OpenFrame(CommonModel):
         ).T
 
     @property
-    def correl_matrix(self: OpenFrame) -> DataFrame:
+    def correl_matrix(self: Self) -> DataFrame:
         """
         Correlation matrix.
 
@@ -704,9 +622,9 @@ class OpenFrame(CommonModel):
         return corr_matrix
 
     def add_timeseries(
-        self: OpenFrame,
+        self: Self,
         new_series: OpenTimeSeries,
-    ) -> OpenFrame:
+    ) -> Self:
         """
         To add an OpenTimeSeries object.
 
@@ -724,7 +642,7 @@ class OpenFrame(CommonModel):
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
-    def delete_timeseries(self: OpenFrame, lvl_zero_item: str) -> OpenFrame:
+    def delete_timeseries(self: Self, lvl_zero_item: str) -> Self:
         """
         To delete an OpenTimeSeries object.
 
@@ -754,11 +672,11 @@ class OpenFrame(CommonModel):
         return self
 
     def trunc_frame(
-        self: OpenFrame,
+        self: Self,
         start_cut: Optional[dt.date] = None,
         end_cut: Optional[dt.date] = None,
         where: LiteralTrunc = "both",
-    ) -> OpenFrame:
+    ) -> Self:
         """
         Truncate DataFrame such that all timeseries have the same time span.
 
@@ -807,7 +725,7 @@ class OpenFrame(CommonModel):
         return self
 
     def relative(
-        self: OpenFrame,
+        self: Self,
         long_column: int = 0,
         short_column: int = 1,
         *,
@@ -819,9 +737,9 @@ class OpenFrame(CommonModel):
         Parameters
         ----------
         long_column: int, default: 0
-            Column # of timeseries bought
+            Column number of timeseries bought
         short_column: int, default: 1
-            Column # of timeseries sold
+            Column number of timeseries sold
         base_zero: bool, default: True
             If set to False 1.0 is added to allow for a capital base and
             to allow a volatility calculation
@@ -844,7 +762,7 @@ class OpenFrame(CommonModel):
         ]
 
     def tracking_error_func(
-        self: OpenFrame,
+        self: Self,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -936,7 +854,7 @@ class OpenFrame(CommonModel):
         )
 
     def info_ratio_func(
-        self: OpenFrame,
+        self: Self,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1033,7 +951,7 @@ class OpenFrame(CommonModel):
         )
 
     def capture_ratio_func(  # noqa: C901
-        self: OpenFrame,
+        self: Self,
         ratio: LiteralCaptureRatio,
         base_column: Union[tuple[str, ValueType], int] = -1,
         months_from_last: Optional[int] = None,
@@ -1233,7 +1151,7 @@ class OpenFrame(CommonModel):
         )
 
     def beta(
-        self: OpenFrame,
+        self: Self,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
     ) -> float:
@@ -1283,7 +1201,9 @@ class OpenFrame(CommonModel):
                     self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
                 )
             elif isinstance(asset, int):
-                y_value = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                y_value = log(
+                    self.tsdf.iloc[:, asset] / cast(float, self.tsdf.iloc[0, asset]),
+                )
             else:
                 msg = "asset should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
@@ -1294,7 +1214,9 @@ class OpenFrame(CommonModel):
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
                 )
             elif isinstance(market, int):
-                x_value = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                x_value = log(
+                    self.tsdf.iloc[:, market] / cast(float, self.tsdf.iloc[0, market]),
+                )
             else:
                 msg = "market should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
@@ -1307,7 +1229,7 @@ class OpenFrame(CommonModel):
         return float(beta)
 
     def ord_least_squares_fit(
-        self: OpenFrame,
+        self: Self,
         y_column: Union[tuple[str, ValueType], int],
         x_column: Union[tuple[str, ValueType], int],
         method: LiteralOlsFitMethod = "pinv",
@@ -1377,7 +1299,7 @@ class OpenFrame(CommonModel):
         return results
 
     def jensen_alpha(  # noqa: C901
-        self: OpenFrame,
+        self: Self,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
@@ -1406,7 +1328,7 @@ class OpenFrame(CommonModel):
         float
             Jensen's alpha
         """
-        full_year: float = 1.0
+        full_year = 1.0
         if all(
             x == ValueType.RTRN
             for x in self.tsdf.columns.get_level_values(1).to_numpy()
@@ -1450,14 +1372,19 @@ class OpenFrame(CommonModel):
                         - 1
                     )
             elif isinstance(asset, int):
-                asset_log = log(self.tsdf.iloc[:, asset] / self.tsdf.iloc[0, asset])
+                asset_log = log(
+                    self.tsdf.iloc[:, asset] / cast(float, self.tsdf.iloc[0, asset]),
+                )
                 if self.yearfrac > full_year:
                     asset_cagr = (
-                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset]
+                        cast(float, self.tsdf.iloc[-1, asset])
+                        / cast(float, self.tsdf.iloc[0, asset])
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     asset_cagr = (
-                        self.tsdf.iloc[-1, asset] / self.tsdf.iloc[0, asset] - 1
+                        cast(float, self.tsdf.iloc[-1, asset])
+                        / cast(float, self.tsdf.iloc[0, asset])
+                        - 1
                     )
             else:
                 msg = "asset should be a tuple[str, ValueType] or an integer."
@@ -1480,14 +1407,19 @@ class OpenFrame(CommonModel):
                         - 1
                     )
             elif isinstance(market, int):
-                market_log = log(self.tsdf.iloc[:, market] / self.tsdf.iloc[0, market])
+                market_log = log(
+                    self.tsdf.iloc[:, market] / cast(float, self.tsdf.iloc[0, market]),
+                )
                 if self.yearfrac > full_year:
                     market_cagr = (
-                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market]
+                        cast(float, self.tsdf.iloc[-1, market])
+                        / cast(float, self.tsdf.iloc[0, market])
                     ) ** (1 / self.yearfrac) - 1
                 else:
                     market_cagr = (
-                        self.tsdf.iloc[-1, market] / self.tsdf.iloc[0, market] - 1
+                        cast(float, self.tsdf.iloc[-1, market])
+                        / cast(float, self.tsdf.iloc[0, market])
+                        - 1
                     )
             else:
                 msg = "market should be a tuple[str, ValueType] or an integer."
@@ -1501,7 +1433,7 @@ class OpenFrame(CommonModel):
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
 
     def make_portfolio(
-        self: OpenFrame,
+        self: Self,
         name: str,
         weight_strat: Optional[LiteralPortfolioWeightings] = None,
         initial_weights: Optional[list[float]] = None,
@@ -1578,7 +1510,7 @@ class OpenFrame(CommonModel):
                 )
                 self.weights = weight_calc
             elif weight_strat == "inv_vol":
-                weight_calc = list(calc_inv_vol_weights(returns=dframe))
+                weight_calc = list(_calc_inv_vol_weights(returns=dframe))
                 self.weights = weight_calc
             elif weight_strat == "mean_var":
                 weight_calc = list(
@@ -1594,13 +1526,15 @@ class OpenFrame(CommonModel):
             else:
                 msg = "Weight strategy not implemented"
                 raise NotImplementedError(msg)
-        portfolio = dframe.dot(self.weights)
-        portfolio = portfolio.add(1.0).cumprod().to_frame()
-        portfolio.columns = [[name], [ValueType.PRICE]]
-        return DataFrame(data=portfolio, dtype="float64")
+        return DataFrame(
+            data=dframe.dot(other=array(self.weights)).add(1.0).cumprod(),
+            index=self.tsdf.index,
+            columns=[[name], [ValueType.PRICE]],
+            dtype="float64",
+        )
 
     def rolling_info_ratio(
-        self: OpenFrame,
+        self: Self,
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
@@ -1666,7 +1600,7 @@ class OpenFrame(CommonModel):
         return DataFrame(ratiodf)
 
     def rolling_beta(
-        self: OpenFrame,
+        self: Self,
         asset_column: int = 0,
         market_column: int = 1,
         observations: int = 21,
@@ -1721,7 +1655,7 @@ class OpenFrame(CommonModel):
         return rollbeta
 
     def rolling_corr(
-        self: OpenFrame,
+        self: Self,
         first_column: int = 0,
         second_column: int = 1,
         observations: int = 21,

@@ -24,18 +24,13 @@ from pandas import (
     date_range,
 )
 from pydantic import model_validator
+from typing_extensions import Self
 
-from openseries.common_model import CommonModel
-from openseries.datefixer import (
-    align_dataframe_to_local_cdays,
-    date_fix,
-    do_resample_to_business_period_ends,
-    get_calc_range,
+from openseries._common_model import _CommonModel
+from openseries._risk import (
+    _ewma_calc,
 )
-from openseries.risk import (
-    drawdown_details,
-    ewma_calc,
-)
+from openseries.datefixer import date_fix, do_resample_to_business_period_ends
 from openseries.types import (
     Countries,
     CountriesType,
@@ -56,7 +51,7 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-class OpenTimeSeries(CommonModel):
+class OpenTimeSeries(_CommonModel):
 
     """
     OpenTimeSeries objects are at the core of the openseries package.
@@ -111,7 +106,7 @@ class OpenTimeSeries(CommonModel):
     label: Optional[str] = None
 
     @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
-    def dates_and_values_validate(self: OpenTimeSeries) -> OpenTimeSeries:
+    def dates_and_values_validate(self: Self) -> Self:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)
         dates_list_length = len(self.dates)
@@ -255,7 +250,7 @@ class OpenTimeSeries(CommonModel):
         else:
             values = cast(DataFrame, dframe).iloc[:, column_nmbr].tolist()
             if isinstance(dframe.columns, MultiIndex):
-                if check_if_none(
+                if _check_if_none(
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
                 ):
                     label = "Series"
@@ -263,7 +258,7 @@ class OpenTimeSeries(CommonModel):
                     warning(msg=msg)
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
-                if check_if_none(
+                if _check_if_none(
                     dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
                 ):
                     valuetype = ValueType.PRICE
@@ -378,7 +373,7 @@ class OpenTimeSeries(CommonModel):
             ),
         )
 
-    def from_deepcopy(self: OpenTimeSeries) -> OpenTimeSeries:
+    def from_deepcopy(self: Self) -> Self:
         """
         Create copy of OpenTimeSeries object.
 
@@ -389,7 +384,7 @@ class OpenTimeSeries(CommonModel):
         """
         return deepcopy(self)
 
-    def pandas_df(self: OpenTimeSeries) -> OpenTimeSeries:
+    def pandas_df(self: Self) -> Self:
         """
         Populate .tsdf Pandas DataFrame from the .dates and .values lists.
 
@@ -408,54 +403,8 @@ class OpenTimeSeries(CommonModel):
 
         return self
 
-    def calc_range(
-        self: OpenTimeSeries,
-        months_offset: Optional[int] = None,
-        from_dt: Optional[dt.date] = None,
-        to_dt: Optional[dt.date] = None,
-    ) -> tuple[dt.date, dt.date]:
-        """
-        Create user defined date range.
-
-        Parameters
-        ----------
-        months_offset: int, optional
-            Number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_dt: datetime.date, optional
-            Specific from date
-        to_dt: datetime.date, optional
-            Specific from date
-
-        Returns
-        -------
-        (datetime.date, datetime.date)
-            Start and end date of the chosen date range
-        """
-        return get_calc_range(
-            data=self.tsdf,
-            months_offset=months_offset,
-            from_dt=from_dt,
-            to_dt=to_dt,
-        )
-
-    def align_index_to_local_cdays(self: OpenTimeSeries) -> OpenTimeSeries:
-        """
-        Align the index .tsdf with local calendar business days.
-
-        Returns
-        -------
-        OpenTimeSeries
-            An OpenTimeSeries object
-        """
-        self.tsdf = align_dataframe_to_local_cdays(
-            data=self.tsdf,
-            countries=self.countries,
-        )
-        return self
-
     def all_properties(
-        self: OpenTimeSeries,
+        self: Self,
         properties: Optional[list[LiteralSeriesProps]] = None,
     ) -> DataFrame:
         """
@@ -483,7 +432,7 @@ class OpenTimeSeries(CommonModel):
         return pdf
 
     @property
-    def worst_month(self: OpenTimeSeries) -> float:
+    def worst_month(self: Self) -> float:
         """
         Most negative month.
 
@@ -503,7 +452,7 @@ class OpenTimeSeries(CommonModel):
             ).iloc[0],
         )
 
-    def value_to_ret(self: OpenTimeSeries) -> OpenTimeSeries:
+    def value_to_ret(self: Self) -> Self:
         """
         Convert series of values into series of returns.
 
@@ -523,10 +472,7 @@ class OpenTimeSeries(CommonModel):
         )
         return self
 
-    def value_to_diff(
-        self: OpenTimeSeries,
-        periods: int = 1,
-    ) -> OpenTimeSeries:
+    def value_to_diff(self: Self, periods: int = 1) -> Self:
         """
         Convert series of values to series of their period differences.
 
@@ -552,7 +498,7 @@ class OpenTimeSeries(CommonModel):
         )
         return self
 
-    def to_cumret(self: OpenTimeSeries) -> OpenTimeSeries:
+    def to_cumret(self: Self) -> Self:
         """
         Convert series of returns into cumulative series of values.
 
@@ -579,10 +525,10 @@ class OpenTimeSeries(CommonModel):
         return self
 
     def from_1d_rate_to_cumret(
-        self: OpenTimeSeries,
+        self: Self,
         days_in_year: int = 365,
         divider: float = 1.0,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """
         Convert series of 1-day rates into series of cumulative values.
 
@@ -616,9 +562,9 @@ class OpenTimeSeries(CommonModel):
         return self
 
     def resample(
-        self: OpenTimeSeries,
+        self: Self,
         freq: Union[LiteralBizDayFreq, str] = "BM",
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """
         Resamples the timeseries frequency.
 
@@ -639,11 +585,11 @@ class OpenTimeSeries(CommonModel):
         return self
 
     def resample_to_business_period_ends(
-        self: OpenTimeSeries,
+        self: Self,
         freq: LiteralBizDayFreq = "BM",
         convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """
         Resamples timeseries frequency to the business calendar month end dates.
 
@@ -676,22 +622,8 @@ class OpenTimeSeries(CommonModel):
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         return self
 
-    def drawdown_details(self: OpenTimeSeries) -> DataFrame:
-        """
-        Details of the maximum drawdown.
-
-        Returns
-        -------
-        Pandas.DataFrame
-            Calculates 'Max Drawdown', 'Start of drawdown', 'Date of bottom',
-            'Days from start to bottom', & 'Average fall per day'
-        """
-        dddf = self.tsdf.copy()
-        dddf.index = DatetimeIndex(dddf.index)
-        return drawdown_details(dddf).to_frame()
-
     def ewma_vol_func(
-        self: OpenTimeSeries,
+        self: Self,
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
@@ -746,18 +678,16 @@ class OpenTimeSeries(CommonModel):
         )
 
         rawdata = [
-            data.loc[:, (self.label, ValueType.RTRN)]  # type: ignore[index]
+            data.loc[:, cast(int, (self.label, ValueType.RTRN))]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, (self.label, ValueType.RTRN)].iloc[  # type: ignore[index]
-            1:
-        ]:
+        for item in data.loc[:, cast(int, (self.label, ValueType.RTRN))].iloc[1:]:
             previous = rawdata[-1]
             rawdata.append(
-                ewma_calc(
+                _ewma_calc(
                     reeturn=cast(float, item),
                     prev_ewma=previous,
                     time_factor=time_factor,
@@ -773,10 +703,10 @@ class OpenTimeSeries(CommonModel):
         )
 
     def running_adjustment(
-        self: OpenTimeSeries,
+        self: Self,
         adjustment: float,
         days_in_year: int = 365,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """
         Add or subtract a fee from the timeseries return.
 
@@ -835,12 +765,12 @@ class OpenTimeSeries(CommonModel):
         return self
 
     def set_new_label(
-        self: OpenTimeSeries,
+        self: Self,
         lvl_zero: Optional[str] = None,
         lvl_one: Optional[ValueType] = None,
         *,
         delete_lvl_one: bool = False,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """
         Set the column labels of the .tsdf Pandas Dataframe.
 
@@ -964,7 +894,7 @@ def timeseries_chain(
     )
 
 
-def check_if_none(item: Any) -> bool:  # noqa: ANN401
+def _check_if_none(item: Any) -> bool:  # noqa: ANN401
     """
     Check if a variable is None or equivalent.
 

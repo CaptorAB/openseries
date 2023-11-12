@@ -3,6 +3,14 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.6] - 2023-11-12
+
+- Removed drawdown_details function as it was unnecessarily complex and of little interest
+- Some dev dependency updates such as ruff and mypy
+- Implemented typing.Self throughout where relevant
+- Consolidated date range functions from series.py and frame.py into _common_model.py
+- Made many functions "private" that are more appropriate with this status
+
 ## Version [1.4.5] - 2023-11-06
 
 - Cleaned up function for exponentially weighted moving average "EWMA" volatility

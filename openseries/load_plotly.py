@@ -10,7 +10,7 @@ import requests
 from openseries.types import CaptorLogoType, PlotlyLayoutType
 
 
-def check_remote_file_existence(url: str) -> bool:
+def _check_remote_file_existence(url: str) -> bool:
     """
     Check if remote file exists.
 
@@ -61,7 +61,7 @@ def load_plotly_dict(
     with Path.open(logofile, encoding="utf-8") as logo_file:
         logo = load(logo_file)
 
-    if check_remote_file_existence(url=logo["source"]) is False:
+    if _check_remote_file_existence(url=logo["source"]) is False:
         msg = f"Failed to add logo image from URL {logo['source']}"
         warning(msg)
         logo = {}

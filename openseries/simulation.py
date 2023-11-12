@@ -56,7 +56,7 @@ def random_generator(seed: Optional[int]) -> Generator:
     return Generator(bit_generator=bg)
 
 
-def convert_returns_to_values(
+def _convert_returns_to_values(
     param: ModelParameters,
     returns: NDArray[float64],
 ) -> NDArray[float64]:
@@ -82,7 +82,7 @@ def convert_returns_to_values(
     return cast(NDArray[float64], cumprod(a=return_array, axis=1))
 
 
-def wiener_process(
+def _wiener_process(
     param: ModelParameters,
     number_of_sims: PositiveInt,
     randomizer: Generator,
@@ -116,7 +116,7 @@ def wiener_process(
     )
 
 
-def brownian_motion_series(
+def _brownian_motion_series(
     param: ModelParameters,
     number_of_sims: PositiveInt,
     randomizer: Generator,
@@ -138,9 +138,9 @@ def brownian_motion_series(
     NDArray[float64]
         Price sequence which follows a Brownian motion
     """
-    return convert_returns_to_values(
+    return _convert_returns_to_values(
         param=param,
-        returns=wiener_process(
+        returns=_wiener_process(
             param=param,
             number_of_sims=number_of_sims,
             randomizer=randomizer,
@@ -148,7 +148,7 @@ def brownian_motion_series(
     )
 
 
-def geometric_brownian_motion_returns(
+def _geometric_brownian_motion_returns(
     param: ModelParameters,
     number_of_sims: PositiveInt,
     randomizer: Generator,
@@ -174,7 +174,7 @@ def geometric_brownian_motion_returns(
     NDArray[float64]
         Returns of a Geometric Brownian Motion process
     """
-    wiener = wiener_process(
+    wiener = _wiener_process(
         param=param,
         number_of_sims=number_of_sims,
         randomizer=randomizer,
@@ -185,7 +185,7 @@ def geometric_brownian_motion_returns(
     return wiener + drift
 
 
-def geometric_brownian_motion_series(
+def _geometric_brownian_motion_series(
     param: ModelParameters,
     number_of_sims: PositiveInt,
     randomizer: Generator,
@@ -207,9 +207,9 @@ def geometric_brownian_motion_series(
     NDArray[float64]
         Price levels for the asset
     """
-    return convert_returns_to_values(
+    return _convert_returns_to_values(
         param=param,
-        returns=geometric_brownian_motion_returns(
+        returns=_geometric_brownian_motion_returns(
             param=param,
             number_of_sims=number_of_sims,
             randomizer=randomizer,
@@ -217,7 +217,7 @@ def geometric_brownian_motion_series(
     )
 
 
-def merton_jump_model_returns(
+def _merton_jump_model_returns(
     param: ModelParameters,
     number_of_sims: PositiveInt,
     randomizer: Generator,
@@ -244,7 +244,7 @@ def merton_jump_model_returns(
     NDArray[float64]
         Merton Jump-Diffusion model
     """
-    wiener = wiener_process(
+    wiener = _wiener_process(
         param=param,
         number_of_sims=number_of_sims,
         randomizer=randomizer,
@@ -274,7 +274,7 @@ def merton_jump_model_returns(
     return cast(NDArray[float64], output)
 
 
-def merton_jump_model_series(
+def _merton_jump_model_series(
     param: ModelParameters,
     number_of_sims: PositiveInt,
     randomizer: Generator,
@@ -302,9 +302,9 @@ def merton_jump_model_series(
     NDArray[float64]
         Price levels for the asset
     """
-    return convert_returns_to_values(
+    return _convert_returns_to_values(
         param=param,
-        returns=merton_jump_model_returns(
+        returns=_merton_jump_model_returns(
             param=param,
             number_of_sims=number_of_sims,
             randomizer=randomizer,
@@ -595,7 +595,7 @@ class ReturnSimulation:
         )
 
         cls.randomizer = random_generator(seed=seed)
-        daily_returns = geometric_brownian_motion_returns(
+        daily_returns = _geometric_brownian_motion_returns(
             param=model_params,
             number_of_sims=number_of_sims,
             randomizer=cls.randomizer,
@@ -666,7 +666,7 @@ class ReturnSimulation:
         )
 
         cls.randomizer = random_generator(seed=seed)
-        daily_returns = merton_jump_model_returns(
+        daily_returns = _merton_jump_model_returns(
             param=model_params,
             number_of_sims=number_of_sims,
             randomizer=cls.randomizer,

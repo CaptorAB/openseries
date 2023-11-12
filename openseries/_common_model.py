@@ -1,4 +1,4 @@
-"""Defining the CommonModel class."""
+"""Defining the _CommonModel class."""
 from __future__ import annotations
 
 import datetime as dt
@@ -10,7 +10,7 @@ from secrets import choice
 from string import ascii_letters
 from typing import Any, Optional, Union, cast
 
-from numpy import log, sqrt
+from numpy import Inf, isnan, log, maximum, sqrt
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -21,14 +21,19 @@ from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import (  # type: ignore[import-untyped,unused-ignore]
     kurtosis,
-    norm,
     skew,
 )
+from typing_extensions import Self
 
-from openseries.datefixer import get_calc_range
+from openseries._risk import (
+    _cvar_down_calc,
+    _var_down_calc,
+    _var_implied_vol_and_target_func,
+)
+from openseries.datefixer import _align_dataframe_to_local_cdays, _get_calc_range
 from openseries.load_plotly import load_plotly_dict
-from openseries.risk import cvar_down_calc, drawdown_series, var_down_calc
 from openseries.types import (
+    CountriesType,
     DaysInYearType,
     LiteralBarPlotMode,
     LiteralLinePlotMode,
@@ -40,9 +45,9 @@ from openseries.types import (
 )
 
 
-class CommonModel(BaseModel):
+class _CommonModel(BaseModel):
 
-    """Declare CommonModel."""
+    """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
 
@@ -53,7 +58,7 @@ class CommonModel(BaseModel):
     )
 
     @property
-    def length(self: CommonModel) -> int:
+    def length(self: Self) -> int:
         """
         Number of observations.
 
@@ -65,7 +70,7 @@ class CommonModel(BaseModel):
         return len(self.tsdf.index)
 
     @property
-    def first_idx(self: CommonModel) -> dt.date:
+    def first_idx(self: Self) -> dt.date:
         """
         The first date in the timeseries.
 
@@ -77,7 +82,7 @@ class CommonModel(BaseModel):
         return cast(dt.date, self.tsdf.index[0])
 
     @property
-    def last_idx(self: CommonModel) -> dt.date:
+    def last_idx(self: Self) -> dt.date:
         """
         The last date in the timeseries.
 
@@ -89,7 +94,7 @@ class CommonModel(BaseModel):
         return cast(dt.date, self.tsdf.index[-1])
 
     @property
-    def span_of_days(self: CommonModel) -> int:
+    def span_of_days(self: Self) -> int:
         """
         Number of days from the first date to the last.
 
@@ -101,7 +106,7 @@ class CommonModel(BaseModel):
         return (self.last_idx - self.first_idx).days
 
     @property
-    def yearfrac(self: CommonModel) -> float:
+    def yearfrac(self: Self) -> float:
         """
         Length of series expressed in years assuming all years have 365.25 days.
 
@@ -114,7 +119,7 @@ class CommonModel(BaseModel):
         return self.span_of_days / 365.25
 
     @property
-    def periods_in_a_year(self: CommonModel) -> float:
+    def periods_in_a_year(self: Self) -> float:
         """
         The average number of observations per year.
 
@@ -126,7 +131,7 @@ class CommonModel(BaseModel):
         return self.length / self.yearfrac
 
     @property
-    def max_drawdown_cal_year(self: CommonModel) -> Union[float, Series[float]]:
+    def max_drawdown_cal_year(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
@@ -154,7 +159,7 @@ class CommonModel(BaseModel):
         )
 
     @property
-    def geo_ret(self: CommonModel) -> Union[float, Series[float]]:
+    def geo_ret(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/c/cagr.asp.
 
@@ -166,7 +171,7 @@ class CommonModel(BaseModel):
         return self.geo_ret_func()
 
     @property
-    def arithmetic_ret(self: CommonModel) -> Union[float, Series[float]]:
+    def arithmetic_ret(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
@@ -178,7 +183,7 @@ class CommonModel(BaseModel):
         return self.arithmetic_ret_func()
 
     @property
-    def value_ret(self: CommonModel) -> Union[float, Series[float]]:
+    def value_ret(self: Self) -> Union[float, Series[float]]:
         """
         Simple return.
 
@@ -190,7 +195,7 @@ class CommonModel(BaseModel):
         return self.value_ret_func()
 
     @property
-    def vol(self: CommonModel) -> Union[float, Series[float]]:
+    def vol(self: Self) -> Union[float, Series[float]]:
         """
         Annualized volatility.
 
@@ -205,7 +210,7 @@ class CommonModel(BaseModel):
         return self.vol_func()
 
     @property
-    def downside_deviation(self: CommonModel) -> Union[float, Series[float]]:
+    def downside_deviation(self: Self) -> Union[float, Series[float]]:
         """
         Downside Deviation.
 
@@ -222,7 +227,7 @@ class CommonModel(BaseModel):
         return self.downside_deviation_func(min_accepted_return=min_accepted_return)
 
     @property
-    def ret_vol_ratio(self: CommonModel) -> Union[float, Series[float]]:
+    def ret_vol_ratio(self: Self) -> Union[float, Series[float]]:
         """
         Ratio of annualized arithmetic mean of returns and annualized volatility.
 
@@ -236,7 +241,7 @@ class CommonModel(BaseModel):
         return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
-    def sortino_ratio(self: CommonModel) -> Union[float, Series[float]]:
+    def sortino_ratio(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/s/sortinoratio.asp.
 
@@ -255,7 +260,7 @@ class CommonModel(BaseModel):
         )
 
     @property
-    def z_score(self: CommonModel) -> Union[float, Series[float]]:
+    def z_score(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/z/zscore.asp.
 
@@ -267,7 +272,7 @@ class CommonModel(BaseModel):
         return self.z_score_func()
 
     @property
-    def max_drawdown(self: CommonModel) -> Union[float, Series[float]]:
+    def max_drawdown(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
@@ -279,7 +284,32 @@ class CommonModel(BaseModel):
         return self.max_drawdown_func()
 
     @property
-    def worst(self: CommonModel) -> Union[float, Series[float]]:
+    def max_drawdown_date(self: Self) -> Union[dt.date, Series[dt.date]]:
+        """
+        Date when the maximum drawdown occurred.
+
+        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+
+        Returns
+        -------
+        Union[datetime.date, pandas.Series[dt.date]]
+            Date when the maximum drawdown occurred
+        """
+        mdddf = self.tsdf.copy()
+        mdddf.index = DatetimeIndex(mdddf.index)
+        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date
+
+        if self.tsdf.shape[1] == 1:
+            return result.iloc[0]
+        return Series(
+            data=result,
+            index=self.tsdf.columns,
+            name="Max drawdown date",
+            dtype="datetime64[ns]",
+        ).dt.date
+
+    @property
+    def worst(self: Self) -> Union[float, Series[float]]:
         """
         Most negative percentage change.
 
@@ -292,7 +322,7 @@ class CommonModel(BaseModel):
         return self.worst_func(observations=observations)
 
     @property
-    def positive_share(self: CommonModel) -> Union[float, Series[float]]:
+    def positive_share(self: Self) -> Union[float, Series[float]]:
         """
         The share of percentage changes that are greater than zero.
 
@@ -304,7 +334,7 @@ class CommonModel(BaseModel):
         return self.positive_share_func()
 
     @property
-    def skew(self: CommonModel) -> Union[float, Series[float]]:
+    def skew(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/s/skewness.asp.
 
@@ -316,7 +346,7 @@ class CommonModel(BaseModel):
         return self.skew_func()
 
     @property
-    def kurtosis(self: CommonModel) -> Union[float, Series[float]]:
+    def kurtosis(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/k/kurtosis.asp.
 
@@ -328,7 +358,7 @@ class CommonModel(BaseModel):
         return self.kurtosis_func()
 
     @property
-    def cvar_down(self: CommonModel) -> Union[float, Series[float]]:
+    def cvar_down(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
@@ -341,7 +371,7 @@ class CommonModel(BaseModel):
         return self.cvar_down_func(level=level)
 
     @property
-    def var_down(self: CommonModel) -> Union[float, Series[float]]:
+    def var_down(self: Self) -> Union[float, Series[float]]:
         """
         Downside 95% Value At Risk (VaR).
 
@@ -358,7 +388,7 @@ class CommonModel(BaseModel):
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
-    def vol_from_var(self: CommonModel) -> Union[float, Series[float]]:
+    def vol_from_var(self: Self) -> Union[float, Series[float]]:
         """
         Implied annualized volatility from Downside 95% Value at Risk.
 
@@ -374,7 +404,61 @@ class CommonModel(BaseModel):
         interpolation: LiteralQuantileInterp = "lower"
         return self.vol_from_var_func(level=level, interpolation=interpolation)
 
-    def value_to_log(self: CommonModel) -> CommonModel:
+    def calc_range(
+        self: Self,
+        months_offset: Optional[int] = None,
+        from_dt: Optional[dt.date] = None,
+        to_dt: Optional[dt.date] = None,
+    ) -> tuple[dt.date, dt.date]:
+        """
+        Create user defined date range.
+
+        Parameters
+        ----------
+        months_offset: int, optional
+            Number of months offset as positive integer. Overrides use of from_date
+            and to_date
+        from_dt: datetime.date, optional
+            Specific from date
+        to_dt: datetime.date, optional
+            Specific from date
+
+        Returns
+        -------
+        (datetime.date, datetime.date)
+            Start and end date of the chosen date range
+        """
+        return _get_calc_range(
+            data=self.tsdf,
+            months_offset=months_offset,
+            from_dt=from_dt,
+            to_dt=to_dt,
+        )
+
+    def align_index_to_local_cdays(
+        self: Self,
+        countries: CountriesType = "SE",
+    ) -> Self:
+        """
+        Align the index of .tsdf with local calendar business days.
+
+        Parameters
+        ----------
+        countries: CountriesType, default: "SE"
+            (List of) country code(s) according to ISO 3166-1 alpha-2
+
+        Returns
+        -------
+        OpenFrame
+            An OpenFrame object
+        """
+        self.tsdf = _align_dataframe_to_local_cdays(
+            data=self.tsdf,
+            countries=countries,
+        )
+        return self
+
+    def value_to_log(self: Self) -> Self:
         """
         Series of values converted into logarithmic weighted series.
 
@@ -392,10 +476,7 @@ class CommonModel(BaseModel):
         )
         return self
 
-    def value_nan_handle(
-        self: CommonModel,
-        method: LiteralNanMethod = "fill",
-    ) -> CommonModel:
+    def value_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
         """
         Handle missing values in a valueseries.
 
@@ -415,10 +496,7 @@ class CommonModel(BaseModel):
             self.tsdf = self.tsdf.dropna()
         return self
 
-    def return_nan_handle(
-        self: CommonModel,
-        method: LiteralNanMethod = "fill",
-    ) -> CommonModel:
+    def return_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
         """
         Handle missing values in a returnseries.
 
@@ -438,7 +516,7 @@ class CommonModel(BaseModel):
             self.tsdf = self.tsdf.dropna()
         return self
 
-    def to_drawdown_series(self: CommonModel) -> CommonModel:
+    def to_drawdown_series(self: Self) -> Self:
         """
         Convert timeseries into a drawdown series.
 
@@ -447,14 +525,14 @@ class CommonModel(BaseModel):
         self
             An object of the same class
         """
-        for serie in self.tsdf:
-            self.tsdf.loc[:, serie] = drawdown_series(  # type: ignore[index]
-                prices=self.tsdf.loc[:, serie],  # type: ignore[index]
-            )
+        drawdown = self.tsdf.copy()
+        drawdown[isnan(drawdown)] = -Inf
+        roll_max = maximum.accumulate(drawdown, axis=0)
+        self.tsdf = DataFrame(drawdown / roll_max - 1.0)
         return self
 
     def to_json(
-        self: CommonModel,
+        self: Self,
         filename: str,
         directory: Optional[DirectoryPath] = None,
     ) -> list[dict[str, Union[str, bool, ValueType, list[str], list[float]]]]:
@@ -490,11 +568,8 @@ class CommonModel(BaseModel):
                 data.pop(item)
             output.append(dict(data))
         else:
-            series = [
-                dict(serie.__dict__)
-                for serie in cast(list[Any], data.get("constituents"))
-            ]
-            for itemdata in series:
+            for serie in cast(list[Any], data.get("constituents")):
+                itemdata = dict(serie.__dict__)
                 for item in cleaner_list:
                     itemdata.pop(item)
                 output.append(dict(itemdata))
@@ -509,7 +584,7 @@ class CommonModel(BaseModel):
         return output
 
     def to_xlsx(
-        self: CommonModel,
+        self: Self,
         filename: str,
         sheet_title: Optional[str] = None,
         directory: Optional[DirectoryPath] = None,
@@ -566,7 +641,7 @@ class CommonModel(BaseModel):
         return str(sheetfile)
 
     def plot_bars(
-        self: CommonModel,
+        self: Self,
         mode: LiteralBarPlotMode = "group",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
@@ -680,7 +755,7 @@ class CommonModel(BaseModel):
         return figure, string_output
 
     def plot_series(  # noqa: C901
-        self: CommonModel,
+        self: Self,
         mode: LiteralLinePlotMode = "lines",
         tick_fmt: Optional[str] = None,
         filename: Optional[str] = None,
@@ -812,7 +887,7 @@ class CommonModel(BaseModel):
         return figure, string_output
 
     def arithmetic_ret_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -839,7 +914,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Annualized arithmetic mean of returns
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -872,7 +947,7 @@ class CommonModel(BaseModel):
         )
 
     def vol_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -901,7 +976,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Annualized volatility
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -931,7 +1006,7 @@ class CommonModel(BaseModel):
         )
 
     def vol_from_var_func(
-        self: CommonModel,
+        self: Self,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -984,7 +1059,7 @@ class CommonModel(BaseModel):
         )
 
     def target_weight_from_var(
-        self: CommonModel,
+        self: Self,
         target_vol: float = 0.175,
         level: float = 0.95,
         min_leverage_local: float = 0.0,
@@ -1049,7 +1124,7 @@ class CommonModel(BaseModel):
         )
 
     def cvar_down_func(
-        self: CommonModel,
+        self: Self,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1077,7 +1152,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Downside Conditional Value At Risk "CVaR"
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1111,7 +1186,7 @@ class CommonModel(BaseModel):
         )
 
     def downside_deviation_func(
-        self: CommonModel,
+        self: Self,
         min_accepted_return: float = 0.0,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1146,7 +1221,7 @@ class CommonModel(BaseModel):
             Downside deviation
         """
         zero: float = 0.0
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1187,7 +1262,7 @@ class CommonModel(BaseModel):
         )
 
     def geo_ret_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1213,7 +1288,7 @@ class CommonModel(BaseModel):
             Compounded Annual Growth Rate (CAGR)
         """
         zero: float = 0.0
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1245,7 +1320,7 @@ class CommonModel(BaseModel):
         )
 
     def skew_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1270,7 +1345,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Skew of the return distribution
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1294,7 +1369,7 @@ class CommonModel(BaseModel):
         )
 
     def kurtosis_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1319,7 +1394,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Kurtosis of the return distribution
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1344,7 +1419,7 @@ class CommonModel(BaseModel):
         )
 
     def max_drawdown_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1372,7 +1447,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Maximum drawdown without any limit on date range
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1393,33 +1468,8 @@ class CommonModel(BaseModel):
             dtype="float64",
         )
 
-    @property
-    def max_drawdown_date(self: CommonModel) -> Union[dt.date, Series[dt.date]]:
-        """
-        Date when the maximum drawdown occurred.
-
-        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
-
-        Returns
-        -------
-        Union[datetime.date, pandas.Series[dt.date]]
-            Date when the maximum drawdown occurred
-        """
-        mdddf = self.tsdf.copy()
-        mdddf.index = DatetimeIndex(mdddf.index)
-        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date
-
-        if self.tsdf.shape[1] == 1:
-            return result.iloc[0]
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Max drawdown date",
-            dtype="datetime64[ns]",
-        ).dt.date
-
     def positive_share_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1443,7 +1493,7 @@ class CommonModel(BaseModel):
             Calculate share of percentage changes that are greater than zero
         """
         zero: float = 0.0
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1475,7 +1525,7 @@ class CommonModel(BaseModel):
         )
 
     def ret_vol_ratio_func(
-        self: CommonModel,
+        self: Self,
         riskfree_rate: float = 0.0,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1537,7 +1587,7 @@ class CommonModel(BaseModel):
         )
 
     def sortino_ratio_func(
-        self: CommonModel,
+        self: Self,
         riskfree_rate: float = 0.0,
         min_accepted_return: float = 0.0,
         months_from_last: Optional[int] = None,
@@ -1603,7 +1653,7 @@ class CommonModel(BaseModel):
         )
 
     def value_ret_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1627,7 +1677,7 @@ class CommonModel(BaseModel):
             Calculate simple return
         """
         zero: float = 0.0
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1654,7 +1704,7 @@ class CommonModel(BaseModel):
         )
 
     def value_ret_calendar_period(
-        self: CommonModel,
+        self: Self,
         year: int,
         month: Optional[int] = None,
     ) -> Union[float, Series[float]]:
@@ -1692,7 +1742,7 @@ class CommonModel(BaseModel):
         )
 
     def var_down_func(
-        self: CommonModel,
+        self: Self,
         level: float = 0.95,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1724,7 +1774,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Downside Value At Risk
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1746,7 +1796,7 @@ class CommonModel(BaseModel):
         )
 
     def worst_func(
-        self: CommonModel,
+        self: Self,
         observations: int = 1,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
@@ -1773,7 +1823,7 @@ class CommonModel(BaseModel):
             Most negative percentage change over a rolling number of observations
             within a chosen date range
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1797,7 +1847,7 @@ class CommonModel(BaseModel):
         )
 
     def z_score_func(
-        self: CommonModel,
+        self: Self,
         months_from_last: Optional[int] = None,
         from_date: Optional[dt.date] = None,
         to_date: Optional[dt.date] = None,
@@ -1822,7 +1872,7 @@ class CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Z-score as (last return - mean return) / standard deviation of returns
         """
-        earlier, later = get_calc_range(
+        earlier, later = _get_calc_range(
             data=self.tsdf,
             months_offset=months_from_last,
             from_dt=from_date,
@@ -1843,7 +1893,7 @@ class CommonModel(BaseModel):
         )
 
     def rolling_cvar_down(
-        self: CommonModel,
+        self: Self,
         column: int = 0,
         level: float = 0.95,
         observations: int = 252,
@@ -1869,7 +1919,7 @@ class CommonModel(BaseModel):
         cvarseries = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
-            .apply(lambda x: cvar_down_calc(x, level=level))
+            .apply(lambda x: _cvar_down_calc(x, level=level))
         )
         cvardf = cvarseries.dropna().to_frame()
         cvardf.columns = MultiIndex.from_arrays([[cvar_label], ["Rolling CVaR"]])
@@ -1877,7 +1927,7 @@ class CommonModel(BaseModel):
         return cvardf
 
     def rolling_return(
-        self: CommonModel,
+        self: Self,
         column: int = 0,
         observations: int = 21,
     ) -> DataFrame:
@@ -1909,7 +1959,7 @@ class CommonModel(BaseModel):
         return retdf
 
     def rolling_var_down(
-        self: CommonModel,
+        self: Self,
         column: int = 0,
         level: float = 0.95,
         observations: int = 252,
@@ -1939,7 +1989,7 @@ class CommonModel(BaseModel):
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
             .apply(
-                lambda x: var_down_calc(x, level=level, interpolation=interpolation),
+                lambda x: _var_down_calc(x, level=level, interpolation=interpolation),
             )
         )
         vardf = varseries.dropna().to_frame()
@@ -1948,7 +1998,7 @@ class CommonModel(BaseModel):
         return vardf
 
     def rolling_vol(
-        self: CommonModel,
+        self: Self,
         column: int = 0,
         observations: int = 21,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
@@ -1992,112 +2042,3 @@ class CommonModel(BaseModel):
         )
 
         return DataFrame(voldf)
-
-
-def _var_implied_vol_and_target_func(
-    data: DataFrame,
-    level: float,
-    target_vol: Optional[float] = None,
-    min_leverage_local: float = 0.0,
-    max_leverage_local: float = 99999.0,
-    months_from_last: Optional[int] = None,
-    from_date: Optional[dt.date] = None,
-    to_date: Optional[dt.date] = None,
-    interpolation: LiteralQuantileInterp = "lower",
-    periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    *,
-    drift_adjust: bool = False,
-) -> Union[float, Series[float]]:
-    """
-    Volatility implied from VaR or Target Weight.
-
-    The function returns a position weight multiplier from the ratio between
-    a VaR implied volatility and a given target volatility if the argument
-    target_vol is provided. Otherwise the function returns the VaR implied
-    volatility. Multiplier = 1.0 -> target met.
-
-    Parameters
-    ----------
-    data: DataFrame
-        Timeseries data
-    level: float
-        The sought VaR level
-    target_vol: Optional[float]
-        Target Volatility
-    min_leverage_local: float, default: 0.0
-        A minimum adjustment factor
-    max_leverage_local: float, default: 99999.0
-        A maximum adjustment factor
-    months_from_last : int, optional
-        number of months offset as positive integer. Overrides use of from_date
-        and to_date
-    from_date : datetime.date, optional
-        Specific from date
-    to_date : datetime.date, optional
-        Specific to date
-    interpolation: LiteralQuantileInterp, default: "lower"
-        type of interpolation in Pandas.DataFrame.quantile() function.
-    periods_in_a_year_fixed : DaysInYearType, optional
-        Allows locking the periods-in-a-year to simplify test cases and
-        comparisons
-    drift_adjust: bool, default: False
-        An adjustment to remove the bias implied by the average return
-
-    Returns
-    -------
-    Union[float, Pandas.Series[float]]
-        Target volatility if target_vol is provided otherwise the VaR
-        implied volatility.
-    """
-    earlier, later = get_calc_range(
-        data=data,
-        months_offset=months_from_last,
-        from_dt=from_date,
-        to_dt=to_date,
-    )
-    if periods_in_a_year_fixed:
-        time_factor = float(periods_in_a_year_fixed)
-    else:
-        fraction = (later - earlier).days / 365.25
-        how_many = data.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
-        time_factor = how_many / fraction
-    if drift_adjust:
-        imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
-            data.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
-            .quantile(1 - level, interpolation=interpolation)
-            - data.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
-            .sum()
-            / len(
-                data.loc[cast(int, earlier) : cast(int, later)].pct_change(
-                    fill_method=cast(str, None),
-                ),
-            )
-        )
-    else:
-        imp_vol = (
-            -sqrt(time_factor)
-            * data.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
-            .quantile(1 - level, interpolation=interpolation)
-            / norm.ppf(level)
-        )
-
-    if target_vol:
-        result = imp_vol.apply(
-            lambda x: max(min_leverage_local, min(target_vol / x, max_leverage_local)),
-        )
-        label = "Weight from target vol"
-    else:
-        result = imp_vol
-        label = f"Imp vol from VaR {level:.0%}"
-
-    if data.shape[1] == 1:
-        return float(result.iloc[0])
-    return Series(
-        data=result,
-        index=data.columns,
-        name=label,
-        dtype="float64",
-    )

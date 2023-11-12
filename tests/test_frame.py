@@ -16,17 +16,17 @@ from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
 from requests.exceptions import ConnectionError
 
+from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
-from openseries.risk import cvar_down_calc, var_down_calc
 from openseries.series import OpenTimeSeries
 from openseries.types import (
     LiteralFrameProps,
     LiteralPortfolioWeightings,
     ValueType,
 )
-from tests.common_sim import SIMFRAME, SIMSERIES
+from tests.test_common_sim import SIMFRAME, SIMSERIES
 
 
 class TestOpenFrame(TestCase):
@@ -564,28 +564,32 @@ class TestOpenFrame(TestCase):
         riskseries.to_cumret()
         riskframe.to_cumret()
 
-        if riskseries.cvar_down != cvar_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
+        if riskseries.cvar_down != _cvar_down_calc(
+            riskseries.tsdf.iloc[:, 0].tolist(),
+        ):
             msg = "CVaR for OpenTimeSeries not equal"
             raise ValueError(msg)
-        if riskseries.var_down != var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
+        if riskseries.var_down != _var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
             msg = "VaR for OpenTimeSeries not equal"
             raise ValueError(msg)
 
-        if cast(Series, riskframe.cvar_down).iloc[0] != cvar_down_calc(
+        if cast(Series, riskframe.cvar_down).iloc[0] != _cvar_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "CVaR for OpenFrame not equal"
             raise ValueError(msg)
-        if cast(Series, riskframe.var_down).iloc[0] != var_down_calc(
+        if cast(Series, riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "VaR for OpenFrame not equal"
             raise ValueError(msg)
 
-        if cast(Series, riskframe.cvar_down).iloc[0] != cvar_down_calc(riskframe.tsdf):
+        if cast(Series, riskframe.cvar_down).iloc[0] != _cvar_down_calc(
+            riskframe.tsdf,
+        ):
             msg = "CVaR for OpenFrame not equal"
             raise ValueError(msg)
-        if cast(Series, riskframe.var_down).iloc[0] != var_down_calc(
+        if cast(Series, riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf,
         ):
             msg = "VaR for OpenFrame not equal"
@@ -947,7 +951,6 @@ class TestOpenFrame(TestCase):
             "align_index_to_local_cdays",
             "all_properties",
             "calc_range",
-            "drawdown_details",
             "from_deepcopy",
             "plot_bars",
             "plot_series",
@@ -988,7 +991,6 @@ class TestOpenFrame(TestCase):
         frame_unique = [
             "add_timeseries",
             "beta",
-            "check_labels_unique",
             "delete_timeseries",
             "ewma_risk",
             "rolling_info_ratio",
@@ -1002,7 +1004,6 @@ class TestOpenFrame(TestCase):
             "relative",
             "rolling_corr",
             "rolling_beta",
-            "set_tsdf",
             "trunc_frame",
         ]
 
@@ -1433,18 +1434,6 @@ class TestOpenFrame(TestCase):
             OpenFrame([])
         if contextmgr.output != ["WARNING:root:OpenFrame() was passed an empty list."]:
             msg = "OpenFrame failed to log warning about empty input list."
-            raise ValueError(msg)
-
-    def test_drawdown_details(self: TestOpenFrame) -> None:
-        """Test drawdown_details method."""
-        ddframe = self.randomframe.from_deepcopy()
-        for serie in ddframe.constituents:
-            serie.to_cumret()
-        ddframe.to_cumret()
-        dds = ddframe.drawdown_details().loc["Days from start to bottom"].tolist()
-
-        if [1747, 315, 128, 746, 736] != dds:
-            msg = "Method drawdown_details() did not produce intended result."
             raise ValueError(msg)
 
     def test_trunc_frame(self: TestOpenFrame) -> None:
