@@ -14,9 +14,9 @@ from openseries.series import OpenTimeSeries
 from openseries.simulation import (
     ModelParameters,
     ReturnSimulation,
-    brownian_motion_series,
-    geometric_brownian_motion_series,
-    merton_jump_model_series,
+    _brownian_motion_series,
+    _geometric_brownian_motion_series,
+    _merton_jump_model_series,
     random_generator,
 )
 from openseries.types import ValueType
@@ -149,9 +149,9 @@ class TestSimulation(TestCase):
         )
 
         processes = [
-            brownian_motion_series,
-            geometric_brownian_motion_series,
-            merton_jump_model_series,
+            _brownian_motion_series,
+            _geometric_brownian_motion_series,
+            _merton_jump_model_series,
         ]
 
         series = []

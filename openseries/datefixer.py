@@ -472,7 +472,7 @@ def do_resample_to_business_period_ends(
     return dates.drop_duplicates()
 
 
-def get_calc_range(  # noqa: C901
+def _get_calc_range(  # noqa: C901
     data: DataFrame,
     months_offset: Optional[int] = None,
     from_dt: Optional[dt.date] = None,

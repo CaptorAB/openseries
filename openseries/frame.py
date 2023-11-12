@@ -31,16 +31,16 @@ from statsmodels.regression.linear_model import (  # type: ignore[import-untyped
     RegressionResults,
 )
 
+from openseries._risk import (
+    _calc_inv_vol_weights,
+    _drawdown_details,
+    _ewma_calc,
+)
 from openseries.common_model import CommonModel
 from openseries.datefixer import (
+    _get_calc_range,
     align_dataframe_to_local_cdays,
     do_resample_to_business_period_ends,
-    get_calc_range,
-)
-from openseries.risk import (
-    calc_inv_vol_weights,
-    drawdown_details,
-    ewma_calc,
 )
 from openseries.series import OpenTimeSeries
 from openseries.types import (
@@ -89,7 +89,7 @@ class OpenFrame(CommonModel):
 
     # noinspection PyMethodParameters
     @field_validator("constituents")  # type: ignore[misc]
-    def check_labels_unique(
+    def _check_labels_unique(
         cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:
@@ -129,9 +129,9 @@ class OpenFrame(CommonModel):
 
         self.constituents = constituents
         self.weights = weights
-        self.set_tsdf()
+        self._set_tsdf()
 
-    def set_tsdf(self: OpenFrame) -> None:
+    def _set_tsdf(self: OpenFrame) -> None:
         """Set the tsdf DataFrame."""
         if self.constituents is not None and len(self.constituents) != 0:
             self.tsdf = reduce(
@@ -242,7 +242,7 @@ class OpenFrame(CommonModel):
         tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
         """
-        return get_calc_range(
+        return _get_calc_range(
             data=self.tsdf,
             months_offset=months_offset,
             from_dt=from_dt,
@@ -553,7 +553,7 @@ class OpenFrame(CommonModel):
         for i in self.constituents:
             tmpdf = i.tsdf.copy()
             tmpdf.index = DatetimeIndex(tmpdf.index)
-            ddown = drawdown_details(prices=tmpdf, min_periods=min_periods)
+            ddown = _drawdown_details(prices=tmpdf, min_periods=min_periods)
             ddown.name = i.label
             mxdwndf = concat([mxdwndf, ddown], axis="columns")
         return mxdwndf
@@ -653,13 +653,13 @@ class OpenFrame(CommonModel):
         raw_corr = [raw_cov[0] / (2 * raw_one[0] * raw_two[0])]
 
         for _, row in data.iloc[1:].iterrows():
-            tmp_raw_one = ewma_calc(
+            tmp_raw_one = _ewma_calc(
                 reeturn=row.loc[cols[0], ValueType.RTRN],
                 prev_ewma=raw_one[-1],
                 time_factor=time_factor,
                 lmbda=lmbda,
             )
-            tmp_raw_two = ewma_calc(
+            tmp_raw_two = _ewma_calc(
                 reeturn=row.loc[cols[1], ValueType.RTRN],
                 prev_ewma=raw_two[-1],
                 time_factor=time_factor,
@@ -1592,7 +1592,7 @@ class OpenFrame(CommonModel):
                 )
                 self.weights = weight_calc
             elif weight_strat == "inv_vol":
-                weight_calc = list(calc_inv_vol_weights(returns=dframe))
+                weight_calc = list(_calc_inv_vol_weights(returns=dframe))
                 self.weights = weight_calc
             elif weight_strat == "mean_var":
                 weight_calc = list(

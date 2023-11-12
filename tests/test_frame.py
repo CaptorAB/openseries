@@ -16,10 +16,10 @@ from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
 from requests.exceptions import ConnectionError
 
+from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
-from openseries.risk import cvar_down_calc, var_down_calc
 from openseries.series import OpenTimeSeries
 from openseries.types import (
     LiteralFrameProps,
@@ -564,28 +564,32 @@ class TestOpenFrame(TestCase):
         riskseries.to_cumret()
         riskframe.to_cumret()
 
-        if riskseries.cvar_down != cvar_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
+        if riskseries.cvar_down != _cvar_down_calc(
+            riskseries.tsdf.iloc[:, 0].tolist(),
+        ):
             msg = "CVaR for OpenTimeSeries not equal"
             raise ValueError(msg)
-        if riskseries.var_down != var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
+        if riskseries.var_down != _var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
             msg = "VaR for OpenTimeSeries not equal"
             raise ValueError(msg)
 
-        if cast(Series, riskframe.cvar_down).iloc[0] != cvar_down_calc(
+        if cast(Series, riskframe.cvar_down).iloc[0] != _cvar_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "CVaR for OpenFrame not equal"
             raise ValueError(msg)
-        if cast(Series, riskframe.var_down).iloc[0] != var_down_calc(
+        if cast(Series, riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "VaR for OpenFrame not equal"
             raise ValueError(msg)
 
-        if cast(Series, riskframe.cvar_down).iloc[0] != cvar_down_calc(riskframe.tsdf):
+        if cast(Series, riskframe.cvar_down).iloc[0] != _cvar_down_calc(
+            riskframe.tsdf,
+        ):
             msg = "CVaR for OpenFrame not equal"
             raise ValueError(msg)
-        if cast(Series, riskframe.var_down).iloc[0] != var_down_calc(
+        if cast(Series, riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf,
         ):
             msg = "VaR for OpenFrame not equal"
@@ -988,7 +992,6 @@ class TestOpenFrame(TestCase):
         frame_unique = [
             "add_timeseries",
             "beta",
-            "check_labels_unique",
             "delete_timeseries",
             "ewma_risk",
             "rolling_info_ratio",
@@ -1002,7 +1005,6 @@ class TestOpenFrame(TestCase):
             "relative",
             "rolling_corr",
             "rolling_beta",
-            "set_tsdf",
             "trunc_frame",
         ]
 

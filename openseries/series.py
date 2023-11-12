@@ -25,16 +25,16 @@ from pandas import (
 )
 from pydantic import model_validator
 
+from openseries._risk import (
+    _drawdown_details,
+    _ewma_calc,
+)
 from openseries.common_model import CommonModel
 from openseries.datefixer import (
+    _get_calc_range,
     align_dataframe_to_local_cdays,
     date_fix,
     do_resample_to_business_period_ends,
-    get_calc_range,
-)
-from openseries.risk import (
-    drawdown_details,
-    ewma_calc,
 )
 from openseries.types import (
     Countries,
@@ -255,7 +255,7 @@ class OpenTimeSeries(CommonModel):
         else:
             values = cast(DataFrame, dframe).iloc[:, column_nmbr].tolist()
             if isinstance(dframe.columns, MultiIndex):
-                if check_if_none(
+                if _check_if_none(
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
                 ):
                     label = "Series"
@@ -263,7 +263,7 @@ class OpenTimeSeries(CommonModel):
                     warning(msg=msg)
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
-                if check_if_none(
+                if _check_if_none(
                     dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
                 ):
                     valuetype = ValueType.PRICE
@@ -432,7 +432,7 @@ class OpenTimeSeries(CommonModel):
         (datetime.date, datetime.date)
             Start and end date of the chosen date range
         """
-        return get_calc_range(
+        return _get_calc_range(
             data=self.tsdf,
             months_offset=months_offset,
             from_dt=from_dt,
@@ -688,7 +688,7 @@ class OpenTimeSeries(CommonModel):
         """
         dddf = self.tsdf.copy()
         dddf.index = DatetimeIndex(dddf.index)
-        return drawdown_details(dddf).to_frame()
+        return _drawdown_details(dddf).to_frame()
 
     def ewma_vol_func(
         self: OpenTimeSeries,
@@ -757,7 +757,7 @@ class OpenTimeSeries(CommonModel):
         ]:
             previous = rawdata[-1]
             rawdata.append(
-                ewma_calc(
+                _ewma_calc(
                     reeturn=cast(float, item),
                     prev_ewma=previous,
                     time_factor=time_factor,
@@ -964,7 +964,7 @@ def timeseries_chain(
     )
 
 
-def check_if_none(item: Any) -> bool:  # noqa: ANN401
+def _check_if_none(item: Any) -> bool:  # noqa: ANN401
     """
     Check if a variable is None or equivalent.
 

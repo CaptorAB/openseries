@@ -14,7 +14,7 @@ from pydantic import ValidationError
 
 from openseries.series import (
     OpenTimeSeries,
-    check_if_none,
+    _check_if_none,
     timeseries_chain,
 )
 from openseries.types import CountriesType, LiteralSeriesProps, ValueType
@@ -590,12 +590,12 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
     def test_check_if_none(self: TestOpenTimeSeries) -> None:
-        """Test check_if_none function."""
-        if not check_if_none(None):
-            msg = "Method check_if_none() not working as intended"
+        """Test _check_if_none function."""
+        if not _check_if_none(None):
+            msg = "Method _check_if_none() not working as intended"
             raise ValueError(msg)
-        if check_if_none(0.0):
-            msg = "Method check_if_none() not working as intended"
+        if _check_if_none(0.0):
+            msg = "Method _check_if_none() not working as intended"
             raise ValueError(msg)
 
     def test_save_to_json(self: TestOpenTimeSeries) -> None:
@@ -1362,13 +1362,13 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
     def test_drawdown_details(self: TestOpenTimeSeries) -> None:
-        """Test drawdown_details method."""
+        """Test _drawdown_details method."""
         days_from_start_to_bottom = 1747
         details = self.randomseries.drawdown_details()
 
         if f"{details.loc['Max Drawdown', 'Drawdown details']:7f}" != "-0.208637":
             msg = (
-                f"Unexpected result from drawdown_details(): "
+                f"Unexpected result from _drawdown_details(): "
                 f"'{details.loc['Max Drawdown', 'Drawdown details']:7f}'"
             )
             raise ValueError(msg)
@@ -1378,13 +1378,13 @@ class TestOpenTimeSeries(TestCase):
             22,
         ):
             msg = (
-                f"Unexpected result from drawdown_details(): "
+                f"Unexpected result from _drawdown_details(): "
                 f"'{details.loc['Start of drawdown', 'Drawdown details']}'"
             )
             raise ValueError(msg)
         if details.loc["Date of bottom", "Drawdown details"] != dt.date(2016, 10, 3):
             msg = (
-                f"Unexpected result from drawdown_details(): "
+                f"Unexpected result from _drawdown_details(): "
                 f"'{details.loc['Date of bottom', 'Drawdown details']}'"
             )
             raise ValueError(msg)
@@ -1393,7 +1393,7 @@ class TestOpenTimeSeries(TestCase):
             != days_from_start_to_bottom
         ):
             msg = (
-                f"Unexpected result from drawdown_details(): "
+                f"Unexpected result from _drawdown_details(): "
                 f"'{details.loc['Days from start to bottom', 'Drawdown details']}'"
             )
             raise ValueError(msg)
@@ -1402,7 +1402,7 @@ class TestOpenTimeSeries(TestCase):
             != "-0.000119426"
         ):
             msg = (
-                f"Unexpected result from drawdown_details(): "
+                f"Unexpected result from _drawdown_details(): "
                 f"'{details.loc['Average fall per day', 'Drawdown details']:.9f}'"
             )
             raise ValueError(msg)
