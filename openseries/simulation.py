@@ -20,7 +20,14 @@ from typing import Optional, cast
 from numpy import multiply, sqrt
 from numpy.random import PCG64, Generator, SeedSequence
 from pandas import DataFrame, Index, MultiIndex, concat
-from pydantic import NonNegativeFloat, PositiveFloat, PositiveInt
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    NonNegativeFloat,
+    PositiveFloat,
+    PositiveInt,
+)
+from typing_extensions import Self
 
 from openseries.datefixer import generate_calender_date_range
 from openseries.types import (
@@ -49,7 +56,7 @@ def random_generator(seed: Optional[int]) -> Generator:
     return Generator(bit_generator=bg)
 
 
-class ReturnSimulation:
+class ReturnSimulation(BaseModel):
 
     """
     Object of the class ReturnSimulation.
@@ -80,63 +87,17 @@ class ReturnSimulation:
     mean_annual_return: float
     mean_annual_vol: PositiveFloat
     dframe: DataFrame
-    seed: Optional[int]
-    randomizer: Optional[Generator]
+    seed: Optional[int] = None
+    randomizer: Optional[Generator] = None
 
-    def __init__(
-        self: ReturnSimulation,
-        number_of_sims: PositiveInt,
-        trading_days: PositiveInt,
-        trading_days_in_year: DaysInYearType,
-        mean_annual_return: float,
-        mean_annual_vol: PositiveFloat,
-        dframe: DataFrame,
-        seed: Optional[int] = None,
-        randomizer: Optional[Generator] = None,
-    ) -> None:
-        """
-        Object of the class ReturnSimulation.
-
-        Parameters
-        ----------
-        number_of_sims : PositiveInt
-            Number of simulations to generate
-        trading_days: PositiveInt
-            Total number of days to simulate
-        trading_days_in_year : DaysInYearType
-            Number of trading days used to annualize
-        mean_annual_return : float
-            Mean annual return of the distribution
-        mean_annual_vol : PositiveFloat
-            Mean annual standard deviation of the distribution
-        dframe: pandas.DataFrame
-            Pandas DataFrame object holding the resulting values
-        seed: int, optional
-            Seed for random process initiation
-        randomizer: numpy.random.Generator, optional
-            Random process generator
-
-        Returns
-        -------
-        ReturnSimulation
-            Object of the class ReturnSimulation
-        """
-        self.number_of_sims = number_of_sims
-        self.trading_days = trading_days
-        self.trading_days_in_year = trading_days_in_year
-        self.mean_annual_return = mean_annual_return
-        self.mean_annual_vol = mean_annual_vol
-        self.dframe = dframe
-
-        if randomizer:
-            self.randomizer = randomizer
-        else:
-            self.randomizer = random_generator(seed=seed)
-
-        self.seed = seed
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
+        revalidate_instances="always",
+    )
 
     @property
-    def results(self: ReturnSimulation) -> DataFrame:
+    def results(self: Self) -> DataFrame:
         """
         Simulation data.
 
@@ -148,7 +109,7 @@ class ReturnSimulation:
         return self.dframe.add(1.0).cumprod(axis="columns").T
 
     @property
-    def realized_mean_return(self: ReturnSimulation) -> float:
+    def realized_mean_return(self: Self) -> float:
         """
         Annualized arithmetic mean of returns.
 
@@ -166,7 +127,7 @@ class ReturnSimulation:
         )
 
     @property
-    def realized_vol(self: ReturnSimulation) -> float:
+    def realized_vol(self: Self) -> float:
         """
         Annualized volatility.
 
@@ -429,7 +390,7 @@ class ReturnSimulation:
         )
 
     def to_dataframe(
-        self: ReturnSimulation,
+        self: Self,
         name: str,
         start: Optional[dt.date] = None,
         end: Optional[dt.date] = None,
