@@ -17,7 +17,7 @@ from pydantic import (
 )
 from typing_extensions import Self
 
-from openseries.datefixer import generate_calender_date_range
+from openseries.datefixer import generate_calendar_date_range
 from openseries.types import (
     CountriesType,
     DaysInYearType,
@@ -403,7 +403,7 @@ class ReturnSimulation(BaseModel):
         pandas.DataFrame
             Object based on the simulation(s)
         """
-        d_range = generate_calender_date_range(
+        d_range = generate_calendar_date_range(
             trading_days=self.trading_days,
             start=start,
             end=end,

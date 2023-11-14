@@ -296,14 +296,14 @@ def offset_business_days(
     return cast(dt.date, local_bdays[idx[0] + days])
 
 
-def generate_calender_date_range(
+def generate_calendar_date_range(
     trading_days: PositiveInt,
     start: Optional[dt.date] = None,
     end: Optional[dt.date] = None,
     countries: CountriesType = "SE",
 ) -> list[dt.date]:
     """
-    Generate a list of business day calender dates.
+    Generate a list of business day calendar dates.
 
     Parameters
     ----------
@@ -319,7 +319,7 @@ def generate_calender_date_range(
     Returns
     -------
     list[dt.date]
-        List of business day calender dates
+        List of business day calendar dates
     """
     if start and not end:
         tmp_range = date_range(
