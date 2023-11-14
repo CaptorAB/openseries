@@ -3,6 +3,14 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.7] - 2023-11-15
+
+- Some doc string cleanup. Removed sources where code no longer resembles original
+- Finalized simplification of simulation.py
+- Implemented Pydantic BaseModel on ReturnSimulation class
+- Further consolidated date range and vol from VaR functions
+- Other smaller miscellaneous
+
 ## Version [1.4.6] - 2023-11-12
 
 - Removed drawdown_details function as it was unnecessarily complex and of little interest
