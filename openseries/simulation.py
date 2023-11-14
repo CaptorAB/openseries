@@ -1,16 +1,4 @@
-"""
-Defining the ReturnSimulation class and ModelParameters used by it.
-
-Sources:
-http://www.turingfinance.com/random-walks-down-wall-street-stochastic-processes-in-python/
-https://github.com/StuartGordonReid/Python-Notebooks/blob/master/Stochastic%20Process%20Algorithms.ipynb
-https://www.codearmo.com/python-tutorial/merton-jump-diffusion-model-python
-
-Processes that can be simulated in this module are:
-- Brownian Motion
-- Geometric Brownian Motion
-- The Merton Jump Diffusion Model
-"""
+"""Defining the ReturnSimulation class."""
 from __future__ import annotations
 
 import datetime as dt
@@ -59,7 +47,7 @@ def random_generator(seed: Optional[int]) -> Generator:
 class ReturnSimulation(BaseModel):
 
     """
-    Object of the class ReturnSimulation.
+    The class ReturnSimulation allows for simulating financial timeseries.
 
     Parameters
     ----------
@@ -155,7 +143,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
     ) -> ReturnSimulation:
         """
-        Simulate normally distributed prices.
+        Create a Normal distribution simulation.
 
         Parameters
         ----------
@@ -176,7 +164,7 @@ class ReturnSimulation(BaseModel):
         Returns
         -------
         ReturnSimulation
-            Normally distributed prices
+            Normal distribution simulation
         """
         cls.randomizer = random_generator(seed=seed)
         daily_returns = cls.randomizer.normal(
@@ -207,7 +195,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
     ) -> ReturnSimulation:
         """
-        Lognormal distribution simulation.
+        Create a Lognormal distribution simulation.
 
         Parameters
         ----------
@@ -262,7 +250,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
     ) -> ReturnSimulation:
         """
-        Geometric Brownian Motion simulation.
+        Create a Geometric Brownian Motion simulation.
 
         Parameters
         ----------
@@ -322,7 +310,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
     ) -> ReturnSimulation:
         """
-        Merton Jump-Diffusion model simulation.
+        Create a Merton Jump-Diffusion model simulation.
 
         Parameters
         ----------
@@ -336,9 +324,9 @@ class ReturnSimulation(BaseModel):
             Mean standard deviation
         seed: int
             Seed for random process initiation
-        jumps_lamda: float
+        jumps_lamda: NonNegativeFloat
             This is the probability of a jump happening at each point in time
-        jumps_sigma: PositiveFloat, default: 0.0
+        jumps_sigma: NonNegativeFloat, default: 0.0
             This is the volatility of the jump size
         jumps_mu: float, default: 0.0
             This is the average jump size
@@ -397,7 +385,7 @@ class ReturnSimulation(BaseModel):
         countries: CountriesType = "SE",
     ) -> DataFrame:
         """
-        Create pandas.DataFrame from simulation(s).
+        Create a pandas.DataFrame from simulation(s).
 
         Parameters
         ----------
