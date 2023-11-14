@@ -14,13 +14,15 @@ from numpy import Inf, isnan, log, maximum, sqrt
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from pandas import DataFrame, DatetimeIndex, Index, MultiIndex, Series
+from pandas import DataFrame, DatetimeIndex, Index, MultiIndex, Series, date_range
+from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure  # type: ignore[import-untyped,unused-ignore]
 from plotly.io import to_html  # type: ignore[import-untyped,unused-ignore]
 from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import (  # type: ignore[import-untyped,unused-ignore]
     kurtosis,
+    norm,
     skew,
 )
 from typing_extensions import Self
@@ -28,9 +30,8 @@ from typing_extensions import Self
 from openseries._risk import (
     _cvar_down_calc,
     _var_down_calc,
-    _var_implied_vol_and_target_func,
 )
-from openseries.datefixer import _align_dataframe_to_local_cdays, _get_calc_range
+from openseries.datefixer import date_offset_foll, holiday_calendar
 from openseries.load_plotly import load_plotly_dict
 from openseries.types import (
     CountriesType,
@@ -404,7 +405,7 @@ class _CommonModel(BaseModel):
         interpolation: LiteralQuantileInterp = "lower"
         return self.vol_from_var_func(level=level, interpolation=interpolation)
 
-    def calc_range(
+    def calc_range(  # noqa: C901
         self: Self,
         months_offset: Optional[int] = None,
         from_dt: Optional[dt.date] = None,
@@ -425,15 +426,47 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        (datetime.date, datetime.date)
+        tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
         """
-        return _get_calc_range(
-            data=self.tsdf,
-            months_offset=months_offset,
-            from_dt=from_dt,
-            to_dt=to_dt,
-        )
+        earlier, later = self.tsdf.index[0], self.tsdf.index[-1]
+        if any([months_offset, from_dt, to_dt]):
+            if months_offset is not None:
+                earlier = date_offset_foll(
+                    raw_date=self.tsdf.index[-1],
+                    months_offset=-months_offset,
+                    adjust=False,
+                    following=True,
+                )
+                if earlier < self.tsdf.index[0]:
+                    msg = "Function calc_range returned earlier date < series start"
+                    raise ValueError(
+                        msg,
+                    )
+                later = self.tsdf.index[-1]
+            elif from_dt is not None and to_dt is None:
+                if from_dt < self.tsdf.index[0]:
+                    msg = "Given from_dt date < series start"
+                    raise ValueError(msg)
+                earlier, later = from_dt, self.tsdf.index[-1]
+            elif from_dt is None and to_dt is not None:
+                if to_dt > self.tsdf.index[-1]:
+                    msg = "Given to_dt date > series end"
+                    raise ValueError(msg)
+                earlier, later = self.tsdf.index[0], to_dt
+            elif from_dt is not None and to_dt is not None:
+                if to_dt > self.tsdf.index[-1] or from_dt < self.tsdf.index[0]:
+                    msg = "Given from_dt or to_dt dates outside series range"
+                    raise ValueError(
+                        msg,
+                    )
+                earlier, later = from_dt, to_dt
+            while earlier not in self.tsdf.index.tolist():
+                earlier -= dt.timedelta(days=1)
+            while later not in self.tsdf.index.tolist():
+                later += dt.timedelta(days=1)
+
+        return earlier, later
 
     def align_index_to_local_cdays(
         self: Self,
@@ -452,10 +485,24 @@ class _CommonModel(BaseModel):
         OpenFrame
             An OpenFrame object
         """
-        self.tsdf = _align_dataframe_to_local_cdays(
-            data=self.tsdf,
+        startyear = self.tsdf.index[0].year
+        endyear = self.tsdf.index[-1].year
+        calendar = holiday_calendar(
+            startyear=startyear,
+            endyear=endyear,
             countries=countries,
         )
+
+        d_range = [
+            d.date()
+            for d in date_range(
+                start=cast(dt.date, self.tsdf.first_valid_index()),
+                end=cast(dt.date, self.tsdf.last_valid_index()),
+                freq=CustomBusinessDay(calendar=calendar),
+            )
+        ]
+        self.tsdf = self.tsdf.reindex(d_range, method=None, copy=False)
+
         return self
 
     def value_to_log(self: Self) -> Self:
@@ -683,7 +730,7 @@ class _CommonModel(BaseModel):
         Returns
         -------
         tuple[plotly.go.Figure, str]
-            Plotly Figure and html filename with location
+            Plotly Figure and a div section or a html filename with location
         """
         if labels:
             if len(labels) != self.tsdf.shape[1]:
@@ -800,7 +847,7 @@ class _CommonModel(BaseModel):
         Returns
         -------
         tuple[plotly.go.Figure, str]
-            Plotly Figure and html filename with location
+            Plotly Figure and a div section or a html filename with location
         """
         if labels:
             if len(labels) != self.tsdf.shape[1]:
@@ -914,8 +961,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Annualized arithmetic mean of returns
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -976,8 +1022,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Annualized volatility
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1047,8 +1092,7 @@ class _CommonModel(BaseModel):
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
         """
-        return _var_implied_vol_and_target_func(
-            data=self.tsdf,
+        return self._var_implied_vol_and_target_func(
             level=level,
             months_from_last=months_from_last,
             from_date=from_date,
@@ -1109,8 +1153,7 @@ class _CommonModel(BaseModel):
             A position weight multiplier from the ratio between a VaR implied
             volatility and a given target volatility. Multiplier = 1.0 -> target met
         """
-        return _var_implied_vol_and_target_func(
-            data=self.tsdf,
+        return self._var_implied_vol_and_target_func(
             target_vol=target_vol,
             level=level,
             min_leverage_local=min_leverage_local,
@@ -1121,6 +1164,116 @@ class _CommonModel(BaseModel):
             interpolation=interpolation,
             drift_adjust=drift_adjust,
             periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
+
+    def _var_implied_vol_and_target_func(
+        self: Self,
+        level: float,
+        target_vol: Optional[float] = None,
+        min_leverage_local: float = 0.0,
+        max_leverage_local: float = 99999.0,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+        interpolation: LiteralQuantileInterp = "lower",
+        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        *,
+        drift_adjust: bool = False,
+    ) -> Union[float, Series[float]]:
+        """
+        Volatility implied from VaR or Target Weight.
+
+        The function returns a position weight multiplier from the ratio between
+        a VaR implied volatility and a given target volatility if the argument
+        target_vol is provided. Otherwise the function returns the VaR implied
+        volatility. Multiplier = 1.0 -> target met.
+
+        Parameters
+        ----------
+        level: float
+            The sought VaR level
+        target_vol: Optional[float]
+            Target Volatility
+        min_leverage_local: float, default: 0.0
+            A minimum adjustment factor
+        max_leverage_local: float, default: 99999.0
+            A maximum adjustment factor
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+        interpolation: LiteralQuantileInterp, default: "lower"
+            type of interpolation in Pandas.DataFrame.quantile() function.
+        periods_in_a_year_fixed : DaysInYearType, optional
+            Allows locking the periods-in-a-year to simplify test cases and
+            comparisons
+        drift_adjust: bool, default: False
+            An adjustment to remove the bias implied by the average return
+
+        Returns
+        -------
+        Union[float, Pandas.Series[float]]
+            Target volatility if target_vol is provided otherwise the VaR
+            implied volatility.
+        """
+        earlier, later = self.calc_range(
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
+        )
+        if periods_in_a_year_fixed:
+            time_factor = float(periods_in_a_year_fixed)
+        else:
+            fraction = (later - earlier).days / 365.25
+            how_many = (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
+            )
+            time_factor = how_many / fraction
+        if drift_adjust:
+            imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
+                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change(fill_method=cast(str, None))
+                .quantile(1 - level, interpolation=interpolation)
+                - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change(fill_method=cast(str, None))
+                .sum()
+                / len(
+                    self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(
+                        fill_method=cast(str, None),
+                    ),
+                )
+            )
+        else:
+            imp_vol = (
+                -sqrt(time_factor)
+                * self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                .pct_change(fill_method=cast(str, None))
+                .quantile(1 - level, interpolation=interpolation)
+                / norm.ppf(level)
+            )
+
+        if target_vol:
+            result = imp_vol.apply(
+                lambda x: max(
+                    min_leverage_local,
+                    min(target_vol / x, max_leverage_local),
+                ),
+            )
+            label = "Weight from target vol"
+        else:
+            result = imp_vol
+            label = f"Imp vol from VaR {level:.0%}"
+
+        if self.tsdf.shape[1] == 1:
+            return float(result.iloc[0])
+        return Series(
+            data=result,
+            index=self.tsdf.columns,
+            name=label,
+            dtype="float64",
         )
 
     def cvar_down_func(
@@ -1152,8 +1305,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Downside Conditional Value At Risk "CVaR"
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1221,8 +1373,7 @@ class _CommonModel(BaseModel):
             Downside deviation
         """
         zero: float = 0.0
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1288,8 +1439,7 @@ class _CommonModel(BaseModel):
             Compounded Annual Growth Rate (CAGR)
         """
         zero: float = 0.0
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1345,8 +1495,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Skew of the return distribution
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1394,8 +1543,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Kurtosis of the return distribution
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1447,8 +1595,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Maximum drawdown without any limit on date range
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1493,8 +1640,7 @@ class _CommonModel(BaseModel):
             Calculate share of percentage changes that are greater than zero
         """
         zero: float = 0.0
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1677,8 +1823,7 @@ class _CommonModel(BaseModel):
             Calculate simple return
         """
         zero: float = 0.0
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1774,8 +1919,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Downside Value At Risk
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1823,8 +1967,7 @@ class _CommonModel(BaseModel):
             Most negative percentage change over a rolling number of observations
             within a chosen date range
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
@@ -1872,8 +2015,7 @@ class _CommonModel(BaseModel):
         Union[float, Pandas.Series[float]]
             Z-score as (last return - mean return) / standard deviation of returns
         """
-        earlier, later = _get_calc_range(
-            data=self.tsdf,
+        earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,

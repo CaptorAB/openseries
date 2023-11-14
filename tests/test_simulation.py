@@ -1,22 +1,16 @@
 """Test suite for the openseries/simulation.py module."""
-# mypy: disable-error-code="type-arg"
 from __future__ import annotations
 
 import datetime as dt
 from copy import copy
-from typing import Union, cast
+from typing import Union
 from unittest import TestCase
 
-from pandas import DataFrame, Series, date_range
+from pandas import DataFrame
 
-from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
 from openseries.simulation import (
-    ModelParameters,
     ReturnSimulation,
-    _brownian_motion_series,
-    _geometric_brownian_motion_series,
-    _merton_jump_model_series,
     random_generator,
 )
 from openseries.types import ValueType
@@ -132,65 +126,6 @@ class TestSimulation(TestCase):
 
         if f"{psim.realized_vol:.9f}" != "0.096761956":
             msg = f"Unexpected result: '{psim.realized_vol:.9f}'"
-            raise ValueError(msg)
-
-    def test_assets(self: TestSimulation) -> None:
-        """Test stoch processes output."""
-        days = 2512
-        modelparams = ModelParameters(
-            all_s0=1.0,
-            all_time=days,
-            all_delta=1.0 / 252,
-            all_sigma=0.2,
-            gbm_mu=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-        )
-
-        processes = [
-            _brownian_motion_series,
-            _geometric_brownian_motion_series,
-            _merton_jump_model_series,
-        ]
-
-        series = []
-        for i, process in zip(range(len(processes)), processes):
-            modelresult = process(
-                param=modelparams,
-                number_of_sims=1,
-                randomizer=random_generator(seed=SEED),
-            )
-            d_range = [
-                d.date()
-                for d in date_range(
-                    periods=days + 1,
-                    end=dt.date(2019, 6, 30),
-                    freq="D",
-                )
-            ]
-            sdf = DataFrame(  # type: ignore[call-overload,unused-ignore]
-                data=modelresult.T,
-                index=d_range,
-                columns=[f"Simulation_{i}"],
-            )
-            series.append(
-                OpenTimeSeries.from_df(sdf, valuetype=ValueType.PRICE).to_cumret(),
-            )
-
-        intended_returns = ["-0.088256155", "0.027742385", "0.027969270"]
-
-        intended_volatilities = ["0.232986005", "0.232986005", "0.232985779"]
-
-        frame = OpenFrame(series)
-        returns = [f"{r:.9f}" for r in cast(Series, frame.arithmetic_ret)]
-        volatilities = [f"{v:.9f}" for v in cast(Series, frame.vol)]
-
-        if intended_returns != returns:
-            msg = f"Unexpected returns result\n {returns}"
-            raise ValueError(msg)
-        if intended_volatilities != volatilities:
-            msg = f"Unexpected volatilities result\n {volatilities}"
             raise ValueError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:

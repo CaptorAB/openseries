@@ -144,7 +144,7 @@ make lint
 - [Basic Usage](#basic-usage)
 - [Development Instructions](#development-instructions)
 - [Testing and Linting / Type-checking](#testing-and-linting--type-checking)
-- [Files / Modules in the project](#files-in-the-project)
+- [On some files in the project](#on-some-files-in-the-project)
 - [Class methods used to construct an OpenTimeSeries](#class-methods-used-to-construct-objects)
 - [OpenTimeSeries non-numerical properties](#non-numerical-or-helper-properties-that-apply-only-to-the-opentimeseries-class)
 - [OpenFrame non-numerical properties](#non-numerical-or-helper-properties-that-apply-only-to-the-openframe-class)
@@ -155,20 +155,13 @@ make lint
 - [Numerical properties for both classes](#numerical-properties-available-for-individual-opentimeseries-or-on-all-series-in-an-openframe)
 - [Numerical methods with period arguments for both classes](#methods-below-are-identical-to-the-numerical-properties-above)
 
-### Files in the project
+### On some files in the project
 
 | File                                                                                                             | Description                                                                                                                                                                                         |
 |:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
 | [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
-| [common_model.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/common_model.py)                 | Defines the class _CommonModel_ which is a base class for both the above classes.                                                                                                                   |
-| [datefixer.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/datefixer.py)                       | Date utilities. Please read the docstring of each function for its description.                                                                                                                     |
-| [load_plotly.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/load_plotly.py)                   | Functions to load [Plotly](https://plotly.com/python/) default layout and configuration from local json file.                                                                                       |
-| [plotly_layouts.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_layouts.json)         | [Plotly](https://plotly.com/python/) defaults used in the `plot_bars` and `plot_series` methods.                                                                                                    |
-| [plotly_captor_logo.json](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/plotly_captor_logo.json) | JSON with a link to the Captor logo used in the `plot_bars` and `plot_series` methods.                                                                                                              |
-| [risk.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/risk.py)                                 | Functions used to calculate VaR, CVaR and drawdowns.                                                                                                                                                |
-| [simulation.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/simulation.py)                     | Simulates OpenTimeSeries from different stochastic processes.                                                                                                                                       |
-| [types.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/types.py)                               | Contains all bespoke typing.                                                                                                                                                                        |
+| [simulation.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/simulation.py)                     | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                     |
 
 ### Class methods used to construct objects.
 

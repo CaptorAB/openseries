@@ -296,14 +296,14 @@ def offset_business_days(
     return cast(dt.date, local_bdays[idx[0] + days])
 
 
-def generate_calender_date_range(
+def generate_calendar_date_range(
     trading_days: PositiveInt,
     start: Optional[dt.date] = None,
     end: Optional[dt.date] = None,
     countries: CountriesType = "SE",
 ) -> list[dt.date]:
     """
-    Generate a list of business day calender dates.
+    Generate a list of business day calendar dates.
 
     Parameters
     ----------
@@ -319,7 +319,7 @@ def generate_calender_date_range(
     Returns
     -------
     list[dt.date]
-        List of business day calender dates
+        List of business day calendar dates
     """
     if start and not end:
         tmp_range = date_range(
@@ -364,44 +364,6 @@ def generate_calender_date_range(
     raise ValueError(
         msg,
     )
-
-
-def _align_dataframe_to_local_cdays(
-    data: DataFrame,
-    countries: CountriesType = "SE",
-) -> DataFrame:
-    """
-    Align the index .tsdf with local calendar business days.
-
-    Parameters
-    ----------
-    data: pandas.DataFrame
-        The timeseries data
-    countries: CountriesType, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-
-    Returns
-    -------
-    pandas.DataFrame
-        An OpenFrame object
-    """
-    startyear = data.index[0].year
-    endyear = data.index[-1].year
-    calendar = holiday_calendar(
-        startyear=startyear,
-        endyear=endyear,
-        countries=countries,
-    )
-
-    d_range = [
-        d.date()
-        for d in date_range(
-            start=cast(dt.date, data.first_valid_index()),
-            end=cast(dt.date, data.last_valid_index()),
-            freq=CustomBusinessDay(calendar=calendar),
-        )
-    ]
-    return data.reindex(d_range, method=None, copy=False)
 
 
 def do_resample_to_business_period_ends(
@@ -470,69 +432,3 @@ def do_resample_to_business_period_ends(
         + [data.index[-1]],
     )
     return dates.drop_duplicates()
-
-
-def _get_calc_range(  # noqa: C901
-    data: DataFrame,
-    months_offset: Optional[int] = None,
-    from_dt: Optional[dt.date] = None,
-    to_dt: Optional[dt.date] = None,
-) -> tuple[dt.date, dt.date]:
-    """
-    Create user defined date range.
-
-    Parameters
-    ----------
-    data: pandas.DataFrame
-        The data with the date range
-    months_offset: int, optional
-        Number of months offset as positive integer. Overrides use of from_date
-        and to_date
-    from_dt: datetime.date, optional
-        Specific from date
-    to_dt: datetime.date, optional
-        Specific from date
-
-    Returns
-    -------
-    tuple[datetime.date, datetime.date]
-        Start and end date of the chosen date range
-    """
-    earlier, later = data.index[0], data.index[-1]
-    if any([months_offset, from_dt, to_dt]):
-        if months_offset is not None:
-            earlier = date_offset_foll(
-                raw_date=data.index[-1],
-                months_offset=-months_offset,
-                adjust=False,
-                following=True,
-            )
-            if earlier < data.index[0]:
-                msg = "Function calc_range returned earlier date < series start"
-                raise ValueError(
-                    msg,
-                )
-            later = data.index[-1]
-        elif from_dt is not None and to_dt is None:
-            if from_dt < data.index[0]:
-                msg = "Given from_dt date < series start"
-                raise ValueError(msg)
-            earlier, later = from_dt, data.index[-1]
-        elif from_dt is None and to_dt is not None:
-            if to_dt > data.index[-1]:
-                msg = "Given to_dt date > series end"
-                raise ValueError(msg)
-            earlier, later = data.index[0], to_dt
-        elif from_dt is not None and to_dt is not None:
-            if to_dt > data.index[-1] or from_dt < data.index[0]:
-                msg = "Given from_dt or to_dt dates outside series range"
-                raise ValueError(
-                    msg,
-                )
-            earlier, later = from_dt, to_dt
-        while earlier not in data.index.tolist():
-            earlier -= dt.timedelta(days=1)
-        while later not in data.index.tolist():
-            later += dt.timedelta(days=1)
-
-    return earlier, later

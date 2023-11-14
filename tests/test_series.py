@@ -12,6 +12,7 @@ import pytest
 from pandas import DataFrame, DatetimeIndex, Series, date_range
 from pydantic import ValidationError
 
+# noinspection PyProtectedMember
 from openseries.series import (
     OpenTimeSeries,
     _check_if_none,

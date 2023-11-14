@@ -12,7 +12,7 @@ from pandas import Timestamp
 from openseries.datefixer import (
     date_fix,
     date_offset_foll,
-    generate_calender_date_range,
+    generate_calendar_date_range,
     get_previous_business_day_before_today,
     holiday_calendar,
     offset_business_days,
@@ -302,7 +302,7 @@ class TestDateFixer(TestCase):
                 msg = "Unintended result from offset_business_days"
                 raise ValueError(msg)
 
-    def test_offset_business_days_calender_options(self: TestDateFixer) -> None:
+    def test_offset_business_days_calendar_options(self: TestDateFixer) -> None:
         """Test offset_business_days function with different calendar combinations."""
         day_after_se_nationalday = dt.date(2022, 6, 7)
         se_enddate = offset_business_days(
@@ -405,20 +405,20 @@ class TestDateFixer(TestCase):
             msg = "Unintended result from offset_business_days"
             raise ValueError(msg)
 
-    def test_generate_calender_date_range(self: TestDateFixer) -> None:
-        """Test generate_calender_date_range function with wrong date input."""
+    def test_generate_calendar_date_range(self: TestDateFixer) -> None:
+        """Test generate_calendar_date_range function with wrong date input."""
         start = dt.date(2009, 6, 30)
         trd_days: int = 506
         end = dt.date(2011, 6, 30)
 
-        d_range = generate_calender_date_range(trading_days=trd_days, start=start)
+        d_range = generate_calendar_date_range(trading_days=trd_days, start=start)
 
         if len(d_range) != trd_days:
-            msg = "Unintended result from generate_calender_date_range"
+            msg = "Unintended result from generate_calendar_date_range"
             raise ValueError(msg)
 
         if d_range[-1] != end:
-            msg = "Unintended result from generate_calender_date_range"
+            msg = "Unintended result from generate_calendar_date_range"
             raise ValueError(msg)
 
         with pytest.raises(
@@ -428,7 +428,7 @@ class TestDateFixer(TestCase):
                 "Date range is inferred from number of trading days."
             ),
         ):
-            _ = generate_calender_date_range(
+            _ = generate_calendar_date_range(
                 trading_days=trd_days,
                 start=start,
                 end=end,
@@ -441,4 +441,4 @@ class TestDateFixer(TestCase):
                 "Date range is inferred from number of trading days."
             ),
         ):
-            _ = generate_calender_date_range(trading_days=trd_days)
+            _ = generate_calendar_date_range(trading_days=trd_days)

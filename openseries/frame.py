@@ -28,7 +28,7 @@ from pydantic import field_validator
 
 # noinspection PyProtectedMember
 from statsmodels.regression.linear_model import (  # type: ignore[import-untyped,unused-ignore]
-    RegressionResults,
+    OLSResults,
 )
 from typing_extensions import Self
 
@@ -1236,7 +1236,7 @@ class OpenFrame(_CommonModel):
         cov_type: LiteralOlsFitCovType = "nonrobust",
         *,
         fitted_series: bool = True,
-    ) -> RegressionResults:
+    ) -> OLSResults:
         """
         Ordinary Least Squares fit.
 
@@ -1259,7 +1259,7 @@ class OpenFrame(_CommonModel):
 
         Returns
         -------
-        RegressionResults
+        OLSResults
             The Statsmodels regression output
         """
         if isinstance(y_column, tuple):
@@ -1296,7 +1296,7 @@ class OpenFrame(_CommonModel):
         if fitted_series:
             self.tsdf[y_label, x_label] = results.predict(x_value)
 
-        return results
+        return cast(OLSResults, results)
 
     def jensen_alpha(  # noqa: C901
         self: Self,
