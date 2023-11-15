@@ -361,9 +361,10 @@ class ReturnSimulation(BaseModel):
             mean_annual_return
             - 0.5 * mathpow(mean_annual_vol, 2.0)
             - jumps_lamda * (jumps_mu + mathpow(jumps_sigma, 2.0))
-        ) * (1.0 / trading_days_in_year) + wiener
+        ) * (1.0 / trading_days_in_year)
 
-        daily_returns = poi_rv + geo
+        daily_returns = poi_rv + geo + wiener
+
         daily_returns[:, 0] = 0.0
 
         return cls(
