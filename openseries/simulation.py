@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import datetime as dt
-from math import pow as mathpow
 from typing import Optional, cast
 
 from numpy import multiply, sqrt
@@ -168,7 +167,7 @@ class ReturnSimulation(BaseModel):
         """
         cls.randomizer = random_generator(seed=seed)
 
-        daily_returns = cls.randomizer.normal(
+        returns = cls.randomizer.normal(
             loc=mean_annual_return / trading_days_in_year,
             scale=mean_annual_vol / sqrt(trading_days_in_year),
             size=(number_of_sims, trading_days),
@@ -180,7 +179,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            dframe=DataFrame(data=daily_returns, dtype="float64"),
+            dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
             randomizer=cls.randomizer,
         )
@@ -221,7 +220,7 @@ class ReturnSimulation(BaseModel):
         """
         cls.randomizer = random_generator(seed=seed)
 
-        daily_returns = (
+        returns = (
             cls.randomizer.lognormal(
                 mean=mean_annual_return / trading_days_in_year,
                 sigma=mean_annual_vol / sqrt(trading_days_in_year),
@@ -236,7 +235,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            dframe=DataFrame(data=daily_returns, dtype="float64"),
+            dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
             randomizer=cls.randomizer,
         )
@@ -276,7 +275,7 @@ class ReturnSimulation(BaseModel):
         """
         cls.randomizer = random_generator(seed=seed)
 
-        drift = (mean_annual_return - 0.5 * mathpow(mean_annual_vol, 2.0)) * (
+        drift = (mean_annual_return - 0.5 * mean_annual_vol**2.0) * (
             1.0 / trading_days_in_year
         )
 
@@ -287,7 +286,7 @@ class ReturnSimulation(BaseModel):
             size=(number_of_sims, trading_days),
         )
 
-        daily_returns = drift + wiener
+        returns = drift + wiener
 
         return cls(
             number_of_sims=number_of_sims,
@@ -295,7 +294,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            dframe=DataFrame(data=daily_returns, dtype="float64"),
+            dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
             randomizer=cls.randomizer,
         )
@@ -365,13 +364,13 @@ class ReturnSimulation(BaseModel):
 
         drift = (
             mean_annual_return
-            - 0.5 * mathpow(mean_annual_vol, 2.0)
-            - jumps_lamda * (jumps_mu + mathpow(jumps_sigma, 2.0))
+            - 0.5 * mean_annual_vol**2.0
+            - jumps_lamda * (jumps_mu + jumps_sigma**2.0)
         ) * (1.0 / trading_days_in_year)
 
-        daily_returns = poisson_jumps + drift + wiener
+        returns = poisson_jumps + drift + wiener
 
-        daily_returns[:, 0] = 0.0
+        returns[:, 0] = 0.0
 
         return cls(
             number_of_sims=number_of_sims,
@@ -379,7 +378,7 @@ class ReturnSimulation(BaseModel):
             trading_days_in_year=trading_days_in_year,
             mean_annual_return=mean_annual_return,
             mean_annual_vol=mean_annual_vol,
-            dframe=DataFrame(data=daily_returns, dtype="float64"),
+            dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
             randomizer=cls.randomizer,
         )
