@@ -1,0 +1,47 @@
+{% set name = "OpenSeries" %}
+{% set version = "1.4.7" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://github.com/CaptorAB/OpenSeries/archive/{{ version }}.tar.gz
+  sha256: d7412668d36cddf3c2b211c3e2659badc1b834795e48e873e828ff242dcd4644
+
+build:
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+
+requirements:
+  host:
+    - python
+    - poetry-core
+    - pip
+  run:
+    - python >=3.9,<3.12
+    - ffn >=0.3.7,<0.4.0
+    - holidays >=0.36.0,<0.37.0
+    - numpy >=1.26.1,<2.0.0
+    - openpyxl >=3.1.2,<4.0.0
+    - pandas >=2.1.2,<3.0.0
+    - plotly >=5.18.0,<6.0.0
+    - pydantic >=2.5.0,<3.0.0
+    - python-dateutil >=2.8.2,<3.0.0
+    - scipy >=1.11.3,<2.0.0
+    - statsmodels >=0.14.0,<0.15.0
+
+test:
+  commands:
+    - pip check
+  requires:
+    - pip
+
+about:
+  license: BSD-3-Clause
+  license_file: LICENSE.md
+
+extra:
+  recipe-maintainers:
+    - karrmagadgeteer2
