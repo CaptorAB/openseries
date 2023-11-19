@@ -8,6 +8,7 @@ __pycache__/
 .coverage
 
 # Environments
+envs/
 .venv
 venv/
 

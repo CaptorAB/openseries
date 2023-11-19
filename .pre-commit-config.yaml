@@ -40,7 +40,7 @@ repos:
       - id: check-docstring-first
       - id: check-json
       - id: check-toml
-      - id: check-yaml
+      # - id: check-yaml
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: name-tests-test

@@ -1,0 +1,42 @@
+{% set name = "openseries" %}
+{% set version = "1.4.7" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 403e4d6a8cf1fc6e4df35593fcddb00272d97fde67df895bbbb31b53a165b5e2
+
+build:
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+
+requirements:
+  host:
+    - python
+    - pip
+  run:
+    - python
+    - terminal
+    - pyyaml
+
+test:
+  imports:
+    - openseries
+  commands:
+    - pip check
+  requires:
+    - pip
+
+about:
+  home: UNKNOWN
+  summary: UNKNOWN
+  license: JSON AND BSD-3-Clause
+  license_file:
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - karrmagadgeteer2
