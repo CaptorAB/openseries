@@ -1,9 +1,0 @@
-channels:
-  - conda-forge
-
-show_channel_urls: True
-
-channel_priority: strict
-
-# For more information about this file see:
-# https://conda.io/docs/user-guide/configuration/use-condarc.html
