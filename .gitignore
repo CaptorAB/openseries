@@ -8,9 +8,11 @@ __pycache__/
 .coverage
 
 # Environments
-envs/
 .venv
-venv/
+/venv/
+
+# Build and packaging
+/dist/
 
 # Pycharm
 .idea/*
