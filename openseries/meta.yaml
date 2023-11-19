@@ -2,10 +2,6 @@ package:
   name: openseries
   version: 1.4.7
 
-source:
-  url: file://C:\Users\MartinKarrin\miniconda3\OpenSeries\dist\openseries-1.4.7.tar.gz
-  sha256: 3e45ed4d52def9a05b2d3e9ac8262163109326a8a1126ce61f6d130fd746295b
-
 build:
   noarch: python
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
