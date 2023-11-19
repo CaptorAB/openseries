@@ -3,7 +3,7 @@ name: deploy
 on: workflow_dispatch
 
 env:
-  POETRY_VER: 1.7.0
+  POETRY_VER: 1.7.1
 
 jobs:
   deploy:
