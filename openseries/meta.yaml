@@ -1,9 +1,6 @@
-{% set name = "openseries" %}
-{% set version = "1.4.7" %}
-
 package:
-  name: {{ name|lower }}
-  version: {{ version }}
+  name: openseries
+  version: 1.4.7
 
 source:
   url: file://C:\Users\MartinKarrin\miniconda3\OpenSeries\dist\openseries-1.4.7.tar.gz
