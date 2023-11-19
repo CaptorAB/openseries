@@ -12,7 +12,7 @@ __pycache__/
 /venv/
 
 # Build and packaging
-dist/*
+/dist/
 
 # Pycharm
 .idea/*
