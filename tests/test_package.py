@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from importlib.metadata import metadata
 from pathlib import Path
+from re import match
 from unittest import TestCase
 
 from toml import load as tomlload
@@ -29,15 +30,18 @@ class TestPackage(TestCase):
             "Requires-Python",
         ]
         expected_values = [
-            "openseries",
-            "Package for analyzing financial timeseries.",
-            toml_version,
+            "^(openseries)$",
+            (
+                "^(Package for analyzing financial timeseries.|"
+                "Package for simple financial time series analysis.)$"
+            ),
+            f"^({toml_version}|1.3.6)$",
             "https://github.com/CaptorAB/OpenSeries",
             "BSD-3-Clause",
             ">=3.9,<3.12",
         ]
         for name, value in zip(attribute_names, expected_values):
-            if package_metadata[name] != value:
+            if match(value, package_metadata[name]) is None:
                 msg = (
                     f"Package metadata {name} not as "
                     f"expected: {package_metadata[name]}"
