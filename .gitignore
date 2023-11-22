@@ -12,6 +12,7 @@ __pycache__/
 /venv/
 
 # Build and packaging
+/conda/
 /dist/
 
 # Pycharm
