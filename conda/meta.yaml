@@ -1,10 +1,11 @@
-package:
-  name: openseries
-  version: 1.4.7
+build:
+  number: 0
+  noarch: python
+  script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
   host:
-    - python
+    - python >=3.9.0,<3.12.0
     - poetry-core
     - pip
   run:
@@ -29,6 +30,8 @@ about:
   summary: Package for analyzing financial timeseries.
   license: BSD-3-Clause
   license_file: LICENSE.md
+  doc_url: https://github.com/CaptorAB/OpenSeries
+  dev_url: https://github.com/CaptorAB/OpenSeries
 
 extra:
   recipe-maintainers:
