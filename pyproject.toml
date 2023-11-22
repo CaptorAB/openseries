@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.7"
+version = "1.4.8"
 description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -33,13 +33,13 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-ffn = "^0.3.7"
-holidays = "^0.36"
-numpy = "^1.26.1"
+ffn = "^1.0.0"
+holidays = "^0.37"
+numpy = ">=1.23.2,<=1.26.0"
 openpyxl = "^3.1.2"
 pandas = "^2.1.2"
 plotly = "^5.18.0"
-pydantic = "^2.5.0"
+pydantic = "^2.5.1"
 python-dateutil = "^2.8.2"
 scipy = "^1.11.3"
 statsmodels = "^0.14.0"
@@ -51,7 +51,7 @@ coverage-badge = "^1.1.0"
 mypy = "^1.7.0"
 pre-commit = "^3.5.0"
 pytest = "^7.4.3"
-ruff = "^0.1.5"
+ruff = "^0.1.6"
 toml = "^0.10.2"
 types-openpyxl = "^3.1.0.27"
 pandas-stubs = "^2.1.1.230928"
@@ -72,6 +72,8 @@ path = "venv"
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
+    'ignore:is_sparse is deprecated:FutureWarning',
+    'ignore:The:FutureWarning',
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]

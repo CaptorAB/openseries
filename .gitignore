@@ -9,7 +9,11 @@ __pycache__/
 
 # Environments
 .venv
-venv/
+/venv/
+
+# Build and packaging
+/conda/
+/dist/
 
 # Pycharm
 .idea/*

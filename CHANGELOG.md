@@ -3,6 +3,11 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.8] - 2023-11-22
+
+- Some readability cleanup in simulation.py
+- Preparations to allow publishing on anaconda.org
+
 ## Version [1.4.7] - 2023-11-15
 
 - Some doc string cleanup. Removed sources where code no longer resembles original

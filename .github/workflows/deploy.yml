@@ -3,7 +3,7 @@ name: deploy
 on: workflow_dispatch
 
 env:
-  POETRY_VER: 1.7.0
+  POETRY_VER: 1.7.1
 
 jobs:
   deploy:
@@ -75,13 +75,13 @@ jobs:
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry config pypi-token.testpypi ${{ secrets.TEST_PYPI_API_TOKEN }}
-          poetry build --format=wheel
+          poetry build
           poetry check
           poetry publish --repository testpypi --skip-existing
 
       - name: Build and Publish to PyPI
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
-          poetry build --format=wheel
+          poetry build
           poetry check
           poetry publish

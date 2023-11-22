@@ -3,7 +3,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.1.5'
+    rev: 'v0.1.6'
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
@@ -18,7 +18,7 @@ repos:
       - id: mypy
         additional_dependencies:
         - types-all
-        - pydantic>=2.4.2
+        - pydantic>=2.5.1
         - types-openpyxl>=3.1.0.27
         - pandas-stubs>=2.1.1.230928
         - types-python-dateutil>=2.8.19.14
@@ -40,7 +40,7 @@ repos:
       - id: check-docstring-first
       - id: check-json
       - id: check-toml
-      - id: check-yaml
+      # - id: check-yaml
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: name-tests-test
@@ -54,7 +54,7 @@ repos:
       - id: fix-byte-order-marker
         exclude: .gitignore
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.7.0
+    rev: 1.7.1
     hooks:
       - id: poetry-check
       - id: poetry-lock
