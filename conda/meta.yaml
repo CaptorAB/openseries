@@ -2,19 +2,15 @@ package:
   name: openseries
   version: 1.4.7
 
-source:
-  url: file:///home/karrmagadgeteer2/workgit/OpenSeries/dist/openseries-1.4.7.tar.gz
-  sha256: 87a4eafcbabaa63aa6a2c58ac8e0e5b1df2d3af16e7086652c403546b9dd055d
-
 requirements:
   host:
     - python
     - poetry-core
     - pip
   run:
-    - python >=3.9,<3.12
-    - ffn >=0.3.7,<0.4.0
-    - holidays >=0.36.0,<0.37.0
+    - python >=3.9.0,<3.12.0
+    - ffn >=1.0.0,<2.0.0
+    - holidays >=0.37.0,<1.0.0
     - numpy >=1.23.2,<=1.26.0
     - openpyxl >=3.1.2,<4.0.0
     - pandas >=2.1.2,<3.0.0
@@ -24,7 +20,12 @@ requirements:
     - scipy >=1.11.3,<2.0.0
     - statsmodels >=0.14.0,<0.15.0
 
+test:
+  imports:
+    - openseries
+
 about:
+  home: https://github.com/CaptorAB/OpenSeries
   summary: Package for analyzing financial timeseries.
   license: BSD-3-Clause
   license_file: LICENSE.md
