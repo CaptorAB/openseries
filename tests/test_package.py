@@ -35,7 +35,7 @@ class TestPackage(TestCase):
             f"^({toml_version})$",
             "^(https://github.com/CaptorAB/OpenSeries)$",
             "^(BSD-3-Clause)$",
-            "^(>=3.9,<3.12)$",
+            "^(>=3.9,<3.13)$",
         ]
         for name, value in zip(attribute_names, expected_values):
             if match(value, package_metadata[name]) is None:
