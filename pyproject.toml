@@ -10,6 +10,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Intended Audience :: Financial and Insurance Industry",
     "Topic :: Office/Business :: Financial :: Investment",
@@ -32,7 +33,7 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
+python = ">=3.9,<3.13"
 ffn = ">=1.0.0,<2.0.0"
 holidays = ">=0.37,<1.0"
 numpy = ">=1.23.2,<=1.26.0"
@@ -74,6 +75,8 @@ filterwarnings = [
     "error",
     'ignore:is_sparse is deprecated:FutureWarning',
     'ignore:The:FutureWarning',
+    'ignore::DeprecationWarning:dateutil.*:',
+    'ignore::DeprecationWarning:openpyxl.*:',
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]
