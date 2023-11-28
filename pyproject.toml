@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.8"
+version = "1.4.9"
 description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -10,6 +10,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Intended Audience :: Financial and Insurance Industry",
     "Topic :: Office/Business :: Financial :: Investment",
@@ -32,28 +33,28 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
-ffn = "^1.0.0"
-holidays = "^0.37"
-numpy = ">=1.23.2,<=1.26.0"
-openpyxl = "^3.1.2"
-pandas = "^2.1.2"
-plotly = "^5.18.0"
-pydantic = "^2.5.1"
-python-dateutil = "^2.8.2"
-scipy = "^1.11.3"
-statsmodels = "^0.14.0"
+python = ">=3.9,<3.13"
+ffn = ">=1.0.0,<2.0.0"
+holidays = ">=0.37,<1.0"
+numpy = ">=1.23.2,<=1.26.2"
+openpyxl = ">=3.1.2,<4.0.0"
+pandas = ">=2.1.2,<3.0.0"
+plotly = ">=5.18.0,<6.0.0"
+pydantic = ">=2.5.2,<3.0.0"
+python-dateutil = ">=2.8.2,<3.0.0"
+scipy = ">=1.11.4,<2.0.0"
+statsmodels = ">=0.14.0,<1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.11.0"
 coverage = "^7.3.2"
 coverage-badge = "^1.1.0"
-mypy = "^1.7.0"
+mypy = "^1.7.1"
 pre-commit = "^3.5.0"
 pytest = "^7.4.3"
 ruff = "^0.1.6"
 toml = "^0.10.2"
-types-openpyxl = "^3.1.0.27"
+types-openpyxl = "^3.1.0.28"
 pandas-stubs = "^2.1.1.230928"
 types-python-dateutil = "^2.8.19.14"
 types-requests = "^2.31.0.10"
@@ -74,13 +75,16 @@ filterwarnings = [
     "error",
     'ignore:is_sparse is deprecated:FutureWarning',
     'ignore:The:FutureWarning',
+    # https://github.com/dateutil/dateutil/issues/1314
+    'ignore::DeprecationWarning:dateutil.*:',
+    'ignore::DeprecationWarning:openpyxl.*:',
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]
 
 [tool.black]
 line-length = 87
-target-version = ["py39", "py310", "py311"]
+target-version = ["py39", "py310", "py311", "py312"]
 
 [tool.coverage.run]
 omit = ["venv/*"]

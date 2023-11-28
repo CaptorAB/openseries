@@ -31,14 +31,11 @@ class TestPackage(TestCase):
         ]
         expected_values = [
             "^(openseries)$",
-            (
-                "^(Package for analyzing financial timeseries.|"
-                "Package for simple financial time series analysis.)$"
-            ),
-            f"^({toml_version}|1.3.6)$",
-            "https://github.com/CaptorAB/OpenSeries",
-            "BSD-3-Clause",
-            ">=3.9,<3.12",
+            "^(Package for analyzing financial timeseries.)$",
+            f"^({toml_version})$",
+            "^(https://github.com/CaptorAB/OpenSeries)$",
+            "^(BSD-3-Clause)$",
+            "^(>=3.9,<3.13)$",
         ]
         for name, value in zip(attribute_names, expected_values):
             if match(value, package_metadata[name]) is None:

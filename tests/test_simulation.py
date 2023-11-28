@@ -22,7 +22,6 @@ class TestSimulation(TestCase):
     """class to run unittests on the module simulation.py."""
 
     seriesim: ReturnSimulation
-    framesim: ReturnSimulation
 
     @classmethod
     def setUpClass(cls: type[TestSimulation]) -> None:
