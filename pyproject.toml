@@ -75,6 +75,7 @@ filterwarnings = [
     "error",
     'ignore:is_sparse is deprecated:FutureWarning',
     'ignore:The:FutureWarning',
+    # https://github.com/dateutil/dateutil/issues/1314
     'ignore::DeprecationWarning:dateutil.*:',
     'ignore::DeprecationWarning:openpyxl.*:',
     # https://github.com/pydata/pandas-datareader/issues/960
