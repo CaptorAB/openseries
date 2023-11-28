@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.8"
+version = "1.4.9"
 description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -36,7 +36,7 @@ keywords = [
 python = ">=3.9,<3.13"
 ffn = ">=1.0.0,<2.0.0"
 holidays = ">=0.37,<1.0"
-numpy = ">=1.23.2,<=1.26.0"
+numpy = ">=1.23.2,<=1.26.2"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
 plotly = ">=5.18.0,<6.0.0"
@@ -84,7 +84,7 @@ filterwarnings = [
 
 [tool.black]
 line-length = 87
-target-version = ["py39", "py310", "py311"]
+target-version = ["py39", "py310", "py311", "py312"]
 
 [tool.coverage.run]
 omit = ["venv/*"]
