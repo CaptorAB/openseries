@@ -35,7 +35,7 @@ keywords = [
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 ffn = ">=1.0.0,<2.0.0"
-holidays = ">=0.37,<1.0.0"
+holidays = ">=0.37,<1.0"
 numpy = ">=1.23.2,<=1.26.2"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
@@ -104,7 +104,7 @@ disallow_any_generics = true
 check_untyped_defs = true
 no_implicit_reexport = true
 disallow_untyped_defs = true
-exclude = ["venv/*","docs/*"]
+exclude = ["venv/*"]
 plugins = [
     "pydantic.mypy",
     "numpy.typing.mypy_plugin"
@@ -116,7 +116,6 @@ init_typed = true
 warn_required_dynamic_aliases = true
 
 [tool.ruff]
-exclude = ["docs/*", "venv/*"]
 select = ["ALL"]
 ignore = ["D211", "D212", "TCH"]
 fixable = ["ALL"]
