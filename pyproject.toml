@@ -115,6 +115,7 @@ init_typed = true
 warn_required_dynamic_aliases = true
 
 [tool.ruff]
+exclude = ["docs/*", "venv/*"]
 select = ["ALL"]
 ignore = ["D211", "D212", "TCH"]
 fixable = ["ALL"]
