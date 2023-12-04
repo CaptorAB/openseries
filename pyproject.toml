@@ -35,7 +35,7 @@ keywords = [
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 ffn = ">=1.0.0,<2.0.0"
-holidays = "==0.37"
+holidays = ">=0.37,<1.0.0"
 numpy = ">=1.23.2,<=1.26.2"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
@@ -77,6 +77,7 @@ filterwarnings = [
     'ignore:The:FutureWarning',
     # https://github.com/dateutil/dateutil/issues/1314
     'ignore::DeprecationWarning:dateutil.*:',
+    'ignore:invalid escape sequence:DeprecationWarning',
     'ignore::DeprecationWarning:openpyxl.*:',
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
@@ -103,7 +104,7 @@ disallow_any_generics = true
 check_untyped_defs = true
 no_implicit_reexport = true
 disallow_untyped_defs = true
-exclude = ["venv/*"]
+exclude = ["venv/*","docs/*"]
 plugins = [
     "pydantic.mypy",
     "numpy.typing.mypy_plugin"
