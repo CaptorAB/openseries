@@ -1901,13 +1901,13 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.0.30"
+version = "3.1.0.31"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "types-openpyxl-3.1.0.30.tar.gz", hash = "sha256:78d5f24ebd28b33fa360452072a332f3189c541731e00aae36d1c8101922ab25"},
-    {file = "types_openpyxl-3.1.0.30-py3-none-any.whl", hash = "sha256:b54db6e5e71bf62d293f6c56286670f6f386b5c4d239655dc4e94b9525393bae"},
+    {file = "types-openpyxl-3.1.0.31.tar.gz", hash = "sha256:80806bc31864c0af6c45e92ac40f39bb23c647ec92641142b2e4f73a7bc7433f"},
+    {file = "types_openpyxl-3.1.0.31-py3-none-any.whl", hash = "sha256:df3651e9ed2860f54ebc0ba753e6af8021d32adca0af0b57026d2e69a187b871"},
 ]
 
 [[package]]
@@ -2068,4 +2068,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "40ba3ba311cdf38f2121ce4f4e23f0556ccbae782bf87aefcaac8dff10038802"
+content-hash = "fb29cbea247ce2633e0f8eb0a9ff3be0ba9816482bbd2f659593be01a7e597be"
