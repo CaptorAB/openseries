@@ -620,13 +620,13 @@ lxml = ["lxml"]
 
 [[package]]
 name = "identify"
-version = "2.5.32"
+version = "2.5.33"
 description = "File identification library for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "identify-2.5.32-py2.py3-none-any.whl", hash = "sha256:0b7656ef6cba81664b783352c73f8c24b39cf82f926f78f4550eda928e5e0545"},
-    {file = "identify-2.5.32.tar.gz", hash = "sha256:5d9979348ec1a21c768ae07e0a652924538e8bce67313a73cb0f681cf08ba407"},
+    {file = "identify-2.5.33-py2.py3-none-any.whl", hash = "sha256:d40ce5fcd762817627670da8a7d8d8e65f24342d14539c59488dc603bf662e34"},
+    {file = "identify-2.5.33.tar.gz", hash = "sha256:161558f9fe4559e1557e1bff323e8631f6a0e4837f7497767c1782832f16b62d"},
 ]
 
 [package.extras]
@@ -1901,13 +1901,13 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.0.31"
+version = "3.1.0.32"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "types-openpyxl-3.1.0.31.tar.gz", hash = "sha256:80806bc31864c0af6c45e92ac40f39bb23c647ec92641142b2e4f73a7bc7433f"},
-    {file = "types_openpyxl-3.1.0.31-py3-none-any.whl", hash = "sha256:df3651e9ed2860f54ebc0ba753e6af8021d32adca0af0b57026d2e69a187b871"},
+    {file = "types-openpyxl-3.1.0.32.tar.gz", hash = "sha256:3d37da6490fc4ed04f1d79c0f523b31197d559043cbc90cbd15acab542a0267b"},
+    {file = "types_openpyxl-3.1.0.32-py3-none-any.whl", hash = "sha256:d347f177783dde0f3970aa4a32f808932a269f93809aa953a2bf33bc92b25eb1"},
 ]
 
 [[package]]
@@ -2028,13 +2028,13 @@ files = [
 
 [[package]]
 name = "yfinance"
-version = "0.2.32"
+version = "0.2.33"
 description = "Download market data from Yahoo! Finance API"
 optional = false
 python-versions = "*"
 files = [
-    {file = "yfinance-0.2.32-py2.py3-none-any.whl", hash = "sha256:1a825a6f6201fb4204a4fc81e27c7bd5179a640e06f861316242d31d30cee035"},
-    {file = "yfinance-0.2.32.tar.gz", hash = "sha256:fed6e37702af75a6c07c8c2e1c56a5331a4d4f341634995ebc735f1df06ea543"},
+    {file = "yfinance-0.2.33-py2.py3-none-any.whl", hash = "sha256:2076a19ee13fb55af0ad3d5f110db3fb007409893e40464177685fc3e6d08ffd"},
+    {file = "yfinance-0.2.33.tar.gz", hash = "sha256:08aeb63a927742514098698d80f4315aa92d23bc253c1f204ced6377457c3e07"},
 ]
 
 [package.dependencies]
@@ -2068,4 +2068,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "fb29cbea247ce2633e0f8eb0a9ff3be0ba9816482bbd2f659593be01a7e597be"
+content-hash = "ef4c4661ae3e550960c5d3fff2ec374aaa6b58f2caa58acd4b129e9e97113ee7"
