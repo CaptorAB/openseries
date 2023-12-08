@@ -1354,6 +1354,7 @@ class TestOpenFrame(TestCase):
     def test_plot_methods_mock_logo_url_fail(self: TestOpenFrame) -> None:
         """Test plot_series and plot_bars methods with mock logo file URL fail."""
         plotframe = self.randomframe.from_deepcopy()
+        plotframe.to_cumret()
 
         with patch("requests.head") as mock_conn_error:
             mock_conn_error.side_effect = ConnectionError()
@@ -1428,6 +1429,19 @@ class TestOpenFrame(TestCase):
                     "expected when logo URL not working"
                 )
                 raise ValueError(msg)
+
+        with patch("requests.head") as mock_statuscode:
+            mock_statuscode.return_value.status_code = 200
+
+            fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
+            fig_json = loads(fig.to_json())
+
+            for i in range(plotframe.item_count):
+                rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
+                fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
+                if rawdata != fig_data:
+                    msg = "Unaligned data between original and data in Figure."
+                    raise ValueError(msg)
 
     def test_passed_empty_list(self: TestOpenFrame) -> None:
         """Test warning on object construct with empty list."""
