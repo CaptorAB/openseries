@@ -38,9 +38,6 @@ jobs:
           poetry run ruff check ./openseries/*.py --fix --exit-non-zero-on-fix
           poetry run ruff check ./tests/*.py --fix --exit-non-zero-on-fix
 
-      - name: Format with Black
-        run: poetry run black ./openseries/*.py ./tests/*.py
-
       - name: Type check with Mypy
         run: poetry run mypy .
 

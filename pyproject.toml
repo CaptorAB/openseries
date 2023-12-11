@@ -46,7 +46,6 @@ scipy = ">=1.11.4,<2.0.0"
 statsmodels = ">=0.14.0,<1.0.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.11.0"
 coverage = "^7.3.2"
 coverage-badge = "^1.1.0"
 mypy = "^1.7.1"
@@ -82,10 +81,6 @@ filterwarnings = [
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]
-
-[tool.black]
-line-length = 87
-target-version = ["py39", "py310", "py311", "py312"]
 
 [tool.coverage.run]
 omit = ["venv/*"]

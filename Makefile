@@ -16,7 +16,6 @@ test:
 
 lint:
 	poetry run ruff check . --fix --exit-non-zero-on-fix
-	poetry run black ./openseries/*.py ./tests/*.py
 	poetry run mypy .
 
 clean:
