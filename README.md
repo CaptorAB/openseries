@@ -13,7 +13,6 @@ https://anaconda.org/conda-forge/openseries/badges/version.svg)](https://anacond
 [![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
 [![Styling, Linting & Type checks](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml)
-[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/index.html)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
@@ -121,7 +120,7 @@ make install
 
 ## Testing and Linting / Type-checking
 
-Ruff, Black and Mypy checking is embedded in the pre-commit hook. All
+Ruff and Mypy checking is embedded in the pre-commit hook. All
 are also used in the project's GitHub workflows and are run when the `lint`
 alternative is chosen in the below commands.
 Any silenced error codes can be found in the

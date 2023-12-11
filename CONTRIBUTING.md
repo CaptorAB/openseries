@@ -36,10 +36,9 @@ Provide information about your environment, such as your operating system or app
 If possible, try to isolate the issue to a specific code block or function.
 
 ## Use a Consistent Coding Style
-Three tools are used for styling and linting and their configurations are kept in the project's [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml) file. They are:
+Two tools are used for styling and linting and their configurations are kept in the project's [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml) file. They are:
 
 * Ruff linting
-* Black code styling
 * Mypy type checking
 
 ## References

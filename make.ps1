@@ -27,7 +27,6 @@ elseif ($task -eq "test") {
 elseif ($task -eq "lint") {
     # run lint and typing checks
     poetry run ruff check . --fix --exit-non-zero-on-fix
-    poetry run black ./openseries/*.py ./tests/*.py
     poetry run mypy .
 }
 elseif ($task -eq "clean") {
