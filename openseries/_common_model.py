@@ -10,7 +10,7 @@ from secrets import choice
 from string import ascii_letters
 from typing import Any, Optional, Union, cast
 
-from numpy import Inf, isnan, log, maximum, sqrt
+from numpy import Inf, float64, isnan, log, maximum, sqrt
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -1724,7 +1724,7 @@ class _CommonModel(BaseModel):
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(ratio.iloc[0])
+            return float(cast(float64, ratio.iloc[0]))
         return Series(
             data=ratio,
             index=self.tsdf.columns,
@@ -1790,7 +1790,7 @@ class _CommonModel(BaseModel):
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(ratio.iloc[0])
+            return float(cast(float64, ratio.iloc[0]))
         return Series(
             data=ratio,
             index=self.tsdf.columns,
