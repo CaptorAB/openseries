@@ -814,6 +814,8 @@ def timeseries_chain(
     """
     Chain two timeseries together.
 
+    The function assumes that the two series have at least one date in common.
+
     Parameters
     ----------
     front: TypeOpenTimeSeries
