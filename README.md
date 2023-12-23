@@ -120,7 +120,7 @@ make install
 
 ## Testing and Linting / Type-checking
 
-Ruff and Mypy checking is embedded in the pre-commit hook. All
+Ruff and Mypy checking is embedded in the pre-commit hook. Both
 are also used in the project's GitHub workflows and are run when the `lint`
 alternative is chosen in the below commands.
 Any silenced error codes can be found in the

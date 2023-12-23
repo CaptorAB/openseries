@@ -3,19 +3,19 @@ default_language_version:
 
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.1.8'
+    rev: 'v0.1.9'
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
       - id: mypy
         additional_dependencies:
         - types-all
         - pydantic>=2.5.2,<3.0.0
         - types-openpyxl>=3.1.0.32
-        - pandas-stubs>=2.1.1.230928
+        - pandas-stubs>=2.1.4.231218
         - types-python-dateutil>=2.8.19.14
         - types-requests>=2.31.0.10
         - types-toml>=0.10.8.7
