@@ -73,6 +73,7 @@ path = "venv"
 filterwarnings = [
     "error",
     'ignore:is_sparse is deprecated:FutureWarning',
+    'ignore:is_categorical_dtype is deprecated:DeprecationWarning',
     'ignore:The:FutureWarning',
     # https://github.com/dateutil/dateutil/issues/1314
     'ignore::DeprecationWarning:dateutil.*:',
