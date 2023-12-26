@@ -71,14 +71,6 @@ path = "venv"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    "error",
-    'ignore:is_sparse is deprecated:FutureWarning',
-    'ignore:is_categorical_dtype is deprecated:DeprecationWarning',
-    'ignore:The:FutureWarning',
-    # https://github.com/dateutil/dateutil/issues/1314
-    'ignore::DeprecationWarning:dateutil.*:',
-    'ignore:invalid escape sequence:DeprecationWarning',
-    'ignore::DeprecationWarning:openpyxl.*:',
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]
