@@ -323,6 +323,35 @@ class _CommonModel(BaseModel):
         return self.worst_func(observations=observations)
 
     @property
+    def worst_month(self: Self) -> Union[float, Series[float]]:
+        """
+        Most negative month.
+
+        Returns
+        -------
+        Pandas.Series[float]
+            Most negative month
+        """
+        wmdf = self.tsdf.copy()
+        wmdf.index = DatetimeIndex(wmdf.index)
+        result = (
+            wmdf.resample("BM")
+            .last()
+            .pct_change(fill_method=cast(str, None))
+            .min()
+        )
+
+        if self.tsdf.shape[1] == 1:
+            return float(result.iloc[0])
+        return Series(
+            data=result,
+            index=self.tsdf.columns,
+            name="Worst month",
+            dtype="float64",
+        )
+
+
+    @property
     def positive_share(self: Self) -> Union[float, Series[float]]:
         """
         The share of percentage changes that are greater than zero.

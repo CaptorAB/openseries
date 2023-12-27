@@ -431,27 +431,6 @@ class OpenTimeSeries(_CommonModel):
         pdf.columns = self.tsdf.columns
         return pdf
 
-    @property
-    def worst_month(self: Self) -> float:
-        """
-        Most negative month.
-
-        Returns
-        -------
-        float
-            Most negative month
-        """
-        resdf = self.tsdf.copy()
-        resdf.index = DatetimeIndex(resdf.index)
-        return float(
-            (
-                resdf.resample("BM")
-                .last()
-                .pct_change(fill_method=cast(str, None))
-                .min()
-            ).iloc[0],
-        )
-
     def value_to_ret(self: Self) -> Self:
         """
         Convert series of values into series of returns.

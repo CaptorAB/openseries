@@ -319,27 +319,6 @@ class OpenFrame(_CommonModel):
             dtype=Int64Dtype(),
         )
 
-    @property
-    def worst_month(self: Self) -> Series[float]:
-        """
-        Most negative month.
-
-        Returns
-        -------
-        Pandas.Series[float]
-            Most negative month
-        """
-        wdf = self.tsdf.copy()
-        wdf.index = DatetimeIndex(wdf.index)
-        return Series(
-            data=wdf.resample("BM")
-            .last()
-            .pct_change(fill_method=cast(str, None))
-            .min(),
-            name="Worst month",
-            dtype="float64",
-        )
-
     def value_to_ret(self: Self) -> Self:
         """
         Convert series of values into series of returns.
