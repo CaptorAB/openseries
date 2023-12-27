@@ -161,13 +161,15 @@ class TestOpenTimeSeries(TestCase):
             expected_exception=ValidationError,
             match="Input should be a valid string",
         ):
-            OpenTimeSeries.setup_class(countries=["SE", cast(str, 12)])
+            OpenTimeSeries.setup_class(
+                countries=cast(CountriesType, ["SE", cast(str, 12)]),
+                )
 
         with pytest.raises(
             expected_exception=ValidationError,
             match="2 validation errors for Countries",
         ):
-            OpenTimeSeries.setup_class(countries=["SE", "12"])
+            OpenTimeSeries.setup_class(countries=cast(CountriesType, ["SE", "12"]))
 
         with pytest.raises(
             expected_exception=ValidationError,
@@ -1269,7 +1271,7 @@ class TestOpenTimeSeries(TestCase):
             raise FileExistsError(msg)
 
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
-        fig_json = loads(fig.to_json())
+        fig_json = loads(cast(str, fig.to_json()))
         rawdata = [f"{x:.11f}" for x in plotseries.tsdf.iloc[1:5, 0]]
         fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
         if rawdata != fig_data:
@@ -1281,7 +1283,7 @@ class TestOpenTimeSeries(TestCase):
             output_type="div",
             show_last=True,
         )
-        fig_last_json = loads(fig_last.to_json())
+        fig_last_json = loads(cast(str, fig_last.to_json()))
         last = fig_last_json["data"][-1]["y"][0]
 
         if f"{last:.10f}" != "1.1058222108":
@@ -1298,7 +1300,7 @@ class TestOpenTimeSeries(TestCase):
             show_last=True,
             tick_fmt=".3%",
         )
-        fig_last_fmt_json = loads(fig_last_fmt.to_json())
+        fig_last_fmt_json = loads(cast(str, fig_last_fmt.to_json()))
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
         if last_fmt != "Last 110.582%":
@@ -1332,7 +1334,7 @@ class TestOpenTimeSeries(TestCase):
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = barseries.plot_bars(auto_open=False, output_type="div")
-        fig_json = loads(fig.to_json())
+        fig_json = loads(cast(str, fig.to_json()))
         fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
         if rawdata != fig_data:
             msg = "Unaligned data between original and data in Figure."
@@ -1355,7 +1357,7 @@ class TestOpenTimeSeries(TestCase):
             output_type="div",
             mode="overlay",
         )
-        overlayfig_json = loads(overlayfig.to_json())
+        overlayfig_json = loads(cast(str, overlayfig.to_json()))
 
         fig_keys.append("opacity")
         if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
@@ -1489,12 +1491,12 @@ class TestOpenTimeSeries(TestCase):
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
-        basecase.countries = ["SE", "US"]
+        basecase.countries = cast(CountriesType, ["SE", "US"])
         if basecase.countries != {"SE", "US"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
-        basecase.countries = ["SE", "SE"]
+        basecase.countries = cast(CountriesType, ["SE", "SE"])
         if basecase.countries != {"SE"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)

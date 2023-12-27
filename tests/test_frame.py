@@ -1116,7 +1116,7 @@ class TestOpenFrame(TestCase):
         plotframe.to_cumret()
 
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
-        fig_json = loads(fig.to_json())
+        fig_json = loads(cast(str, fig.to_json()))
 
         for i in range(plotframe.item_count):
             rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
@@ -1130,7 +1130,7 @@ class TestOpenFrame(TestCase):
             output_type="div",
             show_last=True,
         )
-        fig_last_json = loads(fig_last.to_json())
+        fig_last_json = loads(cast(str, fig_last.to_json()))
         rawlast = plotframe.tsdf.iloc[-1, -1]
         figlast = fig_last_json["data"][-1]["y"][0]
         if f"{figlast:.12f}" != f"{rawlast:.12f}":
@@ -1143,7 +1143,7 @@ class TestOpenFrame(TestCase):
             show_last=True,
             tick_fmt=".3%",
         )
-        fig_last_fmt_json = loads(fig_last_fmt.to_json())
+        fig_last_fmt_json = loads(cast(str, fig_last_fmt.to_json()))
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
         if last_fmt != "Last 105.083%":
@@ -1163,7 +1163,7 @@ class TestOpenFrame(TestCase):
             add_logo=True,
             output_type="div",
         )
-        fig_logo_json = loads(fig_logo.to_json())
+        fig_logo_json = loads(cast(str, fig_logo.to_json()))
 
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
@@ -1178,7 +1178,7 @@ class TestOpenFrame(TestCase):
             add_logo=False,
             output_type="div",
         )
-        fig_nologo_json = loads(fig_nologo.to_json())
+        fig_nologo_json = loads(cast(str, fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_series add_logo argument not setup correctly"
             raise ValueError(msg)
@@ -1215,7 +1215,7 @@ class TestOpenFrame(TestCase):
                 auto_open=False,
                 output_type="div",
             )
-            mockhomefig_json = loads(mockhomefig.to_json())
+            mockhomefig_json = loads(cast(str, mockhomefig.to_json()))
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_series method not working as intended"
@@ -1241,7 +1241,7 @@ class TestOpenFrame(TestCase):
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = plotframe.plot_bars(auto_open=False, output_type="div")
-        fig_json = loads(fig.to_json())
+        fig_json = loads(cast(str, fig.to_json()))
         made_fig_keys = list(fig_json["data"][0].keys())
         made_fig_keys.sort()
         if made_fig_keys != fig_keys:
@@ -1266,7 +1266,7 @@ class TestOpenFrame(TestCase):
             output_type="div",
             mode="overlay",
         )
-        overlayfig_json = loads(overlayfig.to_json())
+        overlayfig_json = loads(cast(str, overlayfig.to_json()))
 
         fig_keys.append("opacity")
         if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
@@ -1280,7 +1280,7 @@ class TestOpenFrame(TestCase):
             add_logo=True,
             output_type="div",
         )
-        fig_logo_json = loads(fig_logo.to_json())
+        fig_logo_json = loads(cast(str, fig_logo.to_json()))
 
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
@@ -1295,7 +1295,7 @@ class TestOpenFrame(TestCase):
             add_logo=False,
             output_type="div",
         )
-        fig_nologo_json = loads(fig_nologo.to_json())
+        fig_nologo_json = loads(cast(str, fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_bars add_logo argument not setup correctly"
             raise ValueError(msg)
@@ -1331,7 +1331,7 @@ class TestOpenFrame(TestCase):
                 auto_open=False,
                 output_type="div",
             )
-            mockhomefig_json = loads(mockhomefig.to_json())
+            mockhomefig_json = loads(cast(str, mockhomefig.to_json()))
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_bars method not working as intended"
@@ -1364,7 +1364,7 @@ class TestOpenFrame(TestCase):
                 add_logo=True,
                 output_type="div",
             )
-            seriesfig_json = loads(seriesfig.to_json())
+            seriesfig_json = loads(cast(str, seriesfig.to_json()))
             if seriesfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_series add_logo argument not setup correctly"
                 raise ValueError(msg)
@@ -1374,7 +1374,7 @@ class TestOpenFrame(TestCase):
                 add_logo=True,
                 output_type="div",
             )
-            barfig_json = loads(barfig.to_json())
+            barfig_json = loads(cast(str, barfig.to_json()))
             if barfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_bars add_logo argument not setup correctly"
                 raise ValueError(msg)
@@ -1434,7 +1434,7 @@ class TestOpenFrame(TestCase):
             mock_statuscode.return_value.status_code = 200
 
             fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
-            fig_json = loads(fig.to_json())
+            fig_json = loads(cast(str, fig.to_json()))
 
             for i in range(plotframe.item_count):
                 rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]

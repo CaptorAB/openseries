@@ -783,7 +783,7 @@ class _CommonModel(BaseModel):
                 auto_open=auto_open,
                 auto_play=False,
                 link_text="",
-                include_plotlyjs=include_plotlyjs,
+                include_plotlyjs=cast(bool, include_plotlyjs),
                 config=fig["config"],
                 output_type=output_type,
             )
@@ -794,7 +794,7 @@ class _CommonModel(BaseModel):
                 fig=figure,
                 config=fig["config"],
                 auto_play=False,
-                include_plotlyjs=include_plotlyjs,
+                include_plotlyjs=cast(bool, include_plotlyjs),
                 full_html=False,
                 div_id=div_id,
             )
@@ -915,7 +915,7 @@ class _CommonModel(BaseModel):
                 auto_open=auto_open,
                 auto_play=False,
                 link_text="",
-                include_plotlyjs=include_plotlyjs,
+                include_plotlyjs=cast(bool, include_plotlyjs),
                 config=fig["config"],
                 output_type=output_type,
             )
@@ -926,7 +926,7 @@ class _CommonModel(BaseModel):
                 fig=figure,
                 config=fig["config"],
                 auto_play=False,
-                include_plotlyjs=include_plotlyjs,
+                include_plotlyjs=cast(bool, include_plotlyjs),
                 full_html=False,
                 div_id=div_id,
             )
@@ -1400,8 +1400,8 @@ class _CommonModel(BaseModel):
         )
 
         result = sqrt((dddf[dddf < zero] ** 2).sum() / how_many) * sqrt(
-            time_factor,
-        )
+                time_factor,
+                )
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
