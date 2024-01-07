@@ -350,7 +350,6 @@ class _CommonModel(BaseModel):
             dtype="float64",
         )
 
-
     @property
     def positive_share(self: Self) -> Union[float, Series[float]]:
         """
