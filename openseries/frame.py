@@ -50,7 +50,6 @@ from openseries.types import (
     LiteralOlsFitCovType,
     LiteralOlsFitMethod,
     LiteralPandasReindexMethod,
-    LiteralPandasResampleConvention,
     LiteralPortfolioWeightings,
     LiteralRiskParityMethod,
     LiteralTrunc,
@@ -381,14 +380,14 @@ class OpenFrame(_CommonModel):
 
     def resample(
         self: Self,
-        freq: Union[LiteralBizDayFreq, str] = "BM",
+        freq: Union[LiteralBizDayFreq, str] = "BME",
     ) -> Self:
         """
         Resample the timeseries frequency.
 
         Parameters
         ----------
-        freq: Union[LiteralBizDayFreq, str], default "BM"
+        freq: Union[LiteralBizDayFreq, str], default "BME"
             The date offset string that sets the resampled frequency
 
         Returns
@@ -410,9 +409,8 @@ class OpenFrame(_CommonModel):
 
     def resample_to_business_period_ends(
         self: Self,
-        freq: LiteralBizDayFreq = "BM",
+        freq: LiteralBizDayFreq = "BME",
         countries: CountriesType = "SE",
-        convention: LiteralPandasResampleConvention = "end",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
         """
@@ -422,13 +420,11 @@ class OpenFrame(_CommonModel):
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq, default "BM"
+        freq: LiteralBizDayFreq, default "BME"
             The date offset string that sets the resampled frequency
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
             to create a business day calendar used for date adjustments
-        convention: LiteralPandasResampleConvention, default; end
-            Controls whether to use the start or end of `rule`.
         method: LiteralPandasReindexMethod, default: nearest
             Controls the method used to align values across columns
 
@@ -445,7 +441,6 @@ class OpenFrame(_CommonModel):
             tail=tail,
             freq=freq,
             countries=countries,
-            convention=convention,
         )
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         for xerie in self.constituents:

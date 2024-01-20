@@ -308,7 +308,7 @@ class TestOpenFrame(TestCase):
 
         before = cast(Series, rs_frame.value_ret).to_dict()
 
-        rs_frame.resample(freq="BM")
+        rs_frame.resample(freq="BME")
 
         if rs_frame.length != expected:
             msg = "resample() method generated unexpected result"
@@ -336,7 +336,7 @@ class TestOpenFrame(TestCase):
             ],
         )
 
-        rsb_stubs_frame.resample_to_business_period_ends(freq="BM")
+        rsb_stubs_frame.resample_to_business_period_ends(freq="BME")
         new_stubs_dates = rsb_stubs_frame.tsdf.index.tolist()
 
         if new_stubs_dates != [
@@ -368,7 +368,7 @@ class TestOpenFrame(TestCase):
             ],
         )
 
-        rsb_frame.resample_to_business_period_ends(freq="BM")
+        rsb_frame.resample_to_business_period_ends(freq="BME")
         new_dates = rsb_frame.tsdf.index.tolist()
 
         if new_dates != [

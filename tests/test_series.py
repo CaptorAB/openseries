@@ -698,7 +698,7 @@ class TestOpenTimeSeries(TestCase):
 
         before = rs_series.value_ret
 
-        rs_series.resample(freq="BM")
+        rs_series.resample(freq="BME")
 
         if rs_series.length != intended_length:
             msg = "Method resample() not working as intended"
@@ -718,7 +718,7 @@ class TestOpenTimeSeries(TestCase):
             end_dt=dt.date(2023, 5, 15),
         )
 
-        rsb_stubs_series.resample_to_business_period_ends(freq="BM")
+        rsb_stubs_series.resample_to_business_period_ends(freq="BME")
         new_stubs_dates = rsb_stubs_series.tsdf.index.tolist()
 
         if new_stubs_dates != [
@@ -738,7 +738,7 @@ class TestOpenTimeSeries(TestCase):
             end_dt=dt.date(2023, 4, 28),
         )
 
-        rsb_series.resample_to_business_period_ends(freq="BM")
+        rsb_series.resample_to_business_period_ends(freq="BME")
         new_dates = rsb_series.tsdf.index.tolist()
 
         if new_dates != [
@@ -1248,7 +1248,7 @@ class TestOpenTimeSeries(TestCase):
             raise TypeError(msg)
 
         copyseries.set_new_label("boo").running_adjustment(0.001).resample(
-            "BM",
+            "BME",
         ).value_to_ret()
         if not isinstance(copyseries, NewTimeSeries):
             msg = "chained methods on subclass not working as intended"
@@ -1317,7 +1317,7 @@ class TestOpenTimeSeries(TestCase):
     def test_plot_bars(self: TestOpenTimeSeries) -> None:
         """Test plot_bars method."""
         barseries = self.randomseries.from_deepcopy()
-        barseries.resample(freq="BM").value_to_ret()
+        barseries.resample(freq="BME").value_to_ret()
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
         directory = Path(__file__).resolve().parent

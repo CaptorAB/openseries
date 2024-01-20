@@ -41,7 +41,6 @@ from openseries.types import (
     DaysInYearType,
     LiteralBizDayFreq,
     LiteralPandasReindexMethod,
-    LiteralPandasResampleConvention,
     LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
     ValueListType,
@@ -542,16 +541,15 @@ class OpenTimeSeries(_CommonModel):
 
     def resample(
         self: Self,
-        freq: Union[LiteralBizDayFreq, str] = "BM",
+        freq: Union[LiteralBizDayFreq, str] = "BME",
     ) -> Self:
         """
         Resamples the timeseries frequency.
 
         Parameters
         ----------
-        freq: Union[LiteralBizDayFreq, str], default "BM"
+        freq: Union[LiteralBizDayFreq, str], default "BME"
             The date offset string that sets the resampled frequency
-            Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 
         Returns
         -------
@@ -565,8 +563,7 @@ class OpenTimeSeries(_CommonModel):
 
     def resample_to_business_period_ends(
         self: Self,
-        freq: LiteralBizDayFreq = "BM",
-        convention: LiteralPandasResampleConvention = "end",
+        freq: LiteralBizDayFreq = "BME",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
         """
@@ -576,10 +573,8 @@ class OpenTimeSeries(_CommonModel):
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq, default BM
+        freq: LiteralBizDayFreq, default BME
             The date offset string that sets the resampled frequency
-        convention: LiteralPandasResampleConvention, default; end
-            Controls whether to use the start or end of `rule`.
         method: LiteralPandasReindexMethod, default: nearest
             Controls the method used to align values across columns
 
@@ -596,7 +591,6 @@ class OpenTimeSeries(_CommonModel):
             tail=tail,
             freq=freq,
             countries=self.countries,
-            convention=convention,
         )
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         return self

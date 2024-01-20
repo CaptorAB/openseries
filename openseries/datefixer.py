@@ -27,7 +27,6 @@ from openseries.types import (
     DateType,
     HolidayType,
     LiteralBizDayFreq,
-    LiteralPandasResampleConvention,
 )
 
 
@@ -372,7 +371,6 @@ def do_resample_to_business_period_ends(
     tail: Series[float],
     freq: LiteralBizDayFreq,
     countries: CountriesType,
-    convention: LiteralPandasResampleConvention,
 ) -> DatetimeIndex:
     """
     Resample timeseries frequency to business calendar month end dates.
@@ -392,8 +390,6 @@ def do_resample_to_business_period_ends(
     countries: CountriesType
         (List of) country code(s) according to ISO 3166-1 alpha-2
         to create a business day calendar used for date adjustments
-    convention: LiteralPandasResampleConvention
-        Controls whether to use the start or end of `rule`.
 
     Returns
     -------
@@ -403,7 +399,7 @@ def do_resample_to_business_period_ends(
     newhead = head.to_frame().T
     newtail = tail.to_frame().T
     data.index = DatetimeIndex(data.index)
-    data = data.resample(rule=freq, convention=convention).last()
+    data = data.resample(rule=freq).last()
     data = data.drop(index=data.index[-1])
     data.index = Index(d.date() for d in DatetimeIndex(data.index))
 

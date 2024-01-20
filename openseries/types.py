@@ -122,8 +122,7 @@ LiteralLinePlotMode = Literal[
 ]
 LiteralHowMerge = Literal["outer", "inner"]
 LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "nearest"]
-LiteralBizDayFreq = Literal["BM", "BQ", "BA"]
-LiteralPandasResampleConvention = Literal["start", "s", "end", "e"]
+LiteralBizDayFreq = Literal["B", "BME", "BQE", "BYE"]
 LiteralPandasReindexMethod = Literal[
     None,
     "pad",

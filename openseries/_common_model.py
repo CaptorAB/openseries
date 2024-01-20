@@ -335,10 +335,7 @@ class _CommonModel(BaseModel):
         wmdf = self.tsdf.copy()
         wmdf.index = DatetimeIndex(wmdf.index)
         result = (
-            wmdf.resample("BM")
-            .last()
-            .pct_change(fill_method=cast(str, None))
-            .min()
+            wmdf.resample("BME").last().pct_change(fill_method=cast(str, None)).min()
         )
 
         if self.tsdf.shape[1] == 1:
@@ -1428,8 +1425,8 @@ class _CommonModel(BaseModel):
         )
 
         result = sqrt((dddf[dddf < zero] ** 2).sum() / how_many) * sqrt(
-                time_factor,
-                )
+            time_factor,
+        )
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
