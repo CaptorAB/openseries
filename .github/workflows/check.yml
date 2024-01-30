@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python on ${{ runner.os }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         id: setup_python
         with:
           python-version: '3.10'
