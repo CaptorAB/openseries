@@ -55,6 +55,7 @@ def holiday_calendar(
     -------
     numpy.busdaycalendar
         Generate a business calendar
+
     """
     startyear -= 1
     endyear += 1
@@ -105,6 +106,7 @@ def date_fix(
     -------
     datetime.date
         Parsed date
+
     """
     if isinstance(fixerdate, (Timestamp, dt.datetime)):
         return fixerdate.date()
@@ -160,6 +162,7 @@ def date_offset_foll(
     -------
     datetime.date
         Off-set date
+
     """
     raw_date = date_fix(raw_date)
     month_delta = relativedelta(months=months_offset)
@@ -205,6 +208,7 @@ def get_previous_business_day_before_today(
     -------
     datetime.date
         The previous business day
+
     """
     if today is None:
         today = dt.datetime.now(tz=dt.timezone.utc).date()
@@ -248,6 +252,7 @@ def offset_business_days(
     -------
     datetime.date
         The new offset business day
+
     """
     if days <= 0:
         scaledtoyeardays = int((days * 372 / 250) // 1) - 365
@@ -319,6 +324,7 @@ def generate_calendar_date_range(
     -------
     list[dt.date]
         List of business day calendar dates
+
     """
     if start and not end:
         tmp_range = date_range(
@@ -395,6 +401,7 @@ def do_resample_to_business_period_ends(
     -------
     Pandas.DatetimeIndex
         A date range aligned to business period ends
+
     """
     newhead = head.to_frame().T
     newtail = tail.to_frame().T

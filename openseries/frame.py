@@ -76,6 +76,7 @@ class OpenFrame(_CommonModel):
     -------
     OpenFrame
         Object of the class OpenFrame
+
     """
 
     constituents: list[OpenTimeSeries]
@@ -116,6 +117,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             Object of the class OpenFrame
+
         """
         super().__init__(  # type: ignore[call-arg]
             constituents=constituents,
@@ -144,6 +146,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         return deepcopy(self)
 
@@ -163,6 +166,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         self.tsdf = reduce(
             lambda left, right: merge(
@@ -203,6 +207,7 @@ class OpenFrame(_CommonModel):
         -------
         pandas.DataFrame
             Properties of the contituent OpenTimeSeries
+
         """
         if properties:
             props = OpenFramePropertiesList(*properties)
@@ -222,6 +227,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.Series[int]
             Number of observations of all constituents
+
         """
         return Series(
             data=[int(self.tsdf.loc[:, d].count()) for d in self.tsdf],
@@ -239,6 +245,7 @@ class OpenFrame(_CommonModel):
         -------
         int
             Number of constituents
+
         """
         return len(self.constituents)
 
@@ -251,6 +258,7 @@ class OpenFrame(_CommonModel):
         -------
         list[str]
             Level 0 values of the MultiIndex columns in the .tsdf DataFrame
+
         """
         return list(self.tsdf.columns.get_level_values(0))
 
@@ -263,6 +271,7 @@ class OpenFrame(_CommonModel):
         -------
         list[ValueType]
             Level 1 values of the MultiIndex columns in the .tsdf DataFrame
+
         """
         return list(self.tsdf.columns.get_level_values(1))
 
@@ -275,6 +284,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.Series[dt.date]
             The first dates in the timeseries of all constituents
+
         """
         return Series(
             data=[i.first_idx for i in self.constituents],
@@ -292,6 +302,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.Series[dt.date]
             The last dates in the timeseries of all constituents
+
         """
         return Series(
             data=[i.last_idx for i in self.constituents],
@@ -310,6 +321,7 @@ class OpenFrame(_CommonModel):
         Pandas.Series[int]
             Number of days from the first date to the last for all
             items in the frame.
+
         """
         return Series(
             data=[c.span_of_days for c in self.constituents],
@@ -326,6 +338,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             The returns of the values in the series
+
         """
         self.tsdf = self.tsdf.pct_change(fill_method=cast(str, None))
         self.tsdf.iloc[0] = 0
@@ -348,6 +361,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
@@ -364,6 +378,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         if any(
             x == ValueType.PRICE
@@ -394,6 +409,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
@@ -432,6 +448,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         head = self.tsdf.loc[self.first_indices.max()].copy()
         tail = self.tsdf.loc[self.last_indices.min()].copy()
@@ -495,6 +512,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.DataFrame
             Series volatilities and correlation
+
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed is None:
@@ -585,6 +603,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.DataFrame
             Correlation matrix
+
         """
         corr_matrix = self.tsdf.pct_change(fill_method=cast(str, None)).corr(
             method="pearson",
@@ -611,6 +630,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         self.constituents += [new_series]
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
@@ -629,6 +649,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         if self.weights:
             new_c, new_w = [], []
@@ -668,6 +689,7 @@ class OpenFrame(_CommonModel):
         -------
         OpenFrame
             An OpenFrame object
+
         """
         if not start_cut and where in ["before", "both"]:
             start_cut = self.first_indices.max()
@@ -717,6 +739,7 @@ class OpenFrame(_CommonModel):
         base_zero: bool, default: True
             If set to False 1.0 is added to allow for a capital base and
             to allow a volatility calculation
+
         """
         rel_label = (
             cast(tuple[str, str], self.tsdf.iloc[:, long_column].name)[0]
@@ -769,6 +792,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.Series[float]
             Tracking Errors
+
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
@@ -862,6 +886,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.Series[float]
             Information Ratios
+
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
@@ -966,6 +991,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.Series[float]
             Capture Ratios
+
         """
         loss_limit: float = 0.0
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
@@ -1146,6 +1172,7 @@ class OpenFrame(_CommonModel):
         -------
         float
             Beta as Co-variance of x & y divided by Variance of x
+
         """
         if all(
             x_value == ValueType.RTRN
@@ -1235,6 +1262,7 @@ class OpenFrame(_CommonModel):
         -------
         OLSResults
             The Statsmodels regression output
+
         """
         if isinstance(y_column, tuple):
             y_value = self.tsdf.loc[:, y_column]
@@ -1301,6 +1329,7 @@ class OpenFrame(_CommonModel):
         -------
         float
             Jensen's alpha
+
         """
         full_year = 1.0
         if all(
@@ -1452,6 +1481,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.DataFrame
             A basket timeseries
+
         """
         if self.weights is None and weight_strat is None:
             msg = (
@@ -1536,6 +1566,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.DataFrame
             Rolling Information Ratios
+
         """
         long_label = cast(
             tuple[str, str],
@@ -1598,6 +1629,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.DataFrame
             Rolling Betas
+
         """
         market_label = cast(tuple[str, str], self.tsdf.iloc[:, market_column].name)[0]
         asset_label = cast(tuple[str, str], self.tsdf.iloc[:, asset_column].name)[0]
@@ -1653,6 +1685,7 @@ class OpenFrame(_CommonModel):
         -------
         Pandas.DataFrame
             Rolling Correlations
+
         """
         corr_label = (
             cast(tuple[str, str], self.tsdf.iloc[:, first_column].name)[0]
