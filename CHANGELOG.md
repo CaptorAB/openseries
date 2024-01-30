@@ -3,6 +3,11 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.10] - 2024-01-30
+
+- Consolidated worst_month function into _common_model.py
+- Miscellaneous dependencies updates & adapting to more recent pandas versions
+
 ## Version [1.4.9] - 2023-11-28
 
 - Fixed so that project can be run on Python 3.12
