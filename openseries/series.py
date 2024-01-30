@@ -41,7 +41,6 @@ from openseries.types import (
     DaysInYearType,
     LiteralBizDayFreq,
     LiteralPandasReindexMethod,
-    LiteralPandasResampleConvention,
     LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
     ValueListType,
@@ -89,6 +88,7 @@ class OpenTimeSeries(_CommonModel):
         ISO 6166 identifier code of the associated instrument
     label : str, optional
         Placeholder for a name of the timeseries
+
     """
 
     timeseries_id: DatabaseIdStringType
@@ -141,6 +141,7 @@ class OpenTimeSeries(_CommonModel):
             Currency code according to ISO 4217
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
+
         """
         _ = Currency(ccy=domestic_ccy)
         _ = Countries(countryinput=countries)
@@ -190,6 +191,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         return cls(
             name=name,
@@ -240,6 +242,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         if isinstance(dframe, Series):
             if isinstance(dframe.name, tuple):
@@ -334,6 +337,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         if not isinstance(d_range, DatetimeIndex) and all([days, end_dt]):
             d_range = DatetimeIndex(
@@ -381,6 +385,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         return deepcopy(self)
 
@@ -392,6 +397,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         dframe = DataFrame(
             data=self.values,
@@ -419,6 +425,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         pandas.DataFrame
             Properties of the OpenTimeSeries
+
         """
         if not properties:
             properties = cast(
@@ -431,27 +438,6 @@ class OpenTimeSeries(_CommonModel):
         pdf.columns = self.tsdf.columns
         return pdf
 
-    @property
-    def worst_month(self: Self) -> float:
-        """
-        Most negative month.
-
-        Returns
-        -------
-        float
-            Most negative month
-        """
-        resdf = self.tsdf.copy()
-        resdf.index = DatetimeIndex(resdf.index)
-        return float(
-            (
-                resdf.resample("BM")
-                .last()
-                .pct_change(fill_method=cast(str, None))
-                .min()
-            ).iloc[0],
-        )
-
     def value_to_ret(self: Self) -> Self:
         """
         Convert series of values into series of returns.
@@ -460,6 +446,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             The returns of the values in the series
+
         """
         self.tsdf = self.tsdf.pct_change(fill_method=cast(str, None))
         self.tsdf.iloc[0] = 0
@@ -486,6 +473,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
@@ -506,6 +494,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         if not any(
             x == ValueType.RTRN
@@ -543,6 +532,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         arr = array(self.values) / divider
 
@@ -563,21 +553,21 @@ class OpenTimeSeries(_CommonModel):
 
     def resample(
         self: Self,
-        freq: Union[LiteralBizDayFreq, str] = "BM",
+        freq: Union[LiteralBizDayFreq, str] = "BME",
     ) -> Self:
         """
         Resamples the timeseries frequency.
 
         Parameters
         ----------
-        freq: Union[LiteralBizDayFreq, str], default "BM"
+        freq: Union[LiteralBizDayFreq, str], default "BME"
             The date offset string that sets the resampled frequency
-            Examples are "7D", "B", "M", "BM", "Q", "BQ", "A", "BA"
 
         Returns
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         self.tsdf = self.tsdf.resample(freq).last()
@@ -586,8 +576,7 @@ class OpenTimeSeries(_CommonModel):
 
     def resample_to_business_period_ends(
         self: Self,
-        freq: LiteralBizDayFreq = "BM",
-        convention: LiteralPandasResampleConvention = "end",
+        freq: LiteralBizDayFreq = "BME",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
         """
@@ -597,10 +586,8 @@ class OpenTimeSeries(_CommonModel):
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq, default BM
+        freq: LiteralBizDayFreq, default BME
             The date offset string that sets the resampled frequency
-        convention: LiteralPandasResampleConvention, default; end
-            Controls whether to use the start or end of `rule`.
         method: LiteralPandasReindexMethod, default: nearest
             Controls the method used to align values across columns
 
@@ -608,6 +595,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         head = self.tsdf.iloc[0].copy()
         tail = self.tsdf.iloc[-1].copy()
@@ -617,7 +605,6 @@ class OpenTimeSeries(_CommonModel):
             tail=tail,
             freq=freq,
             countries=self.countries,
-            convention=convention,
         )
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         return self
@@ -659,6 +646,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         Pandas.Series[float]
             Series EWMA volatility
+
         """
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         if periods_in_a_year_fixed:
@@ -722,6 +710,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         values: list[float]
         if any(
@@ -787,6 +776,7 @@ class OpenTimeSeries(_CommonModel):
         -------
         OpenTimeSeries
             An OpenTimeSeries object
+
         """
         if lvl_zero is None and lvl_one is None:
             self.tsdf.columns = MultiIndex.from_arrays(
@@ -814,6 +804,8 @@ def timeseries_chain(
     """
     Chain two timeseries together.
 
+    The function assumes that the two series have at least one date in common.
+
     Parameters
     ----------
     front: TypeOpenTimeSeries
@@ -827,6 +819,7 @@ def timeseries_chain(
     -------
     Union[TypeOpenTimeSeries, OpenTimeSeries]
         An OpenTimeSeries object or a subclass thereof
+
     """
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)
@@ -907,6 +900,7 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
     -------
     bool
         Answer to whether the variable is None or equivalent
+
     """
     try:
         return cast(bool, isnan(item))

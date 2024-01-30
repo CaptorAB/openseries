@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.9"
+version = "1.4.10"
 description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -35,28 +35,29 @@ keywords = [
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 ffn = ">=1.0.0,<2.0.0"
-holidays = ">=0.37,<1.0"
-numpy = ">=1.23.2,<=1.26.2"
+holidays = ">=0.30,<1.0"
+numpy = ">=1.23.2,<=2.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
 plotly = ">=5.18.0,<6.0.0"
+pyarrow = ">=14.0.2,<16.0.0"
 pydantic = ">=2.5.2,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 scipy = ">=1.11.4,<2.0.0"
 statsmodels = ">=0.14.0,<1.0.0"
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.3.2"
+coverage = "^7.4.1"
 coverage-badge = "^1.1.0"
-mypy = "^1.7.1"
-pre-commit = "^3.5.0"
-pytest = "^7.4.3"
-ruff = "^0.1.7"
+mypy = "^1.8.0"
+pre-commit = "^3.6.0"
+pytest = "^8.0.0"
+ruff = "^0.1.14"
 toml = "^0.10.2"
-types-openpyxl = "^3.1.0.32"
-pandas-stubs = "^2.1.1.230928"
-types-python-dateutil = "^2.8.19.14"
-types-requests = "^2.31.0.10"
+types-openpyxl = "^3.1.0.20240106"
+pandas-stubs = "^2.1.4.231227"
+types-python-dateutil = "^2.8.19.20240106"
+types-requests = "^2.31.0.20240125"
 types-toml = "^0.10.8.7"
 
 [build-system]
@@ -71,13 +72,6 @@ path = "venv"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    "error",
-    'ignore:is_sparse is deprecated:FutureWarning',
-    'ignore:The:FutureWarning',
-    # https://github.com/dateutil/dateutil/issues/1314
-    'ignore::DeprecationWarning:dateutil.*:',
-    'ignore:invalid escape sequence:DeprecationWarning',
-    'ignore::DeprecationWarning:openpyxl.*:',
     # https://github.com/pydata/pandas-datareader/issues/960
     "ignore::DeprecationWarning:pandas_datareader.*:"
 ]

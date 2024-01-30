@@ -37,6 +37,7 @@ def random_generator(seed: Optional[int]) -> Generator:
     -------
     numpy.random.Generator
         Numpy random process generator
+
     """
     ss = SeedSequence(entropy=seed)
     bg = PCG64(seed=cast(Optional[int], ss))
@@ -66,6 +67,7 @@ class ReturnSimulation(BaseModel):
         Seed for random process initiation
     randomizer: numpy.random.Generator, optional
         Random process generator
+
     """
 
     number_of_sims: PositiveInt
@@ -92,6 +94,7 @@ class ReturnSimulation(BaseModel):
         -------
         pandas.DataFrame
             Simulation data
+
         """
         return self.dframe.add(1.0).cumprod(axis="columns").T
 
@@ -104,6 +107,7 @@ class ReturnSimulation(BaseModel):
         -------
         float
             Annualized arithmetic mean of returns
+
         """
         return cast(
             float,
@@ -122,6 +126,7 @@ class ReturnSimulation(BaseModel):
         -------
         float
             Annualized volatility
+
         """
         return cast(
             float,
@@ -164,6 +169,7 @@ class ReturnSimulation(BaseModel):
         -------
         ReturnSimulation
             Normal distribution simulation
+
         """
         cls.randomizer = random_generator(seed=seed)
 
@@ -217,6 +223,7 @@ class ReturnSimulation(BaseModel):
         -------
         ReturnSimulation
             Lognormal distribution simulation
+
         """
         cls.randomizer = random_generator(seed=seed)
 
@@ -272,6 +279,7 @@ class ReturnSimulation(BaseModel):
         -------
         ReturnSimulation
             Geometric Brownian Motion simulation
+
         """
         cls.randomizer = random_generator(seed=seed)
 
@@ -340,6 +348,7 @@ class ReturnSimulation(BaseModel):
         -------
         ReturnSimulation
             Merton Jump-Diffusion model simulation
+
         """
         cls.randomizer = random_generator(seed=seed)
 
@@ -408,6 +417,7 @@ class ReturnSimulation(BaseModel):
         -------
         pandas.DataFrame
             Object based on the simulation(s)
+
         """
         d_range = generate_calendar_date_range(
             trading_days=self.trading_days,

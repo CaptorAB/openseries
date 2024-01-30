@@ -27,7 +27,6 @@ from openseries.types import (
     DateType,
     HolidayType,
     LiteralBizDayFreq,
-    LiteralPandasResampleConvention,
 )
 
 
@@ -56,6 +55,7 @@ def holiday_calendar(
     -------
     numpy.busdaycalendar
         Generate a business calendar
+
     """
     startyear -= 1
     endyear += 1
@@ -106,6 +106,7 @@ def date_fix(
     -------
     datetime.date
         Parsed date
+
     """
     if isinstance(fixerdate, (Timestamp, dt.datetime)):
         return fixerdate.date()
@@ -161,6 +162,7 @@ def date_offset_foll(
     -------
     datetime.date
         Off-set date
+
     """
     raw_date = date_fix(raw_date)
     month_delta = relativedelta(months=months_offset)
@@ -206,6 +208,7 @@ def get_previous_business_day_before_today(
     -------
     datetime.date
         The previous business day
+
     """
     if today is None:
         today = dt.datetime.now(tz=dt.timezone.utc).date()
@@ -249,6 +252,7 @@ def offset_business_days(
     -------
     datetime.date
         The new offset business day
+
     """
     if days <= 0:
         scaledtoyeardays = int((days * 372 / 250) // 1) - 365
@@ -320,6 +324,7 @@ def generate_calendar_date_range(
     -------
     list[dt.date]
         List of business day calendar dates
+
     """
     if start and not end:
         tmp_range = date_range(
@@ -372,7 +377,6 @@ def do_resample_to_business_period_ends(
     tail: Series[float],
     freq: LiteralBizDayFreq,
     countries: CountriesType,
-    convention: LiteralPandasResampleConvention,
 ) -> DatetimeIndex:
     """
     Resample timeseries frequency to business calendar month end dates.
@@ -392,18 +396,17 @@ def do_resample_to_business_period_ends(
     countries: CountriesType
         (List of) country code(s) according to ISO 3166-1 alpha-2
         to create a business day calendar used for date adjustments
-    convention: LiteralPandasResampleConvention
-        Controls whether to use the start or end of `rule`.
 
     Returns
     -------
     Pandas.DatetimeIndex
         A date range aligned to business period ends
+
     """
     newhead = head.to_frame().T
     newtail = tail.to_frame().T
     data.index = DatetimeIndex(data.index)
-    data = data.resample(rule=freq, convention=convention).last()
+    data = data.resample(rule=freq).last()
     data = data.drop(index=data.index[-1])
     data.index = Index(d.date() for d in DatetimeIndex(data.index))
 

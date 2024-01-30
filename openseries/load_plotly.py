@@ -23,6 +23,7 @@ def _check_remote_file_existence(url: str) -> bool:
     -------
     bool
         True if url is valid and False otherwise
+
     """
     ok_code = 200
 
@@ -51,6 +52,7 @@ def load_plotly_dict(
     -------
     tuple[PlotlyLayoutType, CaptorLogoType]
         A dictionary with the Plotly config and layout template
+
     """
     project_root = Path(__file__).resolve().parent.parent
     layoutfile = project_root.joinpath("openseries").joinpath("plotly_layouts.json")

@@ -43,6 +43,7 @@ def _cvar_down_calc(
     -------
     float
         Downside Conditional Value At Risk "CVaR"
+
     """
     if isinstance(data, DataFrame):
         clean = nan_to_num(data.iloc[:, 0])
@@ -77,6 +78,7 @@ def _var_down_calc(
     -------
     float
         Downside Value At Risk
+
     """
     if isinstance(data, DataFrame):
         clean = nan_to_num(data.iloc[:, 0])
@@ -110,6 +112,7 @@ def _ewma_calc(
     -------
     float
         EWMA volatility value
+
     """
     return cast(
         float,
@@ -133,6 +136,7 @@ def _calc_inv_vol_weights(returns: DataFrame) -> NDArray[float64]:
     -------
     NDArray[float64]
         Calculated weights
+
     """
     vol = divide(1.0, std(returns, axis=0, ddof=1))
     vol[isinf(vol)] = NaN
