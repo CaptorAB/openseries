@@ -5,11 +5,11 @@ from math import ceil
 from typing import Union, cast
 
 from numpy import (
-    NaN,
     divide,
     float64,
     isinf,
     mean,
+    nan,
     nan_to_num,
     quantile,
     sort,
@@ -139,6 +139,6 @@ def _calc_inv_vol_weights(returns: DataFrame) -> NDArray[float64]:
 
     """
     vol = divide(1.0, std(returns, axis=0, ddof=1))
-    vol[isinf(vol)] = NaN
+    vol[isinf(vol)] = nan
     volsum = vol.sum()
     return cast(NDArray[float64], divide(vol, volsum))
