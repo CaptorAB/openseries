@@ -63,6 +63,12 @@ class ReturnSimulation(BaseModel):
         Mean annual standard deviation of the distribution
     dframe: pandas.DataFrame
         Pandas DataFrame object holding the resulting values
+    jumps_lamda: NonNegativeFloat, default: 0.0
+        This is the probability of a jump happening at each point in time
+    jumps_sigma: NonNegativeFloat, default: 0.0
+        This is the volatility of the jump size
+    jumps_mu: float, default: 0.0
+        This is the average jump size
     seed: int, optional
         Seed for random process initiation
     randomizer: numpy.random.Generator, optional
@@ -76,6 +82,9 @@ class ReturnSimulation(BaseModel):
     mean_annual_return: float
     mean_annual_vol: PositiveFloat
     dframe: DataFrame
+    jumps_lamda: NonNegativeFloat = 0.0
+    jumps_sigma: NonNegativeFloat = 0.0
+    jumps_mu: float = 0.0
     seed: Optional[int] = None
     randomizer: Optional[Generator] = None
 
