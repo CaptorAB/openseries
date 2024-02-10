@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import datetime as dt
-from copy import copy
 from typing import Union
 from unittest import TestCase
 
@@ -117,18 +116,19 @@ class TestSimulation(TestCase):
 
     def test_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output."""
-        psim = copy(self.seriesim)
-
-        if psim.results.shape[0] != SIMS.trading_days:
+        if self.seriesim.results.shape[0] != SIMS.trading_days:
             msg = "Unexpected result"
             raise ValueError(msg)
 
-        if f"{psim.realized_mean_return:.9f}" != "0.014773538":
-            msg = f"Unexpected return result: '{psim.realized_mean_return:.9f}'"
+        if f"{self.seriesim.realized_mean_return:.9f}" != "0.014773538":
+            msg = (
+                "Unexpected return result: "
+                f"'{self.seriesim.realized_mean_return:.9f}'"
+            )
             raise ValueError(msg)
 
-        if f"{psim.realized_vol:.9f}" != "0.096761956":
-            msg = f"Unexpected volatility result: '{psim.realized_vol:.9f}'"
+        if f"{self.seriesim.realized_vol:.9f}" != "0.096761956":
+            msg = f"Unexpected volatility result: '{self.seriesim.realized_vol:.9f}'"
             raise ValueError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:

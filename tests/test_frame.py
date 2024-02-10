@@ -45,8 +45,6 @@ class TestOpenFrame(TestCase):
 
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
-        jframe = self.randomframe.from_deepcopy()
-
         filename = "framesaved.json"
         if Path.home().joinpath("Documents").exists():
             framefile = Path.home().joinpath("Documents").joinpath(filename)
@@ -62,7 +60,7 @@ class TestOpenFrame(TestCase):
             {"filename": "framesaved.json", "directory": str(framefile.parent)},
         ]
         for kwarg in kwargs:
-            data = jframe.to_json(**kwarg)  # type: ignore[arg-type]
+            data = self.randomframe.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != [
                 "Asset_0",
                 "Asset_1",
@@ -87,7 +85,7 @@ class TestOpenFrame(TestCase):
 
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
-            data = jframe.to_json(filename=filename)
+            data = self.randomframe.to_json(filename=filename)
 
         if [item.get("name") for item in data] != [
             "Asset_0",
@@ -106,7 +104,7 @@ class TestOpenFrame(TestCase):
         ) as mock_donotopen:
             mock_doesnotexist.return_value = True
             mock_donotopen.side_effect = MagicMock()
-            data2 = jframe.to_json(filename=filename)
+            data2 = self.randomframe.to_json(filename=filename)
 
         if [item.get("name") for item in data2] != [
             "Asset_0",
@@ -120,8 +118,6 @@ class TestOpenFrame(TestCase):
 
     def test_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""
-        xseries = self.randomframe.from_deepcopy()
-
         filename = "trial.xlsx"
         if Path.home().joinpath("Documents").exists():
             basefile = Path.home().joinpath("Documents").joinpath(filename)
@@ -133,7 +129,7 @@ class TestOpenFrame(TestCase):
             raise FileExistsError(msg)
 
         seriesfile = Path(
-            xseries.to_xlsx(filename=filename, sheet_title="boo"),
+            self.randomframe.to_xlsx(filename=filename, sheet_title="boo"),
         ).resolve()
 
         if basefile != seriesfile:
@@ -148,7 +144,7 @@ class TestOpenFrame(TestCase):
 
         directory = Path(__file__).resolve().parent
         seriesfile = Path(
-            xseries.to_xlsx(filename="trial.xlsx", directory=directory),
+            self.randomframe.to_xlsx(filename="trial.xlsx", directory=directory),
         ).resolve()
 
         if not Path(seriesfile).exists():
@@ -165,7 +161,7 @@ class TestOpenFrame(TestCase):
             expected_exception=NameError,
             match="Filename must end with .xlsx",
         ):
-            _ = xseries.to_xlsx(filename="trial.pdf")
+            _ = self.randomframe.to_xlsx(filename="trial.pdf")
 
         with Path.open(basefile, "w") as fakefile:
             fakefile.write("Hello world")
@@ -174,14 +170,14 @@ class TestOpenFrame(TestCase):
             expected_exception=FileExistsError,
             match=f"{filename} already exists.",
         ):
-            _ = xseries.to_xlsx(filename=filename, overwrite=False)
+            _ = self.randomframe.to_xlsx(filename=filename, overwrite=False)
 
         basefile.unlink()
 
         localfile = Path(__file__).resolve().parent.joinpath(filename)
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
-            seriesfile = Path(xseries.to_xlsx(filename=filename)).resolve()
+            seriesfile = Path(self.randomframe.to_xlsx(filename=filename)).resolve()
 
         if localfile != seriesfile:
             msg = "test_save_to_xlsx test case setup failed."
@@ -214,7 +210,7 @@ class TestOpenFrame(TestCase):
         ) as mock_donotopen:
             mock_doesnotexist.return_value = True
             mock_donotopen.side_effect = MagicMock()
-            seriesfile2 = Path(xseries.to_xlsx(filename=filename)).resolve()
+            seriesfile2 = Path(self.randomframe.to_xlsx(filename=filename)).resolve()
 
         if seriesfile2.parts[-2:] != ("Documents", "trial.xlsx"):
             msg = "save_to_xlsx not working as intended."
