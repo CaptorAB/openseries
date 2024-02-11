@@ -67,36 +67,57 @@ class TestSimulation(TestCase):
         }
         methods = [
             "from_normal",
+            "from_normal",
             "from_lognormal",
+            "from_lognormal",
+            "from_gbm",
             "from_gbm",
             "from_merton_jump_gbm",
             "from_merton_jump_gbm",
         ]
         added: list[dict[str, Union[int, float]]] = [
             {},
+            {
+                "mean_annual_return": SIMS.mean_annual_return + 0.01,
+                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+            },
             {},
+            {
+                "mean_annual_return": SIMS.mean_annual_return + 0.01,
+                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+            },
             {},
+            {
+                "mean_annual_return": SIMS.mean_annual_return + 0.01,
+                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+            },
             {"jumps_lamda": SIMS.jumps_lamda},
             {
-                "jumps_lamda": SIMS.jumps_lamda,
-                "jumps_sigma": SIMS.jumps_sigma,
-                "jumps_mu": SIMS.jumps_mu,
+                "jumps_lamda": SIMS.jumps_lamda + 0.1,
+                "jumps_sigma": SIMS.jumps_sigma + 0.1,
+                "jumps_mu": SIMS.jumps_mu + 0.1,
             },
         ]
         intended_returns = [
             "0.019523539",
+            "0.026475893",
             "0.024204850",
+            "0.032140993",
             "0.014523539",
+            "0.020425893",
             "0.014523539",
-            "0.014523539",
+            "0.051790043",
         ]
 
         intended_volatilities = [
             "0.096761956",
+            "0.106438152",
             "0.096790015",
+            "0.106474544",
             "0.096761956",
+            "0.106438152",
             "0.096761956",
-            "0.096761956",
+            "0.181849820",
         ]
 
         returns = []
@@ -120,14 +141,14 @@ class TestSimulation(TestCase):
             msg = "Unexpected result"
             raise ValueError(msg)
 
-        if f"{self.seriesim.realized_mean_return:.9f}" != "0.014773538":
+        if f"{self.seriesim.realized_mean_return:.9f}" != "0.058650906":
             msg = (
                 "Unexpected return result: "
                 f"'{self.seriesim.realized_mean_return:.9f}'"
             )
             raise ValueError(msg)
 
-        if f"{self.seriesim.realized_vol:.9f}" != "0.096761956":
+        if f"{self.seriesim.realized_vol:.9f}" != "0.140742347":
             msg = f"Unexpected volatility result: '{self.seriesim.realized_vol:.9f}'"
             raise ValueError(msg)
 
