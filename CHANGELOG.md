@@ -3,6 +3,11 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.11] - 2024-02-13
+
+- Fixed issue that ReturnSimulation.from_merton_jump_gbm() class method missed jump parameters
+- Miscellaneous development dependencies updates
+
 ## Version [1.4.10] - 2024-01-30
 
 - Consolidated worst_month function into _common_model.py
