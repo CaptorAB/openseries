@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.10"
+version = "1.4.11"
 description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -50,11 +50,11 @@ statsmodels = ">=0.14.0,<1.0.0"
 coverage = "^7.4.1"
 coverage-badge = "^1.1.0"
 mypy = "^1.8.0"
-pre-commit = "^3.6.0"
+pre-commit = "^3.6.1"
 pytest = "^8.0.0"
-ruff = "^0.1.14"
+ruff = "^0.2.1"
 toml = "^0.10.2"
-types-openpyxl = "^3.1.0.20240106"
+types-openpyxl = "^3.1.0.20240205"
 pandas-stubs = "^2.1.4.231227"
 types-python-dateutil = "^2.8.19.20240106"
 types-requests = "^2.31.0.20240125"
@@ -105,15 +105,17 @@ init_typed = true
 warn_required_dynamic_aliases = true
 
 [tool.ruff]
+line-length = 87
+
+[tool.ruff.lint]
 select = ["ALL"]
 ignore = ["D211", "D212", "TCH"]
 fixable = ["ALL"]
-line-length = 87
 
-[tool.ruff.pylint]
+[tool.ruff.lint.pylint]
 max-args = 12
 max-branches = 22
 max-statements = 54
 
-[tool.ruff.pyupgrade]
+[tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true

@@ -10,7 +10,7 @@ from secrets import choice
 from string import ascii_letters
 from typing import Any, Optional, Union, cast
 
-from numpy import Inf, float64, isnan, log, maximum, sqrt
+from numpy import float64, inf, isnan, log, maximum, sqrt
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -629,7 +629,7 @@ class _CommonModel(BaseModel):
 
         """
         drawdown = self.tsdf.copy()
-        drawdown[isnan(drawdown)] = -Inf
+        drawdown[isnan(drawdown)] = -inf
         roll_max = maximum.accumulate(drawdown, axis=0)
         self.tsdf = DataFrame(drawdown / roll_max - 1.0)
         return self

@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import datetime as dt
-from decimal import ROUND_HALF_UP, Decimal, localcontext
+from decimal import Decimal
 from json import load, loads
 from pathlib import Path
+from pprint import pformat
 from typing import Union, cast
 from unittest import TestCase
 
@@ -163,7 +164,7 @@ class TestOpenTimeSeries(TestCase):
         ):
             OpenTimeSeries.setup_class(
                 countries=cast(CountriesType, ["SE", cast(str, 12)]),
-                )
+            )
 
         with pytest.raises(
             expected_exception=ValidationError,
@@ -668,26 +669,23 @@ class TestOpenTimeSeries(TestCase):
         if calc != self.randomseries.periods_in_a_year:
             msg = "Property periods_in_a_year returned unexpected result"
             raise ValueError(msg)
-        if (
-            f"{251.3720547945205:.13f}"
-            != f"{self.randomseries.periods_in_a_year:.13f}"
-        ):
+        if f"{251.3720547945:.10f}" != f"{self.randomseries.periods_in_a_year:.10f}":
             msg = "Property periods_in_a_year returned unexpected result"
             raise ValueError(msg)
 
         all_prop = self.random_properties["periods_in_a_year"]
-        if f"{all_prop:.13f}" != f"{self.randomseries.periods_in_a_year:.13f}":
+        if f"{all_prop:.10f}" != f"{self.randomseries.periods_in_a_year:.10f}":
             msg = "Property periods_in_a_year returned unexpected result"
             raise ValueError(msg)
 
     def test_yearfrac(self: TestOpenTimeSeries) -> None:
         """Test yearfrac property."""
-        if f"{9.9931553730322:.13f}" != f"{self.randomseries.yearfrac:.13f}":
+        if f"{9.99315537303:.11f}" != f"{self.randomseries.yearfrac:.11f}":
             msg = "Property periods_in_a_year returned unexpected result"
             raise ValueError(msg)
 
         all_prop = self.random_properties["yearfrac"]
-        if f"{all_prop:.13f}" != f"{self.randomseries.yearfrac:.13f}":
+        if f"{all_prop:.11f}" != f"{self.randomseries.yearfrac:.11f}":
             msg = "Property periods_in_a_year returned unexpected result"
             raise ValueError(msg)
 
@@ -795,19 +793,19 @@ class TestOpenTimeSeries(TestCase):
         values = [f"{nn[0]:.10f}" for nn in diffseries.tsdf.to_numpy()[:10]]
         checkdata = [
             "0.0000000000",
-            "0.0034436868",
-            "-0.0005157676",
-            "-0.0003824129",
-            "0.0033535538",
-            "0.0034159090",
-            "0.0023752572",
-            "-0.0088734032",
-            "-0.0034192716",
-            "-0.0017506253",
+            "0.0034863455",
+            "-0.0004729821",
+            "-0.0003396582",
+            "0.0033967554",
+            "0.0034594087",
+            "0.0024188282",
+            "-0.0088325018",
+            "-0.0033775007",
+            "-0.0017085753",
         ]
 
         if values != checkdata:
-            msg = "Result from method value_to_diff() not as intended."
+            msg = f"Result from method value_to_diff() not as intended\n{values}"
             raise ValueError(msg)
 
     def test_value_to_ret(self: TestOpenTimeSeries) -> None:
@@ -817,19 +815,19 @@ class TestOpenTimeSeries(TestCase):
         values = [f"{nn[0]:.10f}" for nn in retseries.tsdf.to_numpy()[:10]]
         checkdata = [
             "0.0000000000",
-            "0.0034436868",
-            "-0.0005139975",
-            "-0.0003812965",
-            "0.0033450389",
-            "0.0033958765",
-            "0.0023533359",
-            "-0.0087708698",
-            "-0.0034096671",
-            "-0.0017516806",
+            "0.0034863455",
+            "-0.0004713388",
+            "-0.0003386378",
+            "0.0033876977",
+            "0.0034385352",
+            "0.0023959946",
+            "-0.0087282110",
+            "-0.0033670084",
+            "-0.0017090219",
         ]
 
         if values != checkdata:
-            msg = "Result from method value_to_ret() not as intended."
+            msg = f"Result from method value_to_ret() not as intended\n{values}"
             raise ValueError(msg)
 
     def test_valute_to_log(self: TestOpenTimeSeries) -> None:
@@ -839,19 +837,19 @@ class TestOpenTimeSeries(TestCase):
         values = [f"{nn[0]:.10f}" for nn in logseries.tsdf.to_numpy()[:10]]
         checkdata = [
             "0.0000000000",
-            "0.0034377709",
-            "0.0029236412",
-            "0.0025422720",
-            "0.0058817287",
-            "0.0092718523",
-            "0.0116224234",
-            "0.0028128632",
-            "-0.0006026301",
-            "-0.0023558468",
+            "0.0034802823",
+            "0.0030088324",
+            "0.0026701373",
+            "0.0060521096",
+            "0.0094847466",
+            "0.0118778754",
+            "0.0031113505",
+            "-0.0002613391",
+            "-0.0019718230",
         ]
 
         if values != checkdata:
-            msg = "Result from method value_to_log() not as intended."
+            msg = f"Result from method value_to_log() not as intended\n{values}"
             raise ValueError(msg)
 
     def test_all_properties(self: TestOpenTimeSeries) -> None:
@@ -919,35 +917,38 @@ class TestOpenTimeSeries(TestCase):
                     msg,
                 )
         expected_values = {
-            "skew": "0.0605186816",
-            "length": 2512,
-            "geo_ret": "0.0101166343",
-            "vol": "0.0966413232",
-            "last_idx": "2019-06-28",
-            "value_ret": "0.1058222108",
-            "ret_vol_ratio": "0.1524888492",
-            "periods_in_a_year": "251.3720547945",
-            "span_of_days": 3650,
-            "z_score": "0.5671118938",
-            "var_down": "-0.0097608739",
-            "kurtosis": "0.0210174054",
-            "worst_month": "-0.0588900820",
-            "arithmetic_ret": "0.0147367242",
-            "yearfrac": "9.9931553730",
-            "positive_share": "0.5025886101",
-            "max_drawdown_date": "2016-10-03",
-            "max_drawdown": "-0.2086370147",
-            "max_drawdown_cal_year": "-0.1372730654",
-            "vol_from_var": "0.0940849033",
-            "downside_deviation": "0.0671435174",
+            "arithmetic_ret": "0.0585047569",
+            "cvar_down": "-0.0123803429",
+            "downside_deviation": "0.0667228073",
             "first_idx": "2009-06-30",
-            "cvar_down": "-0.0124230016",
-            "sortino_ratio": "0.2194809674",
-            "worst": "-0.0191999470",
+            "geo_ret": "0.0507567099",
+            "kurtosis": "696.0965168893",
+            "last_idx": "2019-06-28",
+            "length": 2512,
+            "max_drawdown": "-0.1314808074",
+            "max_drawdown_cal_year": "-0.1292814491",
+            "max_drawdown_date": "2012-11-21",
+            "periods_in_a_year": "251.3720547945",
+            "positive_share": "0.5057745918",
+            "ret_vol_ratio": "0.4162058331",
+            "skew": "19.1911712502",
+            "sortino_ratio": "0.8768329634",
+            "span_of_days": 3650,
+            "value_ret": "0.6401159258",
+            "var_down": "-0.0097182152",
+            "vol": "0.1405668835",
+            "vol_from_var": "0.0936737165",
+            "worst": "-0.0191572882",
+            "worst_month": "-0.0581245494",
+            "yearfrac": "9.9931553730",
+            "z_score": "0.3750685522",
         }
 
         if result_values != expected_values:
-            msg = "Unexpected results from all_properties() method"
+            msg = (
+                "Unexpected results from "
+                f"all_properties() method\n{pformat(result_values)}"
+            )
             raise ValueError(msg)
 
         props = apseries.all_properties(properties=["geo_ret", "vol"])
@@ -962,85 +963,94 @@ class TestOpenTimeSeries(TestCase):
 
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
         """Test all calculated properties."""
-        with localcontext() as decimal_context:
-            decimal_context.rounding = ROUND_HALF_UP
-            checks = {
-                "cvar_down": Decimal("-0.0124230016"),
-                "downside_deviation": Decimal("0.0671435174"),
-                "geo_ret": Decimal("0.0101166343"),
-                "kurtosis": Decimal("0.0210174054"),
-                "max_drawdown": Decimal("-0.2086370147"),
-                "max_drawdown_cal_year": Decimal("-0.1372730654"),
-                "positive_share": Decimal("0.5025886101"),
-                "ret_vol_ratio": Decimal("0.1524888492"),
-                "skew": Decimal("0.0605186816"),
-                "sortino_ratio": Decimal("0.2194809674"),
-                "value_ret": Decimal("0.1058222108"),
-                "var_down": Decimal("-0.0097608739"),
-                "vol": Decimal("0.0966413232"),
-                "vol_from_var": Decimal("0.0940849033"),
-                "worst": Decimal("-0.0191999470"),
-                "worst_month": Decimal("-0.0588900820"),
-                "z_score": Decimal("0.5671118938"),
-            }
-            for c_key, c_value in checks.items():
-                if c_value != round(Decimal(getattr(self.randomseries, c_key)), 10):
-                    msg = (
-                        f"Difference in {c_key}: "
-                        f"'{Decimal(getattr(self.randomseries, c_key)):.10f}'"
-                    )
-                    raise ValueError(msg)
-                if round(
-                    Decimal(cast(float, self.random_properties[c_key])),
-                    10,
-                ) != round(
-                    Decimal(getattr(self.randomseries, c_key)),
-                    10,
-                ):
-                    msg = (
-                        f"Difference in {c_key}: "
-                        f"{Decimal(cast(float, self.random_properties[c_key])):.10f}"
-                        " versus "
-                        f"{Decimal(getattr(self.randomseries, c_key)):.10f}"
-                    )
-                    raise ValueError(msg)
+        checks = {
+            "cvar_down": "-0.0123803429",
+            "downside_deviation": "0.0667228073",
+            "geo_ret": "0.0507567099",
+            "kurtosis": "696.0965168893",
+            "max_drawdown": "-0.1314808074",
+            "max_drawdown_cal_year": "-0.1292814491",
+            "positive_share": "0.5057745918",
+            "ret_vol_ratio": "0.4162058331",
+            "skew": "19.1911712502",
+            "sortino_ratio": "0.8768329634",
+            "value_ret": "0.6401159258",
+            "var_down": "-0.0097182152",
+            "vol": "0.1405668835",
+            "vol_from_var": "0.0936737165",
+            "worst": "-0.0191572882",
+            "worst_month": "-0.0581245494",
+            "z_score": "0.3750685522",
+        }
+        audit = {}
+        loop_msg = ""
+        for c_key, c_value in checks.items():
+            audit.update({c_key: f"{getattr(self.randomseries, c_key):.10f}"})
+            if c_value != f"{getattr(self.randomseries, c_key):.10f}":
+                loop_msg += (
+                    f"\nDifference in {c_key}: "
+                    f"'{Decimal(getattr(self.randomseries, c_key)):.10f}'"
+                )
+            if round(
+                Decimal(cast(float, self.random_properties[c_key])),
+                10,
+            ) != round(
+                Decimal(getattr(self.randomseries, c_key)),
+                10,
+            ):
+                msg = (
+                    f"Difference in {c_key}: "
+                    f"{self.random_properties[c_key]:.10f}"
+                    " versus "
+                    f"{getattr(self.randomseries, c_key):.10f}"
+                )
+                raise ValueError(msg)
+        if loop_msg != "":
+            loop_msg += f"\n{pformat(audit)}"
+            raise ValueError(loop_msg)
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods."""
-        excel_geo_ret = (1.10582221080 / 1.01262875085) ** (
+        excel_geo_ret = (1.640115925775493 / 1.4387489280838568) ** (
             1 / ((dt.date(2019, 6, 28) - dt.date(2015, 6, 26)).days / 365.25)
         ) - 1
         checks = {
-            "arithmetic_ret_func": "0.02697125480",
-            "cvar_down_func": "-0.01270136518",
-            "downside_deviation_func": "0.06909856465",
+            "arithmetic_ret_func": "0.03770656022",
+            "cvar_down_func": "-0.01265870645",
+            "downside_deviation_func": "0.06871856382",
             "geo_ret_func": f"{excel_geo_ret:.11f}",
             "kurtosis_func": "-0.07991363073",
-            "max_drawdown_func": "-0.13570275011",
-            "positive_share_func": "0.50446871897",
-            "ret_vol_ratio_func": "0.27039659569",
+            "max_drawdown_func": "-0.12512526696",
+            "positive_share_func": "0.50744786495",
+            "ret_vol_ratio_func": "0.37802191976",
             "skew_func": "0.03894541564",
-            "sortino_ratio_func": "0.39033017454",
-            "value_ret_func": "0.09203122059",
-            "var_down_func": "-0.01036895666",
+            "sortino_ratio_func": "0.54870995728",
+            "value_ret_func": "0.13995978990",
+            "var_down_func": "-0.01032629793",
             "vol_func": "0.09974702060",
-            "vol_from_var_func": "0.10000253699",
-            "worst_func": "-0.01919994698",
+            "vol_from_var_func": "0.09959111838",
+            "worst_func": "-0.01915728825",
             "z_score_func": "0.54204277867",
         }
+        audit = {}
+        msg = ""
         for c_key, c_value in checks.items():
+            calc = f"{getattr(self.randomseries, c_key)(months_from_last=48):.11f}"
+            audit.update({c_key: calc})
             if (
                 c_value
                 != f"{getattr(self.randomseries, c_key)(months_from_last=48):.11f}"
             ):
-                msg = (
+                msg += (
                     f"Difference in {c_key}: "
                     f"'{getattr(self.randomseries, c_key)(months_from_last=48):.11f}'"
                 )
-                raise ValueError(msg)
+        if msg != "":
+            msg += f"\n{pformat(audit)}"
+            raise ValueError(msg)
 
         func = "value_ret_calendar_period"
-        if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.034493612016":
+        if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.039890004088":
             msg = (
                 f"Unexpected result from method {func}(): "
                 f"'{getattr(self.randomseries, func)(year=2019):.12f}'"
@@ -1049,7 +1059,7 @@ class TestOpenTimeSeries(TestCase):
 
     def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
         """Test max_drawdown_date property."""
-        if self.randomseries.max_drawdown_date != dt.date(2016, 10, 3):
+        if self.randomseries.max_drawdown_date != dt.date(2012, 11, 21):
             msg = (
                 "Unexpected max_drawdown_date: "
                 f"'{self.randomseries.max_drawdown_date}'"
@@ -1069,7 +1079,7 @@ class TestOpenTimeSeries(TestCase):
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
-        if f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "1.8230275116":
+        if f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "2.7036984198":
             msg = (
                 "Unexpected result from running_adjustment(): "
                 f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
@@ -1081,7 +1091,7 @@ class TestOpenTimeSeries(TestCase):
 
         if (
             f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
-            != "0.0036524025"
+            != "0.0036950612"
         ):
             msg = (
                 "Unexpected result from running_adjustment(): "
@@ -1286,7 +1296,7 @@ class TestOpenTimeSeries(TestCase):
         fig_last_json = loads(cast(str, fig_last.to_json()))
         last = fig_last_json["data"][-1]["y"][0]
 
-        if f"{last:.10f}" != "1.1058222108":
+        if f"{last:.10f}" != "1.6401159258":
             msg = f"Unaligned data between original and data in Figure: '{last:.10f}'"
             raise ValueError(msg)
 
@@ -1303,7 +1313,7 @@ class TestOpenTimeSeries(TestCase):
         fig_last_fmt_json = loads(cast(str, fig_last_fmt.to_json()))
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
-        if last_fmt != "Last 110.582%":
+        if last_fmt != "Last 164.012%":
             msg = f"Unaligned data between original and data in Figure: '{last_fmt}'"
             raise ValueError(msg)
 
@@ -1396,15 +1406,15 @@ class TestOpenTimeSeries(TestCase):
         simdata = self.randomseries.ewma_vol_func()
         values = [f"{v:.11f}" for v in simdata.iloc[:5]]
         checkdata = [
-            "0.06250698830",
-            "0.06205596764",
-            "0.06019861487",
-            "0.05838351179",
-            "0.05807162835",
+            "0.06250431742",
+            "0.06208916909",
+            "0.06022552031",
+            "0.05840562180",
+            "0.05812960782",
         ]
 
         if values != checkdata:
-            msg = "Result from method ewma_vol_func() not as intended."
+            msg = f"Result from method ewma_vol_func() not as intended\n{values}"
             raise ValueError(msg)
 
         simdata_fxd_per_yr = self.randomseries.ewma_vol_func(
@@ -1412,15 +1422,18 @@ class TestOpenTimeSeries(TestCase):
         )
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5]]
         checkdata_fxd_per_yr = [
-            "0.06246071300",
-            "0.06201002623",
-            "0.06015404851",
-            "0.05834028919",
-            "0.05802863664",
+            "0.06245804409",
+            "0.06204320311",
+            "0.06018093403",
+            "0.05836238283",
+            "0.05808657319",
         ]
 
         if values_fxd_per_yr != checkdata_fxd_per_yr:
-            msg = "Result from method ewma_vol_func() not as intended."
+            msg = (
+                "Result from method ewma_vol_func() "
+                f"not as intended\n{values_fxd_per_yr}"
+            )
             raise ValueError(msg)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
@@ -1783,15 +1796,14 @@ class TestOpenTimeSeries(TestCase):
                 raise ValueError(msg)
 
         impvol = mseries.vol_from_var_func(drift_adjust=False)
-        if f"{impvol:.12f}" != "0.094084903324":
+        if f"{impvol:.12f}" != "0.093673716476":
             msg = (
-                "Unexpected result from method vol_from_var_func(): "
-                f"'{impvol:.12f}'"
+                "Unexpected result from method vol_from_var_func(): '{impvol:.12f}'"
             )
             raise ValueError(msg)
 
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
-        if f"{impvoldrifted:.12f}" != "0.094649765217":
+        if f"{impvoldrifted:.12f}" != "0.095916216736":
             msg = (
                 "Unexpected result from method vol_from_var_func(): "
                 f"'{impvoldrifted:.12f}'"

@@ -1,8 +1,8 @@
 """Test suite for the openseries/simulation.py module."""
+
 from __future__ import annotations
 
 import datetime as dt
-from copy import copy
 from typing import Union
 from unittest import TestCase
 
@@ -32,10 +32,10 @@ class TestSimulation(TestCase):
         """Test instantiating ReturnSimulation with & without random generator."""
         sim_without = ReturnSimulation(
             number_of_sims=1,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            trading_days_in_year=252,
+            trading_days=SIMS.trading_days,
+            mean_annual_return=SIMS.mean_annual_return,
+            mean_annual_vol=SIMS.mean_annual_vol,
+            trading_days_in_year=SIMS.trading_days_in_year,
             dframe=DataFrame(),
             seed=SEED,
         )
@@ -45,10 +45,10 @@ class TestSimulation(TestCase):
 
         sim_with = ReturnSimulation(
             number_of_sims=1,
-            trading_days=2512,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            trading_days_in_year=252,
+            trading_days=SIMS.trading_days,
+            mean_annual_return=SIMS.mean_annual_return,
+            mean_annual_vol=SIMS.mean_annual_vol,
+            trading_days_in_year=SIMS.trading_days_in_year,
             dframe=DataFrame(),
             randomizer=random_generator(seed=SEED),
         )
@@ -60,39 +60,64 @@ class TestSimulation(TestCase):
         """Test ReturnSimulation based on different stochastic processes."""
         args: dict[str, Union[int, float]] = {
             "number_of_sims": 1,
-            "trading_days": 2520,
-            "mean_annual_return": 0.05,
-            "mean_annual_vol": 0.2,
+            "trading_days": SIMS.trading_days,
+            "mean_annual_return": SIMS.mean_annual_return,
+            "mean_annual_vol": SIMS.mean_annual_vol,
             "seed": SEED,
         }
         methods = [
             "from_normal",
+            "from_normal",
             "from_lognormal",
+            "from_lognormal",
+            "from_gbm",
             "from_gbm",
             "from_merton_jump_gbm",
             "from_merton_jump_gbm",
         ]
         added: list[dict[str, Union[int, float]]] = [
             {},
+            {
+                "mean_annual_return": SIMS.mean_annual_return + 0.01,
+                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+            },
             {},
+            {
+                "mean_annual_return": SIMS.mean_annual_return + 0.01,
+                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+            },
             {},
-            {"jumps_lamda": 0.0},
-            {"jumps_lamda": 0.3, "jumps_sigma": 0.2, "jumps_mu": -0.2},
+            {
+                "mean_annual_return": SIMS.mean_annual_return + 0.01,
+                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+            },
+            {"jumps_lamda": SIMS.jumps_lamda},
+            {
+                "jumps_lamda": SIMS.jumps_lamda + 0.1,
+                "jumps_sigma": SIMS.jumps_sigma + 0.1,
+                "jumps_mu": SIMS.jumps_mu + 0.1,
+            },
         ]
         intended_returns = [
-            "-0.005640734",
-            "0.013058925",
-            "-0.025640734",
-            "-0.025640734",
-            "-0.011505208",
+            "0.019523539",
+            "0.026475893",
+            "0.024204850",
+            "0.032140993",
+            "0.014523539",
+            "0.020425893",
+            "0.014523539",
+            "0.051790043",
         ]
 
         intended_volatilities = [
-            "0.193403252",
-            "0.193487832",
-            "0.193403252",
-            "0.193403252",
-            "0.211446536",
+            "0.096761956",
+            "0.106438152",
+            "0.096790015",
+            "0.106474544",
+            "0.096761956",
+            "0.106438152",
+            "0.096761956",
+            "0.181849820",
         ]
 
         returns = []
@@ -104,54 +129,53 @@ class TestSimulation(TestCase):
             volatilities.append(f"{onesim.realized_vol:.9f}")
 
         if intended_returns != returns:
-            msg = "Unexpected calculation result"
+            msg = f"Unexpected returns result {returns}"
             raise ValueError(msg)
         if intended_volatilities != volatilities:
-            msg = "Unexpected calculation result"
+            msg = f"Unexpected volatilities result {volatilities}"
             raise ValueError(msg)
 
     def test_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output."""
-        days = 2512
-        psim = copy(self.seriesim)
-
-        if psim.results.shape[0] != days:
+        if self.seriesim.results.shape[0] != SIMS.trading_days:
             msg = "Unexpected result"
             raise ValueError(msg)
 
-        if f"{psim.realized_mean_return:.9f}" != "0.014773538":
-            msg = f"Unexpected result: '{psim.realized_mean_return:.9f}'"
+        if f"{self.seriesim.realized_mean_return:.9f}" != "0.058650906":
+            msg = (
+                "Unexpected return result: "
+                f"'{self.seriesim.realized_mean_return:.9f}'"
+            )
             raise ValueError(msg)
 
-        if f"{psim.realized_vol:.9f}" != "0.096761956":
-            msg = f"Unexpected result: '{psim.realized_vol:.9f}'"
+        if f"{self.seriesim.realized_vol:.9f}" != "0.140742347":
+            msg = f"Unexpected volatility result: '{self.seriesim.realized_vol:.9f}'"
             raise ValueError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:
         """Test method to_dataframe."""
-        trading_days = 2512
         one = 1
         seriesim = ReturnSimulation.from_merton_jump_gbm(
             number_of_sims=one,
-            trading_days=trading_days,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            trading_days_in_year=252,
+            trading_days=SIMS.trading_days,
+            mean_annual_return=SIMS.mean_annual_return,
+            mean_annual_vol=SIMS.mean_annual_vol,
+            jumps_lamda=SIMS.jumps_lamda,
+            jumps_sigma=SIMS.jumps_sigma,
+            jumps_mu=SIMS.jumps_mu,
+            trading_days_in_year=SIMS.trading_days_in_year,
             seed=SEED,
         )
         five = 5
         framesim = ReturnSimulation.from_merton_jump_gbm(
             number_of_sims=five,
-            trading_days=trading_days,
-            mean_annual_return=0.05,
-            mean_annual_vol=0.1,
-            jumps_lamda=0.00125,
-            jumps_sigma=0.001,
-            jumps_mu=-0.2,
-            trading_days_in_year=252,
+            trading_days=SIMS.trading_days,
+            mean_annual_return=SIMS.mean_annual_return,
+            mean_annual_vol=SIMS.mean_annual_vol,
+            jumps_lamda=SIMS.jumps_lamda,
+            jumps_sigma=SIMS.jumps_sigma,
+            jumps_mu=SIMS.jumps_mu,
+            trading_days_in_year=SIMS.trading_days_in_year,
             seed=SEED,
         )
 
@@ -164,15 +188,15 @@ class TestSimulation(TestCase):
         startseries = returnseries.from_deepcopy()
         startseries.to_cumret()
 
-        if onedf.shape != (trading_days, one):
+        if onedf.shape != (SIMS.trading_days, one):
             msg = "Method to_dataframe() not working as intended"
             raise ValueError(msg)
 
-        if fivedf.shape != (trading_days, five):
+        if fivedf.shape != (SIMS.trading_days, five):
             msg = "Method to_dataframe() not working as intended"
             raise ValueError(msg)
 
-        if startseries.valuetype != ValueType.PRICE:
+        if returnseries.valuetype != ValueType.RTRN:
             msg = "Method to_dataframe() not working as intended"
             raise ValueError(msg)
 

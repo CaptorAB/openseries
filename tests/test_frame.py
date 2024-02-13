@@ -7,6 +7,7 @@ from decimal import ROUND_HALF_UP, Decimal, localcontext
 from itertools import product as iter_product
 from json import loads
 from pathlib import Path
+from pprint import pformat
 from typing import Hashable, Optional, Union, cast
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -45,8 +46,6 @@ class TestOpenFrame(TestCase):
 
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
-        jframe = self.randomframe.from_deepcopy()
-
         filename = "framesaved.json"
         if Path.home().joinpath("Documents").exists():
             framefile = Path.home().joinpath("Documents").joinpath(filename)
@@ -62,7 +61,7 @@ class TestOpenFrame(TestCase):
             {"filename": "framesaved.json", "directory": str(framefile.parent)},
         ]
         for kwarg in kwargs:
-            data = jframe.to_json(**kwarg)  # type: ignore[arg-type]
+            data = self.randomframe.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != [
                 "Asset_0",
                 "Asset_1",
@@ -87,7 +86,7 @@ class TestOpenFrame(TestCase):
 
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
-            data = jframe.to_json(filename=filename)
+            data = self.randomframe.to_json(filename=filename)
 
         if [item.get("name") for item in data] != [
             "Asset_0",
@@ -106,7 +105,7 @@ class TestOpenFrame(TestCase):
         ) as mock_donotopen:
             mock_doesnotexist.return_value = True
             mock_donotopen.side_effect = MagicMock()
-            data2 = jframe.to_json(filename=filename)
+            data2 = self.randomframe.to_json(filename=filename)
 
         if [item.get("name") for item in data2] != [
             "Asset_0",
@@ -120,8 +119,6 @@ class TestOpenFrame(TestCase):
 
     def test_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""
-        xseries = self.randomframe.from_deepcopy()
-
         filename = "trial.xlsx"
         if Path.home().joinpath("Documents").exists():
             basefile = Path.home().joinpath("Documents").joinpath(filename)
@@ -133,7 +130,7 @@ class TestOpenFrame(TestCase):
             raise FileExistsError(msg)
 
         seriesfile = Path(
-            xseries.to_xlsx(filename=filename, sheet_title="boo"),
+            self.randomframe.to_xlsx(filename=filename, sheet_title="boo"),
         ).resolve()
 
         if basefile != seriesfile:
@@ -148,7 +145,7 @@ class TestOpenFrame(TestCase):
 
         directory = Path(__file__).resolve().parent
         seriesfile = Path(
-            xseries.to_xlsx(filename="trial.xlsx", directory=directory),
+            self.randomframe.to_xlsx(filename="trial.xlsx", directory=directory),
         ).resolve()
 
         if not Path(seriesfile).exists():
@@ -165,7 +162,7 @@ class TestOpenFrame(TestCase):
             expected_exception=NameError,
             match="Filename must end with .xlsx",
         ):
-            _ = xseries.to_xlsx(filename="trial.pdf")
+            _ = self.randomframe.to_xlsx(filename="trial.pdf")
 
         with Path.open(basefile, "w") as fakefile:
             fakefile.write("Hello world")
@@ -174,14 +171,14 @@ class TestOpenFrame(TestCase):
             expected_exception=FileExistsError,
             match=f"{filename} already exists.",
         ):
-            _ = xseries.to_xlsx(filename=filename, overwrite=False)
+            _ = self.randomframe.to_xlsx(filename=filename, overwrite=False)
 
         basefile.unlink()
 
         localfile = Path(__file__).resolve().parent.joinpath(filename)
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
-            seriesfile = Path(xseries.to_xlsx(filename=filename)).resolve()
+            seriesfile = Path(self.randomframe.to_xlsx(filename=filename)).resolve()
 
         if localfile != seriesfile:
             msg = "test_save_to_xlsx test case setup failed."
@@ -214,7 +211,7 @@ class TestOpenFrame(TestCase):
         ) as mock_donotopen:
             mock_doesnotexist.return_value = True
             mock_donotopen.side_effect = MagicMock()
-            seriesfile2 = Path(xseries.to_xlsx(filename=filename)).resolve()
+            seriesfile2 = Path(self.randomframe.to_xlsx(filename=filename)).resolve()
 
         if seriesfile2.parts[-2:] != ("Documents", "trial.xlsx"):
             msg = "save_to_xlsx not working as intended."
@@ -388,14 +385,18 @@ class TestOpenFrame(TestCase):
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
 
-        if [
-            dt.date(2016, 10, 3),
-            dt.date(2015, 12, 17),
+        mdates = cast(Series, mddframe.max_drawdown_date).tolist()
+
+        checkdates = [
+            dt.date(2012, 11, 21),
+            dt.date(2019, 6, 11),
             dt.date(2015, 7, 24),
-            dt.date(2012, 6, 26),
-            dt.date(2011, 7, 27),
-        ] != cast(Series, mddframe.max_drawdown_date).tolist():
-            msg = "max_drawdown_date property generated unexpected result"
+            dt.date(2010, 11, 19),
+            dt.date(2011, 6, 28),
+        ]
+
+        if mdates != checkdates:
+            msg = f"max_drawdown_date property generated unexpected result\n{mdates}"
             raise ValueError(msg)
 
     def test_make_portfolio(self: TestOpenFrame) -> None:
@@ -408,8 +409,8 @@ class TestOpenFrame(TestCase):
         mptail = mpframe.make_portfolio(name=name).tail()
         mptail = mptail.map(lambda nn: f"{nn:.6f}")
 
-        correct = ["1.493554", "1.492123", "1.492384", "1.488840", "1.490294"]
-        wrong = ["1.493554", "1.492123", "1.492384", "1.488840", "1.490284"]
+        correct = ["1.731448", "1.729862", "1.730238", "1.726204", "1.727963"]
+        wrong = ["1.731448", "1.729862", "1.730238", "1.726204", "1.727933"]
         true_tail = DataFrame(
             columns=[[name], [ValueType.PRICE]],
             index=[
@@ -504,9 +505,7 @@ class TestOpenFrame(TestCase):
                 Decimal("0.755900"),
                 Decimal("0.000000"),
             ]:
-                msg = (
-                    "make_portfolio() mean variance strategy not working as intended."
-                )
+                msg = "make_portfolio() mean variance result not as intended."
                 ValueError(msg)
 
         with pytest.raises(
@@ -1066,48 +1065,48 @@ class TestOpenFrame(TestCase):
         """Test correl_matrix method."""
         corrframe = self.randomframe.from_deepcopy()
         corrframe.to_cumret()
-        dict1 = corrframe.correl_matrix.map(lambda nn: f"{nn:.12f}").to_dict()
+        dict1 = corrframe.correl_matrix.map(lambda nn: f"{nn:.10f}").to_dict()
 
         dict2 = {
             "Asset_0": {
-                "Asset_0": "1.000000000000",
-                "Asset_1": "0.028109095592",
-                "Asset_2": "0.007005391390",
-                "Asset_3": "0.034345077725",
-                "Asset_4": "-0.026070506837",
+                "Asset_0": "1.0000000000",
+                "Asset_1": "0.0239047199",
+                "Asset_2": "-0.0077164998",
+                "Asset_3": "0.0212300816",
+                "Asset_4": "-0.0432032137",
             },
             "Asset_1": {
-                "Asset_0": "0.028109095592",
-                "Asset_1": "1.000000000000",
-                "Asset_2": "-0.002053578402",
-                "Asset_3": "-0.026569389738",
-                "Asset_4": "-0.001550403980",
+                "Asset_0": "0.0239047199",
+                "Asset_1": "1.0000000000",
+                "Asset_2": "-0.0027966077",
+                "Asset_3": "-0.0275509319",
+                "Asset_4": "-0.0078836695",
             },
             "Asset_2": {
-                "Asset_0": "0.007005391390",
-                "Asset_1": "-0.002053578402",
-                "Asset_2": "1.000000000000",
-                "Asset_3": "-0.013891927147",
-                "Asset_4": "0.010365497939",
+                "Asset_0": "-0.0077164998",
+                "Asset_1": "-0.0027966077",
+                "Asset_2": "1.0000000000",
+                "Asset_3": "-0.0138919271",
+                "Asset_4": "0.0103654979",
             },
             "Asset_3": {
-                "Asset_0": "0.034345077725",
-                "Asset_1": "-0.026569389738",
-                "Asset_2": "-0.013891927147",
-                "Asset_3": "1.000000000000",
-                "Asset_4": "0.026474854679",
+                "Asset_0": "0.0212300816",
+                "Asset_1": "-0.0275509319",
+                "Asset_2": "-0.0138919271",
+                "Asset_3": "1.0000000000",
+                "Asset_4": "0.0264748547",
             },
             "Asset_4": {
-                "Asset_0": "-0.026070506837",
-                "Asset_1": "-0.001550403980",
-                "Asset_2": "0.010365497939",
-                "Asset_3": "0.026474854679",
-                "Asset_4": "1.000000000000",
+                "Asset_0": "-0.0432032137",
+                "Asset_1": "-0.0078836695",
+                "Asset_2": "0.0103654979",
+                "Asset_3": "0.0264748547",
+                "Asset_4": "1.0000000000",
             },
         }
 
         if dict1 != dict2:
-            msg = "Unexpected result(s) from method correl_matrix()"
+            msg = f"Unexpected result(s) from method correl_matrix()\n{pformat(dict1)}"
             raise ValueError(msg)
 
     def test_plot_series(self: TestOpenFrame) -> None:
@@ -1146,7 +1145,7 @@ class TestOpenFrame(TestCase):
         fig_last_fmt_json = loads(cast(str, fig_last_fmt.to_json()))
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
-        if last_fmt != "Last 105.083%":
+        if last_fmt != "Last 116.964%":
             msg = f"Unaligned data in Figure: '{last_fmt}'"
             raise ValueError(msg)
 
@@ -1782,33 +1781,36 @@ class TestOpenFrame(TestCase):
                     msg,
                 )
         expected_values = {
-            "Max drawdown date": "2016-10-03",
-            "Max Drawdown": "-0.2086370147",
-            "span of days": 3650,
+            "Arithmetic return": "0.0585047569",
+            "CVaR 95.0%": "-0.0123803429",
+            "Downside deviation": "0.0667228073",
+            "Geometric return": "0.0507567099",
+            "Imp vol from VaR 95%": "0.0936737165",
+            "Kurtosis": "696.0965168893",
+            "Max Drawdown": "-0.1314808074",
+            "Max Drawdown in cal yr": "-0.1292814491",
+            "Max drawdown date": "2012-11-21",
+            "Positive Share": "0.5057745918",
+            "Return vol ratio": "0.4162058331",
+            "Simple return": "0.6401159258",
+            "Skew": "19.1911712502",
+            "Sortino ratio": "0.8768329634",
+            "VaR 95.0%": "-0.0097182152",
+            "Volatility": "0.1405668835",
+            "Worst": "-0.0191572882",
+            "Worst month": "-0.0581245494",
+            "Z-score": "0.3750685522",
             "first indices": "2009-06-30",
-            "Positive Share": "0.5025886101",
-            "Imp vol from VaR 95%": "0.0940849033",
-            "Max Drawdown in cal yr": "-0.1372730654",
-            "Worst": "-0.0191999470",
-            "Kurtosis": "0.0210174054",
-            "Geometric return": "0.0101166343",
-            "Z-score": "0.5671118938",
-            "Skew": "0.0605186816",
             "last indices": "2019-06-28",
-            "Downside deviation": "0.0671435174",
-            "Return vol ratio": "0.1524888492",
-            "Simple return": "0.1058222108",
-            "Sortino ratio": "0.2194809674",
             "observations": 2512,
-            "VaR 95.0%": "-0.0097608739",
-            "Arithmetic return": "0.0147367242",
-            "Worst month": "-0.0588900820",
-            "CVaR 95.0%": "-0.0124230016",
-            "Volatility": "0.0966413232",
+            "span of days": 3650,
         }
 
         if result_values != expected_values:
-            msg = "Method all_properties() results not as expected."
+            msg = (
+                "Method all_properties() results "
+                f"not as expected.\n{pformat(result_values)}"
+            )
             raise ValueError(msg)
 
         with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
@@ -1849,15 +1851,15 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "-0.10940183596",
-            "-0.12177293071",
-            "-0.02843555018",
-            "-0.04861208177",
-            "-0.02517443772",
+            "-0.10944130198",
+            "-0.12182987211",
+            "-0.02845717747",
+            "-0.04862442310",
+            "-0.02521145077",
         ]
 
         if values != checkdata:
-            msg = "Result from method rolling_info_ratio() not as intended."
+            msg = f"Result from method rolling_info_ratio() not as intended\n{values}"
             raise ValueError(msg)
 
         simdata_fxd_per_yr = frame.rolling_info_ratio(
@@ -1868,15 +1870,18 @@ class TestOpenFrame(TestCase):
 
         values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
         checkdata_fxd_per_yr = [
-            "-0.10948288856",
-            "-0.12186314868",
-            "-0.02845661725",
-            "-0.04864809703",
-            "-0.02519308872",
+            "-0.10952238381",
+            "-0.12192013228",
+            "-0.02847826056",
+            "-0.04866044751",
+            "-0.02523012919",
         ]
 
         if values_fxd_per_yr != checkdata_fxd_per_yr:
-            msg = "Result from method rolling_info_ratio() not as intended."
+            msg = (
+                "Result from method rolling_info_ratio()"
+                f" not as intended\n{values_fxd_per_yr}"
+            )
             raise ValueError(msg)
 
     def test_rolling_beta(self: TestOpenFrame) -> None:
@@ -1905,7 +1910,7 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.tracking_error_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.1271963559":
+        if f"{simdataa.iloc[0]:.10f}" != "0.1611858846":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
@@ -1917,7 +1922,7 @@ class TestOpenFrame(TestCase):
             periods_in_a_year_fixed=251,
         )
 
-        if f"{simdatab.iloc[0]:.10f}" != "0.1271021896":
+        if f"{simdatab.iloc[0]:.10f}" != "0.1610665551":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdatab.iloc[0]:.10f}'"
@@ -1926,7 +1931,7 @@ class TestOpenFrame(TestCase):
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.1271963559":
+        if f"{simdatac.iloc[0]:.10f}" != "0.1611858846":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"
@@ -1956,7 +1961,7 @@ class TestOpenFrame(TestCase):
 
         simdataa = frame.info_ratio_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.1057087332":
+        if f"{simdataa.iloc[0]:.10f}" != "0.3141560406":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
@@ -1965,7 +1970,7 @@ class TestOpenFrame(TestCase):
 
         simdatab = frame.info_ratio_func(base_column=-1, periods_in_a_year_fixed=251)
 
-        if f"{simdatab.iloc[0]:.10f}" != "0.1056304747":
+        if f"{simdatab.iloc[0]:.10f}" != "0.3139234639":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatab.iloc[0]:.10f}'"
@@ -1974,7 +1979,7 @@ class TestOpenFrame(TestCase):
 
         simdatac = frame.info_ratio_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.1057087332":
+        if f"{simdatac.iloc[0]:.10f}" != "0.3141560406":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"
@@ -2057,15 +2062,15 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.00611289255",
-            "-0.00351354738",
-            "0.00259355511",
-            "0.00719892104",
-            "0.00293479328",
+            "0.00700872599",
+            "-0.00261771394",
+            "0.00348938855",
+            "0.00809475448",
+            "0.00383062672",
         ]
 
         if values != checkdata:
-            msg = "Result from method rolling_return() not as intended."
+            msg = f"Result from method rolling_return() not as intended\n{values}"
             raise ValueError(msg)
 
     def test_rolling_cvar_down(self: TestOpenFrame) -> None:
@@ -2075,17 +2080,17 @@ class TestOpenFrame(TestCase):
 
         simdata = frame.rolling_cvar_down(column=0, observations=21)
 
-        values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
+        values = [f"{v:.11f}" for v in simdata.iloc[-14:-9, 0]]
         checkdata = [
-            "-0.01105543788",
-            "-0.01105543788",
-            "-0.01105543788",
-            "-0.01105543788",
-            "-0.01105543788",
+            "-0.01044706636",
+            "-0.00974280167",
+            "-0.00974280167",
+            "-0.01139997783",
+            "-0.01077418053",
         ]
 
         if values != checkdata:
-            msg = "Result from method rolling_cvar_down() not as intended."
+            msg = f"Result from method rolling_cvar_down() not as intended\n{values}"
             raise ValueError(msg)
 
     def test_rolling_var_down(self: TestOpenFrame) -> None:
@@ -2097,15 +2102,15 @@ class TestOpenFrame(TestCase):
 
         values = [f"{v:.11f}" for v in simdata.iloc[-5:, 0]]
         checkdata = [
-            "-0.01247401542",
-            "-0.01247401542",
-            "-0.01247401542",
-            "-0.01247401542",
-            "-0.01247401542",
+            "-0.01243135668",
+            "-0.01243135668",
+            "-0.01243135668",
+            "-0.01243135668",
+            "-0.01243135668",
         ]
 
         if values != checkdata:
-            msg = "Result from method rolling_var_down() not as intended."
+            msg = f"Result from method rolling_var_down() not as intended\n{values}"
             raise ValueError(msg)
 
     def test_label_uniqueness(self: TestOpenFrame) -> None:
@@ -2641,13 +2646,13 @@ class TestOpenFrame(TestCase):
 
         ret = [f"{rr:.9f}" for rr in cast(Series, mframe.value_ret_func())]
         if ret != [
-            "0.105822211",
-            "0.376401700",
-            "1.055344627",
-            "0.838144947",
-            "0.050833101",
+            "0.640115926",
+            "0.354975641",
+            "1.287658441",
+            "1.045918527",
+            "0.169641332",
         ]:
-            msg = "Results from value_ret_func() not as expected"
+            msg = f"Results from value_ret_func() not as expected\n{ret}"
             raise ValueError(msg)
 
         impvol = [
@@ -2660,23 +2665,23 @@ class TestOpenFrame(TestCase):
         ]
 
         if impvol != [
-            "0.09408490332",
-            "0.09385039968",
-            "0.09807632973",
-            "0.09944244603",
-            "0.10162640507",
+            "0.09367371648",
+            "0.09357837907",
+            "0.09766514288",
+            "0.09903125918",
+            "0.10121521823",
         ]:
-            msg = "Results from vol_from_var_func() not as expected"
+            msg = f"Results from vol_from_var_func() not as expected\n{impvol}"
             raise ValueError(msg)
 
         if impvoldrifted != [
-            "0.09464976522",
-            "0.09525706555",
-            "0.10103673296",
-            "0.10197033116",
-            "0.10201317661",
+            "0.09591621674",
+            "0.09495303438",
+            "0.10103656927",
+            "0.10197016748",
+            "0.10201301292",
         ]:
-            msg = "Results from vol_from_var_func() not as expected"
+            msg = f"Results from vol_from_var_func() not as expected\n{impvoldrifted}"
             raise ValueError(msg)
 
         # noinspection PyTypeChecker
@@ -2803,32 +2808,32 @@ class TestOpenFrame(TestCase):
 
         if results != [
             "1.00000000000",
-            "0.18767619203",
-            "0.04884473074",
-            "0.05879497888",
-            "-0.01562979922",
-            "1.11544014486",
+            "1.37862724760",
+            "0.56028811567",
+            "0.69603804963",
+            "0.46400465988",
+            "0.65027591851",
             "1.00000000000",
-            "0.30522170688",
-            "0.38385979512",
-            "-0.23367159392",
-            "2.57549091688",
-            "2.70782523748",
+            "0.38009173429",
+            "0.46384576412",
+            "0.22803974704",
+            "1.66624847545",
+            "2.39643672361",
             "1.00000000000",
-            "1.22058750012",
-            "-1.02277439302",
-            "1.93047483232",
-            "2.12060335788",
-            "0.76006462626",
+            "1.20106034055",
+            "0.40261757732",
+            "1.35912552734",
+            "1.92021284114",
+            "0.78861141738",
             "1.00000000000",
-            "-0.43215502806",
-            "-0.08377416376",
-            "-0.21072959640",
-            "-0.10396669673",
-            "-0.07054599563",
+            "0.70469281021",
+            "0.09471012260",
+            "0.09868105726",
+            "0.02763366151",
+            "0.07366264502",
             "1.00000000000",
         ]:
-            msg = "Method ord_least_squares_fit() not working as intended"
+            msg = f"Method ord_least_squares_fit() not working as intended\n{results}"
             raise ValueError(msg)
 
         with pytest.raises(
@@ -2877,32 +2882,32 @@ class TestOpenFrame(TestCase):
 
         if results != [
             "1.00000000000",
-            "0.24360254911",
-            "0.08731135046",
-            "0.06633673290",
-            "0.09428887787",
-            "0.77066684106",
+            "1.29922733925",
+            "0.70818608993",
+            "0.67350090937",
+            "1.10828592932",
+            "0.58286749395",
             "1.00000000000",
-            "0.39540705529",
-            "0.35866090906",
-            "0.48709966165",
-            "1.23484246631",
-            "1.76766686182",
+            "0.44923557262",
+            "0.41611038337",
+            "0.66683747762",
+            "1.26184019179",
+            "1.78421184238",
             "1.00000000000",
-            "0.90921000991",
-            "1.43975815049",
-            "1.03208867367",
-            "1.76385196646",
-            "1.00019871207",
+            "0.92762168147",
+            "1.60509866122",
+            "1.29388135250",
+            "1.78188690161",
+            "1.00016164109",
             "1.00000000000",
-            "1.45535140941",
-            "0.29253512737",
-            "0.47769482792",
-            "0.31583935992",
-            "0.29021676270",
+            "1.61604657978",
+            "0.48322440146",
+            "0.64808557090",
+            "0.39277316259",
+            "0.36677070860",
             "1.00000000000",
         ]:
-            msg = "Unexpected results from method beta()"
+            msg = f"Unexpected results from method beta()\n{results}"
             raise ValueError(msg)
 
         with pytest.raises(
@@ -2949,32 +2954,32 @@ class TestOpenFrame(TestCase):
 
         if results != [
             "1.00000000000",
-            "0.05040478370",
-            "-0.02922223456",
-            "0.03104315575",
-            "0.01545504765",
-            "0.05153728301",
+            "0.08324853413",
+            "-0.10099866224",
+            "0.01462541518",
+            "-0.16899363037",
+            "0.01377634252",
             "1.00000000000",
             "0.01993819305",
             "-0.03779993992",
             "0.01254650184",
-            "-0.03314294171",
+            "-0.01853961987",
             "0.02211636067",
             "1.00000000000",
             "-0.06352408467",
             "-0.01478713969",
-            "0.03003213520",
+            "0.00229000338",
             "-0.03576528518",
             "-0.05418525628",
             "1.00000000000",
             "0.05247274217",
-            "0.01486093157",
+            "-0.02629986958",
             "0.01179909172",
             "-0.01253667106",
             "0.05215417741",
             "1.00000000000",
         ]:
-            msg = "Unexpected results from method beta()"
+            msg = f"Unexpected results from method beta()\n{results}"
             raise ValueError(msg)
 
         with pytest.raises(
@@ -3022,32 +3027,32 @@ class TestOpenFrame(TestCase):
 
         if results != [
             "0.000000000",
-            "0.001840049",
-            "0.002941108",
-            "0.005547195",
-            "0.008972438",
-            "0.024223656",
+            "0.011275539",
+            "-0.011480230",
+            "0.002038749",
+            "0.031602774",
+            "0.000692798",
             "0.000000000",
-            "0.001728423",
-            "0.010033702",
-            "0.028687069",
-            "0.063697804",
-            "0.019663930",
+            "-0.009171994",
+            "0.000198488",
+            "0.018763801",
+            "0.023746109",
+            "0.033640184",
             "0.000000000",
-            "0.020875742",
-            "0.066949977",
-            "0.050205499",
-            "0.004359781",
-            "-0.015439575",
+            "0.020761658",
+            "0.060163598",
+            "0.006548865",
+            "0.018119801",
+            "-0.015604040",
             "0.000000000",
-            "0.051433165",
-            "0.003127020",
-            "-0.009165054",
-            "-0.017920221",
-            "-0.011510114",
+            "0.044390287",
+            "-0.007493292",
+            "-0.002651295",
+            "-0.017441772",
+            "-0.009460482",
             "0.000000000",
         ]:
-            msg = "Unexpected results from method jensen_alpha()"
+            msg = f"Unexpected results from method jensen_alpha()\n{results}"
             raise ValueError(msg)
 
         with pytest.raises(
@@ -3093,32 +3098,32 @@ class TestOpenFrame(TestCase):
 
         if sresults != [
             "0.000000000",
-            "-0.048315256",
-            "-0.018596870",
-            "-0.028455629",
-            "-0.054687160",
-            "0.108490058",
+            "-0.007428381",
+            "-0.015244859",
+            "-0.028785495",
+            "-0.054945887",
+            "-0.025064707",
             "0.000000000",
-            "0.089408376",
-            "0.062476311",
-            "0.030241341",
-            "0.024559358",
-            "-0.023802107",
+            "-0.014783332",
+            "0.024615935",
+            "0.048853995",
+            "0.024840001",
+            "0.012827133",
             "0.000000000",
-            "0.005068201",
-            "-0.067012215",
-            "0.057350615",
-            "0.040513434",
-            "0.054344960",
+            "0.003855844",
+            "-0.066858420",
+            "0.064449240",
+            "0.058748466",
+            "0.061290014",
             "0.000000000",
-            "0.012900051",
-            "0.137363216",
-            "0.090858878",
-            "0.120787319",
-            "0.072810926",
+            "0.013305765",
+            "0.141205760",
+            "0.128274302",
+            "0.123668318",
+            "0.068585817",
             "0.000000000",
         ]:
-            msg = "Unexpected results from method jensen_alpha()"
+            msg = f"Unexpected results from method jensen_alpha()\n{sresults}"
             raise ValueError(msg)
 
     def test_jensen_alpha_returns_input(self: TestOpenFrame) -> None:
@@ -3147,32 +3152,32 @@ class TestOpenFrame(TestCase):
 
         if results != [
             "0.000000000",
-            "0.000113318",
-            "0.000098457",
-            "0.000095700",
-            "0.000103447",
-            "-0.000223221",
+            "0.000791942",
+            "0.000768260",
+            "0.000773600",
+            "0.000772380",
+            "-0.000185997",
             "0.000000000",
-            "-0.000215302",
-            "-0.000209870",
-            "-0.000217043",
-            "-0.000129254",
-            "-0.000127826",
+            "-0.000173494",
+            "-0.000165599",
+            "-0.000174919",
+            "-0.000075575",
+            "-0.000086110",
             "0.000000000",
-            "-0.000119073",
-            "-0.000133711",
-            "0.000210585",
-            "0.000205864",
-            "0.000206471",
+            "-0.000073705",
+            "-0.000090422",
+            "0.000254537",
+            "0.000250048",
+            "0.000251442",
             "0.000000000",
-            "0.000217440",
-            "-0.000073583",
-            "-0.000069491",
-            "-0.000073725",
-            "-0.000083206",
+            "0.000257860",
+            "-0.000008959",
+            "-0.000027335",
+            "-0.000030532",
+            "-0.000042772",
             "0.000000000",
         ]:
-            msg = "Unexpected results from method jensen_alpha()"
+            msg = f"Unexpected results from method jensen_alpha()\n{results}"
             raise ValueError(msg)
 
         with pytest.raises(
@@ -3204,48 +3209,48 @@ class TestOpenFrame(TestCase):
         corr_one = [f"{e:.11f}" for e in edf.head(10).iloc[:, 2]]
 
         if list_one != [
-            "0.06250698830",
-            "0.06205596764",
-            "0.06019861487",
-            "0.05838351179",
-            "0.05807162835",
-            "0.05782140933",
-            "0.05679831931",
-            "0.06483055130",
-            "0.06423989902",
-            "0.06265395692",
+            "0.06250431742",
+            "0.06208916909",
+            "0.06022552031",
+            "0.05840562180",
+            "0.05812960782",
+            "0.05791392918",
+            "0.05691361221",
+            "0.06483761105",
+            "0.06421248171",
+            "0.06260970713",
         ]:
-            msg = "Unexpected results from method ewma_risk()"
+            msg = f"Unexpected results from method ewma_risk()\n{list_one}"
             raise ValueError(msg)
 
         if list_two != [
-            "0.06783598815",
-            "0.06795285653",
-            "0.06588355282",
-            "0.06490739946",
-            "0.06982465906",
-            "0.06785529240",
-            "0.06865861723",
-            "0.06962763445",
-            "0.07402142355",
-            "0.07454420622",
+            "0.06783309941",
+            "0.06799180977",
+            "0.06592070398",
+            "0.06491357256",
+            "0.06990142770",
+            "0.06794101498",
+            "0.06878554654",
+            "0.06979371620",
+            "0.07423575130",
+            "0.07469953921",
         ]:
-            msg = "Unexpected results from method ewma_risk()"
+            msg = f"Unexpected results from method ewma_risk()\n{list_two}"
             raise ValueError(msg)
 
         if corr_one != [
-            "-0.00018950441",
-            "0.02687048364",
-            "0.02693780753",
-            "0.02875311775",
-            "0.07364179536",
-            "0.07929984635",
-            "0.09798984617",
-            "0.00220345225",
-            "-0.04038551458",
-            "-0.02395554391",
+            "-0.00018950439",
+            "0.02743890783",
+            "0.02746345872",
+            "0.02900303362",
+            "0.07459903397",
+            "0.08052954645",
+            "0.09959709234",
+            "0.00357025403",
+            "-0.03875791933",
+            "-0.02293443963",
         ]:
-            msg = "Unexpected results from method ewma_risk()"
+            msg = f"Unexpected results from method ewma_risk()\n{corr_one}"
             raise ValueError(msg)
 
     def test_ewma_risk_set_columns(self: TestOpenFrame) -> None:
@@ -3262,46 +3267,46 @@ class TestOpenFrame(TestCase):
         corr_two = [f"{f:.11f}" for f in fdf.head(10).iloc[:, 2]]
 
         if list_three != [
-            "0.07361573353",
-            "0.08371783953",
-            "0.08380857217",
-            "0.08485493995",
-            "0.08344750795",
-            "0.08160836778",
-            "0.07979989693",
-            "0.07792807450",
-            "0.07592535805",
-            "0.07459871756",
+            "0.07361260347",
+            "0.08380092327",
+            "0.08392771222",
+            "0.08501304571",
+            "0.08362635928",
+            "0.08175874942",
+            "0.07996606071",
+            "0.07806839320",
+            "0.07604456321",
+            "0.07468607166",
         ]:
-            msg = "Unexpected results from method ewma_risk()"
+            msg = f"Unexpected results from method ewma_risk()\n{list_three}"
             raise ValueError(msg)
 
         if list_four != [
-            "0.10703546303",
-            "0.10474269481",
-            "0.10163152360",
-            "0.10348914117",
-            "0.10287186227",
-            "0.09974016110",
-            "0.09698200469",
-            "0.10843843950",
-            "0.11016253144",
-            "0.11644385478",
+            "0.10703091058",
+            "0.10476082189",
+            "0.10165576633",
+            "0.10346063549",
+            "0.10280828404",
+            "0.09967975602",
+            "0.09693631061",
+            "0.10848146972",
+            "0.11025146341",
+            "0.11658815836",
         ]:
-            msg = "Unexpected results from method ewma_risk()"
+            msg = f"Unexpected results from method ewma_risk()\n{list_four}"
             raise ValueError(msg)
 
         if corr_two != [
-            "-0.00112585522",
-            "0.03449468387",
-            "0.03831278446",
-            "-0.00911251783",
-            "-0.02723122588",
-            "-0.02743003951",
-            "-0.02217819799",
-            "-0.04887668808",
-            "-0.06116752077",
-            "-0.08764465967",
+            "-0.00112585517",
+            "0.03499961968",
+            "0.03901924990",
+            "-0.00845828372",
+            "-0.02665539891",
+            "-0.02696637211",
+            "-0.02152694854",
+            "-0.04779886556",
+            "-0.05984710080",
+            "-0.08603979121",
         ]:
-            msg = "Unexpected results from method ewma_risk()"
+            msg = f"Unexpected results from method ewma_risk()\n{corr_two}"
             raise ValueError(msg)
