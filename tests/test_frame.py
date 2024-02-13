@@ -1900,7 +1900,7 @@ class TestOpenFrame(TestCase):
         ]
 
         if values != checkdata:
-            msg = "Result from method rolling_info_ratio() not as intended."
+            msg = f"Result from method rolling_beta() not as intended\n{values}"
             raise ValueError(msg)
 
     def test_tracking_error_func(self: TestOpenFrame) -> None:
