@@ -1046,9 +1046,7 @@ class OpenFrame(_CommonModel):
                         .add(1)
                         .to_numpy()
                     )
-                    up_return = (
-                        uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
-                    )
+                    up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
                         shortdf.pct_change(fill_method=cast(str, None))[
                             shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
@@ -1060,7 +1058,7 @@ class OpenFrame(_CommonModel):
                     up_idx_return = (
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
-                    ratios.append(up_return / up_idx_return)
+                    ratios.append(up_rtrn / up_idx_return)
                 elif ratio == "down":
                     downarray = (
                         longdf.pct_change(fill_method=cast(str, None))[
@@ -1095,9 +1093,7 @@ class OpenFrame(_CommonModel):
                         .add(1)
                         .to_numpy()
                     )
-                    up_return = (
-                        uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
-                    )
+                    up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
                         shortdf.pct_change(fill_method=cast(str, None))[
                             shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
@@ -1133,7 +1129,7 @@ class OpenFrame(_CommonModel):
                         - 1
                     )
                     ratios.append(
-                        (up_return / up_idx_return) / (down_return / down_idx_return),
+                        (up_rtrn / up_idx_return) / (down_return / down_idx_return),
                     )
 
         if ratio == "up":
@@ -1154,6 +1150,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
+        dlta_degr_freedms: int = 1,
     ) -> float:
         """
         Market Beta.
@@ -1167,6 +1164,8 @@ class OpenFrame(_CommonModel):
             The column of the asset
         market: Union[tuple[str, ValueType], int]
             The column of the market against which Beta is measured
+        dlta_degr_freedms: int, default: 1
+            Variance bias factor taking the value 0 or 1.
 
         Returns
         -------
@@ -1224,7 +1223,7 @@ class OpenFrame(_CommonModel):
                     msg,
                 )
 
-        covariance = cov(y_value, x_value, ddof=1)
+        covariance = cov(y_value, x_value, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(beta)
@@ -1305,6 +1304,7 @@ class OpenFrame(_CommonModel):
         asset: Union[tuple[str, ValueType], int],
         market: Union[tuple[str, ValueType], int],
         riskfree_rate: float = 0.0,
+        dlta_degr_freedms: int = 1,
     ) -> float:
         """
         Jensen's alpha.
@@ -1324,6 +1324,8 @@ class OpenFrame(_CommonModel):
             The column of the market against which Jensen's alpha is measured
         riskfree_rate : float, default: 0.0
             The return of the zero volatility riskfree asset
+        dlta_degr_freedms: int, default: 1
+            Variance bias factor taking the value 0 or 1.
 
         Returns
         -------
@@ -1430,7 +1432,7 @@ class OpenFrame(_CommonModel):
                     msg,
                 )
 
-        covariance = cov(asset_log, market_log, ddof=1)
+        covariance = cov(asset_log, market_log, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
@@ -1609,6 +1611,7 @@ class OpenFrame(_CommonModel):
         asset_column: int = 0,
         market_column: int = 1,
         observations: int = 21,
+        dlta_degr_freedms: int = 1,
     ) -> DataFrame:
         """
         Calculate rolling Market Beta.
@@ -1624,6 +1627,8 @@ class OpenFrame(_CommonModel):
             Column of timeseries that is the market.
         observations: int, default: 21
             The length of the rolling window to use is set as number of observations.
+        dlta_degr_freedms: int, default: 1
+            Variance bias factor taking the value 0 or 1.
 
         Returns
         -------
@@ -1635,13 +1640,13 @@ class OpenFrame(_CommonModel):
         asset_label = cast(tuple[str, str], self.tsdf.iloc[:, asset_column].name)[0]
         beta_label = f"{asset_label} / {market_label}"
 
-        rolling = self.tsdf.copy()
+        rolling: DataFrame = self.tsdf.copy()
         rolling = rolling.pct_change(fill_method=cast(str, None)).rolling(
             observations,
             min_periods=observations,
         )
 
-        rcov = rolling.cov()
+        rcov = rolling.cov(ddof=dlta_degr_freedms)
         rcov = rcov.dropna()
 
         rollbetaseries = rcov.iloc[:, asset_column].xs(
@@ -1692,17 +1697,15 @@ class OpenFrame(_CommonModel):
             + "_VS_"
             + cast(tuple[str, str], self.tsdf.iloc[:, second_column].name)[0]
         )
-        corrseries = (
+        first_series = (
             self.tsdf.iloc[:, first_column]
             .pct_change(fill_method=cast(str, None))[1:]
             .rolling(observations, min_periods=observations)
-            .corr(
-                self.tsdf.iloc[:, second_column].pct_change(
-                    fill_method=cast(str, None),
-                )[1:],
-            )
         )
-        corrdf = corrseries.dropna().to_frame()
+        second_series = self.tsdf.iloc[:, second_column].pct_change(
+            fill_method=cast(str, None),
+        )[1:]
+        corrdf = first_series.corr(other=second_series).dropna().to_frame()
         corrdf.columns = MultiIndex.from_arrays(
             [
                 [corr_label],
