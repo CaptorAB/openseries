@@ -168,6 +168,7 @@ class OpenFrame(_CommonModel):
             An OpenFrame object
 
         """
+        lvl_zero = list(self.columns_lvl_zero)
         self.tsdf = reduce(
             lambda left, right: merge(
                 left=left,
@@ -178,14 +179,17 @@ class OpenFrame(_CommonModel):
             ),
             [x.tsdf for x in self.constituents],
         )
+
+        mapper = dict(zip(self.columns_lvl_zero, lvl_zero))
+        self.tsdf = self.tsdf.rename(columns=mapper, level=0)
+
         if self.tsdf.empty:
             msg = (
                 "Merging OpenTimeSeries DataFrames with "
                 f"argument how={how} produced an empty DataFrame."
             )
-            raise ValueError(
-                msg,
-            )
+            raise ValueError(msg)
+
         if how == "inner":
             for xerie in self.constituents:
                 xerie.tsdf = xerie.tsdf.loc[self.tsdf.index]

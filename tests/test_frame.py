@@ -1688,9 +1688,30 @@ class TestOpenFrame(TestCase):
             ],
         )
 
+        oldlabels = list(aframe.columns_lvl_zero)
+        aframe.tsdf = aframe.tsdf.rename(
+            columns={
+                "Asset_one": "Asset_three",
+                "Asset_two": "Asset_four",
+            },
+            level=0,
+        )
+        newlabels = list(aframe.columns_lvl_zero)
+
         b4df = aframe.tsdf.copy()
+
+        if oldlabels == newlabels:
+            msg = "Setup to test merge_series() did not work as intended."
+            raise ValueError(msg)
+
         aframe.merge_series(how="outer")
+        labelspostmerge = list(aframe.columns_lvl_zero)
+
         assert_frame_equal(b4df, aframe.tsdf, check_exact=True)
+
+        if newlabels != labelspostmerge:
+            msg = "Method merge_series() did not work as intended."
+            raise ValueError(msg)
 
         bframe.merge_series(how="inner")
         blist = [d.strftime("%Y-%m-%d") for d in bframe.tsdf.index]
