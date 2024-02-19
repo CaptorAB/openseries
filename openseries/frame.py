@@ -458,8 +458,8 @@ class OpenFrame(_CommonModel):
         tail = self.tsdf.loc[self.last_indices.min()].copy()
         dates = do_resample_to_business_period_ends(
             data=self.tsdf,
-            head=head,
-            tail=tail,
+            head=head,  # type: ignore[arg-type]
+            tail=tail,  # type: ignore[arg-type]
             freq=freq,
             countries=countries,
         )

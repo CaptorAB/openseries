@@ -1,4 +1,5 @@
 """Defining the _CommonModel class."""
+
 from __future__ import annotations
 
 import datetime as dt
@@ -484,7 +485,7 @@ class _CommonModel(BaseModel):
         if any([months_offset, from_dt, to_dt]):
             if months_offset is not None:
                 earlier = date_offset_foll(
-                    raw_date=self.tsdf.index[-1],
+                    raw_date=DatetimeIndex(self.tsdf.index)[-1],
                     months_offset=-months_offset,
                     adjust=False,
                     following=True,
@@ -537,8 +538,8 @@ class _CommonModel(BaseModel):
             An OpenFrame object
 
         """
-        startyear = self.tsdf.index[0].year
-        endyear = self.tsdf.index[-1].year
+        startyear = DatetimeIndex(self.tsdf.index)[0].year
+        endyear = DatetimeIndex(self.tsdf.index)[-1].year
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,
@@ -1514,24 +1515,20 @@ class _CommonModel(BaseModel):
         )
         fraction = (later - earlier).days / 365.25
 
-        if (
-            zero in self.tsdf.loc[earlier].tolist()
-            or self.tsdf.loc[[earlier, later]].lt(0.0).any().any()
-        ):
+        any_below_zero = any(self.tsdf.loc[[earlier, later]].lt(0.0).any().to_numpy())
+        if zero in self.tsdf.loc[earlier].to_numpy() or any_below_zero:
             msg = (
                 "Geometric return cannot be calculated due to "
                 "an initial value being zero or a negative value."
             )
-            raise ValueError(
-                msg,
-            )
+            raise ValueError(msg)
 
         result = (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
         return Series(
-            data=result,
+            data=result.to_numpy(),
             index=self.tsdf.columns,
             name="Geometric return",
             dtype="float64",
@@ -1917,7 +1914,7 @@ class _CommonModel(BaseModel):
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
         return Series(
-            data=result,
+            data=result.to_numpy(),
             index=self.tsdf.columns,
             name="Simple return",
             dtype="float64",
