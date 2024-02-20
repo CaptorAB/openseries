@@ -531,13 +531,13 @@ files = [
 
 [[package]]
 name = "holidays"
-version = "0.42"
+version = "0.43"
 description = "Generate and work with holidays in Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "holidays-0.42-py3-none-any.whl", hash = "sha256:13119a03d33efe50f76ee06042f82bbbc748ba049d3a6c413dba143f577efc7c"},
-    {file = "holidays-0.42.tar.gz", hash = "sha256:1a410a1e68ed460cfbce3fd7fb6d467655a75603e4c7c941b4fbb0535660e23f"},
+    {file = "holidays-0.43-py3-none-any.whl", hash = "sha256:1dca114761bac05fe3e6684d55903c3bd9fb757c37c3dac9da66afd7f8788e38"},
+    {file = "holidays-0.43.tar.gz", hash = "sha256:29e2c5436207dd268a3702338bcc92032aaacf47ed3bb324ff9ba8170e6d0932"},
 ]
 
 [package.dependencies]
@@ -1869,13 +1869,13 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.0.20240205"
+version = "3.1.0.20240220"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-openpyxl-3.1.0.20240205.tar.gz", hash = "sha256:0b1c933f3a33e5f701a748426582aae360bc5c033ce7caea192687a1f99c7bd3"},
-    {file = "types_openpyxl-3.1.0.20240205-py3-none-any.whl", hash = "sha256:734dfff2bfeeee0f46e78aed34f903130afe2364e9655c77b68436f187ec8a2d"},
+    {file = "types-openpyxl-3.1.0.20240220.tar.gz", hash = "sha256:89d481e791c637e27ae6655c119e98fab2956126991d39f52da2dec93e17c1f9"},
+    {file = "types_openpyxl-3.1.0.20240220-py3-none-any.whl", hash = "sha256:aceddbf32b1070c74c40f922cbd6a5d95263483e4cb68bd5610abb9ba7741edf"},
 ]
 
 [[package]]
