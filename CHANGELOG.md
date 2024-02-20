@@ -3,6 +3,12 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.4.12] - 2024-02-20
+
+- Fixed issue that OpenFrame.merge_series() method ignored changes to labels
+- Added option to set statistical method parameters for related methods
+- Miscellaneous development dependencies updates and test cleanup
+
 ## Version [1.4.11] - 2024-02-13
 
 - Fixed issue that ReturnSimulation.from_merton_jump_gbm() class method missed jump parameters

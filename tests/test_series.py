@@ -1,4 +1,5 @@
 """Test suite for the openseries/series.py module."""
+
 from __future__ import annotations
 
 import datetime as dt
@@ -893,16 +894,16 @@ class TestOpenTimeSeries(TestCase):
         result_values = {}
         for value in result.index:
             if isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], float):
-                result_values[
-                    value
-                ] = f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
+                result_values[value] = (
+                    f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
+                )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
-                result_values[
-                    value
-                ] = result.loc[  # type: ignore[assignment,unused-ignore]
-                    value,
-                    ("Asset_0", ValueType.PRICE),
-                ]
+                result_values[value] = (
+                    result.loc[  # type: ignore[assignment,unused-ignore]
+                        value,
+                        ("Asset_0", ValueType.PRICE),
+                    ]
+                )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
                     dt.date,
@@ -1120,7 +1121,7 @@ class TestOpenTimeSeries(TestCase):
 
         back_series = OpenTimeSeries.from_df(
             full_series.tsdf.iloc[
-                full_series.tsdf.index.get_loc(front_series.last_idx) :
+                cast(int, full_series.tsdf.index.get_loc(front_series.last_idx)) :
             ],
         )
         full_series.tsdf.index.get_loc(front_series.last_idx)
@@ -1797,9 +1798,7 @@ class TestOpenTimeSeries(TestCase):
 
         impvol = mseries.vol_from_var_func(drift_adjust=False)
         if f"{impvol:.12f}" != "0.093673716476":
-            msg = (
-                "Unexpected result from method vol_from_var_func(): '{impvol:.12f}'"
-            )
+            msg = "Unexpected result from method vol_from_var_func(): '{impvol:.12f}'"
             raise ValueError(msg)
 
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
