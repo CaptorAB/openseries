@@ -7,8 +7,8 @@ width="81" height="100" align="left" float="right"/><br/>
 # OpenSeries
 
 [![PyPI version](https://img.shields.io/pypi/v/openseries.svg)](https://pypi.org/project/openseries/)
-[![Conda version](
-https://anaconda.org/conda-forge/openseries/badges/version.svg)](https://anaconda.org/conda-forge/openseries)
+[![Conda version](https://img.shields.io/conda/vn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
+[![Conda platforms](https://img.shields.io/conda/pn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
