@@ -8,9 +8,6 @@ on:
       - "*/*" # matches every branch containing a single '/'
       - "**" # matches every branch
 
-env:
-  POETRY_VER: 1.7.1
-
 jobs:
   run_tests:
     runs-on: ubuntu-latest
@@ -22,13 +19,10 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v4
 
-      - name: Update pip
-        run: pip install --upgrade pip
-
-      - name: Install Poetry ${{ env.POETRY_VER }}
+      - name: Install Poetry
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: ${{ env.POETRY_VER }}
+          poetry-version: 1.7.1
 
       - name: Set up Python on ${{ runner.os }}
         uses: actions/setup-python@v5
