@@ -66,9 +66,10 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.setuptools_scm]
 
-[virtualenvs]
+[poetry.virtualenvs]
 create = true
 in-project = true
+path = "venv"
 
 [tool.pytest.ini_options]
 filterwarnings = [

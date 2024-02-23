@@ -27,6 +27,7 @@ jobs:
         id: setup_python
         with:
           python-version: '3.10'
+          cache: 'poetry'
 
       - name: Update pip
         run: pip install --upgrade pip
@@ -35,12 +36,6 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ env.POETRY_VER }}
-
-      - name: Define a cache for the virtual environment based on the dependencies lock file
-        uses: actions/cache@v3
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         run: poetry install --with dev
