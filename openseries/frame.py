@@ -458,8 +458,8 @@ class OpenFrame(_CommonModel):
         tail = self.tsdf.loc[self.last_indices.min()].copy()
         dates = do_resample_to_business_period_ends(
             data=self.tsdf,
-            head=head,  # type: ignore[arg-type]
-            tail=tail,  # type: ignore[arg-type]
+            head=head,
+            tail=tail,
             freq=freq,
             countries=countries,
         )
@@ -841,6 +841,7 @@ class OpenFrame(_CommonModel):
                     :,
                     item,
                 ]
+                # noinspection PyTypeChecker
                 relative = 1.0 + longdf - shortdf
                 vol = float(
                     relative.pct_change(fill_method=cast(str, None)).std()
@@ -935,6 +936,7 @@ class OpenFrame(_CommonModel):
                     :,
                     item,
                 ]
+                # noinspection PyTypeChecker
                 relative = 1.0 + longdf - shortdf
                 ret = float(
                     relative.pct_change(fill_method=cast(str, None)).mean()
