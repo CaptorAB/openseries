@@ -17,7 +17,7 @@ jobs:
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: 1.8.0
+          poetry-version: 1.8.1
 
       - name: Set up Python on ${{ runner.os }}
         uses: actions/setup-python@v5
