@@ -2,7 +2,7 @@ venv:
 	python3 -m venv ./venv
 	venv/bin/python --version
 	venv/bin/python -m pip install --upgrade pip
-	venv/bin/pip install poetry==1.8.1
+	venv/bin/pip install poetry==1.8.2
 
 install:
 	rm -f poetry.lock
