@@ -45,6 +45,7 @@ pydantic = ">=2.5.2,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 scipy = ">=1.11.4,<2.0.0"
 statsmodels = ">=0.14.0,<1.0.0"
+pytest = ">=8.0.2"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.4.3"
