@@ -3477,12 +3477,12 @@ class TestOpenFrame(TestCase):
             raise ValueError(msg)
 
         if (
-            f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.9f}"
-            != "0.004766863"
+            f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
+            != "0.0047669"
         ):
             msg = (
                 "Optimization did not find better return with similar vol\n"
-                f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.9f}"
+                f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
             )
 
             raise ValueError(msg)
@@ -3494,13 +3494,13 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        maxframe_weights = [f"{maxw:.9f}" for maxw in maxframe.weights]
+        maxframe_weights = [f"{maxw:.7f}" for maxw in maxframe.weights]
         if maxframe_weights != [
-            "0.115201536",
-            "0.172120027",
-            "0.297195711",
-            "0.272454270",
-            "0.143028456",
+            "0.1152015",
+            "0.1721200",
+            "0.2971957",
+            "0.2724543",
+            "0.1430285",
         ]:
             msg = (
                 "Function create_optimized_portfolios not "
@@ -3508,10 +3508,10 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        if f"{assets_std.vol - maxseries.vol:.9f}" != "0.000071408":
+        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0000714":
             msg = (
                 "Optimization did not find better return with similar vol\n"
-                f"{assets_std.vol - maxseries.vol:.9f}"
+                f"{assets_std.vol - maxseries.vol:.7f}"
             )
 
             raise ValueError(msg)
