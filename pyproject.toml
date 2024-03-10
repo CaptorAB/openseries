@@ -50,13 +50,13 @@ statsmodels = ">=0.14.0,<1.0.0"
 coverage = "^7.4.3"
 coverage-badge = "^1.1.0"
 mypy = "^1.9.0"
-pre-commit = "^3.6.1"
+pre-commit = "^3.6.2"
 pytest = "^8.1.1"
 ruff = "^0.3.2"
 types-openpyxl = "^3.1.0.20240308"
 pandas-stubs = "^2.2.0.240218"
 types-python-dateutil = "^2.8.19.20240106"
-types-requests = "^2.31.0.20240218"
+types-requests = "^2.31.0.20240310"
 
 [build-system]
 requires = ["poetry-core>=1.8.2"]
@@ -72,7 +72,8 @@ path = "venv"
 [tool.pytest.ini_options]
 filterwarnings = [
     # https://github.com/pydata/pandas-datareader/issues/960
-    "ignore::DeprecationWarning:pandas_datareader.*:"
+    "ignore::DeprecationWarning:pandas_datareader.*:",
+    "ignore::RuntimeWarning:pandas.*:"
 ]
 
 [tool.coverage.run]

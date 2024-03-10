@@ -1,4 +1,5 @@
 """Defining the ReturnSimulation class."""
+
 from __future__ import annotations
 
 import datetime as dt
@@ -6,7 +7,12 @@ from typing import Optional, cast
 
 from numpy import multiply, sqrt
 from numpy.random import PCG64, Generator, SeedSequence
-from pandas import DataFrame, Index, MultiIndex, concat
+from pandas import (
+    DataFrame,
+    Index,
+    MultiIndex,
+    concat,
+)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -428,7 +434,7 @@ class ReturnSimulation(BaseModel):
         Returns
         -------
         pandas.DataFrame
-            Object based on the simulation(s)
+            The simulation(s) data
 
         """
         d_range = generate_calendar_date_range(

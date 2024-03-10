@@ -1,5 +1,6 @@
 """Test suite for the openseries/frame.py module."""
-# mypy: disable-error-code="operator,type-arg,unused-ignore"
+
+# mypy: disable-error-code="operator,type-arg,arg-type,unused-ignore,union-attr"
 from __future__ import annotations
 
 import datetime as dt
@@ -13,6 +14,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 import pytest
+from numpy import sqrt
 from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
 from requests.exceptions import ConnectionError
@@ -20,7 +22,13 @@ from requests.exceptions import ConnectionError
 # noinspection PyProtectedMember
 from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.datefixer import date_offset_foll
-from openseries.frame import OpenFrame
+from openseries.frame import (
+    OpenFrame,
+    create_optimized_portfolios,
+    efficient_frontier,
+    sharpeplot,
+    simulate_portfolios,
+)
 from openseries.load_plotly import load_plotly_dict
 from openseries.series import OpenTimeSeries
 from openseries.types import (
@@ -28,7 +36,7 @@ from openseries.types import (
     LiteralPortfolioWeightings,
     ValueType,
 )
-from tests.test_common_sim import SIMFRAME, SIMSERIES
+from tests.test_common_sim import SEED, SIMFRAME, SIMSERIES
 
 
 class TestOpenFrame(TestCase):
@@ -1783,9 +1791,9 @@ class TestOpenFrame(TestCase):
         result_values = {}
         for value in result.index:
             if isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], float):
-                result_values[
-                    value
-                ] = f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
+                result_values[value] = (
+                    f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
+                )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
                 result_values[value] = cast(
                     str,
@@ -3330,4 +3338,254 @@ class TestOpenFrame(TestCase):
             "-0.08603979121",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{corr_two}"
+            raise ValueError(msg)
+
+    def test_simulate_portfolios(self: TestOpenFrame) -> None:
+        """Test function simulate_portfolios."""
+        simulations = 1000
+
+        spframe = self.randomframe.from_deepcopy()
+
+        result = simulate_portfolios(
+            simframe=spframe,
+            num_ports=simulations,
+            seed=SEED,
+        )
+
+        if result.shape != (simulations, spframe.item_count + 3):
+            msg = "Function simulate_portfolios not working as intended"
+            raise ValueError(msg)
+
+        least_vol = f"{result.loc[:, 'stdev'].min():.9f}"
+        return_where_least_vol = f"{result.loc[result['stdev'].idxmin()]['ret']:.9f}"
+
+        if (least_vol, return_where_least_vol) != ("0.047639486", "0.056817349"):
+            msg = (
+                "Function efficient_frontier not working as intended"
+                f"\n{(least_vol, return_where_least_vol)}"
+            )
+            raise ValueError(msg)
+
+    def test_efficient_frontier(self: TestOpenFrame) -> None:
+        """Test function efficient_frontier."""
+        simulations = 1000
+        points = 20
+
+        eframe = self.randomframe.from_deepcopy()
+        eframe.to_cumret()
+
+        frontier, result, optimal = efficient_frontier(
+            eframe=eframe,
+            num_ports=simulations,
+            seed=SEED,
+            frontier_points=points,
+            tweak=False,
+        )
+
+        if frontier.shape != (points, eframe.item_count + 4):
+            msg = "Function efficient_frontier not working as intended"
+            raise ValueError(msg)
+
+        frt_most_sharpe = f"{frontier.loc[:, 'sharpe'].max():.9f}"
+        frt_return_where_most_sharpe = (
+            f"{frontier.loc[frontier['sharpe'].idxmax()]['ret']:.9f}"
+        )
+
+        if (frt_most_sharpe, frt_return_where_most_sharpe) != (
+            "1.302486911",
+            "0.068289998",
+        ):
+            msg = (
+                "Function efficient_frontier not working as intended"
+                f"\n{(frt_most_sharpe, frt_return_where_most_sharpe)}"
+            )
+            raise ValueError(msg)
+
+        sim_least_vol = f"{result.loc[:, 'stdev'].min():.9f}"
+        sim_return_where_least_vol = (
+            f"{result.loc[result['stdev'].idxmin()]['ret']:.9f}"
+        )
+
+        if (sim_least_vol, sim_return_where_least_vol) != (
+            "0.047639486",
+            "0.056817349",
+        ):
+            msg = (
+                "Function efficient_frontier not working as intended"
+                f"\n{(sim_least_vol, sim_return_where_least_vol)}"
+            )
+            raise ValueError(msg)
+
+        optlist = [f"{n:.9f}" for n in optimal]
+        total = sum(optimal[3:])
+
+        if round(total, 7) != 1.0:
+            msg = f"Function efficient_frontier not working as intended\n{total}"
+            raise ValueError(msg)
+
+        if optlist != [
+            "0.068444187",
+            "0.052547314",
+            "1.302524941",
+            "0.116616455",
+            "0.140094352",
+            "0.352682311",
+            "0.312323642",
+            "0.078283239",
+        ]:
+            msg = f"Function efficient_frontier not working as intended\n{optlist}"
+            raise ValueError(msg)
+
+    def test_create_optimized_portfolios(self: TestOpenFrame) -> None:
+        """Test function create_optimized_portfolios."""
+        simulations = 1000
+        upper_bound = 1.0
+        org_port_name = "Current Portfolio"
+
+        std_frame = SIMFRAME.from_deepcopy()
+        std_frame.to_cumret()
+        std_frame.weights = [1 / std_frame.item_count] * std_frame.item_count
+        assets_std = OpenTimeSeries.from_df(std_frame.make_portfolio(org_port_name))
+
+        minframe, minseries, maxframe, maxseries = create_optimized_portfolios(
+            data=std_frame,
+            serie=assets_std,
+            portfolioname=org_port_name,
+            simulations=simulations,
+            upper_bound=upper_bound,
+        )
+
+        if round(sum(minframe.weights), 7) != 1.0:
+            msg = (
+                "Function efficient_frontier not working as "
+                f"intended\n{round(sum(minframe.weights), 7)}"
+            )
+            raise ValueError(msg)
+
+        minframe_weights = [f"{minw:.9f}" for minw in minframe.weights]
+        if minframe_weights != [
+            "0.115042081",
+            "0.185446593",
+            "0.274308684",
+            "0.257262816",
+            "0.167939826",
+        ]:
+            msg = (
+                "Function create_optimized_portfolios not "
+                f"working as intended\n{minframe_weights}"
+            )
+            raise ValueError(msg)
+
+        if (
+            f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.9f}"
+            != "0.004766863"
+        ):
+            msg = (
+                "Optimization did not find better return with similar vol\n"
+                f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.9f}"
+            )
+
+            raise ValueError(msg)
+
+        if round(sum(maxframe.weights), 7) != 1.0:
+            msg = (
+                "Function efficient_frontier not working as "
+                f"intended\n{round(sum(maxframe.weights), 7)}"
+            )
+            raise ValueError(msg)
+
+        maxframe_weights = [f"{maxw:.9f}" for maxw in maxframe.weights]
+        if maxframe_weights != [
+            "0.115201536",
+            "0.172120027",
+            "0.297195711",
+            "0.272454270",
+            "0.143028456",
+        ]:
+            msg = (
+                "Function create_optimized_portfolios not "
+                f"working as intended\n{maxframe_weights}"
+            )
+            raise ValueError(msg)
+
+        if f"{assets_std.vol - maxseries.vol:.9f}" != "0.000071408":
+            msg = (
+                "Optimization did not find better return with similar vol\n"
+                f"{assets_std.vol - maxseries.vol:.9f}"
+            )
+
+            raise ValueError(msg)
+
+    def test_sharpeplot(self: TestOpenFrame) -> None:
+        """Test function sharpeplot."""
+        simulations = 1000
+        points = 20
+
+        spframe = self.randomframe.from_deepcopy()
+        spframe.to_cumret()
+        spframe.weights = [1.0 / spframe.item_count] * spframe.item_count
+        current = OpenTimeSeries.from_df(spframe.make_portfolio("Current Portfolio"))
+
+        vol: Series[float] = Series(
+            data=spframe.tsdf.diff().std() * sqrt(spframe.periods_in_a_year),
+            dtype="float64",
+        )
+        txt = "<br>".join(
+            [
+                f"{wgt:.1%} - {nm}"
+                for wgt, nm in zip(spframe.weights, spframe.columns_lvl_zero)
+            ],
+        )
+
+        frontier, simulated, optimum = efficient_frontier(
+            eframe=spframe,
+            num_ports=simulations,
+            seed=SEED,
+            frontier_points=points,
+            tweak=False,
+        )
+
+        opt_text = "<br>".join(
+            [
+                f"{wgt:.1%} - {nm}"
+                for wgt, nm in zip(optimum[3:], spframe.columns_lvl_zero)
+            ],
+        )
+        plotframe = DataFrame(
+            data=[
+                spframe.arithmetic_ret,
+                vol,
+                Series(data=[""] * spframe.item_count, index=vol.index),
+            ],
+            index=["ret", "stdev", "text"],
+        )
+        plotframe.columns = plotframe.columns.droplevel(level=1)
+        plotframe["Max Sharpe Portfolio"] = [optimum[0], optimum[1], opt_text]
+        plotframe[current.label] = [current.arithmetic_ret, current.vol, txt]
+
+        figure, _ = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=False,
+            auto_open=False,
+            output_type="div",
+        )
+
+        fig_json = loads(cast(str, figure.to_json()))
+        names = [item["name"] for item in fig_json["data"]]
+
+        if names != [
+            "simulated portfolios",
+            "Efficient frontier",
+            "Asset_0",
+            "Asset_1",
+            "Asset_2",
+            "Asset_3",
+            "Asset_4",
+            "Max Sharpe Portfolio",
+            "Current Portfolio",
+        ]:
+            msg = f"Function sharpeplot not working as intended\n{names}"
             raise ValueError(msg)

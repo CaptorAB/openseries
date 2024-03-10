@@ -1507,7 +1507,7 @@ class _CommonModel(BaseModel):
             Compounded Annual Growth Rate (CAGR)
 
         """
-        zero: float = 0.0
+        zero = 0.0
         earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
