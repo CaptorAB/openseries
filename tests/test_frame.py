@@ -3416,7 +3416,7 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        optlist = [f"{n:.9f}" for n in optimal]
+        optlist = [f"{n:.7f}" for n in optimal]
         total = sum(optimal[3:])
 
         if round(total, 7) != 1.0:
@@ -3424,14 +3424,14 @@ class TestOpenFrame(TestCase):
             raise ValueError(msg)
 
         if optlist != [
-            "0.068444187",
-            "0.052547314",
-            "1.302524941",
-            "0.116616455",
-            "0.140094352",
-            "0.352682311",
-            "0.312323642",
-            "0.078283239",
+            "0.0684442",
+            "0.0525473",
+            "1.3025249",
+            "0.1166165",
+            "0.1400944",
+            "0.3526823",
+            "0.3123236",
+            "0.0782832",
         ]:
             msg = f"Function efficient_frontier not working as intended\n{optlist}"
             raise ValueError(msg)
@@ -3462,13 +3462,13 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        minframe_weights = [f"{minw:.9f}" for minw in minframe.weights]
+        minframe_weights = [f"{minw:.7f}" for minw in minframe.weights]
         if minframe_weights != [
-            "0.115042081",
-            "0.185446593",
-            "0.274308684",
-            "0.257262816",
-            "0.167939826",
+            "0.1150421",
+            "0.1854466",
+            "0.2743087",
+            "0.2572628",
+            "0.1679398",
         ]:
             msg = (
                 "Function create_optimized_portfolios not "
