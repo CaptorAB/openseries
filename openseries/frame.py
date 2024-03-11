@@ -1818,35 +1818,7 @@ def simulate_portfolios(
     return simdf.dropna()
 
 
-def _check_sum(wejts: NDArray[float64]) -> float64:
-    return cast(float64, npsum(wejts) - 1)
-
-
-def _get_ret_vol_sr(
-    lg_ret: DataFrame,
-    weights: NDArray[float64],
-    per_in_yr: float,
-) -> NDArray[float64]:
-    ret = npsum(lg_ret.mean() * weights) * per_in_yr
-    volatility = sqrt(dot(weights.T, dot(lg_ret.cov() * per_in_yr, weights)))
-    sr = ret / volatility
-    return cast(NDArray[float64], array([ret, volatility, sr]))
-
-
-def _diff_return(
-    lg_ret: DataFrame,
-    weights: NDArray[float64],
-    per_in_yr: float,
-    poss_return: float,
-) -> float64:
-    return cast(
-        float64,
-        _get_ret_vol_sr(lg_ret=lg_ret, weights=weights, per_in_yr=per_in_yr)[0]
-        - poss_return,
-    )
-
-
-def efficient_frontier(
+def efficient_frontier(  # noqa: C901
     eframe: OpenFrame,
     num_ports: int = 5000,
     seed: int = 71,
@@ -1901,6 +1873,31 @@ def efficient_frontier(
     frontier_max = 0.0
     if isinstance(arithmetic_mean, Series):
         frontier_max = arithmetic_mean.max()
+
+    def _check_sum(weights: NDArray[float64]) -> float64:
+        return cast(float64, npsum(weights) - 1)
+
+    def _get_ret_vol_sr(
+            lg_ret: DataFrame,
+            weights: NDArray[float64],
+            per_in_yr: float,
+    ) -> NDArray[float64]:
+        ret = npsum(lg_ret.mean() * weights) * per_in_yr
+        volatility = sqrt(dot(weights.T, dot(lg_ret.cov() * per_in_yr, weights)))
+        sr = ret / volatility
+        return cast(NDArray[float64], array([ret, volatility, sr]))
+
+    def _diff_return(
+            lg_ret: DataFrame,
+            weights: NDArray[float64],
+            per_in_yr: float,
+            poss_return: float,
+    ) -> float64:
+        return cast(
+            float64,
+            _get_ret_vol_sr(lg_ret=lg_ret, weights=weights, per_in_yr=per_in_yr)[0]
+            - poss_return,
+        )
 
     def _neg_sharpe(weights: NDArray[float64]) -> float64:
         return cast(
