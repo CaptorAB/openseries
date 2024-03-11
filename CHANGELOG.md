@@ -3,6 +3,13 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.0] - 2024-03-11
+
+- Added helper functions for additional portfolio analyses.
+- The new functions cover weight simulations, efficient frontier optimizations, and plotting.
+- I intend to make an example that will be added [here](https://github.com/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
+- Also miscellaneous development dependencies updates
+
 ## Version [1.4.12] - 2024-02-20
 
 - Fixed issue that OpenFrame.merge_series() method ignored changes to labels
