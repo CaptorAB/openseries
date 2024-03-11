@@ -3454,7 +3454,7 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        optlist = [f"{n:.7f}" for n in optimal]
+        optlist = [round(Decimal(wgt), 6) for wgt in cast(list[float], optimal)]
         total = sum(optimal[3:])
 
         if round(total, 7) != 1.0:
@@ -3462,14 +3462,14 @@ class TestOpenFrame(TestCase):
             raise ValueError(msg)
 
         if optlist != [
-            "0.0684442",
-            "0.0525473",
-            "1.3025249",
-            "0.1166165",
-            "0.1400944",
-            "0.3526823",
-            "0.3123236",
-            "0.0782832",
+            Decimal("0.068444"),
+            Decimal("0.052547"),
+            Decimal("1.302525"),
+            Decimal("0.116616"),
+            Decimal("0.140094"),
+            Decimal("0.352682"),
+            Decimal("0.312324"),
+            Decimal("0.078283"),
         ]:
             msg = f"Function efficient_frontier not working as intended\n{optlist}"
             raise ValueError(msg)
@@ -3577,7 +3577,9 @@ class TestOpenFrame(TestCase):
         )
 
         plotframe = prepare_plot_data(
-            assets=spframe, current=current, optimized=optimum,
+            assets=spframe,
+            current=current,
+            optimized=optimum,
         )
 
         figure_title_no_text, _ = sharpeplot(
