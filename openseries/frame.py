@@ -2155,25 +2155,15 @@ def sharpeplot(  # noqa: C901
     if line_frame is not None:
         returns.extend(list(line_frame.loc[:, "ret"]))
         risk.extend(list(line_frame.loc[:, "stdev"]))
-        if "text" in line_frame.columns:
-            figure.add_scatter(
-                x=line_frame.loc[:, "stdev"],
-                y=line_frame.loc[:, "ret"],
-                text=line_frame.loc[:, "text"],
-                hovertemplate="%{text}<br>Return %{y}<br>Vol %{x}",
-                line={"width": 2.5, "dash": "solid"},
-                mode="lines",
-                name="Efficient frontier",
-            )
-        else:
-            figure.add_scatter(
-                x=line_frame.loc[:, "stdev"],
-                y=line_frame.loc[:, "ret"],
-                hovertemplate="Return %{y}<br>Vol %{x}",
-                line={"width": 2.5, "dash": "solid"},
-                mode="lines",
-                name="Efficient frontier",
-            )
+        figure.add_scatter(
+            x=line_frame.loc[:, "stdev"],
+            y=line_frame.loc[:, "ret"],
+            text=line_frame.loc[:, "text"],
+            hovertemplate="%{text}<br>Return %{y}<br>Vol %{x}",
+            line={"width": 2.5, "dash": "solid"},
+            mode="lines",
+            name="Efficient frontier",
+        )
 
     colorway = cast(dict[str, list[str]], fig["layout"]).get("colorway")[
         : len(point_frame.columns)

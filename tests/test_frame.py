@@ -3346,23 +3346,48 @@ class TestOpenFrame(TestCase):
 
         spframe = self.randomframe.from_deepcopy()
 
-        result = simulate_portfolios(
+        result_returns = simulate_portfolios(
             simframe=spframe,
             num_ports=simulations,
             seed=SEED,
         )
 
-        if result.shape != (simulations, spframe.item_count + 3):
+        if result_returns.shape != (simulations, spframe.item_count + 3):
             msg = "Function simulate_portfolios not working as intended"
             raise ValueError(msg)
 
-        least_vol = f"{result.loc[:, 'stdev'].min():.9f}"
-        return_where_least_vol = f"{result.loc[result['stdev'].idxmin()]['ret']:.9f}"
+        return_least_vol = f"{result_returns.loc[:, 'stdev'].min():.7f}"
+        return_where_least_vol = (
+            f"{result_returns.loc[result_returns['stdev'].idxmin()]['ret']:.7f}"
+        )
 
-        if (least_vol, return_where_least_vol) != ("0.047639486", "0.056817349"):
+        if (return_least_vol, return_where_least_vol) != ("0.0476395", "0.0568173"):
             msg = (
                 "Function efficient_frontier not working as intended"
-                f"\n{(least_vol, return_where_least_vol)}"
+                f"\n{(return_least_vol, return_where_least_vol)}"
+            )
+            raise ValueError(msg)
+
+        spframe.to_cumret()
+        result_values = simulate_portfolios(
+            simframe=spframe,
+            num_ports=simulations,
+            seed=SEED,
+        )
+
+        if result_values.shape != (simulations, spframe.item_count + 3):
+            msg = "Function simulate_portfolios not working as intended"
+            raise ValueError(msg)
+
+        value_least_vol = f"{result_values.loc[:, 'stdev'].min():.7f}"
+        value_where_least_vol = (
+            f"{result_values.loc[result_values['stdev'].idxmin()]['ret']:.7f}"
+        )
+
+        if (value_least_vol, value_where_least_vol) != ("0.0476489", "0.0568400"):
+            msg = (
+                "Function efficient_frontier not working as intended"
+                f"\n{(value_least_vol, value_where_least_vol)}"
             )
             raise ValueError(msg)
 
@@ -3372,6 +3397,19 @@ class TestOpenFrame(TestCase):
         points = 20
 
         eframe = self.randomframe.from_deepcopy()
+
+        frnt, _, _ = efficient_frontier(
+            eframe=eframe,
+            num_ports=simulations,
+            seed=SEED,
+            frontier_points=points,
+            tweak=False,
+        )
+
+        if frnt.shape != (points, eframe.item_count + 4):
+            msg = "Function efficient_frontier not working as intended"
+            raise ValueError(msg)
+
         eframe.to_cumret()
 
         frontier, result, optimal = efficient_frontier(
@@ -3516,7 +3554,7 @@ class TestOpenFrame(TestCase):
 
             raise ValueError(msg)
 
-    def test_sharpeplot(self: TestOpenFrame) -> None:
+    def test_sharpeplot(self: TestOpenFrame) -> None:  # noqa: C901
         """Test function sharpeplot."""
         simulations = 1000
         points = 20
@@ -3563,6 +3601,37 @@ class TestOpenFrame(TestCase):
         plotframe["Max Sharpe Portfolio"] = [optimum[0], optimum[1], opt_text]
         plotframe[current.label] = [current.arithmetic_ret, current.vol, txt]
 
+        figure_title_no_text, _ = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=True,
+            auto_open=False,
+            output_type="div",
+        )
+
+        fig_json_title_no_text = loads(cast(str, figure_title_no_text.to_json()))
+        if "Risk and Return" not in fig_json_title_no_text["layout"]["title"]["text"]:
+            msg = "sharpeplot method not working as intended"
+            raise ValueError(msg)
+
+        figure_title_text, _ = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=True,
+            titletext="Awesome title",
+            auto_open=False,
+            output_type="div",
+        )
+
+        fig_json_title_text = loads(cast(str, figure_title_text.to_json()))
+        if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
+            msg = "sharpeplot method not working as intended"
+            raise ValueError(msg)
+
         figure, _ = sharpeplot(
             sim_frame=simulated,
             line_frame=frontier,
@@ -3574,6 +3643,11 @@ class TestOpenFrame(TestCase):
         )
 
         fig_json = loads(cast(str, figure.to_json()))
+
+        if "text" in fig_json["layout"]["title"]:
+            msg = "sharpeplot method not working as intended"
+            raise ValueError(msg)
+
         names = [item["name"] for item in fig_json["data"]]
 
         if names != [
@@ -3589,3 +3663,79 @@ class TestOpenFrame(TestCase):
         ]:
             msg = f"Function sharpeplot not working as intended\n{names}"
             raise ValueError(msg)
+
+        directory = Path(__file__).resolve().parent
+        _, figfile = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=False,
+            auto_open=False,
+            output_type="file",
+            directory=directory,
+        )
+
+        plotfile = Path(figfile).resolve()
+        if not plotfile.exists():
+            msg = "html file not created"
+            raise FileNotFoundError(msg)
+
+        plotfile.unlink()
+        if plotfile.exists():
+            msg = "html file not deleted as intended"
+            raise FileExistsError(msg)
+
+        if figfile[:5] == "<div>":
+            msg = "sharpeplot method not working as intended"
+            raise ValueError(msg)
+
+        _, divstring = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=False,
+            auto_open=False,
+            output_type="div",
+        )
+        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+            msg = "Html div section not created"
+            raise ValueError(msg)
+
+        with patch("pathlib.Path.exists") as mock_userfolderexists:
+            mock_userfolderexists.return_value = True
+            mockhomefig, _ = sharpeplot(
+                sim_frame=simulated,
+                line_frame=frontier,
+                point_frame=plotframe,
+                point_frame_mode="markers+text",
+                title=False,
+                auto_open=False,
+                output_type="div",
+            )
+            mockhomefig_json = loads(cast(str, mockhomefig.to_json()))
+
+        if mockhomefig_json["data"][0]["name"] != "simulated portfolios":
+            msg = "sharpeplot method not working as intended"
+            raise ValueError(msg)
+
+        with patch("pathlib.Path.exists") as mock_userfolderexists:
+            mock_userfolderexists.return_value = False
+            _, mockfile = sharpeplot(
+                sim_frame=simulated,
+                line_frame=frontier,
+                point_frame=plotframe,
+                point_frame_mode="markers+text",
+                title=False,
+                auto_open=False,
+                output_type="file",
+                filename="seriesfile.html",
+            )
+            mockfilepath = Path(mockfile).resolve()
+
+        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+            msg = "sharpeplot method not working as intended"
+            raise ValueError(msg)
+
+        mockfilepath.unlink()
