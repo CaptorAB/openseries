@@ -2,15 +2,14 @@ name: build
 
 on: workflow_dispatch
 
-env:
-  POETRY_VER: 1.7.1
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+
     defaults:
       run:
         shell: bash
+
     strategy:
       fail-fast: false
       matrix:
@@ -21,24 +20,17 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v4
 
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.8.2
+
       - name: Set up Python on ${{ runner.os }}
         uses: actions/setup-python@v5
         id: setup_python
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Update pip
-        run: |
-          if ${{ matrix.os == 'windows-latest' }}; then
-            python.exe -m pip install --upgrade pip
-          else
-            pip install --upgrade pip
-          fi
-
-      - name: Install Poetry ${{ env.POETRY_VER }} on Python ${{ steps.setup_python.outputs.python-version }}
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: ${{ env.POETRY_VER }}
+          cache: 'poetry'
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         run: poetry install --with dev

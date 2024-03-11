@@ -1,12 +1,11 @@
 """Test suite for the openseries package."""
+
 from __future__ import annotations
 
 from importlib.metadata import metadata
 from pathlib import Path
 from re import match
 from unittest import TestCase
-
-from toml import load as tomlload
 
 
 class TestPackage(TestCase):
@@ -19,7 +18,10 @@ class TestPackage(TestCase):
 
         directory = Path(__file__).resolve().parent.parent
         pyproject_file = directory.joinpath("pyproject.toml")
-        toml_version = tomlload(pyproject_file)["tool"]["poetry"]["version"]
+        with Path.open(pyproject_file, "r") as pfile:
+            lines = pfile.readlines()
+
+        toml_version = lines[2].strip()[lines[2].strip().find('"') :].replace('"', "")
 
         attribute_names = [
             "Name",
@@ -29,6 +31,7 @@ class TestPackage(TestCase):
             "License",
             "Requires-Python",
         ]
+
         expected_values = [
             "^(openseries)$",
             "^(Package for analyzing financial timeseries.)$",
@@ -37,6 +40,7 @@ class TestPackage(TestCase):
             "^(BSD-3-Clause)$",
             "^(>=3.9,<3.13)$",
         ]
+
         for name, value in zip(attribute_names, expected_values):
             if match(value, package_metadata[name]) is None:
                 msg = (

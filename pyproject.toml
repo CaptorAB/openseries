@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.4.12"
+version = "1.5.0"
 description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -40,40 +40,40 @@ numpy = ">=1.23.2,<=2.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
 plotly = ">=5.18.0,<6.0.0"
-pyarrow = ">=14.0.2,<16.0.0"
+pyarrow = ">=14.0.2,<15.0.1"
 pydantic = ">=2.5.2,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 scipy = ">=1.11.4,<2.0.0"
 statsmodels = ">=0.14.0,<1.0.0"
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.4.1"
+coverage = "^7.4.3"
 coverage-badge = "^1.1.0"
-mypy = "^1.8.0"
-pre-commit = "^3.6.1"
-pytest = "^8.0.1"
-ruff = "^0.2.2"
-toml = "^0.10.2"
-types-openpyxl = "^3.1.0.20240205"
-pandas-stubs = "^2.1.4.231227"
-types-python-dateutil = "^2.8.19.20240106"
-types-requests = "^2.31.0.20240218"
-types-toml = "^0.10.8.7"
+mypy = "^1.9.0"
+pandas-stubs = "^2.2.0.240218"
+pre-commit = "^3.6.2"
+pytest = "^8.1.1"
+ruff = "^0.3.2"
+types-openpyxl = "^3.1.0.20240311"
+types-python-dateutil = "^2.8.19.20240311"
+types-requests = "^2.31.0.20240311"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.8.2"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.setuptools_scm]
 
 [poetry.virtualenvs]
+create = true
 in-project = true
 path = "venv"
 
 [tool.pytest.ini_options]
 filterwarnings = [
     # https://github.com/pydata/pandas-datareader/issues/960
-    "ignore::DeprecationWarning:pandas_datareader.*:"
+    "ignore::DeprecationWarning:pandas_datareader.*:",
+    "ignore::RuntimeWarning:pandas.*:"
 ]
 
 [tool.coverage.run]
@@ -115,7 +115,7 @@ fixable = ["ALL"]
 [tool.ruff.lint.pylint]
 max-args = 12
 max-branches = 22
-max-statements = 54
+max-statements = 66
 
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true

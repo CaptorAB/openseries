@@ -7,12 +7,13 @@ width="81" height="100" align="left" float="right"/><br/>
 # OpenSeries
 
 [![PyPI version](https://img.shields.io/pypi/v/openseries.svg)](https://pypi.org/project/openseries/)
-[![Conda version](
-https://anaconda.org/conda-forge/openseries/badges/version.svg)](https://anaconda.org/conda-forge/openseries)
+[![Conda version](https://img.shields.io/conda/vn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
+[![Conda platforms](https://img.shields.io/conda/pn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
 [![Styling, Linting & Type checks](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml)
+[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
@@ -162,11 +163,11 @@ make lint
 
 ### On some files in the project
 
-| File                                                                                                             | Description                                                                                                                                                                                         |
-|:-----------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
-| [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
-| [simulation.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/simulation.py)                     | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                     |
+| File                                                                                                             | Description                                                                                                                                                                                                                               |
+|:-----------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together.                                       |
+| [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries. The module also defines functions to simulate, optimize, and plot portfolios. |
+| [simulation.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/simulation.py)                     | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                                                           |
 
 ### Class methods used to construct objects.
 
