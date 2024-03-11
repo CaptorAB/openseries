@@ -3363,7 +3363,7 @@ class TestOpenFrame(TestCase):
 
         if (return_least_vol, return_where_least_vol) != ("0.0476395", "0.0568173"):
             msg = (
-                "Function efficient_frontier not working as intended"
+                "Function simulate_portfolios not working as intended"
                 f"\n{(return_least_vol, return_where_least_vol)}"
             )
             raise ValueError(msg)
@@ -3386,7 +3386,7 @@ class TestOpenFrame(TestCase):
 
         if (value_least_vol, value_where_least_vol) != ("0.0476489", "0.0568400"):
             msg = (
-                "Function efficient_frontier not working as intended"
+                "Function simulate_portfolios not working as intended"
                 f"\n{(value_least_vol, value_where_least_vol)}"
             )
             raise ValueError(msg)
@@ -3480,7 +3480,7 @@ class TestOpenFrame(TestCase):
         upper_bound = 1.0
         org_port_name = "Current Portfolio"
 
-        std_frame = SIMFRAME.from_deepcopy()
+        std_frame = self.randomframe.from_deepcopy()
         std_frame.to_cumret()
         std_frame.weights = [1 / std_frame.item_count] * std_frame.item_count
         assets_std = OpenTimeSeries.from_df(std_frame.make_portfolio(org_port_name))
@@ -3495,7 +3495,7 @@ class TestOpenFrame(TestCase):
 
         if round(sum(minframe.weights), 7) != 1.0:
             msg = (
-                "Function efficient_frontier not working as "
+                "Function create_optimized_portfolios not working as "
                 f"intended\n{round(sum(minframe.weights), 7)}"
             )
             raise ValueError(msg)
@@ -3527,7 +3527,7 @@ class TestOpenFrame(TestCase):
 
         if round(sum(maxframe.weights), 7) != 1.0:
             msg = (
-                "Function efficient_frontier not working as "
+                "Function create_optimized_portfolios not working as "
                 f"intended\n{round(sum(maxframe.weights), 7)}"
             )
             raise ValueError(msg)
