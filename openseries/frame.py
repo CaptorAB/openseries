@@ -2066,6 +2066,64 @@ def create_optimized_portfolios(
     return lr_frame, resleast, mv_frame, resmost
 
 
+def prepare_plot_data(
+    assets: OpenFrame,
+    current: OpenTimeSeries,
+    optimized: NDArray[float64],
+) -> DataFrame:
+    """
+    Prepare date to be used as point_frame in the sharpeplot function.
+
+    Parameters
+    ----------
+    assets: OpenFrame
+        Portfolio data with individual assets and a weighted portfolio
+    current: OpenTimeSeries
+        The current or initial portfolio based on given weights
+    optimized: DataFrame
+        Data optimized with the efficient_frontier method
+
+    Returns
+    -------
+    DataFrame
+        The data prepared with mean returns, volatility and weights
+
+    """
+    txt = "<br>".join(
+        [
+            f"{wgt:.1%} - {nm}"
+            for wgt, nm in zip(
+                cast(list[float], assets.weights),
+                assets.columns_lvl_zero,
+            )
+        ],
+    )
+
+    opt_text = "<br>".join(
+        [
+            f"{wgt:.1%} - {nm}"
+            for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero)
+        ],
+    )
+    vol: Series[float] = assets.vol
+    plotframe = DataFrame(
+        data=[
+            assets.arithmetic_ret,
+            vol,
+            Series(
+                data=[""] * assets.item_count,
+                index=vol.index,
+            ),
+        ],
+        index=["ret", "stdev", "text"],
+    )
+    plotframe.columns = plotframe.columns.droplevel(level=1)
+    plotframe["Max Sharpe Portfolio"] = [optimized[0], optimized[1], opt_text]
+    plotframe[current.label] = [current.arithmetic_ret, current.vol, txt]
+
+    return plotframe
+
+
 def sharpeplot(  # noqa: C901
     sim_frame: DataFrame = None,
     line_frame: DataFrame = None,

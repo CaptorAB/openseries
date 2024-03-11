@@ -14,7 +14,6 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 import pytest
-from numpy import sqrt
 from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
 from requests.exceptions import ConnectionError
@@ -26,6 +25,7 @@ from openseries.frame import (
     OpenFrame,
     create_optimized_portfolios,
     efficient_frontier,
+    prepare_plot_data,
     sharpeplot,
     simulate_portfolios,
 )
@@ -3561,18 +3561,11 @@ class TestOpenFrame(TestCase):
 
         spframe = self.randomframe.from_deepcopy()
         spframe.to_cumret()
-        spframe.weights = [1.0 / spframe.item_count] * spframe.item_count
-        current = OpenTimeSeries.from_df(spframe.make_portfolio("Current Portfolio"))
-
-        vol: Series[float] = Series(
-            data=spframe.tsdf.diff().std() * sqrt(spframe.periods_in_a_year),
-            dtype="float64",
-        )
-        txt = "<br>".join(
-            [
-                f"{wgt:.1%} - {nm}"
-                for wgt, nm in zip(spframe.weights, spframe.columns_lvl_zero)
-            ],
+        current = OpenTimeSeries.from_df(
+            spframe.make_portfolio(
+                name="Current Portfolio",
+                weight_strat="eq_weights",
+            ),
         )
 
         frontier, simulated, optimum = efficient_frontier(
@@ -3583,23 +3576,9 @@ class TestOpenFrame(TestCase):
             tweak=False,
         )
 
-        opt_text = "<br>".join(
-            [
-                f"{wgt:.1%} - {nm}"
-                for wgt, nm in zip(optimum[3:], spframe.columns_lvl_zero)
-            ],
+        plotframe = prepare_plot_data(
+            assets=spframe, current=current, optimized=optimum,
         )
-        plotframe = DataFrame(
-            data=[
-                spframe.arithmetic_ret,
-                vol,
-                Series(data=[""] * spframe.item_count, index=vol.index),
-            ],
-            index=["ret", "stdev", "text"],
-        )
-        plotframe.columns = plotframe.columns.droplevel(level=1)
-        plotframe["Max Sharpe Portfolio"] = [optimum[0], optimum[1], opt_text]
-        plotframe[current.label] = [current.arithmetic_ret, current.vol, txt]
 
         figure_title_no_text, _ = sharpeplot(
             sim_frame=simulated,
