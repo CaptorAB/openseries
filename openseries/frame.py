@@ -1997,7 +1997,7 @@ def efficient_frontier(  # noqa: C901
     return line_df, simulated, append(optimal, opt_results.x)
 
 
-def create_optimized_portfolios(
+def constrain_optimized_portfolios(
     data: OpenFrame,
     serie: OpenTimeSeries,
     portfolioname: str = "Current Portfolio",
@@ -2006,7 +2006,7 @@ def create_optimized_portfolios(
     upper_bound: float = 0.25,
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
     """
-    Create optimized portfolios.
+    Constrain optimized portfolios to those that improve on the current one.
 
     Parameters
     ----------
@@ -2026,7 +2026,7 @@ def create_optimized_portfolios(
     Returns
     -------
     tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]
-        The filtered optimal portfolio data
+        The constrained optimal portfolio data
 
     """
     lr_frame = data.from_deepcopy()

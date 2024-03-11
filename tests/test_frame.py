@@ -23,7 +23,7 @@ from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.datefixer import date_offset_foll
 from openseries.frame import (
     OpenFrame,
-    create_optimized_portfolios,
+    constrain_optimized_portfolios,
     efficient_frontier,
     prepare_plot_data,
     sharpeplot,
@@ -3474,8 +3474,8 @@ class TestOpenFrame(TestCase):
             msg = f"Function efficient_frontier not working as intended\n{optlist}"
             raise ValueError(msg)
 
-    def test_create_optimized_portfolios(self: TestOpenFrame) -> None:
-        """Test function create_optimized_portfolios."""
+    def test_constrain_optimized_portfolios(self: TestOpenFrame) -> None:
+        """Test function constrain_optimized_portfolios."""
         simulations = 1000
         upper_bound = 1.0
         org_port_name = "Current Portfolio"
@@ -3485,7 +3485,7 @@ class TestOpenFrame(TestCase):
         std_frame.weights = [1 / std_frame.item_count] * std_frame.item_count
         assets_std = OpenTimeSeries.from_df(std_frame.make_portfolio(org_port_name))
 
-        minframe, minseries, maxframe, maxseries = create_optimized_portfolios(
+        minframe, minseries, maxframe, maxseries = constrain_optimized_portfolios(
             data=std_frame,
             serie=assets_std,
             portfolioname=org_port_name,
@@ -3495,7 +3495,7 @@ class TestOpenFrame(TestCase):
 
         if round(sum(minframe.weights), 7) != 1.0:
             msg = (
-                "Function create_optimized_portfolios not working as "
+                "Function constrain_optimized_portfolios not working as "
                 f"intended\n{round(sum(minframe.weights), 7)}"
             )
             raise ValueError(msg)
@@ -3509,7 +3509,7 @@ class TestOpenFrame(TestCase):
             "0.1679398",
         ]:
             msg = (
-                "Function create_optimized_portfolios not "
+                "Function constrain_optimized_portfolios not "
                 f"working as intended\n{minframe_weights}"
             )
             raise ValueError(msg)
@@ -3527,7 +3527,7 @@ class TestOpenFrame(TestCase):
 
         if round(sum(maxframe.weights), 7) != 1.0:
             msg = (
-                "Function create_optimized_portfolios not working as "
+                "Function constrain_optimized_portfolios not working as "
                 f"intended\n{round(sum(maxframe.weights), 7)}"
             )
             raise ValueError(msg)
@@ -3541,7 +3541,7 @@ class TestOpenFrame(TestCase):
             "0.1430285",
         ]:
             msg = (
-                "Function create_optimized_portfolios not "
+                "Function constrain_optimized_portfolios not "
                 f"working as intended\n{maxframe_weights}"
             )
             raise ValueError(msg)
