@@ -50,6 +50,7 @@ from openseries.types import (
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
+# noinspection PyUnresolvedReferences
 class OpenTimeSeries(_CommonModel):
 
     """
