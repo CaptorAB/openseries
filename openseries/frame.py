@@ -87,6 +87,7 @@ from openseries.types import (
 )
 
 
+# noinspection PyUnresolvedReferences
 class OpenFrame(_CommonModel):
 
     """
