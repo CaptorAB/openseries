@@ -250,7 +250,7 @@ class OpenFrame(_CommonModel):
             prop_list = [
                 getattr(self, x) for x in OpenFramePropertiesList.allowed_strings
             ]
-        return concat(prop_list, axis="columns").T
+        return cast(DataFrame, concat(prop_list, axis="columns").T)
 
     @property
     def lengths_of_items(self: Self) -> Series[int]:
