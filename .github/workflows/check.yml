@@ -35,9 +35,7 @@ jobs:
         run: poetry install --with dev
 
       - name: Check and fix with Ruff
-        run: |
-          poetry run ruff check ./openseries/*.py --fix --exit-non-zero-on-fix
-          poetry run ruff check ./tests/*.py --fix --exit-non-zero-on-fix
+        run: poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Type check with Mypy
         run: poetry run mypy .
