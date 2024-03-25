@@ -12,11 +12,11 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-        - pandas-stubs>=2.2.0.240316
-        - pydantic>=2.5.2,<3.0.0
-        - types-openpyxl>=3.1.0.20240311
-        - types-python-dateutil>=2.8.19.20240316
-        - types-requests>=2.31.0.20240311
+          - pandas-stubs>=2.2.0.240316
+          - pydantic>=2.5.2,<3.0.0
+          - types-openpyxl>=3.1.0.20240311
+          - types-python-dateutil>=2.8.19.20240316
+          - types-requests>=2.31.0.20240311
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
@@ -37,14 +37,14 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: name-tests-test
-        args: [--pytest-test-first]
+        args: [ --pytest-test-first ]
       - id: no-commit-to-branch
-        args: ['--branch', 'master']
+        args: [ '--branch', 'master' ]
       - id: pretty-format-json
-        args: [--autofix]
+        args: [ --autofix ]
       - id: trailing-whitespace
       - id: mixed-line-ending
-        args: [--fix=auto]
+        args: [ --fix=auto ]
       - id: fix-byte-order-marker
         exclude: .gitignore
   - repo: https://github.com/python-poetry/poetry
