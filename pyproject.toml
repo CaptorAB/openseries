@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.5.0"
+version = "1.5.1"
 description = "Package for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/OpenSeries"
@@ -34,7 +34,6 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-ffn = ">=1.0.0,<2.0.0"
 holidays = ">=0.30,<1.0"
 numpy = ">=1.23.2,<=2.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
@@ -43,6 +42,7 @@ plotly = ">=5.18.0,<6.0.0"
 pyarrow = ">=14.0.2,<16.0.0"
 pydantic = ">=2.5.2,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
+requests = ">=2.20.0,<3.0.0"
 scipy = ">=1.11.4,<2.0.0"
 statsmodels = ">=0.14.0,<1.0.0"
 
@@ -71,8 +71,6 @@ path = "venv"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    # https://github.com/pydata/pandas-datareader/issues/960
-    "ignore::DeprecationWarning:pandas_datareader.*:",
     "ignore::RuntimeWarning:pandas.*:"
 ]
 
