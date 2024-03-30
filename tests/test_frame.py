@@ -474,20 +474,6 @@ class TestOpenFrame(TestCase):
         with localcontext() as decimal_context:
             decimal_context.rounding = ROUND_HALF_UP
 
-            _ = mpframe.make_portfolio(name=name, weight_strat="eq_risk")
-            eq_risk_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
-            ]
-            if eq_risk_weights != [
-                Decimal("0.206999"),
-                Decimal("0.193416"),
-                Decimal("0.198024"),
-                Decimal("0.206106"),
-                Decimal("0.195454"),
-            ]:
-                msg = "make_portfolio() equal risk strategy not working as intended."
-                ValueError(msg)
-
             _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
             inv_vol_weights = [
                 round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
@@ -500,20 +486,6 @@ class TestOpenFrame(TestCase):
                 Decimal("0.171427"),
             ]:
                 msg = "make_portfolio() inverse vol strategy not working as intended."
-                ValueError(msg)
-
-            _ = mpframe.make_portfolio(name=name, weight_strat="mean_var")
-            mean_var_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
-            ]
-            if mean_var_weights != [
-                Decimal("0.244100"),
-                Decimal("0.000000"),
-                Decimal("0.000000"),
-                Decimal("0.755900"),
-                Decimal("0.000000"),
-            ]:
-                msg = "make_portfolio() mean variance result not as intended."
                 ValueError(msg)
 
         with pytest.raises(

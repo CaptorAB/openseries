@@ -124,9 +124,6 @@ def _calc_inv_vol_weights(returns: DataFrame) -> NDArray[float64]:
     """
     Calculate weights proportional to inverse volatility.
 
-    Source: https://github.com/pmorissette/ffn.
-    Function copied here because of FutureWarning from pandas ^2.1.0
-
     Parameters
     ----------
     returns: pandas.DataFrame

@@ -12,10 +12,6 @@ from pathlib import Path
 from typing import Callable, Optional, Union, cast
 
 import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
-from ffn.core import (  # type: ignore[import-untyped,unused-ignore]
-    calc_erc_weights,
-    calc_mean_var_weights,
-)
 from numpy import (
     append,
     array,
@@ -70,7 +66,6 @@ from openseries.types import (
     DaysInYearType,
     LiteralBizDayFreq,
     LiteralCaptureRatio,
-    LiteralCovMethod,
     LiteralFrameProps,
     LiteralHowMerge,
     LiteralLinePlotMode,
@@ -80,7 +75,6 @@ from openseries.types import (
     LiteralPlotlyJSlib,
     LiteralPlotlyOutput,
     LiteralPortfolioWeightings,
-    LiteralRiskParityMethod,
     LiteralTrunc,
     OpenFramePropertiesList,
     ValueType,
@@ -667,6 +661,7 @@ class OpenFrame(_CommonModel):
 
         """
         self.constituents += [new_series]
+        # noinspection PyUnreachableCode
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
         return self
 
@@ -1477,15 +1472,6 @@ class OpenFrame(_CommonModel):
         self: Self,
         name: str,
         weight_strat: Optional[LiteralPortfolioWeightings] = None,
-        initial_weights: Optional[list[float]] = None,
-        risk_weights: Optional[list[float]] = None,
-        risk_parity_method: LiteralRiskParityMethod = "ccd",
-        maximum_iterations: int = 100,
-        tolerance: float = 1e-8,
-        weight_bounds: tuple[float, float] = (0.0, 1.0),
-        riskfree: float = 0.0,
-        covar_method: LiteralCovMethod = "ledoit-wolf",
-        options: Optional[dict[str, int]] = None,
     ) -> DataFrame:
         """
         Calculate a basket timeseries based on the supplied weights.
@@ -1495,25 +1481,7 @@ class OpenFrame(_CommonModel):
         name: str
             Name of the basket timeseries
         weight_strat: LiteralPortfolioWeightings, optional
-            weight calculation from https://github.com/pmorissette/ffn
-        initial_weights: list[float], optional
-            Starting asset weights, default inverse volatility
-        risk_weights: list[float], optional
-            Risk target weights, default equal weight
-        risk_parity_method: LiteralRiskParityMethod, default: ccd
-            Risk parity estimation method
-        maximum_iterations: int, default: 100
-            Maximum iterations in iterative solutions
-        tolerance: float, default: 1e-8
-            Tolerance level in iterative solutions
-        weight_bounds: tuple[float, float], default: (0.0, 1.0)
-            Weigh limits for optimization
-        riskfree: float, default: 0.0
-            Risk-free rate used in utility calculation
-        covar_method: LiteralCovMethod, default: ledoit-wolf
-            Covariance matrix estimation method
-        options: dict, optional
-            options for minimizing, e.g. {'maxiter': 10000 }
+            weight calculation strategies
 
         Returns
         -------
@@ -1539,31 +1507,8 @@ class OpenFrame(_CommonModel):
         if weight_strat:
             if weight_strat == "eq_weights":
                 self.weights = [1.0 / self.item_count] * self.item_count
-            elif weight_strat == "eq_risk":
-                weight_calc = list(
-                    calc_erc_weights(
-                        returns=dframe,
-                        initial_weights=initial_weights,
-                        risk_weights=risk_weights,
-                        risk_parity_method=risk_parity_method,
-                        maximum_iterations=maximum_iterations,
-                        tolerance=tolerance,
-                    ),
-                )
-                self.weights = weight_calc
             elif weight_strat == "inv_vol":
                 weight_calc = list(_calc_inv_vol_weights(returns=dframe))
-                self.weights = weight_calc
-            elif weight_strat == "mean_var":
-                weight_calc = list(
-                    calc_mean_var_weights(
-                        returns=dframe,
-                        weight_bounds=weight_bounds,
-                        rf=riskfree,
-                        covar_method=covar_method,
-                        options=options,
-                    ),
-                )
                 self.weights = weight_calc
             else:
                 msg = "Weight strategy not implemented"
@@ -1810,9 +1755,12 @@ def simulate_portfolios(
 
         sharpe_arr[x] = ret_arr[x] / vol_arr[x]
 
-    simdf = DataFrame({"stdev": vol_arr, "ret": ret_arr, "sharpe": sharpe_arr})
+    # noinspection PyUnreachableCode
     simdf = concat(
-        [simdf, DataFrame(all_weights, columns=simframe.columns_lvl_zero)],
+        [
+            DataFrame({"stdev": vol_arr, "ret": ret_arr, "sharpe": sharpe_arr}),
+            DataFrame(all_weights, columns=simframe.columns_lvl_zero),
+        ],
         axis="columns",
     )
     simdf = simdf.replace([inf, -inf], nan)
@@ -1879,9 +1827,9 @@ def efficient_frontier(  # noqa: C901
         return cast(float64, npsum(weights) - 1)
 
     def _get_ret_vol_sr(
-            lg_ret: DataFrame,
-            weights: NDArray[float64],
-            per_in_yr: float,
+        lg_ret: DataFrame,
+        weights: NDArray[float64],
+        per_in_yr: float,
     ) -> NDArray[float64]:
         ret = npsum(lg_ret.mean() * weights) * per_in_yr
         volatility = sqrt(dot(weights.T, dot(lg_ret.cov() * per_in_yr, weights)))
@@ -1889,10 +1837,10 @@ def efficient_frontier(  # noqa: C901
         return cast(NDArray[float64], array([ret, volatility, sr]))
 
     def _diff_return(
-            lg_ret: DataFrame,
-            weights: NDArray[float64],
-            per_in_yr: float,
-            poss_return: float,
+        lg_ret: DataFrame,
+        weights: NDArray[float64],
+        per_in_yr: float,
+        poss_return: float,
     ) -> float64:
         return cast(
             float64,
@@ -1973,9 +1921,12 @@ def efficient_frontier(  # noqa: C901
         frontier_x.append(result["fun"])
         frontier_weights.append(result["x"])
 
-    line_df = DataFrame(data=frontier_weights, columns=eframe.columns_lvl_zero)
+    # noinspection PyUnreachableCode
     line_df = concat(
-        [line_df, DataFrame({"stdev": frontier_x, "ret": frontier_y})],
+        [
+            DataFrame(data=frontier_weights, columns=eframe.columns_lvl_zero),
+            DataFrame({"stdev": frontier_x, "ret": frontier_y}),
+        ],
         axis="columns",
     )
     line_df["sharpe"] = line_df.ret / line_df.stdev
