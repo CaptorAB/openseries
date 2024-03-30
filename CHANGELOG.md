@@ -3,6 +3,12 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.1] - 2024-03-30
+
+- Removed two weight strategies in OpenFrame.make_portfolio() to remove ffn as dependency.
+- Removing ffn revealed that requests as explicit dependency was missing in pyproject.toml.
+- Also miscellaneous development dependencies updates
+
 ## Version [1.5.0] - 2024-03-11
 
 - Added helper functions for additional portfolio analyses.
