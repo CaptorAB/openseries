@@ -62,18 +62,6 @@ types-requests = "^2.31.0.20240311"
 requires = ["poetry-core>=1.8.2"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.setuptools_scm]
-
-[poetry.virtualenvs]
-create = true
-in-project = true
-path = "venv"
-
-[tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::RuntimeWarning:pandas.*:"
-]
-
 [tool.coverage.run]
 omit = ["venv/*"]
 include = ["openseries/*"]

@@ -36,7 +36,7 @@ jobs:
         run: poetry run mypy .
 
       - name: Tests with Pytest
-        run: poetry run coverage run -m pytest --verbose
+        run: PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
         run: poetry run coverage report
