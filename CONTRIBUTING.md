@@ -1,4 +1,4 @@
-# Contributing to OpenSeries
+# Contributing to openseries
 Any input is welcome, such as:
 
 - Reporting a bug
