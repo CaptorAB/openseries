@@ -1095,13 +1095,13 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.0.20240331"
+version = "3.1.0.20240402"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-openpyxl-3.1.0.20240331.tar.gz", hash = "sha256:b36047aae13f5ea55f243dd754a12d041149685351e09a9ad7e922f497e5bed7"},
-    {file = "types_openpyxl-3.1.0.20240331-py3-none-any.whl", hash = "sha256:e324cf4f03caf7f93a4a73e90ff0a3293f474481a5f625669d271f60d2f37023"},
+    {file = "types-openpyxl-3.1.0.20240402.tar.gz", hash = "sha256:da3efda6c2d9a18616473de49a506cd10fbc0197136d6cd11084c63aff3b4adb"},
+    {file = "types_openpyxl-3.1.0.20240402-py3-none-any.whl", hash = "sha256:84f3d988ed535f3547db62c0bf2f46a1cee63b3b4436b6fbacf4d035b05efe09"},
 ]
 
 [[package]]
