@@ -275,13 +275,13 @@ typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
 name = "holidays"
-version = "0.45"
+version = "0.46"
 description = "Generate and work with holidays in Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "holidays-0.45-py3-none-any.whl", hash = "sha256:7f24a92aef0954f10e5c2a97246b4ee5ae97e0c3b987f74faf6ec8c4ad290abd"},
-    {file = "holidays-0.45.tar.gz", hash = "sha256:32bca3c0da9b34e9a4ec1a3f1bc2413fc0b3cdc7965bdbc718de1633758affe7"},
+    {file = "holidays-0.46-py3-none-any.whl", hash = "sha256:25e1ccca4b7cafb8602e0dec286a38183eb02029e4182c0ff1f2c3dc69d0cf82"},
+    {file = "holidays-0.46.tar.gz", hash = "sha256:f6b08f97ba8aa8e7a38a0a29e0be9002af973ad80c1e0bb2241bc1eaa8aa906e"},
 ]
 
 [package.dependencies]
@@ -1095,13 +1095,13 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.0.20240331"
+version = "3.1.0.20240402"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-openpyxl-3.1.0.20240331.tar.gz", hash = "sha256:b36047aae13f5ea55f243dd754a12d041149685351e09a9ad7e922f497e5bed7"},
-    {file = "types_openpyxl-3.1.0.20240331-py3-none-any.whl", hash = "sha256:e324cf4f03caf7f93a4a73e90ff0a3293f474481a5f625669d271f60d2f37023"},
+    {file = "types-openpyxl-3.1.0.20240402.tar.gz", hash = "sha256:da3efda6c2d9a18616473de49a506cd10fbc0197136d6cd11084c63aff3b4adb"},
+    {file = "types_openpyxl-3.1.0.20240402-py3-none-any.whl", hash = "sha256:84f3d988ed535f3547db62c0bf2f46a1cee63b3b4436b6fbacf4d035b05efe09"},
 ]
 
 [[package]]
@@ -1128,13 +1128,13 @@ files = [
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.20240311"
+version = "2.31.0.20240402"
 description = "Typing stubs for requests"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-requests-2.31.0.20240311.tar.gz", hash = "sha256:b1c1b66abfb7fa79aae09097a811c4aa97130eb8831c60e47aee4ca344731ca5"},
-    {file = "types_requests-2.31.0.20240311-py3-none-any.whl", hash = "sha256:47872893d65a38e282ee9f277a4ee50d1b28bd592040df7d1fdaffdf3779937d"},
+    {file = "types-requests-2.31.0.20240402.tar.gz", hash = "sha256:e5c09a202f8ae79cd6ffbbba2203b6c3775a83126283bb2a6abbc129abc02a12"},
+    {file = "types_requests-2.31.0.20240402-py3-none-any.whl", hash = "sha256:bd7eb7102168d4b5b489f15cdd9842b63ab7fe56aa82a0589fa595b94195acf4"},
 ]
 
 [package.dependencies]
