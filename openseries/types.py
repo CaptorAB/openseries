@@ -8,6 +8,7 @@ from typing import Annotated, ClassVar, Literal, Union
 from numpy import datetime64
 from pandas import Timestamp
 from pydantic import BaseModel, Field, StringConstraints, conlist, conset
+from typing_extensions import Self
 
 CountryStringType = Annotated[
     str,
@@ -238,14 +239,14 @@ class OpenTimeSeriesPropertiesList(list[str]):
     }
 
     def __init__(
-        self: OpenTimeSeriesPropertiesList,
+        self: Self,
         *args: LiteralSeriesProps,
     ) -> None:
         """Property arguments for the OpenTimeSeries class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self: OpenTimeSeriesPropertiesList) -> None:
+    def _validate(self: Self) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
@@ -291,12 +292,12 @@ class OpenFramePropertiesList(list[str]):
         "span_of_days_all",
     }
 
-    def __init__(self: OpenFramePropertiesList, *args: LiteralFrameProps) -> None:
+    def __init__(self: Self, *args: LiteralFrameProps) -> None:
         """Property arguments for the OpenFrame class."""
         super().__init__(args)
         self._validate()
 
-    def _validate(self: OpenFramePropertiesList) -> None:
+    def _validate(self: Self) -> None:
         seen = set()
         for item in self:
             if item not in self.allowed_strings:
