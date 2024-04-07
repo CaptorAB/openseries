@@ -1,5 +1,4 @@
 """Test suite for the openseries/simulation.py module."""
-
 from __future__ import annotations
 
 import datetime as dt

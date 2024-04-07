@@ -26,12 +26,16 @@ class TestTypes(TestCase):
             msg = "A OpenTimeSeriesPropertiesList was not produced"
             raise TypeError(msg)
 
-        with pytest.raises(ValueError, match="Invalid string: boo"):
+        with pytest.raises(
+                expected_exception=ValueError, match="Invalid string: boo",
+        ):
             OpenTimeSeriesPropertiesList(
                 *cast(LiteralSeriesProps, ["z_score", "boo", "positive_share"]),
             )
 
-        with pytest.raises(ValueError, match="Duplicate string: skew"):
+        with pytest.raises(
+            expected_exception=ValueError, match="Duplicate string: skew",
+        ):
             OpenTimeSeriesPropertiesList(
                 *cast(
                     LiteralSeriesProps,
@@ -47,12 +51,14 @@ class TestTypes(TestCase):
             msg = "A OpenFramePropertiesList was not produced"
             raise TypeError(msg)
 
-        with pytest.raises(ValueError, match="Invalid string: boo"):
+        with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
             OpenFramePropertiesList(
                 *cast(LiteralFrameProps, ["z_score", "boo", "positive_share"]),
             )
 
-        with pytest.raises(ValueError, match="Duplicate string: skew"):
+        with pytest.raises(
+            expected_exception=ValueError, match="Duplicate string: skew",
+        ):
             OpenFramePropertiesList(
                 *cast(
                     LiteralFrameProps,

@@ -44,13 +44,16 @@ class TestDateFixer(TestCase):
                 )
 
     def test_arg_type_error(self: TestDateFixer) -> None:
-        """Test date_fix to raise TypeError when appropriate."""
-        with pytest.raises(TypeError):
+        """Test date_fix to raise TypeError when appropri<ate."""
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="Unknown date format 3 of type <class 'int'> encountered",
+        ):
             _ = date_fix(cast(str, 3))
 
         str_arg: str = "abcdef"
         with pytest.raises(
-            ValueError,
+            expected_exception=ValueError,
             match=f"time data '{str_arg!s}' does not match format '%Y-%m-%d'",
         ):
             _ = date_fix("abcdef")
@@ -190,7 +193,7 @@ class TestDateFixer(TestCase):
 
         nonsense: str = "abcdef"
         with pytest.raises(
-            ValueError,
+            expected_exception=ValueError,
             match=f"time data '{nonsense!s}' does not match format '%Y-%m-%d'",
         ):
             _ = date_offset_foll(
@@ -198,7 +201,7 @@ class TestDateFixer(TestCase):
             )
 
         with pytest.raises(
-            ValueError,
+            expected_exception=ValueError,
             match="Argument countries must be a string country code",
         ):
             _ = date_offset_foll(
@@ -422,7 +425,7 @@ class TestDateFixer(TestCase):
             raise ValueError(msg)
 
         with pytest.raises(
-            ValueError,
+            expected_exception=ValueError,
             match=(
                 "Provide one of start or end date, but not both. "
                 "Date range is inferred from number of trading days."
@@ -435,7 +438,7 @@ class TestDateFixer(TestCase):
             )
 
         with pytest.raises(
-            ValueError,
+            expected_exception=ValueError,
             match=(
                 "Provide one of start or end date, but not both. "
                 "Date range is inferred from number of trading days."
