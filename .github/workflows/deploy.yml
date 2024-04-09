@@ -36,7 +36,7 @@ jobs:
         run: poetry run mypy .
 
       - name: Tests with Pytest
-        run: poetry run coverage run -m pytest --verbose
+        run: PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
         run: poetry run coverage report
@@ -58,7 +58,7 @@ jobs:
           echo "tag_version=$version" >> "$GITHUB_ENV"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.tag_version }}
 

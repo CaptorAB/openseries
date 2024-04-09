@@ -1,5 +1,4 @@
 """Test suite for the openseries package."""
-
 from __future__ import annotations
 
 from importlib.metadata import metadata

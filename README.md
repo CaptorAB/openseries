@@ -4,7 +4,7 @@ width="81" height="100" align="left" float="right"/><br/>
 
 <br><br>
 
-# OpenSeries
+# openseries
 
 [![PyPI version](https://img.shields.io/pypi/v/openseries.svg)](https://pypi.org/project/openseries/)
 [![Conda version](https://img.shields.io/conda/vn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
@@ -17,7 +17,7 @@ width="81" height="100" align="left" float="right"/><br/>
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-**OpenSeries** is a project with tools to analyse financial timeseries of a single
+`openseries` is a project with tools to analyse financial timeseries of a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
 <span style="font-size:2em;">[CHANGELOG](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
