@@ -1,4 +1,5 @@
 """Declaring types used throughout the project."""
+
 from __future__ import annotations
 
 import datetime as dt
@@ -120,6 +121,7 @@ LiteralLinePlotMode = Literal[
     "lines+text",
     "markers+text",
     "lines+markers+text",
+    None,
 ]
 LiteralHowMerge = Literal["outer", "inner"]
 LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "nearest"]
@@ -138,7 +140,7 @@ LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]
 LiteralPlotlyOutput = Literal["file", "div"]
 LiteralPlotlyJSlib = Literal[True, False, "cdn"]
 LiteralOlsFitMethod = Literal["pinv", "qr"]
-LiteralPortfolioWeightings = Literal["eq_weights", "eq_risk", "inv_vol", "mean_var"]
+LiteralPortfolioWeightings = Literal["eq_weights", "inv_vol"]
 LiteralOlsFitCovType = Literal[
     "nonrobust",
     "fixed scale",
