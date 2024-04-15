@@ -35,7 +35,7 @@ class TestPackage(TestCase):
             "^(openseries)$",
             "^(Package for analyzing financial timeseries.)$",
             f"^({toml_version})$",
-            "^(https://github.com/CaptorAB/OpenSeries)$",
+            "^(https://github.com/CaptorAB/openseries)$",
             "^(BSD-3-Clause)$",
             "^(>=3.9,<3.13)$",
         ]

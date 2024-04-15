@@ -24,7 +24,7 @@ Pull requests are the best way to propose changes to the codebase and are welcom
 In short, when you submit code changes, your submissions are understood to be under the same [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause/) that covers the project. Feel free to contact the maintainers if that's a concern.
 
 ## Report bugs using Github's issues
-GitHub issues are used to track public bugs. Report a bug by [opening a new issue](https://github.com/CaptorAB/OpenSeries/issues/new/choose).
+GitHub issues are used to track public bugs. Report a bug by [opening a new issue](https://github.com/CaptorAB/openseries/issues/new/choose).
 
 ## Write bug reports with detail, background, and sample code
 Use a clear and descriptive title.
@@ -36,7 +36,7 @@ Provide information about your environment, such as your operating system or app
 If possible, try to isolate the issue to a specific code block or function.
 
 ## Use a Consistent Coding Style
-Two tools are used for styling and linting and their configurations are kept in the project's [pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml) file. They are:
+Two tools are used for styling and linting and their configurations are kept in the project's [pyproject.toml](https://github.com/CaptorAB/openseries/blob/master/pyproject.toml) file. They are:
 
 * Ruff linting
 * Mypy type checking

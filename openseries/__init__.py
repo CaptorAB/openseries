@@ -1,1 +1,1 @@
-"""OpenSeries.openseries.__init__.py."""
+"""openseries.openseries.__init__.py."""

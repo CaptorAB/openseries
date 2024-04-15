@@ -194,12 +194,12 @@ A significant change that will hopefully not break anything backwards as it is a
 rebuild to remove as much duplicate code as possible. This has been achieved by
 introducing a new base class that OpenTimeSeries and OpenFrame inherits properties
 and methods from, while still also inheriting from the Pydantic BaseModel.
-Further described in [issue 41](https://github.com/CaptorAB/OpenSeries/issues/41).
+Further described in [issue 41](https://github.com/CaptorAB/openseries/issues/41).
 
 ## Version [1.1.7] - 2023-08-11
 
 Changed the Pydantic configuration which will improve popup docs in e.g. Pycharm.
-Also resolved issue [#35](https://github.com/CaptorAB/OpenSeries/issues/35) with
+Also resolved issue [#35](https://github.com/CaptorAB/openseries/issues/35) with
 nested decorator warning.
 
 ## Version [1.1.6] - 2023-08-08
@@ -291,7 +291,7 @@ Fixed typing the inputs for OpenFrame methods
 
 Aligned code to pass many of the type checks performed by `mypy`. A list of error
 codes are for now silenced in the project's
-[pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
+[pyproject.toml](https://github.com/CaptorAB/openseries/blob/master/pyproject.toml)
 file.
 
 ## Version [0.11.4] - 2023-03-19

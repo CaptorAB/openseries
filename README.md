@@ -10,9 +10,9 @@ width="81" height="100" align="left" float="right"/><br/>
 [![Conda version](https://img.shields.io/conda/vn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
 [![Conda platforms](https://img.shields.io/conda/pn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
-[![GitHub Action Test Suite](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
-[![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/OpenSeries@master/coverage.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/test.yml)
-[![Styling, Linting & Type checks](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml/badge.svg)](https://github.com/CaptorAB/OpenSeries/actions/workflows/check.yml)
+[![GitHub Action Test Suite](https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
+[![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/openseries@master/coverage.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
+[![Styling, Linting & Type checks](https://github.com/CaptorAB/openseries/actions/workflows/check.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/check.yml)
 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
@@ -20,7 +20,7 @@ width="81" height="100" align="left" float="right"/><br/>
 `openseries` is a project with tools to analyse financial timeseries of a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
-<span style="font-size:2em;">[CHANGELOG](https://github.com/CaptorAB/OpenSeries/blob/master/CHANGELOG.md)</span>
+<span style="font-size:2em;">[CHANGELOG](https://github.com/CaptorAB/openseries/blob/master/CHANGELOG.md)</span>
 
 
 ## Basic Usage
@@ -102,8 +102,8 @@ on any attributes or methods inherited from this model.
 ### Windows Powershell
 
 ```powershell
-git clone https://github.com/CaptorAB/OpenSeries.git
-cd OpenSeries
+git clone https://github.com/CaptorAB/openseries.git
+cd openseries
 ./make.ps1 make
 
 ```
@@ -111,8 +111,8 @@ cd OpenSeries
 ### Mac Terminal/Linux
 
 ```bash
-git clone https://github.com/CaptorAB/OpenSeries.git
-cd OpenSeries
+git clone https://github.com/CaptorAB/openseries.git
+cd openseries
 make
 source source_me
 make install
@@ -125,7 +125,7 @@ Ruff and Mypy checking is embedded in the pre-commit hook. Both
 are also used in the project's GitHub workflows and are run when the `lint`
 alternative is chosen in the below commands.
 Any silenced error codes can be found in the
-[pyproject.toml](https://github.com/CaptorAB/OpenSeries/blob/master/pyproject.toml)
+[pyproject.toml](https://github.com/CaptorAB/openseries/blob/master/pyproject.toml)
 file or in in-line comments.
 
 ### Windows Powershell
@@ -165,9 +165,9 @@ make lint
 
 | File                                                                                                             | Description                                                                                                                                                                                                                               |
 |:-----------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [series.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together.                                       |
-| [frame.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries. The module also defines functions to simulate, optimize, and plot portfolios. |
-| [simulation.py](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/simulation.py)                     | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                                                           |
+| [series.py](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py)                             | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together.                                       |
+| [frame.py](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py)                               | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries. The module also defines functions to simulate, optimize, and plot portfolios. |
+| [simulation.py](https://github.com/CaptorAB/openseries/blob/master/openseries/simulation.py)                     | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                                                           |
 
 ### Class methods used to construct objects.
 
@@ -178,7 +178,7 @@ make lint
 | `from_fixed_rate` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
 | `from_deepcopy`   | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
 
-### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
+### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) class.
 
 | Property        | type            | Applies to       | Description                                                                                                                                  |
 |:----------------|:----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -195,7 +195,7 @@ make lint
 | `countries`     | `list` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used to generate business days.                                                    |
 | `valuetype`     | `ValueType`     | `OpenTimeSeries` | Field identifies the type of values in the series. ValueType is an Enum.                                                                     |
 
-### Non-numerical or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+### Non-numerical or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
 
 | Property           | type                   | Applies to  | Description                                                              |
 |:-------------------|:-----------------------|:------------|:-------------------------------------------------------------------------|
@@ -209,7 +209,7 @@ make lint
 | `lengths_of_items` | `pandas.Series`        | `OpenFrame` | Number of items in each of the series in the OpenFrame.                  |
 | `span_of_days_all` | `pandas.Series`        | `OpenFrame` | Number of days from the first to the last in each of the series.         |
 
-### Non-numerical or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+### Non-numerical or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
 
 | Property            | type                             | Applies to                    | Description                                                                       |
 |:--------------------|:---------------------------------|:------------------------------|:----------------------------------------------------------------------------------|
@@ -222,7 +222,7 @@ make lint
 | `periods_in_a_year` | `float`                          | `OpenTimeSeries`, `OpenFrame` | The number of observations in an average year for all days in the data.           |
 | `yearfrac`          | `float`                          | `OpenTimeSeries`, `OpenFrame` | Length of timeseries expressed as np.float64 fraction of a year with 365.25 days. |
 
-### Methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) class.
+### Methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) class.
 
 | Method                   | Applies to       | Description                                                                                                                                    |
 |:-------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -234,7 +234,7 @@ make lint
 | `from_1d_rate_to_cumret` | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
                                                                            |
 
-### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
 
 | Method                  | Applies to  | Description                                                                                                                                                                        |
 |:------------------------|:------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -255,7 +255,7 @@ make lint
 | `rolling_corr`          | `OpenFrame` | Calculates and adds a series of rolling [correlations](https://www.investopedia.com/terms/c/correlation.asp) between two other series.                                             |
 | `ewma_risk`             | `OpenFrame` | Returns a `pandas.DataFrame` with volatility and correlation based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp).                  |
 
-### Methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py) class.
+### Methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
 
 | Method                             | Applies to                    | Description                                                                                                                                              |
 |:-----------------------------------|:------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -280,7 +280,7 @@ make lint
 | `rolling_cvar_down`                | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling CVaR figures.                                                                                                    |
 | `calc_range`                       | `OpenTimeSeries`, `OpenFrame` | Returns the start and end dates of a range from specific period definitions. Used by the below numerical methods and not meant to be used independently. |
 
-### Numerical properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/OpenSeries/blob/master/openseries/frame.py).
+### Numerical properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py).
 
 | Property                | type                     | Applies to                    | Description                                                                                                                                                                                                             |
 |:------------------------|:-------------------------|:------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
