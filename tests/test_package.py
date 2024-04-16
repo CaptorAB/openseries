@@ -33,7 +33,7 @@ class TestPackage(TestCase):
 
         expected_values = [
             "^(openseries)$",
-            "^(Package for analyzing financial timeseries.)$",
+            "^(Tools for analyzing financial timeseries.)$",
             f"^({toml_version})$",
             "^(https://github.com/CaptorAB/openseries)$",
             "^(BSD-3-Clause)$",

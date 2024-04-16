@@ -3,6 +3,13 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.2] - 2024-04-16
+
+- Corrected typing.Literal on weight strategies that were removed in 1.5.1
+- Lower cased project name throughout to remove any confusion
+- Added Self typing where missing in types.py
+- Miscellaneous development dependencies update. Minimal related changes.
+
 ## Version [1.5.1] - 2024-03-30
 
 - Removed two weight strategies in OpenFrame.make_portfolio() to remove ffn as dependency.
