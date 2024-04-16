@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "openseries"
-version = "1.5.1"
-description = "Package for analyzing financial timeseries."
+version = "1.5.2"
+description = "Tools for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
-repository = "https://github.com/CaptorAB/OpenSeries"
+repository = "https://github.com/CaptorAB/openseries"
 license = "BSD-3-Clause"
 readme = "README.md"
 classifiers = [
