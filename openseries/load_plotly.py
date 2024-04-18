@@ -1,4 +1,5 @@
 """Function to load plotly layout and configuration from local json file."""
+
 from __future__ import annotations
 
 from json import load

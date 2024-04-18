@@ -228,8 +228,11 @@ class TestOpenFrame(TestCase):
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
         crframe = self.randomframe.from_deepcopy()
-        start, end = crframe.first_idx.strftime("%Y-%m-%d"), crframe.last_idx.strftime(
-            "%Y-%m-%d",
+        start, end = (
+            crframe.first_idx.strftime("%Y-%m-%d"),
+            crframe.last_idx.strftime(
+                "%Y-%m-%d",
+            ),
         )
         rst, ren = crframe.calc_range()
 

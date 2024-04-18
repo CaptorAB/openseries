@@ -1,4 +1,5 @@
 """Various risk related functions."""
+
 from __future__ import annotations
 
 from math import ceil
