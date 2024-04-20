@@ -20,7 +20,7 @@ For now this is the only place where we log summary descriptions.
 
 - Added helper functions for additional portfolio analyses.
 - The new functions cover weight simulations, efficient frontier optimizations, and plotting.
-- I intend to make an example that will be added [here](https://github.com/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
+- I intend to make an example that will be added [here](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
 - Also miscellaneous development dependencies updates
 
 ## Version [1.4.12] - 2024-02-20
