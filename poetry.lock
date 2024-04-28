@@ -793,13 +793,13 @@ typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
 name = "pytest"
-version = "8.1.2"
+version = "8.2.0"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.1.2-py3-none-any.whl", hash = "sha256:6c06dc309ff46a05721e6fd48e492a775ed8165d2ecdf57f156a80c7e95bb142"},
-    {file = "pytest-8.1.2.tar.gz", hash = "sha256:f3c45d1d5eed96b01a2aea70dee6a4a366d51d38f9957768083e4fecfc77f3ef"},
+    {file = "pytest-8.2.0-py3-none-any.whl", hash = "sha256:1733f0620f6cda4095bbf0d9ff8022486e91892245bb9e7d5542c018f612f233"},
+    {file = "pytest-8.2.0.tar.gz", hash = "sha256:d507d4482197eac0ba2bae2e9babf0672eb333017bcedaa5fb1a3d42c1174b3f"},
 ]
 
 [package.dependencies]
@@ -807,11 +807,11 @@ colorama = {version = "*", markers = "sys_platform == \"win32\""}
 exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
 iniconfig = "*"
 packaging = "*"
-pluggy = ">=1.4,<2.0"
+pluggy = ">=1.5,<2.0"
 tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 
 [package.extras]
-testing = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
+dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
 name = "python-dateutil"
@@ -1075,13 +1075,13 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.0.20240425"
+version = "3.1.0.20240428"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-openpyxl-3.1.0.20240425.tar.gz", hash = "sha256:774176d8d8d709b62915fc01a182aa4a5400fa4f6acce54927d3a782a8135c19"},
-    {file = "types_openpyxl-3.1.0.20240425-py3-none-any.whl", hash = "sha256:3f37e8400ffb12e10f768c222acb3d718eb401ff72147491f1c679dd97d9fb52"},
+    {file = "types-openpyxl-3.1.0.20240428.tar.gz", hash = "sha256:76f5d01fb6ecb495683da957ac4e15b982efbeab772f728a348c6e01ae990e9b"},
+    {file = "types_openpyxl-3.1.0.20240428-py3-none-any.whl", hash = "sha256:08b180ec49d15140e07399a3f3cb75fd25e9e09e3326319fc6be5636892480f5"},
 ]
 
 [[package]]
@@ -1182,4 +1182,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "dc7d31a4f7945fa1301e35beb6cece82474bdcdd161aeb36058666e4462a65bd"
+content-hash = "d42d7d35f01814b5b4a52b6256b22900bf82a08200f87c0377d9fe68e7e28a17"
