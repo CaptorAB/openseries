@@ -1934,8 +1934,9 @@ def efficient_frontier(  # noqa: C901
     limit_small = 0.0001
     line_df = line_df.mask(line_df.abs() < limit_small, 0.0)
     line_df["text"] = line_df.apply(
-        lambda c: "<br>".join(
-            [f"{c[nm]:.1%} - {nm}" for nm in eframe.columns_lvl_zero],
+        lambda c: "<br><br>Weights:<br>"
+        + "<br>".join(
+            [f"{c[nm]:.1%}  {nm}" for nm in eframe.columns_lvl_zero],
         ),
         axis="columns",
     )
@@ -2038,9 +2039,9 @@ def prepare_plot_data(
         The data prepared with mean returns, volatility and weights
 
     """
-    txt = "<br>".join(
+    txt = "<br><br>Weights:<br>" + "<br>".join(
         [
-            f"{wgt:.1%} - {nm}"
+            f"{wgt:.1%}  {nm}"
             for wgt, nm in zip(
                 cast(list[float], assets.weights),
                 assets.columns_lvl_zero,
@@ -2048,12 +2049,10 @@ def prepare_plot_data(
         ],
     )
 
-    opt_text = "<br>".join(
-        [
-            f"{wgt:.1%} - {nm}"
-            for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero)
-        ],
-    )
+    opt_text_list = [
+        f"{wgt:.1%}  {nm}" for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero)
+    ]
+    opt_text = "<br><br>Weights:<br>" + "<br>".join(opt_text_list)
     vol: Series[float] = assets.vol
     plotframe = DataFrame(
         data=[
@@ -2166,7 +2165,10 @@ def sharpeplot(  # noqa: C901
             x=line_frame.loc[:, "stdev"],
             y=line_frame.loc[:, "ret"],
             text=line_frame.loc[:, "text"],
-            hovertemplate="%{text}<br>Return %{y}<br>Vol %{x}",
+            xhoverformat=".2%",
+            yhoverformat=".2%",
+            hovertemplate="Return %{y}<br>Vol %{x}%{text}",
+            hoverlabel_align="right",
             line={"width": 2.5, "dash": "solid"},
             mode="lines",
             name="Efficient frontier",
@@ -2182,11 +2184,12 @@ def sharpeplot(  # noqa: C901
             risk.extend([point_frame.loc["stdev", col]])
             figure.add_scatter(
                 x=[point_frame.loc["stdev", col]],
-                xhoverformat=".2%",
                 y=[point_frame.loc["ret", col]],
+                xhoverformat=".2%",
                 yhoverformat=".2%",
                 hovertext=[point_frame.loc["text", col]],
-                hoverinfo="x+y+text+name",
+                hovertemplate=("Return %{y}<br>Vol %{x}%{hovertext}"),
+                hoverlabel_align="right",
                 marker={"size": 20, "color": clr},
                 mode=point_frame_mode,
                 name=col,
