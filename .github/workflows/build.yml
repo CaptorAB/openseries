@@ -20,22 +20,18 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v4
 
+      - name: Install Poetry
+        run: |
+          pip install --user pipx
+          pipx ensurepath
+          pipx install poetry==1.8.2
+
       - name: Set up Python on ${{ runner.os }}
         uses: actions/setup-python@v5
         id: setup_python
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'poetry'
-
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: 1.8.2
-
-      - name: Setup a local virtual environment
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
 
       - name: Install dependencies on Python ${{ steps.setup_python.outputs.python-version }}
         run: poetry install --with dev
