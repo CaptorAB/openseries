@@ -1,17 +1,13 @@
 """Test suite for the openseries/simulation.py module."""
+
 from __future__ import annotations
 
 import datetime as dt
 from typing import Union
 from unittest import TestCase
 
-from pandas import DataFrame
-
 from openseries.series import OpenTimeSeries
-from openseries.simulation import (
-    ReturnSimulation,
-    random_generator,
-)
+from openseries.simulation import ReturnSimulation
 from openseries.types import ValueType
 from tests.test_common_sim import SEED, SIMS
 
@@ -26,34 +22,6 @@ class TestSimulation(TestCase):
     def setUpClass(cls: type[TestSimulation]) -> None:
         """SetUpClass for the TestSimulation class."""
         cls.seriesim = SIMS
-
-    def test_init_with_without_randomizer(self: TestSimulation) -> None:
-        """Test instantiating ReturnSimulation with & without random generator."""
-        sim_without = ReturnSimulation(
-            number_of_sims=1,
-            trading_days=SIMS.trading_days,
-            mean_annual_return=SIMS.mean_annual_return,
-            mean_annual_vol=SIMS.mean_annual_vol,
-            trading_days_in_year=SIMS.trading_days_in_year,
-            dframe=DataFrame(),
-            seed=SEED,
-        )
-        if not isinstance(sim_without, ReturnSimulation):
-            msg = "ReturnSimulation object not instantiated as expected"
-            raise TypeError(msg)
-
-        sim_with = ReturnSimulation(
-            number_of_sims=1,
-            trading_days=SIMS.trading_days,
-            mean_annual_return=SIMS.mean_annual_return,
-            mean_annual_vol=SIMS.mean_annual_vol,
-            trading_days_in_year=SIMS.trading_days_in_year,
-            dframe=DataFrame(),
-            randomizer=random_generator(seed=SEED),
-        )
-        if not isinstance(sim_with, ReturnSimulation):
-            msg = "ReturnSimulation object not instantiated as expected"
-            raise TypeError(msg)
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""

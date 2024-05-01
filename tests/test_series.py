@@ -1,4 +1,5 @@
 """Test suite for the openseries/series.py module."""
+
 from __future__ import annotations
 
 import datetime as dt
@@ -19,7 +20,11 @@ from openseries.series import (
     _check_if_none,
     timeseries_chain,
 )
-from openseries.types import CountriesType, LiteralSeriesProps, ValueType
+from openseries.types import (
+    CountriesType,
+    LiteralSeriesProps,
+    ValueType,
+)
 from tests.test_common_sim import SIMSERIES
 
 
@@ -897,12 +902,10 @@ class TestOpenTimeSeries(TestCase):
                     f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
                 )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
-                result_values[value] = (
-                    result.loc[  # type: ignore[assignment,unused-ignore]
-                        value,
-                        ("Asset_0", ValueType.PRICE),
-                    ]
-                )
+                result_values[value] = result.loc[  # type: ignore[assignment,unused-ignore]
+                    value,
+                    ("Asset_0", ValueType.PRICE),
+                ]
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
                     dt.date,

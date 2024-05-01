@@ -1,4 +1,5 @@
 """Defining the ReturnSimulation class."""
+
 from __future__ import annotations
 
 import datetime as dt
@@ -76,8 +77,6 @@ class ReturnSimulation(BaseModel):
         This is the average jump size
     seed: int, optional
         Seed for random process initiation
-    randomizer: numpy.random.Generator, optional
-        Random process generator
 
     """
 
@@ -91,7 +90,6 @@ class ReturnSimulation(BaseModel):
     jumps_sigma: NonNegativeFloat = 0.0
     jumps_mu: float = 0.0
     seed: Optional[int] = None
-    randomizer: Optional[Generator] = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -159,6 +157,7 @@ class ReturnSimulation(BaseModel):
         trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
+        randomizer: Optional[Generator] = None,
     ) -> ReturnSimulation:
         """
         Create a Normal distribution simulation.
@@ -178,6 +177,8 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
+        randomizer: numpy.random.Generator, optional
+            Random process generator
 
         Returns
         -------
@@ -185,9 +186,10 @@ class ReturnSimulation(BaseModel):
             Normal distribution simulation
 
         """
-        cls.randomizer = random_generator(seed=seed)
+        if not randomizer:
+            randomizer = random_generator(seed=seed)
 
-        returns = cls.randomizer.normal(
+        returns = randomizer.normal(
             loc=mean_annual_return / trading_days_in_year,
             scale=mean_annual_vol / sqrt(trading_days_in_year),
             size=(number_of_sims, trading_days),
@@ -201,7 +203,6 @@ class ReturnSimulation(BaseModel):
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
-            randomizer=cls.randomizer,
         )
 
     @classmethod
@@ -213,6 +214,7 @@ class ReturnSimulation(BaseModel):
         trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
+        randomizer: Optional[Generator] = None,
     ) -> ReturnSimulation:
         """
         Create a Lognormal distribution simulation.
@@ -232,6 +234,8 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType,
             default: 252
             Number of trading days used to annualize
+        randomizer: numpy.random.Generator, optional
+            Random process generator
 
         Returns
         -------
@@ -239,10 +243,11 @@ class ReturnSimulation(BaseModel):
             Lognormal distribution simulation
 
         """
-        cls.randomizer = random_generator(seed=seed)
+        if not randomizer:
+            randomizer = random_generator(seed=seed)
 
         returns = (
-            cls.randomizer.lognormal(
+            randomizer.lognormal(
                 mean=mean_annual_return / trading_days_in_year,
                 sigma=mean_annual_vol / sqrt(trading_days_in_year),
                 size=(number_of_sims, trading_days),
@@ -258,7 +263,6 @@ class ReturnSimulation(BaseModel):
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
-            randomizer=cls.randomizer,
         )
 
     @classmethod
@@ -270,6 +274,7 @@ class ReturnSimulation(BaseModel):
         trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
+        randomizer: Optional[Generator] = None,
     ) -> ReturnSimulation:
         """
         Create a Geometric Brownian Motion simulation.
@@ -288,6 +293,8 @@ class ReturnSimulation(BaseModel):
             Seed for random process initiation
         trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
+        randomizer: numpy.random.Generator, optional
+            Random process generator
 
         Returns
         -------
@@ -295,14 +302,15 @@ class ReturnSimulation(BaseModel):
             Geometric Brownian Motion simulation
 
         """
-        cls.randomizer = random_generator(seed=seed)
+        if not randomizer:
+            randomizer = random_generator(seed=seed)
 
         drift = (mean_annual_return - 0.5 * mean_annual_vol**2.0) * (
             1.0 / trading_days_in_year
         )
 
         normal_mean = 0.0
-        wiener = cls.randomizer.normal(
+        wiener = randomizer.normal(
             loc=normal_mean,
             scale=sqrt(1.0 / trading_days_in_year) * mean_annual_vol,
             size=(number_of_sims, trading_days),
@@ -318,7 +326,6 @@ class ReturnSimulation(BaseModel):
             mean_annual_vol=mean_annual_vol,
             dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
-            randomizer=cls.randomizer,
         )
 
     @classmethod
@@ -333,6 +340,7 @@ class ReturnSimulation(BaseModel):
         jumps_sigma: NonNegativeFloat = 0.0,
         jumps_mu: float = 0.0,
         trading_days_in_year: DaysInYearType = 252,
+        randomizer: Optional[Generator] = None,
     ) -> ReturnSimulation:
         """
         Create a Merton Jump-Diffusion model simulation.
@@ -357,6 +365,8 @@ class ReturnSimulation(BaseModel):
             This is the average jump size
         trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
+        randomizer: numpy.random.Generator, optional
+            Random process generator
 
         Returns
         -------
@@ -364,21 +374,22 @@ class ReturnSimulation(BaseModel):
             Merton Jump-Diffusion model simulation
 
         """
-        cls.randomizer = random_generator(seed=seed)
+        if not randomizer:
+            randomizer = random_generator(seed=seed)
 
         normal_mean = 0.0
-        wiener = cls.randomizer.normal(
+        wiener = randomizer.normal(
             loc=normal_mean,
             scale=sqrt(1.0 / trading_days_in_year) * mean_annual_vol,
             size=(number_of_sims, trading_days),
         )
 
         poisson_jumps = multiply(
-            cls.randomizer.poisson(
+            randomizer.poisson(
                 lam=jumps_lamda * (1.0 / trading_days_in_year),
                 size=(number_of_sims, trading_days),
             ),
-            cls.randomizer.normal(
+            randomizer.normal(
                 loc=jumps_mu,
                 scale=jumps_sigma,
                 size=(number_of_sims, trading_days),
@@ -406,7 +417,6 @@ class ReturnSimulation(BaseModel):
             jumps_mu=jumps_mu,
             dframe=DataFrame(data=returns, dtype="float64"),
             seed=seed,
-            randomizer=cls.randomizer,
         )
 
     def to_dataframe(

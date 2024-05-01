@@ -1,4 +1,5 @@
 """Test suite for the openseries/datefixer.py module."""
+
 from __future__ import annotations
 
 import datetime as dt

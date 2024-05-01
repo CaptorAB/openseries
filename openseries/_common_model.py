@@ -1,4 +1,5 @@
 """Defining the _CommonModel class."""
+
 from __future__ import annotations
 
 import datetime as dt

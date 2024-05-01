@@ -228,8 +228,11 @@ class TestOpenFrame(TestCase):
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
         crframe = self.randomframe.from_deepcopy()
-        start, end = crframe.first_idx.strftime("%Y-%m-%d"), crframe.last_idx.strftime(
-            "%Y-%m-%d",
+        start, end = (
+            crframe.first_idx.strftime("%Y-%m-%d"),
+            crframe.last_idx.strftime(
+                "%Y-%m-%d",
+            ),
         )
         rst, ren = crframe.calc_range()
 
@@ -1430,7 +1433,7 @@ class TestOpenFrame(TestCase):
             msg = "OpenFrame failed to log warning about empty input list."
             raise ValueError(msg)
 
-    def test_trunc_frame(self: TestOpenFrame) -> None:
+    def test_trunc_frame_both(self: TestOpenFrame) -> None:
         """Test trunc_frame method."""
         series_long = self.randomseries.from_deepcopy()
         series_long.set_new_label("Long")
@@ -1457,10 +1460,10 @@ class TestOpenFrame(TestCase):
         ]
 
         if firsts == frame.first_indices.tolist():
-            msg = "Method trunc_frame() did not work as intended."
+            msg = "trunc_frame() test not set up as intended."
             raise ValueError(msg)
         if lasts == frame.last_indices.tolist():
-            msg = "Method trunc_frame() did not work as intended."
+            msg = "trunc_frame() test not set up as intended."
             raise ValueError(msg)
 
         frame.trunc_frame()
@@ -1477,6 +1480,70 @@ class TestOpenFrame(TestCase):
         frame.trunc_frame(start_cut=trunced[0], end_cut=trunced[1])
 
         if trunced != [frame.first_idx, frame.last_idx]:
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+
+    def test_trunc_frame_before_after(self: TestOpenFrame) -> None:
+        """Test trunc_frame method."""
+        series_long = self.randomseries.from_deepcopy()
+        series_long.set_new_label("Long")
+        tmp_series = self.randomseries.from_deepcopy()
+        series_short = OpenTimeSeries.from_df(
+            tmp_series.tsdf.loc[
+                cast(int, dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
+                    int,
+                    dt.date(2018, 6, 27),
+                ),
+                ("Asset_0", ValueType.PRICE),
+            ],
+        )
+        series_short.set_new_label("Short")
+        frame = OpenFrame([series_long, series_short])
+
+        firsts = [
+            dt.date(2017, 6, 27),
+            dt.date(2017, 6, 27),
+        ]
+        lasts = [
+            dt.date(2018, 6, 27),
+            dt.date(2018, 6, 27),
+        ]
+
+        if firsts == frame.first_indices.tolist():
+            msg = "trunc_frame() test not set up as intended."
+            raise ValueError(msg)
+        if lasts == frame.last_indices.tolist():
+            msg = "trunc_frame() test not set up as intended."
+            raise ValueError(msg)
+
+        before_frame = frame.from_deepcopy()
+        after_frame = frame.from_deepcopy()
+
+        before_frame.trunc_frame(where="before")
+
+        if firsts != before_frame.first_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+        if lasts == before_frame.last_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+
+        after_frame.trunc_frame(where="after")
+
+        if firsts == after_frame.first_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+        if lasts != after_frame.last_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+
+        before_frame.trunc_frame(where="after")
+        after_frame.trunc_frame(where="before")
+
+        if firsts != after_frame.first_indices.tolist():
+            msg = "Method trunc_frame() did not work as intended."
+            raise ValueError(msg)
+        if lasts != before_frame.last_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
             raise ValueError(msg)
 

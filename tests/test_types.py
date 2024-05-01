@@ -1,4 +1,5 @@
 """Test suite for the openseries/types.py module."""
+
 from __future__ import annotations
 
 from typing import cast
@@ -27,14 +28,16 @@ class TestTypes(TestCase):
             raise TypeError(msg)
 
         with pytest.raises(
-                expected_exception=ValueError, match="Invalid string: boo",
+            expected_exception=ValueError,
+            match="Invalid string: boo",
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(LiteralSeriesProps, ["z_score", "boo", "positive_share"]),
             )
 
         with pytest.raises(
-            expected_exception=ValueError, match="Duplicate string: skew",
+            expected_exception=ValueError,
+            match="Duplicate string: skew",
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
@@ -57,7 +60,8 @@ class TestTypes(TestCase):
             )
 
         with pytest.raises(
-            expected_exception=ValueError, match="Duplicate string: skew",
+            expected_exception=ValueError,
+            match="Duplicate string: skew",
         ):
             OpenFramePropertiesList(
                 *cast(
