@@ -3,6 +3,12 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.3] - 2024-05-01
+
+- Changed randomizer location on ReturnSimulation. Since constructing methods are never run twice this should have no effect.
+- Improved hover labels in the sharpe_plot.
+- Also miscellaneous dependencies updated.
+
 ## Version [1.5.2] - 2024-04-16
 
 - Corrected typing.Literal on weight strategies that were removed in 1.5.1
