@@ -1,4 +1,3 @@
-# Check if $PWD is already in PYTHONPATH
 if [[ ":$PYTHONPATH:" != *":$PWD:"* ]]; then
     export PYTHONPATH=${PWD}:$PYTHONPATH
     echo ""
