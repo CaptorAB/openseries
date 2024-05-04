@@ -6,7 +6,7 @@ if ($task -eq "active")
 {
     if ($null -ne $env:PYTHONPATH)
     {
-        if (-not $env:PYTHONPATH -match [regex]::Escape($PWD))
+        if (-not ($env:PYTHONPATH -match [regex]::Escape($PWD)))
         {
             $env:PYTHONPATH = "$PWD" + ";$env:PYTHONPATH"
             Write-Output "`nPYTHONPATH changed. It is '$( $env:PYTHONPATH )'"
@@ -31,7 +31,7 @@ elseif ($task -eq "make")
     python -m venv ./venv
     if ($null -ne $env:PYTHONPATH)
     {
-        if (-not $env:PYTHONPATH -match [regex]::Escape($PWD))
+        if (-not ($env:PYTHONPATH -match [regex]::Escape($PWD)))
         {
             $env:PYTHONPATH = "$PWD" + ";$env:PYTHONPATH"
             Write-Output "`nPYTHONPATH changed. It is '$( $env:PYTHONPATH )'"
