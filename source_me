@@ -6,3 +6,6 @@ else
     echo "PYTHONPATH not changed"
 fi
 source venv/bin/activate
+echo ""
+echo "The Python used in the '$(basename "$VIRTUAL_ENV")' environment is:"
+which python

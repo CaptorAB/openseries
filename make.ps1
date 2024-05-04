@@ -9,19 +9,21 @@ if ($task -eq "active")
         if (-not $env:PYTHONPATH -match [regex]::Escape($PWD))
         {
             $env:PYTHONPATH += ";$PWD"
-            Write-Output "PYTHONPATH changed. It is '$( $env:PYTHONPATH )'"
+            Write-Output "`nPYTHONPATH changed. It is '$( $env:PYTHONPATH )'"
         }
         else
         {
-            Write-Output "PYTHONPATH not changed. It is '$( $env:PYTHONPATH )'"
+            Write-Output "`nPYTHONPATH not changed. It is '$( $env:PYTHONPATH )'"
         }
     }
     else
     {
         $env:PYTHONPATH = $PWD
-        Write-Output "PYTHONPATH set to: $( $env:PYTHONPATH )"
+        Write-Output "`nPYTHONPATH set to: $( $env:PYTHONPATH )"
     }
     .\venv\Scripts\activate
+    Write-Output "`nThe Python used in the '$(Split-Path -Leaf $env:VIRTUAL_ENV)' environment is:"
+    Get-Command python
 }
 elseif ($task -eq "make")
 {
@@ -32,19 +34,21 @@ elseif ($task -eq "make")
         if (-not $env:PYTHONPATH -match [regex]::Escape($PWD))
         {
             $env:PYTHONPATH += ";$PWD"
-            Write-Output "PYTHONPATH changed. It is '$( $env:PYTHONPATH )'"
+            Write-Output "`nPYTHONPATH changed. It is '$( $env:PYTHONPATH )'"
         }
         else
         {
-            Write-Output "PYTHONPATH not changed. It is '$( $env:PYTHONPATH )'"
+            Write-Output "`nPYTHONPATH not changed. It is '$( $env:PYTHONPATH )'"
         }
     }
     else
     {
         $env:PYTHONPATH = $PWD
-        Write-Output "PYTHONPATH set to: $( $env:PYTHONPATH )"
+        Write-Output "`nPYTHONPATH set to: $( $env:PYTHONPATH )"
     }
     .\venv\Scripts\activate
+    Write-Output "`nThe Python used in the '$(Split-Path -Leaf $env:VIRTUAL_ENV)' environment is:"
+    Get-Command python
     python.exe -m pip install --upgrade pip
     pip install poetry==1.8.2
     Remove-Item -Path 'poetry.lock' -Force -ErrorAction SilentlyContinue
@@ -71,5 +75,5 @@ elseif ($task -eq "clean")
 }
 else
 {
-    Write-Host "Only active, make, test, clean or lint are allowed as tasks"
+    Write-Output "Only active, make, test, clean or lint are allowed as tasks"
 }
