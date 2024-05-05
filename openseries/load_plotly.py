@@ -7,6 +7,7 @@ from logging import warning
 from pathlib import Path
 
 import requests
+from requests.exceptions import ConnectionError
 
 from openseries.types import CaptorLogoType, PlotlyLayoutType
 
@@ -32,7 +33,7 @@ def _check_remote_file_existence(url: str) -> bool:
         response = requests.head(url, timeout=30)
         if response.status_code != ok_code:
             return False
-    except requests.exceptions.ConnectionError:
+    except ConnectionError:
         return False
     return True
 
@@ -59,9 +60,9 @@ def load_plotly_dict(
     layoutfile = project_root.joinpath("openseries").joinpath("plotly_layouts.json")
     logofile = project_root.joinpath("openseries").joinpath("plotly_captor_logo.json")
 
-    with Path.open(layoutfile, encoding="utf-8") as layout_file:
+    with Path.open(layoutfile, mode="r", encoding="utf-8") as layout_file:
         fig = load(layout_file)
-    with Path.open(logofile, encoding="utf-8") as logo_file:
+    with Path.open(logofile, mode="r", encoding="utf-8") as logo_file:
         logo = load(logo_file)
 
     if _check_remote_file_existence(url=logo["source"]) is False:

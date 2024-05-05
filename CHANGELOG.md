@@ -3,6 +3,12 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.4] - 2024-05-05
+
+- Added new measure Omega Ratio, https://en.wikipedia.org/wiki/Omega_ratio. Works on both OpenTimeSeries and OpenFrame.
+- Changed casing on Positive share and Max drawdown labels for consistency.
+- Outside of the package I have improved the shell scripts used in development.
+
 ## Version [1.5.3] - 2024-05-01
 
 - Changed randomizer location on ReturnSimulation. Since constructing methods are never run twice this should have no effect.

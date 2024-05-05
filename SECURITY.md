@@ -8,6 +8,7 @@ Without an x next to a version below you can assume that it works as intended.
 
 | Version | Supported          |
 |---------|--------------------|
+| 1.5.4   | :white_check_mark: |
 | 1.5.3   | :white_check_mark: |
 | 1.5.2   | :white_check_mark: |
 | 1.5.1   | :white_check_mark: |
