@@ -276,6 +276,20 @@ class _CommonModel(BaseModel):
         )
 
     @property
+    def omega_ratio(self: Self) -> Union[float, Series[float]]:
+        """
+        https://en.wikipedia.org/wiki/Omega_ratio.
+
+        Returns
+        -------
+        Union[float, Pandas.Series[float]]
+            Omega ratio calculation
+
+        """
+        minimum_accepted_return: float = 0.0
+        return self.omega_ratio_func(min_accepted_return=minimum_accepted_return)
+
+    @property
     def z_score(self: Self) -> Union[float, Series[float]]:
         """
         https://www.investopedia.com/terms/z/zscore.asp.
@@ -1866,6 +1880,60 @@ class _CommonModel(BaseModel):
             data=ratio,
             index=self.tsdf.columns,
             name="Sortino ratio",
+            dtype="float64",
+        )
+
+    def omega_ratio_func(
+        self: Self,
+        min_accepted_return: float = 0.0,
+        months_from_last: Optional[int] = None,
+        from_date: Optional[dt.date] = None,
+        to_date: Optional[dt.date] = None,
+    ) -> Union[float, Series[float]]:
+        """
+        Omega Ratio.
+
+        The Omega Ratio compares returns above a certain target level
+        (often referred to as the “minimum acceptable return” or “MAR”)
+        to the total downside risk below that same threshold.
+        https://en.wikipedia.org/wiki/Omega_ratio.
+
+        Parameters
+        ----------
+        min_accepted_return : float, optional
+            The annualized Minimum Accepted Return (MAR)
+        months_from_last : int, optional
+            number of months offset as positive integer. Overrides use of from_date
+            and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns
+        -------
+        Union[float, Pandas.Series[float]]
+            Omega ratio calculation
+
+        """
+        earlier, later = self.calc_range(
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
+        )
+        retdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(
+            fill_method=cast(str, None),
+        )
+        pos = retdf[retdf > min_accepted_return].sub(min_accepted_return).sum()
+        neg = retdf[retdf < min_accepted_return].sub(min_accepted_return).sum()
+        ratio = pos / -neg
+
+        if self.tsdf.shape[1] == 1:
+            return float(cast(float64, ratio.iloc[0]))
+        return Series(
+            data=ratio,
+            index=self.tsdf.columns,
+            name="Omega ratio",
             dtype="float64",
         )
 

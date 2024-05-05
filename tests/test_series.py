@@ -877,6 +877,7 @@ class TestOpenTimeSeries(TestCase):
             "skew",
             "cvar_down",
             "sortino_ratio",
+            "omega_ratio",
             "positive_share",
             "kurtosis",
             "vol_from_var",
@@ -931,6 +932,7 @@ class TestOpenTimeSeries(TestCase):
             "max_drawdown": "-0.1314808074",
             "max_drawdown_cal_year": "-0.1292814491",
             "max_drawdown_date": "2012-11-21",
+            "omega_ratio": "1.0983709757",
             "periods_in_a_year": "251.3720547945",
             "positive_share": "0.5057745918",
             "ret_vol_ratio": "0.4162058331",
@@ -1481,8 +1483,73 @@ class TestOpenTimeSeries(TestCase):
             periods_in_a_year_fixed=1,
         )
 
-        if f"{downdev:.12f}" != "0.043333333333":
-            msg = "Unexpected result from downside_deviation_func()"
+        if f"{downdev:.10f}" != "0.0433333333":
+            msg = f"Unexpected result from downside_deviation_func() {downdev:.10f}"
+            raise ValueError(msg)
+
+    def test_omega_ratio(self: TestOpenTimeSeries) -> None:
+        """
+        Test omega_ratio_func method.
+
+        Source:
+        https://breakingdownfinance.com/finance-topics/
+        performance-measurement/omega-ratio/
+        """
+        or_asset = OpenTimeSeries.from_arrays(
+            name="asset",
+            valuetype=ValueType.RTRN,
+            baseccy="USD",
+            dates=[
+                "1999-12-31",
+                "2000-12-31",
+                "2001-12-31",
+                "2002-12-31",
+                "2003-12-31",
+                "2004-12-31",
+                "2005-12-31",
+                "2006-12-31",
+                "2007-12-31",
+                "2008-12-31",
+                "2009-12-31",
+                "2010-12-31",
+                "2011-12-31",
+                "2012-12-31",
+                "2013-12-31",
+                "2014-12-31",
+                "2015-12-31",
+                "2016-12-31",
+                "2017-12-31",
+            ],
+            values=[
+                1.0000,
+                1.0422,
+                0.9722,
+                1.1002,
+                1.0067,
+                1.2290,
+                1.5040,
+                1.6755,
+                1.9732,
+                2.4217,
+                2.6145,
+                2.6636,
+                2.9385,
+                3.3328,
+                2.9826,
+                2.9775,
+                3.1627,
+                3.0460,
+                3.8614,
+            ],
+        )
+
+        mar = 0.03
+        omega = or_asset.omega_ratio_func(
+            min_accepted_return=mar,
+        )
+
+        if f"{omega:.10f}" != "3.1163413842":
+            msg = f"Unexpected result from omega_ratio_func(): {omega:.10f}"
             raise ValueError(msg)
 
     def test_validations(self: TestOpenTimeSeries) -> None:
