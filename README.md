@@ -17,7 +17,7 @@ width="81" height="100" align="left" float="right"/><br/>
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-`openseries` is a project with tools to analyse financial timeseries of a single
+This is a project with tools to analyze financial timeseries of a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
 <span style="font-size:2em;">[CHANGELOG](https://github.com/CaptorAB/openseries/blob/master/CHANGELOG.md)</span>
