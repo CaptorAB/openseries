@@ -163,7 +163,7 @@ class _CommonModel(BaseModel):
         return Series(
             data=mddc,
             index=self.tsdf.columns,
-            name="Max Drawdown in cal yr",
+            name="Max drawdown in cal yr",
             dtype="float64",
         )
 
@@ -1693,7 +1693,7 @@ class _CommonModel(BaseModel):
         return Series(
             data=result,
             index=self.tsdf.columns,
-            name="Max Drawdown",
+            name="Max drawdown",
             dtype="float64",
         )
 
@@ -1749,7 +1749,7 @@ class _CommonModel(BaseModel):
         return Series(
             data=share,
             index=self.tsdf.columns,
-            name="Positive Share",
+            name="Positive share",
             dtype="float64",
         )
 
