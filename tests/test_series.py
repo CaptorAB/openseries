@@ -364,7 +364,7 @@ class TestOpenTimeSeries(TestCase):
         """Test duplicate handling."""
         json_file = Path(__file__).resolve().parent.joinpath("series.json")
         with Path.open(json_file, encoding="utf-8") as jsonfile:
-            output = load(jsonfile)
+            output = load(jsonfile)[0]
 
         dates = (
             output["dates"][:63]
