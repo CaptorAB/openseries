@@ -113,6 +113,7 @@ PlotlyLayoutType = dict[
 
 CaptorLogoType = dict[str, Union[str, float]]
 
+LiteralJsonOutput = Literal["values", "tsdf"]
 LiteralTrunc = Literal["before", "after", "both"]
 LiteralLinePlotMode = Literal[
     "lines",

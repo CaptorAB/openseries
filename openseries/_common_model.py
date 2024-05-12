@@ -38,6 +38,7 @@ from openseries.types import (
     CountriesType,
     DaysInYearType,
     LiteralBarPlotMode,
+    LiteralJsonOutput,
     LiteralLinePlotMode,
     LiteralNanMethod,
     LiteralPlotlyJSlib,
@@ -651,16 +652,18 @@ class _CommonModel(BaseModel):
 
     def to_json(
         self: Self,
+        what_output: LiteralJsonOutput,
         filename: str,
         directory: Optional[DirectoryPath] = None,
     ) -> list[dict[str, Union[str, bool, ValueType, list[str], list[float]]]]:
         """
         Dump timeseries data into a json file.
 
-        The label and tsdf parameters are deleted before the json file is saved
-
         Parameters
         ----------
+        what_output: LiteralJsonOutput
+            Choice on whether the raw values or the tsdf Dataframe values are
+            returned as json and exported as json file.
         filename: str
             Filename including filetype
         directory: DirectoryPath, optional
@@ -669,7 +672,7 @@ class _CommonModel(BaseModel):
         Returns
         -------
         list[Dict[str, Union[str, bool, ValueType, list[str], list[float]]]]
-            A list of dictionaries with the raw original data of the series
+            A list of dictionaries with the data of the series
 
         """
         if directory:
@@ -683,21 +686,31 @@ class _CommonModel(BaseModel):
         data = dict(self.__dict__)
         output = []
         if "label" in data:
+            if what_output == "tsdf":
+                values = self.tsdf.iloc[:, 0].tolist()
+            else:
+                values = list(cast(list[float], data.get("values")))
             for item in cleaner_list:
                 data.pop(item)
+            valuetype = cast(ValueType, data.get("valuetype")).value
+            data.update({"valuetype": valuetype})
+            data.update({"values": values})
             output.append(dict(data))
         else:
             for serie in cast(list[Any], data.get("constituents")):
+                if what_output == "tsdf":
+                    values = serie.tsdf.iloc[:, 0].tolist()
+                else:
+                    values = list(serie.values)
                 itemdata = dict(serie.__dict__)
                 for item in cleaner_list:
                     itemdata.pop(item)
+                valuetype = cast(ValueType, itemdata["valuetype"]).value
+                itemdata.update({"valuetype": valuetype})
+                itemdata.update({"values": values})
                 output.append(dict(itemdata))
 
-        with Path.open(
-            dirpath.joinpath(filename),
-            "w",
-            encoding="utf-8",
-        ) as jsonfile:
+        with dirpath.joinpath(filename).open(mode="w", encoding="utf-8") as jsonfile:
             dump(output, jsonfile, indent=2, sort_keys=False)
 
         return output

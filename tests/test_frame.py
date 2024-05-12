@@ -6,7 +6,7 @@ from __future__ import annotations
 import datetime as dt
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from itertools import product as iter_product
-from json import loads
+from json import load, loads
 from pathlib import Path
 from pprint import pformat
 from typing import Hashable, Optional, Union, cast
@@ -61,12 +61,17 @@ class TestOpenFrame(TestCase):
             framefile = Path(__file__).resolve().parent.joinpath(filename)
 
         if Path(framefile).exists():
-            msg = "test_save_to_json test case setup failed."
+            msg = "test_to_json test case setup failed."
             raise FileExistsError(msg)
 
         kwargs = [
-            {"filename": str(framefile)},
-            {"filename": "framesaved.json", "directory": str(framefile.parent)},
+            {"what_output": "values", "filename": str(framefile)},
+            {"what_output": "values", "filename": filename},
+            {
+                "what_output": "values",
+                "filename": filename,
+                "directory": str(framefile.parent),
+            },
         ]
         for kwarg in kwargs:
             data = self.randomframe.to_json(**kwarg)  # type: ignore[arg-type]
@@ -94,7 +99,7 @@ class TestOpenFrame(TestCase):
 
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
-            data = self.randomframe.to_json(filename=filename)
+            data = self.randomframe.to_json(what_output="values", filename=filename)
 
         if [item.get("name") for item in data] != [
             "Asset_0",
@@ -113,7 +118,7 @@ class TestOpenFrame(TestCase):
         ) as mock_donotopen:
             mock_doesnotexist.return_value = True
             mock_donotopen.side_effect = MagicMock()
-            data2 = self.randomframe.to_json(filename=filename)
+            data2 = self.randomframe.to_json(what_output="values", filename=filename)
 
         if [item.get("name") for item in data2] != [
             "Asset_0",
@@ -124,6 +129,150 @@ class TestOpenFrame(TestCase):
         ]:
             msg = "Unexpected data from json"
             raise ValueError(msg)
+
+    def test_to_json_and_back(self: TestOpenFrame) -> None:
+        """Test to_json method and creating an OpenFrame from file data."""
+        filename = "frame.json"
+        dirpath = Path(__file__).resolve().parent
+        framefile = dirpath.joinpath(filename)
+
+        if Path(framefile).exists():
+            msg = "test_to_json_and_back test case setup failed."
+            raise FileExistsError(msg)
+
+        intended = ["1.640116", "1.354976", "2.287658", "2.045919", "1.169641"]
+
+        data = self.randomframe.to_json(
+            what_output="values", filename=filename, directory=dirpath,
+        )
+
+        frame_one = OpenFrame(
+            [
+                OpenTimeSeries.from_arrays(
+                    name=item["name"],
+                    dates=item["dates"],
+                    values=item["values"],
+                    valuetype=item["valuetype"],
+                    baseccy=item["currency"],
+                    local_ccy=item["local_ccy"],
+                )
+                for item in data
+            ],
+        ).to_cumret()
+
+        check_one = [f"{endvalue:.6f}" for endvalue in frame_one.tsdf.iloc[-1]]
+
+        if check_one != intended:
+            msg = f"test_to_json_and_back did not output as intended: {check_one}"
+            raise ValueError(msg)
+
+        with Path.open(framefile, encoding="utf-8") as jsonfile:
+            output = load(jsonfile)
+
+        frame_two = OpenFrame(
+            [
+                OpenTimeSeries.from_arrays(
+                    name=item["name"],
+                    dates=item["dates"],
+                    values=item["values"],
+                    valuetype=item["valuetype"],
+                    baseccy=item["currency"],
+                    local_ccy=item["local_ccy"],
+                )
+                for item in output
+            ],
+        ).to_cumret()
+
+        check_two = [f"{endvalue:.6f}" for endvalue in frame_two.tsdf.iloc[-1]]
+
+        if check_two != intended:
+            msg = f"test_to_json_and_back did not output as intended: {check_two}"
+            raise ValueError(msg)
+
+        if not Path(framefile).exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
+
+        framefile.unlink()
+
+        if Path(framefile).exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
+
+    def test_to_json_and_back_tsdf(self: TestOpenFrame) -> None:
+        """Test to_json method and creating an OpenFrame from file data."""
+        filename = "frame_tsdf.json"
+        dirpath = Path(__file__).resolve().parent
+        framefile = dirpath.joinpath(filename)
+
+        if Path(framefile).exists():
+            msg = "test_to_json_and_back_tsdf test case setup failed."
+            raise FileExistsError(msg)
+
+        intended = ["1.640116", "1.354976", "2.287658", "2.045919", "1.169641"]
+
+        data = self.randomframe.to_json(
+            what_output="tsdf", filename=filename, directory=dirpath,
+        )
+
+        frame_one = OpenFrame(
+            [
+                OpenTimeSeries.from_arrays(
+                    name=item["name"],
+                    dates=item["dates"],
+                    values=item["values"],
+                    valuetype=item["valuetype"],
+                    baseccy=item["currency"],
+                    local_ccy=item["local_ccy"],
+                )
+                for item in data
+            ],
+        ).to_cumret()
+
+        check_one = [f"{endvalue:.6f}" for endvalue in frame_one.tsdf.iloc[-1]]
+
+        if check_one != intended:
+            msg = (
+                "test_to_json_and_back_tsdf did "
+                f"not output as intended: {check_one}"
+            )
+            raise ValueError(msg)
+
+        with Path.open(framefile, encoding="utf-8") as jsonfile:
+            output = load(jsonfile)
+
+        frame_two = OpenFrame(
+            [
+                OpenTimeSeries.from_arrays(
+                    name=item["name"],
+                    dates=item["dates"],
+                    values=item["values"],
+                    valuetype=item["valuetype"],
+                    baseccy=item["currency"],
+                    local_ccy=item["local_ccy"],
+                )
+                for item in output
+            ],
+        ).to_cumret()
+
+        check_two = [f"{endvalue:.6f}" for endvalue in frame_two.tsdf.iloc[-1]]
+
+        if check_two != intended:
+            msg = (
+                "test_to_json_and_back_tsdf did "
+                f"not output as intended: {check_two}"
+            )
+            raise ValueError(msg)
+
+        if not Path(framefile).exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
+
+        framefile.unlink()
+
+        if Path(framefile).exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
 
     def test_to_xlsx(self: TestOpenFrame) -> None:
         """Test to_xlsx method."""

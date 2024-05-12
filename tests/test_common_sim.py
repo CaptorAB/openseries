@@ -5,6 +5,7 @@ import datetime as dt
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation
+from openseries.types import ValueType
 
 SEED: int = 71
 
@@ -21,14 +22,16 @@ SIMS = ReturnSimulation.from_merton_jump_gbm(
 )
 
 SIMSERIES = OpenTimeSeries.from_df(
-    SIMS.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
+    dframe=SIMS.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
+    valuetype=ValueType.RTRN,
 ).to_cumret()
 
 SIMFRAME = OpenFrame(
     [
         OpenTimeSeries.from_df(
-            SIMS.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
+            dframe=SIMS.to_dataframe(name="Asset", end=dt.date(2019, 6, 30)),
             column_nmbr=serie,
+            valuetype=ValueType.RTRN,
         )
         for serie in range(SIMS.number_of_sims)
     ],
