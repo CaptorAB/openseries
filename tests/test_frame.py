@@ -56,9 +56,11 @@ class TestOpenFrame(TestCase):
         """Test to_json method."""
         filename = "framesaved.json"
         if Path.home().joinpath("Documents").exists():
-            framefile = Path.home().joinpath("Documents").joinpath(filename)
+            directory = Path.home().joinpath("Documents")
+            framefile = directory.joinpath(filename)
         else:
-            framefile = Path(__file__).resolve().parent.joinpath(filename)
+            directory = Path(__file__).resolve().parent
+            framefile = directory.joinpath(filename)
 
         if Path(framefile).exists():
             msg = "test_to_json test case setup failed."
@@ -70,9 +72,10 @@ class TestOpenFrame(TestCase):
             {
                 "what_output": "values",
                 "filename": filename,
-                "directory": str(framefile.parent),
+                "directory": directory,
             },
         ]
+
         for kwarg in kwargs:
             data = self.randomframe.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != [
@@ -143,7 +146,9 @@ class TestOpenFrame(TestCase):
         intended = ["1.640116", "1.354976", "2.287658", "2.045919", "1.169641"]
 
         data = self.randomframe.to_json(
-            what_output="values", filename=filename, directory=dirpath,
+            what_output="values",
+            filename=filename,
+            directory=dirpath,
         )
 
         frame_one = OpenFrame(
@@ -208,7 +213,9 @@ class TestOpenFrame(TestCase):
         intended = ["1.640116", "1.354976", "2.287658", "2.045919", "1.169641"]
 
         data = self.randomframe.to_json(
-            what_output="tsdf", filename=filename, directory=dirpath,
+            what_output="tsdf",
+            filename=filename,
+            directory=dirpath,
         )
 
         frame_one = OpenFrame(

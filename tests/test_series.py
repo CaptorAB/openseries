@@ -604,23 +604,36 @@ class TestOpenTimeSeries(TestCase):
 
     def test_to_json(self: TestOpenTimeSeries) -> None:
         """Test to_json method."""
-        directory = Path(__file__).resolve().parent
-        seriesfile = directory.joinpath("seriessaved.json")
+        filename = "seriessaved.json"
+        if Path.home().joinpath("Documents").exists():
+            directory = Path.home().joinpath("Documents")
+            seriesfile = directory.joinpath(filename)
+        else:
+            directory = Path(__file__).resolve().parent
+            seriesfile = directory.joinpath(filename)
 
-        jseries = self.randomseries.from_deepcopy()
+        if Path(seriesfile).exists():
+            msg = "test_to_json test case setup failed."
+            raise FileExistsError(msg)
+
         kwargs = [
             {
                 "what_output": "values",
-                "filename": str(directory.joinpath("seriessaved.json")),
+                "filename": str(seriesfile),
             },
             {
                 "what_output": "values",
-                "filename": "seriessaved.json",
+                "filename": seriesfile,
+            },
+            {
+                "what_output": "values",
+                "filename": seriesfile,
                 "directory": directory,
             },
         ]
+
         for kwarg in kwargs:
-            data = jseries.to_json(**kwarg)  # type: ignore[arg-type]
+            data = self.randomseries.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != ["Asset_0"]:
                 msg = "Unexpected data from json"
                 raise ValueError(msg)
@@ -648,17 +661,22 @@ class TestOpenTimeSeries(TestCase):
         intended = "1.640116"
 
         data = self.randomseries.to_json(
-            what_output="values", filename=filename, directory=dirpath,
-        )[0]
+            what_output="values",
+            filename=filename,
+            directory=dirpath,
+        )
 
-        series_one = OpenTimeSeries.from_arrays(
-            name=data["name"],  # type: ignore[arg-type,unused-ignore]
-            dates=data["dates"],  # type: ignore[arg-type,unused-ignore]
-            values=data["values"],  # type: ignore[arg-type,unused-ignore]
-            valuetype=ValueType.RTRN,  # type: ignore[arg-type,unused-ignore]
-            baseccy=data["currency"],  # type: ignore[arg-type,unused-ignore]
-            local_ccy=data["local_ccy"],  # type: ignore[arg-type,unused-ignore]
-        ).to_cumret()
+        series_one = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],  # type: ignore[arg-type,unused-ignore]
+                dates=item["dates"],  # type: ignore[arg-type,unused-ignore]
+                values=item["values"],  # type: ignore[arg-type,unused-ignore]
+                valuetype=ValueType.RTRN,
+                baseccy=item["currency"],  # type: ignore[arg-type,unused-ignore]
+                local_ccy=item["local_ccy"],  # type: ignore[arg-type,unused-ignore]
+            ).to_cumret()
+            for item in data
+        )
 
         if f"{series_one.tsdf.iloc[-1, 0]:.6f}" != intended:
             msg = (
@@ -668,16 +686,19 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
         with Path.open(seriesfile, encoding="utf-8") as jsonfile:
-            output = load(jsonfile)[0]
+            output = load(jsonfile)
 
-        series_two = OpenTimeSeries.from_arrays(
-            name=output["name"],
-            dates=output["dates"],
-            values=output["values"],
-            valuetype=ValueType.RTRN,
-            baseccy=output["currency"],
-            local_ccy=output["local_ccy"],
-        ).to_cumret()
+        series_two = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],
+                dates=item["dates"],
+                values=item["values"],
+                valuetype=ValueType.RTRN,
+                baseccy=item["currency"],
+                local_ccy=item["local_ccy"],
+            ).to_cumret()
+            for item in output
+        )
 
         if f"{series_two.tsdf.iloc[-1, 0]:.6f}" != intended:
             msg = (
@@ -709,16 +730,21 @@ class TestOpenTimeSeries(TestCase):
         intended = "1.640116"
 
         data = self.randomseries.to_json(
-            what_output="tsdf", filename=filename, directory=dirpath,
-        )[0]
+            what_output="tsdf",
+            filename=filename,
+            directory=dirpath,
+        )
 
-        series_one = OpenTimeSeries.from_arrays(
-            name=data["name"],  # type: ignore[arg-type,unused-ignore]
-            dates=data["dates"],  # type: ignore[arg-type,unused-ignore]
-            values=data["values"],  # type: ignore[arg-type,unused-ignore]
-            valuetype=data["valuetype"],  # type: ignore[arg-type,unused-ignore]
-            baseccy=data["currency"],  # type: ignore[arg-type,unused-ignore]
-            local_ccy=data["local_ccy"],  # type: ignore[arg-type,unused-ignore]
+        series_one = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],  # type: ignore[arg-type,unused-ignore]
+                dates=item["dates"],  # type: ignore[arg-type,unused-ignore]
+                values=item["values"],  # type: ignore[arg-type,unused-ignore]
+                valuetype=item["valuetype"],  # type: ignore[arg-type,unused-ignore]
+                baseccy=item["currency"],  # type: ignore[arg-type,unused-ignore]
+                local_ccy=item["local_ccy"],  # type: ignore[arg-type,unused-ignore]
+            ).to_cumret()
+            for item in data
         )
 
         if f"{series_one.tsdf.iloc[-1, 0]:.6f}" != intended:
@@ -729,15 +755,18 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
         with Path.open(seriesfile, encoding="utf-8") as jsonfile:
-            output = load(jsonfile)[0]
+            output = load(jsonfile)
 
-        series_two = OpenTimeSeries.from_arrays(
-            name=output["name"],
-            dates=output["dates"],
-            values=output["values"],
-            valuetype=output["valuetype"],
-            baseccy=output["currency"],
-            local_ccy=output["local_ccy"],
+        series_two = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],
+                dates=item["dates"],
+                values=item["values"],
+                valuetype=item["valuetype"],
+                baseccy=item["currency"],
+                local_ccy=item["local_ccy"],
+            ).to_cumret()
+            for item in output
         )
 
         if f"{series_two.tsdf.iloc[-1, 0]:.6f}" != intended:
