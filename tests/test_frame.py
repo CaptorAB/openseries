@@ -189,10 +189,6 @@ class TestOpenFrame(TestCase):
             msg = f"test_to_json_and_back did not output as intended: {check_two}"
             raise ValueError(msg)
 
-        if not Path(framefile).exists():
-            msg = "json file not created"
-            raise FileNotFoundError(msg)
-
         framefile.unlink()
 
         if Path(framefile).exists():
@@ -263,10 +259,6 @@ class TestOpenFrame(TestCase):
                 f"not output as intended: {check_two}"
             )
             raise ValueError(msg)
-
-        if not Path(framefile).exists():
-            msg = "json file not created"
-            raise FileNotFoundError(msg)
 
         framefile.unlink()
 
