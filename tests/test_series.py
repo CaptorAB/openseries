@@ -362,32 +362,27 @@ class TestOpenTimeSeries(TestCase):
 
     def test_duplicates_handling(self: TestOpenTimeSeries) -> None:
         """Test duplicate handling."""
-        json_file = Path(__file__).resolve().parent.joinpath("series.json")
-        with Path.open(json_file, encoding="utf-8") as jsonfile:
-            output = load(jsonfile)
-
-        dates = (
-            output["dates"][:63]
-            + [output["dates"][63]]
-            + output["dates"][63:128]
-            + [output["dates"][128]] * 2
-            + output["dates"][128:]
-        )
-        values = (
-            output["values"][:63]
-            + [output["values"][63]]
-            + output["values"][63:128]
-            + [output["values"][128]] * 2
-            + output["values"][128:]
-        )
-        output.update({"dates": dates, "values": values})
+        dates = [
+            "2017-05-29",
+            "2017-05-30",
+            "2017-05-31",
+            "2017-06-01",
+            "2017-06-01",
+        ]
+        values = [
+            100.0000,
+            100.0978,
+            100.2821,
+            100.1741,
+            100.4561,
+        ]
 
         with pytest.raises(
             expected_exception=ValidationError,
             match="Dates are not unique",
         ):
             _ = OpenTimeSeries.from_arrays(
-                name="Bond Fund",
+                name="Series",
                 dates=dates,
                 values=values,
             )
@@ -607,18 +602,38 @@ class TestOpenTimeSeries(TestCase):
             msg = "Method _check_if_none() not working as intended"
             raise ValueError(msg)
 
-    def test_save_to_json(self: TestOpenTimeSeries) -> None:
+    def test_to_json(self: TestOpenTimeSeries) -> None:
         """Test to_json method."""
-        directory = Path(__file__).resolve().parent
-        seriesfile = directory.joinpath("seriessaved.json")
+        filename = "seriessaved.json"
+        if Path.home().joinpath("Documents").exists():
+            directory = Path.home().joinpath("Documents")
+            seriesfile = directory.joinpath(filename)
+        else:
+            directory = Path(__file__).resolve().parent
+            seriesfile = directory.joinpath(filename)
 
-        jseries = self.randomseries.from_deepcopy()
+        if Path(seriesfile).exists():
+            msg = "test_to_json test case setup failed."
+            raise FileExistsError(msg)
+
         kwargs = [
-            {"filename": str(directory.joinpath("seriessaved.json"))},
-            {"filename": "seriessaved.json", "directory": directory},
+            {
+                "what_output": "values",
+                "filename": str(seriesfile),
+            },
+            {
+                "what_output": "values",
+                "filename": seriesfile,
+            },
+            {
+                "what_output": "values",
+                "filename": seriesfile,
+                "directory": directory,
+            },
         ]
+
         for kwarg in kwargs:
-            data = jseries.to_json(**kwarg)  # type: ignore[arg-type]
+            data = self.randomseries.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != ["Asset_0"]:
                 msg = "Unexpected data from json"
                 raise ValueError(msg)
@@ -632,6 +647,144 @@ class TestOpenTimeSeries(TestCase):
             if Path(seriesfile).exists():
                 msg = "json file not deleted as intended"
                 raise FileExistsError(msg)
+
+    def test_to_json_and_back(self: TestOpenTimeSeries) -> None:
+        """Test to_json method and creating an OpenTimeSeries from file data."""
+        filename = "series.json"
+        dirpath = Path(__file__).resolve().parent
+        seriesfile = dirpath.joinpath(filename)
+
+        if Path(seriesfile).exists():
+            msg = "test_to_json_and_back test case setup failed."
+            raise FileExistsError(msg)
+
+        intended = "1.640116"
+
+        data = self.randomseries.to_json(
+            what_output="values",
+            filename=filename,
+            directory=dirpath,
+        )
+
+        series_one = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],  # type: ignore[arg-type,unused-ignore]
+                dates=item["dates"],  # type: ignore[arg-type,unused-ignore]
+                values=item["values"],  # type: ignore[arg-type,unused-ignore]
+                valuetype=ValueType.RTRN,
+                baseccy=item["currency"],  # type: ignore[arg-type,unused-ignore]
+                local_ccy=item["local_ccy"],  # type: ignore[arg-type,unused-ignore]
+            ).to_cumret()
+            for item in data
+        )
+
+        if f"{series_one.tsdf.iloc[-1, 0]:.6f}" != intended:
+            msg = (
+                "test_to_json_and_back did not output as intended: "
+                f"{series_one.tsdf.iloc[-1, 0]:.6f}"
+            )
+            raise ValueError(msg)
+
+        with Path.open(seriesfile, encoding="utf-8") as jsonfile:
+            output = load(jsonfile)
+
+        series_two = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],
+                dates=item["dates"],
+                values=item["values"],
+                valuetype=ValueType.RTRN,
+                baseccy=item["currency"],
+                local_ccy=item["local_ccy"],
+            ).to_cumret()
+            for item in output
+        )
+
+        if f"{series_two.tsdf.iloc[-1, 0]:.6f}" != intended:
+            msg = (
+                "test_to_json_and_back did not output as intended: "
+                f"{series_two.tsdf.iloc[-1, 0]:.6f}"
+            )
+            raise ValueError(msg)
+
+        if not Path(seriesfile).exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
+
+        seriesfile.unlink()
+
+        if Path(seriesfile).exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
+
+    def test_to_json_and_back_tsdf(self: TestOpenTimeSeries) -> None:
+        """Test to_json method and creating an OpenTimeSeries from file data."""
+        filename = "series_tsdf.json"
+        dirpath = Path(__file__).resolve().parent
+        seriesfile = dirpath.joinpath(filename)
+
+        if Path(seriesfile).exists():
+            msg = "test_to_json_and_back_tsdf test case setup failed."
+            raise FileExistsError(msg)
+
+        intended = "1.640116"
+
+        data = self.randomseries.to_json(
+            what_output="tsdf",
+            filename=filename,
+            directory=dirpath,
+        )
+
+        series_one = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],  # type: ignore[arg-type,unused-ignore]
+                dates=item["dates"],  # type: ignore[arg-type,unused-ignore]
+                values=item["values"],  # type: ignore[arg-type,unused-ignore]
+                valuetype=item["valuetype"],  # type: ignore[arg-type,unused-ignore]
+                baseccy=item["currency"],  # type: ignore[arg-type,unused-ignore]
+                local_ccy=item["local_ccy"],  # type: ignore[arg-type,unused-ignore]
+            ).to_cumret()
+            for item in data
+        )
+
+        if f"{series_one.tsdf.iloc[-1, 0]:.6f}" != intended:
+            msg = (
+                "test_to_json_and_back_tsdf did not output as intended: "
+                f"{series_one.tsdf.iloc[-1, 0]:.6f}"
+            )
+            raise ValueError(msg)
+
+        with Path.open(seriesfile, encoding="utf-8") as jsonfile:
+            output = load(jsonfile)
+
+        series_two = next(
+            OpenTimeSeries.from_arrays(
+                name=item["name"],
+                dates=item["dates"],
+                values=item["values"],
+                valuetype=item["valuetype"],
+                baseccy=item["currency"],
+                local_ccy=item["local_ccy"],
+            ).to_cumret()
+            for item in output
+        )
+
+        if f"{series_two.tsdf.iloc[-1, 0]:.6f}" != intended:
+            msg = (
+                "test_to_json_and_back_tsdf did not output as intended: "
+                f"{series_two.tsdf.iloc[-1, 0]:.6f}"
+            )
+            raise ValueError(msg)
+
+        if not Path(seriesfile).exists():
+            msg = "json file not created"
+            raise FileNotFoundError(msg)
+
+        seriesfile.unlink()
+
+        if Path(seriesfile).exists():
+            msg = "json file not deleted as intended"
+            raise FileExistsError(msg)
 
     def test_create_from_fixed_rate(self: TestOpenTimeSeries) -> None:
         """Test from_fixed_rate construct method."""
