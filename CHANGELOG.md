@@ -3,6 +3,12 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.5] - 2024-05-24
+
+- Possibly a breaking change, the .to_json() method on both main classes now require an argument to choose if the raw values or the potentially amended values from the associated tsdf DataFrame is exported.
+- The Poetry version for package building has been updated from 1.8.2 to 1.8.3.
+- Outside of the package I have added more to the shell scripts used in development.
+
 ## Version [1.5.4] - 2024-05-05
 
 - Added new measure Omega Ratio, https://en.wikipedia.org/wiki/Omega_ratio. Works on both OpenTimeSeries and OpenFrame.
