@@ -54,18 +54,13 @@ pandas-stubs = "^2.2.2.240514"
 pre-commit = "^3.7.1"
 pytest = "^8.2.1"
 ruff = "^0.4.7"
-types-openpyxl = "^3.1.0.20240428"
+types-openpyxl = "^3.1.2.20240601"
 types-python-dateutil = "^2.9.0.20240316"
 types-requests = "^2.32.0.20240523"
 
 [build-system]
 requires = ["poetry-core>=1.8.3"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::DeprecationWarning:openpyxl.*:"
-]
 
 [tool.coverage.run]
 omit = ["venv/*"]
