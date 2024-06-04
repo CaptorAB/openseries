@@ -3,6 +3,15 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.6] - 2024-06-04
+
+- removed warning filter for deprecation in openpyxl that is now resolved.
+- limiting holidays dependency due to warning in version 0.50.
+- suppress erroneous pycharm inspection on unreachable code in datefixer.py
+- Added int() in range in holiday_calendar method to safeguard against bug seen but not replicated.
+- Corrected description of new to_json() in README.md
+- Also miscellaneous dependencies updated.
+
 ## Version [1.5.5] - 2024-05-24
 
 - Possibly a breaking change, the .to_json() method on both main classes now require an argument to choose if the raw values or the potentially amended values from the associated tsdf DataFrame is exported.

@@ -62,7 +62,7 @@ def holiday_calendar(
     endyear += 1
     if startyear == endyear:
         endyear += 1
-    years = list(range(startyear, endyear))
+    years = list(range(int(startyear), int(endyear)))
 
     if isinstance(countries, str) and countries in list_supported_countries():
         staging = country_holidays(country=countries, years=years)
@@ -412,9 +412,11 @@ def do_resample_to_business_period_ends(
     data.index = Index(d.date() for d in DatetimeIndex(data.index))
 
     if newhead.index[0] not in data.index:
+        # noinspection PyUnreachableCode
         data = concat([data, newhead])
 
     if newtail.index[0] not in data.index:
+        # noinspection PyUnreachableCode
         data = concat([data, newtail])
 
     data = data.sort_index()
