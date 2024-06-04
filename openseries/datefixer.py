@@ -62,7 +62,7 @@ def holiday_calendar(
     endyear += 1
     if startyear == endyear:
         endyear += 1
-    years = list(range(startyear, endyear))
+    years = list(range(int(startyear), int(endyear)))
 
     if isinstance(countries, str) and countries in list_supported_countries():
         staging = country_holidays(country=countries, years=years)
