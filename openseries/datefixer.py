@@ -62,7 +62,7 @@ def holiday_calendar(
     endyear += 1
     if startyear == endyear:
         endyear += 1
-    years = list(range(int(startyear), int(endyear)))
+    years = list(range(startyear, endyear))
 
     if isinstance(countries, str) and countries in list_supported_countries():
         staging = country_holidays(country=countries, years=years)
@@ -259,8 +259,8 @@ def offset_business_days(
         scaledtoyeardays = int((days * 372 / 250) // 1) - 365
         ndate = ddate + dt.timedelta(days=scaledtoyeardays)
         calendar = holiday_calendar(
-            startyear=ndate.year,
-            endyear=ddate.year,
+            startyear=int(ndate.year),
+            endyear=int(ddate.year),
             countries=countries,
             custom_holidays=custom_holidays,
         )
@@ -276,8 +276,8 @@ def offset_business_days(
         scaledtoyeardays = int((days * 372 / 250) // 1) + 365
         ndate = ddate + dt.timedelta(days=scaledtoyeardays)
         calendar = holiday_calendar(
-            startyear=ddate.year,
-            endyear=ndate.year,
+            startyear=int(ddate.year),
+            endyear=int(ndate.year),
             countries=countries,
             custom_holidays=custom_holidays,
         )
