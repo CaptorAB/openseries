@@ -412,9 +412,11 @@ def do_resample_to_business_period_ends(
     data.index = Index(d.date() for d in DatetimeIndex(data.index))
 
     if newhead.index[0] not in data.index:
+        # noinspection PyUnreachableCode
         data = concat([data, newhead])
 
     if newtail.index[0] not in data.index:
+        # noinspection PyUnreachableCode
         data = concat([data, newtail])
 
     data = data.sort_index()
