@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from time import daylight, tzname
 from typing import Union, cast
 from unittest import TestCase
 
@@ -24,6 +25,20 @@ from openseries.types import DateType, HolidayType
 class TestDateFixer(TestCase):
 
     """class to run unittests on the module datefixer.py."""
+
+    def test_local_timezone(self: TestDateFixer) -> None:
+        """Test on the local timezone."""
+        local_datetime = dt.datetime.now().astimezone()
+        datetime_timezone_name = local_datetime.tzname()
+
+        local_timezone_name = tzname[daylight]
+
+        if datetime_timezone_name != local_timezone_name:
+            msg = (
+                f"Expected timezone: {local_timezone_name},"
+                f" but got: {datetime_timezone_name}"
+            )
+            raise ValueError(msg)
 
     def test_arg_types(self: TestDateFixer) -> None:
         """Test date_fix argument types."""

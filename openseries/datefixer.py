@@ -212,7 +212,7 @@ def get_previous_business_day_before_today(
 
     """
     if today is None:
-        today = dt.datetime.now(tz=dt.timezone.utc).date()
+        today = dt.datetime.now().astimezone().date()
 
     return date_offset_foll(
         today - dt.timedelta(days=1),
