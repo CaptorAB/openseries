@@ -21,8 +21,6 @@ jobs:
 
       - name: Install Poetry
         run: |
-          pip install --user pipx
-          pipx ensurepath
           pipx install poetry==1.8.3
 
       - name: Set up Python on ${{ runner.os }}
