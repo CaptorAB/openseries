@@ -6,19 +6,11 @@ from math import ceil
 from typing import Union, cast
 
 from numpy import (
-    divide,
-    float64,
-    isinf,
     mean,
-    nan,
     nan_to_num,
     quantile,
     sort,
-    sqrt,
-    square,
-    std,
 )
-from numpy.typing import NDArray
 from pandas import DataFrame, Series
 
 from openseries.types import LiteralQuantileInterp
@@ -87,56 +79,3 @@ def _var_down_calc(
         clean = nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
     return cast(float, quantile(ret, 1 - level, method=interpolation))
-
-
-def _ewma_calc(
-    reeturn: float,
-    prev_ewma: float,
-    time_factor: float,
-    lmbda: float = 0.94,
-) -> float:
-    """
-    Calculate Exponentially Weighted Moving Average volatility.
-
-    Parameters
-    ----------
-    reeturn : float
-        Return value
-    prev_ewma : float
-        Previous EWMA volatility value
-    time_factor : float
-        Scaling factor to annualize
-    lmbda: float, default: 0.94
-        Scaling factor to determine weighting.
-
-    Returns
-    -------
-    float
-        EWMA volatility value
-
-    """
-    return cast(
-        float,
-        sqrt(square(reeturn) * time_factor * (1 - lmbda) + square(prev_ewma) * lmbda),
-    )
-
-
-def _calc_inv_vol_weights(returns: DataFrame) -> NDArray[float64]:
-    """
-    Calculate weights proportional to inverse volatility.
-
-    Parameters
-    ----------
-    returns: pandas.DataFrame
-        returns data
-
-    Returns
-    -------
-    NDArray[float64]
-        Calculated weights
-
-    """
-    vol = divide(1.0, std(returns, axis=0, ddof=1))
-    vol[isinf(vol)] = nan
-    volsum = vol.sum()
-    return cast(NDArray[float64], divide(vol, volsum))
