@@ -116,15 +116,11 @@ def date_fix(
     if isinstance(fixerdate, datetime64):
         return (
             dt.datetime.strptime(str(fixerdate)[:10], "%Y-%m-%d")
-            .replace(tzinfo=dt.timezone.utc)
+            .astimezone()
             .date()
         )
     if isinstance(fixerdate, str):
-        return (
-            dt.datetime.strptime(fixerdate, "%Y-%m-%d")
-            .replace(tzinfo=dt.timezone.utc)
-            .date()
-        )
+        return dt.datetime.strptime(fixerdate, "%Y-%m-%d").astimezone().date()
     msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
     raise TypeError(
         msg,
@@ -241,8 +237,8 @@ def offset_business_days(
     ddate: datetime.date
         A starting date that does not have to be a business day
     days: int
-        The number of business days to offset from the business day that is
-        the closest preceding the day given
+        The number of business days to offset from the business day that is given
+        If days is set as anything other than an integer its value is set to zero
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: HolidayType, optional
@@ -255,44 +251,45 @@ def offset_business_days(
         The new offset business day
 
     """
-    if isinstance(days, int):
-        if days <= 0:
-            scaledtoyeardays = int((days * 372 / 250) // 1) - 365
-            ndate = ddate + dt.timedelta(days=scaledtoyeardays)
-            calendar = holiday_calendar(
-                startyear=ndate.year,
-                endyear=ddate.year,
-                countries=countries,
-                custom_holidays=custom_holidays,
+    try:
+        days = int(days)
+    except TypeError:
+        days = 0
+
+    if days <= 0:
+        scaledtoyeardays = int((days * 372 / 250) // 1) - 365
+        ndate = ddate + dt.timedelta(days=scaledtoyeardays)
+        calendar = holiday_calendar(
+            startyear=ndate.year,
+            endyear=ddate.year,
+            countries=countries,
+            custom_holidays=custom_holidays,
+        )
+        local_bdays: list[dt.date] = [
+            bday.date()
+            for bday in date_range(
+                periods=abs(scaledtoyeardays),
+                end=ddate,
+                freq=CustomBusinessDay(calendar=calendar),
             )
-            local_bdays: list[dt.date] = [
-                bday.date()
-                for bday in date_range(
-                    periods=abs(scaledtoyeardays),
-                    end=ddate,
-                    freq=CustomBusinessDay(calendar=calendar),
-                )
-            ]
-        else:
-            scaledtoyeardays = int((days * 372 / 250) // 1) + 365
-            ndate = ddate + dt.timedelta(days=scaledtoyeardays)
-            calendar = holiday_calendar(
-                startyear=ddate.year,
-                endyear=ndate.year,
-                countries=countries,
-                custom_holidays=custom_holidays,
-            )
-            local_bdays = [
-                bday.date()
-                for bday in date_range(
-                    start=ddate,
-                    periods=scaledtoyeardays,
-                    freq=CustomBusinessDay(calendar=calendar),
-                )
-            ]
+        ]
     else:
-        msg = "'days' argument must be an integer, it cannot be None."
-        raise TypeError(msg)
+        scaledtoyeardays = int((days * 372 / 250) // 1) + 365
+        ndate = ddate + dt.timedelta(days=scaledtoyeardays)
+        calendar = holiday_calendar(
+            startyear=ddate.year,
+            endyear=ndate.year,
+            countries=countries,
+            custom_holidays=custom_holidays,
+        )
+        local_bdays = [
+            bday.date()
+            for bday in date_range(
+                start=ddate,
+                periods=scaledtoyeardays,
+                freq=CustomBusinessDay(calendar=calendar),
+            )
+        ]
 
     while ddate not in local_bdays:
         if days <= 0:

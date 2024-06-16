@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from time import daylight, tzname
-from typing import Union, cast
+from typing import cast
 from unittest import TestCase
 
 import pytest
@@ -19,7 +19,213 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
-from openseries.types import DateType, HolidayType
+from openseries.types import CountriesType, DateType, HolidayType
+
+
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    ("date", "offset", "country"),
+    [
+        (dt.date(2022, 6, 2), -1, "SE"),
+        (dt.date(2022, 6, 3), 0, "SE"),
+        (dt.date(2022, 6, 8), 1, "SE"),
+        (dt.date(2022, 6, 8), "1", "SE"),
+        (dt.date(2022, 6, 3), None, "SE"),
+        (dt.date(2022, 6, 3), -1, "US"),
+        (dt.date(2022, 6, 6), 0, "US"),
+        (dt.date(2022, 6, 7), 1, "US"),
+        (dt.date(2022, 6, 7), "1", "US"),
+        (dt.date(2022, 6, 6), None, "US"),
+    ],
+)
+def test_offset_business_days(
+    date: dt.date,
+    offset: int,
+    country: CountriesType,
+) -> None:
+    """Test offset_business_days function."""
+    se_nationalday = dt.date(2022, 6, 6)
+    offsetdate = offset_business_days(
+        ddate=se_nationalday,
+        days=offset,
+        countries=country,
+    )
+    if offsetdate != date:
+        msg = f"Unintended result from offset_business_days {offsetdate}"
+        raise ValueError(msg)
+
+
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    "fixerdate",
+    [
+        "2022-07-15",
+        dt.date(year=2022, month=7, day=15),
+        dt.datetime(year=2022, month=7, day=15, tzinfo=dt.timezone.utc),
+        Timestamp(year=2022, month=7, day=15),
+        datetime64("2022-07-15"),
+    ],
+)
+def test_arg_types(fixerdate: DateType) -> None:
+    """Test date_fix argument types."""
+    output = dt.date(2022, 7, 15)
+    if output != date_fix(fixerdate=fixerdate):
+        msg = (
+            f"Unknown date format {fixerdate!s} of"
+            f" type {type(fixerdate)!s} encountered"
+        )
+        raise TypeError(
+            msg,
+        )
+
+
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    ("today", "countries", "intention"),
+    [
+        (dt.date(2022, 6, 7), "SE", dt.date(2022, 6, 3)),
+        (dt.date(2022, 6, 7), "US", dt.date(2022, 6, 6)),
+        (dt.date(2022, 6, 7), ["SE", "US"], dt.date(2022, 6, 3)),
+        (dt.date(2022, 7, 5), "SE", dt.date(2022, 7, 4)),
+        (dt.date(2022, 7, 5), "US", dt.date(2022, 7, 1)),
+        (dt.date(2022, 7, 5), ["SE", "US"], dt.date(2022, 7, 1)),
+    ],
+)
+def test_get_previous_business_day_before_today(
+    today: dt.date,
+    countries: CountriesType,
+    intention: dt.date,
+) -> None:
+    """Test get_previous_business_day_before_today function."""
+    result = get_previous_business_day_before_today(
+        today=today,
+        countries=countries,
+    )
+    if result != intention:
+        msg = f"{result} does not equal {intention}"
+        raise ValueError(msg)
+
+    before_today_one = get_previous_business_day_before_today(
+        today=None,
+        countries=countries,
+    )
+    before_today_two = date_offset_foll(
+        raw_date=dt.datetime.now().astimezone().date() - dt.timedelta(days=1),
+        months_offset=0,
+        countries=countries,
+        adjust=True,
+        following=False,
+    )
+    if before_today_one != before_today_two:
+        msg = (
+            "Inconsistent results from get_previous_business_day_before_today "
+            "and date_offset_foll methods."
+        )
+        raise ValueError(msg)
+
+
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    ("ddate", "countries", "intention"),
+    [
+        (dt.date(2022, 6, 7), "SE", dt.date(2022, 6, 2)),
+        (dt.date(2022, 6, 7), "US", dt.date(2022, 6, 3)),
+        (dt.date(2022, 6, 7), ["SE", "US"], dt.date(2022, 6, 2)),
+        (dt.date(2022, 7, 5), "SE", dt.date(2022, 7, 1)),
+        (dt.date(2022, 7, 5), "US", dt.date(2022, 6, 30)),
+        (dt.date(2022, 7, 5), ["SE", "US"], dt.date(2022, 6, 30)),
+    ],
+)
+def test_offset_business_days_calendar_options(
+    ddate: dt.date,
+    countries: CountriesType,
+    intention: dt.date,
+) -> None:
+    """Test offset_business_days function with different calendar combinations."""
+    result = offset_business_days(
+        ddate=ddate,
+        days=-2,
+        countries=countries,
+    )
+    if result != intention:
+        msg = "Unintended result from offset_business_days"
+        raise ValueError(msg)
+
+
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    ("raw_date", "countries", "following", "intention"),
+    [
+        (dt.date(2022, 6, 5), "SE", False, dt.date(2022, 6, 3)),
+        (dt.date(2022, 7, 3), "SE", False, dt.date(2022, 7, 1)),
+        (dt.date(2022, 6, 5), "US", False, dt.date(2022, 6, 3)),
+        (dt.date(2022, 7, 3), "US", False, dt.date(2022, 7, 1)),
+        (dt.date(2022, 6, 5), ["SE", "US"], False, dt.date(2022, 6, 3)),
+        (dt.date(2022, 7, 3), ["SE", "US"], False, dt.date(2022, 7, 1)),
+        (dt.date(2022, 6, 5), "SE", True, dt.date(2022, 6, 7)),
+        (dt.date(2022, 7, 3), "SE", True, dt.date(2022, 7, 4)),
+        (dt.date(2022, 6, 5), "US", True, dt.date(2022, 6, 6)),
+        (dt.date(2022, 7, 3), "US", True, dt.date(2022, 7, 5)),
+        (dt.date(2022, 6, 5), ["SE", "US"], True, dt.date(2022, 6, 7)),
+        (dt.date(2022, 7, 3), ["SE", "US"], True, dt.date(2022, 7, 5)),
+    ],
+)
+def test_date_offset_foll(
+    raw_date: dt.date,
+    countries: CountriesType,
+    intention: dt.date,
+    *,
+    following: bool,
+) -> None:
+    """Test date_offset_foll function."""
+    result = date_offset_foll(
+        raw_date=raw_date,
+        months_offset=0,
+        countries=countries,
+        adjust=True,
+        following=following,
+    )
+    if result != intention:
+        msg = f"Unintended result from date_offset_foll: {result}"
+        raise ValueError(
+            msg,
+        )
+
+    static = date_offset_foll(
+        raw_date=raw_date,
+        months_offset=0,
+        adjust=False,
+    )
+    if raw_date != static:
+        msg = "Unintended result from date_offset_foll"
+        raise ValueError(msg)
+
+    offset = date_offset_foll(
+        raw_date=raw_date,
+        months_offset=1,
+        adjust=False,
+    )
+    if offset != dt.date(
+        raw_date.year,
+        raw_date.month + 1,
+        raw_date.day,
+    ):
+        msg = "Unintended result from date_offset_foll"
+        raise ValueError(msg)
+
+    nonsense: str = "abcdef"
+    with pytest.raises(
+        expected_exception=ValueError,
+        match=f"time data '{nonsense!s}' does not match format '%Y-%m-%d'",
+    ):
+        _ = date_offset_foll(
+            raw_date=nonsense,
+        )
+
+    with pytest.raises(
+        expected_exception=ValueError,
+        match="Argument countries must be a string country code",
+    ):
+        _ = date_offset_foll(
+            raw_date=dt.datetime.now().astimezone().date(),
+            adjust=True,
+            countries="ZZ",
+        )
 
 
 class TestDateFixer(TestCase):
@@ -40,25 +246,6 @@ class TestDateFixer(TestCase):
             )
             raise ValueError(msg)
 
-    def test_arg_types(self: TestDateFixer) -> None:
-        """Test date_fix argument types."""
-        formats = [
-            "2022-07-15",
-            dt.date(year=2022, month=7, day=15),
-            dt.datetime(year=2022, month=7, day=15, tzinfo=dt.timezone.utc),
-            Timestamp(year=2022, month=7, day=15),
-            datetime64("2022-07-15"),
-        ]
-
-        output = dt.date(2022, 7, 15)
-
-        for fmt in formats:
-            if output != date_fix(cast(DateType, fmt)):
-                msg = f"Unknown date format {fmt!s} of type {type(fmt)!s} encountered"
-                raise TypeError(
-                    msg,
-                )
-
     def test_arg_type_error(self: TestDateFixer) -> None:
         """Test date_fix to raise TypeError when appropri<ate."""
         with pytest.raises(
@@ -73,158 +260,6 @@ class TestDateFixer(TestCase):
             match=f"time data '{str_arg!s}' does not match format '%Y-%m-%d'",
         ):
             _ = date_fix("abcdef")
-
-    def test_get_previous_business_day_before_today(self: TestDateFixer) -> None:
-        """Test get_previous_business_day_before_today function."""
-        day_after_se_nationalday = dt.date(2022, 6, 7)
-        se_dte_swehol = get_previous_business_day_before_today(
-            today=day_after_se_nationalday,
-            countries="SE",
-        )
-        us_dte_swehol = get_previous_business_day_before_today(
-            today=day_after_se_nationalday,
-            countries="US",
-        )
-        se_us_dte_swehol = get_previous_business_day_before_today(
-            today=day_after_se_nationalday,
-            countries=["SE", "US"],
-        )
-        for result, intention in zip(
-            [se_dte_swehol, us_dte_swehol, se_us_dte_swehol],
-            [dt.date(2022, 6, 3), dt.date(2022, 6, 6), dt.date(2022, 6, 3)],
-        ):
-            if result != intention:
-                msg = f"{result} does not equal {intention}"
-                raise ValueError(msg)
-
-        day_after_us_independenceday = dt.date(2022, 7, 5)
-        se_dte_usahol = get_previous_business_day_before_today(
-            today=day_after_us_independenceday,
-            countries="SE",
-        )
-        us_dte_usahol = get_previous_business_day_before_today(
-            today=day_after_us_independenceday,
-            countries="US",
-        )
-        se_us_dte_usahol = get_previous_business_day_before_today(
-            today=day_after_us_independenceday,
-            countries=["SE", "US"],
-        )
-        for result, intention in zip(
-            [se_dte_usahol, us_dte_usahol, se_us_dte_usahol],
-            [dt.date(2022, 7, 4), dt.date(2022, 7, 1), dt.date(2022, 7, 1)],
-        ):
-            if result != intention:
-                msg = f"{result} does not equal {intention}"
-                raise ValueError(msg)
-
-        before_today_one = get_previous_business_day_before_today(
-            countries=["SE", "US"],
-        )
-        before_today_two = date_offset_foll(
-            raw_date=dt.datetime.now(tz=dt.timezone.utc).date() - dt.timedelta(days=1),
-            months_offset=0,
-            countries=["SE", "US"],
-            adjust=True,
-            following=False,
-        )
-        if before_today_one != before_today_two:
-            msg = (
-                "Inconsistent results from get_previous_business_day_before_today "
-                "and date_offset_foll methods."
-            )
-            raise ValueError(msg)
-
-    def test_date_offset_foll(self: TestDateFixer) -> None:
-        """Test date_offset_foll function."""
-        originals = [dt.date(2022, 6, 5), dt.date(2022, 7, 3)]
-        country_sets: list[Union[str, list[str]]] = ["SE", "US", ["SE", "US"]]
-        earliers = [
-            dt.date(2022, 6, 3),
-            dt.date(2022, 7, 1),
-            dt.date(2022, 6, 3),
-            dt.date(2022, 7, 1),
-            dt.date(2022, 6, 3),
-            dt.date(2022, 7, 1),
-        ]
-        laters = [
-            dt.date(2022, 6, 7),
-            dt.date(2022, 7, 4),
-            dt.date(2022, 6, 6),
-            dt.date(2022, 7, 5),
-            dt.date(2022, 6, 7),
-            dt.date(2022, 7, 5),
-        ]
-        counter = 0
-
-        for countries in country_sets:
-            for original in originals:
-                earlier = date_offset_foll(
-                    raw_date=original,
-                    months_offset=0,
-                    countries=countries,
-                    adjust=True,
-                    following=False,
-                )
-                later = date_offset_foll(
-                    raw_date=original,
-                    months_offset=0,
-                    countries=countries,
-                    adjust=True,
-                    following=True,
-                )
-                if earliers[counter] != earlier:
-                    msg = "Unintended result from date_offset_foll preceeding"
-                    raise ValueError(
-                        msg,
-                    )
-                if laters[counter] != later:
-                    msg = "Unintended result from date_offset_foll following"
-                    raise ValueError(
-                        msg,
-                    )
-                counter += 1
-
-        static = date_offset_foll(
-            raw_date=originals[0],
-            months_offset=0,
-            adjust=False,
-        )
-        if originals[0] != static:
-            msg = "Unintended result from date_offset_foll"
-            raise ValueError(msg)
-
-        offset = date_offset_foll(
-            raw_date=originals[0],
-            months_offset=1,
-            adjust=False,
-        )
-        if offset != dt.date(
-            originals[0].year,
-            originals[0].month + 1,
-            originals[0].day,
-        ):
-            msg = "Unintended result from date_offset_foll"
-            raise ValueError(msg)
-
-        nonsense: str = "abcdef"
-        with pytest.raises(
-            expected_exception=ValueError,
-            match=f"time data '{nonsense!s}' does not match format '%Y-%m-%d'",
-        ):
-            _ = date_offset_foll(
-                raw_date=nonsense,
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Argument countries must be a string country code",
-        ):
-            _ = date_offset_foll(
-                raw_date=dt.datetime.now(tz=dt.timezone.utc).date(),
-                adjust=True,
-                countries="ZZ",
-            )
 
     def test_holiday_calendar(self: TestDateFixer) -> None:
         """Test holiday_calendar function."""
@@ -250,7 +285,7 @@ class TestDateFixer(TestCase):
 
     def test_holiday_calendar_with_custom_days(self: TestDateFixer) -> None:
         """Test holiday_calendar with custom input."""
-        year: int = 2021
+        year = 2021
         twentytwentyoneholidays = [
             dt.date(year, 1, 1),
             dt.date(year, 1, 6),
@@ -292,97 +327,6 @@ class TestDateFixer(TestCase):
 
         if twentytwentyoneholidays != hols_with:
             msg = "Holidays not matching as intended"
-            raise ValueError(msg)
-
-    def test_offset_business_days(self: TestDateFixer) -> None:
-        """Test offset_business_days function."""
-        se_nationalday = dt.date(2022, 6, 6)
-        dates = [
-            (dt.date(2022, 6, 2), dt.date(2022, 6, 3)),
-            (dt.date(2022, 6, 3), dt.date(2022, 6, 6)),
-            (dt.date(2022, 6, 8), dt.date(2022, 6, 7)),
-        ]
-        offsets = [-1, 0, 1]
-        for date, offset in zip(dates, offsets):
-            se_offsetdate = offset_business_days(
-                ddate=se_nationalday,
-                days=offset,
-                countries="SE",
-            )
-            if se_offsetdate != date[0]:
-                msg = "Unintended result from offset_business_days"
-                raise ValueError(msg)
-            us_offsetdate = offset_business_days(
-                ddate=se_nationalday,
-                days=offset,
-                countries="US",
-            )
-            if us_offsetdate != date[1]:
-                msg = "Unintended result from offset_business_days"
-                raise ValueError(msg)
-
-        with pytest.raises(
-            expected_exception=TypeError,
-            match="'days' argument must be an integer, it cannot be None.",
-        ):
-            _ = offset_business_days(
-                ddate=se_nationalday,
-                days=cast(int, None),
-                countries="SE",
-            )
-
-    def test_offset_business_days_calendar_options(self: TestDateFixer) -> None:
-        """Test offset_business_days function with different calendar combinations."""
-        day_after_se_nationalday = dt.date(2022, 6, 7)
-        se_enddate = offset_business_days(
-            ddate=day_after_se_nationalday,
-            days=-2,
-            countries="SE",
-        )
-        if se_enddate != dt.date(2022, 6, 2):
-            msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
-        us_enddate = offset_business_days(
-            ddate=day_after_se_nationalday,
-            days=-2,
-            countries="US",
-        )
-        if us_enddate != dt.date(2022, 6, 3):
-            msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
-        se_us_enddate = offset_business_days(
-            ddate=day_after_se_nationalday,
-            days=-2,
-            countries=["SE", "US"],
-        )
-        if se_us_enddate != dt.date(2022, 6, 2):
-            msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
-
-        day_after_us_independenceday = dt.date(2022, 7, 5)
-        se_nddate = offset_business_days(
-            ddate=day_after_us_independenceday,
-            days=-2,
-            countries="SE",
-        )
-        if se_nddate != dt.date(2022, 7, 1):
-            msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
-        us_nddate = offset_business_days(
-            ddate=day_after_us_independenceday,
-            days=-2,
-            countries="US",
-        )
-        if us_nddate != dt.date(2022, 6, 30):
-            msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
-        se_us_nddate = offset_business_days(
-            ddate=day_after_us_independenceday,
-            days=-2,
-            countries=["SE", "US"],
-        )
-        if se_us_nddate != dt.date(2022, 6, 30):
-            msg = "Unintended result from offset_business_days"
             raise ValueError(msg)
 
     def test_offset_business_days_with_custom_days(self: TestDateFixer) -> None:
