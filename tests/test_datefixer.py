@@ -321,6 +321,16 @@ class TestDateFixer(TestCase):
                 msg = "Unintended result from offset_business_days"
                 raise ValueError(msg)
 
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="'days' argument must be an integer, it cannot be None.",
+        ):
+            _ = offset_business_days(
+                ddate=se_nationalday,
+                days=cast(int, None),
+                countries="SE",
+            )
+
     def test_offset_business_days_calendar_options(self: TestDateFixer) -> None:
         """Test offset_business_days function with different calendar combinations."""
         day_after_se_nationalday = dt.date(2022, 6, 7)

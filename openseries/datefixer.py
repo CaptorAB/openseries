@@ -255,40 +255,44 @@ def offset_business_days(
         The new offset business day
 
     """
-    if days <= 0:
-        scaledtoyeardays = int((days * 372 / 250) // 1) - 365
-        ndate = ddate + dt.timedelta(days=scaledtoyeardays)
-        calendar = holiday_calendar(
-            startyear=int(ndate.year),
-            endyear=int(ddate.year),
-            countries=countries,
-            custom_holidays=custom_holidays,
-        )
-        local_bdays: list[dt.date] = [
-            bday.date()
-            for bday in date_range(
-                periods=abs(scaledtoyeardays),
-                end=ddate,
-                freq=CustomBusinessDay(calendar=calendar),
+    if isinstance(days, int):
+        if days <= 0:
+            scaledtoyeardays = int((days * 372 / 250) // 1) - 365
+            ndate = ddate + dt.timedelta(days=scaledtoyeardays)
+            calendar = holiday_calendar(
+                startyear=ndate.year,
+                endyear=ddate.year,
+                countries=countries,
+                custom_holidays=custom_holidays,
             )
-        ]
+            local_bdays: list[dt.date] = [
+                bday.date()
+                for bday in date_range(
+                    periods=abs(scaledtoyeardays),
+                    end=ddate,
+                    freq=CustomBusinessDay(calendar=calendar),
+                )
+            ]
+        else:
+            scaledtoyeardays = int((days * 372 / 250) // 1) + 365
+            ndate = ddate + dt.timedelta(days=scaledtoyeardays)
+            calendar = holiday_calendar(
+                startyear=ddate.year,
+                endyear=ndate.year,
+                countries=countries,
+                custom_holidays=custom_holidays,
+            )
+            local_bdays = [
+                bday.date()
+                for bday in date_range(
+                    start=ddate,
+                    periods=scaledtoyeardays,
+                    freq=CustomBusinessDay(calendar=calendar),
+                )
+            ]
     else:
-        scaledtoyeardays = int((days * 372 / 250) // 1) + 365
-        ndate = ddate + dt.timedelta(days=scaledtoyeardays)
-        calendar = holiday_calendar(
-            startyear=int(ddate.year),
-            endyear=int(ndate.year),
-            countries=countries,
-            custom_holidays=custom_holidays,
-        )
-        local_bdays = [
-            bday.date()
-            for bday in date_range(
-                start=ddate,
-                periods=scaledtoyeardays,
-                freq=CustomBusinessDay(calendar=calendar),
-            )
-        ]
+        msg = "'days' argument must be an integer, it cannot be None."
+        raise TypeError(msg)
 
     while ddate not in local_bdays:
         if days <= 0:
