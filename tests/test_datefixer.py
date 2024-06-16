@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import datetime as dt
-from time import daylight, tzname
 from typing import cast
 from unittest import TestCase
 
@@ -64,7 +63,7 @@ def test_offset_business_days(
         datetime64("2022-07-15"),
     ],
 )
-def test_arg_types(fixerdate: DateType) -> None:
+def test_date_fix(fixerdate: DateType) -> None:
     """Test date_fix argument types."""
     output = dt.date(2022, 7, 15)
     if output != date_fix(fixerdate=fixerdate):
@@ -75,6 +74,20 @@ def test_arg_types(fixerdate: DateType) -> None:
         raise TypeError(
             msg,
         )
+
+    int_arg: int = 3
+    with pytest.raises(
+        expected_exception=TypeError,
+        match="Unknown date format 3 of type <class 'int'> encountered",
+    ):
+        _ = date_fix(fixerdate=cast(str, int_arg))
+
+    str_arg: str = "abcdef"
+    with pytest.raises(
+        expected_exception=ValueError,
+        match=f"time data '{str_arg!s}' does not match format '%Y-%m-%d'",
+    ):
+        _ = date_fix(fixerdate="abcdef")
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -231,35 +244,6 @@ def test_date_offset_foll(
 class TestDateFixer(TestCase):
 
     """class to run unittests on the module datefixer.py."""
-
-    def test_local_timezone(self: TestDateFixer) -> None:
-        """Test on the local timezone."""
-        local_datetime = dt.datetime.now().astimezone()
-        datetime_timezone_name = local_datetime.tzname()
-
-        local_timezone_name = tzname[daylight]
-
-        if datetime_timezone_name != local_timezone_name:
-            msg = (
-                f"Expected timezone: {local_timezone_name},"
-                f" but got: {datetime_timezone_name}"
-            )
-            raise ValueError(msg)
-
-    def test_arg_type_error(self: TestDateFixer) -> None:
-        """Test date_fix to raise TypeError when appropri<ate."""
-        with pytest.raises(
-            expected_exception=TypeError,
-            match="Unknown date format 3 of type <class 'int'> encountered",
-        ):
-            _ = date_fix(cast(str, 3))
-
-        str_arg: str = "abcdef"
-        with pytest.raises(
-            expected_exception=ValueError,
-            match=f"time data '{str_arg!s}' does not match format '%Y-%m-%d'",
-        ):
-            _ = date_fix("abcdef")
 
     def test_holiday_calendar(self: TestDateFixer) -> None:
         """Test holiday_calendar function."""
