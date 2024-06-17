@@ -35,7 +35,7 @@ keywords = [
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 holidays = ">=0.30,<0.50"
-numpy = ">=1.23.2,<=2.0.0"
+numpy = ">=1.23.2,<=3.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
 plotly = ">=5.18.0,<6.0.0"
