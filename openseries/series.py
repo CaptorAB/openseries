@@ -15,6 +15,7 @@ from numpy import (
     isnan,
     log,
     sqrt,
+    square,
 )
 from pandas import (
     DataFrame,
@@ -28,9 +29,6 @@ from pydantic import model_validator
 from typing_extensions import Self
 
 from openseries._common_model import _CommonModel
-from openseries._risk import (
-    _ewma_calc,
-)
 from openseries.datefixer import date_fix, do_resample_to_business_period_ends
 from openseries.types import (
     Countries,
@@ -675,13 +673,10 @@ class OpenTimeSeries(_CommonModel):
         ]
 
         for item in data.loc[:, cast(int, (self.label, ValueType.RTRN))].iloc[1:]:
-            previous = rawdata[-1]
+            prev = rawdata[-1]
             rawdata.append(
-                _ewma_calc(
-                    reeturn=cast(float, item),
-                    prev_ewma=previous,
-                    time_factor=time_factor,
-                    lmbda=lmbda,
+                sqrt(
+                    square(item) * time_factor * (1 - lmbda) + square(prev) * lmbda,
                 ),
             )
 

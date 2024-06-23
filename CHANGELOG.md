@@ -3,6 +3,16 @@
 At some point we will start documenting changes in release documentation instead.
 For now this is the only place where we log summary descriptions.
 
+## Version [1.5.7] - 2024-06-23
+
+- Changed behaviour in get_previous_business_day_before_today() function. None input means days argument is set to zero and not raise Exception. This will eliminate scenario that I earlier believed was bug
+- Simplified Github workflows install of Poetry
+- Cut down functions in _risk.py module to simplify code. Moved code to inline in main modules instead
+- Widened acceptance on holidays dependency while silencing its DeprecationWarning
+- Widened acceptance on numpy dependency and checked that project can use numpy 2.0.0
+- improved exception message on date_fixer.offset_business_days
+- Removed utc timezone setting where datetime.date.today() used. Aimed for local timezone. Do not believe it will impact anything
+
 ## Version [1.5.6] - 2024-06-04
 
 - removed warning filter for deprecation in openpyxl that is now resolved.

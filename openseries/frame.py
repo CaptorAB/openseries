@@ -17,13 +17,17 @@ from numpy import (
     array,
     cov,
     cumprod,
+    divide,
     dot,
     float64,
     inf,
+    isinf,
     linspace,
     log,
     nan,
     sqrt,
+    square,
+    std,
     zeros,
 )
 from numpy import (
@@ -53,10 +57,6 @@ from statsmodels.regression.linear_model import (  # type: ignore[import-untyped
 from typing_extensions import Self
 
 from openseries._common_model import _CommonModel
-from openseries._risk import (
-    _calc_inv_vol_weights,
-    _ewma_calc,
-)
 from openseries.datefixer import do_resample_to_business_period_ends
 from openseries.load_plotly import load_plotly_dict
 from openseries.series import OpenTimeSeries
@@ -591,17 +591,13 @@ class OpenFrame(_CommonModel):
         raw_corr = [raw_cov[0] / (2 * raw_one[0] * raw_two[0])]
 
         for _, row in data.iloc[1:].iterrows():
-            tmp_raw_one = _ewma_calc(
-                reeturn=row.loc[cols[0], ValueType.RTRN],
-                prev_ewma=raw_one[-1],
-                time_factor=time_factor,
-                lmbda=lmbda,
+            tmp_raw_one = sqrt(
+                square(row.loc[cols[0], ValueType.RTRN]) * time_factor * (1 - lmbda)
+                + square(raw_one[-1]) * lmbda,
             )
-            tmp_raw_two = _ewma_calc(
-                reeturn=row.loc[cols[1], ValueType.RTRN],
-                prev_ewma=raw_two[-1],
-                time_factor=time_factor,
-                lmbda=lmbda,
+            tmp_raw_two = sqrt(
+                square(row.loc[cols[1], ValueType.RTRN]) * time_factor * (1 - lmbda)
+                + square(raw_two[-1]) * lmbda,
             )
             tmp_raw_cov = (
                 row.loc[cols[0], ValueType.RTRN]
@@ -1508,8 +1504,9 @@ class OpenFrame(_CommonModel):
             if weight_strat == "eq_weights":
                 self.weights = [1.0 / self.item_count] * self.item_count
             elif weight_strat == "inv_vol":
-                weight_calc = list(_calc_inv_vol_weights(returns=dframe))
-                self.weights = weight_calc
+                vol = divide(1.0, std(dframe, axis=0, ddof=1))
+                vol[isinf(vol)] = nan
+                self.weights = list(divide(vol, vol.sum()))
             else:
                 msg = "Weight strategy not implemented"
                 raise NotImplementedError(msg)
@@ -2188,7 +2185,7 @@ def sharpeplot(  # noqa: C901
                 xhoverformat=".2%",
                 yhoverformat=".2%",
                 hovertext=[point_frame.loc["text", col]],
-                hovertemplate=("Return %{y}<br>Vol %{x}%{hovertext}"),
+                hovertemplate="Return %{y}<br>Vol %{x}%{hovertext}",
                 hoverlabel_align="right",
                 marker={"size": 20, "color": clr},
                 mode=point_frame_mode,

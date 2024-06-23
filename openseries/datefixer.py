@@ -62,7 +62,7 @@ def holiday_calendar(
     endyear += 1
     if startyear == endyear:
         endyear += 1
-    years = list(range(int(startyear), int(endyear)))
+    years = list(range(startyear, endyear))
 
     if isinstance(countries, str) and countries in list_supported_countries():
         staging = country_holidays(country=countries, years=years)
@@ -116,15 +116,11 @@ def date_fix(
     if isinstance(fixerdate, datetime64):
         return (
             dt.datetime.strptime(str(fixerdate)[:10], "%Y-%m-%d")
-            .replace(tzinfo=dt.timezone.utc)
+            .astimezone()
             .date()
         )
     if isinstance(fixerdate, str):
-        return (
-            dt.datetime.strptime(fixerdate, "%Y-%m-%d")
-            .replace(tzinfo=dt.timezone.utc)
-            .date()
-        )
+        return dt.datetime.strptime(fixerdate, "%Y-%m-%d").astimezone().date()
     msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
     raise TypeError(
         msg,
@@ -212,7 +208,7 @@ def get_previous_business_day_before_today(
 
     """
     if today is None:
-        today = dt.datetime.now(tz=dt.timezone.utc).date()
+        today = dt.datetime.now().astimezone().date()
 
     return date_offset_foll(
         today - dt.timedelta(days=1),
@@ -241,8 +237,8 @@ def offset_business_days(
     ddate: datetime.date
         A starting date that does not have to be a business day
     days: int
-        The number of business days to offset from the business day that is
-        the closest preceding the day given
+        The number of business days to offset from the business day that is given
+        If days is set as anything other than an integer its value is set to zero
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     custom_holidays: HolidayType, optional
@@ -255,6 +251,11 @@ def offset_business_days(
         The new offset business day
 
     """
+    try:
+        days = int(days)
+    except TypeError:
+        days = 0
+
     if days <= 0:
         scaledtoyeardays = int((days * 372 / 250) // 1) - 365
         ndate = ddate + dt.timedelta(days=scaledtoyeardays)
