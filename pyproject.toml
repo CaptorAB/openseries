@@ -34,7 +34,7 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-holidays = ">=0.30,<0.50"
+holidays = ">=0.30,<1.0"
 numpy = ">=1.23.2,<=3.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
@@ -107,3 +107,9 @@ max-statements = 66
 
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:holidays.*"
+]
