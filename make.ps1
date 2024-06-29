@@ -2,6 +2,8 @@ param (
     [string]$task = "active"
 )
 
+$ErrorActionPreference = 'Stop'
+
 # Function to get the latest Python 3.10 version from pyenv
 function Get-LatestPython310Version {
     $versions = pyenv versions --bare 3.10.*
@@ -54,6 +56,12 @@ elseif ($task -eq "make")
         }
     }
     python -m venv ./venv
+    if ($?) {
+        Write-Host "Virtual environment 'venv' created successfully." -ForegroundColor Green
+    } else {
+        Write-Host "Failed to create virtual environment 'venv'." -ForegroundColor Red
+        exit 1
+    }
     .\venv\Scripts\activate
     if ($null -ne $env:PYTHONPATH)
     {
