@@ -1,6 +1,6 @@
 """Test suite for the openseries/frame.py module."""
 
-# mypy: disable-error-code="operator,type-arg,arg-type,unused-ignore,union-attr"
+# mypy: disable-error-code="operator,type-arg,arg-type,unused-ignore"
 from __future__ import annotations
 
 import datetime as dt
@@ -3694,7 +3694,7 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        minframe_weights = [f"{minw:.7f}" for minw in minframe.weights]
+        minframe_weights = [f"{minw:.7f}" for minw in list(minframe.weights)]
         if minframe_weights != [
             "0.1150421",
             "0.1854466",
@@ -3726,7 +3726,7 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        maxframe_weights = [f"{maxw:.7f}" for maxw in maxframe.weights]
+        maxframe_weights = [f"{maxw:.7f}" for maxw in list(maxframe.weights)]
         if maxframe_weights != [
             "0.1152015",
             "0.1721200",

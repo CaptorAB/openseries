@@ -11,6 +11,7 @@ function Get-LatestPython310Version {
 
 if ($task -eq "active")
 {
+    .\venv\Scripts\activate
     if ($null -ne $env:PYTHONPATH)
     {
         if (-not ($env:PYTHONPATH -match [regex]::Escape($PWD)))
@@ -28,7 +29,6 @@ if ($task -eq "active")
         $env:PYTHONPATH = $PWD
         Write-Output "`nPYTHONPATH set to: $( $env:PYTHONPATH )"
     }
-    .\venv\Scripts\activate
     Write-Output "`nThe Python used in the '$(Split-Path -Leaf $env:VIRTUAL_ENV)' environment is:"
     Get-Command python
 }
@@ -54,6 +54,7 @@ elseif ($task -eq "make")
         }
     }
     python -m venv ./venv
+    .\venv\Scripts\activate
     if ($null -ne $env:PYTHONPATH)
     {
         if (-not ($env:PYTHONPATH -match [regex]::Escape($PWD)))
@@ -71,7 +72,6 @@ elseif ($task -eq "make")
         $env:PYTHONPATH = $PWD
         Write-Output "`nPYTHONPATH set to: $( $env:PYTHONPATH )"
     }
-    .\venv\Scripts\activate
     Write-Output "`nThe Python used in the '$(Split-Path -Leaf $env:VIRTUAL_ENV)' environment is:"
     Get-Command python
     python.exe -m pip install --upgrade pip
