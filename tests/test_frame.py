@@ -3671,12 +3671,17 @@ class TestOpenFrame(TestCase):
     def test_constrain_optimized_portfolios(self: TestOpenFrame) -> None:
         """Test function constrain_optimized_portfolios."""
         simulations = 1000
-        upper_bound = 1.0
         org_port_name = "Current Portfolio"
 
         std_frame = self.randomframe.from_deepcopy()
         std_frame.to_cumret()
         std_frame.weights = [1 / std_frame.item_count] * std_frame.item_count
+
+        bounds = cast(
+            Optional[tuple[tuple[float]]],
+            tuple((0.0, 1.0) for _ in range(std_frame.item_count)),
+        )
+
         assets_std = OpenTimeSeries.from_df(std_frame.make_portfolio(org_port_name))
 
         minframe, minseries, maxframe, maxseries = constrain_optimized_portfolios(
@@ -3684,7 +3689,14 @@ class TestOpenFrame(TestCase):
             serie=assets_std,
             portfolioname=org_port_name,
             simulations=simulations,
-            upper_bound=upper_bound,
+            bounds=bounds,
+        )
+
+        minframe_nb, _, _, _ = constrain_optimized_portfolios(
+            data=std_frame,
+            serie=assets_std,
+            portfolioname=org_port_name,
+            simulations=simulations,
         )
 
         if round(sum(minframe.weights), 7) != 1.0:
@@ -3705,6 +3717,27 @@ class TestOpenFrame(TestCase):
             msg = (
                 "Function constrain_optimized_portfolios not "
                 f"working as intended\n{minframe_weights}"
+            )
+            raise ValueError(msg)
+
+        if round(sum(minframe_nb.weights), 7) != 1.0:
+            msg = (
+                "Function constrain_optimized_portfolios not working as "
+                f"intended\n{round(sum(minframe_nb.weights), 7)}"
+            )
+            raise ValueError(msg)
+
+        minframe_nb_weights = [f"{minw:.7f}" for minw in list(minframe_nb.weights)]
+        if minframe_nb_weights != [
+            "0.1150421",
+            "0.1854466",
+            "0.2743087",
+            "0.2572628",
+            "0.1679398",
+        ]:
+            msg = (
+                "Function constrain_optimized_portfolios not "
+                f"working as intended\n{minframe_nb_weights}"
             )
             raise ValueError(msg)
 

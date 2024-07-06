@@ -1778,7 +1778,7 @@ def efficient_frontier(  # noqa: C901
     eframe: OpenFrame,
     num_ports: int = 5000,
     seed: int = 71,
-    upperbounds: float = 1.0,
+    bounds: Optional[tuple[tuple[float]]] = None,
     frontier_points: int = 200,
     *,
     tweak: bool = True,
@@ -1794,8 +1794,8 @@ def efficient_frontier(  # noqa: C901
         Number of possible portfolios to simulate
     seed: int, default: 71
         The seed for the random process
-    upperbounds: float, default: 1.0
-        The largest allowed allocation to a single asset
+    bounds: tuple[tuple[float]], optional
+        The range of minumum and maximum allowed allocations for each asset
     frontier_points: int, default: 200
         number of points along frontier to optimize
     tweak: bool, default: True
@@ -1879,7 +1879,8 @@ def efficient_frontier(  # noqa: C901
         )
 
     constraints = {"type": "eq", "fun": _check_sum}
-    bounds = tuple((0, upperbounds) for _ in range(eframe.item_count))
+    if not bounds:
+        bounds = tuple((0.0, 1.0) for _ in range(eframe.item_count))
     init_guess = array(eframe.weights)
 
     opt_results = minimize(
@@ -1963,7 +1964,7 @@ def constrain_optimized_portfolios(
     portfolioname: str = "Current Portfolio",
     simulations: int = 10000,
     curve_points: int = 200,
-    upper_bound: float = 0.25,
+    bounds: Optional[tuple[tuple[float]]] = None,
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
     """
     Constrain optimized portfolios to those that improve on the current one.
@@ -1980,8 +1981,8 @@ def constrain_optimized_portfolios(
         Number of possible portfolios to simulate
     curve_points: int, default: 200
         Number of optimal portfolios on the efficient frontier
-    upper_bound: float, default: 0.25
-        The largest allowed allocation to a single asset
+    bounds: tuple[tuple[float]], optional
+        The range of minumum and maximum allowed allocations for each asset
 
     Returns
     -------
@@ -1992,11 +1993,14 @@ def constrain_optimized_portfolios(
     lr_frame = data.from_deepcopy()
     mv_frame = data.from_deepcopy()
 
+    if not bounds:
+        bounds = tuple((0.0, 1.0) for _ in range(data.item_count))
+
     front_frame, sim_frame, optimal = efficient_frontier(
         eframe=data,
         num_ports=simulations,
         frontier_points=curve_points,
-        upperbounds=upper_bound,
+        bounds=bounds,
     )
 
     condition_least_ret = front_frame.ret > serie.arithmetic_ret
@@ -2080,9 +2084,9 @@ def prepare_plot_data(
 
 
 def sharpeplot(  # noqa: C901
-    sim_frame: DataFrame = None,
-    line_frame: DataFrame = None,
-    point_frame: DataFrame = None,
+    sim_frame: Optional[DataFrame] = None,
+    line_frame: Optional[DataFrame] = None,
+    point_frame: Optional[DataFrame] = None,
     point_frame_mode: LiteralLinePlotMode = "markers",
     filename: Optional[str] = None,
     directory: Optional[DirectoryPath] = None,
@@ -2182,7 +2186,7 @@ def sharpeplot(  # noqa: C901
         )
 
     colorway = cast(dict[str, list[str]], fig["layout"]).get("colorway")[
-        : len(point_frame.columns)
+        : len(cast(DataFrame, point_frame).columns)
     ]
 
     if point_frame is not None:
