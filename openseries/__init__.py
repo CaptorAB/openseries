@@ -9,15 +9,15 @@ from .datefixer import (
     holiday_calendar,
     offset_business_days,
 )
-from .frame import (
-    OpenFrame,
+from .frame import OpenFrame
+from .load_plotly import load_plotly_dict
+from .portfoliotools import (
     constrain_optimized_portfolios,
     efficient_frontier,
     prepare_plot_data,
     sharpeplot,
     simulate_portfolios,
 )
-from .load_plotly import load_plotly_dict
 from .series import OpenTimeSeries, timeseries_chain
 from .simulation import ReturnSimulation
 from .types import ValueType
