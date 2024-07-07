@@ -69,6 +69,7 @@ from openseries.types import (
     LiteralFrameProps,
     LiteralHowMerge,
     LiteralLinePlotMode,
+    LiteralMinimizeMethods,
     LiteralOlsFitCovType,
     LiteralOlsFitMethod,
     LiteralPandasReindexMethod,
@@ -1780,6 +1781,7 @@ def efficient_frontier(  # noqa: C901
     seed: int = 71,
     bounds: Optional[tuple[tuple[float]]] = None,
     frontier_points: int = 200,
+    minimize_method: LiteralMinimizeMethods = "SLSQP",
     *,
     tweak: bool = True,
 ) -> tuple[DataFrame, DataFrame, NDArray[float64]]:
@@ -1798,6 +1800,8 @@ def efficient_frontier(  # noqa: C901
         The range of minumum and maximum allowed allocations for each asset
     frontier_points: int, default: 200
         number of points along frontier to optimize
+    minimize_method: LiteralMinimizeMethods, default: SLSQP
+        The method passed into the scipy.minimize function
     tweak: bool, default: True
         cutting the frontier to exclude multiple points with almost the same risk
 
@@ -1886,7 +1890,7 @@ def efficient_frontier(  # noqa: C901
     opt_results = minimize(
         fun=_neg_sharpe,
         x0=init_guess,
-        method="SLSQP",
+        method=minimize_method,
         bounds=bounds,
         constraints=constraints,
     )
@@ -1921,7 +1925,7 @@ def efficient_frontier(  # noqa: C901
         result = minimize(
             fun=_minimize_volatility,
             x0=init_guess,
-            method="SLSQP",
+            method=minimize_method,
             bounds=bounds,
             constraints=cons,
         )
@@ -1965,6 +1969,7 @@ def constrain_optimized_portfolios(
     simulations: int = 10000,
     curve_points: int = 200,
     bounds: Optional[tuple[tuple[float]]] = None,
+    minimize_method: LiteralMinimizeMethods = "SLSQP",
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
     """
     Constrain optimized portfolios to those that improve on the current one.
@@ -1983,6 +1988,8 @@ def constrain_optimized_portfolios(
         Number of optimal portfolios on the efficient frontier
     bounds: tuple[tuple[float]], optional
         The range of minumum and maximum allowed allocations for each asset
+    minimize_method: LiteralMinimizeMethods, default: SLSQP
+        The method passed into the scipy.minimize function
 
     Returns
     -------
@@ -2001,6 +2008,7 @@ def constrain_optimized_portfolios(
         num_ports=simulations,
         frontier_points=curve_points,
         bounds=bounds,
+        minimize_method=minimize_method,
     )
 
     condition_least_ret = front_frame.ret > serie.arithmetic_ret

@@ -158,6 +158,23 @@ LiteralOlsFitCovType = Literal[
     "cluster",
 ]
 
+LiteralMinimizeMethods = Literal[
+    "SLSQP",
+    "Nelder-Mead",
+    "Powell",
+    "CG",
+    "BFGS",
+    "Newton-CG",
+    "L-BFGS-B",
+    "TNC",
+    "COBYLA",
+    "trust-constr",
+    "dogleg",
+    "trust-ncg",
+    "trust-exact",
+    "trust-krylov",
+]
+
 LiteralSeriesProps = Literal[
     "value_ret",
     "geo_ret",
