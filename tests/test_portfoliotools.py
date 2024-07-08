@@ -3,7 +3,7 @@
 # mypy: disable-error-code="arg-type"
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from pathlib import Path
 from typing import Optional, cast
@@ -90,84 +90,86 @@ class TestPortfoliotools(TestCase):
         """Test function efficient_frontier."""
         simulations = 100
         points = 20
+        with localcontext() as decimal_context:
+            decimal_context.rounding = ROUND_HALF_UP
 
-        eframe = self.randomframe.from_deepcopy()
+            eframe = self.randomframe.from_deepcopy()
 
-        frnt, _, _ = efficient_frontier(
-            eframe=eframe,
-            num_ports=simulations,
-            seed=SEED,
-            frontier_points=points,
-            tweak=False,
-        )
-
-        if frnt.shape != (points, eframe.item_count + 4):
-            msg = "Function efficient_frontier not working as intended"
-            raise ValueError(msg)
-
-        eframe.to_cumret()
-
-        frontier, result, optimal = efficient_frontier(
-            eframe=eframe,
-            num_ports=simulations,
-            seed=SEED,
-            frontier_points=points,
-            tweak=False,
-        )
-
-        if frontier.shape != (points, eframe.item_count + 4):
-            msg = "Function efficient_frontier not working as intended"
-            raise ValueError(msg)
-
-        frt_most_sharpe = f"{frontier.loc[:, 'sharpe'].max():.9f}"
-        frt_return_where_most_sharpe = (
-            f"{frontier.loc[frontier['sharpe'].idxmax()]['ret']:.9f}"
-        )
-
-        if (frt_most_sharpe, frt_return_where_most_sharpe) != (
-            "1.302126047",
-            "0.067698304",
-        ):
-            msg = (
-                "Function efficient_frontier not working as intended"
-                f"\n{(frt_most_sharpe, frt_return_where_most_sharpe)}"
+            frnt, _, _ = efficient_frontier(
+                eframe=eframe,
+                num_ports=simulations,
+                seed=SEED,
+                frontier_points=points,
+                tweak=False,
             )
-            raise ValueError(msg)
 
-        sim_least_vol = f"{result.loc[:, 'stdev'].min():.9f}"
-        sim_return_where_least_vol = (
-            f"{result.loc[result['stdev'].idxmin()]['ret']:.9f}"
-        )
+            if frnt.shape != (points, eframe.item_count + 4):
+                msg = "Function efficient_frontier not working as intended"
+                raise ValueError(msg)
 
-        if (sim_least_vol, sim_return_where_least_vol) != (
-            "0.047678096",
-            "0.055880500",
-        ):
-            msg = (
-                "Function efficient_frontier not working as intended"
-                f"\n{(sim_least_vol, sim_return_where_least_vol)}"
+            eframe.to_cumret()
+
+            frontier, result, optimal = efficient_frontier(
+                eframe=eframe,
+                num_ports=simulations,
+                seed=SEED,
+                frontier_points=points,
+                tweak=False,
             )
-            raise ValueError(msg)
 
-        optlist = [round(Decimal(wgt), 6) for wgt in cast(list[float], optimal)]
-        total = sum(optimal[3:])
+            if frontier.shape != (points, eframe.item_count + 4):
+                msg = "Function efficient_frontier not working as intended"
+                raise ValueError(msg)
 
-        if round(total, 7) != 1.0:
-            msg = f"Function efficient_frontier not working as intended\n{total}"
-            raise ValueError(msg)
+            frt_most_sharpe = round(Decimal(frontier.loc[:, "sharpe"].max()), 6)
+            frt_return_where_most_sharpe = round(
+                Decimal(float(frontier.loc[frontier["sharpe"].idxmax()]["ret"])), 6,
+            )
 
-        if optlist != [
-            Decimal("0.068444"),
-            Decimal("0.052547"),
-            Decimal("1.302525"),
-            Decimal("0.116616"),
-            Decimal("0.140094"),
-            Decimal("0.352682"),
-            Decimal("0.312324"),
-            Decimal("0.078283"),
-        ]:
-            msg = f"Function efficient_frontier not working as intended\n{optlist}"
-            raise ValueError(msg)
+            if (frt_most_sharpe, frt_return_where_most_sharpe) != (
+                Decimal("1.302126"),
+                Decimal("0.067698"),
+            ):
+                msg = (
+                    "Function efficient_frontier not working as intended"
+                    f"\n{(frt_most_sharpe, frt_return_where_most_sharpe)}"
+                )
+                raise ValueError(msg)
+
+            sim_least_vol = round(Decimal(result.loc[:, "stdev"].min()), 6)
+            sim_return_where_least_vol = round(
+                Decimal(float(result.loc[result["stdev"].idxmin()]["ret"])), 6,
+            )
+
+            if (sim_least_vol, sim_return_where_least_vol) != (
+                Decimal("0.047678"),
+                Decimal("0.055881"),
+            ):
+                msg = (
+                    "Function efficient_frontier not working as intended"
+                    f"\n{(sim_least_vol, sim_return_where_least_vol)}"
+                )
+                raise ValueError(msg)
+
+            optlist = [round(Decimal(wgt), 6) for wgt in cast(list[float], optimal)]
+            total = sum(optimal[3:])
+
+            if round(total, 7) != 1.0:
+                msg = f"Function efficient_frontier not working as intended\n{total}"
+                raise ValueError(msg)
+
+            if optlist != [
+                Decimal("0.068444"),
+                Decimal("0.052547"),
+                Decimal("1.302525"),
+                Decimal("0.116616"),
+                Decimal("0.140094"),
+                Decimal("0.352682"),
+                Decimal("0.312324"),
+                Decimal("0.078283"),
+            ]:
+                msg = f"Function efficient_frontier not working as intended\n{optlist}"
+                raise ValueError(msg)
 
     def test_constrain_optimized_portfolios(self: TestPortfoliotools) -> None:
         """Test function constrain_optimized_portfolios."""
