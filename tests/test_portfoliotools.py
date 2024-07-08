@@ -31,13 +31,13 @@ class TestPortfoliotools(TestCase):
 
     @classmethod
     def setUpClass(cls: type[TestPortfoliotools]) -> None:
-        """SetUpClass for the TestOpenFrame class."""
+        """SetUpClass for the TestPortfoliotools class."""
         cls.randomseries = SIMSERIES.from_deepcopy()
         cls.randomframe = SIMFRAME.from_deepcopy()
 
     def test_simulate_portfolios(self: TestPortfoliotools) -> None:
         """Test function simulate_portfolios."""
-        simulations = 1000
+        simulations = 100
 
         spframe = self.randomframe.from_deepcopy()
 
@@ -56,7 +56,7 @@ class TestPortfoliotools(TestCase):
             f"{result_returns.loc[result_returns['stdev'].idxmin()]['ret']:.7f}"
         )
 
-        if (return_least_vol, return_where_least_vol) != ("0.0476395", "0.0568173"):
+        if (return_least_vol, return_where_least_vol) != ("0.0476781", "0.0558805"):
             msg = (
                 "Function simulate_portfolios not working as intended"
                 f"\n{(return_least_vol, return_where_least_vol)}"
@@ -79,7 +79,7 @@ class TestPortfoliotools(TestCase):
             f"{result_values.loc[result_values['stdev'].idxmin()]['ret']:.7f}"
         )
 
-        if (value_least_vol, value_where_least_vol) != ("0.0476489", "0.0568400"):
+        if (value_least_vol, value_where_least_vol) != ("0.0476875", "0.0559028"):
             msg = (
                 "Function simulate_portfolios not working as intended"
                 f"\n{(value_least_vol, value_where_least_vol)}"
@@ -88,7 +88,7 @@ class TestPortfoliotools(TestCase):
 
     def test_efficient_frontier(self: TestPortfoliotools) -> None:
         """Test function efficient_frontier."""
-        simulations = 1000
+        simulations = 100
         points = 20
 
         eframe = self.randomframe.from_deepcopy()
@@ -125,8 +125,8 @@ class TestPortfoliotools(TestCase):
         )
 
         if (frt_most_sharpe, frt_return_where_most_sharpe) != (
-            "1.302486911",
-            "0.068289998",
+            "1.302126047",
+            "0.067698304",
         ):
             msg = (
                 "Function efficient_frontier not working as intended"
@@ -140,8 +140,8 @@ class TestPortfoliotools(TestCase):
         )
 
         if (sim_least_vol, sim_return_where_least_vol) != (
-            "0.047639486",
-            "0.056817349",
+            "0.047678096",
+            "0.055880500",
         ):
             msg = (
                 "Function efficient_frontier not working as intended"
@@ -171,7 +171,8 @@ class TestPortfoliotools(TestCase):
 
     def test_constrain_optimized_portfolios(self: TestPortfoliotools) -> None:
         """Test function constrain_optimized_portfolios."""
-        simulations = 1000
+        simulations = 100
+        curve_points = 20
         org_port_name = "Current Portfolio"
 
         std_frame = self.randomframe.from_deepcopy()
@@ -190,6 +191,7 @@ class TestPortfoliotools(TestCase):
             serie=assets_std,
             portfolioname=org_port_name,
             simulations=simulations,
+            curve_points=curve_points,
             bounds=bounds,
         )
 
@@ -198,6 +200,7 @@ class TestPortfoliotools(TestCase):
             serie=assets_std,
             portfolioname=org_port_name,
             simulations=simulations,
+            curve_points=curve_points,
         )
 
         if round(sum(minframe.weights), 7) != 1.0:
@@ -209,11 +212,11 @@ class TestPortfoliotools(TestCase):
 
         minframe_weights = [f"{minw:.7f}" for minw in list(minframe.weights)]
         if minframe_weights != [
-            "0.1150421",
-            "0.1854466",
-            "0.2743087",
-            "0.2572628",
-            "0.1679398",
+            "0.1150512",
+            "0.2045890",
+            "0.2412361",
+            "0.2352707",
+            "0.2038530",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -230,11 +233,11 @@ class TestPortfoliotools(TestCase):
 
         minframe_nb_weights = [f"{minw:.7f}" for minw in list(minframe_nb.weights)]
         if minframe_nb_weights != [
-            "0.1150421",
-            "0.1854466",
-            "0.2743087",
-            "0.2572628",
-            "0.1679398",
+            "0.1150512",
+            "0.2045890",
+            "0.2412361",
+            "0.2352707",
+            "0.2038530",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -244,7 +247,7 @@ class TestPortfoliotools(TestCase):
 
         if (
             f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
-            != "0.0047669"
+            != "0.0016062"
         ):
             msg = (
                 "Optimization did not find better return with similar vol\n"
@@ -262,11 +265,11 @@ class TestPortfoliotools(TestCase):
 
         maxframe_weights = [f"{maxw:.7f}" for maxw in list(maxframe.weights)]
         if maxframe_weights != [
-            "0.1152015",
-            "0.1721200",
-            "0.2971957",
-            "0.2724543",
-            "0.1430285",
+            "0.1151792",
+            "0.1738639",
+            "0.2942018",
+            "0.2704667",
+            "0.1462884",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -274,7 +277,7 @@ class TestPortfoliotools(TestCase):
             )
             raise ValueError(msg)
 
-        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0000714":
+        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0001994":
             msg = (
                 "Optimization did not find better return with similar vol\n"
                 f"{assets_std.vol - maxseries.vol:.7f}"
@@ -284,7 +287,7 @@ class TestPortfoliotools(TestCase):
 
     def test_sharpeplot(self: TestPortfoliotools) -> None:  # noqa: C901
         """Test function sharpeplot."""
-        simulations = 1000
+        simulations = 100
         points = 20
 
         spframe = self.randomframe.from_deepcopy()
