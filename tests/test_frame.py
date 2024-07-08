@@ -1,6 +1,6 @@
 """Test suite for the openseries/frame.py module."""
 
-# mypy: disable-error-code="operator,type-arg,arg-type,unused-ignore,union-attr"
+# mypy: disable-error-code="operator,type-arg,arg-type,unused-ignore"
 from __future__ import annotations
 
 import datetime as dt
@@ -21,14 +21,7 @@ from requests.exceptions import ConnectionError
 # noinspection PyProtectedMember
 from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.datefixer import date_offset_foll
-from openseries.frame import (
-    OpenFrame,
-    constrain_optimized_portfolios,
-    efficient_frontier,
-    prepare_plot_data,
-    sharpeplot,
-    simulate_portfolios,
-)
+from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
 from openseries.series import OpenTimeSeries
 from openseries.types import (
@@ -36,7 +29,7 @@ from openseries.types import (
     LiteralPortfolioWeightings,
     ValueType,
 )
-from tests.test_common_sim import SEED, SIMFRAME, SIMSERIES
+from tests.test_common_sim import SIMFRAME, SIMSERIES
 
 
 class TestOpenFrame(TestCase):
@@ -620,7 +613,7 @@ class TestOpenFrame(TestCase):
         weights: Optional[list[float]] = [0.2, 0.2, 0.2, 0.2, 0.2]
         if weights != mpframe.weights:
             msg = "make_portfolio() equal weight strategy not working as intended."
-            ValueError(msg)
+            raise ValueError(msg)
 
         with localcontext() as decimal_context:
             decimal_context.rounding = ROUND_HALF_UP
@@ -630,14 +623,17 @@ class TestOpenFrame(TestCase):
                 round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
             ]
             if inv_vol_weights != [
-                Decimal("0.252280"),
-                Decimal("0.163721"),
-                Decimal("0.181780"),
-                Decimal("0.230792"),
-                Decimal("0.171427"),
+                Decimal("0.152977"),
+                Decimal("0.206984"),
+                Decimal("0.212791"),
+                Decimal("0.214929"),
+                Decimal("0.212319"),
             ]:
-                msg = "make_portfolio() inverse vol strategy not working as intended."
-                ValueError(msg)
+                msg = (
+                    "make_portfolio() inverse vol strategy not working as intended."
+                    f"output is \n{inv_vol_weights}"
+                )
+                raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=NotImplementedError,
@@ -2651,20 +2647,20 @@ class TestOpenFrame(TestCase):
         dropframe = nanframe.from_deepcopy()
         dropframe.value_nan_handle(method="drop")
 
-        if [1.1, 1.0, 1.0] != dropframe.tsdf.iloc[:, 0].tolist():
+        if dropframe.tsdf.iloc[:, 0].tolist() != [1.1, 1.0, 1.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise ValueError(msg)
-        if [2.1, 2.0, 2.0] != dropframe.tsdf.iloc[:, 1].tolist():
+        if dropframe.tsdf.iloc[:, 1].tolist() != [2.1, 2.0, 2.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise ValueError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.value_nan_handle(method="fill")
 
-        if [1.1, 1.0, 1.0, 1.1, 1.0] != fillframe.tsdf.iloc[:, 0].tolist():
+        if fillframe.tsdf.iloc[:, 0].tolist() != [1.1, 1.0, 1.0, 1.1, 1.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise ValueError(msg)
-        if [2.1, 2.0, 1.8, 1.8, 2.0] != fillframe.tsdf.iloc[:, 1].tolist():
+        if fillframe.tsdf.iloc[:, 1].tolist() != [2.1, 2.0, 1.8, 1.8, 2.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise ValueError(msg)
 
@@ -2705,20 +2701,20 @@ class TestOpenFrame(TestCase):
         dropframe = nanframe.from_deepcopy()
         dropframe.return_nan_handle(method="drop")
 
-        if [0.1, 0.05, 0.04] != dropframe.tsdf.iloc[:, 0].tolist():
+        if dropframe.tsdf.iloc[:, 0].tolist() != [0.1, 0.05, 0.04]:
             msg = "Method return_nan_handle() not working as intended"
             raise ValueError(msg)
-        if [0.01, 0.04, 0.06] != dropframe.tsdf.iloc[:, 1].tolist():
+        if dropframe.tsdf.iloc[:, 1].tolist() != [0.01, 0.04, 0.06]:
             msg = "Method return_nan_handle() not working as intended"
             raise ValueError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.return_nan_handle(method="fill")
 
-        if [0.1, 0.05, 0.0, 0.01, 0.04] != fillframe.tsdf.iloc[:, 0].tolist():
+        if fillframe.tsdf.iloc[:, 0].tolist() != [0.1, 0.05, 0.0, 0.01, 0.04]:
             msg = "Method return_nan_handle() not working as intended"
             raise ValueError(msg)
-        if [0.01, 0.04, 0.02, 0.0, 0.06] != fillframe.tsdf.iloc[:, 1].tolist():
+        if fillframe.tsdf.iloc[:, 1].tolist() != [0.01, 0.04, 0.02, 0.0, 0.06]:
             msg = "Method return_nan_handle() not working as intended"
             raise ValueError(msg)
 
@@ -2747,11 +2743,11 @@ class TestOpenFrame(TestCase):
 
         if rframe.constituents[-1].label != "Asset_0_over_Asset_1":
             msg = "Method relative() not working as intended"
-            ValueError(msg)
+            raise ValueError(msg)
 
         if rframe.columns_lvl_zero[-1] != "Asset_0_over_Asset_1":
             msg = "Method relative() not working as intended"
-            ValueError(msg)
+            raise ValueError(msg)
 
         rframe.tsdf.iloc[:, -1] = rframe.tsdf.iloc[:, -1].add(1.0)
 
@@ -2762,7 +2758,7 @@ class TestOpenFrame(TestCase):
 
         if rflist != sflist:
             msg = "Method relative() not working as intended"
-            ValueError(msg)
+            raise ValueError(msg)
 
     def test_to_cumret(self: TestOpenFrame) -> None:
         """Test to_cumret method."""
@@ -2780,17 +2776,17 @@ class TestOpenFrame(TestCase):
         cframe = OpenFrame([cseries, ccseries])
         rframe = OpenFrame([rseries, rrseries])
 
-        if [ValueType.RTRN, ValueType.PRICE] != mframe.columns_lvl_one:
+        if mframe.columns_lvl_one != [ValueType.RTRN, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
-        if [ValueType.PRICE, ValueType.PRICE] != cframe.columns_lvl_one:
+        if cframe.columns_lvl_one != [ValueType.PRICE, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
         cframe_lvl_one = list(cframe.columns_lvl_one)
 
-        if [ValueType.RTRN, ValueType.RTRN] != rframe.columns_lvl_one:
+        if rframe.columns_lvl_one != [ValueType.RTRN, ValueType.RTRN]:
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
@@ -2798,7 +2794,7 @@ class TestOpenFrame(TestCase):
         cframe.to_cumret()
         rframe.to_cumret()
 
-        if [ValueType.PRICE, ValueType.PRICE] != mframe.columns_lvl_one:
+        if mframe.columns_lvl_one != [ValueType.PRICE, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
@@ -2806,7 +2802,7 @@ class TestOpenFrame(TestCase):
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
-        if [ValueType.PRICE, ValueType.PRICE] != rframe.columns_lvl_one:
+        if rframe.columns_lvl_one != [ValueType.PRICE, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
@@ -3530,384 +3526,3 @@ class TestOpenFrame(TestCase):
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{corr_two}"
             raise ValueError(msg)
-
-    def test_simulate_portfolios(self: TestOpenFrame) -> None:
-        """Test function simulate_portfolios."""
-        simulations = 1000
-
-        spframe = self.randomframe.from_deepcopy()
-
-        result_returns = simulate_portfolios(
-            simframe=spframe,
-            num_ports=simulations,
-            seed=SEED,
-        )
-
-        if result_returns.shape != (simulations, spframe.item_count + 3):
-            msg = "Function simulate_portfolios not working as intended"
-            raise ValueError(msg)
-
-        return_least_vol = f"{result_returns.loc[:, 'stdev'].min():.7f}"
-        return_where_least_vol = (
-            f"{result_returns.loc[result_returns['stdev'].idxmin()]['ret']:.7f}"
-        )
-
-        if (return_least_vol, return_where_least_vol) != ("0.0476395", "0.0568173"):
-            msg = (
-                "Function simulate_portfolios not working as intended"
-                f"\n{(return_least_vol, return_where_least_vol)}"
-            )
-            raise ValueError(msg)
-
-        spframe.to_cumret()
-        result_values = simulate_portfolios(
-            simframe=spframe,
-            num_ports=simulations,
-            seed=SEED,
-        )
-
-        if result_values.shape != (simulations, spframe.item_count + 3):
-            msg = "Function simulate_portfolios not working as intended"
-            raise ValueError(msg)
-
-        value_least_vol = f"{result_values.loc[:, 'stdev'].min():.7f}"
-        value_where_least_vol = (
-            f"{result_values.loc[result_values['stdev'].idxmin()]['ret']:.7f}"
-        )
-
-        if (value_least_vol, value_where_least_vol) != ("0.0476489", "0.0568400"):
-            msg = (
-                "Function simulate_portfolios not working as intended"
-                f"\n{(value_least_vol, value_where_least_vol)}"
-            )
-            raise ValueError(msg)
-
-    def test_efficient_frontier(self: TestOpenFrame) -> None:
-        """Test function efficient_frontier."""
-        simulations = 1000
-        points = 20
-
-        eframe = self.randomframe.from_deepcopy()
-
-        frnt, _, _ = efficient_frontier(
-            eframe=eframe,
-            num_ports=simulations,
-            seed=SEED,
-            frontier_points=points,
-            tweak=False,
-        )
-
-        if frnt.shape != (points, eframe.item_count + 4):
-            msg = "Function efficient_frontier not working as intended"
-            raise ValueError(msg)
-
-        eframe.to_cumret()
-
-        frontier, result, optimal = efficient_frontier(
-            eframe=eframe,
-            num_ports=simulations,
-            seed=SEED,
-            frontier_points=points,
-            tweak=False,
-        )
-
-        if frontier.shape != (points, eframe.item_count + 4):
-            msg = "Function efficient_frontier not working as intended"
-            raise ValueError(msg)
-
-        frt_most_sharpe = f"{frontier.loc[:, 'sharpe'].max():.9f}"
-        frt_return_where_most_sharpe = (
-            f"{frontier.loc[frontier['sharpe'].idxmax()]['ret']:.9f}"
-        )
-
-        if (frt_most_sharpe, frt_return_where_most_sharpe) != (
-            "1.302486911",
-            "0.068289998",
-        ):
-            msg = (
-                "Function efficient_frontier not working as intended"
-                f"\n{(frt_most_sharpe, frt_return_where_most_sharpe)}"
-            )
-            raise ValueError(msg)
-
-        sim_least_vol = f"{result.loc[:, 'stdev'].min():.9f}"
-        sim_return_where_least_vol = (
-            f"{result.loc[result['stdev'].idxmin()]['ret']:.9f}"
-        )
-
-        if (sim_least_vol, sim_return_where_least_vol) != (
-            "0.047639486",
-            "0.056817349",
-        ):
-            msg = (
-                "Function efficient_frontier not working as intended"
-                f"\n{(sim_least_vol, sim_return_where_least_vol)}"
-            )
-            raise ValueError(msg)
-
-        optlist = [round(Decimal(wgt), 6) for wgt in cast(list[float], optimal)]
-        total = sum(optimal[3:])
-
-        if round(total, 7) != 1.0:
-            msg = f"Function efficient_frontier not working as intended\n{total}"
-            raise ValueError(msg)
-
-        if optlist != [
-            Decimal("0.068444"),
-            Decimal("0.052547"),
-            Decimal("1.302525"),
-            Decimal("0.116616"),
-            Decimal("0.140094"),
-            Decimal("0.352682"),
-            Decimal("0.312324"),
-            Decimal("0.078283"),
-        ]:
-            msg = f"Function efficient_frontier not working as intended\n{optlist}"
-            raise ValueError(msg)
-
-    def test_constrain_optimized_portfolios(self: TestOpenFrame) -> None:
-        """Test function constrain_optimized_portfolios."""
-        simulations = 1000
-        upper_bound = 1.0
-        org_port_name = "Current Portfolio"
-
-        std_frame = self.randomframe.from_deepcopy()
-        std_frame.to_cumret()
-        std_frame.weights = [1 / std_frame.item_count] * std_frame.item_count
-        assets_std = OpenTimeSeries.from_df(std_frame.make_portfolio(org_port_name))
-
-        minframe, minseries, maxframe, maxseries = constrain_optimized_portfolios(
-            data=std_frame,
-            serie=assets_std,
-            portfolioname=org_port_name,
-            simulations=simulations,
-            upper_bound=upper_bound,
-        )
-
-        if round(sum(minframe.weights), 7) != 1.0:
-            msg = (
-                "Function constrain_optimized_portfolios not working as "
-                f"intended\n{round(sum(minframe.weights), 7)}"
-            )
-            raise ValueError(msg)
-
-        minframe_weights = [f"{minw:.7f}" for minw in minframe.weights]
-        if minframe_weights != [
-            "0.1150421",
-            "0.1854466",
-            "0.2743087",
-            "0.2572628",
-            "0.1679398",
-        ]:
-            msg = (
-                "Function constrain_optimized_portfolios not "
-                f"working as intended\n{minframe_weights}"
-            )
-            raise ValueError(msg)
-
-        if (
-            f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
-            != "0.0047669"
-        ):
-            msg = (
-                "Optimization did not find better return with similar vol\n"
-                f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
-            )
-
-            raise ValueError(msg)
-
-        if round(sum(maxframe.weights), 7) != 1.0:
-            msg = (
-                "Function constrain_optimized_portfolios not working as "
-                f"intended\n{round(sum(maxframe.weights), 7)}"
-            )
-            raise ValueError(msg)
-
-        maxframe_weights = [f"{maxw:.7f}" for maxw in maxframe.weights]
-        if maxframe_weights != [
-            "0.1152015",
-            "0.1721200",
-            "0.2971957",
-            "0.2724543",
-            "0.1430285",
-        ]:
-            msg = (
-                "Function constrain_optimized_portfolios not "
-                f"working as intended\n{maxframe_weights}"
-            )
-            raise ValueError(msg)
-
-        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0000714":
-            msg = (
-                "Optimization did not find better return with similar vol\n"
-                f"{assets_std.vol - maxseries.vol:.7f}"
-            )
-
-            raise ValueError(msg)
-
-    def test_sharpeplot(self: TestOpenFrame) -> None:  # noqa: C901
-        """Test function sharpeplot."""
-        simulations = 1000
-        points = 20
-
-        spframe = self.randomframe.from_deepcopy()
-        spframe.to_cumret()
-        current = OpenTimeSeries.from_df(
-            spframe.make_portfolio(
-                name="Current Portfolio",
-                weight_strat="eq_weights",
-            ),
-        )
-
-        frontier, simulated, optimum = efficient_frontier(
-            eframe=spframe,
-            num_ports=simulations,
-            seed=SEED,
-            frontier_points=points,
-            tweak=False,
-        )
-
-        plotframe = prepare_plot_data(
-            assets=spframe,
-            current=current,
-            optimized=optimum,
-        )
-
-        figure_title_no_text, _ = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=True,
-            auto_open=False,
-            output_type="div",
-        )
-
-        fig_json_title_no_text = loads(cast(str, figure_title_no_text.to_json()))
-        if "Risk and Return" not in fig_json_title_no_text["layout"]["title"]["text"]:
-            msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
-
-        figure_title_text, _ = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=True,
-            titletext="Awesome title",
-            auto_open=False,
-            output_type="div",
-        )
-
-        fig_json_title_text = loads(cast(str, figure_title_text.to_json()))
-        if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
-            msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
-
-        figure, _ = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=False,
-            auto_open=False,
-            output_type="div",
-        )
-
-        fig_json = loads(cast(str, figure.to_json()))
-
-        if "text" in fig_json["layout"]["title"]:
-            msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
-
-        names = [item["name"] for item in fig_json["data"]]
-
-        if names != [
-            "simulated portfolios",
-            "Efficient frontier",
-            "Asset_0",
-            "Asset_1",
-            "Asset_2",
-            "Asset_3",
-            "Asset_4",
-            "Max Sharpe Portfolio",
-            "Current Portfolio",
-        ]:
-            msg = f"Function sharpeplot not working as intended\n{names}"
-            raise ValueError(msg)
-
-        directory = Path(__file__).resolve().parent
-        _, figfile = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=False,
-            auto_open=False,
-            output_type="file",
-            directory=directory,
-        )
-
-        plotfile = Path(figfile).resolve()
-        if not plotfile.exists():
-            msg = "html file not created"
-            raise FileNotFoundError(msg)
-
-        plotfile.unlink()
-        if plotfile.exists():
-            msg = "html file not deleted as intended"
-            raise FileExistsError(msg)
-
-        if figfile[:5] == "<div>":
-            msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
-
-        _, divstring = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=False,
-            auto_open=False,
-            output_type="div",
-        )
-        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
-            msg = "Html div section not created"
-            raise ValueError(msg)
-
-        with patch("pathlib.Path.exists") as mock_userfolderexists:
-            mock_userfolderexists.return_value = True
-            mockhomefig, _ = sharpeplot(
-                sim_frame=simulated,
-                line_frame=frontier,
-                point_frame=plotframe,
-                point_frame_mode="markers+text",
-                title=False,
-                auto_open=False,
-                output_type="div",
-            )
-            mockhomefig_json = loads(cast(str, mockhomefig.to_json()))
-
-        if mockhomefig_json["data"][0]["name"] != "simulated portfolios":
-            msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
-
-        with patch("pathlib.Path.exists") as mock_userfolderexists:
-            mock_userfolderexists.return_value = False
-            _, mockfile = sharpeplot(
-                sim_frame=simulated,
-                line_frame=frontier,
-                point_frame=plotframe,
-                point_frame_mode="markers+text",
-                title=False,
-                auto_open=False,
-                output_type="file",
-                filename="seriesfile.html",
-            )
-            mockfilepath = Path(mockfile).resolve()
-
-        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
-            msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
-
-        mockfilepath.unlink()

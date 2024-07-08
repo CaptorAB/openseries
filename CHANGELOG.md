@@ -1,7 +1,13 @@
 # Changelog
 
-At some point we will start documenting changes in release documentation instead.
-For now this is the only place where we log summary descriptions.
+## Version [1.6.0] - 2024-07-08
+
+- Added \_\_all__ where appropriate for proper import autocompletion and hinting
+- Potentially BREAKING CHANGE in constrain_optimized_portfolios and efficient_frontier. They no longer take a single upper bound as argument but instead take both lower and upper bounds for each position in a portfolio. And if given they must all be given.
+- Added option to set which method is passed into the scipy.minimize function that is used when finding the efficient frontier of a portfolio.
+- BREAKING CHANGE - moved functions from frame.py to portfoliotools.py to improve project structure. Users will need to change imports because of this.
+- Improved speed in portfoliotools tests.
+- Miscellaneous dependency updates and tweaks in project tool scripts.
 
 ## Version [1.5.7] - 2024-06-23
 

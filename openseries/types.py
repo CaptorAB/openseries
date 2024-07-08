@@ -11,6 +11,9 @@ from pandas import Timestamp
 from pydantic import BaseModel, Field, StringConstraints, conlist, conset
 from typing_extensions import Self
 
+__all__ = ["ValueType"]
+
+
 CountryStringType = Annotated[
     str,
     StringConstraints(
@@ -153,6 +156,23 @@ LiteralOlsFitCovType = Literal[
     "hac-panel",
     "hac-groupsum",
     "cluster",
+]
+
+LiteralMinimizeMethods = Literal[
+    "SLSQP",
+    "Nelder-Mead",
+    "Powell",
+    "CG",
+    "BFGS",
+    "Newton-CG",
+    "L-BFGS-B",
+    "TNC",
+    "COBYLA",
+    "trust-constr",
+    "dogleg",
+    "trust-ncg",
+    "trust-exact",
+    "trust-krylov",
 ]
 
 LiteralSeriesProps = Literal[
