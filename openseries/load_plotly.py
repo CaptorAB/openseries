@@ -5,18 +5,19 @@ from __future__ import annotations
 from json import load
 from logging import warning
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import requests
 from requests.exceptions import ConnectionError
 
-from openseries.types import CaptorLogoType, PlotlyLayoutType
+if TYPE_CHECKING:
+    from .types import CaptorLogoType, PlotlyLayoutType  # pragma: no cover
 
 __all__ = ["load_plotly_dict"]
 
 
 def _check_remote_file_existence(url: str) -> bool:
-    """
-    Check if remote file exists.
+    """Check if remote file exists.
 
     Parameters
     ----------
@@ -44,8 +45,7 @@ def load_plotly_dict(
     *,
     responsive: bool = True,
 ) -> tuple[PlotlyLayoutType, CaptorLogoType]:
-    """
-    Load Plotly defaults.
+    """Load Plotly defaults.
 
     Parameters
     ----------

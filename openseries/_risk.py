@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import Union, cast
+from typing import TYPE_CHECKING, Union, cast
 
 from numpy import (
     mean,
@@ -13,15 +13,15 @@ from numpy import (
 )
 from pandas import DataFrame, Series
 
-from openseries.types import LiteralQuantileInterp
+if TYPE_CHECKING:
+    from .types import LiteralQuantileInterp  # pragma: no cover
 
 
 def _cvar_down_calc(
     data: Union[DataFrame, Series[float], list[float]],
     level: float = 0.95,
 ) -> float:
-    """
-    Calculate downside Conditional Value at Risk (CVaR).
+    """Calculate downside Conditional Value at Risk (CVaR).
 
     https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
@@ -52,8 +52,7 @@ def _var_down_calc(
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
-    """
-    Calculate downside Value At Risk (VaR).
+    """Calculate downside Value At Risk (VaR).
 
     The equivalent of percentile.inc([...], 1-level) over returns in MS Excel
     https://www.investopedia.com/terms/v/var.asp.

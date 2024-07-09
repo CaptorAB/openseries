@@ -10,7 +10,6 @@ from json import load, loads
 from pathlib import Path
 from pprint import pformat
 from typing import Hashable, Optional, Union, cast
-from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -29,21 +28,11 @@ from openseries.types import (
     LiteralPortfolioWeightings,
     ValueType,
 )
-from tests.test_common_sim import SIMFRAME, SIMSERIES
+from tests.test_common_sim import CommonTestCase
 
 
-class TestOpenFrame(TestCase):
-
-    """class to run unittests on the module frame.py."""
-
-    randomframe: OpenFrame
-    randomseries: OpenTimeSeries
-
-    @classmethod
-    def setUpClass(cls: type[TestOpenFrame]) -> None:
-        """SetUpClass for the TestOpenFrame class."""
-        cls.randomseries = SIMSERIES.from_deepcopy()
-        cls.randomframe = SIMFRAME.from_deepcopy()
+class TestOpenFrame(CommonTestCase):
+    """class to run tests on the module frame.py."""
 
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
@@ -2348,8 +2337,7 @@ class TestOpenFrame(TestCase):
             raise ValueError(msg)
 
     def test_capture_ratio(self: TestOpenFrame) -> None:
-        """
-        Test the capture_ratio_func method.
+        """Test the capture_ratio_func method.
 
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and

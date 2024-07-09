@@ -28,9 +28,9 @@ from pandas import (
 from pydantic import model_validator
 from typing_extensions import Self
 
-from openseries._common_model import _CommonModel
-from openseries.datefixer import date_fix, do_resample_to_business_period_ends
-from openseries.types import (
+from ._common_model import _CommonModel
+from .datefixer import date_fix, do_resample_to_business_period_ends
+from .types import (
     Countries,
     CountriesType,
     Currency,
@@ -53,9 +53,7 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 # noinspection PyUnresolvedReferences
 class OpenTimeSeries(_CommonModel):
-
-    """
-    OpenTimeSeries objects are at the core of the openseries package.
+    """OpenTimeSeries objects are at the core of the openseries package.
 
     The intended use is to allow analyses of financial timeseries.
     It is only intended for daily or less frequent data samples.
@@ -134,8 +132,7 @@ class OpenTimeSeries(_CommonModel):
         domestic_ccy: CurrencyStringType = "SEK",
         countries: CountriesType = "SE",
     ) -> None:
-        """
-        Set the domestic currency and calendar of the user.
+        """Set the domestic currency and calendar of the user.
 
         Parameters
         ----------
@@ -165,8 +162,7 @@ class OpenTimeSeries(_CommonModel):
         *,
         local_ccy: bool = True,
     ) -> OpenTimeSeries:
-        """
-        Create series from a Pandas DataFrame or Series.
+        """Create series from a Pandas DataFrame or Series.
 
         Parameters
         ----------
@@ -224,8 +220,7 @@ class OpenTimeSeries(_CommonModel):
         *,
         local_ccy: bool = True,
     ) -> OpenTimeSeries:
-        """
-        Create series from a Pandas DataFrame or Series.
+        """Create series from a Pandas DataFrame or Series.
 
         Parameters
         ----------
@@ -308,8 +303,7 @@ class OpenTimeSeries(_CommonModel):
         *,
         local_ccy: bool = True,
     ) -> OpenTimeSeries:
-        """
-        Create series from values accruing with a given fixed rate return.
+        """Create series from values accruing with a given fixed rate return.
 
         Providing a date_range of type Pandas DatetimeIndex takes priority over
         providing a combination of days and an end date.
@@ -380,8 +374,7 @@ class OpenTimeSeries(_CommonModel):
         )
 
     def from_deepcopy(self: Self) -> Self:
-        """
-        Create copy of OpenTimeSeries object.
+        """Create copy of OpenTimeSeries object.
 
         Returns
         -------
@@ -392,8 +385,7 @@ class OpenTimeSeries(_CommonModel):
         return deepcopy(self)
 
     def pandas_df(self: Self) -> Self:
-        """
-        Populate .tsdf Pandas DataFrame from the .dates and .values lists.
+        """Populate .tsdf Pandas DataFrame from the .dates and .values lists.
 
         Returns
         -------
@@ -415,8 +407,7 @@ class OpenTimeSeries(_CommonModel):
         self: Self,
         properties: Optional[list[LiteralSeriesProps]] = None,
     ) -> DataFrame:
-        """
-        Calculate chosen properties.
+        """Calculate chosen properties.
 
         Parameters
         ----------
@@ -441,8 +432,7 @@ class OpenTimeSeries(_CommonModel):
         return pdf
 
     def value_to_ret(self: Self) -> Self:
-        """
-        Convert series of values into series of returns.
+        """Convert series of values into series of returns.
 
         Returns
         -------
@@ -462,8 +452,7 @@ class OpenTimeSeries(_CommonModel):
         return self
 
     def value_to_diff(self: Self, periods: int = 1) -> Self:
-        """
-        Convert series of values to series of their period differences.
+        """Convert series of values to series of their period differences.
 
         Parameters
         ----------
@@ -489,8 +478,7 @@ class OpenTimeSeries(_CommonModel):
         return self
 
     def to_cumret(self: Self) -> Self:
-        """
-        Convert series of returns into cumulative series of values.
+        """Convert series of returns into cumulative series of values.
 
         Returns
         -------
@@ -520,8 +508,7 @@ class OpenTimeSeries(_CommonModel):
         days_in_year: int = 365,
         divider: float = 1.0,
     ) -> Self:
-        """
-        Convert series of 1-day rates into series of cumulative values.
+        """Convert series of 1-day rates into series of cumulative values.
 
         Parameters
         ----------
@@ -557,8 +544,7 @@ class OpenTimeSeries(_CommonModel):
         self: Self,
         freq: Union[LiteralBizDayFreq, str] = "BME",
     ) -> Self:
-        """
-        Resamples the timeseries frequency.
+        """Resamples the timeseries frequency.
 
         Parameters
         ----------
@@ -581,8 +567,7 @@ class OpenTimeSeries(_CommonModel):
         freq: LiteralBizDayFreq = "BME",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
-        """
-        Resamples timeseries frequency to the business calendar month end dates.
+        """Resamples timeseries frequency to the business calendar month end dates.
 
         Stubs left in place. Stubs will be aligned to the shortest stub.
 
@@ -621,8 +606,7 @@ class OpenTimeSeries(_CommonModel):
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Series[float]:
-        """
-        Exponentially Weighted Moving Average Model for Volatility.
+        """Exponentially Weighted Moving Average Model for Volatility.
 
         https://www.investopedia.com/articles/07/ewma.asp.
 
@@ -694,8 +678,7 @@ class OpenTimeSeries(_CommonModel):
         adjustment: float,
         days_in_year: int = 365,
     ) -> Self:
-        """
-        Add or subtract a fee from the timeseries return.
+        """Add or subtract a fee from the timeseries return.
 
         Parameters
         ----------
@@ -759,8 +742,7 @@ class OpenTimeSeries(_CommonModel):
         *,
         delete_lvl_one: bool = False,
     ) -> Self:
-        """
-        Set the column labels of the .tsdf Pandas Dataframe.
+        """Set the column labels of the .tsdf Pandas Dataframe.
 
         Parameters
         ----------
@@ -800,8 +782,7 @@ def timeseries_chain(
     back: TypeOpenTimeSeries,
     old_fee: float = 0.0,
 ) -> Union[TypeOpenTimeSeries, OpenTimeSeries]:
-    """
-    Chain two timeseries together.
+    """Chain two timeseries together.
 
     The function assumes that the two series have at least one date in common.
 
@@ -887,8 +868,7 @@ def timeseries_chain(
 
 
 def _check_if_none(item: Any) -> bool:  # noqa: ANN401
-    """
-    Check if a variable is None or equivalent.
+    """Check if a variable is None or equivalent.
 
     Parameters
     ----------

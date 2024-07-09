@@ -33,7 +33,6 @@ CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-
 
 
 class Countries(BaseModel):
-
     """Declare Countries."""
 
     countryinput: CountriesType
@@ -53,7 +52,6 @@ CurrencyStringType = Annotated[
 
 
 class Currency(BaseModel):
-
     """Declare Currency."""
 
     ccy: CurrencyStringType
@@ -230,7 +228,6 @@ LiteralFrameProps = Literal[
 
 
 class OpenTimeSeriesPropertiesList(list[str]):
-
     """Allowed property arguments for the OpenTimeSeries class."""
 
     allowed_strings: ClassVar[set[str]] = {
@@ -287,7 +284,6 @@ class OpenTimeSeriesPropertiesList(list[str]):
 
 
 class OpenFramePropertiesList(list[str]):
-
     """Allowed property arguments for the OpenFrame class."""
 
     allowed_strings: ClassVar[set[str]] = {
@@ -339,7 +335,6 @@ class OpenFramePropertiesList(list[str]):
 
 
 class ValueType(str, Enum):
-
     """Enum types of OpenTimeSeries to identify the output."""
 
     EWMA = "EWMA"

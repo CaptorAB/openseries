@@ -9,7 +9,6 @@ from unittest import TestCase
 
 
 class TestPackage(TestCase):
-
     """class to test openseries packaging."""
 
     def test_metadata(self: TestPackage) -> None:

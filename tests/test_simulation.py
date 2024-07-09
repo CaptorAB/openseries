@@ -4,33 +4,24 @@ from __future__ import annotations
 
 import datetime as dt
 from typing import Union
-from unittest import TestCase
 
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation
 from openseries.types import ValueType
-from tests.test_common_sim import SEED, SIMS
+from tests.test_common_sim import CommonTestCase
 
 
-class TestSimulation(TestCase):
-
-    """class to run unittests on the module simulation.py."""
-
-    seriesim: ReturnSimulation
-
-    @classmethod
-    def setUpClass(cls: type[TestSimulation]) -> None:
-        """SetUpClass for the TestSimulation class."""
-        cls.seriesim = SIMS
+class TestSimulation(CommonTestCase):
+    """class to run tests on the module simulation.py."""
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""
         args: dict[str, Union[int, float]] = {
             "number_of_sims": 1,
-            "trading_days": SIMS.trading_days,
-            "mean_annual_return": SIMS.mean_annual_return,
-            "mean_annual_vol": SIMS.mean_annual_vol,
-            "seed": SEED,
+            "trading_days": self.seriesim.trading_days,
+            "mean_annual_return": self.seriesim.mean_annual_return,
+            "mean_annual_vol": self.seriesim.mean_annual_vol,
+            "seed": self.seed,
         }
         methods = [
             "from_normal",
@@ -45,24 +36,24 @@ class TestSimulation(TestCase):
         added: list[dict[str, Union[int, float]]] = [
             {},
             {
-                "mean_annual_return": SIMS.mean_annual_return + 0.01,
-                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+                "mean_annual_return": self.seriesim.mean_annual_return + 0.01,
+                "mean_annual_vol": self.seriesim.mean_annual_vol + 0.01,
             },
             {},
             {
-                "mean_annual_return": SIMS.mean_annual_return + 0.01,
-                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+                "mean_annual_return": self.seriesim.mean_annual_return + 0.01,
+                "mean_annual_vol": self.seriesim.mean_annual_vol + 0.01,
             },
             {},
             {
-                "mean_annual_return": SIMS.mean_annual_return + 0.01,
-                "mean_annual_vol": SIMS.mean_annual_vol + 0.01,
+                "mean_annual_return": self.seriesim.mean_annual_return + 0.01,
+                "mean_annual_vol": self.seriesim.mean_annual_vol + 0.01,
             },
-            {"jumps_lamda": SIMS.jumps_lamda},
+            {"jumps_lamda": self.seriesim.jumps_lamda},
             {
-                "jumps_lamda": SIMS.jumps_lamda + 0.1,
-                "jumps_sigma": SIMS.jumps_sigma + 0.1,
-                "jumps_mu": SIMS.jumps_mu + 0.1,
+                "jumps_lamda": self.seriesim.jumps_lamda + 0.1,
+                "jumps_sigma": self.seriesim.jumps_sigma + 0.1,
+                "jumps_mu": self.seriesim.jumps_mu + 0.1,
             },
         ]
         intended_returns = [
@@ -104,7 +95,7 @@ class TestSimulation(TestCase):
 
     def test_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output."""
-        if self.seriesim.results.shape[0] != SIMS.trading_days:
+        if self.seriesim.results.shape[0] != self.seriesim.trading_days:
             msg = "Unexpected result"
             raise ValueError(msg)
 
@@ -124,26 +115,26 @@ class TestSimulation(TestCase):
         one = 1
         seriesim = ReturnSimulation.from_merton_jump_gbm(
             number_of_sims=one,
-            trading_days=SIMS.trading_days,
-            mean_annual_return=SIMS.mean_annual_return,
-            mean_annual_vol=SIMS.mean_annual_vol,
-            jumps_lamda=SIMS.jumps_lamda,
-            jumps_sigma=SIMS.jumps_sigma,
-            jumps_mu=SIMS.jumps_mu,
-            trading_days_in_year=SIMS.trading_days_in_year,
-            seed=SEED,
+            trading_days=self.seriesim.trading_days,
+            mean_annual_return=self.seriesim.mean_annual_return,
+            mean_annual_vol=self.seriesim.mean_annual_vol,
+            jumps_lamda=self.seriesim.jumps_lamda,
+            jumps_sigma=self.seriesim.jumps_sigma,
+            jumps_mu=self.seriesim.jumps_mu,
+            trading_days_in_year=self.seriesim.trading_days_in_year,
+            seed=self.seed,
         )
         five = 5
         framesim = ReturnSimulation.from_merton_jump_gbm(
             number_of_sims=five,
-            trading_days=SIMS.trading_days,
-            mean_annual_return=SIMS.mean_annual_return,
-            mean_annual_vol=SIMS.mean_annual_vol,
-            jumps_lamda=SIMS.jumps_lamda,
-            jumps_sigma=SIMS.jumps_sigma,
-            jumps_mu=SIMS.jumps_mu,
-            trading_days_in_year=SIMS.trading_days_in_year,
-            seed=SEED,
+            trading_days=self.seriesim.trading_days,
+            mean_annual_return=self.seriesim.mean_annual_return,
+            mean_annual_vol=self.seriesim.mean_annual_vol,
+            jumps_lamda=self.seriesim.jumps_lamda,
+            jumps_sigma=self.seriesim.jumps_sigma,
+            jumps_mu=self.seriesim.jumps_mu,
+            trading_days_in_year=self.seriesim.trading_days_in_year,
+            seed=self.seed,
         )
 
         start = dt.date(2009, 6, 30)
@@ -155,11 +146,11 @@ class TestSimulation(TestCase):
         startseries = returnseries.from_deepcopy()
         startseries.to_cumret()
 
-        if onedf.shape != (SIMS.trading_days, one):
+        if onedf.shape != (self.seriesim.trading_days, one):
             msg = "Method to_dataframe() not working as intended"
             raise ValueError(msg)
 
-        if fivedf.shape != (SIMS.trading_days, five):
+        if fivedf.shape != (self.seriesim.trading_days, five):
             msg = "Method to_dataframe() not working as intended"
             raise ValueError(msg)
 

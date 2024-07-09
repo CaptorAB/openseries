@@ -7,10 +7,8 @@ from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from pathlib import Path
 from typing import Optional, cast
-from unittest import TestCase
 from unittest.mock import patch
 
-from openseries.frame import OpenFrame
 from openseries.portfoliotools import (
     constrain_optimized_portfolios,
     efficient_frontier,
@@ -19,21 +17,11 @@ from openseries.portfoliotools import (
     simulate_portfolios,
 )
 from openseries.series import OpenTimeSeries
-from tests.test_common_sim import SEED, SIMFRAME, SIMSERIES
+from tests.test_common_sim import CommonTestCase
 
 
-class TestPortfoliotools(TestCase):
-
-    """class to run unittests on the module portfoliotools.py."""
-
-    randomframe: OpenFrame
-    randomseries: OpenTimeSeries
-
-    @classmethod
-    def setUpClass(cls: type[TestPortfoliotools]) -> None:
-        """SetUpClass for the TestPortfoliotools class."""
-        cls.randomseries = SIMSERIES.from_deepcopy()
-        cls.randomframe = SIMFRAME.from_deepcopy()
+class TestPortfoliotools(CommonTestCase):
+    """class to run tests on the module portfoliotools.py."""
 
     def test_simulate_portfolios(self: TestPortfoliotools) -> None:
         """Test function simulate_portfolios."""
@@ -44,7 +32,7 @@ class TestPortfoliotools(TestCase):
         result_returns = simulate_portfolios(
             simframe=spframe,
             num_ports=simulations,
-            seed=SEED,
+            seed=self.seed,
         )
 
         if result_returns.shape != (simulations, spframe.item_count + 3):
@@ -67,7 +55,7 @@ class TestPortfoliotools(TestCase):
         result_values = simulate_portfolios(
             simframe=spframe,
             num_ports=simulations,
-            seed=SEED,
+            seed=self.seed,
         )
 
         if result_values.shape != (simulations, spframe.item_count + 3):
@@ -98,7 +86,7 @@ class TestPortfoliotools(TestCase):
             frnt, _, _ = efficient_frontier(
                 eframe=eframe,
                 num_ports=simulations,
-                seed=SEED,
+                seed=self.seed,
                 frontier_points=points,
                 tweak=False,
             )
@@ -112,7 +100,7 @@ class TestPortfoliotools(TestCase):
             frontier, result, optimal = efficient_frontier(
                 eframe=eframe,
                 num_ports=simulations,
-                seed=SEED,
+                seed=self.seed,
                 frontier_points=points,
                 tweak=False,
             )
@@ -123,7 +111,8 @@ class TestPortfoliotools(TestCase):
 
             frt_most_sharpe = round(Decimal(frontier.loc[:, "sharpe"].max()), 6)
             frt_return_where_most_sharpe = round(
-                Decimal(float(frontier.loc[frontier["sharpe"].idxmax()]["ret"])), 6,
+                Decimal(float(frontier.loc[frontier["sharpe"].idxmax()]["ret"])),
+                6,
             )
 
             if (frt_most_sharpe, frt_return_where_most_sharpe) != (
@@ -138,7 +127,8 @@ class TestPortfoliotools(TestCase):
 
             sim_least_vol = round(Decimal(result.loc[:, "stdev"].min()), 6)
             sim_return_where_least_vol = round(
-                Decimal(float(result.loc[result["stdev"].idxmin()]["ret"])), 6,
+                Decimal(float(result.loc[result["stdev"].idxmin()]["ret"])),
+                6,
             )
 
             if (sim_least_vol, sim_return_where_least_vol) != (
@@ -304,7 +294,7 @@ class TestPortfoliotools(TestCase):
         frontier, simulated, optimum = efficient_frontier(
             eframe=spframe,
             num_ports=simulations,
-            seed=SEED,
+            seed=self.seed,
             frontier_points=points,
             tweak=False,
         )

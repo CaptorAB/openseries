@@ -1,13 +1,17 @@
 """Defining simulated data used in test suite."""
 
+from __future__ import annotations
+
 import datetime as dt
+from typing import Union
+from unittest import TestCase
 
 from openseries.frame import OpenFrame
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation
 from openseries.types import ValueType
 
-SEED: int = 71
+SEED = 71
 
 SIMS = ReturnSimulation.from_merton_jump_gbm(
     number_of_sims=5,
@@ -36,3 +40,24 @@ SIMFRAME = OpenFrame(
         for serie in range(SIMS.number_of_sims)
     ],
 )
+
+
+class CommonTestCase(TestCase):
+    """base class to run project tests."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, Union[dt.date, int, float]]
+
+    @classmethod
+    def setUpClass(cls: type[CommonTestCase]) -> None:
+        """SetUpClass for the CommonTestCase class."""
+        cls.seed = SEED
+        cls.seriesim = SIMS
+        cls.randomseries = SIMSERIES.from_deepcopy()
+        cls.randomframe = SIMFRAME.from_deepcopy()
+        cls.random_properties = cls.randomseries.all_properties().to_dict()[
+            ("Asset_0", ValueType.PRICE)
+        ]

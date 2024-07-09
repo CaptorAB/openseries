@@ -16,8 +16,7 @@ from openseries.types import (
 
 
 class TestTypes(TestCase):
-
-    """class to run unittests on the module types.py."""
+    """class to run tests on the module types.py."""
 
     def test_opentimeseriesproplist_validate(self: TestTypes) -> None:
         """Test that the OpenTimeSeries property input is correctly checked."""

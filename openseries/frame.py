@@ -3,11 +3,13 @@
 # mypy: disable-error-code="index,assignment"
 from __future__ import annotations
 
-import datetime as dt
 from copy import deepcopy
 from functools import reduce
 from logging import warning
-from typing import Optional, Union, cast
+from typing import TYPE_CHECKING, Optional, Union, cast
+
+if TYPE_CHECKING:
+    import datetime as dt  # pragma: no cover
 
 import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
 from numpy import (
@@ -40,10 +42,10 @@ from statsmodels.regression.linear_model import (  # type: ignore[import-untyped
 )
 from typing_extensions import Self
 
-from openseries._common_model import _CommonModel
-from openseries.datefixer import do_resample_to_business_period_ends
-from openseries.series import OpenTimeSeries
-from openseries.types import (
+from ._common_model import _CommonModel
+from .datefixer import do_resample_to_business_period_ends
+from .series import OpenTimeSeries
+from .types import (
     CountriesType,
     DaysInYearType,
     LiteralBizDayFreq,
@@ -64,9 +66,7 @@ __all__ = ["OpenFrame"]
 
 # noinspection PyUnresolvedReferences
 class OpenFrame(_CommonModel):
-
-    """
-    OpenFrame objects hold OpenTimeSeries in the list constituents.
+    """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
     The intended use is to allow comparisons across these timeseries.
 
@@ -106,8 +106,7 @@ class OpenFrame(_CommonModel):
         constituents: list[OpenTimeSeries],
         weights: Optional[list[float]] = None,
     ) -> None:
-        """
-        OpenFrame objects hold OpenTimeSeries in the list constituents.
+        """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
         The intended use is to allow comparisons across these timeseries.
 
@@ -144,8 +143,7 @@ class OpenFrame(_CommonModel):
             warning("OpenFrame() was passed an empty list.")
 
     def from_deepcopy(self: Self) -> Self:
-        """
-        Create copy of the OpenFrame object.
+        """Create copy of the OpenFrame object.
 
         Returns
         -------
@@ -159,8 +157,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         how: LiteralHowMerge = "outer",
     ) -> Self:
-        """
-        Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
+        """Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
 
         Parameters
         ----------
@@ -204,8 +201,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         properties: Optional[list[LiteralFrameProps]] = None,
     ) -> DataFrame:
-        """
-        Calculate chosen timeseries properties.
+        """Calculate chosen timeseries properties.
 
         Parameters
         ----------
@@ -229,8 +225,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def lengths_of_items(self: Self) -> Series[int]:
-        """
-        Number of observations of all constituents.
+        """Number of observations of all constituents.
 
         Returns
         -------
@@ -247,8 +242,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def item_count(self: Self) -> int:
-        """
-        Number of constituents.
+        """Number of constituents.
 
         Returns
         -------
@@ -260,8 +254,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def columns_lvl_zero(self: Self) -> list[str]:
-        """
-        Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
+        """Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns
         -------
@@ -273,8 +266,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def columns_lvl_one(self: Self) -> list[ValueType]:
-        """
-        Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
+        """Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns
         -------
@@ -286,8 +278,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def first_indices(self: Self) -> Series[dt.date]:
-        """
-        The first dates in the timeseries of all constituents.
+        """The first dates in the timeseries of all constituents.
 
         Returns
         -------
@@ -304,8 +295,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def last_indices(self: Self) -> Series[dt.date]:
-        """
-        The last dates in the timeseries of all constituents.
+        """The last dates in the timeseries of all constituents.
 
         Returns
         -------
@@ -322,8 +312,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def span_of_days_all(self: Self) -> Series[int]:
-        """
-        Number of days from the first date to the last for all items in the frame.
+        """Number of days from the first date to the last for all items in the frame.
 
         Returns
         -------
@@ -340,8 +329,7 @@ class OpenFrame(_CommonModel):
         )
 
     def value_to_ret(self: Self) -> Self:
-        """
-        Convert series of values into series of returns.
+        """Convert series of values into series of returns.
 
         Returns
         -------
@@ -357,8 +345,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def value_to_diff(self: Self, periods: int = 1) -> Self:
-        """
-        Convert series of values to series of their period differences.
+        """Convert series of values to series of their period differences.
 
         Parameters
         ----------
@@ -380,8 +367,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def to_cumret(self: Self) -> Self:
-        """
-        Convert series of returns into cumulative series of values.
+        """Convert series of returns into cumulative series of values.
 
         Returns
         -------
@@ -406,8 +392,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         freq: Union[LiteralBizDayFreq, str] = "BME",
     ) -> Self:
-        """
-        Resample the timeseries frequency.
+        """Resample the timeseries frequency.
 
         Parameters
         ----------
@@ -438,8 +423,7 @@ class OpenFrame(_CommonModel):
         countries: CountriesType = "SE",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
-        """
-        Resamples timeseries frequency to the business calendar month end dates.
+        """Resamples timeseries frequency to the business calendar month end dates.
 
         Stubs left in place. Stubs will be aligned to the shortest stub.
 
@@ -488,8 +472,7 @@ class OpenFrame(_CommonModel):
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
-        """
-        Exponentially Weighted Moving Average Volatilities and Correlation.
+        """Exponentially Weighted Moving Average Volatilities and Correlation.
 
         Exponentially Weighted Moving Average (EWMA) for Volatilities and
         Correlation. https://www.investopedia.com/articles/07/ewma.asp.
@@ -601,8 +584,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def correl_matrix(self: Self) -> DataFrame:
-        """
-        Correlation matrix.
+        """Correlation matrix.
 
         Returns
         -------
@@ -623,8 +605,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         new_series: OpenTimeSeries,
     ) -> Self:
-        """
-        To add an OpenTimeSeries object.
+        """To add an OpenTimeSeries object.
 
         Parameters
         ----------
@@ -643,8 +624,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def delete_timeseries(self: Self, lvl_zero_item: str) -> Self:
-        """
-        To delete an OpenTimeSeries object.
+        """To delete an OpenTimeSeries object.
 
         Parameters
         ----------
@@ -678,8 +658,7 @@ class OpenFrame(_CommonModel):
         end_cut: Optional[dt.date] = None,
         where: LiteralTrunc = "both",
     ) -> Self:
-        """
-        Truncate DataFrame such that all timeseries have the same time span.
+        """Truncate DataFrame such that all timeseries have the same time span.
 
         Parameters
         ----------
@@ -733,8 +712,7 @@ class OpenFrame(_CommonModel):
         *,
         base_zero: bool = True,
     ) -> None:
-        """
-        Calculate cumulative relative return between two series.
+        """Calculate cumulative relative return between two series.
 
         Parameters
         ----------
@@ -772,8 +750,7 @@ class OpenFrame(_CommonModel):
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Series[float]:
-        """
-        Tracking Error.
+        """Tracking Error.
 
         Calculates Tracking Error which is the standard deviation of the
         difference between the fund and its index returns.
@@ -866,8 +843,7 @@ class OpenFrame(_CommonModel):
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Series[float]:
-        """
-        Information Ratio.
+        """Information Ratio.
 
         The Information Ratio equals ( fund return less index return ) divided
         by the Tracking Error. And the Tracking Error is the standard deviation of
@@ -966,8 +942,7 @@ class OpenFrame(_CommonModel):
         to_date: Optional[dt.date] = None,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> Series[float]:
-        """
-        Capture Ratio.
+        """Capture Ratio.
 
         The Up (Down) Capture Ratio is calculated by dividing the CAGR
         of the asset during periods that the benchmark returns are positive (negative)
@@ -1160,8 +1135,7 @@ class OpenFrame(_CommonModel):
         market: Union[tuple[str, ValueType], int],
         dlta_degr_freedms: int = 1,
     ) -> float:
-        """
-        Market Beta.
+        """Market Beta.
 
         Calculates Beta as Co-variance of asset & market divided by Variance
         of the market. https://www.investopedia.com/terms/b/beta.asp.
@@ -1245,8 +1219,7 @@ class OpenFrame(_CommonModel):
         *,
         fitted_series: bool = True,
     ) -> OLSResults:
-        """
-        Ordinary Least Squares fit.
+        """Ordinary Least Squares fit.
 
         Performs a linear regression and adds a new column with a fitted line
         using Ordinary Least Squares fit
@@ -1314,8 +1287,7 @@ class OpenFrame(_CommonModel):
         riskfree_rate: float = 0.0,
         dlta_degr_freedms: int = 1,
     ) -> float:
-        """
-        Jensen's alpha.
+        """Jensen's alpha.
 
         The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
         measure that represents the average return on a portfolio or investment,
@@ -1450,8 +1422,7 @@ class OpenFrame(_CommonModel):
         name: str,
         weight_strat: Optional[LiteralPortfolioWeightings] = None,
     ) -> DataFrame:
-        """
-        Calculate a basket timeseries based on the supplied weights.
+        """Calculate a basket timeseries based on the supplied weights.
 
         Parameters
         ----------
@@ -1505,8 +1476,7 @@ class OpenFrame(_CommonModel):
         observations: int = 21,
         periods_in_a_year_fixed: Optional[DaysInYearType] = None,
     ) -> DataFrame:
-        """
-        Calculate rolling Information Ratio.
+        """Calculate rolling Information Ratio.
 
         The Information Ratio equals ( fund return less index return ) divided by
         the Tracking Error. And the Tracking Error is the standard deviation of the
@@ -1572,8 +1542,7 @@ class OpenFrame(_CommonModel):
         observations: int = 21,
         dlta_degr_freedms: int = 1,
     ) -> DataFrame:
-        """
-        Calculate rolling Market Beta.
+        """Calculate rolling Market Beta.
 
         Calculates Beta as Co-variance of asset & market divided by Variance
         of the market. https://www.investopedia.com/terms/b/beta.asp.
@@ -1630,8 +1599,7 @@ class OpenFrame(_CommonModel):
         second_column: int = 1,
         observations: int = 21,
     ) -> DataFrame:
-        """
-        Calculate rolling Correlation.
+        """Calculate rolling Correlation.
 
         Calculates correlation between two series. The period with
         at least the given number of observations is the first period calculated.
