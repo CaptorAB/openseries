@@ -23,8 +23,6 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydantic import PositiveInt
-
     from .types import (
         CountriesType,
         DateType,
@@ -310,7 +308,7 @@ def offset_business_days(
 
 
 def generate_calendar_date_range(
-    trading_days: PositiveInt,
+    trading_days: int,
     start: Optional[dt.date] = None,
     end: Optional[dt.date] = None,
     countries: CountriesType = "SE",
@@ -319,8 +317,8 @@ def generate_calendar_date_range(
 
     Parameters
     ----------
-    trading_days: PositiveInt
-        Number of days to generate
+    trading_days: int
+        Number of days to generate. Must be greater than zero
     start: datetime.date, optional
         Date when the range starts
     end: datetime.date, optional
@@ -334,6 +332,10 @@ def generate_calendar_date_range(
         List of business day calendar dates
 
     """
+    if trading_days < 1:
+        msg = "Argument trading_days must be greater than zero."
+        raise ValueError(msg)
+
     if start and not end:
         tmp_range = date_range(
             start=start,

@@ -379,6 +379,16 @@ class TestDateFixer(CommonTestCase):
             msg = "Unintended result from generate_calendar_date_range"
             raise ValueError(msg)
 
+        neg_days = -5
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Argument trading_days must be greater than zero.",
+        ):
+            _ = generate_calendar_date_range(
+                trading_days=neg_days,
+                start=start,
+            )
+
         with pytest.raises(
             expected_exception=ValueError,
             match=(
