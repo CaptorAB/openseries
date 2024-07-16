@@ -776,7 +776,7 @@ class TestOpenTimeSeries(CommonTestCase):
         fixseries_one = OpenTimeSeries.from_fixed_rate(
             rate=0.03,
             days=756,
-            end_dt=dt.date(2019, 6, 30),
+            end_dt=self.randomseries.last_idx,
         )
         if not isinstance(fixseries_one, OpenTimeSeries):
             msg = "Method from_fixed_rate() not working as intended"

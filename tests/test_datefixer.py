@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from typing import TYPE_CHECKING, cast
+from unittest import TestCase
 
 import pytest
 from numpy import datetime64
@@ -17,7 +18,6 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
-from tests.test_common_sim import CommonTestCase
 
 if TYPE_CHECKING:
     from openseries.types import CountriesType, DateType, HolidayType
@@ -243,7 +243,7 @@ def test_date_offset_foll(
         )
 
 
-class TestDateFixer(CommonTestCase):
+class TestDateFixer(TestCase):
     """class to run tests on the module datefixer.py."""
 
     def test_holiday_calendar(self: TestDateFixer) -> None:
