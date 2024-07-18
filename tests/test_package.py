@@ -17,7 +17,7 @@ class TestPackage(TestCase):
 
         directory = Path(__file__).parent.parent
         pyproject_file = directory.joinpath("pyproject.toml")
-        with pyproject_file.open(mode="r") as pfile:
+        with pyproject_file.open(mode="r", encoding="utf-8") as pfile:
             lines = pfile.readlines()
 
         toml_version = lines[2].strip()[lines[2].strip().find('"') :].replace('"', "")

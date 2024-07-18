@@ -670,7 +670,7 @@ class TestOpenTimeSeries(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with seriesfile.open(encoding="utf-8") as jsonfile:
+        with seriesfile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         series_two = next(
@@ -739,7 +739,7 @@ class TestOpenTimeSeries(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with seriesfile.open(encoding="utf-8") as jsonfile:
+        with seriesfile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         series_two = next(

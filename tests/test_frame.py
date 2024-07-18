@@ -153,7 +153,7 @@ class TestOpenFrame(CommonTestCase):
             msg = f"test_to_json_and_back did not output as intended: {check_one}"
             raise ValueError(msg)
 
-        with framefile.open(encoding="utf-8") as jsonfile:
+        with framefile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         frame_two = OpenFrame(
@@ -223,7 +223,7 @@ class TestOpenFrame(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with framefile.open(encoding="utf-8") as jsonfile:
+        with framefile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         frame_two = OpenFrame(
@@ -302,7 +302,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = self.randomframe.to_xlsx(filename="trial.pdf")
 
-        with basefile.open(mode="w") as fakefile:
+        with basefile.open(mode="w", encoding="utf-8") as fakefile:
             fakefile.write("Hello world")
 
         with pytest.raises(
