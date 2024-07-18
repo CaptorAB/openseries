@@ -594,7 +594,7 @@ class TestOpenTimeSeries(CommonTestCase):
             directory = Path.home().joinpath("Documents")
             seriesfile = directory.joinpath(filename)
         else:
-            directory = Path(__file__).resolve().parent
+            directory = Path(__file__).parent
             seriesfile = directory.joinpath(filename)
 
         if Path(seriesfile).exists():
@@ -636,7 +636,7 @@ class TestOpenTimeSeries(CommonTestCase):
     def test_to_json_and_back(self: TestOpenTimeSeries) -> None:
         """Test to_json method and creating an OpenTimeSeries from file data."""
         filename = "series.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         seriesfile = dirpath.joinpath(filename)
 
         if Path(seriesfile).exists():
@@ -670,7 +670,7 @@ class TestOpenTimeSeries(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with Path.open(seriesfile, encoding="utf-8") as jsonfile:
+        with seriesfile.open(encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         series_two = next(
@@ -705,7 +705,7 @@ class TestOpenTimeSeries(CommonTestCase):
     def test_to_json_and_back_tsdf(self: TestOpenTimeSeries) -> None:
         """Test to_json method and creating an OpenTimeSeries from file data."""
         filename = "series_tsdf.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         seriesfile = dirpath.joinpath(filename)
 
         if Path(seriesfile).exists():
@@ -739,7 +739,7 @@ class TestOpenTimeSeries(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with Path.open(seriesfile, encoding="utf-8") as jsonfile:
+        with seriesfile.open(encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         series_two = next(
@@ -1411,7 +1411,7 @@ class TestOpenTimeSeries(CommonTestCase):
         """Test plot_series method."""
         plotseries = self.randomseries.from_deepcopy()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = plotseries.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1473,7 +1473,7 @@ class TestOpenTimeSeries(CommonTestCase):
         barseries.resample(freq="BME").value_to_ret()
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = barseries.plot_bars(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():

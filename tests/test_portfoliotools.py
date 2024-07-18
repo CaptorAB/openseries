@@ -368,7 +368,7 @@ class TestPortfoliotools(CommonTestCase):
             msg = f"Function sharpeplot not working as intended\n{names}"
             raise ValueError(msg)
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = sharpeplot(
             sim_frame=simulated,
             line_frame=frontier,

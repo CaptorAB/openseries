@@ -41,7 +41,7 @@ class TestOpenFrame(CommonTestCase):
             directory = Path.home().joinpath("Documents")
             framefile = directory.joinpath(filename)
         else:
-            directory = Path(__file__).resolve().parent
+            directory = Path(__file__).parent
             framefile = directory.joinpath(filename)
 
         if Path(framefile).exists():
@@ -80,7 +80,7 @@ class TestOpenFrame(CommonTestCase):
                 msg = "json file not deleted as intended"
                 raise FileExistsError(msg)
 
-        localfile = Path(__file__).resolve().parent.joinpath(filename)
+        localfile = Path(__file__).parent.joinpath(filename)
 
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
@@ -118,7 +118,7 @@ class TestOpenFrame(CommonTestCase):
     def test_to_json_and_back(self: TestOpenFrame) -> None:
         """Test to_json method and creating an OpenFrame from file data."""
         filename = "frame.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         framefile = dirpath.joinpath(filename)
 
         if Path(framefile).exists():
@@ -153,7 +153,7 @@ class TestOpenFrame(CommonTestCase):
             msg = f"test_to_json_and_back did not output as intended: {check_one}"
             raise ValueError(msg)
 
-        with Path.open(framefile, encoding="utf-8") as jsonfile:
+        with framefile.open(encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         frame_two = OpenFrame(
@@ -185,7 +185,7 @@ class TestOpenFrame(CommonTestCase):
     def test_to_json_and_back_tsdf(self: TestOpenFrame) -> None:
         """Test to_json method and creating an OpenFrame from file data."""
         filename = "frame_tsdf.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         framefile = dirpath.joinpath(filename)
 
         if Path(framefile).exists():
@@ -223,7 +223,7 @@ class TestOpenFrame(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with Path.open(framefile, encoding="utf-8") as jsonfile:
+        with framefile.open(encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         frame_two = OpenFrame(
@@ -261,7 +261,7 @@ class TestOpenFrame(CommonTestCase):
         if Path.home().joinpath("Documents").exists():
             basefile = Path.home().joinpath("Documents").joinpath(filename)
         else:
-            basefile = Path(__file__).resolve().parent.joinpath(filename)
+            basefile = Path(__file__).parent.joinpath(filename)
 
         if Path(basefile).exists():
             msg = "test_save_to_xlsx test case setup failed."
@@ -281,7 +281,7 @@ class TestOpenFrame(CommonTestCase):
 
         seriesfile.unlink()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         seriesfile = Path(
             self.randomframe.to_xlsx(filename="trial.xlsx", directory=directory),
         ).resolve()
@@ -302,7 +302,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = self.randomframe.to_xlsx(filename="trial.pdf")
 
-        with Path.open(basefile, "w") as fakefile:
+        with basefile.open(mode="w") as fakefile:
             fakefile.write("Hello world")
 
         with pytest.raises(
@@ -313,7 +313,7 @@ class TestOpenFrame(CommonTestCase):
 
         basefile.unlink()
 
-        localfile = Path(__file__).resolve().parent.joinpath(filename)
+        localfile = Path(__file__).parent.joinpath(filename)
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
             seriesfile = Path(self.randomframe.to_xlsx(filename=filename)).resolve()
@@ -1305,7 +1305,7 @@ class TestOpenFrame(CommonTestCase):
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = plotframe.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1421,7 +1421,7 @@ class TestOpenFrame(CommonTestCase):
         """Test plot_bars method with different file folder options."""
         plotframe = self.randomframe.from_deepcopy()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = plotframe.plot_bars(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():

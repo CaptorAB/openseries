@@ -15,9 +15,9 @@ class TestPackage(TestCase):
         """Test package metadata."""
         package_metadata = metadata("openseries")
 
-        directory = Path(__file__).resolve().parent.parent
+        directory = Path(__file__).parent.parent
         pyproject_file = directory.joinpath("pyproject.toml")
-        with Path.open(pyproject_file, "r") as pfile:
+        with pyproject_file.open(mode="r") as pfile:
             lines = pfile.readlines()
 
         toml_version = lines[2].strip()[lines[2].strip().find('"') :].replace('"', "")
