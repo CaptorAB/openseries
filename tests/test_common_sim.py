@@ -60,3 +60,12 @@ class CommonTestCase(TestCase):
         cls.random_properties = randomseries.all_properties().to_dict()[
             ("Asset_0", ValueType.PRICE)
         ]
+
+    @classmethod
+    def tearDownClass(cls: type[CommonTestCase]) -> None:
+        """TearDownClass for the CommonTestCase class."""
+        del cls.seed
+        del cls.seriesim
+        del cls.randomseries
+        del cls.randomframe
+        del cls.random_properties

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime as dt
 from typing import TYPE_CHECKING, cast
-from unittest import TestCase
 
 import pytest
 from numpy import datetime64
@@ -243,7 +242,7 @@ def test_date_offset_foll(
         )
 
 
-class TestDateFixer(TestCase):
+class TestDateFixer:
     """class to run tests on the module datefixer.py."""
 
     def test_holiday_calendar(self: TestDateFixer) -> None:

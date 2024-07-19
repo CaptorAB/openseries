@@ -5,10 +5,9 @@ from __future__ import annotations
 from importlib.metadata import metadata
 from pathlib import Path
 from re import match
-from unittest import TestCase
 
 
-class TestPackage(TestCase):
+class TestPackage:
     """class to test openseries packaging."""
 
     def test_metadata(self: TestPackage) -> None:
