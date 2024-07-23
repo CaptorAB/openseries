@@ -64,7 +64,7 @@ from .types import (
 __all__ = ["OpenFrame"]
 
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyTypeChecker
 class OpenFrame(_CommonModel):
     """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
