@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import TYPE_CHECKING, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from numpy import (
     mean,
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 def _cvar_down_calc(
-    data: Union[DataFrame, Series[float], list[float]],
+    data: DataFrame | Series[float] | list[float],
     level: float = 0.95,
 ) -> float:
     """Calculate downside Conditional Value at Risk (CVaR).
@@ -27,7 +27,7 @@ def _cvar_down_calc(
 
     Parameters
     ----------
-    data: Union[DataFrame, Series[float], list[float]]
+    data: DataFrame | Series[float] | list[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought CVaR level
@@ -48,7 +48,7 @@ def _cvar_down_calc(
 
 
 def _var_down_calc(
-    data: Union[DataFrame, Series[float], list[float]],
+    data: DataFrame | Series[float] | list[float],
     level: float = 0.95,
     interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
@@ -59,7 +59,7 @@ def _var_down_calc(
 
     Parameters
     ----------
-    data: Union[DataFrame, Series[float], list[float]]
+    data: DataFrame | Series[float] | list[float]
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level

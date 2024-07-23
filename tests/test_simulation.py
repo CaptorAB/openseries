@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Union
 
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation
@@ -16,7 +15,7 @@ class TestSimulation(CommonTestCase):
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""
-        args: dict[str, Union[int, float]] = {
+        args: dict[str, int | float] = {
             "number_of_sims": 1,
             "trading_days": self.seriesim.trading_days,
             "mean_annual_return": self.seriesim.mean_annual_return,
@@ -33,7 +32,7 @@ class TestSimulation(CommonTestCase):
             "from_merton_jump_gbm",
             "from_merton_jump_gbm",
         ]
-        added: list[dict[str, Union[int, float]]] = [
+        added: list[dict[str, int | float]] = [
             {},
             {
                 "mean_annual_return": self.seriesim.mean_annual_return + 0.01,

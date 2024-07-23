@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Union
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
@@ -19,7 +18,7 @@ class CommonTestCase(TestCase):
     seriesim: ReturnSimulation
     randomframe: OpenFrame
     randomseries: OpenTimeSeries
-    random_properties: dict[str, Union[dt.date, int, float]]
+    random_properties: dict[str, dt.date | int | float]
 
     @classmethod
     def setUpClass(cls: type[CommonTestCase]) -> None:

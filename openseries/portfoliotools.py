@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from inspect import stack
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional, Union, cast
+from typing import TYPE_CHECKING, Callable, cast
 
 from numpy import (
     append,
@@ -133,7 +133,7 @@ def efficient_frontier(  # noqa: C901
     eframe: OpenFrame,
     num_ports: int = 5000,
     seed: int = 71,
-    bounds: Optional[tuple[tuple[float]]] = None,
+    bounds: tuple[tuple[float]] | None = None,
     frontier_points: int = 200,
     minimize_method: LiteralMinimizeMethods = "SLSQP",
     *,
@@ -260,7 +260,7 @@ def efficient_frontier(  # noqa: C901
 
     for possible_return in frontier_y:
         cons = cast(
-            dict[str, Union[str, Callable[[float, NDArray[float64]], float64]]],
+            dict[str, str | Callable[[float, NDArray[float64]], float64]],
             (
                 {"type": "eq", "fun": _check_sum},
                 {
@@ -321,7 +321,7 @@ def constrain_optimized_portfolios(
     portfolioname: str = "Current Portfolio",
     simulations: int = 10000,
     curve_points: int = 200,
-    bounds: Optional[tuple[tuple[float]]] = None,
+    bounds: tuple[tuple[float]] | None = None,
     minimize_method: LiteralMinimizeMethods = "SLSQP",
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
     """Constrain optimized portfolios to those that improve on the current one.
@@ -443,13 +443,13 @@ def prepare_plot_data(
 
 
 def sharpeplot(  # noqa: C901
-    sim_frame: Optional[DataFrame] = None,
-    line_frame: Optional[DataFrame] = None,
-    point_frame: Optional[DataFrame] = None,
+    sim_frame: DataFrame | None = None,
+    line_frame: DataFrame | None = None,
+    point_frame: DataFrame | None = None,
     point_frame_mode: LiteralLinePlotMode = "markers",
-    filename: Optional[str] = None,
-    directory: Optional[DirectoryPath] = None,
-    titletext: Optional[str] = None,
+    filename: str | None = None,
+    directory: DirectoryPath | None = None,
+    titletext: str | None = None,
     output_type: LiteralPlotlyOutput = "file",
     include_plotlyjs: LiteralPlotlyJSlib = "cdn",
     *,

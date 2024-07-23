@@ -9,7 +9,7 @@ from itertools import product as iter_product
 from json import load, loads
 from pathlib import Path
 from pprint import pformat
-from typing import Hashable, Optional, Union, cast
+from typing import Hashable, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -31,6 +31,7 @@ from openseries.types import (
 from tests.test_common_sim import CommonTestCase
 
 
+# noinspection PyTypeChecker
 class TestOpenFrame(CommonTestCase):
     """class to run tests on the module frame.py."""
 
@@ -322,11 +323,11 @@ class TestOpenFrame(CommonTestCase):
             msg = "test_save_to_xlsx test case setup failed."
             raise ValueError(msg)
 
-        dframe = read_excel(
+        dframe = read_excel(  # type: ignore[call-overload]
             io=seriesfile,
             header=0,
             index_col=0,
-            usecols="A:F",
+            usecols=cast(int, "A:F"),
             skiprows=[1, 2],
             engine="openpyxl",
         )
@@ -599,7 +600,7 @@ class TestOpenFrame(CommonTestCase):
         name = "portfolio"
 
         _ = mpframe.make_portfolio(name=name, weight_strat="eq_weights")
-        weights: Optional[list[float]] = [0.2, 0.2, 0.2, 0.2, 0.2]
+        weights: list[float] | None = [0.2, 0.2, 0.2, 0.2, 0.2]
         if weights != mpframe.weights:
             msg = "make_portfolio() equal weight strategy not working as intended."
             raise ValueError(msg)
@@ -2156,7 +2157,7 @@ class TestOpenFrame(CommonTestCase):
             match="base_column should be a tuple",
         ):
             _ = frame.tracking_error_func(
-                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+                base_column="string",
             )
 
     def test_info_ratio_func(self: TestOpenFrame) -> None:
@@ -2196,7 +2197,7 @@ class TestOpenFrame(CommonTestCase):
             match="base_column should be a tuple",
         ):
             _ = frame.info_ratio_func(
-                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+                base_column="string",
             )
 
     def test_rolling_corr(self: TestOpenFrame) -> None:
@@ -2507,7 +2508,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = cframe.capture_ratio_func(
                 ratio="up",
-                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+                base_column="string",
             )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
@@ -3046,7 +3047,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = oframe.ord_least_squares_fit(
                 y_column=0,
-                x_column=cast(Union[tuple[str, ValueType], int], "string"),
+                x_column="string",
                 fitted_series=False,
             )
 
@@ -3055,7 +3056,7 @@ class TestOpenFrame(CommonTestCase):
             match="y_column should be a tuple",
         ):
             _ = oframe.ord_least_squares_fit(
-                y_column=cast(Union[tuple[str, ValueType], int], "string"),
+                y_column="string",
                 x_column=1,
                 fitted_series=False,
             )
@@ -3119,7 +3120,7 @@ class TestOpenFrame(CommonTestCase):
             match="asset should be a tuple",
         ):
             _ = bframe.beta(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3129,7 +3130,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = bframe.beta(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
     def test_beta_returns_input(self: TestOpenFrame) -> None:
@@ -3191,7 +3192,7 @@ class TestOpenFrame(CommonTestCase):
             match="asset should be a tuple",
         ):
             _ = bframe.beta(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3201,7 +3202,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = bframe.beta(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
     def test_jensen_alpha(self: TestOpenFrame) -> None:
@@ -3264,7 +3265,7 @@ class TestOpenFrame(CommonTestCase):
             match="asset should be a tuple",
         ):
             _ = jframe.jensen_alpha(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3274,7 +3275,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = jframe.jensen_alpha(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
         ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
@@ -3389,7 +3390,7 @@ class TestOpenFrame(CommonTestCase):
             match="asset should be a tuple",
         ):
             _ = jframe.jensen_alpha(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3399,7 +3400,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = jframe.jensen_alpha(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
     def test_ewma_risk(self: TestOpenFrame) -> None:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     import datetime as dt  # pragma: no cover
@@ -34,7 +34,7 @@ from .types import (
 __all__ = ["ReturnSimulation"]
 
 
-def _random_generator(seed: Optional[int]) -> Generator:
+def _random_generator(seed: int | None) -> Generator:
     """Make a Numpy Random Generator object.
 
     Parameters
@@ -49,7 +49,7 @@ def _random_generator(seed: Optional[int]) -> Generator:
 
     """
     ss = SeedSequence(entropy=seed)
-    bg = PCG64(seed=cast(Optional[int], ss))
+    bg = PCG64(seed=cast(int | None, ss))
     return Generator(bit_generator=bg)
 
 
@@ -90,7 +90,7 @@ class ReturnSimulation(BaseModel):
     jumps_lamda: NonNegativeFloat = 0.0
     jumps_sigma: NonNegativeFloat = 0.0
     jumps_mu: float = 0.0
-    seed: Optional[int] = None
+    seed: int | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -155,7 +155,7 @@ class ReturnSimulation(BaseModel):
         trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-        randomizer: Optional[Generator] = None,
+        randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Normal distribution simulation.
 
@@ -211,7 +211,7 @@ class ReturnSimulation(BaseModel):
         trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-        randomizer: Optional[Generator] = None,
+        randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Lognormal distribution simulation.
 
@@ -270,7 +270,7 @@ class ReturnSimulation(BaseModel):
         trading_days: PositiveInt,
         seed: int,
         trading_days_in_year: DaysInYearType = 252,
-        randomizer: Optional[Generator] = None,
+        randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Geometric Brownian Motion simulation.
 
@@ -335,7 +335,7 @@ class ReturnSimulation(BaseModel):
         jumps_sigma: NonNegativeFloat = 0.0,
         jumps_mu: float = 0.0,
         trading_days_in_year: DaysInYearType = 252,
-        randomizer: Optional[Generator] = None,
+        randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Merton Jump-Diffusion model simulation.
 
@@ -416,8 +416,8 @@ class ReturnSimulation(BaseModel):
     def to_dataframe(
         self: Self,
         name: str,
-        start: Optional[dt.date] = None,
-        end: Optional[dt.date] = None,
+        start: dt.date | None = None,
+        end: dt.date | None = None,
         countries: CountriesType = "SE",
     ) -> DataFrame:
         """Create a pandas.DataFrame from simulation(s).

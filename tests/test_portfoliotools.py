@@ -6,7 +6,7 @@ from __future__ import annotations
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from pathlib import Path
-from typing import Optional, cast
+from typing import cast
 from unittest.mock import patch
 
 from openseries.portfoliotools import (
@@ -172,7 +172,7 @@ class TestPortfoliotools(CommonTestCase):
         std_frame.weights = [1 / std_frame.item_count] * std_frame.item_count
 
         bounds = cast(
-            Optional[tuple[tuple[float]]],
+            tuple[tuple[float]] | None,
             tuple((0.0, 1.0) for _ in range(std_frame.item_count)),
         )
 

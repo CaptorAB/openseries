@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from copy import deepcopy
 from logging import warning
-from typing import Any, Optional, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 from numpy import (
     append,
@@ -102,8 +102,8 @@ class OpenTimeSeries(_CommonModel):
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
     countries: CountriesType = "SE"
-    isin: Optional[str] = None
-    label: Optional[str] = None
+    isin: str | None = None
+    label: str | None = None
 
     @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
     def dates_and_values_validate(self: Self) -> Self:
@@ -157,7 +157,7 @@ class OpenTimeSeries(_CommonModel):
         valuetype: ValueType = ValueType.PRICE,
         timeseries_id: DatabaseIdStringType = "",
         instrument_id: DatabaseIdStringType = "",
-        isin: Optional[str] = None,
+        isin: str | None = None,
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
@@ -213,7 +213,7 @@ class OpenTimeSeries(_CommonModel):
     @classmethod
     def from_df(
         cls: type[OpenTimeSeries],
-        dframe: Union[DataFrame, Series[float]],
+        dframe: DataFrame | Series[float],
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -224,7 +224,7 @@ class OpenTimeSeries(_CommonModel):
 
         Parameters
         ----------
-        dframe: Union[DataFrame, Series[float]]
+        dframe: DataFrame | Series[float]
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
@@ -294,9 +294,9 @@ class OpenTimeSeries(_CommonModel):
     def from_fixed_rate(
         cls: type[OpenTimeSeries],
         rate: float,
-        d_range: Optional[DatetimeIndex] = None,
-        days: Optional[int] = None,
-        end_dt: Optional[dt.date] = None,
+        d_range: DatetimeIndex | None = None,
+        days: int | None = None,
+        end_dt: dt.date | None = None,
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -405,7 +405,7 @@ class OpenTimeSeries(_CommonModel):
 
     def all_properties(
         self: Self,
-        properties: Optional[list[LiteralSeriesProps]] = None,
+        properties: list[LiteralSeriesProps] | None = None,
     ) -> DataFrame:
         """Calculate chosen properties.
 
@@ -440,7 +440,7 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
-        self.tsdf = self.tsdf.pct_change(fill_method=cast(str, None))
+        self.tsdf = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         self.tsdf.columns = MultiIndex.from_arrays(
@@ -542,13 +542,13 @@ class OpenTimeSeries(_CommonModel):
 
     def resample(
         self: Self,
-        freq: Union[LiteralBizDayFreq, str] = "BME",
+        freq: LiteralBizDayFreq | str = "BME",
     ) -> Self:
         """Resamples the timeseries frequency.
 
         Parameters
         ----------
-        freq: Union[LiteralBizDayFreq, str], default "BME"
+        freq: LiteralBizDayFreq | str, default "BME"
             The date offset string that sets the resampled frequency
 
         Returns
@@ -601,10 +601,10 @@ class OpenTimeSeries(_CommonModel):
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> Series[float]:
         """Exponentially Weighted Moving Average Model for Volatility.
 
@@ -704,7 +704,7 @@ class OpenTimeSeries(_CommonModel):
             returns_input = True
         else:
             values = [cast(float, self.tsdf.iloc[0, 0])]
-            ra_df = self.tsdf.pct_change(fill_method=cast(str, None))
+            ra_df = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
             returns_input = False
         ra_df = ra_df.dropna()
 
@@ -737,8 +737,8 @@ class OpenTimeSeries(_CommonModel):
 
     def set_new_label(
         self: Self,
-        lvl_zero: Optional[str] = None,
-        lvl_one: Optional[ValueType] = None,
+        lvl_zero: str | None = None,
+        lvl_one: ValueType | None = None,
         *,
         delete_lvl_one: bool = False,
     ) -> Self:
@@ -781,7 +781,7 @@ def timeseries_chain(
     front: TypeOpenTimeSeries,
     back: TypeOpenTimeSeries,
     old_fee: float = 0.0,
-) -> Union[TypeOpenTimeSeries, OpenTimeSeries]:
+) -> TypeOpenTimeSeries | OpenTimeSeries:
     """Chain two timeseries together.
 
     The function assumes that the two series have at least one date in common.
@@ -797,7 +797,7 @@ def timeseries_chain(
 
     Returns
     -------
-    Union[TypeOpenTimeSeries, OpenTimeSeries]
+    TypeOpenTimeSeries | OpenTimeSeries
         An OpenTimeSeries object or a subclass thereof
 
     """
