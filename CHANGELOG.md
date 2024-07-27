@@ -1,6 +1,6 @@
 # Changelog
 
-## Version [1.7.0] - 2024-xx-xx
+## Version [1.7.0] - 2024-07-27
 
 - Changed code to enforce PEP 604 on typing. This means that the PACKAGE WILL LONGER WORK FOR PYTHON 3.9.
 - Limited GitHub workflow build.yaml to no longer run on Python 3.9
@@ -12,6 +12,7 @@
 - Cleaned up test setups and added tearDownClass method on common testcase class.
 - Removed year from copyright notice in license.md
 - Suppressed pycharm type checker on OpenFrame class.
+- Miscellaneous dependency updates
 
 ## Version [1.6.0] - 2024-07-08
 
