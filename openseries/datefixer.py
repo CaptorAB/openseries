@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Optional, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from dateutil.relativedelta import relativedelta
 from holidays import (
@@ -21,14 +21,14 @@ from pandas import (
     date_range,
 )
 from pandas.tseries.offsets import CustomBusinessDay
-from pydantic import PositiveInt
 
-from openseries.types import (
-    CountriesType,
-    DateType,
-    HolidayType,
-    LiteralBizDayFreq,
-)
+if TYPE_CHECKING:  # pragma: no cover
+    from .types import (
+        CountriesType,
+        DateType,
+        HolidayType,
+        LiteralBizDayFreq,
+    )
 
 __all__ = [
     "date_fix",
@@ -45,10 +45,9 @@ def holiday_calendar(
     startyear: int,
     endyear: int,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[HolidayType] = None,
+    custom_holidays: HolidayType | None = None,
 ) -> busdaycalendar:
-    """
-    Generate a business calendar.
+    """Generate a business calendar.
 
     Parameters
     ----------
@@ -83,7 +82,7 @@ def holiday_calendar(
         country in list_supported_countries() for country in countries
     ):
         country: str
-        countryholidays: list[Union[dt.date, str]] = []
+        countryholidays: list[dt.date | str] = []
         for i, country in enumerate(countries):
             staging = country_holidays(country=country, years=years)
             if i == 0 and custom_holidays is not None:
@@ -105,8 +104,7 @@ def holiday_calendar(
 def date_fix(
     fixerdate: DateType,
 ) -> dt.date:
-    """
-    Parse different date formats into datetime.date.
+    """Parse different date formats into datetime.date.
 
     Parameters
     ----------
@@ -125,9 +123,7 @@ def date_fix(
         return fixerdate
     if isinstance(fixerdate, datetime64):
         return (
-            dt.datetime.strptime(str(fixerdate)[:10], "%Y-%m-%d")
-            .astimezone()
-            .date()
+            dt.datetime.strptime(str(fixerdate)[:10], "%Y-%m-%d").astimezone().date()
         )
     if isinstance(fixerdate, str):
         return dt.datetime.strptime(fixerdate, "%Y-%m-%d").astimezone().date()
@@ -141,13 +137,12 @@ def date_offset_foll(
     raw_date: DateType,
     months_offset: int = 12,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[HolidayType] = None,
+    custom_holidays: HolidayType | None = None,
     *,
     adjust: bool = False,
     following: bool = True,
 ) -> dt.date:
-    """
-    Offset dates according to a given calendar.
+    """Offset dates according to a given calendar.
 
     Parameters
     ----------
@@ -194,12 +189,11 @@ def date_offset_foll(
 
 
 def get_previous_business_day_before_today(
-    today: Optional[dt.date] = None,
+    today: dt.date | None = None,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[HolidayType] = None,
+    custom_holidays: HolidayType | None = None,
 ) -> dt.date:
-    """
-    Bump date backwards to find the previous business day.
+    """Bump date backwards to find the previous business day.
 
     Parameters
     ----------
@@ -234,10 +228,9 @@ def offset_business_days(
     ddate: dt.date,
     days: int,
     countries: CountriesType = "SE",
-    custom_holidays: Optional[HolidayType] = None,
+    custom_holidays: HolidayType | None = None,
 ) -> dt.date:
-    """
-    Bump date by business days.
+    """Bump date by business days.
 
     It first adjusts to a valid business day and then bumps with given
     number of business days from there.
@@ -313,18 +306,17 @@ def offset_business_days(
 
 
 def generate_calendar_date_range(
-    trading_days: PositiveInt,
-    start: Optional[dt.date] = None,
-    end: Optional[dt.date] = None,
+    trading_days: int,
+    start: dt.date | None = None,
+    end: dt.date | None = None,
     countries: CountriesType = "SE",
 ) -> list[dt.date]:
-    """
-    Generate a list of business day calendar dates.
+    """Generate a list of business day calendar dates.
 
     Parameters
     ----------
-    trading_days: PositiveInt
-        Number of days to generate
+    trading_days: int
+        Number of days to generate. Must be greater than zero
     start: datetime.date, optional
         Date when the range starts
     end: datetime.date, optional
@@ -338,6 +330,10 @@ def generate_calendar_date_range(
         List of business day calendar dates
 
     """
+    if trading_days < 1:
+        msg = "Argument trading_days must be greater than zero."
+        raise ValueError(msg)
+
     if start and not end:
         tmp_range = date_range(
             start=start,
@@ -390,8 +386,7 @@ def do_resample_to_business_period_ends(
     freq: LiteralBizDayFreq,
     countries: CountriesType,
 ) -> DatetimeIndex:
-    """
-    Resample timeseries frequency to business calendar month end dates.
+    """Resample timeseries frequency to business calendar month end dates.
 
     Stubs left in place. Stubs will be aligned to the shortest stub.
 

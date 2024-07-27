@@ -9,8 +9,7 @@ from itertools import product as iter_product
 from json import load, loads
 from pathlib import Path
 from pprint import pformat
-from typing import Hashable, Optional, Union, cast
-from unittest import TestCase
+from typing import Hashable, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -29,21 +28,12 @@ from openseries.types import (
     LiteralPortfolioWeightings,
     ValueType,
 )
-from tests.test_common_sim import SIMFRAME, SIMSERIES
+from tests.test_common_sim import CommonTestCase
 
 
-class TestOpenFrame(TestCase):
-
-    """class to run unittests on the module frame.py."""
-
-    randomframe: OpenFrame
-    randomseries: OpenTimeSeries
-
-    @classmethod
-    def setUpClass(cls: type[TestOpenFrame]) -> None:
-        """SetUpClass for the TestOpenFrame class."""
-        cls.randomseries = SIMSERIES.from_deepcopy()
-        cls.randomframe = SIMFRAME.from_deepcopy()
+# noinspection PyTypeChecker
+class TestOpenFrame(CommonTestCase):
+    """class to run tests on the module frame.py."""
 
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
@@ -52,7 +42,7 @@ class TestOpenFrame(TestCase):
             directory = Path.home().joinpath("Documents")
             framefile = directory.joinpath(filename)
         else:
-            directory = Path(__file__).resolve().parent
+            directory = Path(__file__).parent
             framefile = directory.joinpath(filename)
 
         if Path(framefile).exists():
@@ -91,7 +81,7 @@ class TestOpenFrame(TestCase):
                 msg = "json file not deleted as intended"
                 raise FileExistsError(msg)
 
-        localfile = Path(__file__).resolve().parent.joinpath(filename)
+        localfile = Path(__file__).parent.joinpath(filename)
 
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
@@ -129,7 +119,7 @@ class TestOpenFrame(TestCase):
     def test_to_json_and_back(self: TestOpenFrame) -> None:
         """Test to_json method and creating an OpenFrame from file data."""
         filename = "frame.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         framefile = dirpath.joinpath(filename)
 
         if Path(framefile).exists():
@@ -164,7 +154,7 @@ class TestOpenFrame(TestCase):
             msg = f"test_to_json_and_back did not output as intended: {check_one}"
             raise ValueError(msg)
 
-        with Path.open(framefile, encoding="utf-8") as jsonfile:
+        with framefile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         frame_two = OpenFrame(
@@ -196,7 +186,7 @@ class TestOpenFrame(TestCase):
     def test_to_json_and_back_tsdf(self: TestOpenFrame) -> None:
         """Test to_json method and creating an OpenFrame from file data."""
         filename = "frame_tsdf.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         framefile = dirpath.joinpath(filename)
 
         if Path(framefile).exists():
@@ -234,7 +224,7 @@ class TestOpenFrame(TestCase):
             )
             raise ValueError(msg)
 
-        with Path.open(framefile, encoding="utf-8") as jsonfile:
+        with framefile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         frame_two = OpenFrame(
@@ -272,7 +262,7 @@ class TestOpenFrame(TestCase):
         if Path.home().joinpath("Documents").exists():
             basefile = Path.home().joinpath("Documents").joinpath(filename)
         else:
-            basefile = Path(__file__).resolve().parent.joinpath(filename)
+            basefile = Path(__file__).parent.joinpath(filename)
 
         if Path(basefile).exists():
             msg = "test_save_to_xlsx test case setup failed."
@@ -292,7 +282,7 @@ class TestOpenFrame(TestCase):
 
         seriesfile.unlink()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         seriesfile = Path(
             self.randomframe.to_xlsx(filename="trial.xlsx", directory=directory),
         ).resolve()
@@ -313,7 +303,7 @@ class TestOpenFrame(TestCase):
         ):
             _ = self.randomframe.to_xlsx(filename="trial.pdf")
 
-        with Path.open(basefile, "w") as fakefile:
+        with basefile.open(mode="w", encoding="utf-8") as fakefile:
             fakefile.write("Hello world")
 
         with pytest.raises(
@@ -324,7 +314,7 @@ class TestOpenFrame(TestCase):
 
         basefile.unlink()
 
-        localfile = Path(__file__).resolve().parent.joinpath(filename)
+        localfile = Path(__file__).parent.joinpath(filename)
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
             seriesfile = Path(self.randomframe.to_xlsx(filename=filename)).resolve()
@@ -333,11 +323,11 @@ class TestOpenFrame(TestCase):
             msg = "test_save_to_xlsx test case setup failed."
             raise ValueError(msg)
 
-        dframe = read_excel(
+        dframe = read_excel(  # type: ignore[call-overload]
             io=seriesfile,
             header=0,
             index_col=0,
-            usecols="A:F",
+            usecols=cast(int, "A:F"),
             skiprows=[1, 2],
             engine="openpyxl",
         )
@@ -610,7 +600,7 @@ class TestOpenFrame(TestCase):
         name = "portfolio"
 
         _ = mpframe.make_portfolio(name=name, weight_strat="eq_weights")
-        weights: Optional[list[float]] = [0.2, 0.2, 0.2, 0.2, 0.2]
+        weights: list[float] | None = [0.2, 0.2, 0.2, 0.2, 0.2]
         if weights != mpframe.weights:
             msg = "make_portfolio() equal weight strategy not working as intended."
             raise ValueError(msg)
@@ -1316,7 +1306,7 @@ class TestOpenFrame(TestCase):
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = plotframe.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1432,7 +1422,7 @@ class TestOpenFrame(TestCase):
         """Test plot_bars method with different file folder options."""
         plotframe = self.randomframe.from_deepcopy()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = plotframe.plot_bars(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -2167,7 +2157,7 @@ class TestOpenFrame(TestCase):
             match="base_column should be a tuple",
         ):
             _ = frame.tracking_error_func(
-                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+                base_column="string",
             )
 
     def test_info_ratio_func(self: TestOpenFrame) -> None:
@@ -2207,7 +2197,7 @@ class TestOpenFrame(TestCase):
             match="base_column should be a tuple",
         ):
             _ = frame.info_ratio_func(
-                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+                base_column="string",
             )
 
     def test_rolling_corr(self: TestOpenFrame) -> None:
@@ -2348,8 +2338,7 @@ class TestOpenFrame(TestCase):
             raise ValueError(msg)
 
     def test_capture_ratio(self: TestOpenFrame) -> None:
-        """
-        Test the capture_ratio_func method.
+        """Test the capture_ratio_func method.
 
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and
@@ -2519,7 +2508,7 @@ class TestOpenFrame(TestCase):
         ):
             _ = cframe.capture_ratio_func(
                 ratio="up",
-                base_column=cast(Union[tuple[str, ValueType], int], "string"),
+                base_column="string",
             )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
@@ -3058,7 +3047,7 @@ class TestOpenFrame(TestCase):
         ):
             _ = oframe.ord_least_squares_fit(
                 y_column=0,
-                x_column=cast(Union[tuple[str, ValueType], int], "string"),
+                x_column="string",
                 fitted_series=False,
             )
 
@@ -3067,7 +3056,7 @@ class TestOpenFrame(TestCase):
             match="y_column should be a tuple",
         ):
             _ = oframe.ord_least_squares_fit(
-                y_column=cast(Union[tuple[str, ValueType], int], "string"),
+                y_column="string",
                 x_column=1,
                 fitted_series=False,
             )
@@ -3131,7 +3120,7 @@ class TestOpenFrame(TestCase):
             match="asset should be a tuple",
         ):
             _ = bframe.beta(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3141,7 +3130,7 @@ class TestOpenFrame(TestCase):
         ):
             _ = bframe.beta(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
     def test_beta_returns_input(self: TestOpenFrame) -> None:
@@ -3203,7 +3192,7 @@ class TestOpenFrame(TestCase):
             match="asset should be a tuple",
         ):
             _ = bframe.beta(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3213,7 +3202,7 @@ class TestOpenFrame(TestCase):
         ):
             _ = bframe.beta(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
     def test_jensen_alpha(self: TestOpenFrame) -> None:
@@ -3276,7 +3265,7 @@ class TestOpenFrame(TestCase):
             match="asset should be a tuple",
         ):
             _ = jframe.jensen_alpha(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3286,7 +3275,7 @@ class TestOpenFrame(TestCase):
         ):
             _ = jframe.jensen_alpha(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
         ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
@@ -3401,7 +3390,7 @@ class TestOpenFrame(TestCase):
             match="asset should be a tuple",
         ):
             _ = jframe.jensen_alpha(
-                asset=cast(Union[tuple[str, ValueType], int], "string"),
+                asset="string",
                 market=1,
             )
 
@@ -3411,7 +3400,7 @@ class TestOpenFrame(TestCase):
         ):
             _ = jframe.jensen_alpha(
                 asset=0,
-                market=cast(Union[tuple[str, ValueType], int], "string"),
+                market="string",
             )
 
     def test_ewma_risk(self: TestOpenFrame) -> None:

@@ -1,5 +1,19 @@
 # Changelog
 
+## Version [1.7.0] - 2024-07-27
+
+- Changed code to enforce PEP 604 on typing. This means that the PACKAGE WILL LONGER WORK FOR PYTHON 3.9.
+- Limited GitHub workflow build.yaml to no longer run on Python 3.9
+- Adjustments to adhere to ruff TCH type checking imports.
+- Introduced strict requirement that generate_calendar_date_range argument trading_days must be positive.
+- Further simplified common simulation for CommonTestCase class.
+- Removed unnecessary .resolve() from pathlib.Path and simplified Path.open()
+- Made all Path.open() statements follow the same syntax.
+- Cleaned up test setups and added tearDownClass method on common testcase class.
+- Removed year from copyright notice in license.md
+- Suppressed pycharm type checker on OpenFrame class.
+- Miscellaneous dependency updates
+
 ## Version [1.6.0] - 2024-07-08
 
 - Added \_\_all__ where appropriate for proper import autocompletion and hinting

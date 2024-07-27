@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from typing import cast
-from unittest import TestCase
 
 import pytest
 
@@ -15,9 +14,8 @@ from openseries.types import (
 )
 
 
-class TestTypes(TestCase):
-
-    """class to run unittests on the module types.py."""
+class TestTypes:
+    """class to run tests on the module types.py."""
 
     def test_opentimeseriesproplist_validate(self: TestTypes) -> None:
         """Test that the OpenTimeSeries property input is correctly checked."""

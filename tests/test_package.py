@@ -5,20 +5,18 @@ from __future__ import annotations
 from importlib.metadata import metadata
 from pathlib import Path
 from re import match
-from unittest import TestCase
 
 
-class TestPackage(TestCase):
-
+class TestPackage:
     """class to test openseries packaging."""
 
     def test_metadata(self: TestPackage) -> None:
         """Test package metadata."""
         package_metadata = metadata("openseries")
 
-        directory = Path(__file__).resolve().parent.parent
+        directory = Path(__file__).parent.parent
         pyproject_file = directory.joinpath("pyproject.toml")
-        with Path.open(pyproject_file, "r") as pfile:
+        with pyproject_file.open(mode="r", encoding="utf-8") as pfile:
             lines = pfile.readlines()
 
         toml_version = lines[2].strip()[lines[2].strip().find('"') :].replace('"', "")
@@ -38,7 +36,7 @@ class TestPackage(TestCase):
             f"^({toml_version})$",
             "^(https://github.com/CaptorAB/openseries)$",
             "^(BSD-3-Clause)$",
-            "^(>=3.9,<3.13)$",
+            "^(>=3.10,<3.13)$",
         ]
 
         for name, value in zip(attribute_names, expected_values):

@@ -1,13 +1,15 @@
 """Defining the OpenFrame class."""
 
-# mypy: disable-error-code="index,assignment"
+# mypy: disable-error-code="index,assignment,arg-type"
 from __future__ import annotations
 
-import datetime as dt
 from copy import deepcopy
 from functools import reduce
 from logging import warning
-from typing import Optional, Union, cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    import datetime as dt  # pragma: no cover
 
 import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
 from numpy import (
@@ -40,10 +42,10 @@ from statsmodels.regression.linear_model import (  # type: ignore[import-untyped
 )
 from typing_extensions import Self
 
-from openseries._common_model import _CommonModel
-from openseries.datefixer import do_resample_to_business_period_ends
-from openseries.series import OpenTimeSeries
-from openseries.types import (
+from ._common_model import _CommonModel
+from .datefixer import do_resample_to_business_period_ends
+from .series import OpenTimeSeries
+from .types import (
     CountriesType,
     DaysInYearType,
     LiteralBizDayFreq,
@@ -62,11 +64,9 @@ from openseries.types import (
 __all__ = ["OpenFrame"]
 
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyTypeChecker
 class OpenFrame(_CommonModel):
-
-    """
-    OpenFrame objects hold OpenTimeSeries in the list constituents.
+    """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
     The intended use is to allow comparisons across these timeseries.
 
@@ -86,7 +86,7 @@ class OpenFrame(_CommonModel):
 
     constituents: list[OpenTimeSeries]
     tsdf: DataFrame = DataFrame(dtype="float64")
-    weights: Optional[list[float]] = None
+    weights: list[float] | None = None
 
     # noinspection PyMethodParameters
     @field_validator("constituents")  # type: ignore[misc]
@@ -104,10 +104,9 @@ class OpenFrame(_CommonModel):
     def __init__(
         self: Self,
         constituents: list[OpenTimeSeries],
-        weights: Optional[list[float]] = None,
+        weights: list[float] | None = None,
     ) -> None:
-        """
-        OpenFrame objects hold OpenTimeSeries in the list constituents.
+        """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
         The intended use is to allow comparisons across these timeseries.
 
@@ -144,8 +143,7 @@ class OpenFrame(_CommonModel):
             warning("OpenFrame() was passed an empty list.")
 
     def from_deepcopy(self: Self) -> Self:
-        """
-        Create copy of the OpenFrame object.
+        """Create copy of the OpenFrame object.
 
         Returns
         -------
@@ -159,8 +157,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         how: LiteralHowMerge = "outer",
     ) -> Self:
-        """
-        Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
+        """Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
 
         Parameters
         ----------
@@ -202,10 +199,9 @@ class OpenFrame(_CommonModel):
 
     def all_properties(
         self: Self,
-        properties: Optional[list[LiteralFrameProps]] = None,
+        properties: list[LiteralFrameProps] | None = None,
     ) -> DataFrame:
-        """
-        Calculate chosen timeseries properties.
+        """Calculate chosen timeseries properties.
 
         Parameters
         ----------
@@ -229,8 +225,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def lengths_of_items(self: Self) -> Series[int]:
-        """
-        Number of observations of all constituents.
+        """Number of observations of all constituents.
 
         Returns
         -------
@@ -247,8 +242,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def item_count(self: Self) -> int:
-        """
-        Number of constituents.
+        """Number of constituents.
 
         Returns
         -------
@@ -260,8 +254,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def columns_lvl_zero(self: Self) -> list[str]:
-        """
-        Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
+        """Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns
         -------
@@ -273,8 +266,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def columns_lvl_one(self: Self) -> list[ValueType]:
-        """
-        Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
+        """Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns
         -------
@@ -286,8 +278,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def first_indices(self: Self) -> Series[dt.date]:
-        """
-        The first dates in the timeseries of all constituents.
+        """The first dates in the timeseries of all constituents.
 
         Returns
         -------
@@ -304,8 +295,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def last_indices(self: Self) -> Series[dt.date]:
-        """
-        The last dates in the timeseries of all constituents.
+        """The last dates in the timeseries of all constituents.
 
         Returns
         -------
@@ -322,8 +312,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def span_of_days_all(self: Self) -> Series[int]:
-        """
-        Number of days from the first date to the last for all items in the frame.
+        """Number of days from the first date to the last for all items in the frame.
 
         Returns
         -------
@@ -340,8 +329,7 @@ class OpenFrame(_CommonModel):
         )
 
     def value_to_ret(self: Self) -> Self:
-        """
-        Convert series of values into series of returns.
+        """Convert series of values into series of returns.
 
         Returns
         -------
@@ -349,7 +337,7 @@ class OpenFrame(_CommonModel):
             The returns of the values in the series
 
         """
-        self.tsdf = self.tsdf.pct_change(fill_method=cast(str, None))
+        self.tsdf = self.tsdf.pct_change(fill_method=None)
         self.tsdf.iloc[0] = 0
         new_labels = [ValueType.RTRN] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
@@ -357,8 +345,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def value_to_diff(self: Self, periods: int = 1) -> Self:
-        """
-        Convert series of values to series of their period differences.
+        """Convert series of values to series of their period differences.
 
         Parameters
         ----------
@@ -380,8 +367,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def to_cumret(self: Self) -> Self:
-        """
-        Convert series of returns into cumulative series of values.
+        """Convert series of returns into cumulative series of values.
 
         Returns
         -------
@@ -404,14 +390,13 @@ class OpenFrame(_CommonModel):
 
     def resample(
         self: Self,
-        freq: Union[LiteralBizDayFreq, str] = "BME",
+        freq: LiteralBizDayFreq | str = "BME",
     ) -> Self:
-        """
-        Resample the timeseries frequency.
+        """Resample the timeseries frequency.
 
         Parameters
         ----------
-        freq: Union[LiteralBizDayFreq, str], default "BME"
+        freq: LiteralBizDayFreq | str, default "BME"
             The date offset string that sets the resampled frequency
 
         Returns
@@ -438,8 +423,7 @@ class OpenFrame(_CommonModel):
         countries: CountriesType = "SE",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
-        """
-        Resamples timeseries frequency to the business calendar month end dates.
+        """Resamples timeseries frequency to the business calendar month end dates.
 
         Stubs left in place. Stubs will be aligned to the shortest stub.
 
@@ -483,13 +467,12 @@ class OpenFrame(_CommonModel):
         dlta_degr_freedms: int = 0,
         first_column: int = 0,
         second_column: int = 1,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> DataFrame:
-        """
-        Exponentially Weighted Moving Average Volatilities and Correlation.
+        """Exponentially Weighted Moving Average Volatilities and Correlation.
 
         Exponentially Weighted Moving Average (EWMA) for Volatilities and
         Correlation. https://www.investopedia.com/articles/07/ewma.asp.
@@ -601,8 +584,7 @@ class OpenFrame(_CommonModel):
 
     @property
     def correl_matrix(self: Self) -> DataFrame:
-        """
-        Correlation matrix.
+        """Correlation matrix.
 
         Returns
         -------
@@ -610,7 +592,7 @@ class OpenFrame(_CommonModel):
             Correlation matrix
 
         """
-        corr_matrix = self.tsdf.pct_change(fill_method=cast(str, None)).corr(
+        corr_matrix = self.tsdf.pct_change(fill_method=None).corr(
             method="pearson",
             min_periods=1,
         )
@@ -623,8 +605,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         new_series: OpenTimeSeries,
     ) -> Self:
-        """
-        To add an OpenTimeSeries object.
+        """To add an OpenTimeSeries object.
 
         Parameters
         ----------
@@ -643,8 +624,7 @@ class OpenFrame(_CommonModel):
         return self
 
     def delete_timeseries(self: Self, lvl_zero_item: str) -> Self:
-        """
-        To delete an OpenTimeSeries object.
+        """To delete an OpenTimeSeries object.
 
         Parameters
         ----------
@@ -674,12 +654,11 @@ class OpenFrame(_CommonModel):
 
     def trunc_frame(
         self: Self,
-        start_cut: Optional[dt.date] = None,
-        end_cut: Optional[dt.date] = None,
+        start_cut: dt.date | None = None,
+        end_cut: dt.date | None = None,
         where: LiteralTrunc = "both",
     ) -> Self:
-        """
-        Truncate DataFrame such that all timeseries have the same time span.
+        """Truncate DataFrame such that all timeseries have the same time span.
 
         Parameters
         ----------
@@ -733,8 +712,7 @@ class OpenFrame(_CommonModel):
         *,
         base_zero: bool = True,
     ) -> None:
-        """
-        Calculate cumulative relative return between two series.
+        """Calculate cumulative relative return between two series.
 
         Parameters
         ----------
@@ -766,14 +744,13 @@ class OpenFrame(_CommonModel):
 
     def tracking_error_func(
         self: Self,
-        base_column: Union[tuple[str, ValueType], int] = -1,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        base_column: tuple[str, ValueType] | int = -1,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> Series[float]:
-        """
-        Tracking Error.
+        """Tracking Error.
 
         Calculates Tracking Error which is the standard deviation of the
         difference between the fund and its index returns.
@@ -781,7 +758,7 @@ class OpenFrame(_CommonModel):
 
         Parameters
         ----------
-        base_column: Union[tuple[str, ValueType], int], default: -1
+        base_column: tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -846,8 +823,7 @@ class OpenFrame(_CommonModel):
                 # noinspection PyTypeChecker
                 relative = 1.0 + longdf - shortdf
                 vol = float(
-                    relative.pct_change(fill_method=cast(str, None)).std()
-                    * sqrt(time_factor),
+                    relative.pct_change(fill_method=None).std() * sqrt(time_factor),
                 )
                 terrors.append(vol)
 
@@ -860,14 +836,13 @@ class OpenFrame(_CommonModel):
 
     def info_ratio_func(
         self: Self,
-        base_column: Union[tuple[str, ValueType], int] = -1,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        base_column: tuple[str, ValueType] | int = -1,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> Series[float]:
-        """
-        Information Ratio.
+        """Information Ratio.
 
         The Information Ratio equals ( fund return less index return ) divided
         by the Tracking Error. And the Tracking Error is the standard deviation of
@@ -876,7 +851,7 @@ class OpenFrame(_CommonModel):
 
         Parameters
         ----------
-        base_column: Union[tuple[str, ValueType], int], default: -1
+        base_column: tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -941,12 +916,10 @@ class OpenFrame(_CommonModel):
                 # noinspection PyTypeChecker
                 relative = 1.0 + longdf - shortdf
                 ret = float(
-                    relative.pct_change(fill_method=cast(str, None)).mean()
-                    * time_factor,
+                    relative.pct_change(fill_method=None).mean() * time_factor,
                 )
                 vol = float(
-                    relative.pct_change(fill_method=cast(str, None)).std()
-                    * sqrt(time_factor),
+                    relative.pct_change(fill_method=None).std() * sqrt(time_factor),
                 )
                 ratios.append(ret / vol)
 
@@ -960,14 +933,13 @@ class OpenFrame(_CommonModel):
     def capture_ratio_func(  # noqa: C901
         self: Self,
         ratio: LiteralCaptureRatio,
-        base_column: Union[tuple[str, ValueType], int] = -1,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        base_column: tuple[str, ValueType] | int = -1,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> Series[float]:
-        """
-        Capture Ratio.
+        """Capture Ratio.
 
         The Up (Down) Capture Ratio is calculated by dividing the CAGR
         of the asset during periods that the benchmark returns are positive (negative)
@@ -982,7 +954,7 @@ class OpenFrame(_CommonModel):
         ----------
         ratio: LiteralCaptureRatio
             The ratio to calculate
-        base_column: Union[tuple[str, ValueType], int], default: -1
+        base_column: tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
@@ -1047,8 +1019,8 @@ class OpenFrame(_CommonModel):
                 ]
                 if ratio == "up":
                     uparray = (
-                        longdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        longdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             > loss_limit
                         ]
                         .add(1)
@@ -1056,8 +1028,8 @@ class OpenFrame(_CommonModel):
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        shortdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             > loss_limit
                         ]
                         .add(1)
@@ -1069,8 +1041,8 @@ class OpenFrame(_CommonModel):
                     ratios.append(up_rtrn / up_idx_return)
                 elif ratio == "down":
                     downarray = (
-                        longdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        longdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             < loss_limit
                         ]
                         .add(1)
@@ -1080,8 +1052,8 @@ class OpenFrame(_CommonModel):
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        shortdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             < loss_limit
                         ]
                         .add(1)
@@ -1094,8 +1066,8 @@ class OpenFrame(_CommonModel):
                     ratios.append(down_return / down_idx_return)
                 elif ratio == "both":
                     uparray = (
-                        longdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        longdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             > loss_limit
                         ]
                         .add(1)
@@ -1103,8 +1075,8 @@ class OpenFrame(_CommonModel):
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        shortdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             > loss_limit
                         ]
                         .add(1)
@@ -1114,8 +1086,8 @@ class OpenFrame(_CommonModel):
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     downarray = (
-                        longdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        longdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             < loss_limit
                         ]
                         .add(1)
@@ -1125,8 +1097,8 @@ class OpenFrame(_CommonModel):
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change(fill_method=cast(str, None))[
-                            shortdf.pct_change(fill_method=cast(str, None)).to_numpy()
+                        shortdf.pct_change(fill_method=None)[
+                            shortdf.pct_change(fill_method=None).to_numpy()
                             < loss_limit
                         ]
                         .add(1)
@@ -1156,21 +1128,20 @@ class OpenFrame(_CommonModel):
 
     def beta(
         self: Self,
-        asset: Union[tuple[str, ValueType], int],
-        market: Union[tuple[str, ValueType], int],
+        asset: tuple[str, ValueType] | int,
+        market: tuple[str, ValueType] | int,
         dlta_degr_freedms: int = 1,
     ) -> float:
-        """
-        Market Beta.
+        """Market Beta.
 
         Calculates Beta as Co-variance of asset & market divided by Variance
         of the market. https://www.investopedia.com/terms/b/beta.asp.
 
         Parameters
         ----------
-        asset: Union[tuple[str, ValueType], int]
+        asset: tuple[str, ValueType] | int
             The column of the asset
-        market: Union[tuple[str, ValueType], int]
+        market: tuple[str, ValueType] | int
             The column of the market against which Beta is measured
         dlta_degr_freedms: int, default: 1
             Variance bias factor taking the value 0 or 1.
@@ -1238,15 +1209,14 @@ class OpenFrame(_CommonModel):
 
     def ord_least_squares_fit(
         self: Self,
-        y_column: Union[tuple[str, ValueType], int],
-        x_column: Union[tuple[str, ValueType], int],
+        y_column: tuple[str, ValueType] | int,
+        x_column: tuple[str, ValueType] | int,
         method: LiteralOlsFitMethod = "pinv",
         cov_type: LiteralOlsFitCovType = "nonrobust",
         *,
         fitted_series: bool = True,
     ) -> OLSResults:
-        """
-        Ordinary Least Squares fit.
+        """Ordinary Least Squares fit.
 
         Performs a linear regression and adds a new column with a fitted line
         using Ordinary Least Squares fit
@@ -1254,9 +1224,9 @@ class OpenFrame(_CommonModel):
 
         Parameters
         ----------
-        y_column: Union[tuple[str, ValueType], int]
+        y_column: tuple[str, ValueType] | int
             The column level values of the dependent variable y
-        x_column: Union[tuple[str, ValueType], int]
+        x_column: tuple[str, ValueType] | int
             The column level values of the exogenous variable x
         method: LiteralOlsFitMethod, default: pinv
             Method to solve least squares problem
@@ -1309,13 +1279,12 @@ class OpenFrame(_CommonModel):
 
     def jensen_alpha(  # noqa: C901
         self: Self,
-        asset: Union[tuple[str, ValueType], int],
-        market: Union[tuple[str, ValueType], int],
+        asset: tuple[str, ValueType] | int,
+        market: tuple[str, ValueType] | int,
         riskfree_rate: float = 0.0,
         dlta_degr_freedms: int = 1,
     ) -> float:
-        """
-        Jensen's alpha.
+        """Jensen's alpha.
 
         The Jensen's measure, or Jensen's alpha, is a risk-adjusted performance
         measure that represents the average return on a portfolio or investment,
@@ -1326,9 +1295,9 @@ class OpenFrame(_CommonModel):
 
         Parameters
         ----------
-        asset: Union[tuple[str, ValueType], int]
+        asset: tuple[str, ValueType] | int
             The column of the asset
-        market: Union[tuple[str, ValueType], int]
+        market: tuple[str, ValueType] | int
             The column of the market against which Jensen's alpha is measured
         riskfree_rate : float, default: 0.0
             The return of the zero volatility riskfree asset
@@ -1448,10 +1417,9 @@ class OpenFrame(_CommonModel):
     def make_portfolio(
         self: Self,
         name: str,
-        weight_strat: Optional[LiteralPortfolioWeightings] = None,
+        weight_strat: LiteralPortfolioWeightings | None = None,
     ) -> DataFrame:
-        """
-        Calculate a basket timeseries based on the supplied weights.
+        """Calculate a basket timeseries based on the supplied weights.
 
         Parameters
         ----------
@@ -1479,7 +1447,7 @@ class OpenFrame(_CommonModel):
             x == ValueType.RTRN
             for x in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
-            dframe = dframe.pct_change(fill_method=cast(str, None))
+            dframe = dframe.pct_change(fill_method=None)
             dframe.iloc[0] = 0
         if weight_strat:
             if weight_strat == "eq_weights":
@@ -1503,10 +1471,9 @@ class OpenFrame(_CommonModel):
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> DataFrame:
-        """
-        Calculate rolling Information Ratio.
+        """Calculate rolling Information Ratio.
 
         The Information Ratio equals ( fund return less index return ) divided by
         the Tracking Error. And the Tracking Error is the standard deviation of the
@@ -1548,13 +1515,13 @@ class OpenFrame(_CommonModel):
         )
 
         retseries = (
-            relative.pct_change(fill_method=cast(str, None))
+            relative.pct_change(fill_method=None)
             .rolling(observations, min_periods=observations)
             .sum()
         )
         retdf = retseries.dropna().to_frame()
 
-        voldf = relative.pct_change(fill_method=cast(str, None)).rolling(
+        voldf = relative.pct_change(fill_method=None).rolling(
             observations,
             min_periods=observations,
         ).std() * sqrt(time_factor)
@@ -1572,8 +1539,7 @@ class OpenFrame(_CommonModel):
         observations: int = 21,
         dlta_degr_freedms: int = 1,
     ) -> DataFrame:
-        """
-        Calculate rolling Market Beta.
+        """Calculate rolling Market Beta.
 
         Calculates Beta as Co-variance of asset & market divided by Variance
         of the market. https://www.investopedia.com/terms/b/beta.asp.
@@ -1599,8 +1565,7 @@ class OpenFrame(_CommonModel):
         asset_label = cast(tuple[str, str], self.tsdf.iloc[:, asset_column].name)[0]
         beta_label = f"{asset_label} / {market_label}"
 
-        rolling: DataFrame = self.tsdf.copy()
-        rolling = rolling.pct_change(fill_method=cast(str, None)).rolling(
+        rolling = self.tsdf.pct_change(fill_method=None).rolling(
             observations,
             min_periods=observations,
         )
@@ -1630,8 +1595,7 @@ class OpenFrame(_CommonModel):
         second_column: int = 1,
         observations: int = 21,
     ) -> DataFrame:
-        """
-        Calculate rolling Correlation.
+        """Calculate rolling Correlation.
 
         Calculates correlation between two series. The period with
         at least the given number of observations is the first period calculated.
@@ -1658,11 +1622,11 @@ class OpenFrame(_CommonModel):
         )
         first_series = (
             self.tsdf.iloc[:, first_column]
-            .pct_change(fill_method=cast(str, None))[1:]
+            .pct_change(fill_method=None)[1:]
             .rolling(observations, min_periods=observations)
         )
         second_series = self.tsdf.iloc[:, second_column].pct_change(
-            fill_method=cast(str, None),
+            fill_method=None,
         )[1:]
         corrdf = first_series.corr(other=second_series).dropna().to_frame()
         corrdf.columns = MultiIndex.from_arrays(

@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import cast
-from unittest import TestCase
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from numpy import datetime64
@@ -18,7 +17,9 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
-from openseries.types import CountriesType, DateType, HolidayType
+
+if TYPE_CHECKING:
+    from openseries.types import CountriesType, DateType, HolidayType
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -241,9 +242,8 @@ def test_date_offset_foll(
         )
 
 
-class TestDateFixer(TestCase):
-
-    """class to run unittests on the module datefixer.py."""
+class TestDateFixer:
+    """class to run tests on the module datefixer.py."""
 
     def test_holiday_calendar(self: TestDateFixer) -> None:
         """Test holiday_calendar function."""
@@ -377,6 +377,16 @@ class TestDateFixer(TestCase):
         if d_range[-1] != end:
             msg = "Unintended result from generate_calendar_date_range"
             raise ValueError(msg)
+
+        neg_days = -5
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Argument trading_days must be greater than zero.",
+        ):
+            _ = generate_calendar_date_range(
+                trading_days=neg_days,
+                start=start,
+            )
 
         with pytest.raises(
             expected_exception=ValueError,

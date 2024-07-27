@@ -33,7 +33,6 @@ CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-
 
 
 class Countries(BaseModel):
-
     """Declare Countries."""
 
     countryinput: CountriesType
@@ -53,7 +52,6 @@ CurrencyStringType = Annotated[
 
 
 class Currency(BaseModel):
-
     """Declare Currency."""
 
     ccy: CurrencyStringType
@@ -90,31 +88,29 @@ DatabaseIdStringType = Annotated[
 
 DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 
-DateType = Union[str, dt.date, dt.datetime, datetime64, Timestamp]
+DateType = str | dt.date | dt.datetime | datetime64 | Timestamp
 
-HolidayType = Union[
-    dict[Union[dt.date, dt.datetime, str, float, int], str],
-    list[Union[dt.date, dt.datetime, str, float, int]],
-    dt.date,
-    dt.datetime,
-    str,
-    float,
-    int,
-]
+HolidayType = (
+    dict[dt.date | dt.datetime | str | float | int, str]
+    | list[dt.date | dt.datetime | str | float | int]
+    | dt.date
+    | dt.datetime
+    | str
+    | float
+    | int
+)
 
 PlotlyLayoutType = dict[
     str,
-    Union[
-        str,
-        int,
-        float,
-        bool,
-        list[str],
-        dict[str, Union[str, int, float, bool, list[str]]],
-    ],
+    str
+    | int
+    | float
+    | bool
+    | list[str]
+    | dict[str, str | int | float | bool | list[str]],
 ]
 
-CaptorLogoType = dict[str, Union[str, float]]
+CaptorLogoType = dict[str, str | float]
 
 LiteralJsonOutput = Literal["values", "tsdf"]
 LiteralTrunc = Literal["before", "after", "both"]
@@ -230,7 +226,6 @@ LiteralFrameProps = Literal[
 
 
 class OpenTimeSeriesPropertiesList(list[str]):
-
     """Allowed property arguments for the OpenTimeSeries class."""
 
     allowed_strings: ClassVar[set[str]] = {
@@ -287,7 +282,6 @@ class OpenTimeSeriesPropertiesList(list[str]):
 
 
 class OpenFramePropertiesList(list[str]):
-
     """Allowed property arguments for the OpenFrame class."""
 
     allowed_strings: ClassVar[set[str]] = {
@@ -339,7 +333,6 @@ class OpenFramePropertiesList(list[str]):
 
 
 class ValueType(str, Enum):
-
     """Enum types of OpenTimeSeries to identify the output."""
 
     EWMA = "EWMA"

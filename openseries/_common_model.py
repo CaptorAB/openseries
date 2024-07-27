@@ -9,10 +9,12 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import Any, Optional, SupportsFloat, Union, cast
+from typing import TYPE_CHECKING, Any, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
-from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray  # pragma: no cover
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -29,13 +31,13 @@ from scipy.stats import (  # type: ignore[import-untyped,unused-ignore]
 )
 from typing_extensions import Self
 
-from openseries._risk import (
+from ._risk import (
     _cvar_down_calc,
     _var_down_calc,
 )
-from openseries.datefixer import date_offset_foll, holiday_calendar
-from openseries.load_plotly import load_plotly_dict
-from openseries.types import (
+from .datefixer import date_offset_foll, holiday_calendar
+from .load_plotly import load_plotly_dict
+from .types import (
     CountriesType,
     DaysInYearType,
     LiteralBarPlotMode,
@@ -50,7 +52,6 @@ from openseries.types import (
 
 
 class _CommonModel(BaseModel):
-
     """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
@@ -63,8 +64,7 @@ class _CommonModel(BaseModel):
 
     @property
     def length(self: Self) -> int:
-        """
-        Number of observations.
+        """Number of observations.
 
         Returns
         -------
@@ -76,8 +76,7 @@ class _CommonModel(BaseModel):
 
     @property
     def first_idx(self: Self) -> dt.date:
-        """
-        The first date in the timeseries.
+        """The first date in the timeseries.
 
         Returns
         -------
@@ -89,8 +88,7 @@ class _CommonModel(BaseModel):
 
     @property
     def last_idx(self: Self) -> dt.date:
-        """
-        The last date in the timeseries.
+        """The last date in the timeseries.
 
         Returns
         -------
@@ -102,8 +100,7 @@ class _CommonModel(BaseModel):
 
     @property
     def span_of_days(self: Self) -> int:
-        """
-        Number of days from the first date to the last.
+        """Number of days from the first date to the last.
 
         Returns
         -------
@@ -115,8 +112,7 @@ class _CommonModel(BaseModel):
 
     @property
     def yearfrac(self: Self) -> float:
-        """
-        Length of series expressed in years assuming all years have 365.25 days.
+        """Length of series expressed in years assuming all years have 365.25 days.
 
         Returns
         -------
@@ -129,8 +125,7 @@ class _CommonModel(BaseModel):
 
     @property
     def periods_in_a_year(self: Self) -> float:
-        """
-        The average number of observations per year.
+        """The average number of observations per year.
 
         Returns
         -------
@@ -141,13 +136,12 @@ class _CommonModel(BaseModel):
         return self.length / self.yearfrac
 
     @property
-    def max_drawdown_cal_year(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+    def max_drawdown_cal_year(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Maximum drawdown in a single calendar year.
 
         """
@@ -170,64 +164,59 @@ class _CommonModel(BaseModel):
         )
 
     @property
-    def geo_ret(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/c/cagr.asp.
+    def geo_ret(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/c/cagr.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Compounded Annual Growth Rate (CAGR)
 
         """
         return self.geo_ret_func()
 
     @property
-    def arithmetic_ret(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/a/arithmeticmean.asp.
+    def arithmetic_ret(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Annualized arithmetic mean of returns
 
         """
         return self.arithmetic_ret_func()
 
     @property
-    def value_ret(self: Self) -> Union[float, Series[float]]:
-        """
-        Simple return.
+    def value_ret(self: Self) -> float | Series[float]:
+        """Simple return.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Simple return
 
         """
         return self.value_ret_func()
 
     @property
-    def vol(self: Self) -> Union[float, Series[float]]:
-        """
-        Annualized volatility.
+    def vol(self: Self) -> float | Series[float]:
+        """Annualized volatility.
 
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
         https://www.investopedia.com/terms/v/volatility.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Annualized volatility
 
         """
         return self.vol_func()
 
     @property
-    def downside_deviation(self: Self) -> Union[float, Series[float]]:
-        """
-        Downside Deviation.
+    def downside_deviation(self: Self) -> float | Series[float]:
+        """Downside Deviation.
 
         Standard deviation of returns that are below a Minimum Accepted Return
         of zero. It is used to calculate the Sortino Ratio.
@@ -235,7 +224,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Downside deviation
 
         """
@@ -243,13 +232,12 @@ class _CommonModel(BaseModel):
         return self.downside_deviation_func(min_accepted_return=min_accepted_return)
 
     @property
-    def ret_vol_ratio(self: Self) -> Union[float, Series[float]]:
-        """
-        Ratio of annualized arithmetic mean of returns and annualized volatility.
+    def ret_vol_ratio(self: Self) -> float | Series[float]:
+        """Ratio of annualized arithmetic mean of returns and annualized volatility.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility.
 
@@ -258,13 +246,12 @@ class _CommonModel(BaseModel):
         return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
-    def sortino_ratio(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/s/sortinoratio.asp.
+    def sortino_ratio(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
@@ -278,13 +265,12 @@ class _CommonModel(BaseModel):
         )
 
     @property
-    def omega_ratio(self: Self) -> Union[float, Series[float]]:
-        """
-        https://en.wikipedia.org/wiki/Omega_ratio.
+    def omega_ratio(self: Self) -> float | Series[float]:
+        """https://en.wikipedia.org/wiki/Omega_ratio.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Omega ratio calculation
 
         """
@@ -292,41 +278,38 @@ class _CommonModel(BaseModel):
         return self.omega_ratio_func(min_accepted_return=minimum_accepted_return)
 
     @property
-    def z_score(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/z/zscore.asp.
+    def z_score(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/z/zscore.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Z-score as (last return - mean return) / standard deviation of returns.
 
         """
         return self.z_score_func()
 
     @property
-    def max_drawdown(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+    def max_drawdown(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Maximum drawdown without any limit on date range
 
         """
         return self.max_drawdown_func()
 
     @property
-    def max_drawdown_date(self: Self) -> Union[dt.date, Series[dt.date]]:
-        """
-        Date when the maximum drawdown occurred.
+    def max_drawdown_date(self: Self) -> dt.date | Series[dt.date]:
+        """Date when the maximum drawdown occurred.
 
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns
         -------
-        Union[datetime.date, pandas.Series[dt.date]]
+        datetime.date | pandas.Series[dt.date]
             Date when the maximum drawdown occurred
 
         """
@@ -344,13 +327,12 @@ class _CommonModel(BaseModel):
         ).dt.date
 
     @property
-    def worst(self: Self) -> Union[float, Series[float]]:
-        """
-        Most negative percentage change.
+    def worst(self: Self) -> float | Series[float]:
+        """Most negative percentage change.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Most negative percentage change
 
         """
@@ -358,9 +340,8 @@ class _CommonModel(BaseModel):
         return self.worst_func(observations=observations)
 
     @property
-    def worst_month(self: Self) -> Union[float, Series[float]]:
-        """
-        Most negative month.
+    def worst_month(self: Self) -> float | Series[float]:
+        """Most negative month.
 
         Returns
         -------
@@ -384,52 +365,48 @@ class _CommonModel(BaseModel):
         )
 
     @property
-    def positive_share(self: Self) -> Union[float, Series[float]]:
-        """
-        The share of percentage changes that are greater than zero.
+    def positive_share(self: Self) -> float | Series[float]:
+        """The share of percentage changes that are greater than zero.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             The share of percentage changes that are greater than zero
 
         """
         return self.positive_share_func()
 
     @property
-    def skew(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/s/skewness.asp.
+    def skew(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/s/skewness.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Skew of the return distribution
 
         """
         return self.skew_func()
 
     @property
-    def kurtosis(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/k/kurtosis.asp.
+    def kurtosis(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Kurtosis of the return distribution
 
         """
         return self.kurtosis_func()
 
     @property
-    def cvar_down(self: Self) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
+    def cvar_down(self: Self) -> float | Series[float]:
+        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Downside 95% Conditional Value At Risk "CVaR"
 
         """
@@ -437,16 +414,15 @@ class _CommonModel(BaseModel):
         return self.cvar_down_func(level=level)
 
     @property
-    def var_down(self: Self) -> Union[float, Series[float]]:
-        """
-        Downside 95% Value At Risk (VaR).
+    def var_down(self: Self) -> float | Series[float]:
+        """Downside 95% Value At Risk (VaR).
 
         The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
         https://www.investopedia.com/terms/v/var.asp.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Downside 95% Value At Risk (VaR)
 
         """
@@ -455,15 +431,14 @@ class _CommonModel(BaseModel):
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
-    def vol_from_var(self: Self) -> Union[float, Series[float]]:
-        """
-        Implied annualized volatility from Downside 95% Value at Risk.
+    def vol_from_var(self: Self) -> float | Series[float]:
+        """Implied annualized volatility from Downside 95% Value at Risk.
 
         Assumes that returns are normally distributed.
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Implied annualized volatility from the Downside 95% VaR using the
             assumption that returns are normally distributed.
 
@@ -474,12 +449,11 @@ class _CommonModel(BaseModel):
 
     def calc_range(  # noqa: C901
         self: Self,
-        months_offset: Optional[int] = None,
-        from_dt: Optional[dt.date] = None,
-        to_dt: Optional[dt.date] = None,
+        months_offset: int | None = None,
+        from_dt: dt.date | None = None,
+        to_dt: dt.date | None = None,
     ) -> tuple[dt.date, dt.date]:
-        """
-        Create user defined date range.
+        """Create user defined date range.
 
         Parameters
         ----------
@@ -540,8 +514,7 @@ class _CommonModel(BaseModel):
         self: Self,
         countries: CountriesType = "SE",
     ) -> Self:
-        """
-        Align the index of .tsdf with local calendar business days.
+        """Align the index of .tsdf with local calendar business days.
 
         Parameters
         ----------
@@ -575,8 +548,7 @@ class _CommonModel(BaseModel):
         return self
 
     def value_to_log(self: Self) -> Self:
-        """
-        Series of values converted into logarithmic weighted series.
+        """Series of values converted into logarithmic weighted series.
 
         Equivalent to LN(value[t] / value[t=0]) in Excel.
 
@@ -594,8 +566,7 @@ class _CommonModel(BaseModel):
         return self
 
     def value_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
-        """
-        Handle missing values in a valueseries.
+        """Handle missing values in a valueseries.
 
         Parameters
         ----------
@@ -615,8 +586,7 @@ class _CommonModel(BaseModel):
         return self
 
     def return_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
-        """
-        Handle missing values in a returnseries.
+        """Handle missing values in a returnseries.
 
         Parameters
         ----------
@@ -636,8 +606,7 @@ class _CommonModel(BaseModel):
         return self
 
     def to_drawdown_series(self: Self) -> Self:
-        """
-        Convert timeseries into a drawdown series.
+        """Convert timeseries into a drawdown series.
 
         Returns
         -------
@@ -655,10 +624,9 @@ class _CommonModel(BaseModel):
         self: Self,
         what_output: LiteralJsonOutput,
         filename: str,
-        directory: Optional[DirectoryPath] = None,
-    ) -> list[dict[str, Union[str, bool, ValueType, list[str], list[float]]]]:
-        """
-        Dump timeseries data into a json file.
+        directory: DirectoryPath | None = None,
+    ) -> list[dict[str, str | bool | ValueType | list[str] | list[float]]]:
+        """Dump timeseries data into a json file.
 
         Parameters
         ----------
@@ -672,7 +640,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        list[Dict[str, Union[str, bool, ValueType, list[str], list[float]]]]
+        list[dict[str, str | bool | ValueType | list[str] | list[float]]]
             A list of dictionaries with the data of the series
 
         """
@@ -719,13 +687,12 @@ class _CommonModel(BaseModel):
     def to_xlsx(
         self: Self,
         filename: str,
-        sheet_title: Optional[str] = None,
-        directory: Optional[DirectoryPath] = None,
+        sheet_title: str | None = None,
+        directory: DirectoryPath | None = None,
         *,
         overwrite: bool = True,
     ) -> str:
-        """
-        Save .tsdf DataFrame to an Excel spreadsheet file.
+        """Save .tsdf DataFrame to an Excel spreadsheet file.
 
         Parameters
         ----------
@@ -777,18 +744,17 @@ class _CommonModel(BaseModel):
     def plot_bars(
         self: Self,
         mode: LiteralBarPlotMode = "group",
-        tick_fmt: Optional[str] = None,
-        filename: Optional[str] = None,
-        directory: Optional[DirectoryPath] = None,
-        labels: Optional[list[str]] = None,
+        tick_fmt: str | None = None,
+        filename: str | None = None,
+        directory: DirectoryPath | None = None,
+        labels: list[str] | None = None,
         output_type: LiteralPlotlyOutput = "file",
         include_plotlyjs: LiteralPlotlyJSlib = "cdn",
         *,
         auto_open: bool = True,
         add_logo: bool = True,
     ) -> tuple[Figure, str]:
-        """
-        Create a Plotly Bar Figure.
+        """Create a Plotly Bar Figure.
 
         Parameters
         ----------
@@ -892,10 +858,10 @@ class _CommonModel(BaseModel):
     def plot_series(  # noqa: C901
         self: Self,
         mode: LiteralLinePlotMode = "lines",
-        tick_fmt: Optional[str] = None,
-        filename: Optional[str] = None,
-        directory: Optional[DirectoryPath] = None,
-        labels: Optional[list[str]] = None,
+        tick_fmt: str | None = None,
+        filename: str | None = None,
+        directory: DirectoryPath | None = None,
+        labels: list[str] | None = None,
         output_type: LiteralPlotlyOutput = "file",
         include_plotlyjs: LiteralPlotlyJSlib = "cdn",
         *,
@@ -903,8 +869,7 @@ class _CommonModel(BaseModel):
         add_logo: bool = True,
         show_last: bool = False,
     ) -> tuple[Figure, str]:
-        """
-        Create a Plotly Scatter Figure.
+        """Create a Plotly Scatter Figure.
 
         Parameters
         ----------
@@ -1024,13 +989,12 @@ class _CommonModel(BaseModel):
 
     def arithmetic_ret_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        https://www.investopedia.com/terms/a/arithmeticmean.asp.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
+    ) -> float | Series[float]:
+        """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Parameters
         ----------
@@ -1047,7 +1011,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Annualized arithmetic mean of returns
 
         """
@@ -1084,13 +1048,12 @@ class _CommonModel(BaseModel):
 
     def vol_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Annualized volatility.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
+    ) -> float | Series[float]:
+        """Annualized volatility.
 
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
         https://www.investopedia.com/terms/v/volatility.asp.
@@ -1109,7 +1072,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Annualized volatility
 
         """
@@ -1144,16 +1107,15 @@ class _CommonModel(BaseModel):
     def vol_from_var_func(
         self: Self,
         level: float = 0.95,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: LiteralQuantileInterp = "lower",
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> Union[float, Series[float]]:
-        """
-        Implied annualized volatility.
+    ) -> float | Series[float]:
+        """Implied annualized volatility.
 
         Implied annualized volatility from the Downside VaR using the assumption
         that returns are normally distributed.
@@ -1179,7 +1141,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
 
@@ -1200,16 +1162,15 @@ class _CommonModel(BaseModel):
         level: float = 0.95,
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: LiteralQuantileInterp = "lower",
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> Union[float, Series[float]]:
-        """
-        Target weight from VaR.
+    ) -> float | Series[float]:
+        """Target weight from VaR.
 
         A position weight multiplier from the ratio between a VaR implied
         volatility and a given target volatility. Multiplier = 1.0 -> target met.
@@ -1241,7 +1202,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             A position weight multiplier from the ratio between a VaR implied
             volatility and a given target volatility. Multiplier = 1.0 -> target met
 
@@ -1262,19 +1223,18 @@ class _CommonModel(BaseModel):
     def _var_implied_vol_and_target_func(
         self: Self,
         level: float,
-        target_vol: Optional[float] = None,
+        target_vol: float | None = None,
         min_leverage_local: float = 0.0,
         max_leverage_local: float = 99999.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: LiteralQuantileInterp = "lower",
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> Union[float, Series[float]]:
-        """
-        Volatility implied from VaR or Target Weight.
+    ) -> float | Series[float]:
+        """Volatility implied from VaR or Target Weight.
 
         The function returns a position weight multiplier from the ratio between
         a VaR implied volatility and a given target volatility if the argument
@@ -1285,7 +1245,7 @@ class _CommonModel(BaseModel):
         ----------
         level: float
             The sought VaR level
-        target_vol: Optional[float]
+        target_vol: float | None
             Target Volatility
         min_leverage_local: float, default: 0.0
             A minimum adjustment factor
@@ -1308,7 +1268,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Target volatility if target_vol is provided otherwise the VaR
             implied volatility.
 
@@ -1373,12 +1333,11 @@ class _CommonModel(BaseModel):
     def cvar_down_func(
         self: Self,
         level: float = 0.95,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Downside Conditional Value At Risk "CVaR".
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Downside Conditional Value At Risk "CVaR".
 
         https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
@@ -1396,7 +1355,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Downside Conditional Value At Risk "CVaR"
 
         """
@@ -1435,13 +1394,12 @@ class _CommonModel(BaseModel):
     def downside_deviation_func(
         self: Self,
         min_accepted_return: float = 0.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Downside Deviation.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
+    ) -> float | Series[float]:
+        """Downside Deviation.
 
         The standard deviation of returns that are below a Minimum Accepted
         Return of zero. It is used to calculate the Sortino Ratio.
@@ -1464,7 +1422,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Downside deviation
 
         """
@@ -1510,12 +1468,11 @@ class _CommonModel(BaseModel):
 
     def geo_ret_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Compounded Annual Growth Rate (CAGR).
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Compounded Annual Growth Rate (CAGR).
 
         https://www.investopedia.com/terms/c/cagr.asp.
 
@@ -1531,7 +1488,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Compounded Annual Growth Rate (CAGR)
 
         """
@@ -1564,12 +1521,11 @@ class _CommonModel(BaseModel):
 
     def skew_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Skew of the return distribution.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Skew of the return distribution.
 
         https://www.investopedia.com/terms/s/skewness.asp.
 
@@ -1585,7 +1541,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Skew of the return distribution
 
         """
@@ -1613,12 +1569,11 @@ class _CommonModel(BaseModel):
 
     def kurtosis_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Kurtosis of the return distribution.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Kurtosis of the return distribution.
 
         https://www.investopedia.com/terms/k/kurtosis.asp.
 
@@ -1634,7 +1589,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Kurtosis of the return distribution
 
         """
@@ -1663,13 +1618,12 @@ class _CommonModel(BaseModel):
 
     def max_drawdown_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         min_periods: int = 1,
-    ) -> Union[float, Series[float]]:
-        """
-        Maximum drawdown without any limit on date range.
+    ) -> float | Series[float]:
+        """Maximum drawdown without any limit on date range.
 
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
@@ -1687,7 +1641,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Maximum drawdown without any limit on date range
 
         """
@@ -1713,12 +1667,11 @@ class _CommonModel(BaseModel):
 
     def positive_share_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Calculate share of percentage changes that are greater than zero.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Calculate share of percentage changes that are greater than zero.
 
         Parameters
         ----------
@@ -1732,7 +1685,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Calculate share of percentage changes that are greater than zero
 
         """
@@ -1770,13 +1723,12 @@ class _CommonModel(BaseModel):
     def ret_vol_ratio_func(
         self: Self,
         riskfree_rate: float = 0.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Ratio between arithmetic mean of returns and annualized volatility.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
+    ) -> float | Series[float]:
+        """Ratio between arithmetic mean of returns and annualized volatility.
 
         The ratio of annualized arithmetic mean of returns and annualized
         volatility or, if riskfree return provided, Sharpe ratio calculated
@@ -1801,7 +1753,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility or, if risk-free return provided, Sharpe ratio
 
@@ -1834,13 +1786,12 @@ class _CommonModel(BaseModel):
         self: Self,
         riskfree_rate: float = 0.0,
         min_accepted_return: float = 0.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Sortino Ratio.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
+    ) -> float | Series[float]:
+        """Sortino Ratio.
 
         The Sortino ratio calculated as ( return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has zero
@@ -1867,7 +1818,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Sortino ratio calculated as ( return - riskfree return ) /
             downside deviation (std dev of returns below MAR)
 
@@ -1900,12 +1851,11 @@ class _CommonModel(BaseModel):
     def omega_ratio_func(
         self: Self,
         min_accepted_return: float = 0.0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Omega Ratio.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Omega Ratio.
 
         The Omega Ratio compares returns above a certain target level
         (often referred to as the “minimum acceptable return” or “MAR”)
@@ -1926,7 +1876,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Omega ratio calculation
 
         """
@@ -1953,12 +1903,11 @@ class _CommonModel(BaseModel):
 
     def value_ret_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Calculate simple return.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Calculate simple return.
 
         Parameters
         ----------
@@ -1972,7 +1921,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Calculate simple return
 
         """
@@ -2005,10 +1954,9 @@ class _CommonModel(BaseModel):
     def value_ret_calendar_period(
         self: Self,
         year: int,
-        month: Optional[int] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Calculate simple return for a specific calendar period.
+        month: int | None = None,
+    ) -> float | Series[float]:
+        """Calculate simple return for a specific calendar period.
 
         Parameters
         ----------
@@ -2019,7 +1967,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Calculate simple return for a specific calendar period
 
         """
@@ -2029,7 +1977,7 @@ class _CommonModel(BaseModel):
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
-        resultdf = DataFrame(vrdf.pct_change(fill_method=cast(str, None)))
+        resultdf = DataFrame(vrdf.pct_change(fill_method=None))  # type: ignore[arg-type]
         result = resultdf.loc[period] + 1
         cal_period = result.cumprod(axis="index").iloc[-1] - 1
         if self.tsdf.shape[1] == 1:
@@ -2044,13 +1992,12 @@ class _CommonModel(BaseModel):
     def var_down_func(
         self: Self,
         level: float = 0.95,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
         interpolation: LiteralQuantileInterp = "lower",
-    ) -> Union[float, Series[float]]:
-        """
-        Downside Value At Risk, "VaR".
+    ) -> float | Series[float]:
+        """Downside Value At Risk, "VaR".
 
         The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
         https://www.investopedia.com/terms/v/var.asp.
@@ -2071,7 +2018,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Downside Value At Risk
 
         """
@@ -2098,12 +2045,11 @@ class _CommonModel(BaseModel):
     def worst_func(
         self: Self,
         observations: int = 1,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Most negative percentage change over a rolling number of observations.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Most negative percentage change over a rolling number of observations.
 
         Parameters
         ----------
@@ -2119,7 +2065,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Most negative percentage change over a rolling number of observations
             within a chosen date range
 
@@ -2148,12 +2094,11 @@ class _CommonModel(BaseModel):
 
     def z_score_func(
         self: Self,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-    ) -> Union[float, Series[float]]:
-        """
-        Z-score as (last return - mean return) / standard deviation of returns.
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> float | Series[float]:
+        """Z-score as (last return - mean return) / standard deviation of returns.
 
         https://www.investopedia.com/terms/z/zscore.asp.
 
@@ -2169,7 +2114,7 @@ class _CommonModel(BaseModel):
 
         Returns
         -------
-        Union[float, Pandas.Series[float]]
+        float | Pandas.Series[float]
             Z-score as (last return - mean return) / standard deviation of returns
 
         """
@@ -2198,8 +2143,7 @@ class _CommonModel(BaseModel):
         level: float = 0.95,
         observations: int = 252,
     ) -> DataFrame:
-        """
-        Calculate rolling annualized downside CVaR.
+        """Calculate rolling annualized downside CVaR.
 
         Parameters
         ----------
@@ -2232,8 +2176,7 @@ class _CommonModel(BaseModel):
         column: int = 0,
         observations: int = 21,
     ) -> DataFrame:
-        """
-        Calculate rolling returns.
+        """Calculate rolling returns.
 
         Parameters
         ----------
@@ -2267,8 +2210,7 @@ class _CommonModel(BaseModel):
         observations: int = 252,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> DataFrame:
-        """
-        Calculate rolling annualized downside Value At Risk "VaR".
+        """Calculate rolling annualized downside Value At Risk "VaR".
 
         Parameters
         ----------
@@ -2304,10 +2246,9 @@ class _CommonModel(BaseModel):
         self: Self,
         column: int = 0,
         observations: int = 21,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> DataFrame:
-        """
-        Calculate rolling annualised volatilities.
+        """Calculate rolling annualised volatilities.
 
         Parameters
         ----------

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from inspect import stack
 from pathlib import Path
-from typing import Callable, Optional, Union, cast
+from typing import TYPE_CHECKING, Callable, cast
 
 from numpy import (
     append,
@@ -30,21 +30,25 @@ from pandas import (
 from plotly.graph_objs import Figure  # type: ignore[import-untyped,unused-ignore]
 from plotly.io import to_html  # type: ignore[import-untyped,unused-ignore]
 from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
-from pydantic import DirectoryPath
 from scipy.optimize import minimize  # type: ignore[import-untyped,unused-ignore]
 
+from .load_plotly import load_plotly_dict
+from .series import OpenTimeSeries
+
 # noinspection PyProtectedMember
-from openseries.frame import OpenFrame
-from openseries.load_plotly import load_plotly_dict
-from openseries.series import OpenTimeSeries
-from openseries.simulation import _random_generator
-from openseries.types import (
+from .simulation import _random_generator
+from .types import (
     LiteralLinePlotMode,
     LiteralMinimizeMethods,
     LiteralPlotlyJSlib,
     LiteralPlotlyOutput,
     ValueType,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydantic import DirectoryPath
+
+    from .frame import OpenFrame
 
 __all__ = [
     "constrain_optimized_portfolios",
@@ -60,8 +64,7 @@ def simulate_portfolios(
     num_ports: int,
     seed: int,
 ) -> DataFrame:
-    """
-    Generate random weights for simulated portfolios.
+    """Generate random weights for simulated portfolios.
 
     Parameters
     ----------
@@ -130,14 +133,13 @@ def efficient_frontier(  # noqa: C901
     eframe: OpenFrame,
     num_ports: int = 5000,
     seed: int = 71,
-    bounds: Optional[tuple[tuple[float]]] = None,
+    bounds: tuple[tuple[float]] | None = None,
     frontier_points: int = 200,
     minimize_method: LiteralMinimizeMethods = "SLSQP",
     *,
     tweak: bool = True,
 ) -> tuple[DataFrame, DataFrame, NDArray[float64]]:
-    """
-    Identify an efficient frontier.
+    """Identify an efficient frontier.
 
     Parameters
     ----------
@@ -258,7 +260,7 @@ def efficient_frontier(  # noqa: C901
 
     for possible_return in frontier_y:
         cons = cast(
-            dict[str, Union[str, Callable[[float, NDArray[float64]], float64]]],
+            dict[str, str | Callable[[float, NDArray[float64]], float64]],
             (
                 {"type": "eq", "fun": _check_sum},
                 {
@@ -319,11 +321,10 @@ def constrain_optimized_portfolios(
     portfolioname: str = "Current Portfolio",
     simulations: int = 10000,
     curve_points: int = 200,
-    bounds: Optional[tuple[tuple[float]]] = None,
+    bounds: tuple[tuple[float]] | None = None,
     minimize_method: LiteralMinimizeMethods = "SLSQP",
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
-    """
-    Constrain optimized portfolios to those that improve on the current one.
+    """Constrain optimized portfolios to those that improve on the current one.
 
     Parameters
     ----------
@@ -391,8 +392,7 @@ def prepare_plot_data(
     current: OpenTimeSeries,
     optimized: NDArray[float64],
 ) -> DataFrame:
-    """
-    Prepare date to be used as point_frame in the sharpeplot function.
+    """Prepare date to be used as point_frame in the sharpeplot function.
 
     Parameters
     ----------
@@ -443,13 +443,13 @@ def prepare_plot_data(
 
 
 def sharpeplot(  # noqa: C901
-    sim_frame: Optional[DataFrame] = None,
-    line_frame: Optional[DataFrame] = None,
-    point_frame: Optional[DataFrame] = None,
+    sim_frame: DataFrame | None = None,
+    line_frame: DataFrame | None = None,
+    point_frame: DataFrame | None = None,
     point_frame_mode: LiteralLinePlotMode = "markers",
-    filename: Optional[str] = None,
-    directory: Optional[DirectoryPath] = None,
-    titletext: Optional[str] = None,
+    filename: str | None = None,
+    directory: DirectoryPath | None = None,
+    titletext: str | None = None,
     output_type: LiteralPlotlyOutput = "file",
     include_plotlyjs: LiteralPlotlyJSlib = "cdn",
     *,
@@ -457,8 +457,7 @@ def sharpeplot(  # noqa: C901
     add_logo: bool = True,
     auto_open: bool = True,
 ) -> tuple[Figure, str]:
-    """
-    Create scatter plot coloured by Sharpe Ratio.
+    """Create scatter plot coloured by Sharpe Ratio.
 
     Parameters
     ----------

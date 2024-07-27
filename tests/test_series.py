@@ -7,8 +7,7 @@ from decimal import Decimal
 from json import load, loads
 from pathlib import Path
 from pprint import pformat
-from typing import Union, cast
-from unittest import TestCase
+from typing import cast
 
 import pytest
 from pandas import DataFrame, DatetimeIndex, Series, date_range
@@ -25,11 +24,10 @@ from openseries.types import (
     LiteralSeriesProps,
     ValueType,
 )
-from tests.test_common_sim import SIMSERIES
+from tests.test_common_sim import CommonTestCase
 
 
 class NewTimeSeries(OpenTimeSeries):
-
     """class to test correct pass-through of classes."""
 
     extra_info: str = "cool"
@@ -127,21 +125,8 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         serie.countries = countries
 
 
-class TestOpenTimeSeries(TestCase):
-
-    """class to run unittests on the module series.py."""
-
-    randomseries: OpenTimeSeries
-    random_properties: dict[str, Union[dt.date, int, float]]
-
-    @classmethod
-    def setUpClass(cls: type[TestOpenTimeSeries]) -> None:
-        """SetUpClass for the TestOpenTimeSeries class."""
-        cls.randomseries = SIMSERIES.from_deepcopy()
-
-        cls.random_properties = cls.randomseries.all_properties().to_dict()[
-            ("Asset_0", ValueType.PRICE)
-        ]
+class TestOpenTimeSeries(CommonTestCase):
+    """class to run tests on the module series.py."""
 
     def test_setup_class(self: TestOpenTimeSeries) -> None:
         """Test setup_class method."""
@@ -609,7 +594,7 @@ class TestOpenTimeSeries(TestCase):
             directory = Path.home().joinpath("Documents")
             seriesfile = directory.joinpath(filename)
         else:
-            directory = Path(__file__).resolve().parent
+            directory = Path(__file__).parent
             seriesfile = directory.joinpath(filename)
 
         if Path(seriesfile).exists():
@@ -651,7 +636,7 @@ class TestOpenTimeSeries(TestCase):
     def test_to_json_and_back(self: TestOpenTimeSeries) -> None:
         """Test to_json method and creating an OpenTimeSeries from file data."""
         filename = "series.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         seriesfile = dirpath.joinpath(filename)
 
         if Path(seriesfile).exists():
@@ -685,7 +670,7 @@ class TestOpenTimeSeries(TestCase):
             )
             raise ValueError(msg)
 
-        with Path.open(seriesfile, encoding="utf-8") as jsonfile:
+        with seriesfile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         series_two = next(
@@ -720,7 +705,7 @@ class TestOpenTimeSeries(TestCase):
     def test_to_json_and_back_tsdf(self: TestOpenTimeSeries) -> None:
         """Test to_json method and creating an OpenTimeSeries from file data."""
         filename = "series_tsdf.json"
-        dirpath = Path(__file__).resolve().parent
+        dirpath = Path(__file__).parent
         seriesfile = dirpath.joinpath(filename)
 
         if Path(seriesfile).exists():
@@ -754,7 +739,7 @@ class TestOpenTimeSeries(TestCase):
             )
             raise ValueError(msg)
 
-        with Path.open(seriesfile, encoding="utf-8") as jsonfile:
+        with seriesfile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
 
         series_two = next(
@@ -791,7 +776,7 @@ class TestOpenTimeSeries(TestCase):
         fixseries_one = OpenTimeSeries.from_fixed_rate(
             rate=0.03,
             days=756,
-            end_dt=dt.date(2019, 6, 30),
+            end_dt=self.randomseries.last_idx,
         )
         if not isinstance(fixseries_one, OpenTimeSeries):
             msg = "Method from_fixed_rate() not working as intended"
@@ -1426,7 +1411,7 @@ class TestOpenTimeSeries(TestCase):
         """Test plot_series method."""
         plotseries = self.randomseries.from_deepcopy()
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = plotseries.plot_series(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1488,7 +1473,7 @@ class TestOpenTimeSeries(TestCase):
         barseries.resample(freq="BME").value_to_ret()
         rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
 
-        directory = Path(__file__).resolve().parent
+        directory = Path(__file__).parent
         _, figfile = barseries.plot_bars(auto_open=False, directory=directory)
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
@@ -1595,8 +1580,7 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
-        """
-        Test downside_deviation_func method.
+        """Test downside_deviation_func method.
 
         Source: https://www.investopedia.com/terms/d/downside-deviation.asp.
         """
@@ -1641,8 +1625,7 @@ class TestOpenTimeSeries(TestCase):
             raise ValueError(msg)
 
     def test_omega_ratio(self: TestOpenTimeSeries) -> None:
-        """
-        Test omega_ratio_func method.
+        """Test omega_ratio_func method.
 
         Source:
         https://breakingdownfinance.com/finance-topics/

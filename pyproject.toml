@@ -1,13 +1,12 @@
 [tool.poetry]
 name = "openseries"
-version = "1.6.0"
+version = "1.7.0"
 description = "Tools for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/openseries"
 license = "BSD-3-Clause"
 readme = "README.md"
 classifiers = [
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -33,13 +32,13 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
+python = ">=3.10,<3.13"
 holidays = ">=0.30,<1.0"
 numpy = ">=1.23.2,<=3.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
 plotly = ">=5.18.0,<6.0.0"
-pyarrow = ">=14.0.2,<17.0.0"
+pyarrow = ">=14.0.2,<18.0.0"
 pydantic = ">=2.5.2,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 requests = ">=2.20.0,<3.0.0"
@@ -47,13 +46,14 @@ scipy = ">=1.11.4,<2.0.0"
 statsmodels = ">=0.14.0,<1.0.0"
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.5.4"
-coverage-badge = "^1.1.1"
-mypy = "^1.10.1"
+black = ">=24.4.2,<25.0.0"
+coverage = ">=7.6.0,<8.0.0"
+coverage-badge = ">=1.1.1,<2.0.0"
+mypy = "^1.11.0"
 pandas-stubs = ">=2.1.2,<3.0.0"
-pre-commit = "^3.7.1"
-pytest = "^8.2.2"
-ruff = "^0.5.1"
+pre-commit = ">=3.7.1,<4.0.0"
+pytest = ">=8.2.2,<9.0.0"
+ruff = "^0.5.5"
 types-openpyxl = ">=3.1.2,<4.0.0"
 types-python-dateutil = ">=2.8.2,<3.0.0"
 types-requests = ">=2.20.0,<3.0.0"
@@ -92,21 +92,21 @@ init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 
+[tool.black]
+line-length = 87
+
 [tool.ruff]
 line-length = 87
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D211", "D212", "TCH"]
+ignore = ["D203", "D213"]
 fixable = ["ALL"]
 
 [tool.ruff.lint.pylint]
 max-args = 12
 max-branches = 22
-max-statements = 66
-
-[tool.ruff.lint.pyupgrade]
-keep-runtime-typing = true
+max-statements = 59
 
 [tool.pytest.ini_options]
 filterwarnings = [

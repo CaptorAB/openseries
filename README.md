@@ -44,7 +44,7 @@ The code snippet can be pasted into a Python console to run it.
 Install openseries and yfinance first.
 
 ```python
-from openseries.series import OpenTimeSeries
+from openseries import OpenTimeSeries
 import yfinance as yf
 
 msft=yf.Ticker("MSFT")

@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from copy import deepcopy
 from logging import warning
-from typing import Any, Optional, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 from numpy import (
     append,
@@ -28,9 +28,9 @@ from pandas import (
 from pydantic import model_validator
 from typing_extensions import Self
 
-from openseries._common_model import _CommonModel
-from openseries.datefixer import date_fix, do_resample_to_business_period_ends
-from openseries.types import (
+from ._common_model import _CommonModel
+from .datefixer import date_fix, do_resample_to_business_period_ends
+from .types import (
     Countries,
     CountriesType,
     Currency,
@@ -53,9 +53,7 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 # noinspection PyUnresolvedReferences
 class OpenTimeSeries(_CommonModel):
-
-    """
-    OpenTimeSeries objects are at the core of the openseries package.
+    """OpenTimeSeries objects are at the core of the openseries package.
 
     The intended use is to allow analyses of financial timeseries.
     It is only intended for daily or less frequent data samples.
@@ -104,8 +102,8 @@ class OpenTimeSeries(_CommonModel):
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
     countries: CountriesType = "SE"
-    isin: Optional[str] = None
-    label: Optional[str] = None
+    isin: str | None = None
+    label: str | None = None
 
     @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
     def dates_and_values_validate(self: Self) -> Self:
@@ -134,8 +132,7 @@ class OpenTimeSeries(_CommonModel):
         domestic_ccy: CurrencyStringType = "SEK",
         countries: CountriesType = "SE",
     ) -> None:
-        """
-        Set the domestic currency and calendar of the user.
+        """Set the domestic currency and calendar of the user.
 
         Parameters
         ----------
@@ -160,13 +157,12 @@ class OpenTimeSeries(_CommonModel):
         valuetype: ValueType = ValueType.PRICE,
         timeseries_id: DatabaseIdStringType = "",
         instrument_id: DatabaseIdStringType = "",
-        isin: Optional[str] = None,
+        isin: str | None = None,
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
     ) -> OpenTimeSeries:
-        """
-        Create series from a Pandas DataFrame or Series.
+        """Create series from a Pandas DataFrame or Series.
 
         Parameters
         ----------
@@ -217,19 +213,18 @@ class OpenTimeSeries(_CommonModel):
     @classmethod
     def from_df(
         cls: type[OpenTimeSeries],
-        dframe: Union[DataFrame, Series[float]],
+        dframe: DataFrame | Series[float],
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
     ) -> OpenTimeSeries:
-        """
-        Create series from a Pandas DataFrame or Series.
+        """Create series from a Pandas DataFrame or Series.
 
         Parameters
         ----------
-        dframe: Union[DataFrame, Series[float]]
+        dframe: DataFrame | Series[float]
             Pandas DataFrame or Series
         column_nmbr : int, default: 0
             Using iloc[:, column_nmbr] to pick column
@@ -299,17 +294,16 @@ class OpenTimeSeries(_CommonModel):
     def from_fixed_rate(
         cls: type[OpenTimeSeries],
         rate: float,
-        d_range: Optional[DatetimeIndex] = None,
-        days: Optional[int] = None,
-        end_dt: Optional[dt.date] = None,
+        d_range: DatetimeIndex | None = None,
+        days: int | None = None,
+        end_dt: dt.date | None = None,
         label: str = "Series",
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
     ) -> OpenTimeSeries:
-        """
-        Create series from values accruing with a given fixed rate return.
+        """Create series from values accruing with a given fixed rate return.
 
         Providing a date_range of type Pandas DatetimeIndex takes priority over
         providing a combination of days and an end date.
@@ -380,8 +374,7 @@ class OpenTimeSeries(_CommonModel):
         )
 
     def from_deepcopy(self: Self) -> Self:
-        """
-        Create copy of OpenTimeSeries object.
+        """Create copy of OpenTimeSeries object.
 
         Returns
         -------
@@ -392,8 +385,7 @@ class OpenTimeSeries(_CommonModel):
         return deepcopy(self)
 
     def pandas_df(self: Self) -> Self:
-        """
-        Populate .tsdf Pandas DataFrame from the .dates and .values lists.
+        """Populate .tsdf Pandas DataFrame from the .dates and .values lists.
 
         Returns
         -------
@@ -413,10 +405,9 @@ class OpenTimeSeries(_CommonModel):
 
     def all_properties(
         self: Self,
-        properties: Optional[list[LiteralSeriesProps]] = None,
+        properties: list[LiteralSeriesProps] | None = None,
     ) -> DataFrame:
-        """
-        Calculate chosen properties.
+        """Calculate chosen properties.
 
         Parameters
         ----------
@@ -441,8 +432,7 @@ class OpenTimeSeries(_CommonModel):
         return pdf
 
     def value_to_ret(self: Self) -> Self:
-        """
-        Convert series of values into series of returns.
+        """Convert series of values into series of returns.
 
         Returns
         -------
@@ -450,7 +440,7 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
-        self.tsdf = self.tsdf.pct_change(fill_method=cast(str, None))
+        self.tsdf = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         self.tsdf.columns = MultiIndex.from_arrays(
@@ -462,8 +452,7 @@ class OpenTimeSeries(_CommonModel):
         return self
 
     def value_to_diff(self: Self, periods: int = 1) -> Self:
-        """
-        Convert series of values to series of their period differences.
+        """Convert series of values to series of their period differences.
 
         Parameters
         ----------
@@ -489,8 +478,7 @@ class OpenTimeSeries(_CommonModel):
         return self
 
     def to_cumret(self: Self) -> Self:
-        """
-        Convert series of returns into cumulative series of values.
+        """Convert series of returns into cumulative series of values.
 
         Returns
         -------
@@ -520,8 +508,7 @@ class OpenTimeSeries(_CommonModel):
         days_in_year: int = 365,
         divider: float = 1.0,
     ) -> Self:
-        """
-        Convert series of 1-day rates into series of cumulative values.
+        """Convert series of 1-day rates into series of cumulative values.
 
         Parameters
         ----------
@@ -555,14 +542,13 @@ class OpenTimeSeries(_CommonModel):
 
     def resample(
         self: Self,
-        freq: Union[LiteralBizDayFreq, str] = "BME",
+        freq: LiteralBizDayFreq | str = "BME",
     ) -> Self:
-        """
-        Resamples the timeseries frequency.
+        """Resamples the timeseries frequency.
 
         Parameters
         ----------
-        freq: Union[LiteralBizDayFreq, str], default "BME"
+        freq: LiteralBizDayFreq | str, default "BME"
             The date offset string that sets the resampled frequency
 
         Returns
@@ -581,8 +567,7 @@ class OpenTimeSeries(_CommonModel):
         freq: LiteralBizDayFreq = "BME",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
-        """
-        Resamples timeseries frequency to the business calendar month end dates.
+        """Resamples timeseries frequency to the business calendar month end dates.
 
         Stubs left in place. Stubs will be aligned to the shortest stub.
 
@@ -616,13 +601,12 @@ class OpenTimeSeries(_CommonModel):
         lmbda: float = 0.94,
         day_chunk: int = 11,
         dlta_degr_freedms: int = 0,
-        months_from_last: Optional[int] = None,
-        from_date: Optional[dt.date] = None,
-        to_date: Optional[dt.date] = None,
-        periods_in_a_year_fixed: Optional[DaysInYearType] = None,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> Series[float]:
-        """
-        Exponentially Weighted Moving Average Model for Volatility.
+        """Exponentially Weighted Moving Average Model for Volatility.
 
         https://www.investopedia.com/articles/07/ewma.asp.
 
@@ -694,8 +678,7 @@ class OpenTimeSeries(_CommonModel):
         adjustment: float,
         days_in_year: int = 365,
     ) -> Self:
-        """
-        Add or subtract a fee from the timeseries return.
+        """Add or subtract a fee from the timeseries return.
 
         Parameters
         ----------
@@ -721,7 +704,7 @@ class OpenTimeSeries(_CommonModel):
             returns_input = True
         else:
             values = [cast(float, self.tsdf.iloc[0, 0])]
-            ra_df = self.tsdf.pct_change(fill_method=cast(str, None))
+            ra_df = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
             returns_input = False
         ra_df = ra_df.dropna()
 
@@ -754,13 +737,12 @@ class OpenTimeSeries(_CommonModel):
 
     def set_new_label(
         self: Self,
-        lvl_zero: Optional[str] = None,
-        lvl_one: Optional[ValueType] = None,
+        lvl_zero: str | None = None,
+        lvl_one: ValueType | None = None,
         *,
         delete_lvl_one: bool = False,
     ) -> Self:
-        """
-        Set the column labels of the .tsdf Pandas Dataframe.
+        """Set the column labels of the .tsdf Pandas Dataframe.
 
         Parameters
         ----------
@@ -799,9 +781,8 @@ def timeseries_chain(
     front: TypeOpenTimeSeries,
     back: TypeOpenTimeSeries,
     old_fee: float = 0.0,
-) -> Union[TypeOpenTimeSeries, OpenTimeSeries]:
-    """
-    Chain two timeseries together.
+) -> TypeOpenTimeSeries | OpenTimeSeries:
+    """Chain two timeseries together.
 
     The function assumes that the two series have at least one date in common.
 
@@ -816,7 +797,7 @@ def timeseries_chain(
 
     Returns
     -------
-    Union[TypeOpenTimeSeries, OpenTimeSeries]
+    TypeOpenTimeSeries | OpenTimeSeries
         An OpenTimeSeries object or a subclass thereof
 
     """
@@ -887,8 +868,7 @@ def timeseries_chain(
 
 
 def _check_if_none(item: Any) -> bool:  # noqa: ANN401
-    """
-    Check if a variable is None or equivalent.
+    """Check if a variable is None or equivalent.
 
     Parameters
     ----------
