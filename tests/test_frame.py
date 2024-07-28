@@ -452,16 +452,16 @@ class TestOpenFrame(CommonTestCase):
         new_stubs_dates = rsb_stubs_frame.tsdf.index.tolist()
 
         if new_stubs_dates != [
-            dt.date(2023, 1, 15),
+            dt.date(2023, 1, 14),
             dt.date(2023, 1, 31),
             dt.date(2023, 2, 28),
             dt.date(2023, 3, 31),
             dt.date(2023, 4, 28),
-            dt.date(2023, 5, 15),
+            dt.date(2023, 5, 16),
         ]:
             msg = (
                 "resample_to_business_period_ends() method "
-                "generated unexpected result"
+                f"generated unexpected result:\n{new_stubs_dates}"
             )
             raise ValueError(msg)
 

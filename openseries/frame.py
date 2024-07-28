@@ -443,12 +443,8 @@ class OpenFrame(_CommonModel):
             An OpenFrame object
 
         """
-        head: Series[float] = self.tsdf.loc[self.first_indices.max()].copy()
-        tail: Series[float] = self.tsdf.loc[self.last_indices.min()].copy()
         dates = do_resample_to_business_period_ends(
-            data=self.tsdf,
-            head=head,
-            tail=tail,
+            data=self.tsdf.copy(),
             freq=freq,
             countries=countries,
         )

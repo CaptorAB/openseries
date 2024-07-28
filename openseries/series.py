@@ -584,12 +584,8 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        head = self.tsdf.iloc[0].copy()
-        tail = self.tsdf.iloc[-1].copy()
         dates = do_resample_to_business_period_ends(
             data=self.tsdf,
-            head=head,
-            tail=tail,
             freq=freq,
             countries=self.countries,
         )
