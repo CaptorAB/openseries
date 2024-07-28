@@ -389,33 +389,6 @@ class TestOpenFrame(CommonTestCase):
         ):
             _, _ = crframe.calc_range(to_dt=dt.date(2019, 7, 31))
 
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 7, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 5, 31),
-            )
-
         nst, nen = crframe.calc_range(
             from_dt=dt.date(2009, 7, 3),
             to_dt=dt.date(2019, 6, 25),
@@ -1268,6 +1241,17 @@ class TestOpenFrame(CommonTestCase):
             msg = f"Unaligned data in Figure: '{last_fmt}'"
             raise ValueError(msg)
 
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_series(
+            auto_open=False, output_type="div", labels=intended_labels,
+        )
+        fig_labels_json = loads(cast(str, fig_labels.to_json()))
+
+        labels = [item["name"] for item in fig_labels_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise ValueError(msg)
+
         with pytest.raises(
             expected_exception=ValueError,
             match="Must provide same number of labels as items in frame.",
@@ -1372,6 +1356,17 @@ class TestOpenFrame(CommonTestCase):
             if rawdata != fig_data:
                 msg = "Unaligned data between original and data in Figure."
                 raise ValueError(msg)
+
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_bars(
+            auto_open=False, output_type="div", labels=intended_labels,
+        )
+        fig_labels_json = loads(cast(str, fig_labels.to_json()))
+
+        labels = [item["name"] for item in fig_labels_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,

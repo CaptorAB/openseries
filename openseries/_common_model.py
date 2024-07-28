@@ -447,7 +447,7 @@ class _CommonModel(BaseModel):
         interpolation: LiteralQuantileInterp = "lower"
         return self.vol_from_var_func(level=level, interpolation=interpolation)
 
-    def calc_range(  # noqa: C901
+    def calc_range(
         self: Self,
         months_offset: int | None = None,
         from_dt: dt.date | None = None,
@@ -472,41 +472,34 @@ class _CommonModel(BaseModel):
 
         """
         earlier, later = self.tsdf.index[0], self.tsdf.index[-1]
-        if any([months_offset, from_dt, to_dt]):
-            if months_offset is not None:
-                earlier = date_offset_foll(
-                    raw_date=DatetimeIndex(self.tsdf.index)[-1],
-                    months_offset=-months_offset,
-                    adjust=False,
-                    following=True,
+        if months_offset is not None:
+            earlier = date_offset_foll(
+                raw_date=DatetimeIndex(self.tsdf.index)[-1],
+                months_offset=-months_offset,
+                adjust=False,
+                following=True,
+            )
+            if earlier < self.tsdf.index[0]:
+                msg = "Function calc_range returned earlier date < series start"
+                raise ValueError(
+                    msg,
                 )
-                if earlier < self.tsdf.index[0]:
-                    msg = "Function calc_range returned earlier date < series start"
-                    raise ValueError(
-                        msg,
-                    )
-                later = self.tsdf.index[-1]
-            elif from_dt is not None and to_dt is None:
+            later = self.tsdf.index[-1]
+        else:
+            if from_dt is not None:
                 if from_dt < self.tsdf.index[0]:
                     msg = "Given from_dt date < series start"
                     raise ValueError(msg)
-                earlier, later = from_dt, self.tsdf.index[-1]
-            elif from_dt is None and to_dt is not None:
+                earlier = from_dt
+            if to_dt is not None:
                 if to_dt > self.tsdf.index[-1]:
                     msg = "Given to_dt date > series end"
                     raise ValueError(msg)
-                earlier, later = self.tsdf.index[0], to_dt
-            elif from_dt is not None and to_dt is not None:
-                if to_dt > self.tsdf.index[-1] or from_dt < self.tsdf.index[0]:
-                    msg = "Given from_dt or to_dt dates outside series range"
-                    raise ValueError(
-                        msg,
-                    )
-                earlier, later = from_dt, to_dt
-            while earlier not in self.tsdf.index.tolist():
-                earlier -= dt.timedelta(days=1)
-            while later not in self.tsdf.index.tolist():
-                later += dt.timedelta(days=1)
+                later = to_dt
+        while earlier not in self.tsdf.index.tolist():
+            earlier -= dt.timedelta(days=1)
+        while later not in self.tsdf.index.tolist():
+            later += dt.timedelta(days=1)
 
         return earlier, later
 

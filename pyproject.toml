@@ -48,7 +48,7 @@ statsmodels = ">=0.14.0,<1.0.0"
 [tool.poetry.group.dev.dependencies]
 black = ">=24.4.2,<25.0.0"
 coverage = ">=7.6.0,<8.0.0"
-coverage-badge = ">=1.1.1,<2.0.0"
+genbadge = {version = ">=1.1.1,<2.0.0", extras = ["coverage"]}
 mypy = "^1.11.0"
 pandas-stubs = ">=2.1.2,<3.0.0"
 pre-commit = ">=3.7.1,<4.0.0"
@@ -63,12 +63,17 @@ requires = ["poetry-core>=1.8.3"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.coverage.run]
+branch = true
 omit = ["venv/*"]
 include = ["openseries/*"]
 
 [tool.coverage.report]
 skip_empty = true
+show_missing = true
 fail_under = 99
+
+[tool.coverage.xml]
+output = "coverage.xml"
 
 [tool.mypy]
 exclude = ["venv/*"]

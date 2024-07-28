@@ -895,20 +895,20 @@ class TestOpenTimeSeries(CommonTestCase):
         """Test output consistency after calc_range applied."""
         cseries = self.randomseries.from_deepcopy()
 
-        dates = cseries.calc_range(months_offset=48)
+        date_one, date_two = cseries.calc_range(months_offset=48)
 
         if [
-            dates[0].strftime("%Y-%m-%d"),
-            dates[1].strftime("%Y-%m-%d"),
+            date_one.strftime("%Y-%m-%d"),
+            date_two.strftime("%Y-%m-%d"),
         ] != ["2015-06-26", "2019-06-28"]:
             msg = "Method calc_range() not working as intended"
             raise ValueError(msg)
 
-        dates = self.randomseries.calc_range(from_dt=dt.date(2016, 6, 30))
+        date_one, date_two = self.randomseries.calc_range(from_dt=dt.date(2016, 6, 30))
 
         if [
-            dates[0].strftime("%Y-%m-%d"),
-            dates[1].strftime("%Y-%m-%d"),
+            date_one.strftime("%Y-%m-%d"),
+            date_two.strftime("%Y-%m-%d"),
         ] != ["2016-06-30", "2019-06-28"]:
             msg = "Method calc_range() not working as intended"
             raise ValueError(msg)
@@ -1498,12 +1498,6 @@ class TestOpenTimeSeries(CommonTestCase):
         if made_fig_keys != fig_keys:
             msg = "Data in Figure not as intended."
             raise ValueError(msg)
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Must provide same number of labels as items in frame.",
-        ):
-            _, _ = barseries.plot_bars(auto_open=False, labels=["a", "b"])
 
         overlayfig, _ = barseries.plot_bars(
             auto_open=False,

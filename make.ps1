@@ -91,8 +91,9 @@ elseif ($task -eq "make")
 elseif ($task -eq "test")
 {
     poetry run coverage run -m pytest --verbose --capture=no
-    poetry run coverage report -m
-    poetry run coverage-badge -o coverage.svg -f
+    poetry run coverage xml --quiet
+    poetry run coverage report
+    poetry run genbadge coverage --silent --local --input-file coverage.xml --output-file coverage.svg
 }
 elseif ($task -eq "lint")
 {
