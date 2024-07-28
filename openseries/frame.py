@@ -1111,6 +1111,9 @@ class OpenFrame(_CommonModel):
                     ratios.append(
                         (up_rtrn / up_idx_return) / (down_return / down_idx_return),
                     )
+                else:
+                    msg = "ratio must be one of 'up', 'down' or 'both'."
+                    raise ValueError(msg)
 
         if ratio == "up":
             resultname = f"Up Capture Ratios vs {short_label}"

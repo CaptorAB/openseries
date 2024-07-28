@@ -2515,6 +2515,14 @@ class TestOpenFrame(CommonTestCase):
                 base_column="string",
             )
 
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="ratio must be one of 'up', 'down' or 'both'.",
+        ):
+            _ = cframe.capture_ratio_func(
+                ratio="boo",
+            )
+
     def test_georet_exceptions(self: TestOpenFrame) -> None:
         """Test georet property raising exceptions on bad input data."""
         geoframe = OpenFrame(
