@@ -9,6 +9,9 @@ from pathlib import Path
 from typing import cast
 from unittest.mock import patch
 
+import pytest
+
+from openseries.load_plotly import load_plotly_dict
 from openseries.portfoliotools import (
     constrain_optimized_portfolios,
     efficient_frontier,
@@ -316,6 +319,7 @@ class TestPortfoliotools(CommonTestCase):
         )
 
         fig_json_title_no_text = loads(cast(str, figure_title_no_text.to_json()))
+
         if "Risk and Return" not in fig_json_title_no_text["layout"]["title"]["text"]:
             msg = "sharpeplot method not working as intended"
             raise ValueError(msg)
@@ -443,3 +447,139 @@ class TestPortfoliotools(CommonTestCase):
             raise ValueError(msg)
 
         mockfilepath.unlink()
+
+    def test_sharpeplot_frame_input(self: TestPortfoliotools) -> None:
+        """Test function sharpeplot with more or less input data."""
+        simulations = 100
+        points = 20
+
+        spframe = self.randomframe.from_deepcopy()
+        spframe.to_cumret()
+        current = OpenTimeSeries.from_df(
+            spframe.make_portfolio(
+                name="Current Portfolio",
+                weight_strat="eq_weights",
+            ),
+        )
+
+        frontier, simulated, optimum = efficient_frontier(
+            eframe=spframe,
+            num_ports=simulations,
+            seed=self.seed,
+            frontier_points=points,
+            tweak=False,
+        )
+
+        plotframe = prepare_plot_data(
+            assets=spframe,
+            current=current,
+            optimized=optimum,
+        )
+
+        figure_no_sim, _ = sharpeplot(
+            line_frame=frontier,
+            point_frame=plotframe,
+            auto_open=False,
+            output_type="div",
+        )
+        figure_no_sim_or_line, _ = sharpeplot(
+            point_frame=plotframe,
+            auto_open=False,
+            output_type="div",
+        )
+        figure_no_point, _ = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            auto_open=False,
+            output_type="div",
+        )
+        fig_json_no_sim = loads(cast(str, figure_no_sim.to_json()))
+        fig_json_no_sim_or_line = loads(cast(str, figure_no_sim_or_line.to_json()))
+        fig_json_no_point = loads(cast(str, figure_no_point.to_json()))
+
+        no_sim_length = 8
+        no_sim_or_line_length = 7
+        no_point_length = 2
+
+        if len(fig_json_no_sim["data"]) != no_sim_length:
+            msg = "sharpeplot not working as intended."
+            raise ValueError(msg)
+
+        if len(fig_json_no_sim_or_line["data"]) != no_sim_or_line_length:
+            msg = "sharpeplot not working as intended."
+            raise ValueError(msg)
+
+        if len(fig_json_no_point["data"]) != no_point_length:
+            msg = "sharpeplot not working as intended."
+            raise ValueError(msg)
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="One of sim_frame, line_frame or point_frame must be proviced.",
+        ):
+            _, _ = sharpeplot(
+                auto_open=False,
+                output_type="div",
+            )
+
+    def test_sharpeplot_logo(self: TestPortfoliotools) -> None:
+        """Test function sharpeplot with and without added logo."""
+        simulations = 100
+        points = 20
+
+        spframe = self.randomframe.from_deepcopy()
+        spframe.to_cumret()
+        current = OpenTimeSeries.from_df(
+            spframe.make_portfolio(
+                name="Current Portfolio",
+                weight_strat="eq_weights",
+            ),
+        )
+
+        frontier, simulated, optimum = efficient_frontier(
+            eframe=spframe,
+            num_ports=simulations,
+            seed=self.seed,
+            frontier_points=points,
+            tweak=False,
+        )
+
+        plotframe = prepare_plot_data(
+            assets=spframe,
+            current=current,
+            optimized=optimum,
+        )
+
+        fig_logo, _ = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            add_logo=True,
+            auto_open=False,
+            output_type="div",
+        )
+        fig_nologo, _ = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            add_logo=False,
+            auto_open=False,
+            output_type="div",
+        )
+
+        _, logo = load_plotly_dict()
+
+        fig_logo_json = loads(cast(str, fig_logo.to_json()))
+
+        if logo == {}:
+            if fig_logo_json["layout"]["images"][0] != logo:
+                msg = "sharpeplot add_logo argument not setup correctly"
+                raise ValueError(msg)
+        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
+            msg = "sharpeplot add_logo argument not setup correctly"
+            raise ValueError(msg)
+
+        fig_nologo_json = loads(cast(str, fig_nologo.to_json()))
+        if fig_nologo_json["layout"].get("images", None):
+            msg = "sharpeplot add_logo argument not setup correctly"
+            raise ValueError(msg)

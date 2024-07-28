@@ -517,12 +517,16 @@ class TestOpenFrame(CommonTestCase):
     def test_make_portfolio(self: TestOpenFrame) -> None:
         """Test make_portfolio method."""
         mpframe = self.randomframe.from_deepcopy()
+        mrframe = self.randomframe.from_deepcopy()
         mpframe.to_cumret()
         mpframe.weights = [1.0 / mpframe.item_count] * mpframe.item_count
+        mrframe.weights = [1.0 / mrframe.item_count] * mrframe.item_count
 
         name = "portfolio"
         mptail = mpframe.make_portfolio(name=name).tail()
         mptail = mptail.map(lambda nn: f"{nn:.6f}")
+        mrtail = mrframe.make_portfolio(name=name).tail()
+        mrtail = mrtail.map(lambda nn: f"{nn:.6f}")
 
         correct = ["1.731448", "1.729862", "1.730238", "1.726204", "1.727963"]
         wrong = ["1.731448", "1.729862", "1.730238", "1.726204", "1.727933"]
@@ -552,6 +556,7 @@ class TestOpenFrame(CommonTestCase):
         )
 
         assert_frame_equal(true_tail, mptail, check_exact=True)
+        assert_frame_equal(true_tail, mrtail, check_exact=True)
 
         with pytest.raises(expected_exception=AssertionError, match="are different"):
             assert_frame_equal(false_tail, mptail, check_exact=True)
@@ -1243,7 +1248,9 @@ class TestOpenFrame(CommonTestCase):
 
         intended_labels = ["a", "b", "c", "d", "e"]
         fig_labels, _ = plotframe.plot_series(
-            auto_open=False, output_type="div", labels=intended_labels,
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
         )
         fig_labels_json = loads(cast(str, fig_labels.to_json()))
 
@@ -1359,7 +1366,9 @@ class TestOpenFrame(CommonTestCase):
 
         intended_labels = ["a", "b", "c", "d", "e"]
         fig_labels, _ = plotframe.plot_bars(
-            auto_open=False, output_type="div", labels=intended_labels,
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
         )
         fig_labels_json = loads(cast(str, fig_labels.to_json()))
 

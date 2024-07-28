@@ -153,8 +153,8 @@ class ReturnSimulation(BaseModel):
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
         trading_days: PositiveInt,
-        seed: int,
         trading_days_in_year: DaysInYearType = 252,
+        seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Normal distribution simulation.
@@ -169,11 +169,10 @@ class ReturnSimulation(BaseModel):
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        seed: int
-            Seed for random process initiation
-        trading_days_in_year: DaysInYearType,
-            default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
+        seed: int, optional
+            Seed for random process initiation
         randomizer: numpy.random.Generator, optional
             Random process generator
 
@@ -209,8 +208,8 @@ class ReturnSimulation(BaseModel):
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
         trading_days: PositiveInt,
-        seed: int,
         trading_days_in_year: DaysInYearType = 252,
+        seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Lognormal distribution simulation.
@@ -225,11 +224,10 @@ class ReturnSimulation(BaseModel):
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        seed: int
-            Seed for random process initiation
-        trading_days_in_year: DaysInYearType,
-            default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
+        seed: int, optional
+            Seed for random process initiation
         randomizer: numpy.random.Generator, optional
             Random process generator
 
@@ -268,8 +266,8 @@ class ReturnSimulation(BaseModel):
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
         trading_days: PositiveInt,
-        seed: int,
         trading_days_in_year: DaysInYearType = 252,
+        seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Geometric Brownian Motion simulation.
@@ -284,10 +282,10 @@ class ReturnSimulation(BaseModel):
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        seed: int
-            Seed for random process initiation
         trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
+        seed: int, optional
+            Seed for random process initiation
         randomizer: numpy.random.Generator, optional
             Random process generator
 
@@ -330,11 +328,11 @@ class ReturnSimulation(BaseModel):
         trading_days: PositiveInt,
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
-        seed: int,
         jumps_lamda: NonNegativeFloat,
         jumps_sigma: NonNegativeFloat = 0.0,
         jumps_mu: float = 0.0,
         trading_days_in_year: DaysInYearType = 252,
+        seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
         """Create a Merton Jump-Diffusion model simulation.
@@ -349,8 +347,6 @@ class ReturnSimulation(BaseModel):
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        seed: int
-            Seed for random process initiation
         jumps_lamda: NonNegativeFloat
             This is the probability of a jump happening at each point in time
         jumps_sigma: NonNegativeFloat, default: 0.0
@@ -359,6 +355,8 @@ class ReturnSimulation(BaseModel):
             This is the average jump size
         trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
+        seed: int, optional
+            Seed for random process initiation
         randomizer: numpy.random.Generator, optional
             Random process generator
 

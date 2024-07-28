@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import datetime as dt
+from typing import TYPE_CHECKING
 
 from openseries.series import OpenTimeSeries
-from openseries.simulation import ReturnSimulation
+from openseries.simulation import ReturnSimulation, _random_generator
 from openseries.types import ValueType
 from tests.test_common_sim import CommonTestCase
+
+if TYPE_CHECKING:
+    from numpy.random import Generator
 
 
 class TestSimulation(CommonTestCase):
@@ -75,6 +79,86 @@ class TestSimulation(CommonTestCase):
             "0.106438152",
             "0.096761956",
             "0.181849820",
+        ]
+
+        returns = []
+        volatilities = []
+        for method, adding in zip(methods, added):
+            arguments = {**args, **adding}
+            onesim = getattr(ReturnSimulation, method)(**arguments)
+            returns.append(f"{onesim.realized_mean_return:.9f}")
+            volatilities.append(f"{onesim.realized_vol:.9f}")
+
+        if intended_returns != returns:
+            msg = f"Unexpected returns result {returns}"
+            raise ValueError(msg)
+        if intended_volatilities != volatilities:
+            msg = f"Unexpected volatilities result {volatilities}"
+            raise ValueError(msg)
+
+    def test_processes_with_randomizer(self: TestSimulation) -> None:
+        """Test ReturnSimulation with a random generator as input."""
+        randomizer = _random_generator(self.seed)
+        args: dict[str, int | float | Generator] = {
+            "number_of_sims": 1,
+            "trading_days": self.seriesim.trading_days,
+            "mean_annual_return": self.seriesim.mean_annual_return,
+            "mean_annual_vol": self.seriesim.mean_annual_vol,
+            "randomizer": randomizer,
+        }
+        methods = [
+            "from_normal",
+            "from_normal",
+            "from_lognormal",
+            "from_lognormal",
+            "from_gbm",
+            "from_gbm",
+            "from_merton_jump_gbm",
+            "from_merton_jump_gbm",
+        ]
+        added: list[dict[str, int | float]] = [
+            {},
+            {
+                "mean_annual_return": self.seriesim.mean_annual_return + 0.01,
+                "mean_annual_vol": self.seriesim.mean_annual_vol + 0.01,
+            },
+            {},
+            {
+                "mean_annual_return": self.seriesim.mean_annual_return + 0.01,
+                "mean_annual_vol": self.seriesim.mean_annual_vol + 0.01,
+            },
+            {},
+            {
+                "mean_annual_return": self.seriesim.mean_annual_return + 0.01,
+                "mean_annual_vol": self.seriesim.mean_annual_vol + 0.01,
+            },
+            {"jumps_lamda": self.seriesim.jumps_lamda},
+            {
+                "jumps_lamda": self.seriesim.jumps_lamda + 0.1,
+                "jumps_sigma": self.seriesim.jumps_sigma + 0.1,
+                "jumps_mu": self.seriesim.jumps_mu + 0.1,
+            },
+        ]
+        intended_returns = [
+            "0.019523539",
+            "0.050694317",
+            "0.087309636",
+            "0.089036349",
+            "0.009865720",
+            "0.054983999",
+            "0.053461274",
+            "0.013244309",
+        ]
+
+        intended_volatilities = [
+            "0.096761956",
+            "0.106983837",
+            "0.101235865",
+            "0.110245567",
+            "0.101405667",
+            "0.112748630",
+            "0.099448330",
+            "0.102635387",
         ]
 
         returns = []

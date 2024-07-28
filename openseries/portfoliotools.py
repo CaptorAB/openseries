@@ -182,10 +182,8 @@ def efficient_frontier(  # noqa: C901
     simulated = simulate_portfolios(simframe=copi, num_ports=num_ports, seed=seed)
 
     frontier_min = simulated.loc[simulated["stdev"].idxmin()]["ret"]
-    arithmetic_mean = log_ret.mean() * copi.periods_in_a_year
-    frontier_max = 0.0
-    if isinstance(arithmetic_mean, Series):
-        frontier_max = arithmetic_mean.max()
+    arithmetic_mean = Series(log_ret.mean() * copi.periods_in_a_year)
+    frontier_max = float(cast(NDArray[float64], arithmetic_mean.to_numpy()).max())
 
     def _check_sum(weights: NDArray[float64]) -> float64:
         return cast(float64, npsum(weights) - 1)
@@ -509,6 +507,10 @@ def sharpeplot(  # noqa: C901
     fig, logo = load_plotly_dict()
     figure = Figure(fig)
 
+    if sim_frame is None and line_frame is None and point_frame is None:
+        msg = "One of sim_frame, line_frame or point_frame must be proviced."
+        raise ValueError(msg)
+
     if sim_frame is not None:
         returns.extend(list(sim_frame.loc[:, "ret"]))
         risk.extend(list(sim_frame.loc[:, "stdev"]))
@@ -543,11 +545,10 @@ def sharpeplot(  # noqa: C901
             name="Efficient frontier",
         )
 
-    colorway = fig["layout"].get("colorway")[  # type: ignore[union-attr]
-        : len(cast(DataFrame, point_frame).columns)
-    ]
-
     if point_frame is not None:
+        colorway = fig["layout"].get("colorway")[  # type: ignore[union-attr]
+            : len(point_frame.columns)
+        ]
         for col, clr in zip(point_frame.columns, colorway):
             returns.extend([point_frame.loc["ret", col]])
             risk.extend([point_frame.loc["stdev", col]])
