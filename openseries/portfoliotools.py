@@ -508,7 +508,7 @@ def sharpeplot(  # noqa: C901
     figure = Figure(fig)
 
     if sim_frame is None and line_frame is None and point_frame is None:
-        msg = "One of sim_frame, line_frame or point_frame must be proviced."
+        msg = "One of sim_frame, line_frame or point_frame must be provided."
         raise ValueError(msg)
 
     if sim_frame is not None:
@@ -546,9 +546,9 @@ def sharpeplot(  # noqa: C901
         )
 
     if point_frame is not None:
-        colorway = fig["layout"].get("colorway")[  # type: ignore[union-attr]
-            : len(point_frame.columns)
-        ]
+        colorway = cast(
+            dict[str, str | int | float | bool | list[str]], fig["layout"],
+        ).get("colorway")[: len(point_frame.columns)]
         for col, clr in zip(point_frame.columns, colorway):
             returns.extend([point_frame.loc["ret", col]])
             risk.extend([point_frame.loc["stdev", col]])

@@ -378,6 +378,7 @@ def generate_calendar_date_range(
     )
 
 
+# noinspection PyUnusedLocal
 def do_resample_to_business_period_ends(
     data: DataFrame,
     freq: LiteralBizDayFreq,

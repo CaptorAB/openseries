@@ -515,7 +515,7 @@ class TestPortfoliotools(CommonTestCase):
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="One of sim_frame, line_frame or point_frame must be proviced.",
+            match="One of sim_frame, line_frame or point_frame must be provided.",
         ):
             _, _ = sharpeplot(
                 auto_open=False,
