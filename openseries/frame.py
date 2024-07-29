@@ -6,7 +6,7 @@ from __future__ import annotations
 from copy import deepcopy
 from functools import reduce
 from logging import warning
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
 if TYPE_CHECKING:
     import datetime as dt  # pragma: no cover
@@ -45,21 +45,7 @@ from typing_extensions import Self
 from ._common_model import _CommonModel
 from .datefixer import do_resample_to_business_period_ends
 from .series import OpenTimeSeries
-from .types import (
-    CountriesType,
-    DaysInYearType,
-    LiteralBizDayFreq,
-    LiteralCaptureRatio,
-    LiteralFrameProps,
-    LiteralHowMerge,
-    LiteralOlsFitCovType,
-    LiteralOlsFitMethod,
-    LiteralPandasReindexMethod,
-    LiteralPortfolioWeightings,
-    LiteralTrunc,
-    OpenFramePropertiesList,
-    ValueType,
-)
+from .types import ValueType
 
 __all__ = ["OpenFrame"]
 
@@ -155,13 +141,13 @@ class OpenFrame(_CommonModel):
 
     def merge_series(
         self: Self,
-        how: LiteralHowMerge = "outer",
+        how: str = "outer",
     ) -> Self:
         """Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
 
         Parameters
         ----------
-        how: LiteralHowMerge, default: "outer"
+        how: str, default: "outer"
             The Pandas merge method.
 
         Returns
@@ -199,13 +185,13 @@ class OpenFrame(_CommonModel):
 
     def all_properties(
         self: Self,
-        properties: list[LiteralFrameProps] | None = None,
+        properties: list[str] | None = None,
     ) -> DataFrame:
         """Calculate chosen timeseries properties.
 
         Parameters
         ----------
-        properties: list[LiteralFrameProps], optional
+        properties: list[str], optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -390,13 +376,13 @@ class OpenFrame(_CommonModel):
 
     def resample(
         self: Self,
-        freq: LiteralBizDayFreq | str = "BME",
+        freq: str = "BME",
     ) -> Self:
         """Resample the timeseries frequency.
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq | str, default "BME"
+        freq: str, default "BME"
             The date offset string that sets the resampled frequency
 
         Returns
@@ -419,9 +405,9 @@ class OpenFrame(_CommonModel):
 
     def resample_to_business_period_ends(
         self: Self,
-        freq: LiteralBizDayFreq = "BME",
-        countries: CountriesType = "SE",
-        method: LiteralPandasReindexMethod = "nearest",
+        freq: str = "BME",
+        countries: set[str] | str = "SE",
+        method: str | None = "nearest",
     ) -> Self:
         """Resamples timeseries frequency to the business calendar month end dates.
 
@@ -429,12 +415,12 @@ class OpenFrame(_CommonModel):
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq, default "BME"
+        freq: str, default "BME"
             The date offset string that sets the resampled frequency
-        countries: CountriesType, default: "SE"
+        countries: set[str] | str, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
             to create a business day calendar used for date adjustments
-        method: LiteralPandasReindexMethod, default: nearest
+        method: str | None, default: nearest
             Controls the method used to align values across columns
 
         Returns
@@ -466,7 +452,7 @@ class OpenFrame(_CommonModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: DaysInYearType | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> DataFrame:
         """Exponentially Weighted Moving Average Volatilities and Correlation.
 
@@ -492,7 +478,7 @@ class OpenFrame(_CommonModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -652,7 +638,7 @@ class OpenFrame(_CommonModel):
         self: Self,
         start_cut: dt.date | None = None,
         end_cut: dt.date | None = None,
-        where: LiteralTrunc = "both",
+        where: str = "both",
     ) -> Self:
         """Truncate DataFrame such that all timeseries have the same time span.
 
@@ -662,7 +648,7 @@ class OpenFrame(_CommonModel):
             New first date
         end_cut: datetime.date, optional
             New last date
-        where: LiteralTrunc, default: both
+        where: str, default: both
             Determines where dataframe is truncated also when start_cut
             or end_cut is None.
 
@@ -744,7 +730,7 @@ class OpenFrame(_CommonModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: DaysInYearType | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> Series[float]:
         """Tracking Error.
 
@@ -763,7 +749,7 @@ class OpenFrame(_CommonModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -836,7 +822,7 @@ class OpenFrame(_CommonModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: DaysInYearType | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> Series[float]:
         """Information Ratio.
 
@@ -856,7 +842,7 @@ class OpenFrame(_CommonModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -928,12 +914,12 @@ class OpenFrame(_CommonModel):
 
     def capture_ratio_func(  # noqa: C901
         self: Self,
-        ratio: LiteralCaptureRatio,
+        ratio: str,
         base_column: tuple[str, ValueType] | int = -1,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: DaysInYearType | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> Series[float]:
         """Capture Ratio.
 
@@ -948,7 +934,7 @@ class OpenFrame(_CommonModel):
 
         Parameters
         ----------
-        ratio: LiteralCaptureRatio
+        ratio: str
             The ratio to calculate
         base_column: tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
@@ -959,7 +945,7 @@ class OpenFrame(_CommonModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1210,8 +1196,8 @@ class OpenFrame(_CommonModel):
         self: Self,
         y_column: tuple[str, ValueType] | int,
         x_column: tuple[str, ValueType] | int,
-        method: LiteralOlsFitMethod = "pinv",
-        cov_type: LiteralOlsFitCovType = "nonrobust",
+        method: str = "pinv",
+        cov_type: str = "nonrobust",
         *,
         fitted_series: bool = True,
     ) -> OLSResults:
@@ -1227,9 +1213,9 @@ class OpenFrame(_CommonModel):
             The column level values of the dependent variable y
         x_column: tuple[str, ValueType] | int
             The column level values of the exogenous variable x
-        method: LiteralOlsFitMethod, default: pinv
+        method: str, default: pinv
             Method to solve least squares problem
-        cov_type: LiteralOlsFitCovType, default: nonrobust
+        cov_type: str, default: nonrobust
             Covariance estimator
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
@@ -1416,7 +1402,7 @@ class OpenFrame(_CommonModel):
     def make_portfolio(
         self: Self,
         name: str,
-        weight_strat: LiteralPortfolioWeightings | None = None,
+        weight_strat: str | None = None,
     ) -> DataFrame:
         """Calculate a basket timeseries based on the supplied weights.
 
@@ -1424,7 +1410,7 @@ class OpenFrame(_CommonModel):
         ----------
         name: str
             Name of the basket timeseries
-        weight_strat: LiteralPortfolioWeightings, optional
+        weight_strat: str, optional
             weight calculation strategies
 
         Returns
@@ -1470,7 +1456,7 @@ class OpenFrame(_CommonModel):
         long_column: int = 0,
         short_column: int = 1,
         observations: int = 21,
-        periods_in_a_year_fixed: DaysInYearType | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> DataFrame:
         """Calculate rolling Information Ratio.
 
@@ -1486,7 +1472,7 @@ class OpenFrame(_CommonModel):
             Column of timeseries that is the denominator in the ratio.
         observations: int, default: 21
             The length of the rolling window to use is set as number of observations.
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns
@@ -1636,3 +1622,54 @@ class OpenFrame(_CommonModel):
         )
 
         return DataFrame(corrdf)
+
+
+class OpenFramePropertiesList(list[str]):
+    """Allowed property arguments for the OpenFrame class."""
+
+    allowed_strings: ClassVar[set[str]] = {
+        "value_ret",
+        "geo_ret",
+        "arithmetic_ret",
+        "vol",
+        "downside_deviation",
+        "ret_vol_ratio",
+        "sortino_ratio",
+        "omega_ratio",
+        "z_score",
+        "skew",
+        "kurtosis",
+        "positive_share",
+        "var_down",
+        "cvar_down",
+        "vol_from_var",
+        "worst",
+        "worst_month",
+        "max_drawdown",
+        "max_drawdown_date",
+        "max_drawdown_cal_year",
+        "first_indices",
+        "last_indices",
+        "lengths_of_items",
+        "span_of_days_all",
+    }
+
+    def __init__(self: Self, *args: str) -> None:
+        """Property arguments for the OpenFrame class."""
+        super().__init__(args)
+        self._validate()
+
+    def _validate(self: Self) -> None:
+        seen = set()
+        for item in self:
+            if item not in self.allowed_strings:
+                msg = (
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                )
+                raise ValueError(
+                    msg,
+                )
+            if item in seen:
+                msg = f"Duplicate string: {item}"
+                raise ValueError(msg)
+            seen.add(item)

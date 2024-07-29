@@ -5,13 +5,9 @@ from __future__ import annotations
 from json import load
 from logging import warning
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import requests
 from requests.exceptions import ConnectionError
-
-if TYPE_CHECKING:
-    from .types import CaptorLogoType, PlotlyLayoutType  # pragma: no cover
 
 __all__ = ["load_plotly_dict"]
 
@@ -44,7 +40,18 @@ def _check_remote_file_existence(url: str) -> bool:
 def load_plotly_dict(
     *,
     responsive: bool = True,
-) -> tuple[PlotlyLayoutType, CaptorLogoType]:
+) -> tuple[
+    dict[
+        str,
+        str
+        | int
+        | float
+        | bool
+        | list[str]
+        | dict[str, str | int | float | bool | list[str]],
+    ],
+    dict[str, str | float],
+]:
     """Load Plotly defaults.
 
     Parameters
@@ -54,7 +61,8 @@ def load_plotly_dict(
 
     Returns
     -------
-    tuple[PlotlyLayoutType, CaptorLogoType]
+    tuple[dict[str, str | float | bool | list[str] | dict[str, str |
+        float | bool | list[str]]], dict[str, str | float]]
         A dictionary with the Plotly config and layout template
 
     """

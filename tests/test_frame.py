@@ -23,11 +23,7 @@ from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
 from openseries.series import OpenTimeSeries
-from openseries.types import (
-    LiteralFrameProps,
-    LiteralPortfolioWeightings,
-    ValueType,
-)
+from openseries.types import ValueType
 from tests.test_common_sim import CommonTestCase
 
 
@@ -609,7 +605,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = mpframe.make_portfolio(
                 name=name,
-                weight_strat=cast(LiteralPortfolioWeightings, "bogus"),
+                weight_strat="bogus",
             )
 
     def test_add_timeseries(self: TestOpenFrame) -> None:
@@ -1958,7 +1954,7 @@ class TestOpenFrame(CommonTestCase):
             raise TypeError(msg)
 
         result_arg = apframe.all_properties(
-            properties=cast(list[LiteralFrameProps], ["geo_ret"]),
+            properties=["geo_ret"],
         )
         if not isinstance(result_arg, DataFrame):
             msg = "Method all_properties() not working as intended."
@@ -2025,7 +2021,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
             _ = apframe.all_properties(
-                properties=cast(list[LiteralFrameProps], ["geo_ret", "boo"]),
+                properties=["geo_ret", "boo"],
             )
 
     def test_align_index_to_local_cdays(self: TestOpenFrame) -> None:

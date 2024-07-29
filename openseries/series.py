@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from copy import deepcopy
 from logging import warning
-from typing import Any, TypeVar, cast
+from typing import Annotated, Any, ClassVar, TypeVar, Union, cast
 
 from numpy import (
     append,
@@ -25,30 +25,59 @@ from pandas import (
     Series,
     date_range,
 )
-from pydantic import model_validator
+from pydantic import BaseModel, StringConstraints, conset, model_validator
 from typing_extensions import Self
 
 from ._common_model import _CommonModel
 from .datefixer import date_fix, do_resample_to_business_period_ends
-from .types import (
-    Countries,
-    CountriesType,
-    Currency,
-    CurrencyStringType,
-    DatabaseIdStringType,
-    DateListType,
-    DaysInYearType,
-    LiteralBizDayFreq,
-    LiteralPandasReindexMethod,
-    LiteralSeriesProps,
-    OpenTimeSeriesPropertiesList,
-    ValueListType,
-    ValueType,
-)
+from .types import ValueType
 
 __all__ = ["OpenTimeSeries", "timeseries_chain"]
 
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
+
+
+CountryStringType = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        pattern=r"^[A-Z]{2}$",
+        to_upper=True,
+        min_length=2,
+        max_length=2,
+        strict=True,
+    ),
+]
+CountryListType = conset(
+    item_type=CountryStringType,
+    min_length=1,
+)
+CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]
+
+
+class Countries(BaseModel):
+    """Declare Countries."""
+
+    countryinput: CountriesType
+
+
+CurrencyStringType = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"^[A-Z]{3}$",
+        to_upper=True,
+        min_length=3,
+        max_length=3,
+        strict=True,
+        strip_whitespace=True,
+    ),
+]
+
+
+class Currency(BaseModel):
+    """Declare Currency."""
+
+    ccy: CurrencyStringType
 
 
 # noinspection PyUnresolvedReferences
@@ -60,9 +89,9 @@ class OpenTimeSeries(_CommonModel):
 
     Parameters
     ----------
-    timeseries_id : DatabaseIdStringType
+    timeseries_id : str
         Database identifier of the timeseries
-    instrument_id: DatabaseIdStringType
+    instrument_id: str
         Database identifier of the instrument associated with the timeseries
     name : str
         string identifier of the timeseries and/or instrument
@@ -91,12 +120,12 @@ class OpenTimeSeries(_CommonModel):
 
     """
 
-    timeseries_id: DatabaseIdStringType
-    instrument_id: DatabaseIdStringType
+    timeseries_id: str
+    instrument_id: str
     name: str
     valuetype: ValueType
-    dates: DateListType
-    values: ValueListType
+    dates: list[str]
+    values: list[float]
     local_ccy: bool
     tsdf: DataFrame
     currency: CurrencyStringType
@@ -152,11 +181,11 @@ class OpenTimeSeries(_CommonModel):
     def from_arrays(
         cls: type[OpenTimeSeries],
         name: str,
-        dates: DateListType,
-        values: ValueListType,
+        dates: list[str],
+        values: list[float],
         valuetype: ValueType = ValueType.PRICE,
-        timeseries_id: DatabaseIdStringType = "",
-        instrument_id: DatabaseIdStringType = "",
+        timeseries_id: str = "",
+        instrument_id: str = "",
         isin: str | None = None,
         baseccy: CurrencyStringType = "SEK",
         *,
@@ -174,9 +203,9 @@ class OpenTimeSeries(_CommonModel):
             Array of float values
         valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        timeseries_id : DatabaseIdStringType, optional
+        timeseries_id : str, optional
             Database identifier of the timeseries
-        instrument_id: DatabaseIdStringType, optional
+        instrument_id: str, optional
             Database identifier of the instrument associated with the timeseries
         isin : str, optional
             ISO 6166 identifier code of the associated instrument
@@ -405,13 +434,13 @@ class OpenTimeSeries(_CommonModel):
 
     def all_properties(
         self: Self,
-        properties: list[LiteralSeriesProps] | None = None,
+        properties: list[str] | None = None,
     ) -> DataFrame:
         """Calculate chosen properties.
 
         Parameters
         ----------
-        properties: list[LiteralSeriesProps], optional
+        properties: list[str], optional
             The properties to calculate. Defaults to calculating all available.
 
         Returns
@@ -422,7 +451,7 @@ class OpenTimeSeries(_CommonModel):
         """
         if not properties:
             properties = cast(
-                list[LiteralSeriesProps],
+                list[str],
                 OpenTimeSeriesPropertiesList.allowed_strings,
             )
 
@@ -542,13 +571,13 @@ class OpenTimeSeries(_CommonModel):
 
     def resample(
         self: Self,
-        freq: LiteralBizDayFreq | str = "BME",
+        freq: str = "BME",
     ) -> Self:
         """Resamples the timeseries frequency.
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq | str, default "BME"
+        freq: str, default "BME"
             The date offset string that sets the resampled frequency
 
         Returns
@@ -564,8 +593,8 @@ class OpenTimeSeries(_CommonModel):
 
     def resample_to_business_period_ends(
         self: Self,
-        freq: LiteralBizDayFreq = "BME",
-        method: LiteralPandasReindexMethod = "nearest",
+        freq: str = "BME",
+        method: str | None = "nearest",
     ) -> Self:
         """Resamples timeseries frequency to the business calendar month end dates.
 
@@ -573,9 +602,9 @@ class OpenTimeSeries(_CommonModel):
 
         Parameters
         ----------
-        freq: LiteralBizDayFreq, default BME
+        freq: str, default BME
             The date offset string that sets the resampled frequency
-        method: LiteralPandasReindexMethod, default: nearest
+        method: str | None, default: nearest
             Controls the method used to align values across columns
 
         Returns
@@ -589,7 +618,10 @@ class OpenTimeSeries(_CommonModel):
             freq=freq,
             countries=self.countries,
         )
-        self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
+        self.tsdf = self.tsdf.reindex(
+            index=[deyt.date() for deyt in dates],
+            method=method,  # type: ignore[arg-type]
+        )
         return self
 
     def ewma_vol_func(
@@ -600,7 +632,7 @@ class OpenTimeSeries(_CommonModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: DaysInYearType | None = None,
+        periods_in_a_year_fixed: int | None = None,
     ) -> Series[float]:
         """Exponentially Weighted Moving Average Model for Volatility.
 
@@ -621,7 +653,7 @@ class OpenTimeSeries(_CommonModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed : int, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns
@@ -883,3 +915,59 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
         if item is None:
             return True
         return len(str(item)) == 0
+
+
+class OpenTimeSeriesPropertiesList(list[str]):
+    """Allowed property arguments for the OpenTimeSeries class."""
+
+    allowed_strings: ClassVar[set[str]] = {
+        "value_ret",
+        "geo_ret",
+        "arithmetic_ret",
+        "vol",
+        "downside_deviation",
+        "ret_vol_ratio",
+        "sortino_ratio",
+        "omega_ratio",
+        "z_score",
+        "skew",
+        "kurtosis",
+        "positive_share",
+        "var_down",
+        "cvar_down",
+        "vol_from_var",
+        "worst",
+        "worst_month",
+        "max_drawdown_cal_year",
+        "max_drawdown",
+        "max_drawdown_date",
+        "first_idx",
+        "last_idx",
+        "length",
+        "span_of_days",
+        "yearfrac",
+        "periods_in_a_year",
+    }
+
+    def __init__(
+        self: Self,
+        *args: str,
+    ) -> None:
+        """Property arguments for the OpenTimeSeries class."""
+        super().__init__(args)
+        self._validate()
+
+    def _validate(self: Self) -> None:
+        seen = set()
+        for item in self:
+            if item not in self.allowed_strings:
+                msg = (
+                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                )
+                raise ValueError(
+                    msg,
+                )
+            if item in seen:
+                msg = f"Duplicate string: {item}"
+                raise ValueError(msg)
+            seen.add(item)
