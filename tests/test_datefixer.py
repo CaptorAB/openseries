@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from numpy import datetime64
@@ -17,6 +17,9 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
+
+if TYPE_CHECKING:
+    from openseries.types import CountriesType, DateType, HolidayType
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -37,7 +40,7 @@ from openseries.datefixer import (
 def test_offset_business_days(
     date: dt.date,
     offset: int,
-    country: set[str] | str,
+    country: CountriesType,
 ) -> None:
     """Test offset_business_days function."""
     se_nationalday = dt.date(2022, 6, 6)
@@ -61,9 +64,7 @@ def test_offset_business_days(
         datetime64("2022-07-15"),
     ],
 )
-def test_date_fix(
-    fixerdate: str | dt.date | dt.datetime | datetime64 | Timestamp,
-) -> None:
+def test_date_fix(fixerdate: DateType) -> None:
     """Test date_fix argument types."""
     output = dt.date(2022, 7, 15)
     if output != date_fix(fixerdate=fixerdate):
@@ -103,7 +104,7 @@ def test_date_fix(
 )
 def test_get_previous_business_day_before_today(
     today: dt.date,
-    countries: set[str] | str,
+    countries: CountriesType,
     intention: dt.date,
 ) -> None:
     """Test get_previous_business_day_before_today function."""
@@ -147,7 +148,7 @@ def test_get_previous_business_day_before_today(
 )
 def test_offset_business_days_calendar_options(
     ddate: dt.date,
-    countries: set[str] | str,
+    countries: CountriesType,
     intention: dt.date,
 ) -> None:
     """Test offset_business_days function with different calendar combinations."""
@@ -180,7 +181,7 @@ def test_offset_business_days_calendar_options(
 )
 def test_date_offset_foll(
     raw_date: dt.date,
-    countries: set[str] | str,
+    countries: CountriesType,
     intention: dt.date,
     *,
     following: bool,
@@ -287,14 +288,14 @@ class TestDateFixer:
             msg = "Holidays not matching as intended"
             raise ValueError(msg)
 
-        jacks_birthday = {
+        jacks_birthday: HolidayType = {
             f"{year}-02-12": "Jack's birthday",
         }
         cdr_with = holiday_calendar(
             startyear=year,
             endyear=year,
             countries="SE",
-            custom_holidays=jacks_birthday,  # type: ignore[arg-type]
+            custom_holidays=jacks_birthday,
         )
         hols_with = [
             date_fix(d) for d in list(cdr_with.holidays) if date_fix(d).year == year
@@ -304,7 +305,8 @@ class TestDateFixer:
             msg = f"Holidays not the same are: {compared}"
             raise ValueError(msg)
 
-        twentytwentyoneholidays.append(date_fix(next(iter(jacks_birthday.keys()))))
+        jbirth = cast(dict[str, str], jacks_birthday)
+        twentytwentyoneholidays.append(date_fix(next(iter(jbirth.keys()))))
         twentytwentyoneholidays.sort()
 
         if twentytwentyoneholidays != hols_with:
@@ -318,7 +320,7 @@ class TestDateFixer:
         offsetdate_without = offset_business_days(
             ddate=day_after_jacks_birthday,
             days=-2,
-            countries=cast(set[str], ["SE", "US"]),
+            countries=["SE", "US"],
         )
         if offsetdate_without != dt.date(2021, 2, 10):
             msg = "Unintended result from offset_business_days"
@@ -327,7 +329,7 @@ class TestDateFixer:
         offsetdate_with = offset_business_days(
             ddate=day_after_jacks_birthday,
             days=-2,
-            countries=cast(set[str], ["SE", "US"]),
+            countries=["SE", "US"],
             custom_holidays={"2021-02-12": "Jack's birthday"},
         )
         if offsetdate_with != dt.date(2021, 2, 9):
@@ -345,7 +347,7 @@ class TestDateFixer:
         offsetdate_forward = offset_business_days(
             ddate=startdate,
             days=forward,
-            countries=cast(set[str], ["SE", "US"]),
+            countries=["SE", "US"],
         )
         if offsetdate_forward != forwarddate:
             msg = "Unintended result from offset_business_days"
@@ -354,7 +356,7 @@ class TestDateFixer:
         offsetdate_backward = offset_business_days(
             ddate=startdate,
             days=backward,
-            countries=cast(set[str], ["SE", "US"]),
+            countries=["SE", "US"],
         )
         if offsetdate_backward != backwarddate:
             msg = "Unintended result from offset_business_days"

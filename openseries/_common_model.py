@@ -9,7 +9,7 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
+from typing import TYPE_CHECKING, Any, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
 
@@ -37,7 +37,18 @@ from ._risk import (
 )
 from .datefixer import date_offset_foll, holiday_calendar
 from .load_plotly import load_plotly_dict
-from .types import ValueType
+from .types import (
+    CountriesType,
+    DaysInYearType,
+    LiteralBarPlotMode,
+    LiteralJsonOutput,
+    LiteralLinePlotMode,
+    LiteralNanMethod,
+    LiteralPlotlyJSlib,
+    LiteralPlotlyOutput,
+    LiteralQuantileInterp,
+    ValueType,
+)
 
 
 class _CommonModel(BaseModel):
@@ -416,9 +427,7 @@ class _CommonModel(BaseModel):
 
         """
         level: float = 0.95
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"] = (
-            "lower"
-        )
+        interpolation: LiteralQuantileInterp = "lower"
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
@@ -435,9 +444,7 @@ class _CommonModel(BaseModel):
 
         """
         level: float = 0.95
-        interpolation: Literal["linear", "lower", "higher", "midpoint", "nearest"] = (
-            "lower"
-        )
+        interpolation: LiteralQuantileInterp = "lower"
         return self.vol_from_var_func(level=level, interpolation=interpolation)
 
     def calc_range(
@@ -498,13 +505,13 @@ class _CommonModel(BaseModel):
 
     def align_index_to_local_cdays(
         self: Self,
-        countries: set[str] | str = "SE",
+        countries: CountriesType = "SE",
     ) -> Self:
         """Align the index of .tsdf with local calendar business days.
 
         Parameters
         ----------
-        countries: set[str] | str, default: "SE"
+        countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
@@ -551,12 +558,12 @@ class _CommonModel(BaseModel):
         )
         return self
 
-    def value_nan_handle(self: Self, method: str = "fill") -> Self:
+    def value_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
         """Handle missing values in a valueseries.
 
         Parameters
         ----------
-        method: str, default: "fill"
+        method: LiteralNanMethod, default: "fill"
             Method used to handle NaN. Either fill with last known or drop
 
         Returns
@@ -571,12 +578,12 @@ class _CommonModel(BaseModel):
             self.tsdf = self.tsdf.dropna()
         return self
 
-    def return_nan_handle(self: Self, method: str = "fill") -> Self:
+    def return_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
         """Handle missing values in a returnseries.
 
         Parameters
         ----------
-        method: str, default: "fill"
+        method: LiteralNanMethod, default: "fill"
             Method used to handle NaN. Either fill with zero or drop
 
         Returns
@@ -608,7 +615,7 @@ class _CommonModel(BaseModel):
 
     def to_json(
         self: Self,
-        what_output: str,
+        what_output: LiteralJsonOutput,
         filename: str,
         directory: DirectoryPath | None = None,
     ) -> list[dict[str, str | bool | ValueType | list[str] | list[float]]]:
@@ -616,7 +623,7 @@ class _CommonModel(BaseModel):
 
         Parameters
         ----------
-        what_output: str
+        what_output: LiteralJsonOutput
             Choice on whether the raw values or the tsdf Dataframe values are
             returned as json and exported as json file.
         filename: str
@@ -729,13 +736,13 @@ class _CommonModel(BaseModel):
 
     def plot_bars(
         self: Self,
-        mode: str = "group",
+        mode: LiteralBarPlotMode = "group",
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: DirectoryPath | None = None,
         labels: list[str] | None = None,
-        output_type: str = "file",
-        include_plotlyjs: bool | str = "cdn",
+        output_type: LiteralPlotlyOutput = "file",
+        include_plotlyjs: LiteralPlotlyJSlib = "cdn",
         *,
         auto_open: bool = True,
         add_logo: bool = True,
@@ -746,7 +753,7 @@ class _CommonModel(BaseModel):
         ----------
         self.tsdf: pandas.DataFrame
             The timeseries self.tsdf
-        mode: str
+        mode: LiteralBarPlotMode
             The type of bar to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
@@ -757,9 +764,9 @@ class _CommonModel(BaseModel):
         labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
-        output_type: str, default: "file"
+        output_type: LiteralPlotlyOutput, default: "file"
             Determines output type
-        include_plotlyjs: bool | str, default: "cdn"
+        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
             Determines how the plotly.js library is included in the output
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
@@ -843,13 +850,13 @@ class _CommonModel(BaseModel):
 
     def plot_series(  # noqa: C901
         self: Self,
-        mode: str = "lines",
+        mode: LiteralLinePlotMode = "lines",
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: DirectoryPath | None = None,
         labels: list[str] | None = None,
-        output_type: str = "file",
-        include_plotlyjs: bool | str = "cdn",
+        output_type: LiteralPlotlyOutput = "file",
+        include_plotlyjs: LiteralPlotlyJSlib = "cdn",
         *,
         auto_open: bool = True,
         add_logo: bool = True,
@@ -861,7 +868,7 @@ class _CommonModel(BaseModel):
         ----------
         self.tsdf: pandas.DataFrame
             The timeseries self.tsdf
-        mode: str, default: "lines"
+        mode: LiteralLinePlotMode, default: "lines"
             The type of scatter to use
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
@@ -872,9 +879,9 @@ class _CommonModel(BaseModel):
         labels: list[str], optional
             A list of labels to manually override using the names of
             the input self.tsdf
-        output_type: str, default: "file"
+        output_type: LiteralPlotlyOutput, default: "file"
             Determines output type
-        include_plotlyjs: bool | str, default: "cdn"
+        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
             Determines how the plotly.js library is included in the output
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
@@ -978,7 +985,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
@@ -991,7 +998,7 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1037,7 +1044,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
         """Annualized volatility.
 
@@ -1053,7 +1060,7 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns
@@ -1096,14 +1103,8 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Literal[
-            "linear",
-            "lower",
-            "higher",
-            "midpoint",
-            "nearest",
-        ] = "lower",
-        periods_in_a_year_fixed: int | None = None,
+        interpolation: LiteralQuantileInterp = "lower",
+        periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
     ) -> float | Series[float]:
@@ -1123,10 +1124,9 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-            "nearest"], default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -1158,14 +1158,8 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Literal[
-            "linear",
-            "lower",
-            "higher",
-            "midpoint",
-            "nearest",
-        ] = "lower",
-        periods_in_a_year_fixed: int | None = None,
+        interpolation: LiteralQuantileInterp = "lower",
+        periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
     ) -> float | Series[float]:
@@ -1191,10 +1185,9 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-            "nearest"], default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -1229,14 +1222,8 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Literal[
-            "linear",
-            "lower",
-            "higher",
-            "midpoint",
-            "nearest",
-        ] = "lower",
-        periods_in_a_year_fixed: int | None = None,
+        interpolation: LiteralQuantileInterp = "lower",
+        periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
     ) -> float | Series[float]:
@@ -1264,10 +1251,9 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-            "nearest"], default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -1404,7 +1390,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
         """Downside Deviation.
 
@@ -1423,7 +1409,7 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1733,7 +1719,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
         """Ratio between arithmetic mean of returns and annualized volatility.
 
@@ -1754,7 +1740,7 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1796,7 +1782,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
         """Sortino Ratio.
 
@@ -1819,7 +1805,7 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -2002,13 +1988,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-        interpolation: Literal[
-            "linear",
-            "lower",
-            "higher",
-            "midpoint",
-            "nearest",
-        ] = "lower",
+        interpolation: LiteralQuantileInterp = "lower",
     ) -> float | Series[float]:
         """Downside Value At Risk, "VaR".
 
@@ -2026,8 +2006,7 @@ class _CommonModel(BaseModel):
             Specific from date
         to_date : datetime.date, optional
             Specific to date
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-            "nearest"], default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -2222,13 +2201,7 @@ class _CommonModel(BaseModel):
         column: int = 0,
         level: float = 0.95,
         observations: int = 252,
-        interpolation: Literal[
-            "linear",
-            "lower",
-            "higher",
-            "midpoint",
-            "nearest",
-        ] = "lower",
+        interpolation: LiteralQuantileInterp = "lower",
     ) -> DataFrame:
         """Calculate rolling annualized downside Value At Risk "VaR".
 
@@ -2240,8 +2213,7 @@ class _CommonModel(BaseModel):
             The sought Value At Risk level
         observations: int, default: 252
             Number of observations in the overlapping window.
-        interpolation: Literal["linear", "lower", "higher", "midpoint",
-            "nearest"], default: "lower"
+        interpolation: LiteralQuantileInterp, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns
@@ -2267,7 +2239,7 @@ class _CommonModel(BaseModel):
         self: Self,
         column: int = 0,
         observations: int = 21,
-        periods_in_a_year_fixed: int | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> DataFrame:
         """Calculate rolling annualised volatilities.
 
@@ -2277,7 +2249,7 @@ class _CommonModel(BaseModel):
             Position as integer of column to calculate
         observations: int, default: 21
             Number of observations in the overlapping window.
-        periods_in_a_year_fixed : int, optional
+        periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 

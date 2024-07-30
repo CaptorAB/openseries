@@ -19,7 +19,11 @@ from openseries.series import (
     _check_if_none,
     timeseries_chain,
 )
-from openseries.types import ValueType
+from openseries.types import (
+    CountriesType,
+    LiteralSeriesProps,
+    ValueType,
+)
 from tests.test_common_sim import CommonTestCase
 
 
@@ -107,7 +111,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
     "countries",
     ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []],
 )
-def test_opentimeseries_invalid_countries(countries: set[str] | str) -> None:
+def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     """Pytest on invalid country codes as input."""
     serie = OpenTimeSeries.from_arrays(
         name="Asset",
@@ -149,20 +153,20 @@ class TestOpenTimeSeries(CommonTestCase):
             match="Input should be a valid string",
         ):
             OpenTimeSeries.setup_class(
-                countries={"SE", cast(str, 12)},
+                countries=cast(CountriesType, ["SE", cast(str, 12)]),
             )
 
         with pytest.raises(
             expected_exception=ValidationError,
             match="2 validation errors for Countries",
         ):
-            OpenTimeSeries.setup_class(countries={"SE", "12"})
+            OpenTimeSeries.setup_class(countries=cast(CountriesType, ["SE", "12"]))
 
         with pytest.raises(
             expected_exception=ValidationError,
             match="2 validation errors for Countries",
         ):
-            OpenTimeSeries.setup_class(countries=cast(set[str], None))
+            OpenTimeSeries.setup_class(countries=cast(CountriesType, None))
 
         OpenTimeSeries.setup_class(domestic_ccy="USD", countries="US")
         if OpenTimeSeries.domestic != "USD":
@@ -1096,7 +1100,9 @@ class TestOpenTimeSeries(CommonTestCase):
             raise TypeError(msg)
 
         with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
-            _ = apseries.all_properties(["geo_ret", "boo"])
+            _ = apseries.all_properties(
+                cast(list[LiteralSeriesProps], ["geo_ret", "boo"]),
+            )
 
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
         """Test all calculated properties."""
@@ -1679,7 +1685,11 @@ class TestOpenTimeSeries(CommonTestCase):
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
         valid_instrument_id = "58135911b239b413482758c9"
+        invalid_instrument_id_one = "58135911b239b413482758c"
+        invalid_instrument_id_two = "5_135911b239b413482758c9"
         valid_timeseries_id = "5813595971051506189ba416"
+        invalid_timeseries_id_one = "5813595971051506189ba41"
+        invalid_timeseries_id_two = "5_13595971051506189ba416"
 
         basecase = OpenTimeSeries.from_arrays(
             name="asset",
@@ -1694,12 +1704,12 @@ class TestOpenTimeSeries(CommonTestCase):
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
-        basecase.countries = ["SE", "US"]
+        basecase.countries = cast(CountriesType, ["SE", "US"])
         if basecase.countries != {"SE", "US"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
-        basecase.countries = ["SE", "SE"]
+        basecase.countries = cast(CountriesType, ["SE", "SE"])
         if basecase.countries != {"SE"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
@@ -1730,6 +1740,78 @@ class TestOpenTimeSeries(CommonTestCase):
                     "2017-05-30",
                 ],
                 values=[],
+            )
+
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="String should match pattern",
+        ):
+            OpenTimeSeries.from_arrays(
+                timeseries_id=invalid_timeseries_id_one,
+                instrument_id=valid_instrument_id,
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                name="asset",
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+            )
+
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="String should match pattern",
+        ):
+            OpenTimeSeries.from_arrays(
+                timeseries_id=invalid_timeseries_id_two,
+                instrument_id=valid_instrument_id,
+                name="asset",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+            )
+
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="String should match pattern",
+        ):
+            OpenTimeSeries.from_arrays(
+                timeseries_id=valid_timeseries_id,
+                instrument_id=invalid_instrument_id_one,
+                name="asset",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                values=[
+                    100.0,
+                    100.0978,
+                ],
+            )
+
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match="String should match pattern",
+        ):
+            OpenTimeSeries.from_arrays(
+                timeseries_id=valid_timeseries_id,
+                instrument_id=invalid_instrument_id_two,
+                name="asset",
+                dates=[
+                    "2017-05-29",
+                    "2017-05-30",
+                ],
+                values=[
+                    100.0,
+                    100.0978,
+                ],
             )
 
         with pytest.raises(

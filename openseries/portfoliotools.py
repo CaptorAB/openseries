@@ -37,7 +37,13 @@ from .series import OpenTimeSeries
 
 # noinspection PyProtectedMember
 from .simulation import _random_generator
-from .types import ValueType
+from .types import (
+    LiteralLinePlotMode,
+    LiteralMinimizeMethods,
+    LiteralPlotlyJSlib,
+    LiteralPlotlyOutput,
+    ValueType,
+)
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydantic import DirectoryPath
@@ -129,7 +135,7 @@ def efficient_frontier(  # noqa: C901
     seed: int = 71,
     bounds: tuple[tuple[float]] | None = None,
     frontier_points: int = 200,
-    minimize_method: str = "SLSQP",
+    minimize_method: LiteralMinimizeMethods = "SLSQP",
     *,
     tweak: bool = True,
 ) -> tuple[DataFrame, DataFrame, NDArray[float64]]:
@@ -147,7 +153,7 @@ def efficient_frontier(  # noqa: C901
         The range of minumum and maximum allowed allocations for each asset
     frontier_points: int, default: 200
         number of points along frontier to optimize
-    minimize_method: str, default: SLSQP
+    minimize_method: LiteralMinimizeMethods, default: SLSQP
         The method passed into the scipy.minimize function
     tweak: bool, default: True
         cutting the frontier to exclude multiple points with almost the same risk
@@ -314,7 +320,7 @@ def constrain_optimized_portfolios(
     simulations: int = 10000,
     curve_points: int = 200,
     bounds: tuple[tuple[float]] | None = None,
-    minimize_method: str = "SLSQP",
+    minimize_method: LiteralMinimizeMethods = "SLSQP",
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
     """Constrain optimized portfolios to those that improve on the current one.
 
@@ -332,7 +338,7 @@ def constrain_optimized_portfolios(
         Number of optimal portfolios on the efficient frontier
     bounds: tuple[tuple[float]], optional
         The range of minumum and maximum allowed allocations for each asset
-    minimize_method: str, default: SLSQP
+    minimize_method: LiteralMinimizeMethods, default: SLSQP
         The method passed into the scipy.minimize function
 
     Returns
@@ -438,12 +444,12 @@ def sharpeplot(  # noqa: C901
     sim_frame: DataFrame | None = None,
     line_frame: DataFrame | None = None,
     point_frame: DataFrame | None = None,
-    point_frame_mode: str = "markers",
+    point_frame_mode: LiteralLinePlotMode = "markers",
     filename: str | None = None,
     directory: DirectoryPath | None = None,
     titletext: str | None = None,
-    output_type: str = "file",
-    include_plotlyjs: bool | str = "cdn",
+    output_type: LiteralPlotlyOutput = "file",
+    include_plotlyjs: LiteralPlotlyJSlib = "cdn",
     *,
     title: bool = True,
     add_logo: bool = True,
@@ -459,7 +465,7 @@ def sharpeplot(  # noqa: C901
         Data from the efficient_frontier method.
     point_frame: DataFrame, optional
         Data to highlight current and efficient portfolios.
-    point_frame_mode: str, default: markers
+    point_frame_mode: LiteralLinePlotMode, default: markers
         Which type of scatter to use.
     filename: str, optional
         Name of the Plotly html file
@@ -467,9 +473,9 @@ def sharpeplot(  # noqa: C901
         Directory where Plotly html file is saved
     titletext: str, optional
         Text for the plot title
-    output_type: str, default: "file"
+    output_type: LiteralPlotlyOutput, default: "file"
         Determines output type
-    include_plotlyjs: bool | str, default: "cdn"
+    include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
         Determines how the plotly.js library is included in the output
     title: bool, default: True
         Whether to add standard plot title
@@ -541,8 +547,7 @@ def sharpeplot(  # noqa: C901
 
     if point_frame is not None:
         colorway = cast(
-            dict[str, str | int | float | bool | list[str]],
-            fig["layout"],
+            dict[str, str | int | float | bool | list[str]], fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]
         for col, clr in zip(point_frame.columns, colorway):
             returns.extend([point_frame.loc["ret", col]])

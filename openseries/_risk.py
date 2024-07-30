@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import Literal, cast
+from typing import TYPE_CHECKING, cast
 
 from numpy import (
     mean,
@@ -12,6 +12,9 @@ from numpy import (
     sort,
 )
 from pandas import DataFrame, Series
+
+if TYPE_CHECKING:
+    from .types import LiteralQuantileInterp  # pragma: no cover
 
 
 def _cvar_down_calc(
@@ -47,9 +50,7 @@ def _cvar_down_calc(
 def _var_down_calc(
     data: DataFrame | Series[float] | list[float],
     level: float = 0.95,
-    interpolation: Literal[
-        "linear", "lower", "higher", "midpoint", "nearest",
-    ] = "lower",
+    interpolation: LiteralQuantileInterp = "lower",
 ) -> float:
     """Calculate downside Value At Risk (VaR).
 
@@ -62,8 +63,7 @@ def _var_down_calc(
         The data to perform the calculation over
     level: float, default: 0.95
         The sought VaR level
-    interpolation: Literal["linear", "lower", "higher", "midpoint",
-        "nearest"], default: "lower"
+    interpolation: LiteralQuantileInterp, default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
 
     Returns

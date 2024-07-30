@@ -25,7 +25,11 @@ from pydantic import (
 from typing_extensions import Self
 
 from .datefixer import generate_calendar_date_range
-from .types import ValueType
+from .types import (
+    CountriesType,
+    DaysInYearType,
+    ValueType,
+)
 
 __all__ = ["ReturnSimulation"]
 
@@ -58,7 +62,7 @@ class ReturnSimulation(BaseModel):
         Number of simulations to generate
     trading_days: PositiveInt
         Total number of days to simulate
-    trading_days_in_year : int
+    trading_days_in_year : DaysInYearType
         Number of trading days used to annualize
     mean_annual_return : float
         Mean annual return of the distribution
@@ -79,7 +83,7 @@ class ReturnSimulation(BaseModel):
 
     number_of_sims: PositiveInt
     trading_days: PositiveInt
-    trading_days_in_year: int
+    trading_days_in_year: DaysInYearType
     mean_annual_return: float
     mean_annual_vol: PositiveFloat
     dframe: DataFrame
@@ -149,7 +153,7 @@ class ReturnSimulation(BaseModel):
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
         trading_days: PositiveInt,
-        trading_days_in_year: int = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
@@ -165,7 +169,7 @@ class ReturnSimulation(BaseModel):
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        trading_days_in_year: int, default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
         seed: int, optional
             Seed for random process initiation
@@ -204,7 +208,7 @@ class ReturnSimulation(BaseModel):
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
         trading_days: PositiveInt,
-        trading_days_in_year: int = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
@@ -220,7 +224,7 @@ class ReturnSimulation(BaseModel):
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        trading_days_in_year: int, default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
         seed: int, optional
             Seed for random process initiation
@@ -262,7 +266,7 @@ class ReturnSimulation(BaseModel):
         mean_annual_return: float,
         mean_annual_vol: PositiveFloat,
         trading_days: PositiveInt,
-        trading_days_in_year: int = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
@@ -278,7 +282,7 @@ class ReturnSimulation(BaseModel):
             Mean return
         mean_annual_vol: PositiveFloat
             Mean standard deviation
-        trading_days_in_year: int, default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
         seed: int, optional
             Seed for random process initiation
@@ -327,7 +331,7 @@ class ReturnSimulation(BaseModel):
         jumps_lamda: NonNegativeFloat,
         jumps_sigma: NonNegativeFloat = 0.0,
         jumps_mu: float = 0.0,
-        trading_days_in_year: int = 252,
+        trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
     ) -> ReturnSimulation:
@@ -349,7 +353,7 @@ class ReturnSimulation(BaseModel):
             This is the volatility of the jump size
         jumps_mu: float, default: 0.0
             This is the average jump size
-        trading_days_in_year: int, default: 252
+        trading_days_in_year: DaysInYearType, default: 252
             Number of trading days used to annualize
         seed: int, optional
             Seed for random process initiation
@@ -412,7 +416,7 @@ class ReturnSimulation(BaseModel):
         name: str,
         start: dt.date | None = None,
         end: dt.date | None = None,
-        countries: set[str] | str = "SE",
+        countries: CountriesType = "SE",
     ) -> DataFrame:
         """Create a pandas.DataFrame from simulation(s).
 
@@ -424,7 +428,7 @@ class ReturnSimulation(BaseModel):
             Date when the simulation starts
         end: datetime.date, optional
             Date when the simulation ends
-        countries: set[str] | str, default: "SE"
+        countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
 
         Returns
