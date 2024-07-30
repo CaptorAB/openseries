@@ -443,17 +443,18 @@ class OpenFrame(_CommonModel):
             An OpenFrame object
 
         """
-        dates = do_resample_to_business_period_ends(
-            data=self.tsdf.copy(),
-            freq=freq,
-            countries=countries,
-        )
-        self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         for xerie in self.constituents:
-            xerie.tsdf = xerie.tsdf.reindex(
-                [deyt.date() for deyt in dates],
-                method=method,
+            dates = do_resample_to_business_period_ends(
+                data=xerie.tsdf,
+                freq=freq,
+                countries=countries,
             )
+            xerie.tsdf = xerie.tsdf.reindex(
+                [deyt.date() for deyt in dates], method=method,
+            )
+
+        self._set_tsdf()
+
         return self
 
     def ewma_risk(

@@ -406,17 +406,18 @@ def do_resample_to_business_period_ends(
     """
     head = data.head(n=1)
     tail = data.tail(n=1)
-    data.index = DatetimeIndex(data.index)
-    data = data.resample(rule=freq).last()
-    data = data.drop(index=data.index[-1])
-    data.index = Index(d.date() for d in DatetimeIndex(data.index))
+    copydata = data.copy()
+    copydata.index = DatetimeIndex(copydata.index)
+    copydata = copydata.resample(rule=freq).last()
+    copydata = copydata.drop(index=copydata.index[-1])
+    copydata.index = Index(d.date() for d in DatetimeIndex(copydata.index))
 
-    data = concat([data, head])
-    data = concat([data, tail])
-    data = data.sort_index()
+    copydata = concat([copydata, head])
+    copydata = concat([copydata, tail])
+    copydata = copydata.sort_index()
 
     dates = DatetimeIndex(
-        [data.index[0]]
+        [copydata.index[0]]
         + [
             date_offset_foll(
                 dt.date(d.year, d.month, 1)
@@ -427,8 +428,8 @@ def do_resample_to_business_period_ends(
                 adjust=True,
                 following=False,
             )
-            for d in data.index[1:-1]
+            for d in copydata.index[1:-1]
         ]
-        + [data.index[-1]],
+        + [copydata.index[-1]],
     )
     return dates.drop_duplicates()
