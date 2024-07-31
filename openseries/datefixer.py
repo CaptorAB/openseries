@@ -404,17 +404,13 @@ def do_resample_to_business_period_ends(
         A date range aligned to business period ends
 
     """
-    head = data.head(n=1)
-    tail = data.tail(n=1)
     copydata = data.copy()
     copydata.index = DatetimeIndex(copydata.index)
     copydata = copydata.resample(rule=freq).last()
     copydata = copydata.drop(index=copydata.index[-1])
     copydata.index = Index(d.date() for d in DatetimeIndex(copydata.index))
 
-    copydata = concat([copydata, head])
-    copydata = concat([copydata, tail])
-    copydata = copydata.sort_index()
+    copydata = concat([data.head(n=1), copydata, data.tail(n=1)]).sort_index()
 
     dates = DatetimeIndex(
         [copydata.index[0]]
