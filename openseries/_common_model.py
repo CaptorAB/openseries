@@ -471,34 +471,34 @@ class _CommonModel(BaseModel):
             Start and end date of the chosen date range
 
         """
-        earlier, later = self.tsdf.index[0], self.tsdf.index[-1]
+        earlier, later = self.first_idx, self.last_idx
         if months_offset is not None:
             earlier = date_offset_foll(
-                raw_date=DatetimeIndex(self.tsdf.index)[-1],
+                raw_date=self.last_idx,
                 months_offset=-months_offset,
                 adjust=False,
                 following=True,
             )
-            if earlier < self.tsdf.index[0]:
+            if earlier < self.first_idx:
                 msg = "Function calc_range returned earlier date < series start"
                 raise ValueError(
                     msg,
                 )
-            later = self.tsdf.index[-1]
+            later = self.last_idx
         else:
             if from_dt is not None:
-                if from_dt < self.tsdf.index[0]:
+                if from_dt < self.first_idx:
                     msg = "Given from_dt date < series start"
                     raise ValueError(msg)
                 earlier = from_dt
             if to_dt is not None:
-                if to_dt > self.tsdf.index[-1]:
+                if to_dt > self.last_idx:
                     msg = "Given to_dt date > series end"
                     raise ValueError(msg)
                 later = to_dt
-        while earlier not in self.tsdf.index.tolist():
+        while earlier not in self.tsdf.index:
             earlier -= dt.timedelta(days=1)
-        while later not in self.tsdf.index.tolist():
+        while later not in self.tsdf.index:
             later += dt.timedelta(days=1)
 
         return earlier, later
