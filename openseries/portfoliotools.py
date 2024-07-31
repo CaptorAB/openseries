@@ -13,6 +13,7 @@ from numpy import (
     dot,
     float64,
     inf,
+    isnan,
     linspace,
     nan,
     sqrt,
@@ -182,8 +183,11 @@ def efficient_frontier(  # noqa: C901
     simulated = simulate_portfolios(simframe=copi, num_ports=num_ports, seed=seed)
 
     frontier_min = simulated.loc[simulated["stdev"].idxmin()]["ret"]
-    arithmetic_mean = Series(log_ret.mean() * copi.periods_in_a_year)
-    frontier_max = float(cast(NDArray[float64], arithmetic_mean.to_numpy()).max())
+
+    arithmetic_means = array(log_ret.mean() * copi.periods_in_a_year)
+    cleaned_arithmetic_means = arithmetic_means[~isnan(arithmetic_means)]
+
+    frontier_max = cleaned_arithmetic_means.max()
 
     def _check_sum(weights: NDArray[float64]) -> float64:
         return cast(float64, npsum(weights) - 1)
@@ -547,7 +551,8 @@ def sharpeplot(  # noqa: C901
 
     if point_frame is not None:
         colorway = cast(
-            dict[str, str | int | float | bool | list[str]], fig["layout"],
+            dict[str, str | int | float | bool | list[str]],
+            fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]
         for col, clr in zip(point_frame.columns, colorway):
             returns.extend([point_frame.loc["ret", col]])
