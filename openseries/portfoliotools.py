@@ -288,7 +288,6 @@ def efficient_frontier(  # noqa: C901
         frontier_x.append(result["fun"])
         frontier_weights.append(result["x"])
 
-    # noinspection PyUnreachableCode
     line_df = concat(
         [
             DataFrame(data=frontier_weights, columns=eframe.columns_lvl_zero),
