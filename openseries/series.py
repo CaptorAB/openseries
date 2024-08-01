@@ -29,7 +29,7 @@ from pydantic import model_validator
 from typing_extensions import Self
 
 from ._common_model import _CommonModel
-from .datefixer import date_fix, do_resample_to_business_period_ends
+from .datefixer import _do_resample_to_business_period_ends, date_fix
 from .types import (
     Countries,
     CountriesType,
@@ -584,7 +584,7 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        dates = do_resample_to_business_period_ends(
+        dates = _do_resample_to_business_period_ends(
             data=self.tsdf,
             freq=freq,
             countries=self.countries,

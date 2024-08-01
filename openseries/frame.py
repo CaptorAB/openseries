@@ -43,7 +43,7 @@ from statsmodels.regression.linear_model import (  # type: ignore[import-untyped
 from typing_extensions import Self
 
 from ._common_model import _CommonModel
-from .datefixer import do_resample_to_business_period_ends
+from .datefixer import _do_resample_to_business_period_ends
 from .series import OpenTimeSeries
 from .types import (
     CountriesType,
@@ -444,7 +444,7 @@ class OpenFrame(_CommonModel):
 
         """
         for xerie in self.constituents:
-            dates = do_resample_to_business_period_ends(
+            dates = _do_resample_to_business_period_ends(
                 data=xerie.tsdf,
                 freq=freq,
                 countries=countries,

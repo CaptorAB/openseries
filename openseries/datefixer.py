@@ -32,7 +32,7 @@ if TYPE_CHECKING:  # pragma: no cover
 __all__ = [
     "date_fix",
     "date_offset_foll",
-    "do_resample_to_business_period_ends",
+    "_do_resample_to_business_period_ends",
     "generate_calendar_date_range",
     "get_previous_business_day_before_today",
     "holiday_calendar",
@@ -379,7 +379,7 @@ def generate_calendar_date_range(
 
 
 # noinspection PyUnusedLocal
-def do_resample_to_business_period_ends(
+def _do_resample_to_business_period_ends(
     data: DataFrame,
     freq: LiteralBizDayFreq,
     countries: CountriesType,
