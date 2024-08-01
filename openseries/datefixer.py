@@ -32,7 +32,6 @@ if TYPE_CHECKING:
 __all__ = [
     "date_fix",
     "date_offset_foll",
-    "_do_resample_to_business_period_ends",
     "generate_calendar_date_range",
     "get_previous_business_day_before_today",
     "holiday_calendar",
