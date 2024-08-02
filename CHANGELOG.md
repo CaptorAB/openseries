@@ -5,7 +5,7 @@
 - Changed so that resample_to_business_period_ends method on OpenFrame now retains original stubs on all constituent OpenTimeSeries.
 - Made do_resample_to_business_period_ends private.
 - Cleaned up calc_range and efficient_frontier functions.
-- Introduced branch coverage and added tests to brin coverage back to 100% from 99%.
+- Introduced branch coverage and added tests to bring coverage back to 100% from 99%.
 - Miscellaneous cleanup and depedencies updated.
 
 ## Version [1.7.0] - 2024-07-27
