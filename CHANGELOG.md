@@ -1,5 +1,13 @@
 # Changelog
 
+## Version [1.7.1] - 2024-xx-xx
+
+- Changed so that resample_to_business_period_ends method on OpenFrame now retains original stubs on all constituent OpenTimeSeries.
+- Made do_resample_to_business_period_ends private.
+- Cleaned up calc_range and efficient_frontier functions.
+- Introduced branch coverage and added tests to brin coverage back to 100% from 99%.
+- Miscellaneous cleanup and depedencies updated.
+
 ## Version [1.7.0] - 2024-07-27
 
 - Changed code to enforce PEP 604 on typing. This means that the PACKAGE WILL LONGER WORK FOR PYTHON 3.9.
