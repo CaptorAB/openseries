@@ -359,15 +359,11 @@ class TestOpenFrame(CommonTestCase):
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
         crframe = self.randomframe.from_deepcopy()
-        start, end = (
-            crframe.first_idx.strftime("%Y-%m-%d"),
-            crframe.last_idx.strftime(
-                "%Y-%m-%d",
-            ),
-        )
+        start, end = crframe.first_idx, crframe.last_idx
+
         rst, ren = crframe.calc_range()
 
-        if [start, end] != [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]:
+        if [start, end] != [rst, ren]:
             msg = "Unintended output from calc_range()"
             raise ValueError(msg)
 
@@ -389,15 +385,28 @@ class TestOpenFrame(CommonTestCase):
         ):
             _, _ = crframe.calc_range(to_dt=dt.date(2019, 7, 31))
 
-        nst, nen = crframe.calc_range(
+        offsetst, offseten = crframe.calc_range(
+            months_offset=12,
+        )
+        if [offsetst, offseten] != [dt.date(2018, 6, 28), end]:
+            msg = f"Unintended output from calc_range():{[offsetst, offseten]}"
+            raise ValueError(msg)
+
+        fromtost, fromtoen = crframe.calc_range(
             from_dt=dt.date(2009, 7, 3),
             to_dt=dt.date(2019, 6, 25),
         )
-        if nst != dt.date(2009, 7, 3):
-            msg = "Unintended output from calc_range()"
+        if [fromtost, fromtoen] != [dt.date(2009, 7, 3), dt.date(2019, 6, 25)]:
+            msg = f"Unintended output from calc_range():{[fromtost, fromtoen]}"
             raise ValueError(msg)
-        if nen != dt.date(2019, 6, 25):
-            msg = "Unintended output from calc_range()"
+
+        bothst, bothen = crframe.calc_range(
+            months_offset=12,
+            from_dt=dt.date(2009, 7, 3),
+            to_dt=dt.date(2019, 6, 25),
+        )
+        if [bothst, bothen] != [offsetst, end]:
+            msg = f"Unintended output from calc_range():{[bothst, bothen]}"
             raise ValueError(msg)
 
         crframe.resample()
