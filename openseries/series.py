@@ -247,8 +247,8 @@ class OpenTimeSeries(_CommonModel):
             else:
                 label = dframe.name
             values = dframe.to_numpy().tolist()
-        else:
-            values = cast(DataFrame, dframe).iloc[:, column_nmbr].tolist()
+        elif isinstance(dframe, DataFrame):
+            values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
                 if _check_if_none(
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
@@ -270,6 +270,10 @@ class OpenTimeSeries(_CommonModel):
                     ]
             else:
                 label = cast(MultiIndex, dframe.columns).to_numpy()[column_nmbr]
+        else:
+            msg = "Argument dframe must be pandas Series or DataFrame."
+            raise TypeError(msg)
+
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
 
         return cls(

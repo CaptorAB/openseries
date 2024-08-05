@@ -591,6 +591,15 @@ class TestOpenTimeSeries(CommonTestCase):
             msg = "Method from_df() not working as intended"
             raise ValueError(msg)
 
+        wrongtype = [["2023-01-01", "2023-01-02"], [1.0, 1.1]]
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="Argument dframe must be pandas Series or DataFrame.",
+        ):
+            _ = OpenTimeSeries.from_df(
+                dframe=wrongtype,  # type: ignore[arg-type]
+            )
+
     def test_check_if_none(self: TestOpenTimeSeries) -> None:
         """Test _check_if_none function."""
         if not _check_if_none(None):
