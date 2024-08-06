@@ -369,7 +369,10 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="Function calc_range returned earlier date < series start",
+            match=(
+                "Argument months_offset implies start"
+                "date before first date in series."
+            ),
         ):
             _, _ = crframe.calc_range(months_offset=125)
 

@@ -480,7 +480,10 @@ class _CommonModel(BaseModel):
                 following=True,
             )
             if earlier < self.first_idx:
-                msg = "Function calc_range returned earlier date < series start"
+                msg = (
+                    "Argument months_offset implies start"
+                    "date before first date in series."
+                )
                 raise ValueError(
                     msg,
                 )
