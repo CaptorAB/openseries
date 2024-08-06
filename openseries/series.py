@@ -107,14 +107,14 @@ class OpenTimeSeries(_CommonModel):
 
     @field_validator("domestic", mode="before")
     @classmethod
-    def validate_domestic(cls, value: CurrencyStringType) -> str:
+    def validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
         _ = Currency(ccy=value)
         return value
 
     @field_validator("countries", mode="before")
     @classmethod
-    def validate_countries(cls, value: CountriesType) -> str:
+    def validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
         _ = Countries(countryinput=value)
         return value
