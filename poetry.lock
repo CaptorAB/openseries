@@ -376,13 +376,13 @@ tests = ["defusedxml"]
 
 [[package]]
 name = "holidays"
-version = "0.53"
+version = "0.54"
 description = "Generate and work with holidays in Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "holidays-0.53-py3-none-any.whl", hash = "sha256:371080faaa1c85fef49a64b16c52c2ec5cc9674360cc9fafad312eba74f3de1a"},
-    {file = "holidays-0.53.tar.gz", hash = "sha256:ed8c935d35ad3c3e0866cd49256a51fb3e63d4ba506ca7ebbf07819feb055bfa"},
+    {file = "holidays-0.54-py3-none-any.whl", hash = "sha256:18f56909f9bd7c3a4c0b309bfc6c9b2684da41079165d00e4d3148269964884b"},
+    {file = "holidays-0.54.tar.gz", hash = "sha256:11bbd051c14b6f1a35071d7c0dde5b225575c263cd9890869d740771f6381fc4"},
 ]
 
 [package.dependencies]
@@ -655,22 +655,10 @@ files = [
 ]
 
 [package.dependencies]
-numpy = {version = ">=1.23.5", markers = "python_version >= \"3.9\" and python_version < \"3.12\""}
-types-pytz = ">=2022.1.1"
-
-[[package]]
-name = "pandas-stubs"
-version = "2.2.2.240805"
-description = "Type annotations for pandas"
-optional = false
-python-versions = ">=3.9"
-files = [
-    {file = "pandas_stubs-2.2.2.240805-py3-none-any.whl", hash = "sha256:6413687e85851c7962e99f4d629ed86d0a3d91d4bd5fec269c8d871b30552172"},
-    {file = "pandas_stubs-2.2.2.240805.tar.gz", hash = "sha256:881a1a642a1fb8ec3b3787e036b0650d2bf0953f4e0ad1907eea164dc671ecee"},
+numpy = [
+    {version = ">=1.23.5", markers = "python_version >= \"3.9\" and python_version < \"3.12\""},
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\" and python_version < \"3.13\""},
 ]
-
-[package.dependencies]
-numpy = {version = ">=2.0.0", markers = "python_version >= \"3.12\" and python_version < \"3.13\""}
 types-pytz = ">=2022.1.1"
 
 [[package]]
@@ -1307,13 +1295,13 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.5.20240719"
+version = "3.1.5.20240806"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-openpyxl-3.1.5.20240719.tar.gz", hash = "sha256:46c7167e0a2998b7d76d9d9f25eb7bca3f94409dbeddabdc5c9ff93c1e49f503"},
-    {file = "types_openpyxl-3.1.5.20240719-py3-none-any.whl", hash = "sha256:b629c8c4f22bf9395eac59698ae320159d5090080d757d0950852dacae93fb0b"},
+    {file = "types-openpyxl-3.1.5.20240806.tar.gz", hash = "sha256:d12a3a9dfa3c43f57aa3249a38a7bf891698bca88c8ad30385d04008d865a956"},
+    {file = "types_openpyxl-3.1.5.20240806-py3-none-any.whl", hash = "sha256:0982f206597b0f01154c66ab21199b22680137bfb63b3a4009067b1ae077ef25"},
 ]
 
 [[package]]
