@@ -128,68 +128,6 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
 class TestOpenTimeSeries(CommonTestCase):
     """class to run tests on the module series.py."""
 
-    def test_setup_class(self: TestOpenTimeSeries) -> None:
-        """Test setup_class method."""
-        myseries = self.randomseries.from_deepcopy()
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="String should have at least 3 characters",
-        ):
-            myseries.setup_class(domestic_ccy="12")
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="Input should be a valid string",
-        ):
-            myseries.setup_class(domestic_ccy=cast(str, 12))
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="Input should be a valid list|String should match pattern",
-        ):
-            myseries.setup_class(countries="12")
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="Input should be a valid string",
-        ):
-            myseries.setup_class(
-                countries=cast(CountriesType, ["SE", cast(str, 12)]),
-            )
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="2 validation errors for Countries",
-        ):
-            myseries.setup_class(countries=cast(CountriesType, ["SE", "12"]))
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="2 validation errors for Countries",
-        ):
-            myseries.setup_class(countries=cast(CountriesType, None))
-
-        OpenTimeSeries.setup_class(domestic_ccy="USD", countries="US")
-
-        if cast(OpenTimeSeries, OpenTimeSeries).domestic != "USD":
-            msg = "Method setup_class() not working as intended"
-            raise ValueError(msg)
-
-        if cast(OpenTimeSeries, OpenTimeSeries).countries != "US":
-            msg = "Method setup_class() not working as intended"
-            raise ValueError(msg)
-
-        myseries.domestic = "USD"
-        myseries.countries = "US"
-
-        if myseries.domestic != "USD":
-            msg = "setting domestic argument not working as intended"
-            raise ValueError(msg)
-
-        if myseries.countries != "US":
-            msg = "setting countries argument not working as intended"
-            raise ValueError(msg)
-
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
         """Test invalid dates as input."""
         with pytest.raises(

@@ -25,7 +25,7 @@ from pandas import (
     Series,
     date_range,
 )
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from typing_extensions import Self
 
 from ._common_model import _CommonModel
@@ -105,6 +105,20 @@ class OpenTimeSeries(_CommonModel):
     isin: str | None = None
     label: str | None = None
 
+    @field_validator("domestic", mode="before")
+    @classmethod
+    def validate_domestic(cls, value: CurrencyStringType) -> str:
+        """Pydantic validator to ensure domestic field is validated."""
+        _ = Currency(ccy=value)
+        return value
+
+    @field_validator("countries", mode="before")
+    @classmethod
+    def validate_countries(cls, value: CountriesType) -> str:
+        """Pydantic validator to ensure countries field is validated."""
+        _ = Countries(countryinput=value)
+        return value
+
     @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
     def dates_and_values_validate(self: Self) -> Self:
         """Pydantic validator to ensure dates and values are validated."""
@@ -125,28 +139,6 @@ class OpenTimeSeries(_CommonModel):
             msg = "Number of dates and values passed do not match"
             raise ValueError(msg)
         return self
-
-    @classmethod
-    def setup_class(
-        cls: type[OpenTimeSeries],
-        domestic_ccy: CurrencyStringType = "SEK",
-        countries: CountriesType = "SE",
-    ) -> None:
-        """Set the domestic currency and calendar of the user.
-
-        Parameters
-        ----------
-        domestic_ccy : CurrencyStringType, default: "SEK"
-            Currency code according to ISO 4217
-        countries: CountriesType, default: "SE"
-            (List of) country code(s) according to ISO 3166-1 alpha-2
-
-        """
-        _ = Currency(ccy=domestic_ccy)
-        _ = Countries(countryinput=countries)
-
-        cls.domestic = domestic_ccy
-        cls.countries = countries
 
     @classmethod
     def from_arrays(
