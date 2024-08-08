@@ -5,9 +5,9 @@ param (
 $ErrorActionPreference = 'Stop'
 
 # Function to get the latest Python 3.10 version from pyenv
-function Get-LatestPython310Version {
+function Get-LatestPythonVersion {
     $versions = pyenv versions --bare 3.10.*
-    $latestVersion = $versions | Where-Object { $_ -match '^3\.10\.\d+$' } | Sort-Object -Descending | Select-Object -First 1
+    $latestVersion = $versions | Where-Object { $_ -match '^3\.10\.[a-zA-Z0-9]+$' } | Sort-Object -Descending | Select-Object -First 1
     return $latestVersion
 }
 
@@ -38,7 +38,7 @@ elseif ($task -eq "make")
 {
     Remove-Item -Path ".\venv" -Recurse -Force -ErrorAction SilentlyContinue
     if (Test-Path $env:USERPROFILE\.pyenv) {
-        $latestVersion = Get-LatestPython310Version
+        $latestVersion = Get-LatestPythonVersion
         if ($latestVersion) {
             pyenv global $latestVersion
             pyenv local $latestVersion
