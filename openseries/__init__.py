@@ -3,7 +3,6 @@
 from .datefixer import (
     date_fix,
     date_offset_foll,
-    do_resample_to_business_period_ends,
     generate_calendar_date_range,
     get_previous_business_day_before_today,
     holiday_calendar,
@@ -31,7 +30,6 @@ __all__ = [
     "simulate_portfolios",
     "date_fix",
     "date_offset_foll",
-    "do_resample_to_business_period_ends",
     "generate_calendar_date_range",
     "get_previous_business_day_before_today",
     "holiday_calendar",

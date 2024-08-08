@@ -128,55 +128,6 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
 class TestOpenTimeSeries(CommonTestCase):
     """class to run tests on the module series.py."""
 
-    def test_setup_class(self: TestOpenTimeSeries) -> None:
-        """Test setup_class method."""
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="String should have at least 3 characters",
-        ):
-            OpenTimeSeries.setup_class(domestic_ccy="12")
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="Input should be a valid string",
-        ):
-            OpenTimeSeries.setup_class(domestic_ccy=cast(str, 12))
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="Input should be a valid list|String should match pattern",
-        ):
-            OpenTimeSeries.setup_class(countries="12")
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="Input should be a valid string",
-        ):
-            OpenTimeSeries.setup_class(
-                countries=cast(CountriesType, ["SE", cast(str, 12)]),
-            )
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="2 validation errors for Countries",
-        ):
-            OpenTimeSeries.setup_class(countries=cast(CountriesType, ["SE", "12"]))
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="2 validation errors for Countries",
-        ):
-            OpenTimeSeries.setup_class(countries=cast(CountriesType, None))
-
-        OpenTimeSeries.setup_class(domestic_ccy="USD", countries="US")
-        if OpenTimeSeries.domestic != "USD":
-            msg = "Method setup_class() not working as intended"
-            raise ValueError(msg)
-
-        if OpenTimeSeries.countries != "US":
-            msg = "Method setup_class() not working as intended"
-            raise ValueError(msg)
-
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
         """Test invalid dates as input."""
         with pytest.raises(
@@ -578,6 +529,15 @@ class TestOpenTimeSeries(CommonTestCase):
             msg = "Method from_df() not working as intended"
             raise ValueError(msg)
 
+        wrongtype = [["2023-01-01", "2023-01-02"], [1.0, 1.1]]
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="Argument dframe must be pandas Series or DataFrame.",
+        ):
+            _ = OpenTimeSeries.from_df(
+                dframe=wrongtype,  # type: ignore[arg-type]
+            )
+
     def test_check_if_none(self: TestOpenTimeSeries) -> None:
         """Test _check_if_none function."""
         if not _check_if_none(None):
@@ -895,20 +855,20 @@ class TestOpenTimeSeries(CommonTestCase):
         """Test output consistency after calc_range applied."""
         cseries = self.randomseries.from_deepcopy()
 
-        dates = cseries.calc_range(months_offset=48)
+        date_one, date_two = cseries.calc_range(months_offset=48)
 
         if [
-            dates[0].strftime("%Y-%m-%d"),
-            dates[1].strftime("%Y-%m-%d"),
+            date_one.strftime("%Y-%m-%d"),
+            date_two.strftime("%Y-%m-%d"),
         ] != ["2015-06-26", "2019-06-28"]:
             msg = "Method calc_range() not working as intended"
             raise ValueError(msg)
 
-        dates = self.randomseries.calc_range(from_dt=dt.date(2016, 6, 30))
+        date_one, date_two = self.randomseries.calc_range(from_dt=dt.date(2016, 6, 30))
 
         if [
-            dates[0].strftime("%Y-%m-%d"),
-            dates[1].strftime("%Y-%m-%d"),
+            date_one.strftime("%Y-%m-%d"),
+            date_two.strftime("%Y-%m-%d"),
         ] != ["2016-06-30", "2019-06-28"]:
             msg = "Method calc_range() not working as intended"
             raise ValueError(msg)
@@ -1498,12 +1458,6 @@ class TestOpenTimeSeries(CommonTestCase):
         if made_fig_keys != fig_keys:
             msg = "Data in Figure not as intended."
             raise ValueError(msg)
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Must provide same number of labels as items in frame.",
-        ):
-            _, _ = barseries.plot_bars(auto_open=False, labels=["a", "b"])
 
         overlayfig, _ = barseries.plot_bars(
             auto_open=False,

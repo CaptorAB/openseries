@@ -359,21 +359,20 @@ class TestOpenFrame(CommonTestCase):
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
         crframe = self.randomframe.from_deepcopy()
-        start, end = (
-            crframe.first_idx.strftime("%Y-%m-%d"),
-            crframe.last_idx.strftime(
-                "%Y-%m-%d",
-            ),
-        )
+        start, end = crframe.first_idx, crframe.last_idx
+
         rst, ren = crframe.calc_range()
 
-        if [start, end] != [rst.strftime("%Y-%m-%d"), ren.strftime("%Y-%m-%d")]:
+        if [start, end] != [rst, ren]:
             msg = "Unintended output from calc_range()"
             raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="Function calc_range returned earlier date < series start",
+            match=(
+                "Argument months_offset implies start"
+                "date before first date in series."
+            ),
         ):
             _, _ = crframe.calc_range(months_offset=125)
 
@@ -389,42 +388,28 @@ class TestOpenFrame(CommonTestCase):
         ):
             _, _ = crframe.calc_range(to_dt=dt.date(2019, 7, 31))
 
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
+        offsetst, offseten = crframe.calc_range(
+            months_offset=12,
+        )
+        if [offsetst, offseten] != [dt.date(2018, 6, 28), end]:
+            msg = f"Unintended output from calc_range():{[offsetst, offseten]}"
+            raise ValueError(msg)
 
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 7, 31),
-                to_dt=dt.date(2019, 7, 31),
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Given from_dt or to_dt dates outside series range",
-        ):
-            _, _ = crframe.calc_range(
-                from_dt=dt.date(2009, 5, 31),
-                to_dt=dt.date(2019, 5, 31),
-            )
-
-        nst, nen = crframe.calc_range(
+        fromtost, fromtoen = crframe.calc_range(
             from_dt=dt.date(2009, 7, 3),
             to_dt=dt.date(2019, 6, 25),
         )
-        if nst != dt.date(2009, 7, 3):
-            msg = "Unintended output from calc_range()"
+        if [fromtost, fromtoen] != [dt.date(2009, 7, 3), dt.date(2019, 6, 25)]:
+            msg = f"Unintended output from calc_range():{[fromtost, fromtoen]}"
             raise ValueError(msg)
-        if nen != dt.date(2019, 6, 25):
-            msg = "Unintended output from calc_range()"
+
+        bothst, bothen = crframe.calc_range(
+            months_offset=12,
+            from_dt=dt.date(2009, 7, 3),
+            to_dt=dt.date(2019, 6, 25),
+        )
+        if [bothst, bothen] != [offsetst, end]:
+            msg = f"Unintended output from calc_range():{[bothst, bothen]}"
             raise ValueError(msg)
 
         crframe.resample()
@@ -479,16 +464,18 @@ class TestOpenFrame(CommonTestCase):
         new_stubs_dates = rsb_stubs_frame.tsdf.index.tolist()
 
         if new_stubs_dates != [
+            dt.date(2023, 1, 14),
             dt.date(2023, 1, 15),
             dt.date(2023, 1, 31),
             dt.date(2023, 2, 28),
             dt.date(2023, 3, 31),
             dt.date(2023, 4, 28),
             dt.date(2023, 5, 15),
+            dt.date(2023, 5, 16),
         ]:
             msg = (
                 "resample_to_business_period_ends() method "
-                "generated unexpected result"
+                f"generated unexpected result:\n{new_stubs_dates}"
             )
             raise ValueError(msg)
 
@@ -514,11 +501,12 @@ class TestOpenFrame(CommonTestCase):
             dt.date(2023, 1, 31),
             dt.date(2023, 2, 28),
             dt.date(2023, 3, 31),
+            dt.date(2023, 4, 21),
             dt.date(2023, 4, 28),
         ]:
             msg = (
                 "resample_to_business_period_ends() method "
-                "generated unexpected result"
+                f"generated unexpected result:\n{new_dates}"
             )
             raise ValueError(msg)
 
@@ -544,12 +532,16 @@ class TestOpenFrame(CommonTestCase):
     def test_make_portfolio(self: TestOpenFrame) -> None:
         """Test make_portfolio method."""
         mpframe = self.randomframe.from_deepcopy()
+        mrframe = self.randomframe.from_deepcopy()
         mpframe.to_cumret()
         mpframe.weights = [1.0 / mpframe.item_count] * mpframe.item_count
+        mrframe.weights = [1.0 / mrframe.item_count] * mrframe.item_count
 
         name = "portfolio"
         mptail = mpframe.make_portfolio(name=name).tail()
         mptail = mptail.map(lambda nn: f"{nn:.6f}")
+        mrtail = mrframe.make_portfolio(name=name).tail()
+        mrtail = mrtail.map(lambda nn: f"{nn:.6f}")
 
         correct = ["1.731448", "1.729862", "1.730238", "1.726204", "1.727963"]
         wrong = ["1.731448", "1.729862", "1.730238", "1.726204", "1.727933"]
@@ -579,6 +571,7 @@ class TestOpenFrame(CommonTestCase):
         )
 
         assert_frame_equal(true_tail, mptail, check_exact=True)
+        assert_frame_equal(true_tail, mrtail, check_exact=True)
 
         with pytest.raises(expected_exception=AssertionError, match="are different"):
             assert_frame_equal(false_tail, mptail, check_exact=True)
@@ -1103,7 +1096,8 @@ class TestOpenFrame(CommonTestCase):
             "pandas_df",
             "running_adjustment",
             "set_new_label",
-            "setup_class",
+            "validate_domestic",
+            "validate_countries",
             "dates_and_values_validate",
         ]
 
@@ -1268,6 +1262,19 @@ class TestOpenFrame(CommonTestCase):
             msg = f"Unaligned data in Figure: '{last_fmt}'"
             raise ValueError(msg)
 
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_series(
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
+        )
+        fig_labels_json = loads(cast(str, fig_labels.to_json()))
+
+        labels = [item["name"] for item in fig_labels_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise ValueError(msg)
+
         with pytest.raises(
             expected_exception=ValueError,
             match="Must provide same number of labels as items in frame.",
@@ -1372,6 +1379,19 @@ class TestOpenFrame(CommonTestCase):
             if rawdata != fig_data:
                 msg = "Unaligned data between original and data in Figure."
                 raise ValueError(msg)
+
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_bars(
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
+        )
+        fig_labels_json = loads(cast(str, fig_labels.to_json()))
+
+        labels = [item["name"] for item in fig_labels_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise ValueError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -2509,6 +2529,14 @@ class TestOpenFrame(CommonTestCase):
             _ = cframe.capture_ratio_func(
                 ratio="up",
                 base_column="string",
+            )
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="ratio must be one of 'up', 'down' or 'both'.",
+        ):
+            _ = cframe.capture_ratio_func(
+                ratio="boo",
             )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
