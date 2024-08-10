@@ -47,7 +47,7 @@ jobs:
         run: |
           export GPG_TTY=$(tty)
           echo "$GPG_PRIVATE_KEY" | gpg --batch --pinentry-mode loopback --import
-          version=$(grep -oP '(?<=version = ").*(?=")' pyproject.toml)
+          version=$(grep -oPm1 '(?<=version = ").*(?=")' pyproject.toml)
           echo "Version: $version"
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR_EMAIL}"
