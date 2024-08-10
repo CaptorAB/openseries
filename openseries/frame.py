@@ -43,7 +43,7 @@ from statsmodels.regression.linear_model import (  # type: ignore[import-untyped
 from typing_extensions import Self
 
 from ._common_model import _CommonModel
-from .datefixer import do_resample_to_business_period_ends
+from .datefixer import _do_resample_to_business_period_ends
 from .series import OpenTimeSeries
 from .types import (
     CountriesType,
@@ -443,21 +443,18 @@ class OpenFrame(_CommonModel):
             An OpenFrame object
 
         """
-        head: Series[float] = self.tsdf.loc[self.first_indices.max()].copy()
-        tail: Series[float] = self.tsdf.loc[self.last_indices.min()].copy()
-        dates = do_resample_to_business_period_ends(
-            data=self.tsdf,
-            head=head,
-            tail=tail,
-            freq=freq,
-            countries=countries,
-        )
-        self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         for xerie in self.constituents:
-            xerie.tsdf = xerie.tsdf.reindex(
-                [deyt.date() for deyt in dates],
-                method=method,
+            dates = _do_resample_to_business_period_ends(
+                data=xerie.tsdf,
+                freq=freq,
+                countries=countries,
             )
+            xerie.tsdf = xerie.tsdf.reindex(
+                [deyt.date() for deyt in dates], method=method,
+            )
+
+        self._set_tsdf()
+
         return self
 
     def ewma_risk(
@@ -1111,6 +1108,9 @@ class OpenFrame(_CommonModel):
                     ratios.append(
                         (up_rtrn / up_idx_return) / (down_return / down_idx_return),
                     )
+                else:
+                    msg = "ratio must be one of 'up', 'down' or 'both'."
+                    raise ValueError(msg)
 
         if ratio == "up":
             resultname = f"Up Capture Ratios vs {short_label}"

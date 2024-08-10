@@ -6,6 +6,7 @@ __pycache__/
 /.pytest_cache/
 /.ruff_cache/
 .coverage
+coverage.xml
 
 # Environments
 /venv/
@@ -18,7 +19,3 @@ __pycache__/
 
 # Visual Studio Code
 .vscode/*
-
-# My own additions
-/.inspectionProfiles/
-.xml

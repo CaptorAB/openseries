@@ -36,4 +36,4 @@ jobs:
         run: PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --capture=no
 
       - name: Report coverage
-        run: poetry run coverage report -m
+        run: poetry run coverage report

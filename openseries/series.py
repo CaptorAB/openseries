@@ -25,11 +25,11 @@ from pandas import (
     Series,
     date_range,
 )
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from typing_extensions import Self
 
 from ._common_model import _CommonModel
-from .datefixer import date_fix, do_resample_to_business_period_ends
+from .datefixer import _do_resample_to_business_period_ends, date_fix
 from .types import (
     Countries,
     CountriesType,
@@ -105,6 +105,20 @@ class OpenTimeSeries(_CommonModel):
     isin: str | None = None
     label: str | None = None
 
+    @field_validator("domestic", mode="before")
+    @classmethod
+    def validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
+        """Pydantic validator to ensure domestic field is validated."""
+        _ = Currency(ccy=value)
+        return value
+
+    @field_validator("countries", mode="before")
+    @classmethod
+    def validate_countries(cls, value: CountriesType) -> CountriesType:
+        """Pydantic validator to ensure countries field is validated."""
+        _ = Countries(countryinput=value)
+        return value
+
     @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
     def dates_and_values_validate(self: Self) -> Self:
         """Pydantic validator to ensure dates and values are validated."""
@@ -125,28 +139,6 @@ class OpenTimeSeries(_CommonModel):
             msg = "Number of dates and values passed do not match"
             raise ValueError(msg)
         return self
-
-    @classmethod
-    def setup_class(
-        cls: type[OpenTimeSeries],
-        domestic_ccy: CurrencyStringType = "SEK",
-        countries: CountriesType = "SE",
-    ) -> None:
-        """Set the domestic currency and calendar of the user.
-
-        Parameters
-        ----------
-        domestic_ccy : CurrencyStringType, default: "SEK"
-            Currency code according to ISO 4217
-        countries: CountriesType, default: "SE"
-            (List of) country code(s) according to ISO 3166-1 alpha-2
-
-        """
-        _ = Currency(ccy=domestic_ccy)
-        _ = Countries(countryinput=countries)
-
-        cls.domestic = domestic_ccy
-        cls.countries = countries
 
     @classmethod
     def from_arrays(
@@ -247,8 +239,8 @@ class OpenTimeSeries(_CommonModel):
             else:
                 label = dframe.name
             values = dframe.to_numpy().tolist()
-        else:
-            values = cast(DataFrame, dframe).iloc[:, column_nmbr].tolist()
+        elif isinstance(dframe, DataFrame):
+            values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
                 if _check_if_none(
                     dframe.columns.get_level_values(0).to_numpy()[column_nmbr],
@@ -270,6 +262,10 @@ class OpenTimeSeries(_CommonModel):
                     ]
             else:
                 label = cast(MultiIndex, dframe.columns).to_numpy()[column_nmbr]
+        else:
+            msg = "Argument dframe must be pandas Series or DataFrame."
+            raise TypeError(msg)
+
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
 
         return cls(
@@ -584,12 +580,8 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        head = self.tsdf.iloc[0].copy()
-        tail = self.tsdf.iloc[-1].copy()
-        dates = do_resample_to_business_period_ends(
+        dates = _do_resample_to_business_period_ends(
             data=self.tsdf,
-            head=head,
-            tail=tail,
             freq=freq,
             countries=self.countries,
         )

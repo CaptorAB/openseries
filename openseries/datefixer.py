@@ -15,15 +15,14 @@ from pandas import (
     DataFrame,
     DatetimeIndex,
     Index,
-    Series,
     Timestamp,
     concat,
     date_range,
 )
 from pandas.tseries.offsets import CustomBusinessDay
 
-if TYPE_CHECKING:  # pragma: no cover
-    from .types import (
+if TYPE_CHECKING:
+    from .types import (  # pragma: no cover
         CountriesType,
         DateType,
         HolidayType,
@@ -33,7 +32,6 @@ if TYPE_CHECKING:  # pragma: no cover
 __all__ = [
     "date_fix",
     "date_offset_foll",
-    "do_resample_to_business_period_ends",
     "generate_calendar_date_range",
     "get_previous_business_day_before_today",
     "holiday_calendar",
@@ -379,10 +377,9 @@ def generate_calendar_date_range(
     )
 
 
-def do_resample_to_business_period_ends(
+# noinspection PyUnusedLocal
+def _do_resample_to_business_period_ends(
     data: DataFrame,
-    head: Series[float],
-    tail: Series[float],
     freq: LiteralBizDayFreq,
     countries: CountriesType,
 ) -> DatetimeIndex:
@@ -394,10 +391,6 @@ def do_resample_to_business_period_ends(
     ----------
     data: pandas.DataFrame
         The timeseries data
-    head: pandas:Series[float]
-        Data point at maximum first date of all series
-    tail: pandas:Series[float]
-        Data point at minimum last date of all series
     freq: LiteralBizDayFreq
         The date offset string that sets the resampled frequency
     countries: CountriesType
@@ -410,25 +403,16 @@ def do_resample_to_business_period_ends(
         A date range aligned to business period ends
 
     """
-    newhead = head.to_frame().T
-    newtail = tail.to_frame().T
-    data.index = DatetimeIndex(data.index)
-    data = data.resample(rule=freq).last()
-    data = data.drop(index=data.index[-1])
-    data.index = Index(d.date() for d in DatetimeIndex(data.index))
+    copydata = data.copy()
+    copydata.index = DatetimeIndex(copydata.index)
+    copydata = copydata.resample(rule=freq).last()
+    copydata = copydata.drop(index=copydata.index[-1])
+    copydata.index = Index(d.date() for d in DatetimeIndex(copydata.index))
 
-    if newhead.index[0] not in data.index:
-        # noinspection PyUnreachableCode
-        data = concat([data, newhead])
-
-    if newtail.index[0] not in data.index:
-        # noinspection PyUnreachableCode
-        data = concat([data, newtail])
-
-    data = data.sort_index()
+    copydata = concat([data.head(n=1), copydata, data.tail(n=1)]).sort_index()
 
     dates = DatetimeIndex(
-        [data.index[0]]
+        [copydata.index[0]]
         + [
             date_offset_foll(
                 dt.date(d.year, d.month, 1)
@@ -439,8 +423,8 @@ def do_resample_to_business_period_ends(
                 adjust=True,
                 following=False,
             )
-            for d in data.index[1:-1]
+            for d in copydata.index[1:-1]
         ]
-        + [data.index[-1]],
+        + [copydata.index[-1]],
     )
     return dates.drop_duplicates()
