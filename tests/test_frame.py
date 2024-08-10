@@ -1096,9 +1096,6 @@ class TestOpenFrame(CommonTestCase):
             "pandas_df",
             "running_adjustment",
             "set_new_label",
-            "validate_domestic",
-            "validate_countries",
-            "dates_and_values_validate",
         ]
 
         frame_unique = [
