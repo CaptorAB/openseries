@@ -1,6 +1,6 @@
 # Changelog
 
-## Version [1.7.1] - 2024-xx-xx
+## Version [1.7.1] - 2024-08-10
 
 - Changed so that resample_to_business_period_ends method on OpenFrame now retains original stubs on all constituent OpenTimeSeries.
 - Made do_resample_to_business_period_ends private.
