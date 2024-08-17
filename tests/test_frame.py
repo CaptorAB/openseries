@@ -1966,15 +1966,16 @@ class TestOpenFrame(CommonTestCase):
         result = apframe.all_properties()
         result_index = result.index.tolist()
 
+        msg = "Method all_properties() not working as intended."
         if not isinstance(result, DataFrame):
-            msg = "Method all_properties() not working as intended."
             raise TypeError(msg)
 
         result_arg = apframe.all_properties(
             properties=cast(list[LiteralFrameProps], ["geo_ret"]),
         )
+
+        msg = "Method all_properties() not working as intended."
         if not isinstance(result_arg, DataFrame):
-            msg = "Method all_properties() not working as intended."
             raise TypeError(msg)
 
         if set(prop_index) != set(result_index):

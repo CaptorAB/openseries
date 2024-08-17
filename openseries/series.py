@@ -233,8 +233,9 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        if isinstance(dframe, Series):
-            if isinstance(dframe.name, tuple):
+        msg = "Argument dframe must be pandas Series or DataFrame."
+        if isinstance(dframe, Series):  # type: ignore[unreachable]
+            if isinstance(dframe.name, tuple):  # type: ignore[unreachable]
                 label, _ = dframe.name
             else:
                 label = dframe.name
@@ -263,7 +264,6 @@ class OpenTimeSeries(_CommonModel):
             else:
                 label = cast(MultiIndex, dframe.columns).to_numpy()[column_nmbr]
         else:
-            msg = "Argument dframe must be pandas Series or DataFrame."
             raise TypeError(msg)
 
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]

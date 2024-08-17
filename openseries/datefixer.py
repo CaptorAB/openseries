@@ -115,6 +115,7 @@ def date_fix(
         Parsed date
 
     """
+    msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
     if isinstance(fixerdate, (Timestamp, dt.datetime)):
         return fixerdate.date()
     if isinstance(fixerdate, dt.date):
@@ -125,10 +126,7 @@ def date_fix(
         )
     if isinstance(fixerdate, str):
         return dt.datetime.strptime(fixerdate, "%Y-%m-%d").astimezone().date()
-    msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
-    raise TypeError(
-        msg,
-    )
+    raise TypeError(msg)
 
 
 def date_offset_foll(

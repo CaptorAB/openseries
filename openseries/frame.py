@@ -777,6 +777,7 @@ class OpenFrame(_CommonModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
 
+        msg = "base_column should be a tuple[str, ValueType] or an integer."
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
                 :,
@@ -798,7 +799,6 @@ class OpenFrame(_CommonModel):
             ].name
             short_label = cast(tuple[str, str], self.tsdf.iloc[:, base_column].name)[0]
         else:
-            msg = "base_column should be a tuple[str, ValueType] or an integer."
             raise TypeError(
                 msg,
             )
@@ -870,6 +870,7 @@ class OpenFrame(_CommonModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
 
+        msg = "base_column should be a tuple[str, ValueType] or an integer."
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
                 :,
@@ -891,7 +892,6 @@ class OpenFrame(_CommonModel):
             ].name
             short_label = cast(tuple[str, str], self.tsdf.iloc[:, base_column].name)[0]
         else:
-            msg = "base_column should be a tuple[str, ValueType] or an integer."
             raise TypeError(
                 msg,
             )
@@ -974,6 +974,7 @@ class OpenFrame(_CommonModel):
         earlier, later = self.calc_range(months_from_last, from_date, to_date)
         fraction = (later - earlier).days / 365.25
 
+        msg = "base_column should be a tuple[str, ValueType] or an integer."
         if isinstance(base_column, tuple):
             shortdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].loc[
                 :,
@@ -995,7 +996,6 @@ class OpenFrame(_CommonModel):
             ].name
             short_label = cast(tuple[str, str], self.tsdf.iloc[:, base_column].name)[0]
         else:
-            msg = "base_column should be a tuple[str, ValueType] or an integer."
             raise TypeError(
                 msg,
             )
@@ -1014,6 +1014,7 @@ class OpenFrame(_CommonModel):
                     :,
                     item,
                 ]
+                msg = "ratio must be one of 'up', 'down' or 'both'."
                 if ratio == "up":
                     uparray = (
                         longdf.pct_change(fill_method=None)[
@@ -1109,7 +1110,6 @@ class OpenFrame(_CommonModel):
                         (up_rtrn / up_idx_return) / (down_return / down_idx_return),
                     )
                 else:
-                    msg = "ratio must be one of 'up', 'down' or 'both'."
                     raise ValueError(msg)
 
         if ratio == "up":
@@ -1156,25 +1156,26 @@ class OpenFrame(_CommonModel):
             x_value == ValueType.RTRN
             for x_value in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
+            msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
                 y_value = self.tsdf.loc[:, asset]
             elif isinstance(asset, int):
                 y_value = self.tsdf.iloc[:, asset]
             else:
-                msg = "asset should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
+            msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
                 x_value = self.tsdf.loc[:, market]
             elif isinstance(market, int):
                 x_value = self.tsdf.iloc[:, market]
             else:
-                msg = "market should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
         else:
+            msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
                 y_value = log(
                     self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
@@ -1184,10 +1185,11 @@ class OpenFrame(_CommonModel):
                     self.tsdf.iloc[:, asset] / cast(float, self.tsdf.iloc[0, asset]),
                 )
             else:
-                msg = "asset should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
+
+            msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
                 x_value = log(
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
@@ -1197,7 +1199,6 @@ class OpenFrame(_CommonModel):
                     self.tsdf.iloc[:, market] / cast(float, self.tsdf.iloc[0, market]),
                 )
             else:
-                msg = "market should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
@@ -1241,6 +1242,7 @@ class OpenFrame(_CommonModel):
             The Statsmodels regression output
 
         """
+        msg = "y_column should be a tuple[str, ValueType] or an integer."
         if isinstance(y_column, tuple):
             y_value = self.tsdf.loc[:, y_column]
             y_label = cast(
@@ -1251,11 +1253,11 @@ class OpenFrame(_CommonModel):
             y_value = self.tsdf.iloc[:, y_column]
             y_label = cast(tuple[str, str], self.tsdf.iloc[:, y_column].name)[0]
         else:
-            msg = "y_column should be a tuple[str, ValueType] or an integer."
             raise TypeError(
                 msg,
             )
 
+        msg = "x_column should be a tuple[str, ValueType] or an integer."
         if isinstance(x_column, tuple):
             x_value = self.tsdf.loc[:, x_column]
             x_label = cast(
@@ -1266,7 +1268,6 @@ class OpenFrame(_CommonModel):
             x_value = self.tsdf.iloc[:, x_column]
             x_label = cast(tuple[str, str], self.tsdf.iloc[:, x_column].name)[0]
         else:
-            msg = "x_column should be a tuple[str, ValueType] or an integer."
             raise TypeError(
                 msg,
             )
@@ -1315,6 +1316,7 @@ class OpenFrame(_CommonModel):
             x == ValueType.RTRN
             for x in self.tsdf.columns.get_level_values(1).to_numpy()
         ):
+            msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
                 asset_log = self.tsdf.loc[:, asset]
                 asset_cagr = asset_log.mean()
@@ -1322,10 +1324,11 @@ class OpenFrame(_CommonModel):
                 asset_log = self.tsdf.iloc[:, asset]
                 asset_cagr = asset_log.mean()
             else:
-                msg = "asset should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
+
+            msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
                 market_log = self.tsdf.loc[:, market]
                 market_cagr = market_log.mean()
@@ -1333,11 +1336,11 @@ class OpenFrame(_CommonModel):
                 market_log = self.tsdf.iloc[:, market]
                 market_cagr = market_log.mean()
             else:
-                msg = "market should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
         else:
+            msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
                 asset_log = log(
                     self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
@@ -1369,10 +1372,11 @@ class OpenFrame(_CommonModel):
                         - 1
                     )
             else:
-                msg = "asset should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
+
+            msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
                 market_log = log(
                     self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
@@ -1404,7 +1408,6 @@ class OpenFrame(_CommonModel):
                         - 1
                     )
             else:
-                msg = "market should be a tuple[str, ValueType] or an integer."
                 raise TypeError(
                     msg,
                 )
@@ -1449,6 +1452,8 @@ class OpenFrame(_CommonModel):
         ):
             dframe = dframe.pct_change(fill_method=None)
             dframe.iloc[0] = 0
+
+        msg = "Weight strategy not implemented"
         if weight_strat:
             if weight_strat == "eq_weights":
                 self.weights = [1.0 / self.item_count] * self.item_count
@@ -1457,8 +1462,8 @@ class OpenFrame(_CommonModel):
                 vol[isinf(vol)] = nan
                 self.weights = list(divide(vol, vol.sum()))
             else:
-                msg = "Weight strategy not implemented"
                 raise NotImplementedError(msg)
+
         return DataFrame(
             data=dframe.dot(other=array(self.weights)).add(1.0).cumprod(),
             index=self.tsdf.index,
