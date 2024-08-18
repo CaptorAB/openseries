@@ -1022,9 +1022,8 @@ class TestOpenTimeSeries(CommonTestCase):
                 ).strftime("%Y-%m-%d")
             else:
                 msg = f"all_properties returned unexpected type {type(value)}"
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
+
         expected_values = {
             "arithmetic_ret": "0.0585047569",
             "cvar_down": "-0.0123803429",

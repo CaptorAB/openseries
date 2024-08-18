@@ -2000,9 +2000,8 @@ class TestOpenFrame(CommonTestCase):
                 ).strftime("%Y-%m-%d")
             else:
                 msg = f"all_properties returned unexpected type {type(value)}"
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
+
         expected_values = {
             "Arithmetic return": "0.0585047569",
             "CVaR 95.0%": "-0.0123803429",

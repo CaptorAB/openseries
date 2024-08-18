@@ -72,9 +72,7 @@ def test_date_fix(fixerdate: DateType) -> None:
             f"Unknown date format {fixerdate!s} of"
             f" type {type(fixerdate)!s} encountered"
         )
-        raise TypeError(
-            msg,
-        )
+        raise TypeError(msg)
 
     int_arg: int = 3
     with pytest.raises(
@@ -196,9 +194,7 @@ def test_date_offset_foll(
     )
     if result != intention:
         msg = f"Unintended result from date_offset_foll: {result}"
-        raise ValueError(
-            msg,
-        )
+        raise ValueError(msg)
 
     static = date_offset_foll(
         raw_date=raw_date,

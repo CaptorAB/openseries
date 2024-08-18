@@ -799,9 +799,7 @@ class OpenFrame(_CommonModel):
             ].name
             short_label = cast(tuple[str, str], self.tsdf.iloc[:, base_column].name)[0]
         else:
-            raise TypeError(
-                msg,
-            )
+            raise TypeError(msg)
 
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -892,9 +890,7 @@ class OpenFrame(_CommonModel):
             ].name
             short_label = cast(tuple[str, str], self.tsdf.iloc[:, base_column].name)[0]
         else:
-            raise TypeError(
-                msg,
-            )
+            raise TypeError(msg)
 
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -996,9 +992,7 @@ class OpenFrame(_CommonModel):
             ].name
             short_label = cast(tuple[str, str], self.tsdf.iloc[:, base_column].name)[0]
         else:
-            raise TypeError(
-                msg,
-            )
+            raise TypeError(msg)
 
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -1162,18 +1156,15 @@ class OpenFrame(_CommonModel):
             elif isinstance(asset, int):
                 y_value = self.tsdf.iloc[:, asset]
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
+
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
                 x_value = self.tsdf.loc[:, market]
             elif isinstance(market, int):
                 x_value = self.tsdf.iloc[:, market]
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
         else:
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
@@ -1185,9 +1176,7 @@ class OpenFrame(_CommonModel):
                     self.tsdf.iloc[:, asset] / cast(float, self.tsdf.iloc[0, asset]),
                 )
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
@@ -1199,9 +1188,7 @@ class OpenFrame(_CommonModel):
                     self.tsdf.iloc[:, market] / cast(float, self.tsdf.iloc[0, market]),
                 )
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
 
         covariance = cov(y_value, x_value, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -1253,9 +1240,7 @@ class OpenFrame(_CommonModel):
             y_value = self.tsdf.iloc[:, y_column]
             y_label = cast(tuple[str, str], self.tsdf.iloc[:, y_column].name)[0]
         else:
-            raise TypeError(
-                msg,
-            )
+            raise TypeError(msg)
 
         msg = "x_column should be a tuple[str, ValueType] or an integer."
         if isinstance(x_column, tuple):
@@ -1268,9 +1253,7 @@ class OpenFrame(_CommonModel):
             x_value = self.tsdf.iloc[:, x_column]
             x_label = cast(tuple[str, str], self.tsdf.iloc[:, x_column].name)[0]
         else:
-            raise TypeError(
-                msg,
-            )
+            raise TypeError(msg)
 
         results = sm.OLS(y_value, x_value).fit(method=method, cov_type=cov_type)
         if fitted_series:
@@ -1324,9 +1307,7 @@ class OpenFrame(_CommonModel):
                 asset_log = self.tsdf.iloc[:, asset]
                 asset_cagr = asset_log.mean()
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
@@ -1336,9 +1317,7 @@ class OpenFrame(_CommonModel):
                 market_log = self.tsdf.iloc[:, market]
                 market_cagr = market_log.mean()
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
         else:
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
@@ -1372,9 +1351,7 @@ class OpenFrame(_CommonModel):
                         - 1
                     )
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
@@ -1408,9 +1385,7 @@ class OpenFrame(_CommonModel):
                         - 1
                     )
             else:
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
 
         covariance = cov(asset_log, market_log, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -1442,9 +1417,7 @@ class OpenFrame(_CommonModel):
                 "OpenFrame weights property must be provided "
                 "to run the make_portfolio method."
             )
-            raise ValueError(
-                msg,
-            )
+            raise ValueError(msg)
         dframe = self.tsdf.copy()
         if not any(
             x == ValueType.RTRN

@@ -339,9 +339,7 @@ class OpenTimeSeries(_CommonModel):
             )
         elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
             msg = "If d_range is not provided both days and end_dt must be."
-            raise ValueError(
-                msg,
-            )
+            raise ValueError(msg)
 
         deltas = array(
             [
