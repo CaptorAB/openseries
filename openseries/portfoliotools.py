@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Callable, cast
 from numpy import (
     append,
     array,
-    dot,
     float64,
     inf,
     isnan,
@@ -106,11 +105,8 @@ def simulate_portfolios(
         weights = weights / npsum(weights)
         all_weights[x, :] = weights
 
-        vol_arr[x] = sqrt(
-            dot(
-                weights.T,
-                dot(log_ret.cov() * simframe.periods_in_a_year, weights),
-            ),
+        vol_arr[x] = sqrt(weights.T @
+                (log_ret.cov() * simframe.periods_in_a_year @ weights),
         )
 
         ret_arr[x] = npsum(log_ret.mean() * weights * simframe.periods_in_a_year)
@@ -198,7 +194,7 @@ def efficient_frontier(  # noqa: C901
         per_in_yr: float,
     ) -> NDArray[float64]:
         ret = npsum(lg_ret.mean() * weights) * per_in_yr
-        volatility = sqrt(dot(weights.T, dot(lg_ret.cov() * per_in_yr, weights)))
+        volatility = sqrt(weights.T @ (lg_ret.cov() * per_in_yr @ weights))
         sr = ret / volatility
         return cast(NDArray[float64], array([ret, volatility, sr]))
 
@@ -288,6 +284,7 @@ def efficient_frontier(  # noqa: C901
         frontier_x.append(result["fun"])
         frontier_weights.append(result["x"])
 
+    # noinspection PyUnreachableCode
     line_df = concat(
         [
             DataFrame(data=frontier_weights, columns=eframe.columns_lvl_zero),
