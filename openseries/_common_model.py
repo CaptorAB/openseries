@@ -484,9 +484,7 @@ class _CommonModel(BaseModel):
                     "Argument months_offset implies start"
                     "date before first date in series."
                 )
-                raise ValueError(
-                    msg,
-                )
+                raise ValueError(msg)
             later = self.last_idx
         else:
             if from_dt is not None:
@@ -785,9 +783,7 @@ class _CommonModel(BaseModel):
         if labels:
             if len(labels) != self.tsdf.shape[1]:
                 msg = "Must provide same number of labels as items in frame."
-                raise ValueError(
-                    msg,
-                )
+                raise ValueError(msg)
         else:
             labels = list(self.tsdf.columns.get_level_values(0))
 
@@ -902,9 +898,7 @@ class _CommonModel(BaseModel):
         if labels:
             if len(labels) != self.tsdf.shape[1]:
                 msg = "Must provide same number of labels as items in frame."
-                raise ValueError(
-                    msg,
-                )
+                raise ValueError(msg)
         else:
             labels = list(self.tsdf.columns.get_level_values(0))
 
@@ -1932,9 +1926,7 @@ class _CommonModel(BaseModel):
                 "Simple return cannot be calculated due to "
                 f"an initial value being zero. ({self.tsdf.head(3)})"
             )
-            raise ValueError(
-                msg,
-            )
+            raise ValueError(msg)
 
         result = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
 

@@ -1096,9 +1096,6 @@ class TestOpenFrame(CommonTestCase):
             "pandas_df",
             "running_adjustment",
             "set_new_label",
-            "validate_domestic",
-            "validate_countries",
-            "dates_and_values_validate",
         ]
 
         frame_unique = [
@@ -1969,15 +1966,16 @@ class TestOpenFrame(CommonTestCase):
         result = apframe.all_properties()
         result_index = result.index.tolist()
 
+        msg = "Method all_properties() not working as intended."
         if not isinstance(result, DataFrame):
-            msg = "Method all_properties() not working as intended."
             raise TypeError(msg)
 
         result_arg = apframe.all_properties(
             properties=cast(list[LiteralFrameProps], ["geo_ret"]),
         )
+
+        msg = "Method all_properties() not working as intended."
         if not isinstance(result_arg, DataFrame):
-            msg = "Method all_properties() not working as intended."
             raise TypeError(msg)
 
         if set(prop_index) != set(result_index):
@@ -2002,9 +2000,8 @@ class TestOpenFrame(CommonTestCase):
                 ).strftime("%Y-%m-%d")
             else:
                 msg = f"all_properties returned unexpected type {type(value)}"
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
+
         expected_values = {
             "Arithmetic return": "0.0585047569",
             "CVaR 95.0%": "-0.0123803429",

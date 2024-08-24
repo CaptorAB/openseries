@@ -21,8 +21,8 @@ class TestTypes:
         """Test that the OpenTimeSeries property input is correctly checked."""
         subset = cast(LiteralSeriesProps, ["z_score", "kurtosis", "positive_share"])
         lst = OpenTimeSeriesPropertiesList(*subset)
+        msg = "A OpenTimeSeriesPropertiesList was not produced"
         if not isinstance(lst, OpenTimeSeriesPropertiesList):
-            msg = "A OpenTimeSeriesPropertiesList was not produced"
             raise TypeError(msg)
 
         with pytest.raises(
@@ -48,8 +48,8 @@ class TestTypes:
         """Test that the OpenFrame property input is correctly checked."""
         subset = cast(LiteralFrameProps, ["z_score", "kurtosis", "positive_share"])
         lst = OpenFramePropertiesList(*subset)
+        msg = "A OpenFramePropertiesList was not produced"
         if not isinstance(lst, OpenFramePropertiesList):
-            msg = "A OpenFramePropertiesList was not produced"
             raise TypeError(msg)
 
         with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):

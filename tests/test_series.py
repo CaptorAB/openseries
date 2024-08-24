@@ -393,8 +393,9 @@ class TestOpenTimeSeries(CommonTestCase):
             ],
             values=[1.0, 1.01, 0.99, 1.015, 1.003],
         )
+
+        msg = "Method from_arrays() not working as intended"
         if not isinstance(arrseries, OpenTimeSeries):
-            msg = "Method from_arrays() not working as intended"
             raise TypeError(msg)
 
     def test_create_from_pd_dataframe(self: TestOpenTimeSeries) -> None:
@@ -457,11 +458,12 @@ class TestOpenTimeSeries(CommonTestCase):
         df1series = OpenTimeSeries.from_df(dframe=df1, column_nmbr=1)
         df2series = OpenTimeSeries.from_df(dframe=df2, column_nmbr=0)
 
+        msg = "Method from_df() not working as intended"
         if not isinstance(df1series, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
             raise TypeError(msg)
+
+        msg = "Method from_df() not working as intended"
         if not isinstance(df2series, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
             raise TypeError(msg)
 
         with self.assertLogs() as contextmgr:
@@ -482,11 +484,12 @@ class TestOpenTimeSeries(CommonTestCase):
         df3series = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
         df4series = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
 
+        msg = "Method from_df() not working as intended"
         if not isinstance(df3series, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
             raise TypeError(msg)
+
+        msg = "Method from_df() not working as intended"
         if not isinstance(df4series, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
             raise TypeError(msg)
 
     def test_create_from_pd_series(self: TestOpenTimeSeries) -> None:
@@ -519,12 +522,14 @@ class TestOpenTimeSeries(CommonTestCase):
         seseries = OpenTimeSeries.from_df(dframe=serie)
         senseries = OpenTimeSeries.from_df(dframe=sen)
 
+        msg = "Method from_df() not working as intended"
         if not isinstance(seseries, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
             raise TypeError(msg)
+
+        msg = "Method from_df() not working as intended"
         if not isinstance(senseries, OpenTimeSeries):
-            msg = "Method from_df() not working as intended"
             raise TypeError(msg)
+
         if seseries.label != senseries.label:
             msg = "Method from_df() not working as intended"
             raise ValueError(msg)
@@ -738,8 +743,9 @@ class TestOpenTimeSeries(CommonTestCase):
             days=756,
             end_dt=self.randomseries.last_idx,
         )
+
+        msg = "Method from_fixed_rate() not working as intended"
         if not isinstance(fixseries_one, OpenTimeSeries):
-            msg = "Method from_fixed_rate() not working as intended"
             raise TypeError(msg)
 
         rnd_series = self.randomseries.from_deepcopy()
@@ -747,8 +753,9 @@ class TestOpenTimeSeries(CommonTestCase):
             rate=0.03,
             d_range=DatetimeIndex(rnd_series.tsdf.index),
         )
+
+        msg = "Method from_fixed_rate() not working as intended"
         if not isinstance(fixseries_two, OpenTimeSeries):
-            msg = "Method from_fixed_rate() not working as intended"
             raise TypeError(msg)
 
         with pytest.raises(
@@ -1015,9 +1022,8 @@ class TestOpenTimeSeries(CommonTestCase):
                 ).strftime("%Y-%m-%d")
             else:
                 msg = f"all_properties returned unexpected type {type(value)}"
-                raise TypeError(
-                    msg,
-                )
+                raise TypeError(msg)
+
         expected_values = {
             "arithmetic_ret": "0.0585047569",
             "cvar_down": "-0.0123803429",
@@ -1055,8 +1061,8 @@ class TestOpenTimeSeries(CommonTestCase):
             raise ValueError(msg)
 
         props = apseries.all_properties(properties=["geo_ret", "vol"])
+        msg = "Method all_properties() not working as intended"
         if not isinstance(props, DataFrame):
-            msg = "Method all_properties() not working as intended"
             raise TypeError(msg)
 
         with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
@@ -1256,8 +1262,8 @@ class TestOpenTimeSeries(CommonTestCase):
             raise ValueError(msg)
 
         new_chained_series = timeseries_chain(front_series_two, back_series)
+        msg = "Function timeseries_chain() not working as intended"
         if not isinstance(new_chained_series, OpenTimeSeries):
-            msg = "Function timeseries_chain() not working as intended"
             raise TypeError(msg)
 
         front_series_three = OpenTimeSeries.from_df(full_series.tsdf.iloc[:136])
@@ -1320,8 +1326,8 @@ class TestOpenTimeSeries(CommonTestCase):
         new_base = timeseries_chain(front=base_series_one, back=base_series_two)
         new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
 
+        msg = "Function timeseries_chain() not working as intended"
         if not isinstance(new_base, OpenTimeSeries):
-            msg = "Function timeseries_chain() not working as intended"
             raise TypeError(msg)
 
         if not isinstance(new_sub, NewTimeSeries):
@@ -1347,8 +1353,9 @@ class TestOpenTimeSeries(CommonTestCase):
     def test_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
         """Test that chained methods on subclass returns subclass and not baseclass."""
         cseries = self.randomseries.from_deepcopy()
+
+        msg = "chained methods on subclass not working as intended"
         if not isinstance(cseries, OpenTimeSeries):
-            msg = "chained methods on subclass not working as intended"
             raise TypeError(msg)
 
         copyseries = NewTimeSeries.from_arrays(
@@ -1363,8 +1370,9 @@ class TestOpenTimeSeries(CommonTestCase):
         copyseries.set_new_label("boo").running_adjustment(0.001).resample(
             "BME",
         ).value_to_ret()
+
+        msg = "chained methods on subclass not working as intended"
         if not isinstance(copyseries, NewTimeSeries):
-            msg = "chained methods on subclass not working as intended"
             raise TypeError(msg)
 
     def test_plot_series(self: TestOpenTimeSeries) -> None:

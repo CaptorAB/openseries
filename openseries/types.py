@@ -272,9 +272,7 @@ class OpenTimeSeriesPropertiesList(list[str]):
                 msg = (
                     f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
                 )
-                raise ValueError(
-                    msg,
-                )
+                raise ValueError(msg)
             if item in seen:
                 msg = f"Duplicate string: {item}"
                 raise ValueError(msg)
@@ -323,9 +321,7 @@ class OpenFramePropertiesList(list[str]):
                 msg = (
                     f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
                 )
-                raise ValueError(
-                    msg,
-                )
+                raise ValueError(msg)
             if item in seen:
                 msg = f"Duplicate string: {item}"
                 raise ValueError(msg)

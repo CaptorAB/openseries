@@ -92,9 +92,7 @@ def holiday_calendar(
             "Argument countries must be a string country code or "
             "a list of string country codes according to ISO 3166-1 alpha-2."
         )
-        raise ValueError(
-            msg,
-        )
+        raise ValueError(msg)
 
     return busdaycalendar(holidays=hols)
 
@@ -115,6 +113,7 @@ def date_fix(
         Parsed date
 
     """
+    msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
     if isinstance(fixerdate, (Timestamp, dt.datetime)):
         return fixerdate.date()
     if isinstance(fixerdate, dt.date):
@@ -125,10 +124,7 @@ def date_fix(
         )
     if isinstance(fixerdate, str):
         return dt.datetime.strptime(fixerdate, "%Y-%m-%d").astimezone().date()
-    msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
-    raise TypeError(
-        msg,
-    )
+    raise TypeError(msg)
 
 
 def date_offset_foll(
@@ -372,9 +368,7 @@ def generate_calendar_date_range(
         "Provide one of start or end date, but not both. "
         "Date range is inferred from number of trading days."
     )
-    raise ValueError(
-        msg,
-    )
+    raise ValueError(msg)
 
 
 # noinspection PyUnusedLocal

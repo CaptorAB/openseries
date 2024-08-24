@@ -107,20 +107,20 @@ class OpenTimeSeries(_CommonModel):
 
     @field_validator("domestic", mode="before")
     @classmethod
-    def validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
+    def _validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
         _ = Currency(ccy=value)
         return value
 
     @field_validator("countries", mode="before")
     @classmethod
-    def validate_countries(cls, value: CountriesType) -> CountriesType:
+    def _validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
         _ = Countries(countryinput=value)
         return value
 
     @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
-    def dates_and_values_validate(self: Self) -> Self:
+    def _dates_and_values_validate(self: Self) -> Self:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)
         dates_list_length = len(self.dates)
@@ -233,8 +233,11 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        if isinstance(dframe, Series):
-            if isinstance(dframe.name, tuple):
+        msg = "Argument dframe must be pandas Series or DataFrame."
+        if isinstance(dframe, Series):  # type: ignore[unreachable,unused-ignore]
+            if isinstance(  # type: ignore[unreachable,unused-ignore]
+                    dframe.name, tuple,
+            ):
                 label, _ = dframe.name
             else:
                 label = dframe.name
@@ -263,7 +266,6 @@ class OpenTimeSeries(_CommonModel):
             else:
                 label = cast(MultiIndex, dframe.columns).to_numpy()[column_nmbr]
         else:
-            msg = "Argument dframe must be pandas Series or DataFrame."
             raise TypeError(msg)
 
         dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
@@ -337,9 +339,7 @@ class OpenTimeSeries(_CommonModel):
             )
         elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
             msg = "If d_range is not provided both days and end_dt must be."
-            raise ValueError(
-                msg,
-            )
+            raise ValueError(msg)
 
         deltas = array(
             [
