@@ -1,5 +1,15 @@
 # Changelog
 
+## Version [1.7.2] - 2024-08-24
+
+- Replaced the dot operator from numpy and pandas with the Python @ operator.
+- Made OpenTimeSeries Pydantic validator methods private.
+- Adjustments to adhere to mypy unreachable code warnings.
+- Removed table in security.md to limit maintenance.
+- Removed setup_class from readme.md as it was deleted in version 1.7.1.
+- Cosmetic improvements on raise exception statements.
+- Miscellaneous dependency updates
+
 ## Version [1.7.1] - 2024-08-10
 
 - Changed so that resample_to_business_period_ends method on OpenFrame now retains original stubs on all constituent OpenTimeSeries.
