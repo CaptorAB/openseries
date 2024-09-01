@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from enum import Enum
+from pprint import pformat
 from typing import Annotated, ClassVar, Literal, Union
 
 from numpy import datetime64
@@ -270,7 +271,8 @@ class OpenTimeSeriesPropertiesList(list[str]):
         for item in self:
             if item not in self.allowed_strings:
                 msg = (
-                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                    f"Invalid string: {item}. Allowed strings are:"
+                    f"\n{pformat(self.allowed_strings)}"
                 )
                 raise ValueError(msg)
             if item in seen:
@@ -319,7 +321,8 @@ class OpenFramePropertiesList(list[str]):
         for item in self:
             if item not in self.allowed_strings:
                 msg = (
-                    f"Invalid string: {item}. Allowed strings: {self.allowed_strings}"
+                    f"Invalid string: {item}. Allowed strings are:"
+                    f"\n{pformat(self.allowed_strings)}"
                 )
                 raise ValueError(msg)
             if item in seen:
