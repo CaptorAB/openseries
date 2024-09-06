@@ -268,17 +268,24 @@ class OpenTimeSeriesPropertiesList(list[str]):
 
     def _validate(self: Self) -> None:
         seen = set()
+        invalids = set()
+        duplicates = set()
+        msg = ""
         for item in self:
             if item not in self.allowed_strings:
-                msg = (
-                    f"Invalid string: {item}. Allowed strings are:"
-                    f"\n{pformat(self.allowed_strings)}"
-                )
-                raise ValueError(msg)
+                invalids.add(item)
             if item in seen:
-                msg = f"Duplicate string: {item}"
-                raise ValueError(msg)
+                duplicates.add(item)
             seen.add(item)
+        if len(invalids) != 0:
+            msg += (
+                f"Invalid string(s): {list(invalids)}.\nAllowed strings are:"
+                f"\n{pformat(self.allowed_strings)}\n"
+            )
+        if len(duplicates) != 0:
+            msg += f"Duplicate string(s): {list(duplicates)}."
+        if len(msg) != 0:
+            raise ValueError(msg)
 
 
 class OpenFramePropertiesList(list[str]):
@@ -318,17 +325,24 @@ class OpenFramePropertiesList(list[str]):
 
     def _validate(self: Self) -> None:
         seen = set()
+        invalids = set()
+        duplicates = set()
+        msg = ""
         for item in self:
             if item not in self.allowed_strings:
-                msg = (
-                    f"Invalid string: {item}. Allowed strings are:"
-                    f"\n{pformat(self.allowed_strings)}"
-                )
-                raise ValueError(msg)
+                invalids.add(item)
             if item in seen:
-                msg = f"Duplicate string: {item}"
-                raise ValueError(msg)
+                duplicates.add(item)
             seen.add(item)
+        if len(invalids) != 0:
+            msg += (
+                f"Invalid string(s): {list(invalids)}.\nAllowed strings are:"
+                f"\n{pformat(self.allowed_strings)}\n"
+            )
+        if len(duplicates) != 0:
+            msg += f"Duplicate string(s): {list(duplicates)}."
+        if len(msg) != 0:
+            raise ValueError(msg)
 
 
 class ValueType(str, Enum):

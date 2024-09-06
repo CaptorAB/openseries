@@ -1065,7 +1065,7 @@ class TestOpenTimeSeries(CommonTestCase):
         if not isinstance(props, DataFrame):
             raise TypeError(msg)
 
-        with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
+        with pytest.raises(expected_exception=ValueError, match="Invalid string"):
             _ = apseries.all_properties(
                 cast(list[LiteralSeriesProps], ["geo_ret", "boo"]),
             )

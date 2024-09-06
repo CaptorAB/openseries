@@ -27,7 +27,7 @@ class TestTypes:
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="Invalid string: boo",
+            match="Invalid string",
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(LiteralSeriesProps, ["z_score", "boo", "positive_share"]),
@@ -35,7 +35,7 @@ class TestTypes:
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="Duplicate string: skew",
+            match="Duplicate string",
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
@@ -52,15 +52,12 @@ class TestTypes:
         if not isinstance(lst, OpenFramePropertiesList):
             raise TypeError(msg)
 
-        with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
+        with pytest.raises(expected_exception=ValueError, match="Invalid string"):
             OpenFramePropertiesList(
                 *cast(LiteralFrameProps, ["z_score", "boo", "positive_share"]),
             )
 
-        with pytest.raises(
-            expected_exception=ValueError,
-            match="Duplicate string: skew",
-        ):
+        with pytest.raises(expected_exception=ValueError, match="Duplicate string"):
             OpenFramePropertiesList(
                 *cast(
                     LiteralFrameProps,

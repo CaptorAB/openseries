@@ -2036,7 +2036,7 @@ class TestOpenFrame(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with pytest.raises(expected_exception=ValueError, match="Invalid string: boo"):
+        with pytest.raises(expected_exception=ValueError, match="Invalid string"):
             _ = apframe.all_properties(
                 properties=cast(list[LiteralFrameProps], ["geo_ret", "boo"]),
             )
