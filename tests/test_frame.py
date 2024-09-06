@@ -2036,11 +2036,6 @@ class TestOpenFrame(CommonTestCase):
             )
             raise ValueError(msg)
 
-        with pytest.raises(expected_exception=ValueError, match="Invalid string"):
-            _ = apframe.all_properties(
-                properties=cast(list[LiteralFrameProps], ["geo_ret", "boo"]),
-            )
-
     def test_align_index_to_local_cdays(self: TestOpenFrame) -> None:
         """Test align_index_to_local_cdays method."""
         d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]

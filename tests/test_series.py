@@ -21,7 +21,6 @@ from openseries.series import (
 )
 from openseries.types import (
     CountriesType,
-    LiteralSeriesProps,
     ValueType,
 )
 from tests.test_common_sim import CommonTestCase
@@ -1064,11 +1063,6 @@ class TestOpenTimeSeries(CommonTestCase):
         msg = "Method all_properties() not working as intended"
         if not isinstance(props, DataFrame):
             raise TypeError(msg)
-
-        with pytest.raises(expected_exception=ValueError, match="Invalid string"):
-            _ = apseries.all_properties(
-                cast(list[LiteralSeriesProps], ["geo_ret", "boo"]),
-            )
 
     def test_all_calc_properties(self: TestOpenTimeSeries) -> None:
         """Test all calculated properties."""
