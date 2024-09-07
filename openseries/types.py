@@ -226,8 +226,8 @@ LiteralFrameProps = Literal[
 ]
 
 
-class OpenTimeSeriesPropertiesList(list[str]):
-    """Allowed property arguments for the OpenTimeSeries class."""
+class PropertiesList(list[str]):
+    """Base class for allowed property arguments definition."""
 
     allowed_strings: ClassVar[set[str]] = {
         "value_ret",
@@ -247,9 +247,37 @@ class OpenTimeSeriesPropertiesList(list[str]):
         "vol_from_var",
         "worst",
         "worst_month",
-        "max_drawdown_cal_year",
         "max_drawdown",
         "max_drawdown_date",
+        "max_drawdown_cal_year",
+    }
+
+    def _validate(self: Self) -> None:
+        seen = set()
+        invalids = set()
+        duplicates = set()
+        msg = ""
+        for item in self:
+            if item not in self.allowed_strings:
+                invalids.add(item)
+            if item in seen:
+                duplicates.add(item)
+            seen.add(item)
+        if len(invalids) != 0:
+            msg += (
+                f"Invalid string(s): {list(invalids)}.\nAllowed strings are:"
+                f"\n{pformat(self.allowed_strings)}\n"
+            )
+        if len(duplicates) != 0:
+            msg += f"Duplicate string(s): {list(duplicates)}."
+        if len(msg) != 0:
+            raise ValueError(msg)
+
+
+class OpenTimeSeriesPropertiesList(PropertiesList):
+    """Allowed property arguments for the OpenTimeSeries class."""
+
+    allowed_strings: ClassVar[set[str]] = PropertiesList.allowed_strings | {
         "first_idx",
         "last_idx",
         "length",
@@ -266,52 +294,11 @@ class OpenTimeSeriesPropertiesList(list[str]):
         super().__init__(args)
         self._validate()
 
-    def _validate(self: Self) -> None:
-        seen = set()
-        invalids = set()
-        duplicates = set()
-        msg = ""
-        for item in self:
-            if item not in self.allowed_strings:
-                invalids.add(item)
-            if item in seen:
-                duplicates.add(item)
-            seen.add(item)
-        if len(invalids) != 0:
-            msg += (
-                f"Invalid string(s): {list(invalids)}.\nAllowed strings are:"
-                f"\n{pformat(self.allowed_strings)}\n"
-            )
-        if len(duplicates) != 0:
-            msg += f"Duplicate string(s): {list(duplicates)}."
-        if len(msg) != 0:
-            raise ValueError(msg)
 
-
-class OpenFramePropertiesList(list[str]):
+class OpenFramePropertiesList(PropertiesList):
     """Allowed property arguments for the OpenFrame class."""
 
-    allowed_strings: ClassVar[set[str]] = {
-        "value_ret",
-        "geo_ret",
-        "arithmetic_ret",
-        "vol",
-        "downside_deviation",
-        "ret_vol_ratio",
-        "sortino_ratio",
-        "omega_ratio",
-        "z_score",
-        "skew",
-        "kurtosis",
-        "positive_share",
-        "var_down",
-        "cvar_down",
-        "vol_from_var",
-        "worst",
-        "worst_month",
-        "max_drawdown",
-        "max_drawdown_date",
-        "max_drawdown_cal_year",
+    allowed_strings: ClassVar[set[str]] = PropertiesList.allowed_strings | {
         "first_indices",
         "last_indices",
         "lengths_of_items",
@@ -322,27 +309,6 @@ class OpenFramePropertiesList(list[str]):
         """Property arguments for the OpenFrame class."""
         super().__init__(args)
         self._validate()
-
-    def _validate(self: Self) -> None:
-        seen = set()
-        invalids = set()
-        duplicates = set()
-        msg = ""
-        for item in self:
-            if item not in self.allowed_strings:
-                invalids.add(item)
-            if item in seen:
-                duplicates.add(item)
-            seen.add(item)
-        if len(invalids) != 0:
-            msg += (
-                f"Invalid string(s): {list(invalids)}.\nAllowed strings are:"
-                f"\n{pformat(self.allowed_strings)}\n"
-            )
-        if len(duplicates) != 0:
-            msg += f"Duplicate string(s): {list(duplicates)}."
-        if len(msg) != 0:
-            raise ValueError(msg)
 
 
 class ValueType(str, Enum):
