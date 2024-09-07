@@ -105,8 +105,8 @@ def simulate_portfolios(
         weights = weights / npsum(weights)
         all_weights[x, :] = weights
 
-        vol_arr[x] = sqrt(weights.T @
-                (log_ret.cov() * simframe.periods_in_a_year @ weights),
+        vol_arr[x] = sqrt(
+            weights.T @ (log_ret.cov() * simframe.periods_in_a_year @ weights),
         )
 
         ret_arr[x] = npsum(log_ret.mean() * weights * simframe.periods_in_a_year)

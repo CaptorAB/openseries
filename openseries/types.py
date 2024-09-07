@@ -253,6 +253,7 @@ class PropertiesList(list[str]):
     }
 
     def _validate(self: Self) -> None:
+        """Validate the string input of the all_propoerties method."""
         seen = set()
         invalids = set()
         duplicates = set()

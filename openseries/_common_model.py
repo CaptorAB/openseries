@@ -504,6 +504,7 @@ class _CommonModel(BaseModel):
 
         return earlier, later
 
+    # noinspection PyUnresolvedReferences
     def align_index_to_local_cdays(
         self: Self,
         countries: CountriesType = "SE",

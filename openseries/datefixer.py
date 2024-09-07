@@ -299,6 +299,7 @@ def offset_business_days(
     return cast(dt.date, local_bdays[idx[0] + days])
 
 
+# noinspection PyUnresolvedReferences
 def generate_calendar_date_range(
     trading_days: int,
     start: dt.date | None = None,
@@ -421,4 +422,4 @@ def _do_resample_to_business_period_ends(
         ]
         + [copydata.index[-1]],
     )
-    return dates.drop_duplicates()
+    return DatetimeIndex(dates.drop_duplicates())
