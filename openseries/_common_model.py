@@ -351,9 +351,9 @@ class _CommonModel(BaseModel):
         """
         wmdf = self.tsdf.copy()
         wmdf.index = DatetimeIndex(wmdf.index)
-        result = (
-            wmdf.resample("BME").last().pct_change(fill_method=cast(str, None)).min()
-        )
+        result = wmdf.resample("BME").last().pct_change(
+            fill_method=None,  # type: ignore[arg-type,unused-ignore]
+        ).min()
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
@@ -1023,7 +1023,7 @@ class _CommonModel(BaseModel):
 
         result = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .mean()
             * time_factor
         )
@@ -1082,9 +1082,9 @@ class _CommonModel(BaseModel):
             time_factor = how_many / fraction
 
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-        result = (
-            data.pct_change(fill_method=cast(str, None)).std().mul(sqrt(time_factor))
-        )
+        result = data.pct_change(
+            fill_method=None,  # type: ignore[arg-type,unused-ignore]
+        ).std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
             return float(cast(SupportsFloat, result.iloc[0]))
@@ -1280,14 +1280,14 @@ class _CommonModel(BaseModel):
         if drift_adjust:
             imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
                 self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change(fill_method=cast(str, None))
+                .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
                 .quantile(1 - level, interpolation=interpolation)
                 - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change(fill_method=cast(str, None))
+                .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
                 .sum()
                 / len(
                     self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(
-                        fill_method=cast(str, None),
+                        fill_method=None,  # type: ignore[arg-type,unused-ignore]
                     ),
                 )
             )
@@ -1295,7 +1295,7 @@ class _CommonModel(BaseModel):
             imp_vol = (
                 -sqrt(time_factor)
                 * self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-                .pct_change(fill_method=cast(str, None))
+                .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
                 .quantile(1 - level, interpolation=interpolation)
                 / norm.ppf(level)
             )
@@ -1358,14 +1358,16 @@ class _CommonModel(BaseModel):
         cvar_df = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy(deep=True)
         result = [
             cvar_df.loc[:, x]  # type: ignore[call-overload,index]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .sort_values()
             .iloc[
                 : int(
                     ceil(
                         (1 - level)
                         * cvar_df.loc[:, x]  # type: ignore[index]
-                        .pct_change(fill_method=cast(str, None))
+                        .pct_change(
+                            fill_method=None,  # type: ignore[arg-type,unused-ignore]
+                        )
                         .count(),
                     ),
                 )
@@ -1425,7 +1427,7 @@ class _CommonModel(BaseModel):
         )
         how_many = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .count(numeric_only=True)
         )
         if periods_in_a_year_fixed:
@@ -1440,7 +1442,7 @@ class _CommonModel(BaseModel):
 
         dddf = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .sub(min_accepted_return / time_factor)
         )
 
@@ -1543,7 +1545,7 @@ class _CommonModel(BaseModel):
         )
         result: NDArray[float64] = skew(
             a=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .to_numpy(),
             bias=True,
             nan_policy="omit",
@@ -1591,7 +1593,7 @@ class _CommonModel(BaseModel):
         )
         result: NDArray[float64] = kurtosis(
             self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(
-                fill_method=cast(str, None),
+                fill_method=None,  # type: ignore[arg-type,unused-ignore]
             ),
             fisher=True,
             bias=True,
@@ -1688,9 +1690,9 @@ class _CommonModel(BaseModel):
         )
         pos = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))[1:][
+            .pct_change(fill_method=None)[1:][  # type: ignore[arg-type,unused-ignore]
                 self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(
-                    fill_method=cast(str, None),
+                    fill_method=None,  # type: ignore[arg-type,unused-ignore]
                 )[1:]
                 > zero
             ]
@@ -1698,7 +1700,7 @@ class _CommonModel(BaseModel):
         )
         tot = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))[1:]
+            .pct_change(fill_method=None)[1:]  # type: ignore[arg-type,unused-ignore]
             .count()
         )
         share = pos / tot
@@ -1877,7 +1879,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         retdf = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(
-            fill_method=cast(str, None),
+            fill_method=None,  # type: ignore[arg-type,unused-ignore]
         )
         pos = retdf[retdf > min_accepted_return].sub(min_accepted_return).sum()
         neg = retdf[retdf < min_accepted_return].sub(min_accepted_return).sum()
@@ -1966,7 +1968,9 @@ class _CommonModel(BaseModel):
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
-        resultdf = DataFrame(vrdf.pct_change(fill_method=None))  # type: ignore[arg-type]
+        resultdf = DataFrame(vrdf.pct_change(
+            fill_method=None,  # type: ignore[arg-type,unused-ignore]
+        ))
         result = resultdf.loc[period] + 1
         cal_period = result.cumprod(axis="index").iloc[-1] - 1
         if self.tsdf.shape[1] == 1:
@@ -2018,7 +2022,7 @@ class _CommonModel(BaseModel):
         )
         result = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .quantile(1 - level, interpolation=interpolation)
         )
 
@@ -2066,7 +2070,7 @@ class _CommonModel(BaseModel):
         )
         result = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .rolling(observations, min_periods=observations)
             .sum()
             .min()
@@ -2113,7 +2117,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         zscframe = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change(
-            fill_method=cast(str, None),
+            fill_method=None,  # type: ignore[arg-type,unused-ignore]
         )
         result = (zscframe.iloc[-1] - zscframe.mean()) / zscframe.std()
 
@@ -2183,7 +2187,7 @@ class _CommonModel(BaseModel):
         ret_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
         retseries = (
             self.tsdf.iloc[:, column]
-            .pct_change(fill_method=cast(str, None))
+            .pct_change(fill_method=None)  # type: ignore[arg-type,unused-ignore]
             .rolling(observations, min_periods=observations)
             .sum()
         )
@@ -2260,7 +2264,9 @@ class _CommonModel(BaseModel):
         else:
             time_factor = self.periods_in_a_year
         vol_label = cast(tuple[str, ValueType], self.tsdf.iloc[:, column].name)[0]
-        dframe = self.tsdf.iloc[:, column].pct_change(fill_method=cast(str, None))
+        dframe = self.tsdf.iloc[:, column].pct_change(
+            fill_method=None,  # type: ignore[arg-type,unused-ignore]
+        )
         volseries = dframe.rolling(
             observations,
             min_periods=observations,

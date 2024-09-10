@@ -436,7 +436,9 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
-        self.tsdf = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
+        self.tsdf = self.tsdf.pct_change(
+            fill_method=None,   # type: ignore[arg-type,unused-ignore]
+        )
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         self.tsdf.columns = MultiIndex.from_arrays(
@@ -696,7 +698,9 @@ class OpenTimeSeries(_CommonModel):
             returns_input = True
         else:
             values = [cast(float, self.tsdf.iloc[0, 0])]
-            ra_df = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
+            ra_df = self.tsdf.pct_change(
+                fill_method=None,  # type: ignore[arg-type,unused-ignore]
+            )
             returns_input = False
         ra_df = ra_df.dropna()
 
