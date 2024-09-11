@@ -1020,8 +1020,7 @@ class _CommonModel(BaseModel):
             time_factor = how_many / fraction
 
         result = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change().mean()
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().mean()
             * time_factor
         )
 
@@ -1685,10 +1684,7 @@ class _CommonModel(BaseModel):
             ]
             .count()
         )
-        tot = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change().count()
-        )
+        tot = self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().count()
         share = pos / tot
         if self.tsdf.shape[1] == 1:
             return float(share.iloc[0])
@@ -2004,7 +2000,8 @@ class _CommonModel(BaseModel):
         )
         result = (
             self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            .pct_change().quantile(1 - level, interpolation=interpolation)
+            .pct_change()
+            .quantile(1 - level, interpolation=interpolation)
         )
 
         if self.tsdf.shape[1] == 1:
@@ -2166,7 +2163,8 @@ class _CommonModel(BaseModel):
         ret_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
         retseries = (
             self.tsdf.iloc[:, column]
-            .pct_change().rolling(observations, min_periods=observations)
+            .pct_change()
+            .rolling(observations, min_periods=observations)
             .sum()
         )
         retdf = retseries.dropna().to_frame()

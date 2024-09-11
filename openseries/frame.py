@@ -449,7 +449,8 @@ class OpenFrame(_CommonModel):
                 countries=countries,
             )
             xerie.tsdf = xerie.tsdf.reindex(
-                [deyt.date() for deyt in dates], method=method,
+                [deyt.date() for deyt in dates],
+                method=method,
             )
 
         self._set_tsdf()

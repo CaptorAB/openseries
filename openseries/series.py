@@ -236,7 +236,8 @@ class OpenTimeSeries(_CommonModel):
         msg = "Argument dframe must be pandas Series or DataFrame."
         if isinstance(dframe, Series):  # type: ignore[unreachable,unused-ignore]
             if isinstance(  # type: ignore[unreachable,unused-ignore]
-                    dframe.name, tuple,
+                dframe.name,
+                tuple,
             ):
                 label, _ = dframe.name
             else:
