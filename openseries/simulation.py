@@ -123,9 +123,7 @@ class ReturnSimulation(BaseModel):
         return cast(
             float,
             (
-                self.results.pct_change(
-                    fill_method=None,  # type: ignore[arg-type,unused-ignore]
-                ).mean()
+                self.results.pct_change().mean()
                 * self.trading_days_in_year
             ).iloc[0],
         )
@@ -143,9 +141,7 @@ class ReturnSimulation(BaseModel):
         return cast(
             float,
             (
-                self.results.pct_change(
-                    fill_method=None,  # type: ignore[arg-type,unused-ignore]
-                ).std()
+                self.results.pct_change().std()
                 * sqrt(self.trading_days_in_year)
             ).iloc[0],
         )
