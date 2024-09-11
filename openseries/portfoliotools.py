@@ -113,7 +113,6 @@ def simulate_portfolios(
 
         sharpe_arr[x] = ret_arr[x] / vol_arr[x]
 
-    # noinspection PyUnreachableCode
     simdf = concat(
         [
             DataFrame({"stdev": vol_arr, "ret": ret_arr, "sharpe": sharpe_arr}),
@@ -284,7 +283,6 @@ def efficient_frontier(  # noqa: C901
         frontier_x.append(result["fun"])
         frontier_weights.append(result["x"])
 
-    # noinspection PyUnreachableCode
     line_df = concat(
         [
             DataFrame(data=frontier_weights, columns=eframe.columns_lvl_zero),

@@ -18,7 +18,15 @@ if TYPE_CHECKING:
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from pandas import DataFrame, DatetimeIndex, Index, MultiIndex, Series, date_range
+from pandas import (
+    DataFrame,
+    DatetimeIndex,
+    Index,
+    MultiIndex,
+    Series,
+    date_range,
+    to_datetime,
+)
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.graph_objs import Figure  # type: ignore[import-untyped,unused-ignore]
 from plotly.io import to_html  # type: ignore[import-untyped,unused-ignore]
@@ -502,7 +510,6 @@ class _CommonModel(BaseModel):
 
         return earlier, later
 
-    # noinspection PyUnresolvedReferences
     def align_index_to_local_cdays(
         self: Self,
         countries: CountriesType = "SE",
@@ -520,8 +527,8 @@ class _CommonModel(BaseModel):
             An OpenFrame object
 
         """
-        startyear = DatetimeIndex(self.tsdf.index)[0].year
-        endyear = DatetimeIndex(self.tsdf.index)[-1].year
+        startyear = to_datetime(self.tsdf.index[0]).year
+        endyear = to_datetime(self.tsdf.index[-1]).year
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,

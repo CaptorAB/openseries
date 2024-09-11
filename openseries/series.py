@@ -205,7 +205,7 @@ class OpenTimeSeries(_CommonModel):
     @classmethod
     def from_df(
         cls: type[OpenTimeSeries],
-        dframe: DataFrame | Series[float],
+        dframe: Series[float] | DataFrame,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -234,11 +234,8 @@ class OpenTimeSeries(_CommonModel):
 
         """
         msg = "Argument dframe must be pandas Series or DataFrame."
-        if isinstance(dframe, Series):  # type: ignore[unreachable,unused-ignore]
-            if isinstance(  # type: ignore[unreachable,unused-ignore]
-                dframe.name,
-                tuple,
-            ):
+        if isinstance(dframe, Series):
+            if isinstance(dframe.name, tuple):
                 label, _ = dframe.name
             else:
                 label = dframe.name
