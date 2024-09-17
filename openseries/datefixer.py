@@ -336,7 +336,7 @@ def generate_calendar_date_range(
         )
         calendar = holiday_calendar(
             startyear=start.year,
-            endyear=tmp_range[-1].year,
+            endyear=date_fix(tmp_range[-1]).year,
             countries=countries,
         )
         return [
@@ -351,7 +351,7 @@ def generate_calendar_date_range(
     if end and not start:
         tmp_range = date_range(end=end, periods=trading_days * 365 // 252, freq="D")
         calendar = holiday_calendar(
-            startyear=tmp_range[0].year,
+            startyear=date_fix(tmp_range[0]).year,
             endyear=end.year,
             countries=countries,
         )
@@ -371,7 +371,6 @@ def generate_calendar_date_range(
     raise ValueError(msg)
 
 
-# noinspection PyUnusedLocal
 def _do_resample_to_business_period_ends(
     data: DataFrame,
     freq: LiteralBizDayFreq,
@@ -421,4 +420,4 @@ def _do_resample_to_business_period_ends(
         ]
         + [copydata.index[-1]],
     )
-    return dates.drop_duplicates()
+    return DatetimeIndex(dates.drop_duplicates())

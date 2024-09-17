@@ -1,5 +1,12 @@
 # Changelog
 
+## Version [1.7.3] - 2024-09-17
+
+- Consolidated all_properties() method and its string validations.
+- Simplified pandas.pct_change() after new pandas type stubs and fill_method no longer required by mypy.
+- Simplified dependencies after bug in statsmodels resolved in version 0.14.3.
+- Miscellaneous dependency and lockfile updates
+
 ## Version [1.7.2] - 2024-08-24
 
 - Replaced the dot operator from numpy and pandas with the Python @ operator.

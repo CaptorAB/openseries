@@ -205,7 +205,7 @@ class OpenTimeSeries(_CommonModel):
     @classmethod
     def from_df(
         cls: type[OpenTimeSeries],
-        dframe: DataFrame | Series[float],
+        dframe: Series[float] | DataFrame,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -234,10 +234,8 @@ class OpenTimeSeries(_CommonModel):
 
         """
         msg = "Argument dframe must be pandas Series or DataFrame."
-        if isinstance(dframe, Series):  # type: ignore[unreachable,unused-ignore]
-            if isinstance(  # type: ignore[unreachable,unused-ignore]
-                    dframe.name, tuple,
-            ):
+        if isinstance(dframe, Series):
+            if isinstance(dframe.name, tuple):
                 label, _ = dframe.name
             else:
                 label = dframe.name
@@ -436,7 +434,7 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
-        self.tsdf = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
+        self.tsdf = self.tsdf.pct_change()
         self.tsdf.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         self.tsdf.columns = MultiIndex.from_arrays(
@@ -696,7 +694,7 @@ class OpenTimeSeries(_CommonModel):
             returns_input = True
         else:
             values = [cast(float, self.tsdf.iloc[0, 0])]
-            ra_df = self.tsdf.pct_change(fill_method=None)  # type: ignore[arg-type]
+            ra_df = self.tsdf.pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
 
