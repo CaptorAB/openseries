@@ -1407,27 +1407,30 @@ class OpenFrame(_CommonModel):
                 "to run the make_portfolio method."
             )
             raise ValueError(msg)
-        dframe = self.tsdf.copy()
-        if not any(
-            x == ValueType.RTRN
-            for x in self.tsdf.columns.get_level_values(1).to_numpy()
-        ):
-            dframe = dframe.pct_change()
-            dframe.iloc[0] = 0
+
+        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        if not any(vtypes):
+            returns = self.tsdf.ffill().pct_change()
+            returns.iloc[0] = 0
+        elif all(vtypes):
+            returns = self.tsdf.copy()
+        else:
+            msg = "Mix of series types will give inconsistent results"
+            raise ValueError(msg)
 
         msg = "Weight strategy not implemented"
         if weight_strat:
             if weight_strat == "eq_weights":
                 self.weights = [1.0 / self.item_count] * self.item_count
             elif weight_strat == "inv_vol":
-                vol = divide(1.0, std(dframe, axis=0, ddof=1))
+                vol = divide(1.0, std(returns, axis=0, ddof=1))
                 vol[isinf(vol)] = nan
                 self.weights = list(divide(vol, vol.sum()))
             else:
                 raise NotImplementedError(msg)
 
         return DataFrame(
-            data=(dframe @ self.weights).add(1.0).cumprod(),
+            data=(returns @ self.weights).add(1.0).cumprod(),
             index=self.tsdf.index,
             columns=[[name], [ValueType.PRICE]],
             dtype="float64",
