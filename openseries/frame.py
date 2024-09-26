@@ -340,7 +340,7 @@ class OpenFrame(_CommonModel):
         returns.iloc[0] = 0
         new_labels = [ValueType.RTRN] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        returns.columns = MultiIndex.from_arrays(arrays)
+        returns.columns = MultiIndex.from_arrays(arrays=arrays)
         self.tsdf = returns.copy()
         return self
 
