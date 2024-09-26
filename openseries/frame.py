@@ -336,11 +336,12 @@ class OpenFrame(_CommonModel):
             The returns of the values in the series
 
         """
-        self.tsdf = self.tsdf.pct_change()
-        self.tsdf.iloc[0] = 0
+        returns = self.tsdf.ffill().pct_change()
+        returns.iloc[0] = 0
         new_labels = [ValueType.RTRN] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
-        self.tsdf.columns = MultiIndex.from_arrays(arrays)
+        returns.columns = MultiIndex.from_arrays(arrays)
+        self.tsdf = returns.copy()
         return self
 
     def value_to_diff(self: Self, periods: int = 1) -> Self:
