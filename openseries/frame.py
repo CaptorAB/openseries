@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
 from numpy import (
     cov,
-    cumprod,
     divide,
     isinf,
     log,
@@ -375,14 +374,20 @@ class OpenFrame(_CommonModel):
             An OpenFrame object
 
         """
-        if any(
-            x == ValueType.PRICE
-            for x in self.tsdf.columns.get_level_values(1).to_numpy()
-        ):
-            self.value_to_ret()
+        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        if not any(vtypes):
+            returns = self.tsdf.ffill().pct_change()
+            returns.iloc[0] = 0
+        elif all(vtypes):
+            returns = self.tsdf.copy()
+            returns.iloc[0] = 0
+        else:
+            msg = "Mix of series types will give inconsistent results"
+            raise ValueError(msg)
 
-        self.tsdf = self.tsdf.add(1.0)
-        self.tsdf = self.tsdf.apply(cumprod, axis="index") / self.tsdf.iloc[0]
+        returns = returns.add(1.0)
+        self.tsdf = returns.cumprod(axis=0) / returns.iloc[0]
+
         new_labels = [ValueType.PRICE] * self.item_count
         arrays = [self.tsdf.columns.get_level_values(0), new_labels]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
@@ -1285,30 +1290,8 @@ class OpenFrame(_CommonModel):
 
         """
         full_year = 1.0
-        if all(
-            x == ValueType.RTRN
-            for x in self.tsdf.columns.get_level_values(1).to_numpy()
-        ):
-            msg = "asset should be a tuple[str, ValueType] or an integer."
-            if isinstance(asset, tuple):
-                asset_log = self.tsdf.loc[:, asset]
-                asset_cagr = asset_log.mean()
-            elif isinstance(asset, int):
-                asset_log = self.tsdf.iloc[:, asset]
-                asset_cagr = asset_log.mean()
-            else:
-                raise TypeError(msg)
-
-            msg = "market should be a tuple[str, ValueType] or an integer."
-            if isinstance(market, tuple):
-                market_log = self.tsdf.loc[:, market]
-                market_cagr = market_log.mean()
-            elif isinstance(market, int):
-                market_log = self.tsdf.iloc[:, market]
-                market_cagr = market_log.mean()
-            else:
-                raise TypeError(msg)
-        else:
+        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        if not any(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
                 asset_log = log(
@@ -1376,6 +1359,29 @@ class OpenFrame(_CommonModel):
                     )
             else:
                 raise TypeError(msg)
+        elif all(vtypes):
+            msg = "asset should be a tuple[str, ValueType] or an integer."
+            if isinstance(asset, tuple):
+                asset_log = self.tsdf.loc[:, asset]
+                asset_cagr = asset_log.mean()
+            elif isinstance(asset, int):
+                asset_log = self.tsdf.iloc[:, asset]
+                asset_cagr = asset_log.mean()
+            else:
+                raise TypeError(msg)
+
+            msg = "market should be a tuple[str, ValueType] or an integer."
+            if isinstance(market, tuple):
+                market_log = self.tsdf.loc[:, market]
+                market_cagr = market_log.mean()
+            elif isinstance(market, int):
+                market_log = self.tsdf.iloc[:, market]
+                market_cagr = market_log.mean()
+            else:
+                raise TypeError(msg)
+        else:
+            msg = "Mix of series types will give inconsistent results"
+            raise ValueError(msg)
 
         covariance = cov(asset_log, market_log, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]

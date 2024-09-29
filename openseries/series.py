@@ -478,14 +478,12 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        if not any(
-            x == ValueType.RTRN
-            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).to_numpy()
-        ):
+        if self.valuetype == ValueType.PRICE:
             self.value_to_ret()
 
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
+
         self.valuetype = ValueType.PRICE
         self.tsdf.columns = MultiIndex.from_arrays(
             [
@@ -683,11 +681,7 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        values: list[float]
-        if any(
-            x == ValueType.RTRN
-            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).to_numpy()
-        ):
+        if self.valuetype == ValueType.RTRN:
             ra_df = self.tsdf.copy()
             values = [1.0]
             returns_input = True

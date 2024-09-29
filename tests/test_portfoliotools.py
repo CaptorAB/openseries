@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 import pytest
 
+from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
 from openseries.portfoliotools import (
     constrain_optimized_portfolios,
@@ -76,6 +77,22 @@ class TestPortfoliotools(CommonTestCase):
                 f"\n{(value_least_vol, value_where_least_vol)}"
             )
             raise ValueError(msg)
+
+        series = self.randomseries.from_deepcopy()
+        returns = self.randomseries.from_deepcopy()
+        returns.set_new_label(lvl_zero="returns")
+        returns.value_to_ret()
+        mixframe = OpenFrame(constituents=[series, returns])
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Mix of series types will give inconsistent results",
+        ):
+            _ = simulate_portfolios(
+                simframe=mixframe,
+                num_ports=simulations,
+                seed=self.seed,
+            )
 
     def test_efficient_frontier(self: TestPortfoliotools) -> None:
         """Test function efficient_frontier."""
@@ -163,6 +180,24 @@ class TestPortfoliotools(CommonTestCase):
             ]:
                 msg = f"Function efficient_frontier not working as intended\n{optlist}"
                 raise ValueError(msg)
+
+        series = self.randomseries.from_deepcopy()
+        returns = self.randomseries.from_deepcopy()
+        returns.set_new_label(lvl_zero="returns")
+        returns.value_to_ret()
+        mixframe = OpenFrame(constituents=[series, returns])
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Mix of series types will give inconsistent results",
+        ):
+            _, _, _ = efficient_frontier(
+                eframe=mixframe,
+                num_ports=simulations,
+                seed=self.seed,
+                frontier_points=points,
+                tweak=False,
+            )
 
     def test_constrain_optimized_portfolios(self: TestPortfoliotools) -> None:
         """Test function constrain_optimized_portfolios."""

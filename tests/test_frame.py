@@ -2785,6 +2785,7 @@ class TestOpenFrame(CommonTestCase):
         rseries = self.randomseries.from_deepcopy()
         rseries.value_to_ret()
         rrseries = rseries.from_deepcopy()
+        rrseries.value_to_ret()
         rrseries.set_new_label(lvl_zero="Rasset")
 
         cseries = self.randomseries.from_deepcopy()
@@ -2810,11 +2811,10 @@ class TestOpenFrame(CommonTestCase):
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
-        mframe.to_cumret()
         cframe.to_cumret()
         rframe.to_cumret()
 
-        if mframe.columns_lvl_one != [ValueType.PRICE, ValueType.PRICE]:
+        if mframe.columns_lvl_one != [ValueType.RTRN, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
 
@@ -2825,6 +2825,12 @@ class TestOpenFrame(CommonTestCase):
         if rframe.columns_lvl_one != [ValueType.PRICE, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
             raise ValueError(msg)
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Mix of series types will give inconsistent results",
+        ):
+            mframe.to_cumret()
 
         fmt = "{:.8f}"
 
@@ -3433,6 +3439,17 @@ class TestOpenFrame(CommonTestCase):
                 asset=0,
                 market="string",
             )
+
+        series = self.randomseries.from_deepcopy()
+        returns = self.randomseries.from_deepcopy()
+        returns.set_new_label(lvl_zero="returns")
+        returns.value_to_ret()
+        mixframe = OpenFrame(constituents=[series, returns])
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Mix of series types will give inconsistent results",
+        ):
+            _ = mixframe.jensen_alpha(asset=0, market=1)
 
     def test_ewma_risk(self: TestOpenFrame) -> None:
         """Test ewma_risk method."""
