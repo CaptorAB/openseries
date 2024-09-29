@@ -510,6 +510,27 @@ class TestOpenFrame(CommonTestCase):
             )
             raise ValueError(msg)
 
+    def test_resample_to_business_period_ends_renaming(self: TestOpenFrame) -> None:
+        """Test resample_to_business_period_ends method and its handling of labels."""
+        rename = {
+            "Asset_0": "Asset_A",
+            "Asset_1": "Asset_B",
+            "Asset_2": "Asset_C",
+            "Asset_3": "Asset_D",
+            "Asset_4": "Asset_E",
+        }
+
+        frame = self.randomframe.from_deepcopy()
+        frame.tsdf = frame.tsdf.rename(columns=rename, level=0)
+        frame.resample_to_business_period_ends(freq="BYE")
+
+        if frame.columns_lvl_zero != list(rename.values()):
+            msg = (
+                "Method .resample_to_business_period_ends() "
+                "not considering new columns in .tsdf"
+            )
+            raise ValueError(msg)
+
     def test_max_drawdown_date(self: TestOpenFrame) -> None:
         """Test max_drawdown_date method."""
         mddframe = self.randomframe.from_deepcopy()

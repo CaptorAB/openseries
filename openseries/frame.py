@@ -459,7 +459,14 @@ class OpenFrame(_CommonModel):
                 method=method,
             )
 
+        arrays = [
+            self.tsdf.columns.get_level_values(0),
+            self.tsdf.columns.get_level_values(1),
+        ]
+
         self._set_tsdf()
+
+        self.tsdf.columns = MultiIndex.from_arrays(arrays)
 
         return self
 
