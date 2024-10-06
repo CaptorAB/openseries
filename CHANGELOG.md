@@ -1,10 +1,11 @@
 # Changelog
 
-## Version [1.7.4] - 2024-XX-XX
+## Version [1.7.4] - 2024-10-06
 
 - Tightened existing checks to not allow mixed series types as methods input. The coverage level of the checks has not been widened.
 - Added pandas .ffill() as precursor to pct_change() to suppress pandas FutureWarnings in dependent projects.
 - Fixed method .resample_to_business_period_ends() so it considers renamed labels.
+- Corrected warning in this changelog for release of version 1.7.0. Added 'NO'.
 - Miscellaneous dependency and lockfile updates.
 
 ## Version [1.7.3] - 2024-09-17
