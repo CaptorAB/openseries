@@ -1,5 +1,13 @@
 # Changelog
 
+## Version [1.7.4] - 2024-10-06
+
+- Tightened existing checks to not allow mixed series types as methods input. The coverage level of the checks has not been widened.
+- Added pandas .ffill() as precursor to pct_change() to suppress pandas FutureWarnings in dependent projects.
+- Fixed method .resample_to_business_period_ends() so it considers renamed labels.
+- Corrected warning in this changelog for release of version 1.7.0. Added 'NO'.
+- Miscellaneous dependency and lockfile updates.
+
 ## Version [1.7.3] - 2024-09-17
 
 - Consolidated all_properties() method and its string validations.
@@ -30,7 +38,7 @@
 
 ## Version [1.7.0] - 2024-07-27
 
-- Changed code to enforce PEP 604 on typing. This means that the PACKAGE WILL LONGER WORK FOR PYTHON 3.9.
+- Changed code to enforce PEP 604 on typing. This means that the PACKAGE WILL NO LONGER WORK FOR PYTHON 3.9.
 - Limited GitHub workflow build.yaml to no longer run on Python 3.9
 - Adjustments to adhere to ruff TCH type checking imports.
 - Introduced strict requirement that generate_calendar_date_range argument trading_days must be positive.

@@ -346,6 +346,7 @@ class OpenTimeSeries(_CommonModel):
                 - cast(DatetimeIndex, d_range)[:-1]
             ],
         )
+        # noinspection PyTypeChecker
         arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
         dates = [d.strftime("%Y-%m-%d") for d in cast(DatetimeIndex, d_range)]
 
@@ -434,15 +435,12 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
-        self.tsdf = self.tsdf.pct_change()
-        self.tsdf.iloc[0] = 0
+        returns = self.tsdf.ffill().pct_change()
+        returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
-        self.tsdf.columns = MultiIndex.from_arrays(
-            [
-                [self.label],
-                [self.valuetype],
-            ],
-        )
+        arrays = [[self.label], [self.valuetype]]
+        returns.columns = MultiIndex.from_arrays(arrays=arrays)
+        self.tsdf = returns.copy()
         return self
 
     def value_to_diff(self: Self, periods: int = 1) -> Self:
@@ -480,14 +478,12 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        if not any(
-            x == ValueType.RTRN
-            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).to_numpy()
-        ):
+        if self.valuetype == ValueType.PRICE:
             self.value_to_ret()
 
         self.tsdf = self.tsdf.add(1.0)
         self.tsdf = self.tsdf.cumprod(axis=0) / self.tsdf.iloc[0]
+
         self.valuetype = ValueType.PRICE
         self.tsdf.columns = MultiIndex.from_arrays(
             [
@@ -520,6 +516,7 @@ class OpenTimeSeries(_CommonModel):
         arr = array(self.values) / divider
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
+        # noinspection PyTypeChecker
         arr = cumprod(insert(1.0 + deltas * arr[:-1] / days_in_year, 0, 1.0))
 
         self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
@@ -684,11 +681,7 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        values: list[float]
-        if any(
-            x == ValueType.RTRN
-            for x in cast(MultiIndex, self.tsdf.columns).get_level_values(1).to_numpy()
-        ):
+        if self.valuetype == ValueType.RTRN:
             ra_df = self.tsdf.copy()
             values = [1.0]
             returns_input = True
@@ -818,6 +811,7 @@ def timeseries_chain(
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
+    # noinspection PyUnresolvedReferences
     if back.__class__.__subclasscheck__(
         OpenTimeSeries,
     ):

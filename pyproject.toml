@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.7.3"
+version = "1.7.4"
 description = "Tools for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/openseries"
@@ -51,9 +51,9 @@ coverage = ">=7.6.0,<8.0.0"
 genbadge = {version = ">=1.1.1,<2.0.0", extras = ["coverage"]}
 mypy = "^1.11.2"
 pandas-stubs = ">=2.1.2,<3.0.0"
-pre-commit = ">=3.7.1,<4.0.0"
+pre-commit = ">=3.7.1,<6.0.0"
 pytest = ">=8.2.2,<9.0.0"
-ruff = "^0.6.5"
+ruff = "^0.6.9"
 types-openpyxl = ">=3.1.2,<4.0.0"
 types-python-dateutil = ">=2.8.2,<3.0.0"
 types-requests = ">=2.20.0,<3.0.0"
@@ -110,7 +110,7 @@ fixable = ["ALL"]
 
 [tool.ruff.lint.pylint]
 max-args = 12
-max-branches = 22
+max-branches = 23
 max-statements = 59
 
 [tool.pytest.ini_options]

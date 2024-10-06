@@ -59,6 +59,7 @@ from .types import (
 )
 
 
+# noinspection PyTypeChecker
 class _CommonModel(BaseModel):
     """Declare _CommonModel."""
 
@@ -680,7 +681,7 @@ class _CommonModel(BaseModel):
                 output.append(dict(itemdata))
 
         with dirpath.joinpath(filename).open(mode="w", encoding="utf-8") as jsonfile:
-            dump(output, jsonfile, indent=2, sort_keys=False)
+            dump(obj=output, fp=jsonfile, indent=2, sort_keys=False)
 
         return output
 
@@ -1027,7 +1028,10 @@ class _CommonModel(BaseModel):
             time_factor = how_many / fraction
 
         result = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].pct_change().mean()
+            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            .ffill()
+            .pct_change()
+            .mean()
             * time_factor
         )
 
@@ -1085,7 +1089,7 @@ class _CommonModel(BaseModel):
             time_factor = how_many / fraction
 
         data = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-        result = data.pct_change().std().mul(sqrt(time_factor))
+        result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
             return float(cast(SupportsFloat, result.iloc[0]))

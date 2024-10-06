@@ -83,13 +83,15 @@ def simulate_portfolios(
     """
     copi = simframe.from_deepcopy()
 
-    if any(
-        x == ValueType.PRICE for x in copi.tsdf.columns.get_level_values(1).to_numpy()
-    ):
+    vtypes = [x == ValueType.RTRN for x in copi.tsdf.columns.get_level_values(1)]
+    if not any(vtypes):
         copi.value_to_ret()
         log_ret = copi.tsdf.copy()[1:]
-    else:
+    elif all(vtypes):
         log_ret = copi.tsdf.copy()
+    else:
+        msg = "Mix of series types will give inconsistent results"
+        raise ValueError(msg)
 
     log_ret.columns = log_ret.columns.droplevel(level=1)
 
@@ -165,13 +167,15 @@ def efficient_frontier(  # noqa: C901
 
     copi = eframe.from_deepcopy()
 
-    if any(
-        x == ValueType.PRICE for x in copi.tsdf.columns.get_level_values(1).to_numpy()
-    ):
+    vtypes = [x == ValueType.RTRN for x in copi.tsdf.columns.get_level_values(1)]
+    if not any(vtypes):
         copi.value_to_ret()
         log_ret = copi.tsdf.copy()[1:]
-    else:
+    elif all(vtypes):
         log_ret = copi.tsdf.copy()
+    else:
+        msg = "Mix of series types will give inconsistent results"
+        raise ValueError(msg)
 
     log_ret.columns = log_ret.columns.droplevel(level=1)
 
