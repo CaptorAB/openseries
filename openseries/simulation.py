@@ -122,7 +122,7 @@ class ReturnSimulation(BaseModel):
         """
         return cast(
             float,
-            (self.results.mean() * self.trading_days_in_year).iloc[0],
+            (self.results.pct_change().mean() * self.trading_days_in_year).iloc[0],
         )
 
     @property
@@ -137,7 +137,9 @@ class ReturnSimulation(BaseModel):
         """
         return cast(
             float,
-            (self.results.std() * sqrt(self.trading_days_in_year)).iloc[0],
+            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[
+                0
+            ],
         )
 
     @classmethod
