@@ -67,12 +67,19 @@ jobs:
             source venv/Scripts/activate
             poetry config cache-dir
             echo "Listing Poetry cache dir on Windows"
-            dir ~/.cache/pypoetry
-          else
+            dir ~/AppData/Local/pypoetry/Cache
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            source venv/bin/activate
+            poetry config cache-dir
+            echo "Listing Poetry cache dir on Mac OS"
+            ls -alh ~/Library/Caches/pypoetry
+          elif [[ "$RUNNER_OS" == "Linux" ]]; then
             source venv/bin/activate
             poetry config cache-dir
             echo "Listing Poetry cache dir on Unix-like systems"
             ls -alh ~/.cache/pypoetry
+          else
+            echo "Unknown OS"
           fi
 
       - name: Check and fix with Ruff
