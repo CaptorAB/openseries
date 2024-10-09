@@ -20,15 +20,12 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v4
 
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v4
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v5
+        id: setup_python
         with:
-          path: |
-            ~/.cache/pypoetry/cache
-            ~/.cache/pypoetry/artifacts
-          key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            poetry-${{ runner.os }}-
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
 
       - name: Create virtual environment
         run: python -m venv venv
