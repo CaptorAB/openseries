@@ -64,15 +64,16 @@ jobs:
       - name: List Poetry cache directory
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
+            source venv/Scripts/activate
+            poetry config cache-dir
             echo "Listing Poetry cache dir on Windows"
             dir ~/.cache/pypoetry
-            source venv/Scripts/activate
           else
+            source venv/bin/activate
+            poetry config cache-dir
             echo "Listing Poetry cache dir on Unix-like systems"
             ls -alh ~/.cache/pypoetry
-            source venv/bin/activate
           fi
-          poetry config cache-dir
 
       - name: Check and fix with Ruff
         run: |
