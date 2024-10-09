@@ -60,6 +60,20 @@ jobs:
           fi
           poetry install --with dev
 
+      # Debug step to inspect Poetry cache directories
+      - name: List Poetry cache directory
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "Listing Poetry cache dir on Windows"
+            dir ~/.cache/pypoetry
+            source venv/Scripts/activate
+          else
+            echo "Listing Poetry cache dir on Unix-like systems"
+            ls -alh ~/.cache/pypoetry
+            source venv/bin/activate
+          fi
+          poetry config cache-dir
+
       - name: Check and fix with Ruff
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then

@@ -50,12 +50,6 @@ jobs:
           source venv/bin/activate
           poetry install --with dev
 
-      # Debug step to inspect Poetry cache directories
-      - name: List Poetry cache directory
-        run: |
-          echo "Listing Poetry cache dir on Unix-like systems"
-          ls -alh ~/.cache/pypoetry
-
       - name: Tests with Pytest
         run: |
           source venv/bin/activate
