@@ -43,10 +43,11 @@ jobs:
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             source venv/Scripts/activate
+            python.exe -m pip install --upgrade pip
           else
             source venv/bin/activate
+            pip install --upgrade pip
           fi
-          pip install --upgrade pip
           pip install poetry==1.8.3
 
       - name: Install dependencies with Poetry
