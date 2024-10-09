@@ -26,17 +26,28 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Get Python version
+        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/pypoetry/cache
-            ~/.cache/pypoetry/artifacts
+            if [[ "$RUNNER_OS" == "Windows" ]]; then
+              ~/AppData/Local/pypoetry/Cache/cache
+              ~/AppData/Local/pypoetry/Cache/artifacts
+            elif [[ "$RUNNER_OS" == "macOS" ]]; then
+              ~/Library/Caches/pypoetry/cache
+              ~/Library/Caches/pypoetry/artifacts
+            else
+              ~/.cache/pypoetry/cache
+              ~/.cache/pypoetry/artifacts
+            fi
           key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
           restore-keys: |
             poetry-${{ runner.os }}-
 
-      - name: Create virtual environment
+      - name: Create virtual environment with Python version ${{ env.PYTHON_VERSION }}
         run: python -m venv venv
 
       - name: Activate virtual environment and install Poetry
@@ -49,7 +60,6 @@ jobs:
             pip install --upgrade pip
           fi
           pip install poetry==1.8.3
-          python --version
 
       - name: Install dependencies with Poetry
         run: |
@@ -59,28 +69,6 @@ jobs:
             source venv/bin/activate
           fi
           poetry install --with dev
-
-      # Debug step to inspect Poetry cache directories
-      - name: List Poetry cache directory
-        run: |
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            source venv/Scripts/activate
-            poetry config cache-dir
-            echo "Listing Poetry cache dir on Windows"
-            dir ~/AppData/Local/pypoetry/Cache
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            source venv/bin/activate
-            poetry config cache-dir
-            echo "Listing Poetry cache dir on Mac OS"
-            ls -alh ~/Library/Caches/pypoetry
-          elif [[ "$RUNNER_OS" == "Linux" ]]; then
-            source venv/bin/activate
-            poetry config cache-dir
-            echo "Listing Poetry cache dir on Unix-like systems"
-            ls -alh ~/.cache/pypoetry
-          else
-            echo "Unknown OS"
-          fi
 
       - name: Check and fix with Ruff
         run: |
