@@ -36,7 +36,7 @@ jobs:
       - name: Activate virtual environment and install Poetry
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            venv\Scripts\activate
+            .\venv\Scripts\activate
           else
             source venv/bin/activate
           fi
@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies with Poetry
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            venv\Scripts\activate
+            .\venv\Scripts\activate
           else
             source venv/bin/activate
           fi
@@ -54,7 +54,7 @@ jobs:
       - name: Check and fix with Ruff
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            venv\Scripts\activate
+            .\venv\Scripts\activate
           else
             source venv/bin/activate
           fi
@@ -63,7 +63,7 @@ jobs:
       - name: Type check with Mypy
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            venv\Scripts\activate
+            .\venv\Scripts\activate
           else
             source venv/bin/activate
           fi
@@ -72,7 +72,7 @@ jobs:
       - name: Tests with Pytest
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            venv\Scripts\activate
+            .\venv\Scripts\activate
           else
             source venv/bin/activate
           fi
@@ -81,7 +81,7 @@ jobs:
       - name: Report coverage
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            venv\Scripts\activate
+            .\venv\Scripts\activate
           else
             source venv/bin/activate
           fi
@@ -90,7 +90,7 @@ jobs:
       - name: Package and check
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            venv\Scripts\activate
+            .\venv\Scripts\activate
           else
             source venv/bin/activate
           fi
