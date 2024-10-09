@@ -32,7 +32,7 @@ jobs:
           path: |
             ~/.cache/pypoetry/cache
             ~/.cache/pypoetry/artifacts
-          key: poetry-${{ runner.os }}-${{ hashFiles('.github/workflows/build.yml') }}-${{ hashFiles('poetry.lock') }}
+          key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
           restore-keys: |
             poetry-${{ runner.os }}-
 
