@@ -25,12 +25,6 @@ jobs:
         with:
           python-version: '3.10'
 
-      # Debug step to inspect Poetry cache directories
-      - name: List Poetry cache directory
-        run: |
-          echo "Listing Poetry cache dir on Unix-like systems"
-          ls -alh ~/.cache/pypoetry
-
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
         with:
