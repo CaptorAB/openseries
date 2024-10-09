@@ -26,6 +26,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # Debug step to inspect Poetry cache directories
+      - name: List Poetry cache directory
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "Listing Poetry cache dir on Windows"
+            dir ~/.cache/pypoetry
+          else
+            echo "Listing Poetry cache dir on Unix-like systems"
+            ls -alh ~/.cache/pypoetry
+          fi
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
         with:
@@ -49,6 +60,7 @@ jobs:
             pip install --upgrade pip
           fi
           pip install poetry==1.8.3
+          python --version
 
       - name: Install dependencies with Poetry
         run: |

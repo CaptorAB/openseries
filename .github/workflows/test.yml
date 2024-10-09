@@ -19,6 +19,18 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v4
 
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v5
+        id: setup_python
+        with:
+          python-version: '3.10'
+
+      # Debug step to inspect Poetry cache directories
+      - name: List Poetry cache directory
+        run: |
+          echo "Listing Poetry cache dir on Unix-like systems"
+          ls -alh ~/.cache/pypoetry
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
         with:
@@ -35,6 +47,8 @@ jobs:
       - name: Activate virtual environment and install Poetry
         run: |
           source venv/bin/activate
+          python --version
+          pip install --upgrade pip
           pip install poetry==1.8.3
 
       - name: Install dependencies with Poetry
