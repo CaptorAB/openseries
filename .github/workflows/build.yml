@@ -25,7 +25,16 @@ jobs:
         id: setup_python
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry/cache
+            ~/.cache/pypoetry/artifacts
+          key: poetry-${{ runner.os }}-${{ hashFiles('.github/workflows/build.yml') }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            poetry-${{ runner.os }}-
 
       - name: Create virtual environment
         run: python -m venv venv
@@ -37,6 +46,7 @@ jobs:
           else
             source venv/bin/activate
           fi
+          pip install --upgrade pip
           pip install poetry==1.8.3
 
       - name: Install dependencies with Poetry
