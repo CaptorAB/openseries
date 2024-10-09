@@ -14,6 +14,15 @@ jobs:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v4
 
+      - name: Set up Python on ${{ runner.os }}
+        uses: actions/setup-python@v5
+        id: setup_python
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Get Python version
+        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
         with:
@@ -24,7 +33,7 @@ jobs:
           restore-keys: |
             poetry-${{ runner.os }}-
 
-      - name: Create virtual environment
+      - name: Create virtual environment with Python version ${{ env.PYTHON_VERSION }}
         run: python -m venv venv
 
       - name: Activate virtual environment and install Poetry
