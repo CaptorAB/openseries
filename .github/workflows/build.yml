@@ -95,7 +95,7 @@ jobs:
           else
             source venv/bin/activate
           fi
-          poetry run coverage run -m pytest --verbose
+          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
         run: |

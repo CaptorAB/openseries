@@ -60,7 +60,7 @@ jobs:
       - name: Tests with Pytest
         run: |
           source venv/bin/activate
-          poetry run coverage run -m pytest --verbose
+          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
         run: |

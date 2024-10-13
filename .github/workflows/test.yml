@@ -56,7 +56,7 @@ jobs:
       - name: Tests with Pytest
         run: |
           source venv/bin/activate
-          poetry run coverage run -m pytest --verbose --capture=no
+          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --capture=no
 
       - name: Report coverage
         run: |
