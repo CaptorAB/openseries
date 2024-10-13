@@ -1,5 +1,9 @@
 # Changelog
 
+## Version [1.7.5] - 2024-10-13
+
+- Added pandas .ffill() as precursor to all remainging pct_change() to suppress pandas FutureWarnings in dependent projects.
+
 ## Version [1.7.4] - 2024-10-06
 
 - Tightened existing checks to not allow mixed series types as methods input. The coverage level of the checks has not been widened.
