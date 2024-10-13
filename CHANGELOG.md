@@ -2,7 +2,7 @@
 
 ## Version [1.7.5] - 2024-10-13
 
-- Added pandas .ffill() as precursor to all remainging pct_change() to suppress pandas FutureWarnings in dependent projects.
+- Added pandas .ffill() as precursor to all remaining pct_change() to suppress pandas FutureWarnings in dependent projects.
 
 ## Version [1.7.4] - 2024-10-06
 
