@@ -33,7 +33,7 @@ jobs:
           restore-keys: |
             poetry-${{ runner.os }}-
 
-      - name: Create virtual environment with Python version ${{ env.PYTHON_VERSION }}
+      - name: Create virtual environment on ${{ env.PYTHON_VERSION }}
         run: python -m venv venv
 
       - name: Activate virtual environment and install Poetry
