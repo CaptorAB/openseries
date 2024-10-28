@@ -43,7 +43,11 @@ from ._risk import (
     _cvar_down_calc,
     _var_down_calc,
 )
-from .datefixer import date_offset_foll, holiday_calendar
+from .datefixer import (
+    _do_resample_to_business_period_ends,
+    date_offset_foll,
+    holiday_calendar,
+)
 from .load_plotly import load_plotly_dict
 from .types import (
     CountriesType,
@@ -52,6 +56,7 @@ from .types import (
     LiteralJsonOutput,
     LiteralLinePlotMode,
     LiteralNanMethod,
+    LiteralPandasReindexMethod,
     LiteralPlotlyJSlib,
     LiteralPlotlyOutput,
     LiteralQuantileInterp,
@@ -358,9 +363,17 @@ class _CommonModel(BaseModel):
             Most negative month
 
         """
+        method: LiteralPandasReindexMethod = "nearest"
+        countries = "SE"
         wmdf = self.tsdf.copy()
+        dates = _do_resample_to_business_period_ends(
+            data=wmdf,
+            freq="BME",
+            countries=countries,
+        )
+        wmdf = wmdf.reindex(index=[deyt.date() for deyt in dates], method=method)
         wmdf.index = DatetimeIndex(wmdf.index)
-        result = wmdf.resample("BME").last().ffill().pct_change().min()
+        result = wmdf.ffill().pct_change().min()
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])

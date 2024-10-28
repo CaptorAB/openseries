@@ -83,7 +83,7 @@ elseif ($task -eq "make")
     Write-Output "`nThe Python used in the '$(Split-Path -Leaf $env:VIRTUAL_ENV)' environment is:"
     Get-Command python
     python.exe -m pip install --upgrade pip
-    pip install poetry==1.8.3
+    pip install poetry==1.8.4
     Remove-Item -Path 'poetry.lock' -Force -ErrorAction SilentlyContinue
     poetry install --with dev
     poetry run pre-commit install
