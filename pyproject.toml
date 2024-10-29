@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.7.5"
+version = "1.7.6"
 description = "Tools for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/openseries"
@@ -38,7 +38,7 @@ numpy = ">=1.23.2,<3.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
 pandas = ">=2.1.2,<3.0.0"
 plotly = ">=5.18.0,<6.0.0"
-pyarrow = ">=14.0.2,<18.0.0"
+pyarrow = ">=14.0.2,<19.0.0"
 pydantic = ">=2.5.2,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 requests = ">=2.20.0,<3.0.0"
@@ -59,7 +59,7 @@ types-python-dateutil = ">=2.8.2,<3.0.0"
 types-requests = ">=2.20.0,<3.0.0"
 
 [build-system]
-requires = ["poetry-core>=1.8.3"]
+requires = ["poetry-core>=1.8.4"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.coverage.run]
