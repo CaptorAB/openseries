@@ -1,5 +1,11 @@
 # Changelog
 
+## Version [1.7.6] - 2024-10-29
+
+- Changed worst_month() to be consistent with resample_to_business_period_ends().
+- Updated Poetry to version 1.8.4.
+- Miscellaneous dependency and lockfile updates.
+
 ## Version [1.7.5] - 2024-10-13
 
 - Added pandas .ffill() as precursor to all remaining pct_change() to suppress pandas FutureWarnings in dependent projects.
