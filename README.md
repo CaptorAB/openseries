@@ -18,8 +18,6 @@
 This is a project with tools to analyze financial timeseries of a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
-<span style="font-size:2em;">[CHANGELOG](https://github.com/CaptorAB/openseries/blob/master/CHANGELOG.md)</span>
-
 
 ## Basic Usage
 
