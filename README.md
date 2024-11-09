@@ -27,6 +27,8 @@ To install:
 pip install openseries
 ```
 
+or:
+
 ```bash
 conda install -c conda-forge openseries
 ```
