@@ -25,35 +25,36 @@ class TestTypes:
         if not isinstance(lst, OpenTimeSeriesPropertiesList):
             raise TypeError(msg)
 
-        msg2 = "OpenTimeSeriesPropertiesList._validate not raising expected Exception"
-        with pytest.raises(expected_exception=ValueError) as exc:
+        with pytest.raises(
+                expected_exception=ValueError,
+                match=r"Invalid string\(s\): \['boo'\]\.",
+        ):
             OpenTimeSeriesPropertiesList(
                 *cast(LiteralSeriesProps, ["z_score", "boo", "positive_share"]),
             )
-        if "Invalid string(s): ['boo']." not in str(exc.value):
-            raise ValueError(msg2)
 
-        with pytest.raises(expected_exception=ValueError) as excc:
+        with pytest.raises(
+                expected_exception=ValueError,
+                match=r"Duplicate string\(s\): \['skew'\]\.",
+        ):
             OpenTimeSeriesPropertiesList(
                 *cast(
                     LiteralSeriesProps,
                     ["z_score", "skew", "skew", "positive_share"],
                 ),
             )
-        if "Duplicate string(s): ['skew']." not in str(excc.value):
-            raise ValueError(msg2)
 
-        with pytest.raises(expected_exception=ValueError) as exccc:
+        with pytest.raises(
+                expected_exception=ValueError,
+                match=(r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
+                       r"(?=.*Duplicate string\(s\): \['skew'\])"),
+        ):
             OpenTimeSeriesPropertiesList(
                 *cast(
                     LiteralSeriesProps,
                     ["z_score", "skew", "skew", "boo"],
                 ),
             )
-        if "Duplicate string(s): ['skew']." not in str(
-            exccc.value,
-        ) and "Invalid string(s): ['boo']." not in str(exccc.value):
-            raise ValueError(msg2)
 
     def test_openframeproplist_validate(self: TestTypes) -> None:
         """Test that the OpenFrame property input is correctly checked."""
@@ -63,32 +64,33 @@ class TestTypes:
         if not isinstance(lst, OpenFramePropertiesList):
             raise TypeError(msg)
 
-        msg2 = "OpenFramePropertiesList._validate not raising expected Exception"
-        with pytest.raises(expected_exception=ValueError) as exc:
+        with pytest.raises(
+                expected_exception=ValueError,
+                match=r"Invalid string\(s\): \['boo'\]\.",
+        ):
             OpenFramePropertiesList(
                 *cast(LiteralFrameProps, ["z_score", "boo", "positive_share"]),
             )
-        if "Invalid string(s): ['boo']." not in str(exc.value):
-            raise ValueError(msg2)
 
-        with pytest.raises(expected_exception=ValueError) as excc:
+        with pytest.raises(
+                expected_exception=ValueError,
+                match=r"Duplicate string\(s\): \['skew'\]\.",
+        ):
             OpenFramePropertiesList(
                 *cast(
                     LiteralFrameProps,
                     ["z_score", "skew", "skew", "positive_share"],
                 ),
             )
-        if "Duplicate string(s): ['skew']." not in str(excc.value):
-            raise ValueError(msg2)
 
-        with pytest.raises(expected_exception=ValueError) as exccc:
+        with pytest.raises(
+                expected_exception=ValueError,
+                match=(r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
+                       r"(?=.*Duplicate string\(s\): \['skew'\])"),
+        ):
             OpenFramePropertiesList(
                 *cast(
                     LiteralFrameProps,
                     ["z_score", "skew", "skew", "boo"],
                 ),
             )
-        if "Duplicate string(s): ['skew']." not in str(
-            exccc.value,
-        ) and "Invalid string(s): ['boo']." not in str(exccc.value):
-            raise ValueError(msg2)
