@@ -47,7 +47,7 @@ statsmodels = ">=0.14.0,!=0.14.2,<1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=24.4.2,<25.0.0"
-coverage = "^7.6.4"
+coverage = "^7.6.6"
 genbadge = {version = ">=1.1.1,<2.0.0", extras = ["coverage"]}
 mypy = "^1.13.0"
 pandas-stubs = ">=2.1.2,<3.0.0"
