@@ -79,6 +79,15 @@ jobs:
           fi
           poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
+      - name: Format with Ruff
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            source venv/Scripts/activate
+          else
+            source venv/bin/activate
+          fi
+          poetry run ruff format
+
       - name: Type check with Mypy
         run: |
           if [[ "$RUNNER_OS" == "Windows" ]]; then
