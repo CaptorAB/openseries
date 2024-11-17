@@ -98,6 +98,7 @@ elseif ($task -eq "test")
 elseif ($task -eq "lint")
 {
     poetry run ruff check . --fix --exit-non-zero-on-fix
+    poetry run ruff format
     poetry run mypy .
 }
 elseif ($task -eq "clean")

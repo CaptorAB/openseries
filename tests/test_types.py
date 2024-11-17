@@ -26,16 +26,16 @@ class TestTypes:
             raise TypeError(msg)
 
         with pytest.raises(
-                expected_exception=ValueError,
-                match=r"Invalid string\(s\): \['boo'\]\.",
+            expected_exception=ValueError,
+            match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(LiteralSeriesProps, ["z_score", "boo", "positive_share"]),
             )
 
         with pytest.raises(
-                expected_exception=ValueError,
-                match=r"Duplicate string\(s\): \['skew'\]\.",
+            expected_exception=ValueError,
+            match=r"Duplicate string\(s\): \['skew'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
@@ -45,9 +45,11 @@ class TestTypes:
             )
 
         with pytest.raises(
-                expected_exception=ValueError,
-                match=(r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
-                       r"(?=.*Duplicate string\(s\): \['skew'\])"),
+            expected_exception=ValueError,
+            match=(
+                r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
+                r"(?=.*Duplicate string\(s\): \['skew'\])"
+            ),
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
@@ -65,16 +67,16 @@ class TestTypes:
             raise TypeError(msg)
 
         with pytest.raises(
-                expected_exception=ValueError,
-                match=r"Invalid string\(s\): \['boo'\]\.",
+            expected_exception=ValueError,
+            match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenFramePropertiesList(
                 *cast(LiteralFrameProps, ["z_score", "boo", "positive_share"]),
             )
 
         with pytest.raises(
-                expected_exception=ValueError,
-                match=r"Duplicate string\(s\): \['skew'\]\.",
+            expected_exception=ValueError,
+            match=r"Duplicate string\(s\): \['skew'\]\.",
         ):
             OpenFramePropertiesList(
                 *cast(
@@ -84,9 +86,11 @@ class TestTypes:
             )
 
         with pytest.raises(
-                expected_exception=ValueError,
-                match=(r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
-                       r"(?=.*Duplicate string\(s\): \['skew'\])"),
+            expected_exception=ValueError,
+            match=(
+                r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
+                r"(?=.*Duplicate string\(s\): \['skew'\])"
+            ),
         ):
             OpenFramePropertiesList(
                 *cast(

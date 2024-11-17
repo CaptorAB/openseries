@@ -105,7 +105,7 @@ line-length = 87
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D203", "D213"]
+ignore = ["COM812", "D203", "D213", "ISC001"]
 fixable = ["ALL"]
 
 [tool.ruff.lint.pylint]
