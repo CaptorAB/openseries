@@ -335,7 +335,7 @@ class TestDateFixer:
     def test_offset_business_days_many_days(self: TestDateFixer) -> None:
         """Test offset_business_days function with many days."""
         startdate = dt.date(2023, 4, 13)
-        forward = 2421
+        forward = 2431
         forwarddate = dt.date(2033, 4, 13)
         backward = -forward
         backwarddate = dt.date(2013, 4, 23)
@@ -346,7 +346,10 @@ class TestDateFixer:
             countries=["SE", "US"],
         )
         if offsetdate_forward != forwarddate:
-            msg = "Unintended result from offset_business_days"
+            msg = (
+                "Unintended result from offset_business_days: "
+                f"{offsetdate_forward.strftime('%Y-%m-%d')}"
+            )
             raise ValueError(msg)
 
         offsetdate_backward = offset_business_days(
