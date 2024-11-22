@@ -9,13 +9,16 @@ from itertools import product as iter_product
 from json import load, loads
 from pathlib import Path
 from pprint import pformat
-from typing import Hashable, cast
+from typing import TYPE_CHECKING, cast
 from unittest.mock import MagicMock, patch
+
+if TYPE_CHECKING:
+    from collections.abc import Hashable  # pragma: no cover
 
 import pytest
 from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 # noinspection PyProtectedMember
 from openseries._risk import _cvar_down_calc, _var_down_calc
@@ -99,9 +102,12 @@ class TestOpenFrame(CommonTestCase):
 
         localfile.unlink()
 
-        with patch("pathlib.Path.exists") as mock_doesnotexist, patch(
-            "pathlib.Path.open",
-        ) as mock_donotopen:
+        with (
+            patch("pathlib.Path.exists") as mock_doesnotexist,
+            patch(
+                "pathlib.Path.open",
+            ) as mock_donotopen,
+        ):
             mock_doesnotexist.return_value = True
             mock_donotopen.side_effect = MagicMock()
             data2 = self.randomframe.to_json(what_output="values", filename=filename)
@@ -345,9 +351,12 @@ class TestOpenFrame(CommonTestCase):
 
         seriesfile.unlink()
 
-        with patch("pathlib.Path.exists") as mock_doesnotexist, patch(
-            "openpyxl.workbook.workbook.Workbook.save",
-        ) as mock_donotopen:
+        with (
+            patch("pathlib.Path.exists") as mock_doesnotexist,
+            patch(
+                "openpyxl.workbook.workbook.Workbook.save",
+            ) as mock_donotopen,
+        ):
             mock_doesnotexist.return_value = True
             mock_donotopen.side_effect = MagicMock()
             seriesfile2 = Path(self.randomframe.to_xlsx(filename=filename)).resolve()
@@ -1524,7 +1533,7 @@ class TestOpenFrame(CommonTestCase):
         plotframe.to_cumret()
 
         with patch("requests.head") as mock_conn_error:
-            mock_conn_error.side_effect = ConnectionError()
+            mock_conn_error.side_effect = RequestsConnectionError()
 
             seriesfig, _ = plotframe.plot_series(
                 auto_open=False,
