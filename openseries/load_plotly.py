@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 if TYPE_CHECKING:
     from .types import CaptorLogoType, PlotlyLayoutType  # pragma: no cover
@@ -36,7 +36,7 @@ def _check_remote_file_existence(url: str) -> bool:
         response = requests.head(url, timeout=30)
         if response.status_code != ok_code:
             return False
-    except ConnectionError:
+    except RequestsConnectionError:
         return False
     return True
 
