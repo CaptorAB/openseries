@@ -45,10 +45,10 @@ Install openseries and yfinance first.
 from openseries import OpenTimeSeries
 import yfinance as yf
 
-msft=yf.Ticker("MSFT")
-history=msft.history(period="max")
+move=yf.Ticker("^MOVE")
+history=move.history(period="max")
 series=OpenTimeSeries.from_df(history.loc[:, "Close"])
-_=series.value_to_log().set_new_label("Microsoft Log Returns of Close Prices")
+_=series.set_new_label("ICE BofAML MOVE Index")
 _,_=series.plot_series()
 
 ```
