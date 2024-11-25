@@ -10,7 +10,6 @@
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/openseries@master/coverage.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
-[![Styling, Linting & Type checks](https://github.com/CaptorAB/openseries/actions/workflows/check.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/check.yml)
 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
