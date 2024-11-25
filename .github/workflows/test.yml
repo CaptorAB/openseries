@@ -53,6 +53,21 @@ jobs:
           source venv/bin/activate
           poetry install --with dev
 
+      - name: Check and fix with Ruff
+        run: |
+          source venv/bin/activate
+          poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
+
+      - name: Format with Ruff
+        run: |
+          source venv/bin/activate
+          poetry run ruff format
+
+      - name: Type check with Mypy
+        run: |
+          source venv/bin/activate
+          poetry run mypy .
+
       - name: Tests with Pytest
         run: |
           source venv/bin/activate
