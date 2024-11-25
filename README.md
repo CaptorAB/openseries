@@ -5,7 +5,7 @@
 # openseries
 
 [![PyPI version](https://img.shields.io/pypi/v/openseries.svg)](https://pypi.org/project/openseries/)
-[![Conda version](https://img.shields.io/conda/vn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
+![Conda Version](https://img.shields.io/conda/vn/conda-forge/openseries?label=conda-forge&link=https%3A%2F%2Fanaconda.org%2Fconda-forge%2Fopenseries)
 [![Conda platforms](https://img.shields.io/conda/pn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
