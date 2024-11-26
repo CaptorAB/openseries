@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
 from numpy import (
+    array,
     cov,
     divide,
     isinf,
@@ -1456,7 +1457,7 @@ class OpenFrame(_CommonModel):
                 raise NotImplementedError(msg)
 
         return DataFrame(
-            data=(returns @ self.weights).add(1.0).cumprod(),
+            data=(returns @ array(self.weights)).add(1.0).cumprod(),
             index=self.tsdf.index,
             columns=[[name], [ValueType.PRICE]],
             dtype="float64",
