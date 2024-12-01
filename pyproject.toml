@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openseries"
-version = "1.7.6"
+version = "1.7.7"
 description = "Tools for analyzing financial timeseries."
 authors = ["Martin Karrin <martin.karrin@captor.se>"]
 repository = "https://github.com/CaptorAB/openseries"
@@ -10,6 +10,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: BSD License",
     "Intended Audience :: Financial and Insurance Industry",
     "Topic :: Office/Business :: Financial :: Investment",
@@ -32,7 +33,7 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.10,<3.14"
 holidays = ">=0.30,<1.0"
 numpy = ">=1.23.2,<3.0.0"
 openpyxl = ">=3.1.2,<4.0.0"
