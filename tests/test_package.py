@@ -36,7 +36,7 @@ class TestPackage:
             f"^({toml_version})$",
             "^(https://github.com/CaptorAB/openseries)$",
             "^(BSD-3-Clause)$",
-            "^(>=3.10,<3.13)$",
+            "^(>=3.10,<3.14)$",
         ]
 
         for name, value in zip(attribute_names, expected_values):
