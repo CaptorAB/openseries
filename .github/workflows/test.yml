@@ -28,15 +28,16 @@ jobs:
       - name: Get Python version
         run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
 
-      - name: Cache Poetry dependencies
+      - name: Restore Poetry cache
         uses: actions/cache@v4
+        id: poetry-cache
         with:
           path: |
             ~/.cache/pypoetry/cache
             ~/.cache/pypoetry/artifacts
-          key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+          key: poetry-cache-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
           restore-keys: |
-            poetry-${{ runner.os }}-
+            poetry-cache-${{ runner.os }}-
 
       - name: Create virtual environment on ${{ env.PYTHON_VERSION }}
         run: python -m venv venv
@@ -53,6 +54,15 @@ jobs:
           source venv/bin/activate
           poetry install --with dev
 
+      - name: Save Poetry cache
+        uses: actions/cache@v4
+        if: steps.poetry-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.cache/pypoetry/cache
+            ~/.cache/pypoetry/artifacts
+          key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+
       - name: Check and fix with Ruff
         run: |
           source venv/bin/activate
@@ -63,10 +73,26 @@ jobs:
           source venv/bin/activate
           poetry run ruff format
 
-      - name: Type check with Mypy
+      - name: Restore mypy cache
+        uses: actions/cache@v4
+        id: mypy-cache
+        with:
+          path: .mypy_cache
+          key: mypy-cache-${{ github.ref }}-${{ hashFiles('**/*.py') }}
+          restore-keys: |
+            mypy-cache-${{ github.ref }}-
+
+      - name: Type check with mypy
         run: |
           source venv/bin/activate
-          poetry run mypy .
+          poetry run mypy --cache-dir .mypy_cache .
+
+      - name: Save mypy cache
+        if: steps.mypy-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: mypy-cache-${{ github.ref }}-${{ hashFiles('**/*.py') }}
 
       - name: Tests with Pytest
         run: |
