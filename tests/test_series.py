@@ -458,10 +458,10 @@ class TestOpenTimeSeries(CommonTestCase):
         df2series = OpenTimeSeries.from_df(dframe=df2, column_nmbr=0)
 
         msg = "Method from_df() not working as intended"
+
         if not isinstance(df1series, OpenTimeSeries):
             raise TypeError(msg)
 
-        msg = "Method from_df() not working as intended"
         if not isinstance(df2series, OpenTimeSeries):
             raise TypeError(msg)
 
@@ -469,25 +469,23 @@ class TestOpenTimeSeries(CommonTestCase):
             _ = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
 
         if contextmgr.output != ["WARNING:root:Label missing. Adding: Series"]:
-            msg = "OpenTimeSeries failed to log warning about label missing."
-            raise ValueError(msg)
+            msgl = "OpenTimeSeries failed to log warning about label missing."
+            raise ValueError(msgl)
 
         with self.assertLogs() as contextmgr:
             _ = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
         if contextmgr.output != [
             "WARNING:root:valuetype missing. Adding: Price(Close)",
         ]:
-            msg = "OpenTimeSeries failed to log warning about valuetype missing."
-            raise ValueError(msg)
+            msgv = "OpenTimeSeries failed to log warning about valuetype missing."
+            raise ValueError(msgv)
 
         df3series = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
         df4series = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
 
-        msg = "Method from_df() not working as intended"
         if not isinstance(df3series, OpenTimeSeries):
             raise TypeError(msg)
 
-        msg = "Method from_df() not working as intended"
         if not isinstance(df4series, OpenTimeSeries):
             raise TypeError(msg)
 
@@ -522,15 +520,14 @@ class TestOpenTimeSeries(CommonTestCase):
         senseries = OpenTimeSeries.from_df(dframe=sen)
 
         msg = "Method from_df() not working as intended"
+
         if not isinstance(seseries, OpenTimeSeries):
             raise TypeError(msg)
 
-        msg = "Method from_df() not working as intended"
         if not isinstance(senseries, OpenTimeSeries):
             raise TypeError(msg)
 
         if seseries.label != senseries.label:
-            msg = "Method from_df() not working as intended"
             raise ValueError(msg)
 
         wrongtype = [["2023-01-01", "2023-01-02"], [1.0, 1.1]]
