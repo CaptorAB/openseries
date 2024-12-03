@@ -28,7 +28,7 @@ jobs:
       - name: Get Python version
         run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
 
-      - name: Restore Poetry cache
+      - name: Manage Poetry cache
         uses: actions/cache@v4
         id: poetry-cache
         with:
@@ -54,15 +54,6 @@ jobs:
           source venv/bin/activate
           poetry install --with dev
 
-      - name: Save Poetry cache
-        uses: actions/cache@v4
-        if: steps.poetry-cache.outputs.cache-hit != 'true'
-        with:
-          path: |
-            ~/.cache/pypoetry/cache
-            ~/.cache/pypoetry/artifacts
-          key: poetry-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-
       - name: Check and fix with Ruff
         run: |
           source venv/bin/activate
@@ -73,26 +64,19 @@ jobs:
           source venv/bin/activate
           poetry run ruff format
 
-      - name: Restore mypy cache
+      - name: Manage Mypy cache
         uses: actions/cache@v4
         id: mypy-cache
         with:
           path: .mypy_cache
-          key: mypy-cache-${{ github.ref }}-${{ hashFiles('**/*.py') }}
+          key: mypy-cache-${{ hashFiles('**/*.py') }}
           restore-keys: |
-            mypy-cache-${{ github.ref }}-
+            mypy-cache-
 
-      - name: Type check with mypy
+      - name: Type check with Mypy
         run: |
           source venv/bin/activate
           poetry run mypy --cache-dir .mypy_cache .
-
-      - name: Save mypy cache
-        if: steps.mypy-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: .mypy_cache
-          key: mypy-cache-${{ github.ref }}-${{ hashFiles('**/*.py') }}
 
       - name: Tests with Pytest
         run: |
