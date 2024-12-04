@@ -1,7 +1,5 @@
-# Byte-compiled / optimized / DLL files
+# Cache files / coverage files
 __pycache__/
-
-# Check and test cache files / coverage reports
 /.mypy_cache/
 /.pytest_cache/
 /.ruff_cache/
