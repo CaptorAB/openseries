@@ -1,8 +1,10 @@
-# Cache files / coverage files
+# Cache files
 __pycache__/
 /.mypy_cache/
 /.pytest_cache/
 /.ruff_cache/
+
+# Coverage files
 .coverage
 coverage.xml
 
