@@ -36,8 +36,7 @@ jobs:
             ~/.cache/pypoetry/cache
             ~/.cache/pypoetry/artifacts
           key: poetry-cache-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            poetry-cache-${{ runner.os }}-
+          restore-keys: poetry-cache-${{ runner.os }}-
 
       - name: Create virtual environment on ${{ env.PYTHON_VERSION }}
         run: python -m venv venv
@@ -70,8 +69,7 @@ jobs:
         with:
           path: .mypy_cache
           key: mypy-cache-${{ hashFiles('**/*.py') }}
-          restore-keys: |
-            mypy-cache-
+          restore-keys: mypy-cache-
 
       - name: Type check with Mypy
         run: |
