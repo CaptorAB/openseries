@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Iterable
 from copy import deepcopy
 from logging import warning
 from typing import Any, TypeVar, cast
@@ -234,12 +235,13 @@ class OpenTimeSeries(_CommonModel):
 
         """
         msg = "Argument dframe must be pandas Series or DataFrame."
+        values: list[float]
         if isinstance(dframe, Series):
             if isinstance(dframe.name, tuple):
                 label, _ = dframe.name
             else:
                 label = dframe.name
-            values = dframe.to_numpy().tolist()
+            values = cast(list[float], dframe.to_numpy().tolist())
         elif isinstance(dframe, DataFrame):
             values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
@@ -331,24 +333,19 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        if not isinstance(d_range, DatetimeIndex) and all([days, end_dt]):
+        if not isinstance(d_range, Iterable) and all([days, end_dt]):
             d_range = DatetimeIndex(
                 [d.date() for d in date_range(periods=days, end=end_dt, freq="D")],
             )
-        elif not isinstance(d_range, DatetimeIndex) and not all([days, end_dt]):
+        elif not isinstance(d_range, Iterable) and not all([days, end_dt]):
             msg = "If d_range is not provided both days and end_dt must be."
             raise ValueError(msg)
 
         deltas = array(
-            [
-                i.days
-                for i in cast(DatetimeIndex, d_range)[1:]
-                - cast(DatetimeIndex, d_range)[:-1]
-            ],
+            [i.days for i in DatetimeIndex(d_range)[1:] - DatetimeIndex(d_range)[:-1]],  # type: ignore[arg-type]
         )
-        # noinspection PyTypeChecker
-        arr = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
-        dates = [d.strftime("%Y-%m-%d") for d in cast(DatetimeIndex, d_range)]
+        arr: list[float] = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
+        dates = [d.strftime("%Y-%m-%d") for d in DatetimeIndex(d_range)]  # type: ignore[arg-type]
 
         return cls(
             timeseries_id="",

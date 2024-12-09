@@ -189,7 +189,7 @@ def efficient_frontier(  # noqa: C901
     frontier_max = cleaned_arithmetic_means.max()
 
     def _check_sum(weights: NDArray[float64]) -> float64:
-        return cast(float64, npsum(weights) - 1)
+        return npsum(weights) - 1
 
     def _get_ret_vol_sr(
         lg_ret: DataFrame,
