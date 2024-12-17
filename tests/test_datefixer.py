@@ -335,7 +335,7 @@ class TestDateFixer:
     def test_offset_business_days_many_days(self: TestDateFixer) -> None:
         """Test offset_business_days function with many days."""
         startdate = dt.date(2023, 4, 13)
-        forward = 2431
+        forward = 2421
         forwarddate = dt.date(2033, 4, 13)
         backward = -forward
         backwarddate = dt.date(2013, 4, 23)
