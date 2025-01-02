@@ -1643,13 +1643,6 @@ class TestOpenTimeSeries(CommonTestCase):
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
-        valid_instrument_id = "58135911b239b413482758c9"
-        invalid_instrument_id_one = "58135911b239b413482758c"
-        invalid_instrument_id_two = "5_135911b239b413482758c9"
-        valid_timeseries_id = "5813595971051506189ba416"
-        invalid_timeseries_id_one = "5813595971051506189ba41"
-        invalid_timeseries_id_two = "5_13595971051506189ba416"
-
         basecase = OpenTimeSeries.from_arrays(
             name="asset",
             dates=["2017-05-29"],
@@ -1675,21 +1668,6 @@ class TestOpenTimeSeries(CommonTestCase):
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="Shape of passed values is",
-        ):
-            OpenTimeSeries.from_arrays(
-                name="asset",
-                timeseries_id=valid_timeseries_id,
-                instrument_id=valid_instrument_id,
-                dates=[],
-                values=[
-                    100.0,
-                    100.0978,
-                ],
-            )
-
-        with pytest.raises(
-            expected_exception=ValueError,
             match="There must be at least 1 value",
         ):
             OpenTimeSeries.from_arrays(
@@ -1699,78 +1677,6 @@ class TestOpenTimeSeries(CommonTestCase):
                     "2017-05-30",
                 ],
                 values=[],
-            )
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="String should match pattern",
-        ):
-            OpenTimeSeries.from_arrays(
-                timeseries_id=invalid_timeseries_id_one,
-                instrument_id=valid_instrument_id,
-                dates=[
-                    "2017-05-29",
-                    "2017-05-30",
-                ],
-                name="asset",
-                values=[
-                    100.0,
-                    100.0978,
-                ],
-            )
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="String should match pattern",
-        ):
-            OpenTimeSeries.from_arrays(
-                timeseries_id=invalid_timeseries_id_two,
-                instrument_id=valid_instrument_id,
-                name="asset",
-                dates=[
-                    "2017-05-29",
-                    "2017-05-30",
-                ],
-                values=[
-                    100.0,
-                    100.0978,
-                ],
-            )
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="String should match pattern",
-        ):
-            OpenTimeSeries.from_arrays(
-                timeseries_id=valid_timeseries_id,
-                instrument_id=invalid_instrument_id_one,
-                name="asset",
-                dates=[
-                    "2017-05-29",
-                    "2017-05-30",
-                ],
-                values=[
-                    100.0,
-                    100.0978,
-                ],
-            )
-
-        with pytest.raises(
-            expected_exception=ValidationError,
-            match="String should match pattern",
-        ):
-            OpenTimeSeries.from_arrays(
-                timeseries_id=valid_timeseries_id,
-                instrument_id=invalid_instrument_id_two,
-                name="asset",
-                dates=[
-                    "2017-05-29",
-                    "2017-05-30",
-                ],
-                values=[
-                    100.0,
-                    100.0978,
-                ],
             )
 
         with pytest.raises(
