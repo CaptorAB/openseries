@@ -77,16 +77,6 @@ DateListType = Annotated[
 
 ValueListType = Annotated[list[float], conlist(float, min_length=1)]
 
-DatabaseIdStringType = Annotated[
-    str,
-    StringConstraints(
-        pattern=r"^([0-9a-f]{24})?$",
-        strict=True,
-        strip_whitespace=True,
-        max_length=24,
-    ),
-]
-
 DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 
 DateType = str | dt.date | dt.datetime | datetime64 | Timestamp

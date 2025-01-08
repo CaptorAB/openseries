@@ -36,7 +36,6 @@ from .types import (
     CountriesType,
     Currency,
     CurrencyStringType,
-    DatabaseIdStringType,
     DateListType,
     DaysInYearType,
     LiteralBizDayFreq,
@@ -61,9 +60,9 @@ class OpenTimeSeries(_CommonModel):
 
     Parameters
     ----------
-    timeseries_id : DatabaseIdStringType
+    timeseries_id : str
         Database identifier of the timeseries
-    instrument_id: DatabaseIdStringType
+    instrument_id: str
         Database identifier of the instrument associated with the timeseries
     name : str
         string identifier of the timeseries and/or instrument
@@ -92,8 +91,8 @@ class OpenTimeSeries(_CommonModel):
 
     """
 
-    timeseries_id: DatabaseIdStringType
-    instrument_id: DatabaseIdStringType
+    timeseries_id: str
+    instrument_id: str
     name: str
     valuetype: ValueType
     dates: DateListType
@@ -148,8 +147,8 @@ class OpenTimeSeries(_CommonModel):
         dates: DateListType,
         values: ValueListType,
         valuetype: ValueType = ValueType.PRICE,
-        timeseries_id: DatabaseIdStringType = "",
-        instrument_id: DatabaseIdStringType = "",
+        timeseries_id: str = "",
+        instrument_id: str = "",
         isin: str | None = None,
         baseccy: CurrencyStringType = "SEK",
         *,
@@ -167,9 +166,9 @@ class OpenTimeSeries(_CommonModel):
             Array of float values
         valuetype : ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        timeseries_id : DatabaseIdStringType, optional
+        timeseries_id : str, optional
             Database identifier of the timeseries
-        instrument_id: DatabaseIdStringType, optional
+        instrument_id: str, optional
             Database identifier of the instrument associated with the timeseries
         isin : str, optional
             ISO 6166 identifier code of the associated instrument
