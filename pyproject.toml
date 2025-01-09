@@ -1,11 +1,18 @@
-[tool.poetry]
+[project]
 name = "openseries"
 version = "1.7.8"
 description = "Tools for analyzing financial timeseries."
-authors = ["Martin Karrin <martin.karrin@captor.se>"]
+authors = [
+    { name = "Martin Karrin", email = "martin.karrin@captor.se" },
+]
+maintainers = [
+    { name = "Martin Karrin", email = "martin.karrin@captor.se" },
+]
 repository = "https://github.com/CaptorAB/openseries"
 license = "BSD-3-Clause"
 readme = "README.md"
+requires-python = ">=3.10,<3.14"
+
 classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -19,6 +26,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Framework :: Pydantic",
 ]
+
 keywords = [
     "python",
     "finance",
@@ -32,24 +40,24 @@ keywords = [
     "investing"
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<3.14"
-holidays = ">=0.30,<1.0"
-numpy = ">=1.23.2,<3.0.0"
-openpyxl = ">=3.1.2,<4.0.0"
-pandas = ">=2.1.2,<3.0.0"
-plotly = ">=5.18.0,<6.0.0"
-pyarrow = ">=14.0.2,<19.0.0"
-pydantic = ">=2.5.2,<3.0.0"
-python-dateutil = ">=2.8.2,<3.0.0"
-requests = ">=2.20.0,<3.0.0"
-scipy = ">=1.11.4,<2.0.0"
-statsmodels = ">=0.14.0,!=0.14.2,<1.0.0"
+dependencies = [
+    "holidays (>=0.30,<1.0)",
+    "numpy (>=1.23.2,<3.0.0)",
+    "openpyxl (>=3.1.2,<4.0.0)",
+    "pandas (>=2.1.2,<3.0.0)",
+    "plotly (>=5.18.0,<6.0.0)",
+    "pyarrow (>=14.0.2,<19.0.0)",
+    "pydantic (>=2.5.2,<3.0.0)",
+    "python-dateutil (>=2.8.2,<3.0.0)",
+    "requests (>=2.20.0,<3.0.0)",
+    "scipy (>=1.11.4,<2.0.0)",
+    "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)"
+]
 
-[tool.poetry.group.dev.dependencies]
+[project.group.dev.dependencies]
 black = ">=24.4.2,<25.0.0"
 coverage = ">=7.2.7,<9.0.0"
-genbadge = {version = ">=1.1.1,<2.0.0", extras = ["coverage"]}
+genbadge = { version = ">=1.1.1,<2.0.0", extras = ["coverage"] }
 mypy = "1.14.1"
 pandas-stubs = ">=2.1.2,<3.0.0"
 pre-commit = ">=3.7.1,<6.0.0"
@@ -60,7 +68,7 @@ types-python-dateutil = ">=2.8.2,<3.0.0"
 types-requests = ">=2.20.0,<3.0.0"
 
 [build-system]
-requires = ["poetry-core>=1.8.4"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.coverage.run]

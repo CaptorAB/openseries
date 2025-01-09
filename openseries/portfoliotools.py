@@ -3,9 +3,10 @@
 # mypy: disable-error-code="index,assignment"
 from __future__ import annotations
 
+from collections.abc import Callable
 from inspect import stack
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, cast
+from typing import TYPE_CHECKING, cast
 
 from numpy import (
     append,
@@ -415,12 +416,14 @@ def prepare_plot_data(
             for wgt, nm in zip(
                 cast(list[float], assets.weights),
                 assets.columns_lvl_zero,
+                strict=False,
             )
         ],
     )
 
     opt_text_list = [
-        f"{wgt:.1%}  {nm}" for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero)
+        f"{wgt:.1%}  {nm}"
+        for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero, strict=False)
     ]
     opt_text = "<br><br>Weights:<br>" + "<br>".join(opt_text_list)
     vol: Series[float] = assets.vol
@@ -552,7 +555,7 @@ def sharpeplot(  # noqa: C901
             dict[str, str | int | float | bool | list[str]],
             fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]
-        for col, clr in zip(point_frame.columns, colorway):
+        for col, clr in zip(point_frame.columns, colorway, strict=False):
             returns.extend([point_frame.loc["ret", col]])
             risk.extend([point_frame.loc["stdev", col]])
             figure.add_scatter(

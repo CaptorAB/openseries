@@ -114,7 +114,7 @@ def date_fix(
 
     """
     msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
-    if isinstance(fixerdate, (Timestamp, dt.datetime)):
+    if isinstance(fixerdate, Timestamp | dt.datetime):
         return fixerdate.date()
     if isinstance(fixerdate, dt.date):
         return fixerdate

@@ -2895,7 +2895,7 @@ class TestOpenFrame(CommonTestCase):
         for methd in methods:
             no_fixed = getattr(mframe, methd)()
             fixed = getattr(mframe, methd)(periods_in_a_year_fixed=252)
-            for nofix, fix in zip(no_fixed, fixed):
+            for nofix, fix in zip(no_fixed, fixed, strict=False):
                 if f"{100*abs(nofix-fix):.0f}" != zero_str:
                     msg = (
                         "Difference with or without "
@@ -2908,7 +2908,7 @@ class TestOpenFrame(CommonTestCase):
                 to_date=mframe.last_idx,
             )
             undated = getattr(mframe, methd)()
-            for ddat, undat in zip(dated, undated):
+            for ddat, undat in zip(dated, undated, strict=False):
                 if f"{ddat:.10f}" != f"{undat:.10f}":
                     msg = (
                         f"Method {methd} with and without date "

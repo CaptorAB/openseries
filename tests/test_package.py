@@ -39,7 +39,7 @@ class TestPackage:
             "^(>=3.10,<3.14)$",
         ]
 
-        for name, value in zip(attribute_names, expected_values):
+        for name, value in zip(attribute_names, expected_values, strict=False):
             if match(value, package_metadata[name]) is None:
                 msg = (
                     f"Package metadata {name} not as "

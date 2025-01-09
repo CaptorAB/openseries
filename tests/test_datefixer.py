@@ -254,7 +254,7 @@ class TestDateFixer:
             datetime64("2023-12-25"),
             datetime64("2023-12-26"),
         ]
-        for start, end in zip([2023, 2024], [2023, 2022]):
+        for start, end in zip([2023, 2024], [2023, 2022], strict=False):
             cdr = holiday_calendar(startyear=start, endyear=end, countries="SE")
             if not all(
                 date_str in list(cdr.holidays)

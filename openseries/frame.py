@@ -181,7 +181,7 @@ class OpenFrame(_CommonModel):
             [x.tsdf for x in self.constituents],
         )
 
-        mapper = dict(zip(self.columns_lvl_zero, lvl_zero))
+        mapper = dict(zip(self.columns_lvl_zero, lvl_zero, strict=False))
         self.tsdf = self.tsdf.rename(columns=mapper, level=0)
 
         if self.tsdf.empty:
@@ -653,7 +653,7 @@ class OpenFrame(_CommonModel):
         """
         if self.weights:
             new_c, new_w = [], []
-            for serie, weight in zip(self.constituents, self.weights):
+            for serie, weight in zip(self.constituents, self.weights, strict=False):
                 if serie.label != lvl_zero_item:
                     new_c.append(serie)
                     new_w.append(weight)

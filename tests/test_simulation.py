@@ -83,7 +83,7 @@ class TestSimulation(CommonTestCase):
 
         returns = []
         volatilities = []
-        for method, adding in zip(methods, added):
+        for method, adding in zip(methods, added, strict=False):
             arguments = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
@@ -163,7 +163,7 @@ class TestSimulation(CommonTestCase):
 
         returns = []
         volatilities = []
-        for method, adding in zip(methods, added):
+        for method, adding in zip(methods, added, strict=False):
             arguments = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")

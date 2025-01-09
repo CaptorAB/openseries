@@ -59,7 +59,7 @@ jobs:
             source venv/bin/activate
             pip install --upgrade pip
           fi
-          pip install poetry==1.8.4
+          pip install poetry==2.0.0
 
       - name: Install dependencies with Poetry
         run: |
