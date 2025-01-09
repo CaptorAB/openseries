@@ -8,7 +8,6 @@ authors = [
 maintainers = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
 ]
-repository = "https://github.com/CaptorAB/openseries"
 license = "BSD-3-Clause"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -53,6 +52,11 @@ dependencies = [
     "scipy (>=1.11.4,<2.0.0)",
     "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)"
 ]
+
+[project.urls]
+homepage = "https://github.com/CaptorAB/openseries"
+repository = "https://github.com/CaptorAB/openseries"
+documentation = "https://github.com/CaptorAB/openseries"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=24.4.2,<25.0.0"

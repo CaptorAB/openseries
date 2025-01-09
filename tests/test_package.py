@@ -25,7 +25,7 @@ class TestPackage:
             "Name",
             "Summary",
             "Version",
-            "Home-page",
+            "Author",
             "License",
             "Requires-Python",
         ]
@@ -34,7 +34,7 @@ class TestPackage:
             "^(openseries)$",
             "^(Tools for analyzing financial timeseries.)$",
             f"^({toml_version})$",
-            "^(https://github.com/CaptorAB/openseries)$",
+            "^(Martin Karrin)$",
             "^(BSD-3-Clause)$",
             "^(>=3.10,<3.14)$",
         ]
