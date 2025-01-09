@@ -54,7 +54,7 @@ dependencies = [
     "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)"
 ]
 
-[project.group.dev.dependencies]
+[tool.poetry.group.dev.dependencies]
 black = ">=24.4.2,<25.0.0"
 coverage = ">=7.2.7,<9.0.0"
 genbadge = { version = ">=1.1.1,<2.0.0", extras = ["coverage"] }
