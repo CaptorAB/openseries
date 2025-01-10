@@ -31,7 +31,7 @@ from typing_extensions import Self
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends, date_fix
-from .types import (
+from .owntypes import (
     Countries,
     CountriesType,
     Currency,

@@ -19,7 +19,7 @@ from openseries.datefixer import (
 )
 
 if TYPE_CHECKING:
-    from openseries.types import CountriesType, DateType, HolidayType
+    from openseries.owntypes import CountriesType, DateType, HolidayType
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -254,7 +254,7 @@ class TestDateFixer:
             datetime64("2023-12-25"),
             datetime64("2023-12-26"),
         ]
-        for start, end in zip([2023, 2024], [2023, 2022], strict=False):
+        for start, end in zip([2023, 2024], [2023, 2022], strict=True):
             cdr = holiday_calendar(startyear=start, endyear=end, countries="SE")
             if not all(
                 date_str in list(cdr.holidays)

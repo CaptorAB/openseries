@@ -6,9 +6,9 @@ import datetime as dt
 from unittest import TestCase
 
 from openseries.frame import OpenFrame
+from openseries.owntypes import ValueType
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation
-from openseries.types import ValueType
 
 
 class CommonTestCase(TestCase):

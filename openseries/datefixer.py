@@ -22,7 +22,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 
 if TYPE_CHECKING:
-    from .types import (  # pragma: no cover
+    from .owntypes import (  # pragma: no cover
         CountriesType,
         DateType,
         HolidayType,

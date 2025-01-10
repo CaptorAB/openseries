@@ -43,8 +43,7 @@ from typing_extensions import Self
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends
-from .series import OpenTimeSeries
-from .types import (
+from .owntypes import (
     CountriesType,
     DaysInYearType,
     LiteralBizDayFreq,
@@ -59,6 +58,7 @@ from .types import (
     OpenFramePropertiesList,
     ValueType,
 )
+from .series import OpenTimeSeries
 
 __all__ = ["OpenFrame"]
 
@@ -181,7 +181,7 @@ class OpenFrame(_CommonModel):
             [x.tsdf for x in self.constituents],
         )
 
-        mapper = dict(zip(self.columns_lvl_zero, lvl_zero, strict=False))
+        mapper = dict(zip(self.columns_lvl_zero, lvl_zero, strict=True))
         self.tsdf = self.tsdf.rename(columns=mapper, level=0)
 
         if self.tsdf.empty:
@@ -653,7 +653,7 @@ class OpenFrame(_CommonModel):
         """
         if self.weights:
             new_c, new_w = [], []
-            for serie, weight in zip(self.constituents, self.weights, strict=False):
+            for serie, weight in zip(self.constituents, self.weights, strict=True):
                 if serie.label != lvl_zero_item:
                     new_c.append(serie)
                     new_w.append(weight)

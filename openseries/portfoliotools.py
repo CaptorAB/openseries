@@ -34,17 +34,17 @@ from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
 from scipy.optimize import minimize  # type: ignore[import-untyped,unused-ignore]
 
 from .load_plotly import load_plotly_dict
-from .series import OpenTimeSeries
-
-# noinspection PyProtectedMember
-from .simulation import _random_generator
-from .types import (
+from .owntypes import (
     LiteralLinePlotMode,
     LiteralMinimizeMethods,
     LiteralPlotlyJSlib,
     LiteralPlotlyOutput,
     ValueType,
 )
+from .series import OpenTimeSeries
+
+# noinspection PyProtectedMember
+from .simulation import _random_generator
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydantic import DirectoryPath
@@ -416,14 +416,14 @@ def prepare_plot_data(
             for wgt, nm in zip(
                 cast(list[float], assets.weights),
                 assets.columns_lvl_zero,
-                strict=False,
+                strict=True,
             )
         ],
     )
 
     opt_text_list = [
         f"{wgt:.1%}  {nm}"
-        for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero, strict=False)
+        for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero, strict=True)
     ]
     opt_text = "<br><br>Weights:<br>" + "<br>".join(opt_text_list)
     vol: Series[float] = assets.vol
@@ -555,7 +555,7 @@ def sharpeplot(  # noqa: C901
             dict[str, str | int | float | bool | list[str]],
             fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]
-        for col, clr in zip(point_frame.columns, colorway, strict=False):
+        for col, clr in zip(point_frame.columns, colorway, strict=True):
             returns.extend([point_frame.loc["ret", col]])
             risk.extend([point_frame.loc["stdev", col]])
             figure.add_scatter(

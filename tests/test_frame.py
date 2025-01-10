@@ -25,12 +25,12 @@ from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
-from openseries.series import OpenTimeSeries
-from openseries.types import (
+from openseries.owntypes import (
     LiteralFrameProps,
     LiteralPortfolioWeightings,
     ValueType,
 )
+from openseries.series import OpenTimeSeries
 from tests.test_common_sim import CommonTestCase
 
 
@@ -224,10 +224,7 @@ class TestOpenFrame(CommonTestCase):
         check_one = [f"{endvalue:.6f}" for endvalue in frame_one.tsdf.iloc[-1]]
 
         if check_one != intended:
-            msg = (
-                "test_to_json_and_back_tsdf did "
-                f"not output as intended: {check_one}"
-            )
+            msg = f"test_to_json_and_back_tsdf did not output as intended: {check_one}"
             raise ValueError(msg)
 
         with framefile.open(mode="r", encoding="utf-8") as jsonfile:
@@ -250,10 +247,7 @@ class TestOpenFrame(CommonTestCase):
         check_two = [f"{endvalue:.6f}" for endvalue in frame_two.tsdf.iloc[-1]]
 
         if check_two != intended:
-            msg = (
-                "test_to_json_and_back_tsdf did "
-                f"not output as intended: {check_two}"
-            )
+            msg = f"test_to_json_and_back_tsdf did not output as intended: {check_two}"
             raise ValueError(msg)
 
         framefile.unlink()
@@ -379,8 +373,7 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=ValueError,
             match=(
-                "Argument months_offset implies start"
-                "date before first date in series."
+                "Argument months_offset implies startdate before first date in series."
             ),
         ):
             _, _ = crframe.calc_range(months_offset=125)
@@ -851,8 +844,7 @@ class TestOpenFrame(CommonTestCase):
             != f"{smf_vrf:.11f}"
         ):
             msg = (
-                "ret_vol_ratio_func() not aligned between "
-                "OpenTimeSeries and OpenFrame"
+                "ret_vol_ratio_func() not aligned between OpenTimeSeries and OpenFrame"
             )
             raise ValueError(msg)
 
@@ -865,8 +857,7 @@ class TestOpenFrame(CommonTestCase):
             != f"{smf_srf:.11f}"
         ):
             msg = (
-                "sortino_ratio_func() not aligned between "
-                "OpenTimeSeries and OpenFrame"
+                "sortino_ratio_func() not aligned between OpenTimeSeries and OpenFrame"
             )
             raise ValueError(msg)
 
@@ -906,8 +897,7 @@ class TestOpenFrame(CommonTestCase):
             ]
             if rounded != roundmeasure:
                 msg = (
-                    f"Property {prop} not aligned between "
-                    "OpenTimeSeries and OpenFrame"
+                    f"Property {prop} not aligned between OpenTimeSeries and OpenFrame"
                 )
                 raise ValueError(msg)
 
@@ -2895,11 +2885,10 @@ class TestOpenFrame(CommonTestCase):
         for methd in methods:
             no_fixed = getattr(mframe, methd)()
             fixed = getattr(mframe, methd)(periods_in_a_year_fixed=252)
-            for nofix, fix in zip(no_fixed, fixed, strict=False):
-                if f"{100*abs(nofix-fix):.0f}" != zero_str:
+            for nofix, fix in zip(no_fixed, fixed, strict=True):
+                if f"{100 * abs(nofix - fix):.0f}" != zero_str:
                     msg = (
-                        "Difference with or without "
-                        "fixed periods in year is too great"
+                        "Difference with or without fixed periods in year is too great"
                     )
                     raise ValueError(msg)
         for methd in methods:
@@ -2908,7 +2897,7 @@ class TestOpenFrame(CommonTestCase):
                 to_date=mframe.last_idx,
             )
             undated = getattr(mframe, methd)()
-            for ddat, undat in zip(dated, undated, strict=False):
+            for ddat, undat in zip(dated, undated, strict=True):
                 if f"{ddat:.10f}" != f"{undat:.10f}":
                     msg = (
                         f"Method {methd} with and without date "

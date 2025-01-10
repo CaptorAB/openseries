@@ -5,9 +5,9 @@ from __future__ import annotations
 import datetime as dt
 from typing import TYPE_CHECKING
 
+from openseries.owntypes import ValueType
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation, _random_generator
-from openseries.types import ValueType
 from tests.test_common_sim import CommonTestCase
 
 if TYPE_CHECKING:
@@ -83,7 +83,7 @@ class TestSimulation(CommonTestCase):
 
         returns = []
         volatilities = []
-        for method, adding in zip(methods, added, strict=False):
+        for method, adding in zip(methods, added, strict=True):
             arguments = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
@@ -163,7 +163,7 @@ class TestSimulation(CommonTestCase):
 
         returns = []
         volatilities = []
-        for method, adding in zip(methods, added, strict=False):
+        for method, adding in zip(methods, added, strict=True):
             arguments = {**args, **adding}
             onesim = getattr(ReturnSimulation, method)(**arguments)
             returns.append(f"{onesim.realized_mean_return:.9f}")
@@ -184,8 +184,7 @@ class TestSimulation(CommonTestCase):
 
         if f"{self.seriesim.realized_mean_return:.9f}" != "0.058650906":
             msg = (
-                "Unexpected return result: "
-                f"'{self.seriesim.realized_mean_return:.9f}'"
+                f"Unexpected return result: '{self.seriesim.realized_mean_return:.9f}'"
             )
             raise ValueError(msg)
 
