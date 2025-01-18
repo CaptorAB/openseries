@@ -44,10 +44,10 @@ Install openseries and yfinance first.
 from openseries import OpenTimeSeries
 import yfinance as yf
 
-move=yf.Ticker("^MOVE")
+move=yf.Ticker(ticker="^MOVE")
 history=move.history(period="max")
-series=OpenTimeSeries.from_df(history.loc[:, "Close"])
-_=series.set_new_label("ICE BofAML MOVE Index")
+series=OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
+_=series.set_new_label(lvl_zero="ICE BofAML MOVE Index")
 _,_=series.plot_series()
 
 ```
