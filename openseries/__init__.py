@@ -10,6 +10,7 @@ from .datefixer import (
 )
 from .frame import OpenFrame
 from .load_plotly import load_plotly_dict
+from .owntypes import ValueType
 from .portfoliotools import (
     constrain_optimized_portfolios,
     efficient_frontier,
@@ -19,7 +20,6 @@ from .portfoliotools import (
 )
 from .series import OpenTimeSeries, timeseries_chain
 from .simulation import ReturnSimulation
-from .types import ValueType
 
 __all__ = [
     "OpenFrame",

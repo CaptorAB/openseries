@@ -11,7 +11,7 @@ import requests
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
 if TYPE_CHECKING:
-    from .types import CaptorLogoType, PlotlyLayoutType  # pragma: no cover
+    from .owntypes import CaptorLogoType, PlotlyLayoutType  # pragma: no cover
 
 __all__ = ["load_plotly_dict"]
 

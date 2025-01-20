@@ -13,15 +13,16 @@ import pytest
 from pandas import DataFrame, DatetimeIndex, Series, date_range
 from pydantic import ValidationError
 
+from openseries.owntypes import (
+    CountriesType,
+    ValueType,
+)
+
 # noinspection PyProtectedMember
 from openseries.series import (
     OpenTimeSeries,
     _check_if_none,
     timeseries_chain,
-)
-from openseries.types import (
-    CountriesType,
-    ValueType,
 )
 from tests.test_common_sim import CommonTestCase
 
@@ -1856,7 +1857,7 @@ class TestOpenTimeSeries(CommonTestCase):
         for methd in methods:
             no_fixed = getattr(mseries, methd)()
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
-            if f"{100*abs(no_fixed-fixed):.0f}" != zero_str:
+            if f"{100 * abs(no_fixed - fixed):.0f}" != zero_str:
                 msg = "Difference with or without fixed periods in year is too great"
                 raise ValueError(msg)
 
