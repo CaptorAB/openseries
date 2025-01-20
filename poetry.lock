@@ -396,15 +396,15 @@ tests = ["defusedxml"]
 
 [[package]]
 name = "holidays"
-version = "0.64"
+version = "0.65"
 description = "Open World Holidays Framework"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "python_version <= \"3.11\" or python_version >= \"3.12\""
 files = [
-    {file = "holidays-0.64-py3-none-any.whl", hash = "sha256:df5bd6efce61f2eafe235bddc847d4a9a3adeff0270711516588aeeef4ba98b7"},
-    {file = "holidays-0.64.tar.gz", hash = "sha256:c9ebd1b0391700cadeb4fab88274833ee7f1f355966e0486068ec0816122d26a"},
+    {file = "holidays-0.65-py3-none-any.whl", hash = "sha256:9fb957f6c2ac5b849e3473e000e0acfad4553215b575d43d6b60e09c47bb7897"},
+    {file = "holidays-0.65.tar.gz", hash = "sha256:a20a4f0299b1ecd6238c8a62f622c637742ee3212b3abeb616a85686b99ea621"},
 ]
 
 [package.dependencies]
@@ -918,15 +918,15 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pre-commit"
-version = "4.0.1"
+version = "4.1.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 markers = "python_version <= \"3.11\" or python_version >= \"3.12\""
 files = [
-    {file = "pre_commit-4.0.1-py2.py3-none-any.whl", hash = "sha256:efde913840816312445dc98787724647c65473daefe420785f885e8ed9a06878"},
-    {file = "pre_commit-4.0.1.tar.gz", hash = "sha256:80905ac375958c0444c65e9cebebd948b3cdb518f335a091a670a89d652139d2"},
+    {file = "pre_commit-4.1.0-py2.py3-none-any.whl", hash = "sha256:d29e7cb346295bcc1cc75fc3e92e343495e3ea0196c9ec6ba53f49f10ab6ae7b"},
+    {file = "pre_commit-4.1.0.tar.gz", hash = "sha256:ae3f018575a588e30dfddfab9a05448bfbd6b73d78709617b5a2b853549716d4"},
 ]
 
 [package.dependencies]
