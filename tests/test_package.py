@@ -23,20 +23,22 @@ class TestPackage:
 
         attribute_names = [
             "Name",
-            "Summary",
             "Version",
-            "Author",
+            "Summary",
             "License",
+            "Author",
             "Requires-Python",
+            "Project-URL",
         ]
 
         expected_values = [
             "^(openseries)$",
-            "^(Tools for analyzing financial timeseries.)$",
             f"^({toml_version})$",
-            "^(Martin Karrin)$",
+            "^(Tools for analyzing financial timeseries.)$",
             "^(BSD-3-Clause)$",
+            "^(Martin Karrin)$",
             "^(>=3.10,<3.14)$",
+            "^(Documentation, https://github.com/CaptorAB/openseries)$",
         ]
 
         for name, value in zip(attribute_names, expected_values, strict=True):
