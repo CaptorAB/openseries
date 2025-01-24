@@ -49,7 +49,7 @@ from .datefixer import (
     holiday_calendar,
 )
 from .load_plotly import load_plotly_dict
-from .types import (
+from .owntypes import (
     CountriesType,
     DaysInYearType,
     LiteralBarPlotMode,

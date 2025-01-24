@@ -1,4 +1,4 @@
-"""Test suite for the openseries/types.py module."""
+"""Test suite for the openseries/owntypes.py module."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from typing import cast
 
 import pytest
 
-from openseries.types import (
+from openseries.owntypes import (
     LiteralFrameProps,
     LiteralSeriesProps,
     OpenFramePropertiesList,
@@ -15,7 +15,7 @@ from openseries.types import (
 
 
 class TestTypes:
-    """class to run tests on the module types.py."""
+    """class to run tests on the module owntypes.py."""
 
     def test_opentimeseriesproplist_validate(self: TestTypes) -> None:
         """Test that the OpenTimeSeries property input is correctly checked."""

@@ -14,7 +14,7 @@ from numpy import (
 from pandas import DataFrame, Series
 
 if TYPE_CHECKING:
-    from .types import LiteralQuantileInterp  # pragma: no cover
+    from .owntypes import LiteralQuantileInterp  # pragma: no cover
 
 
 def _cvar_down_calc(
