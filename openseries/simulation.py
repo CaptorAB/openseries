@@ -25,7 +25,7 @@ from pydantic import (
 from typing_extensions import Self
 
 from .datefixer import generate_calendar_date_range
-from .types import (
+from .owntypes import (
     CountriesType,
     DaysInYearType,
     ValueType,

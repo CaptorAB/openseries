@@ -7,6 +7,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/openseries.svg)](https://pypi.org/project/openseries/)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
 [![Conda platforms](https://img.shields.io/conda/pn/conda-forge/openseries.svg)](https://anaconda.org/conda-forge/openseries)
+[![Code Sample](https://img.shields.io/badge/-Code%20Sample-blue)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
 [![Coverage](https://cdn.jsdelivr.net/gh/CaptorAB/openseries@master/coverage.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
@@ -44,10 +45,10 @@ Install openseries and yfinance first.
 from openseries import OpenTimeSeries
 import yfinance as yf
 
-move=yf.Ticker("^MOVE")
+move=yf.Ticker(ticker="^MOVE")
 history=move.history(period="max")
-series=OpenTimeSeries.from_df(history.loc[:, "Close"])
-_=series.set_new_label("ICE BofAML MOVE Index")
+series=OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
+_=series.set_new_label(lvl_zero="ICE BofAML MOVE Index")
 _,_=series.plot_series()
 
 ```
@@ -80,11 +81,6 @@ span of days                                               6301                 
 first indices                                        2006-01-03                       2006-01-03
 last indices                                         2023-04-05                       2023-04-05
 ```
-
-### Usage example on Jupyter Nbviewer
-
-[![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)
-
 
 ## Development Instructions
 

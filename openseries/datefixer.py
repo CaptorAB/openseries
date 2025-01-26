@@ -22,7 +22,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 
 if TYPE_CHECKING:
-    from .types import (  # pragma: no cover
+    from .owntypes import (  # pragma: no cover
         CountriesType,
         DateType,
         HolidayType,
@@ -114,7 +114,7 @@ def date_fix(
 
     """
     msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
-    if isinstance(fixerdate, (Timestamp, dt.datetime)):
+    if isinstance(fixerdate, Timestamp | dt.datetime):
         return fixerdate.date()
     if isinstance(fixerdate, dt.date):
         return fixerdate

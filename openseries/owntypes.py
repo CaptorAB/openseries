@@ -30,7 +30,7 @@ CountryListType = conset(
     item_type=CountryStringType,
     min_length=1,
 )
-CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]
+CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]  # noqa: UP007
 
 
 class Countries(BaseModel):

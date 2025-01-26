@@ -23,23 +23,25 @@ class TestPackage:
 
         attribute_names = [
             "Name",
-            "Summary",
             "Version",
-            "Home-page",
+            "Summary",
             "License",
+            "Author",
             "Requires-Python",
+            "Project-URL",
         ]
 
         expected_values = [
             "^(openseries)$",
-            "^(Tools for analyzing financial timeseries.)$",
             f"^({toml_version})$",
-            "^(https://github.com/CaptorAB/openseries)$",
+            "^(Tools for analyzing financial timeseries.)$",
             "^(BSD-3-Clause)$",
+            "^(Martin Karrin)$",
             "^(>=3.10,<3.14)$",
+            "^(Documentation, https://github.com/CaptorAB/openseries)$",
         ]
 
-        for name, value in zip(attribute_names, expected_values):
+        for name, value in zip(attribute_names, expected_values, strict=True):
             if match(value, package_metadata[name]) is None:
                 msg = (
                     f"Package metadata {name} not as "

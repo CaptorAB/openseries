@@ -31,7 +31,7 @@ from typing_extensions import Self
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends, date_fix
-from .types import (
+from .owntypes import (
     Countries,
     CountriesType,
     Currency,
@@ -513,7 +513,9 @@ class OpenTimeSeries(_CommonModel):
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
         # noinspection PyTypeChecker
-        arr = cumprod(insert(1.0 + deltas * arr[:-1] / days_in_year, 0, 1.0))
+        arr = cumprod(  # type: ignore[assignment,unused-ignore]
+            a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
+        )
 
         self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
         self.values = list(arr)
