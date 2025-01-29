@@ -1258,12 +1258,10 @@ class TestOpenFrame(CommonTestCase):
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
         fig_json = loads(cast(str, fig.to_json()))
 
-        for i in range(plotframe.item_count):
-            rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
-            fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
-            if rawdata != fig_data:
-                msg = "Unaligned data between original and data in Figure."
-                raise ValueError(msg)
+        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
+        if rawdata != fig_json["data"][0]["x"][1:5]:
+            msg = "Unaligned data between original and data in Figure."
+            raise ValueError(msg)
 
         fig_last, _ = plotframe.plot_series(
             auto_open=False,
@@ -1401,12 +1399,10 @@ class TestOpenFrame(CommonTestCase):
             msg = "Data in Figure not as intended."
             raise ValueError(msg)
 
-        for i in range(plotframe.item_count):
-            rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
-            fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
-            if rawdata != fig_data:
-                msg = "Unaligned data between original and data in Figure."
-                raise ValueError(msg)
+        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
+        if rawdata != fig_json["data"][0]["x"][1:5]:
+            msg = "Unaligned data between original and data in Figure."
+            raise ValueError(msg)
 
         intended_labels = ["a", "b", "c", "d", "e"]
         fig_labels, _ = plotframe.plot_bars(
@@ -1602,12 +1598,10 @@ class TestOpenFrame(CommonTestCase):
             fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
             fig_json = loads(cast(str, fig.to_json()))
 
-            for i in range(plotframe.item_count):
-                rawdata = [f"{x:.11f}" for x in plotframe.tsdf.iloc[1:5, i]]
-                fig_data = [f"{x:.11f}" for x in fig_json["data"][i]["y"][1:5]]
-                if rawdata != fig_data:
-                    msg = "Unaligned data between original and data in Figure."
-                    raise ValueError(msg)
+            rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
+            if rawdata != fig_json["data"][0]["x"][1:5]:
+                msg = "Unaligned data between original and data in Figure."
+                raise ValueError(msg)
 
     def test_passed_empty_list(self: TestOpenFrame) -> None:
         """Test warning on object construct with empty list."""

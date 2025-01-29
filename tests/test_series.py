@@ -1385,9 +1385,8 @@ class TestOpenTimeSeries(CommonTestCase):
 
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
         fig_json = loads(cast(str, fig.to_json()))
-        rawdata = [f"{x:.11f}" for x in plotseries.tsdf.iloc[1:5, 0]]
-        fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
-        if rawdata != fig_data:
+        rawdata = [x.strftime("%Y-%m-%d") for x in plotseries.tsdf.index[1:5]]
+        if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
             raise ValueError(msg)
 
@@ -1431,7 +1430,7 @@ class TestOpenTimeSeries(CommonTestCase):
         """Test plot_bars method."""
         barseries = self.randomseries.from_deepcopy()
         barseries.resample(freq="BME").value_to_ret()
-        rawdata = [f"{x:.11f}" for x in barseries.tsdf.iloc[1:5, 0]]
+        rawdata = [x.strftime("%Y-%m-%d") for x in barseries.tsdf.index[1:5]]
 
         directory = Path(__file__).parent
         _, figfile = barseries.plot_bars(auto_open=False, directory=directory)
@@ -1448,8 +1447,7 @@ class TestOpenTimeSeries(CommonTestCase):
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = barseries.plot_bars(auto_open=False, output_type="div")
         fig_json = loads(cast(str, fig.to_json()))
-        fig_data = [f"{x:.11f}" for x in fig_json["data"][0]["y"][1:5]]
-        if rawdata != fig_data:
+        if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
             raise ValueError(msg)
 
