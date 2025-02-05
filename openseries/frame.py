@@ -88,8 +88,8 @@ class OpenFrame(_CommonModel):
     weights: list[float] | None = None
 
     # noinspection PyMethodParameters
-    @field_validator("constituents")  # type: ignore[misc]
-    def _check_labels_unique(
+    @field_validator("constituents")
+    def _check_labels_unique(  # type: ignore[misc]
         cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:

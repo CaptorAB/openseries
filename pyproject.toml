@@ -62,7 +62,7 @@ documentation = "https://github.com/CaptorAB/openseries"
 black = ">=24.4.2,<26.0.0"
 coverage = ">=7.2.7,<9.0.0"
 genbadge = { version = ">=1.1.1,<2.0.0", extras = ["coverage"] }
-mypy = "1.14.1"
+mypy = "1.15.0"
 pandas-stubs = ">=2.1.2,<3.0.0"
 pre-commit = ">=3.7.1,<6.0.0"
 pytest = ">=8.2.2,<9.0.0"
