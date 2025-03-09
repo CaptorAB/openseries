@@ -1516,7 +1516,12 @@ class _CommonModel(BaseModel):
         )
         fraction = (later - earlier).days / 365.25
 
-        any_below_zero = any(self.tsdf.loc[[earlier, later]].lt(0.0).any().to_numpy())
+        any_below_zero = any(
+            self.tsdf.loc[[earlier, later]]  # type: ignore[index,unused-ignore]
+            .lt(0.0)
+            .any()
+            .to_numpy()
+        )
         if zero in self.tsdf.loc[earlier].to_numpy() or any_below_zero:
             msg = (
                 "Geometric return cannot be calculated due to "

@@ -51,7 +51,7 @@ __all__ = ["OpenTimeSeries", "timeseries_chain"]
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyNestedDecorators
 class OpenTimeSeries(_CommonModel):
     """OpenTimeSeries objects are at the core of the openseries package.
 
@@ -435,7 +435,9 @@ class OpenTimeSeries(_CommonModel):
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
-        returns.columns = MultiIndex.from_arrays(arrays=arrays)
+        returns.columns = MultiIndex.from_arrays(
+            arrays=arrays  # type: ignore[arg-type,unused-ignore]
+        )
         self.tsdf = returns.copy()
         return self
 
