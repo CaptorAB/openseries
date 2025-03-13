@@ -469,14 +469,16 @@ class TestOpenTimeSeries(CommonTestCase):
         with self.assertLogs() as contextmgr:
             _ = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
 
-        if contextmgr.output != ["WARNING:root:Label missing. Adding: Series"]:
+        if contextmgr.output != [
+            "WARNING:openseries.series:Label missing. Adding: Series"
+        ]:
             msgl = "OpenTimeSeries failed to log warning about label missing."
             raise ValueError(msgl)
 
         with self.assertLogs() as contextmgr:
             _ = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
         if contextmgr.output != [
-            "WARNING:root:valuetype missing. Adding: Price(Close)",
+            "WARNING:openseries.series:valuetype missing. Adding: Price(Close)",
         ]:
             msgv = "OpenTimeSeries failed to log warning about valuetype missing."
             raise ValueError(msgv)

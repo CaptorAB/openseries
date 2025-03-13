@@ -7,7 +7,7 @@ from copy import deepcopy
 from logging import getLogger
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
 
 from numpy import (

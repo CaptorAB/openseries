@@ -13,8 +13,8 @@ from typing import TYPE_CHECKING, Any, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
 
-if TYPE_CHECKING:
-    from numpy.typing import NDArray  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
+    from numpy.typing import NDArray
     from openpyxl.worksheet.worksheet import Worksheet
 
     from .owntypes import (

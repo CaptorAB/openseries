@@ -8,8 +8,8 @@ from functools import reduce
 from logging import getLogger
 from typing import TYPE_CHECKING, cast
 
-if TYPE_CHECKING:
-    import datetime as dt  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime as dt
 
     from statsmodels.regression.linear_model import (  # type: ignore[import-untyped,unused-ignore]
         OLSResults,

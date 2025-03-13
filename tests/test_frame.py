@@ -1544,19 +1544,20 @@ class TestOpenFrame(CommonTestCase):
             with self.assertLogs() as plotseries_context:
                 _, _ = plotframe.plot_series(auto_open=False, output_type="div")
             if (
-                "WARNING:root:Failed to add logo image from URL"
+                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
                 not in plotseries_context.output[0]
             ):
                 msg = (
                     "plot_series() method did not warn as "
-                    "expected when logo URL not working"
+                    "expected when logo URL not working: "
+                    f"{pformat(plotseries_context.output[0])}"
                 )
                 raise ValueError(msg)
 
             with self.assertLogs() as plotbars_context:
                 _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
             if (
-                "WARNING:root:Failed to add logo image from URL"
+                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
                 not in plotbars_context.output[0]
             ):
                 msg = (
@@ -1571,7 +1572,7 @@ class TestOpenFrame(CommonTestCase):
             with self.assertLogs() as plotseries_context:
                 _, _ = plotframe.plot_series(auto_open=False, output_type="div")
             if (
-                "WARNING:root:Failed to add logo image from URL"
+                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
                 not in plotseries_context.output[0]
             ):
                 msg = (
@@ -1583,7 +1584,7 @@ class TestOpenFrame(CommonTestCase):
             with self.assertLogs() as plotbars_context:
                 _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
             if (
-                "WARNING:root:Failed to add logo image from URL"
+                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
                 not in plotbars_context.output[0]
             ):
                 msg = (
@@ -1607,8 +1608,13 @@ class TestOpenFrame(CommonTestCase):
         """Test warning on object construct with empty list."""
         with self.assertLogs() as contextmgr:
             OpenFrame([])
-        if contextmgr.output != ["WARNING:root:OpenFrame() was passed an empty list."]:
-            msg = "OpenFrame failed to log warning about empty input list."
+        if contextmgr.output != [
+            "WARNING:openseries.frame:OpenFrame() was passed an empty list."
+        ]:
+            msg = (
+                "OpenFrame failed to log warning about "
+                f"empty input list: {pformat(contextmgr.output)}"
+            )
             raise ValueError(msg)
 
     def test_trunc_frame_both(self: TestOpenFrame) -> None:
@@ -1786,7 +1792,7 @@ class TestOpenFrame(CommonTestCase):
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
         if (
-            "WARNING:root:One or more constituents "
+            "WARNING:openseries.frame:One or more constituents "
             "still not truncated to same start dates."
         ) not in logs.output[0]:
             msg = "Method trunc_frame() did not work as intended."
@@ -1852,7 +1858,7 @@ class TestOpenFrame(CommonTestCase):
         with self.assertLogs("root", level="WARNING") as logs:
             frame.trunc_frame()
         if (
-            "WARNING:root:One or more constituents "
+            "WARNING:openseries.frame:One or more constituents "
             "still not truncated to same end dates."
         ) not in logs.output[0]:
             msg = "Method trunc_frame() did not work as intended."
