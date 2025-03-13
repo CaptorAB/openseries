@@ -296,7 +296,7 @@ def offset_business_days(
 
     idx = where(array(local_bdays) == ddate)[0]
 
-    return cast(dt.date, local_bdays[idx[0] + days])
+    return cast("dt.date", local_bdays[idx[0] + days])
 
 
 def generate_calendar_date_range(

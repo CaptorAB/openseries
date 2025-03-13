@@ -161,7 +161,7 @@ class TestPortfoliotools(CommonTestCase):
                 )
                 raise ValueError(msg)
 
-            optlist = [round(Decimal(wgt), 6) for wgt in cast(list[float], optimal)]
+            optlist = [round(Decimal(wgt), 6) for wgt in cast("list[float]", optimal)]
             total = sum(optimal[3:])
 
             if round(total, 7) != 1.0:
@@ -210,7 +210,7 @@ class TestPortfoliotools(CommonTestCase):
         std_frame.weights = [1 / std_frame.item_count] * std_frame.item_count
 
         bounds = cast(
-            tuple[tuple[float]] | None,
+            "tuple[tuple[float]] | None",
             tuple((0.0, 1.0) for _ in range(std_frame.item_count)),
         )
 
@@ -353,7 +353,7 @@ class TestPortfoliotools(CommonTestCase):
             output_type="div",
         )
 
-        fig_json_title_no_text = loads(cast(str, figure_title_no_text.to_json()))
+        fig_json_title_no_text = loads(cast("str", figure_title_no_text.to_json()))
 
         if "Risk and Return" not in fig_json_title_no_text["layout"]["title"]["text"]:
             msg = "sharpeplot method not working as intended"
@@ -370,7 +370,7 @@ class TestPortfoliotools(CommonTestCase):
             output_type="div",
         )
 
-        fig_json_title_text = loads(cast(str, figure_title_text.to_json()))
+        fig_json_title_text = loads(cast("str", figure_title_text.to_json()))
         if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
             msg = "sharpeplot method not working as intended"
             raise ValueError(msg)
@@ -385,7 +385,7 @@ class TestPortfoliotools(CommonTestCase):
             output_type="div",
         )
 
-        fig_json = loads(cast(str, figure.to_json()))
+        fig_json = loads(cast("str", figure.to_json()))
 
         if "text" in fig_json["layout"]["title"]:
             msg = "sharpeplot method not working as intended"
@@ -457,7 +457,7 @@ class TestPortfoliotools(CommonTestCase):
                 auto_open=False,
                 output_type="div",
             )
-            mockhomefig_json = loads(cast(str, mockhomefig.to_json()))
+            mockhomefig_json = loads(cast("str", mockhomefig.to_json()))
 
         if mockhomefig_json["data"][0]["name"] != "simulated portfolios":
             msg = "sharpeplot method not working as intended"
@@ -528,9 +528,9 @@ class TestPortfoliotools(CommonTestCase):
             auto_open=False,
             output_type="div",
         )
-        fig_json_no_sim = loads(cast(str, figure_no_sim.to_json()))
-        fig_json_no_sim_or_line = loads(cast(str, figure_no_sim_or_line.to_json()))
-        fig_json_no_point = loads(cast(str, figure_no_point.to_json()))
+        fig_json_no_sim = loads(cast("str", figure_no_sim.to_json()))
+        fig_json_no_sim_or_line = loads(cast("str", figure_no_sim_or_line.to_json()))
+        fig_json_no_point = loads(cast("str", figure_no_point.to_json()))
 
         no_sim_length = 8
         no_sim_or_line_length = 7
@@ -604,7 +604,7 @@ class TestPortfoliotools(CommonTestCase):
 
         _, logo = load_plotly_dict()
 
-        fig_logo_json = loads(cast(str, fig_logo.to_json()))
+        fig_logo_json = loads(cast("str", fig_logo.to_json()))
 
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
@@ -614,7 +614,7 @@ class TestPortfoliotools(CommonTestCase):
             msg = "sharpeplot add_logo argument not setup correctly"
             raise ValueError(msg)
 
-        fig_nologo_json = loads(cast(str, fig_nologo.to_json()))
+        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "sharpeplot add_logo argument not setup correctly"
             raise ValueError(msg)

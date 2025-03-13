@@ -44,7 +44,7 @@ def _cvar_down_calc(
         clean = nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
     array = sort(ret)
-    return cast(float, mean(array[: int(ceil(len(array) * (1 - level)))]))
+    return cast("float", mean(array[: ceil(len(array) * (1 - level))]))
 
 
 def _var_down_calc(
@@ -77,4 +77,4 @@ def _var_down_calc(
     else:
         clean = nan_to_num(data)
     ret = clean[1:] / clean[:-1] - 1
-    return cast(float, quantile(ret, 1 - level, method=interpolation))
+    return cast("float", quantile(ret, 1 - level, method=interpolation))

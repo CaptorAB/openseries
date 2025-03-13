@@ -49,7 +49,7 @@ def _random_generator(seed: int | None) -> Generator:
 
     """
     ss = SeedSequence(entropy=seed)
-    bg = PCG64(seed=cast(int | None, ss))
+    bg = PCG64(seed=cast("int | None", ss))
     return Generator(bit_generator=bg)
 
 
@@ -121,7 +121,7 @@ class ReturnSimulation(BaseModel):
 
         """
         return cast(
-            float,
+            "float",
             (
                 self.results.ffill().pct_change().mean() * self.trading_days_in_year
             ).iloc[0],
@@ -138,7 +138,7 @@ class ReturnSimulation(BaseModel):
 
         """
         return cast(
-            float,
+            "float",
             (
                 self.results.ffill().pct_change().std()
                 * sqrt(self.trading_days_in_year)

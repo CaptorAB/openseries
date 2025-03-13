@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from json import load
-from logging import warning
+from logging import getLogger
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -12,6 +12,8 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 
 if TYPE_CHECKING:
     from .owntypes import CaptorLogoType, PlotlyLayoutType  # pragma: no cover
+
+logger = getLogger(__name__)
 
 __all__ = ["load_plotly_dict"]
 
@@ -69,7 +71,7 @@ def load_plotly_dict(
 
     if _check_remote_file_existence(url=logo["source"]) is False:
         msg = f"Failed to add logo image from URL {logo['source']}"
-        warning(msg)
+        logger.warning(msg)
         logo = {}
 
     fig["config"].update({"responsive": responsive})

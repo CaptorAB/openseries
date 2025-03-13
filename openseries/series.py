@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-import datetime as dt
 from collections.abc import Iterable
 from copy import deepcopy
-from logging import warning
-from typing import Any, TypeVar, cast
+from logging import getLogger
+from typing import TYPE_CHECKING, Any, TypeVar, cast
+
+if TYPE_CHECKING:
+    import datetime as dt
 
 from numpy import (
     append,
@@ -45,6 +47,8 @@ from .owntypes import (
     ValueListType,
     ValueType,
 )
+
+logger = getLogger(__name__)
 
 __all__ = ["OpenTimeSeries", "timeseries_chain"]
 
@@ -240,7 +244,7 @@ class OpenTimeSeries(_CommonModel):
                 label, _ = dframe.name
             else:
                 label = dframe.name
-            values = cast(list[float], dframe.to_numpy().tolist())
+            values = cast("list[float]", dframe.to_numpy().tolist())
         elif isinstance(dframe, DataFrame):
             values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
@@ -249,7 +253,7 @@ class OpenTimeSeries(_CommonModel):
                 ):
                     label = "Series"
                     msg = f"Label missing. Adding: {label}"
-                    warning(msg=msg)
+                    logger.warning(msg=msg)
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
                 if _check_if_none(
@@ -257,13 +261,13 @@ class OpenTimeSeries(_CommonModel):
                 ):
                     valuetype = ValueType.PRICE
                     msg = f"valuetype missing. Adding: {valuetype.value}"
-                    warning(msg=msg)
+                    logger.warning(msg=msg)
                 else:
                     valuetype = dframe.columns.get_level_values(1).to_numpy()[
                         column_nmbr
                     ]
             else:
-                label = cast(MultiIndex, dframe.columns).to_numpy()[column_nmbr]
+                label = cast("MultiIndex", dframe.columns).to_numpy()[column_nmbr]
         else:
             raise TypeError(msg)
 
@@ -413,7 +417,7 @@ class OpenTimeSeries(_CommonModel):
         """
         if not properties:
             properties = cast(
-                list[LiteralSeriesProps],
+                "list[LiteralSeriesProps]",
                 OpenTimeSeriesPropertiesList.allowed_strings,
             )
 
@@ -626,26 +630,26 @@ class OpenTimeSeries(_CommonModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             how_many = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later),
+                cast("int", earlier) : cast("int", later),
                 self.tsdf.columns.to_numpy()[0],
             ].count()
             fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
+        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 
         data[self.label, ValueType.RTRN] = (
             data.loc[:, self.tsdf.columns.to_numpy()[0]].apply(log).diff()
         )
 
         rawdata = [
-            data.loc[:, cast(int, (self.label, ValueType.RTRN))]
+            data.loc[:, cast("int", (self.label, ValueType.RTRN))]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, cast(int, (self.label, ValueType.RTRN))].iloc[1:]:
+        for item in data.loc[:, cast("int", (self.label, ValueType.RTRN))].iloc[1:]:
             prev = rawdata[-1]
             rawdata.append(
                 sqrt(
@@ -686,7 +690,7 @@ class OpenTimeSeries(_CommonModel):
             values = [1.0]
             returns_input = True
         else:
-            values = [cast(float, self.tsdf.iloc[0, 0])]
+            values = [cast("float", self.tsdf.iloc[0, 0])]
             ra_df = self.tsdf.ffill().pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
@@ -695,16 +699,16 @@ class OpenTimeSeries(_CommonModel):
         dates: list[dt.date] = [prev]
 
         for idx, row in ra_df.iterrows():
-            dates.append(cast(dt.date, idx))
+            dates.append(cast("dt.date", idx))
             values.append(
                 values[-1]
                 * (
                     1
                     + row.iloc[0]
-                    + adjustment * (cast(dt.date, idx) - prev).days / days_in_year
+                    + adjustment * (cast("dt.date", idx) - prev).days / days_in_year
                 ),
             )
-            prev = cast(dt.date, idx)
+            prev = cast("dt.date", idx)
         self.tsdf = DataFrame(data=values, index=dates)
         self.valuetype = ValueType.PRICE
         self.tsdf.columns = MultiIndex.from_arrays(
@@ -754,7 +758,7 @@ class OpenTimeSeries(_CommonModel):
             self.valuetype = lvl_one
         else:
             self.tsdf.columns = MultiIndex.from_arrays([[lvl_zero], [lvl_one]])
-            self.label, self.valuetype = lvl_zero, cast(ValueType, lvl_one)
+            self.label, self.valuetype = lvl_zero, cast("ValueType", lvl_one)
         if delete_lvl_one:
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
         return self
@@ -866,7 +870,7 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
 
     """
     try:
-        return cast(bool, isnan(item))
+        return cast("bool", isnan(item))
     except TypeError:
         if item is None:
             return True

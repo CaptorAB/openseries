@@ -15,9 +15,23 @@ from numpy import float64, inf, isnan, log, maximum, sqrt
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray  # pragma: no cover
+    from openpyxl.worksheet.worksheet import Worksheet
+
+    from .owntypes import (
+        CountriesType,
+        DaysInYearType,
+        LiteralBarPlotMode,
+        LiteralJsonOutput,
+        LiteralLinePlotMode,
+        LiteralNanMethod,
+        LiteralPandasReindexMethod,
+        LiteralPlotlyJSlib,
+        LiteralPlotlyOutput,
+        LiteralQuantileInterp,
+        ValueType,
+    )
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
-from openpyxl.worksheet.worksheet import Worksheet
 from pandas import (
     DataFrame,
     DatetimeIndex,
@@ -49,19 +63,6 @@ from .datefixer import (
     holiday_calendar,
 )
 from .load_plotly import load_plotly_dict
-from .owntypes import (
-    CountriesType,
-    DaysInYearType,
-    LiteralBarPlotMode,
-    LiteralJsonOutput,
-    LiteralLinePlotMode,
-    LiteralNanMethod,
-    LiteralPandasReindexMethod,
-    LiteralPlotlyJSlib,
-    LiteralPlotlyOutput,
-    LiteralQuantileInterp,
-    ValueType,
-)
 
 
 # noinspection PyTypeChecker
@@ -98,7 +99,7 @@ class _CommonModel(BaseModel):
             The first date in the timeseries
 
         """
-        return cast(dt.date, self.tsdf.index[0])
+        return cast("dt.date", self.tsdf.index[0])
 
     @property
     def last_idx(self: Self) -> dt.date:
@@ -110,7 +111,7 @@ class _CommonModel(BaseModel):
             The last date in the timeseries
 
         """
-        return cast(dt.date, self.tsdf.index[-1])
+        return cast("dt.date", self.tsdf.index[-1])
 
     @property
     def span_of_days(self: Self) -> int:
@@ -552,8 +553,8 @@ class _CommonModel(BaseModel):
         d_range = [
             d.date()
             for d in date_range(
-                start=cast(dt.date, self.tsdf.first_valid_index()),
-                end=cast(dt.date, self.tsdf.last_valid_index()),
+                start=cast("dt.date", self.tsdf.first_valid_index()),
+                end=cast("dt.date", self.tsdf.last_valid_index()),
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
@@ -672,15 +673,15 @@ class _CommonModel(BaseModel):
             if what_output == "tsdf":
                 values = self.tsdf.iloc[:, 0].tolist()
             else:
-                values = list(cast(list[float], data.get("values")))
+                values = list(cast("list[float]", data.get("values")))
             for item in cleaner_list:
                 data.pop(item)
-            valuetype = cast(ValueType, data.get("valuetype")).value
+            valuetype = cast("ValueType", data.get("valuetype")).value
             data.update({"valuetype": valuetype})
             data.update({"values": values})
             output.append(dict(data))
         else:
-            for serie in cast(list[Any], data.get("constituents")):
+            for serie in cast("list[Any]", data.get("constituents")):
                 if what_output == "tsdf":
                     values = serie.tsdf.iloc[:, 0].tolist()
                 else:
@@ -688,7 +689,7 @@ class _CommonModel(BaseModel):
                 itemdata = dict(serie.__dict__)
                 for item in cleaner_list:
                     itemdata.pop(item)
-                valuetype = cast(ValueType, itemdata["valuetype"]).value
+                valuetype = cast("ValueType", itemdata["valuetype"]).value
                 itemdata.update({"valuetype": valuetype})
                 itemdata.update({"values": values})
                 output.append(dict(itemdata))
@@ -742,10 +743,10 @@ class _CommonModel(BaseModel):
         wrksheet = wrkbook.active
 
         if sheet_title:
-            cast(Worksheet, wrksheet).title = sheet_title
+            cast("Worksheet", wrksheet).title = sheet_title
 
         for row in dataframe_to_rows(df=self.tsdf, index=True, header=True):
-            cast(Worksheet, wrksheet).append(row)
+            cast("Worksheet", wrksheet).append(row)
 
         if not overwrite and Path(sheetfile).exists():
             msg = f"{sheetfile!s} already exists."
@@ -849,7 +850,7 @@ class _CommonModel(BaseModel):
                 auto_open=auto_open,
                 auto_play=False,
                 link_text="",
-                include_plotlyjs=cast(bool, include_plotlyjs),
+                include_plotlyjs=cast("bool", include_plotlyjs),
                 config=fig["config"],
                 output_type=output_type,
             )
@@ -860,7 +861,7 @@ class _CommonModel(BaseModel):
                 fig=figure,
                 config=fig["config"],
                 auto_play=False,
-                include_plotlyjs=cast(bool, include_plotlyjs),
+                include_plotlyjs=cast("bool", include_plotlyjs),
                 full_html=False,
                 div_id=div_id,
             )
@@ -979,7 +980,7 @@ class _CommonModel(BaseModel):
                 auto_open=auto_open,
                 auto_play=False,
                 link_text="",
-                include_plotlyjs=cast(bool, include_plotlyjs),
+                include_plotlyjs=cast("bool", include_plotlyjs),
                 config=fig["config"],
                 output_type=output_type,
             )
@@ -990,7 +991,7 @@ class _CommonModel(BaseModel):
                 fig=figure,
                 config=fig["config"],
                 auto_play=False,
-                include_plotlyjs=cast(bool, include_plotlyjs),
+                include_plotlyjs=cast("bool", include_plotlyjs),
                 full_html=False,
                 div_id=div_id,
             )
@@ -1035,13 +1036,13 @@ class _CommonModel(BaseModel):
         else:
             fraction = (later - earlier).days / 365.25
             how_many = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later),
+                cast("int", earlier) : cast("int", later),
                 self.tsdf.columns.to_numpy()[0],
             ].count()
             time_factor = how_many / fraction
 
         result = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()
             .mean()
@@ -1097,15 +1098,17 @@ class _CommonModel(BaseModel):
         else:
             fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
+                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                .count()
+                .iloc[0]
             )
             time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)]
         result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
-            return float(cast(SupportsFloat, result.iloc[0]))
+            return float(cast("SupportsFloat", result.iloc[0]))
         return Series(
             data=result,
             index=self.tsdf.columns,
@@ -1292,21 +1295,23 @@ class _CommonModel(BaseModel):
         else:
             fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)].count().iloc[0]
+                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                .count()
+                .iloc[0]
             )
             time_factor = how_many / fraction
         if drift_adjust:
             imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
                 .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
-                - self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                - self.tsdf.loc[cast("int", earlier) : cast("int", later)]
                 .ffill()
                 .pct_change()
                 .sum()
                 / len(
-                    self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                    self.tsdf.loc[cast("int", earlier) : cast("int", later)]
                     .ffill()
                     .pct_change(),
                 )
@@ -1314,7 +1319,7 @@ class _CommonModel(BaseModel):
         else:
             imp_vol = (
                 -sqrt(time_factor)
-                * self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                * self.tsdf.loc[cast("int", earlier) : cast("int", later)]
                 .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
@@ -1334,7 +1339,7 @@ class _CommonModel(BaseModel):
             label = f"Imp vol from VaR {level:.0%}"
 
         if self.tsdf.shape[1] == 1:
-            return float(cast(SupportsFloat, result.iloc[0]))
+            return float(cast("SupportsFloat", result.iloc[0]))
         return Series(
             data=result,
             index=self.tsdf.columns,
@@ -1376,22 +1381,22 @@ class _CommonModel(BaseModel):
             from_dt=from_date,
             to_dt=to_date,
         )
-        cvar_df = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy(deep=True)
+        cvar_df = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy(
+            deep=True
+        )
         result = [
             cvar_df.loc[:, x]  # type: ignore[call-overload,index]
             .ffill()
             .pct_change()
             .sort_values()
             .iloc[
-                : int(
-                    ceil(
-                        (1 - level)
-                        * cvar_df.loc[:, x]  # type: ignore[index]
-                        .ffill()
-                        .pct_change()
-                        .count(),
-                    ),
-                )
+                : ceil(
+                    (1 - level)
+                    * cvar_df.loc[:, x]  # type: ignore[index]
+                    .ffill()
+                    .pct_change()
+                    .count(),
+                ),
             ]
             .mean()
             for x in self.tsdf
@@ -1447,7 +1452,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         how_many = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()
             .count(numeric_only=True)
@@ -1463,7 +1468,7 @@ class _CommonModel(BaseModel):
             time_factor = how_many.div(fraction)
 
         dddf = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()
             .sub(min_accepted_return / time_factor)
@@ -1572,7 +1577,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result: NDArray[float64] = skew(
-            a=self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            a=self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()
             .to_numpy(),
@@ -1621,7 +1626,11 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result: NDArray[float64] = kurtosis(
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].ffill().pct_change(),
+            a=(
+                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                .ffill()
+                .pct_change()
+            ),
             fisher=True,
             bias=True,
             nan_policy="omit",
@@ -1671,8 +1680,8 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
-            / self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            / self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .expanding(min_periods=min_periods)
             .max()
         ).min() - 1
@@ -1716,10 +1725,10 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         pos = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()[1:][
-                self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
                 .ffill()
                 .pct_change()[1:]
                 > zero
@@ -1727,7 +1736,7 @@ class _CommonModel(BaseModel):
             .count()
         )
         tot = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()
             .count()
@@ -1796,7 +1805,7 @@ class _CommonModel(BaseModel):
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(cast(float64, ratio.iloc[0]))
+            return float(cast("float64", ratio.iloc[0]))
         return Series(
             data=ratio,
             index=self.tsdf.columns,
@@ -1862,7 +1871,7 @@ class _CommonModel(BaseModel):
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(cast(float64, ratio.iloc[0]))
+            return float(cast("float64", ratio.iloc[0]))
         return Series(
             data=ratio,
             index=self.tsdf.columns,
@@ -1908,14 +1917,16 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         retdf = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].ffill().pct_change()
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            .ffill()
+            .pct_change()
         )
         pos = retdf[retdf > min_accepted_return].sub(min_accepted_return).sum()
         neg = retdf[retdf < min_accepted_return].sub(min_accepted_return).sum()
         ratio = pos / -neg
 
         if self.tsdf.shape[1] == 1:
-            return float(cast(float64, ratio.iloc[0]))
+            return float(cast("float64", ratio.iloc[0]))
         return Series(
             data=ratio,
             index=self.tsdf.columns,
@@ -2048,7 +2059,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()
             .quantile(1 - level, interpolation=interpolation)
@@ -2097,7 +2108,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)]
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
@@ -2146,7 +2157,9 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         zscframe = (
-            self.tsdf.loc[cast(int, earlier) : cast(int, later)].ffill().pct_change()
+            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            .ffill()
+            .pct_change()
         )
         result = (zscframe.iloc[-1] - zscframe.mean()) / zscframe.std()
 
@@ -2182,7 +2195,7 @@ class _CommonModel(BaseModel):
             Calculate rolling annualized downside CVaR
 
         """
-        cvar_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
+        cvar_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         cvarseries = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
@@ -2213,7 +2226,7 @@ class _CommonModel(BaseModel):
             Calculate rolling returns
 
         """
-        ret_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
+        ret_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         retseries = (
             self.tsdf.iloc[:, column]
             .ffill()
@@ -2252,7 +2265,7 @@ class _CommonModel(BaseModel):
            Calculate rolling annualized downside Value At Risk "VaR"
 
         """
-        var_label = cast(tuple[str], self.tsdf.iloc[:, column].name)[0]
+        var_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         varseries = (
             self.tsdf.iloc[:, column]
             .rolling(observations, min_periods=observations)
@@ -2293,7 +2306,7 @@ class _CommonModel(BaseModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
-        vol_label = cast(tuple[str, ValueType], self.tsdf.iloc[:, column].name)[0]
+        vol_label = cast("tuple[str, ValueType]", self.tsdf.iloc[:, column].name)[0]
         dframe = self.tsdf.iloc[:, column].ffill().pct_change()
         volseries = dframe.rolling(
             observations,

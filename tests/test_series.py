@@ -136,7 +136,7 @@ class TestOpenTimeSeries(CommonTestCase):
         ):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
-                dates=["2023-01-01", cast(str, None)],
+                dates=["2023-01-01", cast("str", None)],
                 values=[1.0, 1.1],
             )
 
@@ -146,7 +146,7 @@ class TestOpenTimeSeries(CommonTestCase):
         ):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
-                dates=cast(list[str], None),
+                dates=cast("list[str]", None),
                 values=[1.0, 1.1],
             )
 
@@ -156,7 +156,7 @@ class TestOpenTimeSeries(CommonTestCase):
         ):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
-                dates=cast(list[str], "2023-01-01"),
+                dates=cast("list[str]", "2023-01-01"),
                 values=[1.0, 1.1],
             )
 
@@ -189,7 +189,7 @@ class TestOpenTimeSeries(CommonTestCase):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
-                values=[1.0, cast(float, None)],
+                values=[1.0, cast("float", None)],
             )
 
         with pytest.raises(
@@ -199,7 +199,7 @@ class TestOpenTimeSeries(CommonTestCase):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
-                values=cast(list[float], None),
+                values=cast("list[float]", None),
             )
 
         with pytest.raises(
@@ -209,7 +209,7 @@ class TestOpenTimeSeries(CommonTestCase):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
-                values=cast(list[float], 1.0),
+                values=cast("list[float]", 1.0),
             )
 
         with pytest.raises(
@@ -219,7 +219,7 @@ class TestOpenTimeSeries(CommonTestCase):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
                 dates=["2023-01-01", "2023-01-02"],
-                values=[1.0, cast(float, "bb")],
+                values=[1.0, cast("float", "bb")],
             )
 
         with pytest.raises(
@@ -1011,7 +1011,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 ]
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
-                    dt.date,
+                    "dt.date",
                     result.loc[
                         value,
                         ("Asset_0", ValueType.PRICE),
@@ -1093,7 +1093,7 @@ class TestOpenTimeSeries(CommonTestCase):
                     f"'{Decimal(getattr(self.randomseries, c_key)):.10f}'"
                 )
             if round(
-                Decimal(cast(float, self.random_properties[c_key])),
+                Decimal(cast("float", self.random_properties[c_key])),
                 10,
             ) != round(
                 Decimal(getattr(self.randomseries, c_key)),
@@ -1180,10 +1180,10 @@ class TestOpenTimeSeries(CommonTestCase):
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
-        if f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "2.7036984198":
+        if f"{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "2.7036984198":
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
         adjustedseries_returns = self.randomseries.from_deepcopy()
@@ -1191,24 +1191,24 @@ class TestOpenTimeSeries(CommonTestCase):
         adjustedseries_returns.running_adjustment(0.05)
 
         if (
-            f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
+            f"{cast('float', adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
             != "0.0036950612"
         ):
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast('float', adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
 
         adjustedseries_returns.to_cumret()
         if (
-            f"{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}"
-            != f"{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
+            f"{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}"
+            != f"{cast('float', adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}"
         ):
             msg = (
                 "Unexpected result from running_adjustment(): "
-                f"'{cast(float, adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
-                f"'{cast(float, adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
+                f"'{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
+                f"'{cast('float', adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
             raise ValueError(msg)
 
@@ -1221,7 +1221,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         back_series = OpenTimeSeries.from_df(
             full_series.tsdf.iloc[
-                cast(int, full_series.tsdf.index.get_loc(front_series.last_idx)) :
+                cast("int", full_series.tsdf.index.get_loc(front_series.last_idx)) :
             ],
         )
         full_series.tsdf.index.get_loc(front_series.last_idx)
@@ -1238,7 +1238,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         pushed_date = front_series.last_idx + dt.timedelta(days=10)
         no_overlap_series = OpenTimeSeries.from_df(
-            full_series.tsdf.loc[cast(int, pushed_date) :],
+            full_series.tsdf.loc[cast("int", pushed_date) :],
         )
         with pytest.raises(
             expected_exception=ValueError,
@@ -1384,7 +1384,7 @@ class TestOpenTimeSeries(CommonTestCase):
             raise FileExistsError(msg)
 
         fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
-        fig_json = loads(cast(str, fig.to_json()))
+        fig_json = loads(cast("str", fig.to_json()))
         rawdata = [x.strftime("%Y-%m-%d") for x in plotseries.tsdf.index[1:5]]
         if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
@@ -1395,7 +1395,7 @@ class TestOpenTimeSeries(CommonTestCase):
             output_type="div",
             show_last=True,
         )
-        fig_last_json = loads(cast(str, fig_last.to_json()))
+        fig_last_json = loads(cast("str", fig_last.to_json()))
         last = fig_last_json["data"][-1]["y"][0]
 
         if f"{last:.10f}" != "1.6401159258":
@@ -1412,7 +1412,7 @@ class TestOpenTimeSeries(CommonTestCase):
             show_last=True,
             tick_fmt=".3%",
         )
-        fig_last_fmt_json = loads(cast(str, fig_last_fmt.to_json()))
+        fig_last_fmt_json = loads(cast("str", fig_last_fmt.to_json()))
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
         if last_fmt != "Last 164.012%":
@@ -1446,7 +1446,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = barseries.plot_bars(auto_open=False, output_type="div")
-        fig_json = loads(cast(str, fig.to_json()))
+        fig_json = loads(cast("str", fig.to_json()))
         if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
             raise ValueError(msg)
@@ -1462,7 +1462,7 @@ class TestOpenTimeSeries(CommonTestCase):
             output_type="div",
             mode="overlay",
         )
-        overlayfig_json = loads(cast(str, overlayfig.to_json()))
+        overlayfig_json = loads(cast("str", overlayfig.to_json()))
 
         fig_keys.append("opacity")
         if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
@@ -1655,12 +1655,12 @@ class TestOpenTimeSeries(CommonTestCase):
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
-        basecase.countries = cast(CountriesType, ["SE", "US"])
+        basecase.countries = cast("CountriesType", ["SE", "US"])
         if basecase.countries != {"SE", "US"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
 
-        basecase.countries = cast(CountriesType, ["SE", "SE"])
+        basecase.countries = cast("CountriesType", ["SE", "SE"])
         if basecase.countries != {"SE"}:
             msg = "Validations base case setup failed"
             raise ValueError(msg)
@@ -1919,7 +1919,7 @@ class TestOpenTimeSeries(CommonTestCase):
         """Test set_new_label method."""
         lseries = self.randomseries.from_deepcopy()
 
-        if cast(tuple[str, str], lseries.tsdf.columns[0]) != (
+        if cast("tuple[str, str]", lseries.tsdf.columns[0]) != (
             "Asset_0",
             ValueType.PRICE,
         ):
@@ -1937,7 +1937,10 @@ class TestOpenTimeSeries(CommonTestCase):
             raise ValueError(msg)
 
         lseries.set_new_label(lvl_zero="two", lvl_one=ValueType.PRICE)
-        if cast(tuple[str, str], lseries.tsdf.columns[0]) != ("two", ValueType.PRICE):
+        if cast("tuple[str, str]", lseries.tsdf.columns[0]) != (
+            "two",
+            ValueType.PRICE,
+        ):
             msg = "Method set_new_label() base case not working as intended"
             raise ValueError(msg)
 

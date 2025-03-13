@@ -327,7 +327,7 @@ class TestOpenFrame(CommonTestCase):
             io=seriesfile,
             header=0,
             index_col=0,
-            usecols=cast(int, "A:F"),
+            usecols=cast("int", "A:F"),
             skiprows=[1, 2],
             engine="openpyxl",
         )
@@ -432,7 +432,7 @@ class TestOpenFrame(CommonTestCase):
         rs_frame = self.randomframe.from_deepcopy()
         rs_frame.to_cumret()
 
-        before = cast(Series, rs_frame.value_ret).to_dict()
+        before = cast("Series", rs_frame.value_ret).to_dict()
 
         rs_frame.resample(freq="BME")
 
@@ -440,7 +440,7 @@ class TestOpenFrame(CommonTestCase):
             msg = "resample() method generated unexpected result"
             raise ValueError(msg)
 
-        after = cast(Series, rs_frame.value_ret).to_dict()
+        after = cast("Series", rs_frame.value_ret).to_dict()
         if before != after:
             msg = "resample() method generated unexpected result"
             raise ValueError(msg)
@@ -538,7 +538,7 @@ class TestOpenFrame(CommonTestCase):
         mddframe = self.randomframe.from_deepcopy()
         mddframe.to_cumret()
 
-        mdates = cast(Series, mddframe.max_drawdown_date).tolist()
+        mdates = cast("Series", mddframe.max_drawdown_date).tolist()
 
         checkdates = [
             dt.date(2012, 11, 21),
@@ -626,7 +626,7 @@ class TestOpenFrame(CommonTestCase):
 
             _ = mpframe.make_portfolio(name=name, weight_strat="inv_vol")
             inv_vol_weights = [
-                round(Decimal(wgt), 6) for wgt in cast(list[float], mpframe.weights)
+                round(Decimal(wgt), 6) for wgt in cast("list[float]", mpframe.weights)
             ]
             if inv_vol_weights != [
                 Decimal("0.152977"),
@@ -658,7 +658,7 @@ class TestOpenFrame(CommonTestCase):
         ):
             _ = mpframe.make_portfolio(
                 name=name,
-                weight_strat=cast(LiteralPortfolioWeightings, "bogus"),
+                weight_strat=cast("LiteralPortfolioWeightings", "bogus"),
             )
 
     def test_add_timeseries(self: TestOpenFrame) -> None:
@@ -667,7 +667,7 @@ class TestOpenFrame(CommonTestCase):
         items = int(frameas.item_count)
         frameas.weights = [1 / items] * items
         cols = list(frameas.columns_lvl_zero)
-        nbr_cols = int(len(frameas.columns_lvl_zero))
+        nbr_cols = len(frameas.columns_lvl_zero)
         seriesas = self.randomseries.from_deepcopy()
         seriesas.set_new_label("Asset_6")
         frameas.add_timeseries(seriesas)
@@ -717,23 +717,23 @@ class TestOpenFrame(CommonTestCase):
             msg = "VaR for OpenTimeSeries not equal"
             raise ValueError(msg)
 
-        if cast(Series, riskframe.cvar_down).iloc[0] != _cvar_down_calc(
+        if cast("Series", riskframe.cvar_down).iloc[0] != _cvar_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "CVaR for OpenFrame not equal"
             raise ValueError(msg)
-        if cast(Series, riskframe.var_down).iloc[0] != _var_down_calc(
+        if cast("Series", riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "VaR for OpenFrame not equal"
             raise ValueError(msg)
 
-        if cast(Series, riskframe.cvar_down).iloc[0] != _cvar_down_calc(
+        if cast("Series", riskframe.cvar_down).iloc[0] != _cvar_down_calc(
             riskframe.tsdf,
         ):
             msg = "CVaR for OpenFrame not equal"
             raise ValueError(msg)
-        if cast(Series, riskframe.var_down).iloc[0] != _var_down_calc(
+        if cast("Series", riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf,
         ):
             msg = "VaR for OpenFrame not equal"
@@ -836,7 +836,7 @@ class TestOpenFrame(CommonTestCase):
         samef.to_cumret()
 
         smf_vrf = cast(
-            Series,
+            "Series",
             samef.ret_vol_ratio_func(riskfree_rate=0.0, months_from_last=12),
         ).iloc[0]
         if (
@@ -849,7 +849,7 @@ class TestOpenFrame(CommonTestCase):
             raise ValueError(msg)
 
         smf_srf = cast(
-            Series,
+            "Series",
             samef.sortino_ratio_func(riskfree_rate=0.0, months_from_last=12),
         ).iloc[0]
         if (
@@ -1256,7 +1256,7 @@ class TestOpenFrame(CommonTestCase):
         plotframe.to_cumret()
 
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
-        fig_json = loads(cast(str, fig.to_json()))
+        fig_json = loads(cast("str", fig.to_json()))
 
         rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
         if rawdata != fig_json["data"][0]["x"][1:5]:
@@ -1268,7 +1268,7 @@ class TestOpenFrame(CommonTestCase):
             output_type="div",
             show_last=True,
         )
-        fig_last_json = loads(cast(str, fig_last.to_json()))
+        fig_last_json = loads(cast("str", fig_last.to_json()))
         rawlast = plotframe.tsdf.iloc[-1, -1]
         figlast = fig_last_json["data"][-1]["y"][0]
         if f"{figlast:.12f}" != f"{rawlast:.12f}":
@@ -1281,7 +1281,7 @@ class TestOpenFrame(CommonTestCase):
             show_last=True,
             tick_fmt=".3%",
         )
-        fig_last_fmt_json = loads(cast(str, fig_last_fmt.to_json()))
+        fig_last_fmt_json = loads(cast("str", fig_last_fmt.to_json()))
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
 
         if last_fmt != "Last 116.964%":
@@ -1294,7 +1294,7 @@ class TestOpenFrame(CommonTestCase):
             output_type="div",
             labels=intended_labels,
         )
-        fig_labels_json = loads(cast(str, fig_labels.to_json()))
+        fig_labels_json = loads(cast("str", fig_labels.to_json()))
 
         labels = [item["name"] for item in fig_labels_json["data"]]
         if labels != intended_labels:
@@ -1314,7 +1314,7 @@ class TestOpenFrame(CommonTestCase):
             add_logo=True,
             output_type="div",
         )
-        fig_logo_json = loads(cast(str, fig_logo.to_json()))
+        fig_logo_json = loads(cast("str", fig_logo.to_json()))
 
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
@@ -1329,7 +1329,7 @@ class TestOpenFrame(CommonTestCase):
             add_logo=False,
             output_type="div",
         )
-        fig_nologo_json = loads(cast(str, fig_nologo.to_json()))
+        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_series add_logo argument not setup correctly"
             raise ValueError(msg)
@@ -1366,7 +1366,7 @@ class TestOpenFrame(CommonTestCase):
                 auto_open=False,
                 output_type="div",
             )
-            mockhomefig_json = loads(cast(str, mockhomefig.to_json()))
+            mockhomefig_json = loads(cast("str", mockhomefig.to_json()))
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_series method not working as intended"
@@ -1392,7 +1392,7 @@ class TestOpenFrame(CommonTestCase):
 
         fig_keys = ["hovertemplate", "name", "type", "x", "y"]
         fig, _ = plotframe.plot_bars(auto_open=False, output_type="div")
-        fig_json = loads(cast(str, fig.to_json()))
+        fig_json = loads(cast("str", fig.to_json()))
         made_fig_keys = list(fig_json["data"][0].keys())
         made_fig_keys.sort()
         if made_fig_keys != fig_keys:
@@ -1410,7 +1410,7 @@ class TestOpenFrame(CommonTestCase):
             output_type="div",
             labels=intended_labels,
         )
-        fig_labels_json = loads(cast(str, fig_labels.to_json()))
+        fig_labels_json = loads(cast("str", fig_labels.to_json()))
 
         labels = [item["name"] for item in fig_labels_json["data"]]
         if labels != intended_labels:
@@ -1428,7 +1428,7 @@ class TestOpenFrame(CommonTestCase):
             output_type="div",
             mode="overlay",
         )
-        overlayfig_json = loads(cast(str, overlayfig.to_json()))
+        overlayfig_json = loads(cast("str", overlayfig.to_json()))
 
         fig_keys.append("opacity")
         if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
@@ -1442,7 +1442,7 @@ class TestOpenFrame(CommonTestCase):
             add_logo=True,
             output_type="div",
         )
-        fig_logo_json = loads(cast(str, fig_logo.to_json()))
+        fig_logo_json = loads(cast("str", fig_logo.to_json()))
 
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
@@ -1457,7 +1457,7 @@ class TestOpenFrame(CommonTestCase):
             add_logo=False,
             output_type="div",
         )
-        fig_nologo_json = loads(cast(str, fig_nologo.to_json()))
+        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_bars add_logo argument not setup correctly"
             raise ValueError(msg)
@@ -1493,7 +1493,7 @@ class TestOpenFrame(CommonTestCase):
                 auto_open=False,
                 output_type="div",
             )
-            mockhomefig_json = loads(cast(str, mockhomefig.to_json()))
+            mockhomefig_json = loads(cast("str", mockhomefig.to_json()))
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_bars method not working as intended"
@@ -1526,7 +1526,7 @@ class TestOpenFrame(CommonTestCase):
                 add_logo=True,
                 output_type="div",
             )
-            seriesfig_json = loads(cast(str, seriesfig.to_json()))
+            seriesfig_json = loads(cast("str", seriesfig.to_json()))
             if seriesfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_series add_logo argument not setup correctly"
                 raise ValueError(msg)
@@ -1536,7 +1536,7 @@ class TestOpenFrame(CommonTestCase):
                 add_logo=True,
                 output_type="div",
             )
-            barfig_json = loads(cast(str, barfig.to_json()))
+            barfig_json = loads(cast("str", barfig.to_json()))
             if barfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_bars add_logo argument not setup correctly"
                 raise ValueError(msg)
@@ -1596,7 +1596,7 @@ class TestOpenFrame(CommonTestCase):
             mock_statuscode.return_value.status_code = 200
 
             fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
-            fig_json = loads(cast(str, fig.to_json()))
+            fig_json = loads(cast("str", fig.to_json()))
 
             rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
             if rawdata != fig_json["data"][0]["x"][1:5]:
@@ -1618,8 +1618,8 @@ class TestOpenFrame(CommonTestCase):
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast(int, dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
-                    int,
+                cast("int", dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
+                    "int",
                     dt.date(2018, 6, 27),
                 ),
                 ("Asset_0", ValueType.PRICE),
@@ -1668,8 +1668,8 @@ class TestOpenFrame(CommonTestCase):
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast(int, dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
-                    int,
+                cast("int", dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
+                    "int",
                     dt.date(2018, 6, 27),
                 ),
                 ("Asset_0", ValueType.PRICE),
@@ -1996,7 +1996,7 @@ class TestOpenFrame(CommonTestCase):
             raise TypeError(msg)
 
         result_arg = apframe.all_properties(
-            properties=cast(list[LiteralFrameProps], ["geo_ret"]),
+            properties=cast("list[LiteralFrameProps]", ["geo_ret"]),
         )
 
         msg = "Method all_properties() not working as intended."
@@ -2015,12 +2015,12 @@ class TestOpenFrame(CommonTestCase):
                 )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
                 result_values[value] = cast(
-                    str,
+                    "str",
                     result.loc[value, ("Asset_0", ValueType.PRICE)],
                 )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
-                    dt.date,
+                    "dt.date",
                     result.loc[value, ("Asset_0", ValueType.PRICE)],
                 ).strftime("%Y-%m-%d")
             else:
@@ -2572,14 +2572,14 @@ class TestOpenFrame(CommonTestCase):
                 ),
             ],
         )
-        if [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)] != [
+        if [f"{gr:.5f}" for gr in cast("Series", geoframe.geo_ret)] != [
             "0.10007",
             "0.20015",
         ]:
             msg = "Unexpected result from property geo_ret"
             raise ValueError(msg)
 
-        if [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret_func())] != [
+        if [f"{gr:.5f}" for gr in cast("Series", geoframe.geo_ret_func())] != [
             "0.10007",
             "0.20015",
         ]:
@@ -2614,7 +2614,7 @@ class TestOpenFrame(CommonTestCase):
 
         geoframe.delete_timeseries(lvl_zero_item="geoseries3")
 
-        if [f"{gr:.5f}" for gr in cast(Series, geoframe.geo_ret)] != [
+        if [f"{gr:.5f}" for gr in cast("Series", geoframe.geo_ret)] != [
             "0.10007",
             "0.20015",
         ]:
@@ -2899,7 +2899,7 @@ class TestOpenFrame(CommonTestCase):
                     )
                     raise ValueError(msg)
 
-        ret = [f"{rr:.9f}" for rr in cast(Series, mframe.value_ret_func())]
+        ret = [f"{rr:.9f}" for rr in cast("Series", mframe.value_ret_func())]
         if ret != [
             "0.640115926",
             "0.354975641",
@@ -2912,11 +2912,11 @@ class TestOpenFrame(CommonTestCase):
 
         impvol = [
             f"{iv:.11f}"
-            for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=False))
+            for iv in cast("Series", mframe.vol_from_var_func(drift_adjust=False))
         ]
         impvoldrifted = [
             f"{iv:.11f}"
-            for iv in cast(Series, mframe.vol_from_var_func(drift_adjust=True))
+            for iv in cast("Series", mframe.vol_from_var_func(drift_adjust=True))
         ]
 
         if impvol != [
@@ -2969,11 +2969,11 @@ class TestOpenFrame(CommonTestCase):
             from_date=dt.date(2017, 12, 29),
             to_date=dt.date(2018, 12, 28),
         )
-        vrffl_y = [f"{rr:.11f}" for rr in cast(Series, vrff_y)]
+        vrffl_y = [f"{rr:.11f}" for rr in cast("Series", vrff_y)]
 
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
         vrvrcf_y = vrcframe.value_ret_calendar_period(year=2018)
-        vrvrcfl_y = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_y)]
+        vrvrcfl_y = [f"{rr:.11f}" for rr in cast("Series", vrvrcf_y)]
 
         if f"{vrfs_y:.11f}" != f"{vrvrcs_y:.11f}":
             msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
@@ -2991,11 +2991,11 @@ class TestOpenFrame(CommonTestCase):
             from_date=dt.date(2018, 4, 30),
             to_date=dt.date(2018, 5, 31),
         )
-        vrffl_ym = [f"{rr:.11f}" for rr in cast(Series, vrff_ym)]
+        vrffl_ym = [f"{rr:.11f}" for rr in cast("Series", vrff_ym)]
 
         vrvrcs_ym = vrcseries.value_ret_calendar_period(year=2018, month=5)
         vrvrcf_ym = vrcframe.value_ret_calendar_period(year=2018, month=5)
-        vrvrcfl_ym = [f"{rr:.11f}" for rr in cast(Series, vrvrcf_ym)]
+        vrvrcfl_ym = [f"{rr:.11f}" for rr in cast("Series", vrvrcf_ym)]
 
         if f"{vrfs_ym:.11f}" != f"{vrvrcs_ym:.11f}":
             msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
@@ -3009,7 +3009,7 @@ class TestOpenFrame(CommonTestCase):
         """Test to_drawdown_series method."""
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
-        ddown = [f"{dmax:.11f}" for dmax in cast(Series, mframe.max_drawdown)]
+        ddown = [f"{dmax:.11f}" for dmax in cast("Series", mframe.max_drawdown)]
         mframe.to_drawdown_series()
         ddownserie = [f"{dmax:.11f}" for dmax in mframe.tsdf.min()]
 
@@ -3051,8 +3051,8 @@ class TestOpenFrame(CommonTestCase):
         for k_tuple in oframe.tsdf:
             for l_tuple in oframe.tsdf:
                 tmp = oframe.ord_least_squares_fit(
-                    y_column=cast(tuple[str, ValueType], k_tuple),
-                    x_column=cast(tuple[str, ValueType], l_tuple),
+                    y_column=cast("tuple[str, ValueType]", k_tuple),
+                    x_column=cast("tuple[str, ValueType]", l_tuple),
                     fitted_series=False,
                 )
                 results_tuple.append(f"{float(tmp.params.iloc[0]):.11f}")

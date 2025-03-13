@@ -3,7 +3,6 @@
 # mypy: disable-error-code="index,assignment"
 from __future__ import annotations
 
-from collections.abc import Callable
 from inspect import stack
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -22,7 +21,6 @@ from numpy import (
 from numpy import (
     sum as npsum,
 )
-from numpy.typing import NDArray
 from pandas import (
     DataFrame,
     Series,
@@ -47,6 +45,9 @@ from .series import OpenTimeSeries
 from .simulation import _random_generator
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Callable
+
+    from numpy.typing import NDArray
     from pydantic import DirectoryPath
 
     from .frame import OpenFrame
@@ -200,7 +201,7 @@ def efficient_frontier(  # noqa: C901
         ret = npsum(lg_ret.mean() * weights) * per_in_yr
         volatility = sqrt(weights.T @ (lg_ret.cov() * per_in_yr @ weights))
         sr = ret / volatility
-        return cast(NDArray[float64], array([ret, volatility, sr]))
+        return cast("NDArray[float64]", array([ret, volatility, sr]))
 
     def _diff_return(
         lg_ret: DataFrame,
@@ -209,14 +210,14 @@ def efficient_frontier(  # noqa: C901
         poss_return: float,
     ) -> float64:
         return cast(
-            float64,
+            "float64",
             _get_ret_vol_sr(lg_ret=lg_ret, weights=weights, per_in_yr=per_in_yr)[0]
             - poss_return,
         )
 
     def _neg_sharpe(weights: NDArray[float64]) -> float64:
         return cast(
-            float64,
+            "float64",
             _get_ret_vol_sr(
                 lg_ret=log_ret,
                 weights=weights,
@@ -229,7 +230,7 @@ def efficient_frontier(  # noqa: C901
         weights: NDArray[float64],
     ) -> float64:
         return cast(
-            float64,
+            "float64",
             _get_ret_vol_sr(
                 lg_ret=log_ret,
                 weights=weights,
@@ -262,7 +263,7 @@ def efficient_frontier(  # noqa: C901
 
     for possible_return in frontier_y:
         cons = cast(
-            dict[str, str | Callable[[float, NDArray[float64]], float64]],
+            "dict[str, str | Callable[[float, NDArray[float64]], float64]]",
             (
                 {"type": "eq", "fun": _check_sum},
                 {
@@ -414,7 +415,7 @@ def prepare_plot_data(
         [
             f"{wgt:.1%}  {nm}"
             for wgt, nm in zip(
-                cast(list[float], assets.weights),
+                cast("list[float]", assets.weights),
                 assets.columns_lvl_zero,
                 strict=True,
             )
@@ -552,7 +553,7 @@ def sharpeplot(  # noqa: C901
 
     if point_frame is not None:
         colorway = cast(
-            dict[str, str | int | float | bool | list[str]],
+            "dict[str, str | int | float | bool | list[str]]",
             fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]
         for col, clr in zip(point_frame.columns, colorway, strict=True):
@@ -600,7 +601,7 @@ def sharpeplot(  # noqa: C901
             auto_open=auto_open,
             auto_play=False,
             link_text="",
-            include_plotlyjs=cast(bool, include_plotlyjs),
+            include_plotlyjs=cast("bool", include_plotlyjs),
             config=fig["config"],
             output_type=output_type,
         )
@@ -611,7 +612,7 @@ def sharpeplot(  # noqa: C901
             fig=figure,
             config=fig["config"],
             auto_play=False,
-            include_plotlyjs=cast(bool, include_plotlyjs),
+            include_plotlyjs=cast("bool", include_plotlyjs),
             full_html=False,
             div_id=div_id,
         )

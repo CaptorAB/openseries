@@ -19,7 +19,7 @@ class TestTypes:
 
     def test_opentimeseriesproplist_validate(self: TestTypes) -> None:
         """Test that the OpenTimeSeries property input is correctly checked."""
-        subset = cast(LiteralSeriesProps, ["z_score", "kurtosis", "positive_share"])
+        subset = cast("LiteralSeriesProps", ["z_score", "kurtosis", "positive_share"])
         lst = OpenTimeSeriesPropertiesList(*subset)
         msg = "A OpenTimeSeriesPropertiesList was not produced"
         if not isinstance(lst, OpenTimeSeriesPropertiesList):
@@ -30,7 +30,7 @@ class TestTypes:
             match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
-                *cast(LiteralSeriesProps, ["z_score", "boo", "positive_share"]),
+                *cast("LiteralSeriesProps", ["z_score", "boo", "positive_share"]),
             )
 
         with pytest.raises(
@@ -39,7 +39,7 @@ class TestTypes:
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
-                    LiteralSeriesProps,
+                    "LiteralSeriesProps",
                     ["z_score", "skew", "skew", "positive_share"],
                 ),
             )
@@ -53,14 +53,14 @@ class TestTypes:
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
-                    LiteralSeriesProps,
+                    "LiteralSeriesProps",
                     ["z_score", "skew", "skew", "boo"],
                 ),
             )
 
     def test_openframeproplist_validate(self: TestTypes) -> None:
         """Test that the OpenFrame property input is correctly checked."""
-        subset = cast(LiteralFrameProps, ["z_score", "kurtosis", "positive_share"])
+        subset = cast("LiteralFrameProps", ["z_score", "kurtosis", "positive_share"])
         lst = OpenFramePropertiesList(*subset)
         msg = "A OpenFramePropertiesList was not produced"
         if not isinstance(lst, OpenFramePropertiesList):
@@ -71,7 +71,7 @@ class TestTypes:
             match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenFramePropertiesList(
-                *cast(LiteralFrameProps, ["z_score", "boo", "positive_share"]),
+                *cast("LiteralFrameProps", ["z_score", "boo", "positive_share"]),
             )
 
         with pytest.raises(
@@ -80,7 +80,7 @@ class TestTypes:
         ):
             OpenFramePropertiesList(
                 *cast(
-                    LiteralFrameProps,
+                    "LiteralFrameProps",
                     ["z_score", "skew", "skew", "positive_share"],
                 ),
             )
@@ -94,7 +94,7 @@ class TestTypes:
         ):
             OpenFramePropertiesList(
                 *cast(
-                    LiteralFrameProps,
+                    "LiteralFrameProps",
                     ["z_score", "skew", "skew", "boo"],
                 ),
             )

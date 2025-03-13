@@ -79,7 +79,7 @@ def test_date_fix(fixerdate: DateType) -> None:
         expected_exception=TypeError,
         match="Unknown date format 3 of type <class 'int'> encountered",
     ):
-        _ = date_fix(fixerdate=cast(str, int_arg))
+        _ = date_fix(fixerdate=cast("str", int_arg))
 
     str_arg: str = "abcdef"
     with pytest.raises(
@@ -301,7 +301,7 @@ class TestDateFixer:
             msg = f"Holidays not the same are: {compared}"
             raise ValueError(msg)
 
-        jbirth = cast(dict[str, str], jacks_birthday)
+        jbirth = cast("dict[str, str]", jacks_birthday)
         twentytwentyoneholidays.append(date_fix(next(iter(jbirth.keys()))))
         twentytwentyoneholidays.sort()
 
