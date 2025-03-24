@@ -45,6 +45,7 @@ from .datefixer import _do_resample_to_business_period_ends
 from .owntypes import (
     CountriesType,
     DaysInYearType,
+    LabelsNotUniqueError,
     LiteralBizDayFreq,
     LiteralCaptureRatio,
     LiteralFrameProps,
@@ -54,7 +55,11 @@ from .owntypes import (
     LiteralPandasReindexMethod,
     LiteralPortfolioWeightings,
     LiteralTrunc,
+    MergingResultedInEmptyError,
+    MixedValuetypesError,
+    NoWeightsError,
     OpenFramePropertiesList,
+    RatioInputError,
     ValueType,
 )
 from .series import OpenTimeSeries
@@ -98,7 +103,7 @@ class OpenFrame(_CommonModel):
         labls = [x.label for x in tseries]
         if len(set(labls)) != len(labls):
             msg = "TimeSeries names/labels must be unique"
-            raise ValueError(msg)
+            raise LabelsNotUniqueError(msg)
         return tseries
 
     def __init__(
@@ -190,7 +195,7 @@ class OpenFrame(_CommonModel):
                 "Merging OpenTimeSeries DataFrames with "
                 f"argument how={how} produced an empty DataFrame."
             )
-            raise ValueError(msg)
+            raise MergingResultedInEmptyError(msg)
 
         if how == "inner":
             for xerie in self.constituents:
@@ -385,7 +390,7 @@ class OpenFrame(_CommonModel):
             returns.iloc[0] = 0
         else:
             msg = "Mix of series types will give inconsistent results"
-            raise ValueError(msg)
+            raise MixedValuetypesError(msg)
 
         returns = returns.add(1.0)
         self.tsdf = returns.cumprod(axis=0) / returns.iloc[0]
@@ -1128,7 +1133,7 @@ class OpenFrame(_CommonModel):
                         (up_rtrn / up_idx_return) / (down_return / down_idx_return),
                     )
                 else:
-                    raise ValueError(msg)
+                    raise RatioInputError(msg)
 
         if ratio == "up":
             resultname = f"Up Capture Ratios vs {short_label}"
@@ -1412,7 +1417,7 @@ class OpenFrame(_CommonModel):
                 raise TypeError(msg)
         else:
             msg = "Mix of series types will give inconsistent results"
-            raise ValueError(msg)
+            raise MixedValuetypesError(msg)
 
         covariance = cov(asset_log, market_log, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -1444,7 +1449,7 @@ class OpenFrame(_CommonModel):
                 "OpenFrame weights property must be provided "
                 "to run the make_portfolio method."
             )
-            raise ValueError(msg)
+            raise NoWeightsError(msg)
 
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
@@ -1454,7 +1459,7 @@ class OpenFrame(_CommonModel):
             returns = self.tsdf.copy()
         else:
             msg = "Mix of series types will give inconsistent results"
-            raise ValueError(msg)
+            raise MixedValuetypesError(msg)
 
         msg = "Weight strategy not implemented"
         if weight_strat:

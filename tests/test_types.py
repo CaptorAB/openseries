@@ -11,6 +11,7 @@ from openseries.owntypes import (
     LiteralSeriesProps,
     OpenFramePropertiesList,
     OpenTimeSeriesPropertiesList,
+    PropertiesInputValidationError,
 )
 
 
@@ -26,7 +27,7 @@ class TestTypes:
             raise TypeError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
@@ -34,7 +35,7 @@ class TestTypes:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Duplicate string\(s\): \['skew'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
@@ -45,7 +46,7 @@ class TestTypes:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=(
                 r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
                 r"(?=.*Duplicate string\(s\): \['skew'\])"
@@ -67,7 +68,7 @@ class TestTypes:
             raise TypeError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenFramePropertiesList(
@@ -75,7 +76,7 @@ class TestTypes:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Duplicate string\(s\): \['skew'\]\.",
         ):
             OpenFramePropertiesList(
@@ -86,7 +87,7 @@ class TestTypes:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=(
                 r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
                 r"(?=.*Duplicate string\(s\): \['skew'\])"

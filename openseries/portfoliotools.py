@@ -33,10 +33,12 @@ from scipy.optimize import minimize  # type: ignore[import-untyped,unused-ignore
 
 from .load_plotly import load_plotly_dict
 from .owntypes import (
+    AtLeastOneFrameError,
     LiteralLinePlotMode,
     LiteralMinimizeMethods,
     LiteralPlotlyJSlib,
     LiteralPlotlyOutput,
+    MixedValuetypesError,
     ValueType,
 )
 from .series import OpenTimeSeries
@@ -93,7 +95,7 @@ def simulate_portfolios(
         log_ret = copi.tsdf.copy()
     else:
         msg = "Mix of series types will give inconsistent results"
-        raise ValueError(msg)
+        raise MixedValuetypesError(msg)
 
     log_ret.columns = log_ret.columns.droplevel(level=1)
 
@@ -177,7 +179,7 @@ def efficient_frontier(
         log_ret = copi.tsdf.copy()
     else:
         msg = "Mix of series types will give inconsistent results"
-        raise ValueError(msg)
+        raise MixedValuetypesError(msg)
 
     log_ret.columns = log_ret.columns.droplevel(level=1)
 
@@ -515,7 +517,7 @@ def sharpeplot(
 
     if sim_frame is None and line_frame is None and point_frame is None:
         msg = "One of sim_frame, line_frame or point_frame must be provided."
-        raise ValueError(msg)
+        raise AtLeastOneFrameError(msg)
 
     if sim_frame is not None:
         returns.extend(list(sim_frame.loc[:, "ret"]))

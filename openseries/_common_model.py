@@ -13,6 +13,12 @@ from typing import TYPE_CHECKING, Any, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
 
+from .owntypes import (
+    DateAlignmentError,
+    InitialValueZeroError,
+    NumberOfItemsAndLabelsNotSameError,
+)
+
 if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import NDArray
     from openpyxl.worksheet.worksheet import Worksheet
@@ -505,18 +511,18 @@ class _CommonModel(BaseModel):
                     "Argument months_offset implies start"
                     "date before first date in series."
                 )
-                raise ValueError(msg)
+                raise DateAlignmentError(msg)
             later = self.last_idx
         else:
             if from_dt is not None:
                 if from_dt < self.first_idx:
                     msg = "Given from_dt date < series start"
-                    raise ValueError(msg)
+                    raise DateAlignmentError(msg)
                 earlier = from_dt
             if to_dt is not None:
                 if to_dt > self.last_idx:
                     msg = "Given to_dt date > series end"
-                    raise ValueError(msg)
+                    raise DateAlignmentError(msg)
                 later = to_dt
         while earlier not in self.tsdf.index:
             earlier -= dt.timedelta(days=1)
@@ -804,7 +810,7 @@ class _CommonModel(BaseModel):
         if labels:
             if len(labels) != self.tsdf.shape[1]:
                 msg = "Must provide same number of labels as items in frame."
-                raise ValueError(msg)
+                raise NumberOfItemsAndLabelsNotSameError(msg)
         else:
             labels = list(self.tsdf.columns.get_level_values(0))
 
@@ -919,7 +925,7 @@ class _CommonModel(BaseModel):
         if labels:
             if len(labels) != self.tsdf.shape[1]:
                 msg = "Must provide same number of labels as items in frame."
-                raise ValueError(msg)
+                raise NumberOfItemsAndLabelsNotSameError(msg)
         else:
             labels = list(self.tsdf.columns.get_level_values(0))
 
@@ -1532,7 +1538,7 @@ class _CommonModel(BaseModel):
                 "Geometric return cannot be calculated due to "
                 "an initial value being zero or a negative value."
             )
-            raise ValueError(msg)
+            raise InitialValueZeroError(msg)
 
         result = (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
 
@@ -1969,7 +1975,7 @@ class _CommonModel(BaseModel):
                 "Simple return cannot be calculated due to "
                 f"an initial value being zero. ({self.tsdf.head(3)})"
             )
-            raise ValueError(msg)
+            raise InitialValueZeroError(msg)
 
         result = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
 

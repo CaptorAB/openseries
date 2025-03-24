@@ -26,8 +26,15 @@ from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
 from openseries.owntypes import (
+    DateAlignmentError,
+    InitialValueZeroError,
+    LabelsNotUniqueError,
     LiteralFrameProps,
     LiteralPortfolioWeightings,
+    MixedValuetypesError,
+    NoWeightsError,
+    NumberOfItemsAndLabelsNotSameError,
+    RatioInputError,
     ValueType,
 )
 from openseries.series import OpenTimeSeries
@@ -375,7 +382,7 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=DateAlignmentError,
             match=(
                 "Argument months_offset implies startdate before first date in series."
             ),
@@ -383,13 +390,13 @@ class TestOpenFrame(CommonTestCase):
             _, _ = crframe.calc_range(months_offset=125)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=DateAlignmentError,
             match="Given from_dt date < series start",
         ):
             _, _ = crframe.calc_range(from_dt=dt.date(2009, 5, 31))
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=DateAlignmentError,
             match="Given to_dt date > series end",
         ):
             _, _ = crframe.calc_range(to_dt=dt.date(2019, 7, 31))
@@ -605,7 +612,7 @@ class TestOpenFrame(CommonTestCase):
 
         mpframe.weights = None
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=NoWeightsError,
             match=(
                 "OpenFrame weights property must be provided "
                 "to run the make_portfolio method."
@@ -651,7 +658,7 @@ class TestOpenFrame(CommonTestCase):
         returns.value_to_ret()
         mixframe = OpenFrame(constituents=[series, returns])
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=MixedValuetypesError,
             match="Mix of series types will give inconsistent results",
         ):
             _ = mixframe.make_portfolio(name=name, weight_strat="eq_weights")
@@ -1306,7 +1313,7 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=NumberOfItemsAndLabelsNotSameError,
             match="Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
@@ -1422,7 +1429,7 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=NumberOfItemsAndLabelsNotSameError,
             match="Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_bars(auto_open=False, labels=["a", "b"])
@@ -2372,7 +2379,7 @@ class TestOpenFrame(CommonTestCase):
         bseries = self.randomseries.from_deepcopy()
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=LabelsNotUniqueError,
             match="TimeSeries names/labels must be unique",
         ):
             OpenFrame([aseries, bseries])
@@ -2559,7 +2566,7 @@ class TestOpenFrame(CommonTestCase):
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=RatioInputError,
             match="ratio must be one of 'up', 'down' or 'both'.",
         ):
             _ = cframe.capture_ratio_func(
@@ -2605,7 +2612,7 @@ class TestOpenFrame(CommonTestCase):
         )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -2614,7 +2621,7 @@ class TestOpenFrame(CommonTestCase):
             _ = geoframe.geo_ret
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -2639,7 +2646,7 @@ class TestOpenFrame(CommonTestCase):
             ),
         )
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -2648,7 +2655,7 @@ class TestOpenFrame(CommonTestCase):
             _ = geoframe.geo_ret
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -2851,7 +2858,7 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=MixedValuetypesError,
             match="Mix of series types will give inconsistent results",
         ):
             mframe.to_cumret()
@@ -2953,13 +2960,13 @@ class TestOpenFrame(CommonTestCase):
         mframe.tsdf.iloc[0, 2] = zero_float
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match="Simple return cannot be calculated due to an",
         ):
             _ = mframe.value_ret
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match="Simple return cannot be calculated due to an",
         ):
             _ = mframe.value_ret_func()
@@ -3469,7 +3476,7 @@ class TestOpenFrame(CommonTestCase):
         returns.value_to_ret()
         mixframe = OpenFrame(constituents=[series, returns])
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=MixedValuetypesError,
             match="Mix of series types will give inconsistent results",
         ):
             _ = mixframe.jensen_alpha(asset=0, market=1)

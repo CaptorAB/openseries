@@ -15,6 +15,9 @@ from pydantic import ValidationError
 
 from openseries.owntypes import (
     CountriesType,
+    DateAlignmentError,
+    IncorrectArgumentComboError,
+    InitialValueZeroError,
     ValueType,
 )
 
@@ -762,13 +765,13 @@ class TestOpenTimeSeries(CommonTestCase):
             raise TypeError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=IncorrectArgumentComboError,
             match="If d_range is not provided both days and end_dt must be.",
         ):
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=IncorrectArgumentComboError,
             match="If d_range is not provided both days and end_dt must be.",
         ):
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03, days=30)
@@ -1247,7 +1250,7 @@ class TestOpenTimeSeries(CommonTestCase):
             full_series.tsdf.loc[cast("int", pushed_date) :],
         )
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=DateAlignmentError,
             match="Timeseries dates must overlap to allow them to be chained.",
         ):
             _ = timeseries_chain(front_series, no_overlap_series)
@@ -1272,7 +1275,7 @@ class TestOpenTimeSeries(CommonTestCase):
             raise OpenTimeSeriesTestError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=DateAlignmentError,
             match="Failed to find a matching date between series",
         ):
             _ = timeseries_chain(front_series_three, back_series)
@@ -1790,7 +1793,7 @@ class TestOpenTimeSeries(CommonTestCase):
             ],
         )
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -1799,7 +1802,7 @@ class TestOpenTimeSeries(CommonTestCase):
             _ = zeroseries.geo_ret
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -1808,13 +1811,13 @@ class TestOpenTimeSeries(CommonTestCase):
             _ = zeroseries.geo_ret_func()
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match="Simple return cannot be calculated due to an",
         ):
             _ = zeroseries.value_ret
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match="Simple return cannot be calculated due to an",
         ):
             _ = zeroseries.value_ret_func()
@@ -1829,7 +1832,7 @@ class TestOpenTimeSeries(CommonTestCase):
         )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."
@@ -1838,7 +1841,7 @@ class TestOpenTimeSeries(CommonTestCase):
             _ = negseries.geo_ret
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=InitialValueZeroError,
             match=(
                 "Geometric return cannot be calculated due to an "
                 "initial value being zero or a negative value."

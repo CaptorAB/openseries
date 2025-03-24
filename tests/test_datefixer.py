@@ -17,9 +17,18 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
+from openseries.owntypes import (
+    BothStartAndEndError,
+    CountriesNotStringNorListStrError,
+    TradingDaysNotAboveZeroError,
+)
 
 if TYPE_CHECKING:
-    from openseries.owntypes import CountriesType, DateType, HolidayType
+    from openseries.owntypes import (
+        CountriesType,
+        DateType,
+        HolidayType,
+    )
 
 
 class DatefixerTestError(Exception):
@@ -232,7 +241,7 @@ def test_date_offset_foll(
         )
 
     with pytest.raises(
-        expected_exception=ValueError,
+        expected_exception=CountriesNotStringNorListStrError,
         match="Argument countries must be a string country code",
     ):
         _ = date_offset_foll(
@@ -383,7 +392,7 @@ class TestDateFixer:
 
         neg_days = -5
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=TradingDaysNotAboveZeroError,
             match="Argument trading_days must be greater than zero.",
         ):
             _ = generate_calendar_date_range(
@@ -392,7 +401,7 @@ class TestDateFixer:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=BothStartAndEndError,
             match=(
                 "Provide one of start or end date, but not both. "
                 "Date range is inferred from number of trading days."
@@ -405,7 +414,7 @@ class TestDateFixer:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=BothStartAndEndError,
             match=(
                 "Provide one of start or end date, but not both. "
                 "Date range is inferred from number of trading days."

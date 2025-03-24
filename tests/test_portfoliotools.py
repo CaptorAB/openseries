@@ -13,6 +13,7 @@ import pytest
 
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
+from openseries.owntypes import AtLeastOneFrameError, MixedValuetypesError
 from openseries.portfoliotools import (
     constrain_optimized_portfolios,
     efficient_frontier,
@@ -89,7 +90,7 @@ class TestPortfoliotools(CommonTestCase):
         mixframe = OpenFrame(constituents=[series, returns])
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=MixedValuetypesError,
             match="Mix of series types will give inconsistent results",
         ):
             _ = simulate_portfolios(
@@ -192,7 +193,7 @@ class TestPortfoliotools(CommonTestCase):
         mixframe = OpenFrame(constituents=[series, returns])
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=MixedValuetypesError,
             match="Mix of series types will give inconsistent results",
         ):
             _, _, _ = efficient_frontier(
@@ -553,7 +554,7 @@ class TestPortfoliotools(CommonTestCase):
             raise PortfoliotoolsTestError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=AtLeastOneFrameError,
             match="One of sim_frame, line_frame or point_frame must be provided.",
         ):
             _, _ = sharpeplot(

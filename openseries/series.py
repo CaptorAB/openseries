@@ -38,8 +38,10 @@ from .owntypes import (
     CountriesType,
     Currency,
     CurrencyStringType,
+    DateAlignmentError,
     DateListType,
     DaysInYearType,
+    IncorrectArgumentComboError,
     LiteralBizDayFreq,
     LiteralPandasReindexMethod,
     LiteralSeriesProps,
@@ -342,7 +344,7 @@ class OpenTimeSeries(_CommonModel):
             )
         elif not isinstance(d_range, Iterable) and not all([days, end_dt]):
             msg = "If d_range is not provided both days and end_dt must be."
-            raise ValueError(msg)
+            raise IncorrectArgumentComboError(msg)
 
         deltas = array(
             [i.days for i in DatetimeIndex(d_range)[1:] - DatetimeIndex(d_range)[:-1]],  # type: ignore[arg-type]
@@ -796,14 +798,14 @@ def timeseries_chain(
 
     if old.last_idx < first:
         msg = "Timeseries dates must overlap to allow them to be chained."
-        raise ValueError(msg)
+        raise DateAlignmentError(msg)
 
     while first not in old.tsdf.index:
         idx += 1
         first = new.tsdf.index[idx]
         if first > old.tsdf.index[-1]:
             msg = "Failed to find a matching date between series"
-            raise ValueError(msg)
+            raise DateAlignmentError(msg)
 
     dates: list[str] = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < first]
 
