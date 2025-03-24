@@ -945,7 +945,7 @@ class OpenFrame(_CommonModel):
             dtype="float64",
         )
 
-    def capture_ratio_func(  # noqa: C901
+    def capture_ratio_func(
         self: Self,
         ratio: LiteralCaptureRatio,
         base_column: tuple[str, ValueType] | int = -1,
@@ -1286,7 +1286,7 @@ class OpenFrame(_CommonModel):
 
         return cast("OLSResults", results)
 
-    def jensen_alpha(  # noqa: C901
+    def jensen_alpha(
         self: Self,
         asset: tuple[str, ValueType] | int,
         market: tuple[str, ValueType] | int,

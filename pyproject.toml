@@ -54,9 +54,10 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/CaptorAB/openseries"
-repository = "https://github.com/CaptorAB/openseries"
-documentation = "https://github.com/CaptorAB/openseries"
+"Homepage" = "https://github.com/CaptorAB/openseries"
+"Source" = "https://github.com/CaptorAB/openseries"
+"Issue Tracker" = "https://github.com/CaptorAB/openseries/issues"
+"Release Notes" = "https://github.com/CaptorAB/openseries/releases"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=24.4.2,<26.0.0"
@@ -125,6 +126,9 @@ fixable = ["ALL"]
 max-args = 12
 max-branches = 23
 max-statements = 59
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
 
 [tool.pytest.ini_options]
 filterwarnings = [

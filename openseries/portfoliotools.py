@@ -129,7 +129,7 @@ def simulate_portfolios(
 
 
 # noinspection PyUnusedLocal
-def efficient_frontier(  # noqa: C901
+def efficient_frontier(
     eframe: OpenFrame,
     num_ports: int = 5000,
     seed: int = 71,
@@ -446,7 +446,7 @@ def prepare_plot_data(
     return plotframe
 
 
-def sharpeplot(  # noqa: C901
+def sharpeplot(
     sim_frame: DataFrame | None = None,
     line_frame: DataFrame | None = None,
     point_frame: DataFrame | None = None,

@@ -868,7 +868,7 @@ class _CommonModel(BaseModel):
 
         return figure, string_output
 
-    def plot_series(  # noqa: C901
+    def plot_series(
         self: Self,
         mode: LiteralLinePlotMode = "lines",
         tick_fmt: str | None = None,

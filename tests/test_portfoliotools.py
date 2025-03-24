@@ -319,7 +319,7 @@ class TestPortfoliotools(CommonTestCase):
 
             raise PortfoliotoolsTestError(msg)
 
-    def test_sharpeplot(self: TestPortfoliotools) -> None:  # noqa: C901
+    def test_sharpeplot(self: TestPortfoliotools) -> None:
         """Test function sharpeplot."""
         simulations = 100
         points = 20
