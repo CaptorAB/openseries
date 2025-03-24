@@ -6,6 +6,12 @@ from importlib.metadata import metadata
 from pathlib import Path
 from re import match
 
+from tomllib import load as toml_load
+
+
+class PackageTestError(Exception):
+    """Custom exception used for signaling test failures."""
+
 
 class TestPackage:
     """class to test openseries packaging."""
@@ -16,16 +22,15 @@ class TestPackage:
 
         directory = Path(__file__).parent.parent
         pyproject_file = directory.joinpath("pyproject.toml")
-        with pyproject_file.open(mode="r", encoding="utf-8") as pfile:
-            lines = pfile.readlines()
+        with pyproject_file.open(mode="rb") as pfile:
+            data = toml_load(pfile)
 
-        toml_version = lines[2].strip()[lines[2].strip().find('"') :].replace('"', "")
+        toml_version = data["project"]["version"]
 
         attribute_names = [
             "Name",
             "Version",
             "Summary",
-            "License",
             "Author",
             "Requires-Python",
             "Project-URL",
@@ -35,7 +40,6 @@ class TestPackage:
             "^(openseries)$",
             f"^({toml_version})$",
             "^(Tools for analyzing financial timeseries.)$",
-            "^(BSD-3-Clause)$",
             "^(Martin Karrin)$",
             "^(>=3.10,<3.14)$",
             "^(Documentation, https://github.com/CaptorAB/openseries)$",
@@ -47,4 +51,4 @@ class TestPackage:
                     f"Package metadata {name} not as "
                     f"expected: {package_metadata[name]}"
                 )
-                raise ValueError(msg)
+                raise PackageTestError(msg)

@@ -33,6 +33,10 @@ class NewTimeSeries(OpenTimeSeries):
     extra_info: str = "cool"
 
 
+class OpenTimeSeriesTestError(Exception):
+    """Custom exception used for signaling test failures."""
+
+
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
     "valuetype",
     [ValueType.PRICE, "Price(Close)"],
@@ -372,7 +376,7 @@ class TestOpenTimeSeries(CommonTestCase):
         df_obj = OpenTimeSeries(**df_data)  # type: ignore[arg-type,unused-ignore]
         if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
             msg = "Raw values and DataFrame values not matching"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         with pytest.raises(
             expected_exception=ValidationError,
@@ -473,7 +477,7 @@ class TestOpenTimeSeries(CommonTestCase):
             "WARNING:openseries.series:Label missing. Adding: Series"
         ]:
             msgl = "OpenTimeSeries failed to log warning about label missing."
-            raise ValueError(msgl)
+            raise OpenTimeSeriesTestError(msgl)
 
         with self.assertLogs() as contextmgr:
             _ = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
@@ -481,7 +485,7 @@ class TestOpenTimeSeries(CommonTestCase):
             "WARNING:openseries.series:valuetype missing. Adding: Price(Close)",
         ]:
             msgv = "OpenTimeSeries failed to log warning about valuetype missing."
-            raise ValueError(msgv)
+            raise OpenTimeSeriesTestError(msgv)
 
         df3series = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
         df4series = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
@@ -531,7 +535,7 @@ class TestOpenTimeSeries(CommonTestCase):
             raise TypeError(msg)
 
         if seseries.label != senseries.label:
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         wrongtype = [["2023-01-01", "2023-01-02"], [1.0, 1.1]]
         with pytest.raises(
@@ -546,10 +550,10 @@ class TestOpenTimeSeries(CommonTestCase):
         """Test _check_if_none function."""
         if not _check_if_none(None):
             msg = "Method _check_if_none() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
         if _check_if_none(0.0):
             msg = "Method _check_if_none() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_to_json(self: TestOpenTimeSeries) -> None:
         """Test to_json method."""
@@ -585,7 +589,7 @@ class TestOpenTimeSeries(CommonTestCase):
             data = self.randomseries.to_json(**kwarg)  # type: ignore[arg-type]
             if [item.get("name") for item in data] != ["Asset_0"]:
                 msg = "Unexpected data from json"
-                raise ValueError(msg)
+                raise OpenTimeSeriesTestError(msg)
 
             if not Path(seriesfile).exists():
                 msg = "json file not created"
@@ -632,7 +636,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "test_to_json_and_back did not output as intended: "
                 f"{series_one.tsdf.iloc[-1, 0]:.6f}"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         with seriesfile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
@@ -654,7 +658,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "test_to_json_and_back did not output as intended: "
                 f"{series_two.tsdf.iloc[-1, 0]:.6f}"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if not Path(seriesfile).exists():
             msg = "json file not created"
@@ -701,7 +705,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "test_to_json_and_back_tsdf did not output as intended: "
                 f"{series_one.tsdf.iloc[-1, 0]:.6f}"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         with seriesfile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
@@ -723,7 +727,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "test_to_json_and_back_tsdf did not output as intended: "
                 f"{series_two.tsdf.iloc[-1, 0]:.6f}"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if not Path(seriesfile).exists():
             msg = "json file not created"
@@ -777,26 +781,26 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if calc != self.randomseries.periods_in_a_year:
             msg = "Property periods_in_a_year returned unexpected result"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
         if f"{251.3720547945:.10f}" != f"{self.randomseries.periods_in_a_year:.10f}":
             msg = "Property periods_in_a_year returned unexpected result"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         all_prop = self.random_properties["periods_in_a_year"]
         if f"{all_prop:.10f}" != f"{self.randomseries.periods_in_a_year:.10f}":
             msg = "Property periods_in_a_year returned unexpected result"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_yearfrac(self: TestOpenTimeSeries) -> None:
         """Test yearfrac property."""
         if f"{9.99315537303:.11f}" != f"{self.randomseries.yearfrac:.11f}":
             msg = "Property periods_in_a_year returned unexpected result"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         all_prop = self.random_properties["yearfrac"]
         if f"{all_prop:.11f}" != f"{self.randomseries.yearfrac:.11f}":
             msg = "Property periods_in_a_year returned unexpected result"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_resample(self: TestOpenTimeSeries) -> None:
         """Test resample method."""
@@ -809,11 +813,11 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if rs_series.length != intended_length:
             msg = "Method resample() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if before != rs_series.value_ret:
             msg = "Method resample() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_resample_to_business_period_ends(
         self: TestOpenTimeSeries,
@@ -837,7 +841,7 @@ class TestOpenTimeSeries(CommonTestCase):
             dt.date(2023, 5, 15),
         ]:
             msg = "Method resample_to_business_period_ends() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         rsb_series = OpenTimeSeries.from_fixed_rate(
             rate=0.01,
@@ -855,7 +859,7 @@ class TestOpenTimeSeries(CommonTestCase):
             dt.date(2023, 4, 28),
         ]:
             msg = "Method resample_to_business_period_ends() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_calc_range_output(self: TestOpenTimeSeries) -> None:
         """Test output consistency after calc_range applied."""
@@ -868,7 +872,7 @@ class TestOpenTimeSeries(CommonTestCase):
             date_two.strftime("%Y-%m-%d"),
         ] != ["2015-06-26", "2019-06-28"]:
             msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         date_one, date_two = self.randomseries.calc_range(from_dt=dt.date(2016, 6, 30))
 
@@ -877,7 +881,7 @@ class TestOpenTimeSeries(CommonTestCase):
             date_two.strftime("%Y-%m-%d"),
         ] != ["2016-06-30", "2019-06-28"]:
             msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         gr_0 = cseries.vol_func(months_from_last=48)
 
@@ -893,7 +897,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if f"{gr_0:.13f}" != f"{gr_1:.13f}":
             msg = "Method calc_range() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_value_to_diff(self: TestOpenTimeSeries) -> None:
         """Test value_to_diff method."""
@@ -915,7 +919,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method value_to_diff() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_value_to_ret(self: TestOpenTimeSeries) -> None:
         """Test value_to_ret method."""
@@ -937,7 +941,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method value_to_ret() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_valute_to_log(self: TestOpenTimeSeries) -> None:
         """Test value_to_log method."""
@@ -959,7 +963,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method value_to_log() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_all_properties(self: TestOpenTimeSeries) -> None:
         """Test all_properties method."""
@@ -998,7 +1002,7 @@ class TestOpenTimeSeries(CommonTestCase):
         result_index = result.index.tolist()
         if set(prop_index) != set(result_index):
             msg = "Method all_properties() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         result_values = {}
         for value in result.index:
@@ -1057,7 +1061,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Unexpected results from "
                 f"all_properties() method\n{pformat(result_values)}"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         props = apseries.all_properties(properties=["geo_ret", "vol"])
         msg = "Method all_properties() not working as intended"
@@ -1107,10 +1111,10 @@ class TestOpenTimeSeries(CommonTestCase):
                     " versus "
                     f"{getattr(self.randomseries, c_key):.10f}"
                 )
-                raise ValueError(msg)
+                raise OpenTimeSeriesTestError(msg)
         if loop_msg != "":
             loop_msg += f"\n{pformat(audit)}"
-            raise ValueError(loop_msg)
+            raise OpenTimeSeriesTestError(loop_msg)
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods."""
@@ -1150,7 +1154,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 )
         if msg != "":
             msg += f"\n{pformat(audit)}"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         func = "value_ret_calendar_period"
         if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.039890004088":
@@ -1158,7 +1162,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 f"Unexpected result from method {func}(): "
                 f"'{getattr(self.randomseries, func)(year=2019):.12f}'"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
         """Test max_drawdown_date property."""
@@ -1167,7 +1171,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Unexpected max_drawdown_date: "
                 f"'{self.randomseries.max_drawdown_date}'"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         all_prop = self.random_properties["max_drawdown_date"]
         if self.randomseries.max_drawdown_date != all_prop:
@@ -1175,7 +1179,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Unexpected max_drawdown_date: "
                 f"'{self.randomseries.max_drawdown_date}'"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_running_adjustment(self: TestOpenTimeSeries) -> None:
         """Test running_adjustment method."""
@@ -1187,7 +1191,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Unexpected result from running_adjustment(): "
                 f"'{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
         adjustedseries_returns = self.randomseries.from_deepcopy()
         adjustedseries_returns.value_to_ret()
         adjustedseries_returns.running_adjustment(0.05)
@@ -1200,7 +1204,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Unexpected result from running_adjustment(): "
                 f"'{cast('float', adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         adjustedseries_returns.to_cumret()
         if (
@@ -1212,7 +1216,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 f"'{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}' versus "
                 f"'{cast('float', adjustedseries_returns.tsdf.iloc[-1, 0]):.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_timeseries_chain(self: TestOpenTimeSeries) -> None:
         """Test timeseries_chain function."""
@@ -1232,11 +1236,11 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if full_series.dates != chained_series.dates:
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if full_values != chained_values:
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         pushed_date = front_series.last_idx + dt.timedelta(days=10)
         no_overlap_series = OpenTimeSeries.from_df(
@@ -1253,7 +1257,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if back_series.first_idx in front_series_two.tsdf.index:
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         new_chained_series = timeseries_chain(front_series_two, back_series)
         msg = "Function timeseries_chain() not working as intended"
@@ -1265,7 +1269,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if back_series.first_idx in front_series_three.tsdf.index:
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -1315,7 +1319,7 @@ class TestOpenTimeSeries(CommonTestCase):
             != "cool"
         ):
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         new_base = timeseries_chain(front=base_series_one, back=base_series_two)
         new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
@@ -1334,15 +1338,15 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if new_sub.__class__.__subclasscheck__(OpenTimeSeries):
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if new_base.dates != new_sub.dates:
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if new_base.values != new_sub.values:  # noqa: PD011
             msg = "Function timeseries_chain() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
         """Test that chained methods on subclass returns subclass and not baseclass."""
@@ -1390,7 +1394,7 @@ class TestOpenTimeSeries(CommonTestCase):
         rawdata = [x.strftime("%Y-%m-%d") for x in plotseries.tsdf.index[1:5]]
         if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         fig_last, _ = plotseries.plot_series(
             auto_open=False,
@@ -1402,11 +1406,11 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if f"{last:.10f}" != "1.6401159258":
             msg = f"Unaligned data between original and data in Figure: '{last:.10f}'"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if fig_last_json["data"][-1]["hovertemplate"] != "%{y}<br>%{x|%Y-%m-%d}":
             msg = "plot_series hovertemplate not as expected"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         fig_last_fmt, _ = plotseries.plot_series(
             auto_open=False,
@@ -1419,14 +1423,14 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if last_fmt != "Last 164.012%":
             msg = f"Unaligned data between original and data in Figure: '{last_fmt}'"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if (
             fig_last_fmt_json["data"][-1]["hovertemplate"]
             != "%{y:.3%}<br>%{x|%Y-%m-%d}"
         ):
             msg = "plot_series hovertemplate not as expected"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_plot_bars(self: TestOpenTimeSeries) -> None:
         """Test plot_bars method."""
@@ -1451,13 +1455,13 @@ class TestOpenTimeSeries(CommonTestCase):
         fig_json = loads(cast("str", fig.to_json()))
         if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         made_fig_keys = list(fig_json["data"][0].keys())
         made_fig_keys.sort()
         if made_fig_keys != fig_keys:
             msg = "Data in Figure not as intended."
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         overlayfig, _ = barseries.plot_bars(
             auto_open=False,
@@ -1469,7 +1473,7 @@ class TestOpenTimeSeries(CommonTestCase):
         fig_keys.append("opacity")
         if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
             msg = "Data in Figure not as intended."
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_align_index_to_local_cdays(
         self: TestOpenTimeSeries,
@@ -1486,17 +1490,17 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if aseries.countries != "SE":
             msg = "Base case test_align_index_to_local_cdays not set up as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         midsummer = dt.date(2020, 6, 19)
         if midsummer not in d_range:
             msg = "Date range generation not run as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         aseries.align_index_to_local_cdays()
         if midsummer in aseries.tsdf.index:
             msg = "Method align_index_to_local_cdays() not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_ewma_vol_func(self: TestOpenTimeSeries) -> None:
         """Test ewma_vol_func method."""
@@ -1512,7 +1516,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method ewma_vol_func() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         simdata_fxd_per_yr = self.randomseries.ewma_vol_func(
             periods_in_a_year_fixed=251,
@@ -1531,7 +1535,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Result from method ewma_vol_func() "
                 f"not as intended\n{values_fxd_per_yr}"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
         """Test downside_deviation_func method.
@@ -1576,7 +1580,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if f"{downdev:.10f}" != "0.0433333333":
             msg = f"Unexpected result from downside_deviation_func() {downdev:.10f}"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_omega_ratio(self: TestOpenTimeSeries) -> None:
         """Test omega_ratio_func method.
@@ -1640,7 +1644,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if f"{omega:.10f}" != "3.1163413842":
             msg = f"Unexpected result from omega_ratio_func(): {omega:.10f}"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
@@ -1651,21 +1655,21 @@ class TestOpenTimeSeries(CommonTestCase):
         )
         if basecase.dates != ["2017-05-29"]:
             msg = "Validations base case setup failed"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if basecase.values != [100.0]:  # noqa: PD011
             msg = "Validations base case setup failed"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("CountriesType", ["SE", "US"])
         if basecase.countries != {"SE", "US"}:
             msg = "Validations base case setup failed"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("CountriesType", ["SE", "SE"])
         if basecase.countries != {"SE"}:
             msg = "Validations base case setup failed"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -1748,14 +1752,14 @@ class TestOpenTimeSeries(CommonTestCase):
         ave_rate = f"{tms.tsdf.mean().iloc[0]:.5f}"
         if ave_rate != "0.02434":
             msg = "from_1d_rate_to_cumret() base case setup failed"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         tms.from_1d_rate_to_cumret()
 
         val_ret = f"{tms.value_ret:.5f}"
         if val_ret != "0.00093":
             msg = "Unexpected result from from_1d_rate_to_cumret()"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_geo_ret_value_ret_exceptions(
         self: TestOpenTimeSeries,
@@ -1771,11 +1775,11 @@ class TestOpenTimeSeries(CommonTestCase):
         )
         if f"{geoseries.geo_ret:.7f}" != "0.1000718":
             msg = "Property geo_ret base case setup failed"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         if f"{geoseries.geo_ret_func():.7f}" != "0.1000718":
             msg = "Method geo_ret_func() base case setup failed"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         zeroseries = OpenTimeSeries.from_arrays(
             name="asset",
@@ -1859,12 +1863,12 @@ class TestOpenTimeSeries(CommonTestCase):
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
             if f"{100 * abs(no_fixed - fixed):.0f}" != zero_str:
                 msg = "Difference with or without fixed periods in year is too great"
-                raise ValueError(msg)
+                raise OpenTimeSeriesTestError(msg)
 
         impvol = mseries.vol_from_var_func(drift_adjust=False)
         if f"{impvol:.12f}" != "0.093673716476":
             msg = "Unexpected result from method vol_from_var_func(): '{impvol:.12f}'"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
         if f"{impvoldrifted:.12f}" != "0.095916216736":
@@ -1872,7 +1876,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Unexpected result from method vol_from_var_func(): "
                 f"'{impvoldrifted:.12f}'"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_value_ret_calendar_period(
         self: TestOpenTimeSeries,
@@ -1890,7 +1894,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Results from value_ret_func() and value_ret_calendar_period() "
                 "not matching as expected"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         vrfs_ym = vrcseries.value_ret_func(
             from_date=dt.date(2018, 4, 30),
@@ -1902,7 +1906,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Results from value_ret_func() and value_ret_calendar_period() "
                 "not matching as expected"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_to_drawdown_series(self: TestOpenTimeSeries) -> None:
         """Test to_drawdown_series method."""
@@ -1915,7 +1919,7 @@ class TestOpenTimeSeries(CommonTestCase):
                 "Results from property max_drawdown and to_drawdown_series() "
                 "not matching as expected"
             )
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
     def test_set_new_label(self: TestOpenTimeSeries) -> None:
         """Test set_new_label method."""
@@ -1926,17 +1930,17 @@ class TestOpenTimeSeries(CommonTestCase):
             ValueType.PRICE,
         ):
             msg = "set_new_label() base case not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         lseries.set_new_label(lvl_zero="zero")
         if lseries.tsdf.columns[0][0] != "zero":
             msg = "Method set_new_label() base case not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         lseries.set_new_label(lvl_one=ValueType.RTRN)
         if lseries.tsdf.columns[0][1] != ValueType.RTRN:
             msg = "Method set_new_label() base case not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         lseries.set_new_label(lvl_zero="two", lvl_one=ValueType.PRICE)
         if cast("tuple[str, str]", lseries.tsdf.columns[0]) != (
@@ -1944,9 +1948,9 @@ class TestOpenTimeSeries(CommonTestCase):
             ValueType.PRICE,
         ):
             msg = "Method set_new_label() base case not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)
 
         lseries.set_new_label(delete_lvl_one=True)
         if lseries.tsdf.columns[0] != "two":
             msg = "Method set_new_label() base case not working as intended"
-            raise ValueError(msg)
+            raise OpenTimeSeriesTestError(msg)

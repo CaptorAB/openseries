@@ -24,6 +24,10 @@ from openseries.series import OpenTimeSeries
 from tests.test_common_sim import CommonTestCase
 
 
+class PortfoliotoolsTestError(Exception):
+    """Custom exception used for signaling test failures."""
+
+
 class TestPortfoliotools(CommonTestCase):
     """class to run tests on the module portfoliotools.py."""
 
@@ -41,7 +45,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if result_returns.shape != (simulations, spframe.item_count + 3):
             msg = "Function simulate_portfolios not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         return_least_vol = f"{result_returns.loc[:, 'stdev'].min():.7f}"
         return_where_least_vol = (
@@ -53,7 +57,7 @@ class TestPortfoliotools(CommonTestCase):
                 "Function simulate_portfolios not working as intended"
                 f"\n{(return_least_vol, return_where_least_vol)}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         spframe.to_cumret()
         result_values = simulate_portfolios(
@@ -64,7 +68,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if result_values.shape != (simulations, spframe.item_count + 3):
             msg = "Function simulate_portfolios not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         value_least_vol = f"{result_values.loc[:, 'stdev'].min():.7f}"
         value_where_least_vol = (
@@ -76,7 +80,7 @@ class TestPortfoliotools(CommonTestCase):
                 "Function simulate_portfolios not working as intended"
                 f"\n{(value_least_vol, value_where_least_vol)}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         series = self.randomseries.from_deepcopy()
         returns = self.randomseries.from_deepcopy()
@@ -113,7 +117,7 @@ class TestPortfoliotools(CommonTestCase):
 
             if frnt.shape != (points, eframe.item_count + 4):
                 msg = "Function efficient_frontier not working as intended"
-                raise ValueError(msg)
+                raise PortfoliotoolsTestError(msg)
 
             eframe.to_cumret()
 
@@ -127,7 +131,7 @@ class TestPortfoliotools(CommonTestCase):
 
             if frontier.shape != (points, eframe.item_count + 4):
                 msg = "Function efficient_frontier not working as intended"
-                raise ValueError(msg)
+                raise PortfoliotoolsTestError(msg)
 
             frt_most_sharpe = round(Decimal(frontier.loc[:, "sharpe"].max()), 6)
             frt_return_where_most_sharpe = round(
@@ -143,7 +147,7 @@ class TestPortfoliotools(CommonTestCase):
                     "Function efficient_frontier not working as intended"
                     f"\n{(frt_most_sharpe, frt_return_where_most_sharpe)}"
                 )
-                raise ValueError(msg)
+                raise PortfoliotoolsTestError(msg)
 
             sim_least_vol = round(Decimal(result.loc[:, "stdev"].min()), 6)
             sim_return_where_least_vol = round(
@@ -159,14 +163,14 @@ class TestPortfoliotools(CommonTestCase):
                     "Function efficient_frontier not working as intended"
                     f"\n{(sim_least_vol, sim_return_where_least_vol)}"
                 )
-                raise ValueError(msg)
+                raise PortfoliotoolsTestError(msg)
 
             optlist = [round(Decimal(wgt), 6) for wgt in cast("list[float]", optimal)]
             total = sum(optimal[3:])
 
             if round(total, 7) != 1.0:
                 msg = f"Function efficient_frontier not working as intended\n{total}"
-                raise ValueError(msg)
+                raise PortfoliotoolsTestError(msg)
 
             if optlist != [
                 Decimal("0.068444"),
@@ -179,7 +183,7 @@ class TestPortfoliotools(CommonTestCase):
                 Decimal("0.078283"),
             ]:
                 msg = f"Function efficient_frontier not working as intended\n{optlist}"
-                raise ValueError(msg)
+                raise PortfoliotoolsTestError(msg)
 
         series = self.randomseries.from_deepcopy()
         returns = self.randomseries.from_deepcopy()
@@ -238,7 +242,7 @@ class TestPortfoliotools(CommonTestCase):
                 "Function constrain_optimized_portfolios not working as "
                 f"intended\n{round(sum(minframe.weights), 7)}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         minframe_weights = [f"{minw:.7f}" for minw in list(minframe.weights)]
         if minframe_weights != [
@@ -252,14 +256,14 @@ class TestPortfoliotools(CommonTestCase):
                 "Function constrain_optimized_portfolios not "
                 f"working as intended\n{minframe_weights}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         if round(sum(minframe_nb.weights), 7) != 1.0:
             msg = (
                 "Function constrain_optimized_portfolios not working as "
                 f"intended\n{round(sum(minframe_nb.weights), 7)}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         minframe_nb_weights = [f"{minw:.7f}" for minw in list(minframe_nb.weights)]
         if minframe_nb_weights != [
@@ -273,7 +277,7 @@ class TestPortfoliotools(CommonTestCase):
                 "Function constrain_optimized_portfolios not "
                 f"working as intended\n{minframe_nb_weights}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         if (
             f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
@@ -284,14 +288,14 @@ class TestPortfoliotools(CommonTestCase):
                 f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
             )
 
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         if round(sum(maxframe.weights), 7) != 1.0:
             msg = (
                 "Function constrain_optimized_portfolios not working as "
                 f"intended\n{round(sum(maxframe.weights), 7)}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         maxframe_weights = [f"{maxw:.7f}" for maxw in list(maxframe.weights)]
         if maxframe_weights != [
@@ -305,7 +309,7 @@ class TestPortfoliotools(CommonTestCase):
                 "Function constrain_optimized_portfolios not "
                 f"working as intended\n{maxframe_weights}"
             )
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0001994":
             msg = (
@@ -313,7 +317,7 @@ class TestPortfoliotools(CommonTestCase):
                 f"{assets_std.vol - maxseries.vol:.7f}"
             )
 
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
     def test_sharpeplot(self: TestPortfoliotools) -> None:  # noqa: C901
         """Test function sharpeplot."""
@@ -357,7 +361,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if "Risk and Return" not in fig_json_title_no_text["layout"]["title"]["text"]:
             msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         figure_title_text, _ = sharpeplot(
             sim_frame=simulated,
@@ -373,7 +377,7 @@ class TestPortfoliotools(CommonTestCase):
         fig_json_title_text = loads(cast("str", figure_title_text.to_json()))
         if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
             msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         figure, _ = sharpeplot(
             sim_frame=simulated,
@@ -389,7 +393,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if "text" in fig_json["layout"]["title"]:
             msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         names = [item["name"] for item in fig_json["data"]]
 
@@ -405,7 +409,7 @@ class TestPortfoliotools(CommonTestCase):
             "Current Portfolio",
         ]:
             msg = f"Function sharpeplot not working as intended\n{names}"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         directory = Path(__file__).parent
         _, figfile = sharpeplot(
@@ -431,7 +435,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if figfile[:5] == "<div>":
             msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         _, divstring = sharpeplot(
             sim_frame=simulated,
@@ -444,7 +448,7 @@ class TestPortfoliotools(CommonTestCase):
         )
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True
@@ -461,7 +465,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if mockhomefig_json["data"][0]["name"] != "simulated portfolios":
             msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = False
@@ -479,7 +483,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
             msg = "sharpeplot method not working as intended"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         mockfilepath.unlink()
 
@@ -538,15 +542,15 @@ class TestPortfoliotools(CommonTestCase):
 
         if len(fig_json_no_sim["data"]) != no_sim_length:
             msg = "sharpeplot not working as intended."
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         if len(fig_json_no_sim_or_line["data"]) != no_sim_or_line_length:
             msg = "sharpeplot not working as intended."
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         if len(fig_json_no_point["data"]) != no_point_length:
             msg = "sharpeplot not working as intended."
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -609,12 +613,12 @@ class TestPortfoliotools(CommonTestCase):
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
                 msg = "sharpeplot add_logo argument not setup correctly"
-                raise ValueError(msg)
+                raise PortfoliotoolsTestError(msg)
         elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "sharpeplot add_logo argument not setup correctly"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)
 
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "sharpeplot add_logo argument not setup correctly"
-            raise ValueError(msg)
+            raise PortfoliotoolsTestError(msg)

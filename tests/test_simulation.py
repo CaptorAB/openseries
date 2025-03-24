@@ -14,6 +14,10 @@ if TYPE_CHECKING:
     from numpy.random import Generator
 
 
+class SimulationTestError(Exception):
+    """Custom exception used for signaling test failures."""
+
+
 class TestSimulation(CommonTestCase):
     """class to run tests on the module simulation.py."""
 
@@ -91,10 +95,10 @@ class TestSimulation(CommonTestCase):
 
         if intended_returns != returns:
             msg = f"Unexpected returns result {returns}"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
         if intended_volatilities != volatilities:
             msg = f"Unexpected volatilities result {volatilities}"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
     def test_processes_with_randomizer(self: TestSimulation) -> None:
         """Test ReturnSimulation with a random generator as input."""
@@ -171,26 +175,26 @@ class TestSimulation(CommonTestCase):
 
         if intended_returns != returns:
             msg = f"Unexpected returns result {returns}"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
         if intended_volatilities != volatilities:
             msg = f"Unexpected volatilities result {volatilities}"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
     def test_properties(self: TestSimulation) -> None:
         """Test ReturnSimulation properties output."""
         if self.seriesim.results.shape[0] != self.seriesim.trading_days:
             msg = "Unexpected result"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
         if f"{self.seriesim.realized_mean_return:.9f}" != "0.058650906":
             msg = (
                 f"Unexpected return result: '{self.seriesim.realized_mean_return:.9f}'"
             )
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
         if f"{self.seriesim.realized_vol:.9f}" != "0.140742347":
             msg = f"Unexpected volatility result: '{self.seriesim.realized_vol:.9f}'"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
     def test_to_dataframe(self: TestSimulation) -> None:
         """Test method to_dataframe."""
@@ -230,16 +234,16 @@ class TestSimulation(CommonTestCase):
 
         if onedf.shape != (self.seriesim.trading_days, one):
             msg = "Method to_dataframe() not working as intended"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
         if fivedf.shape != (self.seriesim.trading_days, five):
             msg = "Method to_dataframe() not working as intended"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
         if returnseries.valuetype != ValueType.RTRN:
             msg = "Method to_dataframe() not working as intended"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)
 
         if startseries.valuetype != ValueType.PRICE:
             msg = "Method to_dataframe() not working as intended"
-            raise ValueError(msg)
+            raise SimulationTestError(msg)

@@ -34,6 +34,10 @@ from openseries.series import OpenTimeSeries
 from tests.test_common_sim import CommonTestCase
 
 
+class OpenFrameTestError(Exception):
+    """Custom exception used for signaling test failures."""
+
+
 # noinspection PyTypeChecker
 class TestOpenFrame(CommonTestCase):
     """class to run tests on the module frame.py."""
@@ -72,7 +76,7 @@ class TestOpenFrame(CommonTestCase):
                 "Asset_4",
             ]:
                 msg = "Unexpected data from json"
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
             if not Path(framefile).exists():
                 msg = "json file not created"
@@ -98,7 +102,7 @@ class TestOpenFrame(CommonTestCase):
             "Asset_4",
         ]:
             msg = "Unexpected data from json"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         localfile.unlink()
 
@@ -120,7 +124,7 @@ class TestOpenFrame(CommonTestCase):
             "Asset_4",
         ]:
             msg = "Unexpected data from json"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_to_json_and_back(self: TestOpenFrame) -> None:
         """Test to_json method and creating an OpenFrame from file data."""
@@ -158,7 +162,7 @@ class TestOpenFrame(CommonTestCase):
 
         if check_one != intended:
             msg = f"test_to_json_and_back did not output as intended: {check_one}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with framefile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
@@ -181,7 +185,7 @@ class TestOpenFrame(CommonTestCase):
 
         if check_two != intended:
             msg = f"test_to_json_and_back did not output as intended: {check_two}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         framefile.unlink()
 
@@ -225,7 +229,7 @@ class TestOpenFrame(CommonTestCase):
 
         if check_one != intended:
             msg = f"test_to_json_and_back_tsdf did not output as intended: {check_one}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with framefile.open(mode="r", encoding="utf-8") as jsonfile:
             output = load(jsonfile)
@@ -248,7 +252,7 @@ class TestOpenFrame(CommonTestCase):
 
         if check_two != intended:
             msg = f"test_to_json_and_back_tsdf did not output as intended: {check_two}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         framefile.unlink()
 
@@ -274,7 +278,7 @@ class TestOpenFrame(CommonTestCase):
 
         if basefile != seriesfile:
             msg = "test_save_to_xlsx test case setup failed."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if not Path(seriesfile).exists():
             msg = "xlsx file not created"
@@ -321,7 +325,7 @@ class TestOpenFrame(CommonTestCase):
 
         if localfile != seriesfile:
             msg = "test_save_to_xlsx test case setup failed."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         dframe = read_excel(  # type: ignore[call-overload]
             io=seriesfile,
@@ -341,7 +345,7 @@ class TestOpenFrame(CommonTestCase):
             "2009-07-06",
         ]:
             msg = "save_to_xlsx not working as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         seriesfile.unlink()
 
@@ -357,7 +361,7 @@ class TestOpenFrame(CommonTestCase):
 
         if seriesfile2.parts[-2:] != ("Documents", "trial.xlsx"):
             msg = "save_to_xlsx not working as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_calc_range(self: TestOpenFrame) -> None:
         """Test calc_range method."""
@@ -368,7 +372,7 @@ class TestOpenFrame(CommonTestCase):
 
         if [start, end] != [rst, ren]:
             msg = "Unintended output from calc_range()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -395,7 +399,7 @@ class TestOpenFrame(CommonTestCase):
         )
         if [offsetst, offseten] != [dt.date(2018, 6, 28), end]:
             msg = f"Unintended output from calc_range():{[offsetst, offseten]}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         fromtost, fromtoen = crframe.calc_range(
             from_dt=dt.date(2009, 7, 3),
@@ -403,7 +407,7 @@ class TestOpenFrame(CommonTestCase):
         )
         if [fromtost, fromtoen] != [dt.date(2009, 7, 3), dt.date(2019, 6, 25)]:
             msg = f"Unintended output from calc_range():{[fromtost, fromtoen]}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         bothst, bothen = crframe.calc_range(
             months_offset=12,
@@ -412,19 +416,19 @@ class TestOpenFrame(CommonTestCase):
         )
         if [bothst, bothen] != [offsetst, end]:
             msg = f"Unintended output from calc_range():{[bothst, bothen]}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         crframe.resample()
 
         earlier_moved, _ = crframe.calc_range(from_dt=dt.date(2009, 8, 10))
         if earlier_moved != dt.date(2009, 7, 31):
             msg = "Unintended output from calc_range()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         _, later_moved = crframe.calc_range(to_dt=dt.date(2009, 8, 20))
         if later_moved != dt.date(2009, 8, 31):
             msg = "Unintended output from calc_range()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_resample(self: TestOpenFrame) -> None:
         """Test resample method."""
@@ -438,12 +442,12 @@ class TestOpenFrame(CommonTestCase):
 
         if rs_frame.length != expected:
             msg = "resample() method generated unexpected result"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         after = cast("Series", rs_frame.value_ret).to_dict()
         if before != after:
             msg = "resample() method generated unexpected result"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_resample_to_business_period_ends(self: TestOpenFrame) -> None:
         """Test resample_to_business_period_ends method."""
@@ -479,7 +483,7 @@ class TestOpenFrame(CommonTestCase):
                 "resample_to_business_period_ends() method "
                 f"generated unexpected result:\n{new_stubs_dates}"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         rsb_frame = OpenFrame(
             [
@@ -510,7 +514,7 @@ class TestOpenFrame(CommonTestCase):
                 "resample_to_business_period_ends() method "
                 f"generated unexpected result:\n{new_dates}"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_resample_to_business_period_ends_renaming(self: TestOpenFrame) -> None:
         """Test resample_to_business_period_ends method and its handling of labels."""
@@ -531,7 +535,7 @@ class TestOpenFrame(CommonTestCase):
                 "Method .resample_to_business_period_ends() "
                 "not considering new columns in .tsdf"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_max_drawdown_date(self: TestOpenFrame) -> None:
         """Test max_drawdown_date method."""
@@ -550,7 +554,7 @@ class TestOpenFrame(CommonTestCase):
 
         if mdates != checkdates:
             msg = f"max_drawdown_date property generated unexpected result\n{mdates}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_make_portfolio(self: TestOpenFrame) -> None:
         """Test make_portfolio method."""
@@ -619,7 +623,7 @@ class TestOpenFrame(CommonTestCase):
         weights: list[float] | None = [0.2, 0.2, 0.2, 0.2, 0.2]
         if weights != mpframe.weights:
             msg = "make_portfolio() equal weight strategy not working as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with localcontext() as decimal_context:
             decimal_context.rounding = ROUND_HALF_UP
@@ -639,7 +643,7 @@ class TestOpenFrame(CommonTestCase):
                     "make_portfolio() inverse vol strategy not working as intended."
                     f"output is \n{inv_vol_weights}"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
         series = self.randomseries.from_deepcopy()
         returns = self.randomseries.from_deepcopy()
@@ -674,13 +678,13 @@ class TestOpenFrame(CommonTestCase):
 
         if items + 1 != frameas.item_count:
             msg = "add_timeseries() method did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if nbr_cols + 1 != len(frameas.columns_lvl_zero):
             msg = "add_timeseries() method did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if [*cols, "Asset_6"] != frameas.columns_lvl_zero:
             msg = "add_timeseries() method did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_delete_timeseries(self: TestOpenFrame) -> None:
         """Test delete_timeseries method."""
@@ -693,10 +697,10 @@ class TestOpenFrame(CommonTestCase):
 
         if labels != ["Asset_0", "Asset_2", "Asset_3", "Asset_4"]:
             msg = "delete_timeseries() method did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if frame.weights != [0.4, 0.2, 0.1, 0.2]:
             msg = "delete_timeseries() method did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_risk_functions_same_as_opentimeseries(
         self: TestOpenFrame,
@@ -712,32 +716,32 @@ class TestOpenFrame(CommonTestCase):
             riskseries.tsdf.iloc[:, 0].tolist(),
         ):
             msg = "CVaR for OpenTimeSeries not equal"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if riskseries.var_down != _var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
             msg = "VaR for OpenTimeSeries not equal"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if cast("Series", riskframe.cvar_down).iloc[0] != _cvar_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "CVaR for OpenFrame not equal"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if cast("Series", riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf.iloc[:, 0],
         ):
             msg = "VaR for OpenFrame not equal"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if cast("Series", riskframe.cvar_down).iloc[0] != _cvar_down_calc(
             riskframe.tsdf,
         ):
             msg = "CVaR for OpenFrame not equal"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if cast("Series", riskframe.var_down).iloc[0] != _var_down_calc(
             riskframe.tsdf,
         ):
             msg = "VaR for OpenFrame not equal"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_methods_same_as_opentimeseries(self: TestOpenFrame) -> None:
         """Test that method results align between OpenFrame and OpenTimeSeries."""
@@ -823,7 +827,7 @@ class TestOpenFrame(CommonTestCase):
                     f"Calc method {method} not aligned between "
                     "OpenTimeSeries and OpenFrame"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
     def test_ratio_methods_same_as_opentimeseries(
         self: TestOpenFrame,
@@ -846,7 +850,7 @@ class TestOpenFrame(CommonTestCase):
             msg = (
                 "ret_vol_ratio_func() not aligned between OpenTimeSeries and OpenFrame"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         smf_srf = cast(
             "Series",
@@ -859,7 +863,7 @@ class TestOpenFrame(CommonTestCase):
             msg = (
                 "sortino_ratio_func() not aligned between OpenTimeSeries and OpenFrame"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_measures_same_as_opentimeseries(self: TestOpenFrame) -> None:
         """Test that measure results align between OpenFrame and OpenTimeSeries."""
@@ -899,7 +903,7 @@ class TestOpenFrame(CommonTestCase):
                 msg = (
                     f"Property {prop} not aligned between OpenTimeSeries and OpenFrame"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
     def test_properties_same_as_opentimeseries(
         self: TestOpenFrame,
@@ -917,7 +921,7 @@ class TestOpenFrame(CommonTestCase):
                     f"Property {comnprop} not aligned between "
                     "OpenTimeSeries and OpenFrame"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
     def test_keeping_attributes_aligned_vs_opentimeseries(
         self: TestOpenFrame,
@@ -1013,7 +1017,7 @@ class TestOpenFrame(CommonTestCase):
         )
         if len(series_compared) != 0:
             msg = f"Difference is: {series_compared}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         frame_props = [
             a
@@ -1032,7 +1036,7 @@ class TestOpenFrame(CommonTestCase):
         )
         if len(frame_compared) != 0:
             msg = f"Difference is: {frame_compared}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_keeping_methods_aligned_vs_opentimeseries(
         self: TestOpenFrame,
@@ -1164,7 +1168,7 @@ class TestOpenFrame(CommonTestCase):
         )
         if len(series_compared) != 0:
             msg = f"Difference is: {series_compared}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         frame_methods = [
             a
@@ -1181,7 +1185,7 @@ class TestOpenFrame(CommonTestCase):
         )
         if len(frame_compared) != 0:
             msg = f"Difference is: {frame_compared}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_value_to_log(self: TestOpenFrame) -> None:
         """Test value_to_log method."""
@@ -1200,7 +1204,7 @@ class TestOpenFrame(CommonTestCase):
 
         if b4_log == middle_log:
             msg = "Method value_to_log() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_correl_matrix(self: TestOpenFrame) -> None:
         """Test correl_matrix method."""
@@ -1248,7 +1252,7 @@ class TestOpenFrame(CommonTestCase):
 
         if dict1 != dict2:
             msg = f"Unexpected result(s) from method correl_matrix()\n{pformat(dict1)}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_plot_series(self: TestOpenFrame) -> None:
         """Test plot_series method."""
@@ -1261,7 +1265,7 @@ class TestOpenFrame(CommonTestCase):
         rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
         if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         fig_last, _ = plotframe.plot_series(
             auto_open=False,
@@ -1273,7 +1277,7 @@ class TestOpenFrame(CommonTestCase):
         figlast = fig_last_json["data"][-1]["y"][0]
         if f"{figlast:.12f}" != f"{rawlast:.12f}":
             msg = "Unaligned data between original and data in Figure."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         fig_last_fmt, _ = plotframe.plot_series(
             auto_open=False,
@@ -1286,7 +1290,7 @@ class TestOpenFrame(CommonTestCase):
 
         if last_fmt != "Last 116.964%":
             msg = f"Unaligned data in Figure: '{last_fmt}'"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         intended_labels = ["a", "b", "c", "d", "e"]
         fig_labels, _ = plotframe.plot_series(
@@ -1299,7 +1303,7 @@ class TestOpenFrame(CommonTestCase):
         labels = [item["name"] for item in fig_labels_json["data"]]
         if labels != intended_labels:
             msg = f"Manual setting of labels not working: {labels}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -1319,10 +1323,10 @@ class TestOpenFrame(CommonTestCase):
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
                 msg = "plot_series add_logo argument not setup correctly"
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
         elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_series add_logo argument not setup correctly"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         fig_nologo, _ = plotframe.plot_series(
             auto_open=False,
@@ -1332,7 +1336,7 @@ class TestOpenFrame(CommonTestCase):
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_series add_logo argument not setup correctly"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_plot_series_filefolders(self: TestOpenFrame) -> None:
         """Test plot_series method with different file folder options."""
@@ -1353,12 +1357,12 @@ class TestOpenFrame(CommonTestCase):
 
         if figfile[:5] == "<div>":
             msg = "plot_series method not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         _, divstring = plotframe.plot_series(auto_open=False, output_type="div")
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True
@@ -1370,7 +1374,7 @@ class TestOpenFrame(CommonTestCase):
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_series method not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = False
@@ -1382,7 +1386,7 @@ class TestOpenFrame(CommonTestCase):
 
         if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
             msg = "plot_series method not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         mockfilepath.unlink()
 
@@ -1397,12 +1401,12 @@ class TestOpenFrame(CommonTestCase):
         made_fig_keys.sort()
         if made_fig_keys != fig_keys:
             msg = "Data in Figure not as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
         if rawdata != fig_json["data"][0]["x"][1:5]:
             msg = "Unaligned data between original and data in Figure."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         intended_labels = ["a", "b", "c", "d", "e"]
         fig_labels, _ = plotframe.plot_bars(
@@ -1415,7 +1419,7 @@ class TestOpenFrame(CommonTestCase):
         labels = [item["name"] for item in fig_labels_json["data"]]
         if labels != intended_labels:
             msg = f"Manual setting of labels not working: {labels}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -1433,7 +1437,7 @@ class TestOpenFrame(CommonTestCase):
         fig_keys.append("opacity")
         if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
             msg = "Data in Figure not as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         _, logo = load_plotly_dict()
 
@@ -1447,10 +1451,10 @@ class TestOpenFrame(CommonTestCase):
         if logo == {}:
             if fig_logo_json["layout"]["images"][0] != logo:
                 msg = "plot_bars add_logo argument not setup correctly"
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
         elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
             msg = "plot_bars add_logo argument not setup correctly"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         fig_nologo, _ = plotframe.plot_bars(
             auto_open=False,
@@ -1460,7 +1464,7 @@ class TestOpenFrame(CommonTestCase):
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_bars add_logo argument not setup correctly"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_plot_bars_filefolders(self: TestOpenFrame) -> None:
         """Test plot_bars method with different file folder options."""
@@ -1480,12 +1484,12 @@ class TestOpenFrame(CommonTestCase):
 
         if figfile[:5] == "<div>":
             msg = "plot_bars method not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         _, divstring = plotframe.plot_bars(auto_open=False, output_type="div")
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = True
@@ -1497,7 +1501,7 @@ class TestOpenFrame(CommonTestCase):
 
         if mockhomefig_json["data"][0]["name"] != "Asset_0":
             msg = "plot_bars method not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with patch("pathlib.Path.exists") as mock_userfolderexists:
             mock_userfolderexists.return_value = False
@@ -1509,7 +1513,7 @@ class TestOpenFrame(CommonTestCase):
 
         if mockfilepath.parts[-2:] != ("tests", "barfile.html"):
             msg = "plot_bars method not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         mockfilepath.unlink()
 
@@ -1529,7 +1533,7 @@ class TestOpenFrame(CommonTestCase):
             seriesfig_json = loads(cast("str", seriesfig.to_json()))
             if seriesfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_series add_logo argument not setup correctly"
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
             barfig, _ = plotframe.plot_bars(
                 auto_open=False,
@@ -1539,7 +1543,7 @@ class TestOpenFrame(CommonTestCase):
             barfig_json = loads(cast("str", barfig.to_json()))
             if barfig_json["layout"]["images"][0].get("source", None):
                 msg = "plot_bars add_logo argument not setup correctly"
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
             with self.assertLogs() as plotseries_context:
                 _, _ = plotframe.plot_series(auto_open=False, output_type="div")
@@ -1552,7 +1556,7 @@ class TestOpenFrame(CommonTestCase):
                     "expected when logo URL not working: "
                     f"{pformat(plotseries_context.output[0])}"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
             with self.assertLogs() as plotbars_context:
                 _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
@@ -1564,7 +1568,7 @@ class TestOpenFrame(CommonTestCase):
                     "plot_bars() method did not warn as "
                     "expected when logo URL not working"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
         with patch("requests.head") as mock_statuscode:
             mock_statuscode.return_value.status_code = 400
@@ -1579,7 +1583,7 @@ class TestOpenFrame(CommonTestCase):
                     "plot_series() method did not warn as "
                     "expected when logo URL not working"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
             with self.assertLogs() as plotbars_context:
                 _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
@@ -1591,7 +1595,7 @@ class TestOpenFrame(CommonTestCase):
                     "plot_bars() method did not warn as "
                     "expected when logo URL not working"
                 )
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
         with patch("requests.head") as mock_statuscode:
             mock_statuscode.return_value.status_code = 200
@@ -1602,7 +1606,7 @@ class TestOpenFrame(CommonTestCase):
             rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
             if rawdata != fig_json["data"][0]["x"][1:5]:
                 msg = "Unaligned data between original and data in Figure."
-                raise ValueError(msg)
+                raise OpenFrameTestError(msg)
 
     def test_passed_empty_list(self: TestOpenFrame) -> None:
         """Test warning on object construct with empty list."""
@@ -1615,7 +1619,7 @@ class TestOpenFrame(CommonTestCase):
                 "OpenFrame failed to log warning about "
                 f"empty input list: {pformat(contextmgr.output)}"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_trunc_frame_both(self: TestOpenFrame) -> None:
         """Test trunc_frame method."""
@@ -1645,19 +1649,19 @@ class TestOpenFrame(CommonTestCase):
 
         if firsts == frame.first_indices.tolist():
             msg = "trunc_frame() test not set up as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if lasts == frame.last_indices.tolist():
             msg = "trunc_frame() test not set up as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         frame.trunc_frame()
 
         if firsts != frame.first_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if lasts != frame.last_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         trunced = [dt.date(2017, 12, 29), dt.date(2018, 3, 29)]
 
@@ -1665,7 +1669,7 @@ class TestOpenFrame(CommonTestCase):
 
         if trunced != [frame.first_idx, frame.last_idx]:
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_trunc_frame_before_after(self: TestOpenFrame) -> None:
         """Test trunc_frame method."""
@@ -1695,10 +1699,10 @@ class TestOpenFrame(CommonTestCase):
 
         if firsts == frame.first_indices.tolist():
             msg = "trunc_frame() test not set up as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if lasts == frame.last_indices.tolist():
             msg = "trunc_frame() test not set up as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         before_frame = frame.from_deepcopy()
         after_frame = frame.from_deepcopy()
@@ -1707,29 +1711,29 @@ class TestOpenFrame(CommonTestCase):
 
         if firsts != before_frame.first_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if lasts == before_frame.last_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         after_frame.trunc_frame(where="after")
 
         if firsts == after_frame.first_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if lasts != after_frame.last_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         before_frame.trunc_frame(where="after")
         after_frame.trunc_frame(where="before")
 
         if firsts != after_frame.first_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if lasts != before_frame.last_indices.tolist():
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_trunc_frame_start_fail(self: TestOpenFrame) -> None:
         """Test trunc_frame method start fail scenario."""
@@ -1796,7 +1800,7 @@ class TestOpenFrame(CommonTestCase):
             "still not truncated to same start dates."
         ) not in logs.output[0]:
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_trunc_frame_end_fail(self: TestOpenFrame) -> None:
         """Test trunc_frame method end fail scenario."""
@@ -1862,7 +1866,7 @@ class TestOpenFrame(CommonTestCase):
             "still not truncated to same end dates."
         ) not in logs.output[0]:
             msg = "Method trunc_frame() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_merge_series(self: TestOpenFrame) -> None:
         """Test merge_series method."""
@@ -1933,7 +1937,7 @@ class TestOpenFrame(CommonTestCase):
 
         if oldlabels == newlabels:
             msg = "Setup to test merge_series() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         aframe.merge_series(how="outer")
         labelspostmerge = list(aframe.columns_lvl_zero)
@@ -1942,7 +1946,7 @@ class TestOpenFrame(CommonTestCase):
 
         if newlabels != labelspostmerge:
             msg = "Method merge_series() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         bframe.merge_series(how="inner")
         blist = [d.strftime("%Y-%m-%d") for d in bframe.tsdf.index]
@@ -1953,7 +1957,7 @@ class TestOpenFrame(CommonTestCase):
             "2022-07-14",
         ]:
             msg = "Method merge_series() did not work as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=Exception,
@@ -2011,7 +2015,7 @@ class TestOpenFrame(CommonTestCase):
 
         if set(prop_index) != set(result_index):
             msg = "Method all_properties() output not as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         result_values = {}
         for value in result.index:
@@ -2065,7 +2069,7 @@ class TestOpenFrame(CommonTestCase):
                 "Method all_properties() results "
                 f"not as expected.\n{pformat(result_values)}"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_align_index_to_local_cdays(self: TestOpenFrame) -> None:
         """Test align_index_to_local_cdays method."""
@@ -2084,12 +2088,12 @@ class TestOpenFrame(CommonTestCase):
         midsummer = dt.date(2022, 6, 6)
         if midsummer not in d_range:
             msg = "Midsummer not in date range"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         aframe.align_index_to_local_cdays()
         if midsummer in aframe.tsdf.index:
             msg = "Midsummer in date range"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:
         """Test rolling_info_ratio method."""
@@ -2109,7 +2113,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method rolling_info_ratio() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         simdata_fxd_per_yr = frame.rolling_info_ratio(
             long_column=0,
@@ -2131,7 +2135,7 @@ class TestOpenFrame(CommonTestCase):
                 "Result from method rolling_info_ratio()"
                 f" not as intended\n{values_fxd_per_yr}"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_rolling_beta(self: TestOpenFrame) -> None:
         """Test rolling_beta method."""
@@ -2150,7 +2154,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method rolling_beta() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_tracking_error_func(self: TestOpenFrame) -> None:
         """Test tracking_error_func method."""
@@ -2164,7 +2168,7 @@ class TestOpenFrame(CommonTestCase):
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         simdatab = frame.tracking_error_func(
             base_column=-1,
@@ -2176,7 +2180,7 @@ class TestOpenFrame(CommonTestCase):
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdatab.iloc[0]:.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
@@ -2185,7 +2189,7 @@ class TestOpenFrame(CommonTestCase):
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if f"{simdataa.iloc[0]:.10f}" != f"{simdatac.iloc[0]:.10f}":
             msg = (
@@ -2193,7 +2197,7 @@ class TestOpenFrame(CommonTestCase):
                 f"as expected: '{simdataa.iloc[0]:.10f}' "
                 f"versus '{simdatac.iloc[0]:.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -2215,7 +2219,7 @@ class TestOpenFrame(CommonTestCase):
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         simdatab = frame.info_ratio_func(base_column=-1, periods_in_a_year_fixed=251)
 
@@ -2224,7 +2228,7 @@ class TestOpenFrame(CommonTestCase):
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatab.iloc[0]:.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         simdatac = frame.info_ratio_func(base_column=("Asset_4", ValueType.PRICE))
 
@@ -2233,7 +2237,7 @@ class TestOpenFrame(CommonTestCase):
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"
             )
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -2261,7 +2265,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values != checkdata:
             msg = "Result from method rolling_corr() not as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_rolling_vol(self: TestOpenFrame) -> None:
         """Test rolling_vol method."""
@@ -2281,7 +2285,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values != checkdata:
             msg = "Result from method rolling_vol() not as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         simdata_fxd_per_yr = frame.rolling_vol(
             column=0,
@@ -2300,7 +2304,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values_fxd_per_yr != checkdata_fxd_per_yr:
             msg = "Result from method rolling_vol() not as intended."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_rolling_return(self: TestOpenFrame) -> None:
         """Test rolling_return method."""
@@ -2320,7 +2324,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method rolling_return() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_rolling_cvar_down(self: TestOpenFrame) -> None:
         """Test rolling_cvar_down method."""
@@ -2340,7 +2344,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method rolling_cvar_down() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_rolling_var_down(self: TestOpenFrame) -> None:
         """Test rolling_var_down method."""
@@ -2360,7 +2364,7 @@ class TestOpenFrame(CommonTestCase):
 
         if values != checkdata:
             msg = f"Result from method rolling_var_down() not as intended\n{values}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_label_uniqueness(self: TestOpenFrame) -> None:
         """Test label uniqueness."""
@@ -2378,7 +2382,7 @@ class TestOpenFrame(CommonTestCase):
 
         if uframe.columns_lvl_zero != ["Asset_0", "other_name"]:
             msg = "Fix of non-unique labels unsuccessful."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_capture_ratio(self: TestOpenFrame) -> None:
         """Test the capture_ratio_func method.
@@ -2514,23 +2518,23 @@ class TestOpenFrame(CommonTestCase):
 
         if f"{upp.iloc[0]:.12f}" != "1.063842457805":
             msg = "Result from capture_ratio_func() not as expected."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if f"{down.iloc[0]:.12f}" != "0.922188852957":
             msg = "Result from capture_ratio_func() not as expected."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if f"{both.iloc[0]:.12f}" != "1.153605852417":
             msg = "Result from capture_ratio_func() not as expected."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         upfixed = cframe.capture_ratio_func(ratio="up", periods_in_a_year_fixed=12)
 
         if f"{upfixed.iloc[0]:.12f}" != "1.063217236138":
             msg = "Result from capture_ratio_func() not as expected."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if f"{upp.iloc[0]:.2f}" != f"{upfixed.iloc[0]:.2f}":
             msg = "Result from capture_ratio_func() not as expected."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         uptuple = cframe.capture_ratio_func(
             ratio="up",
@@ -2539,11 +2543,11 @@ class TestOpenFrame(CommonTestCase):
 
         if f"{uptuple.iloc[0]:.12f}" != "1.063842457805":
             msg = "Result from capture_ratio_func() not as expected."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if f"{upp.iloc[0]:.12f}" != f"{uptuple.iloc[0]:.12f}":
             msg = "Result from capture_ratio_func() not as expected."
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -2583,14 +2587,14 @@ class TestOpenFrame(CommonTestCase):
             "0.20015",
         ]:
             msg = "Unexpected result from property geo_ret"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if [f"{gr:.5f}" for gr in cast("Series", geoframe.geo_ret_func())] != [
             "0.10007",
             "0.20015",
         ]:
             msg = "Unexpected result from property geo_ret"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         geoframe.add_timeseries(
             OpenTimeSeries.from_arrays(
@@ -2625,7 +2629,7 @@ class TestOpenFrame(CommonTestCase):
             "0.20015",
         ]:
             msg = "Unexpected result from property geo_ret"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         geoframe.add_timeseries(
             OpenTimeSeries.from_arrays(
@@ -2689,20 +2693,20 @@ class TestOpenFrame(CommonTestCase):
 
         if dropframe.tsdf.iloc[:, 0].tolist() != [1.1, 1.0, 1.0]:
             msg = "Method value_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if dropframe.tsdf.iloc[:, 1].tolist() != [2.1, 2.0, 2.0]:
             msg = "Method value_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.value_nan_handle(method="fill")
 
         if fillframe.tsdf.iloc[:, 0].tolist() != [1.1, 1.0, 1.0, 1.1, 1.0]:
             msg = "Method value_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if fillframe.tsdf.iloc[:, 1].tolist() != [2.1, 2.0, 1.8, 1.8, 2.0]:
             msg = "Method value_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_return_nan_handle(self: TestOpenFrame) -> None:
         """Test return_nan_handle method."""
@@ -2743,20 +2747,20 @@ class TestOpenFrame(CommonTestCase):
 
         if dropframe.tsdf.iloc[:, 0].tolist() != [0.1, 0.05, 0.04]:
             msg = "Method return_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if dropframe.tsdf.iloc[:, 1].tolist() != [0.01, 0.04, 0.06]:
             msg = "Method return_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.return_nan_handle(method="fill")
 
         if fillframe.tsdf.iloc[:, 0].tolist() != [0.1, 0.05, 0.0, 0.01, 0.04]:
             msg = "Method return_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
         if fillframe.tsdf.iloc[:, 1].tolist() != [0.01, 0.04, 0.02, 0.0, 0.06]:
             msg = "Method return_nan_handle() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_relative(self: TestOpenFrame) -> None:
         """Test relative method."""
@@ -2769,25 +2773,25 @@ class TestOpenFrame(CommonTestCase):
 
         if rframe.item_count != series_before:
             msg = "Method relative() base case not as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         rframe.relative()
 
         if rframe.item_count != series_after:
             msg = "Method relative() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if rframe.tsdf.shape[1] != series_after:
             msg = "Method relative() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if rframe.constituents[-1].label != "Asset_0_over_Asset_1":
             msg = "Method relative() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if rframe.columns_lvl_zero[-1] != "Asset_0_over_Asset_1":
             msg = "Method relative() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         rframe.tsdf.iloc[:, -1] = rframe.tsdf.iloc[:, -1].add(1.0)
 
@@ -2798,7 +2802,7 @@ class TestOpenFrame(CommonTestCase):
 
         if rflist != sflist:
             msg = "Method relative() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_to_cumret(self: TestOpenFrame) -> None:
         """Test to_cumret method."""
@@ -2819,32 +2823,32 @@ class TestOpenFrame(CommonTestCase):
 
         if mframe.columns_lvl_one != [ValueType.RTRN, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if cframe.columns_lvl_one != [ValueType.PRICE, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         cframe_lvl_one = list(cframe.columns_lvl_one)
 
         if rframe.columns_lvl_one != [ValueType.RTRN, ValueType.RTRN]:
             msg = "Method to_cumret() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         cframe.to_cumret()
         rframe.to_cumret()
 
         if mframe.columns_lvl_one != [ValueType.RTRN, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if cframe_lvl_one != cframe.columns_lvl_one:
             msg = "Method to_cumret() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if rframe.columns_lvl_one != [ValueType.PRICE, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=ValueError,
@@ -2866,7 +2870,7 @@ class TestOpenFrame(CommonTestCase):
 
         if dict_toframe_0 != dict_toframe_1:
             msg = "Method to_cumret() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_miscellaneous(self: TestOpenFrame) -> None:
         """Test miscellaneous methods."""
@@ -2890,7 +2894,7 @@ class TestOpenFrame(CommonTestCase):
                     msg = (
                         "Difference with or without fixed periods in year is too great"
                     )
-                    raise ValueError(msg)
+                    raise OpenFrameTestError(msg)
         for methd in methods:
             dated = getattr(mframe, methd)(
                 from_date=mframe.first_idx,
@@ -2903,7 +2907,7 @@ class TestOpenFrame(CommonTestCase):
                         f"Method {methd} with and without date "
                         "arguments returned inconsistent results"
                     )
-                    raise ValueError(msg)
+                    raise OpenFrameTestError(msg)
 
         ret = [f"{rr:.9f}" for rr in cast("Series", mframe.value_ret_func())]
         if ret != [
@@ -2914,7 +2918,7 @@ class TestOpenFrame(CommonTestCase):
             "0.169641332",
         ]:
             msg = f"Results from value_ret_func() not as expected\n{ret}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         impvol = [
             f"{iv:.11f}"
@@ -2933,7 +2937,7 @@ class TestOpenFrame(CommonTestCase):
             "0.10121521823",
         ]:
             msg = f"Results from vol_from_var_func() not as expected\n{impvol}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if impvoldrifted != [
             "0.09591621674",
@@ -2943,7 +2947,7 @@ class TestOpenFrame(CommonTestCase):
             "0.10201301292",
         ]:
             msg = f"Results from vol_from_var_func() not as expected\n{impvoldrifted}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         # noinspection PyTypeChecker
         mframe.tsdf.iloc[0, 2] = zero_float
@@ -2983,11 +2987,11 @@ class TestOpenFrame(CommonTestCase):
 
         if f"{vrfs_y:.11f}" != f"{vrvrcs_y:.11f}":
             msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if vrffl_y != vrvrcfl_y:
             msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         vrfs_ym = vrcseries.value_ret_func(
             from_date=dt.date(2018, 4, 30),
@@ -3005,11 +3009,11 @@ class TestOpenFrame(CommonTestCase):
 
         if f"{vrfs_ym:.11f}" != f"{vrvrcs_ym:.11f}":
             msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if vrffl_ym != vrvrcfl_ym:
             msg = "value_ret_func() and value_ret_calendar_period() inconsistent"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_to_drawdown_series(self: TestOpenFrame) -> None:
         """Test to_drawdown_series method."""
@@ -3021,7 +3025,7 @@ class TestOpenFrame(CommonTestCase):
 
         if ddown != ddownserie:
             msg = "Method to_drawdown_series() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_ord_least_squares_fit(self: TestOpenFrame) -> None:
         """Test ord_least_squares_fit method."""
@@ -3035,11 +3039,11 @@ class TestOpenFrame(CommonTestCase):
 
         if fsframe.columns_lvl_zero[-1] != oframe.columns_lvl_zero[0]:
             msg = "Method ord_least_squares_fit() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if fsframe.columns_lvl_one[-1] != oframe.columns_lvl_zero[1]:
             msg = "Method ord_least_squares_fit() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         results = []
         for i in range(oframe.item_count):
@@ -3065,7 +3069,7 @@ class TestOpenFrame(CommonTestCase):
 
         if results != results_tuple:
             msg = "Method ord_least_squares_fit() not working as intended"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if results != [
             "1.00000000000",
@@ -3095,7 +3099,7 @@ class TestOpenFrame(CommonTestCase):
             "1.00000000000",
         ]:
             msg = f"Method ord_least_squares_fit() not working as intended\n{results}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -3139,7 +3143,7 @@ class TestOpenFrame(CommonTestCase):
 
         if results != results_tuple:
             msg = "Unexpected results from method beta()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if results != [
             "1.00000000000",
@@ -3169,7 +3173,7 @@ class TestOpenFrame(CommonTestCase):
             "1.00000000000",
         ]:
             msg = f"Unexpected results from method beta()\n{results}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -3211,7 +3215,7 @@ class TestOpenFrame(CommonTestCase):
 
         if results != results_tuple:
             msg = "Unexpected results from method beta()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if results != [
             "1.00000000000",
@@ -3241,7 +3245,7 @@ class TestOpenFrame(CommonTestCase):
             "1.00000000000",
         ]:
             msg = f"Unexpected results from method beta()\n{results}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -3284,7 +3288,7 @@ class TestOpenFrame(CommonTestCase):
 
         if results != results_tuple:
             msg = "Unexpected results from method jensen_alpha()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if results != [
             "0.000000000",
@@ -3314,7 +3318,7 @@ class TestOpenFrame(CommonTestCase):
             "0.000000000",
         ]:
             msg = f"Unexpected results from method jensen_alpha()\n{results}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -3355,7 +3359,7 @@ class TestOpenFrame(CommonTestCase):
 
         if sresults != sresults_tuple:
             msg = "Unexpected results from method jensen_alpha()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if sresults != [
             "0.000000000",
@@ -3385,7 +3389,7 @@ class TestOpenFrame(CommonTestCase):
             "0.000000000",
         ]:
             msg = f"Unexpected results from method jensen_alpha()\n{sresults}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_jensen_alpha_returns_input(self: TestOpenFrame) -> None:
         """Test jensen_alpha method with returns input."""
@@ -3409,7 +3413,7 @@ class TestOpenFrame(CommonTestCase):
 
         if results != results_tuple:
             msg = "Unexpected results from method jensen_alpha()"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if results != [
             "0.000000000",
@@ -3439,7 +3443,7 @@ class TestOpenFrame(CommonTestCase):
             "0.000000000",
         ]:
             msg = f"Unexpected results from method jensen_alpha()\n{results}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -3493,7 +3497,7 @@ class TestOpenFrame(CommonTestCase):
             "0.06260970713",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{list_one}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if list_two != [
             "0.06783309941",
@@ -3508,7 +3512,7 @@ class TestOpenFrame(CommonTestCase):
             "0.07469953921",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{list_two}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if corr_one != [
             "-0.00018950439",
@@ -3523,7 +3527,7 @@ class TestOpenFrame(CommonTestCase):
             "-0.02293443963",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{corr_one}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
     def test_ewma_risk_set_columns(self: TestOpenFrame) -> None:
         """Test ewma_risk method on specified columns."""
@@ -3551,7 +3555,7 @@ class TestOpenFrame(CommonTestCase):
             "0.07468607166",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{list_three}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if list_four != [
             "0.10703091058",
@@ -3566,7 +3570,7 @@ class TestOpenFrame(CommonTestCase):
             "0.11658815836",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{list_four}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
 
         if corr_two != [
             "-0.00112585517",
@@ -3581,4 +3585,4 @@ class TestOpenFrame(CommonTestCase):
             "-0.08603979121",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{corr_two}"
-            raise ValueError(msg)
+            raise OpenFrameTestError(msg)
