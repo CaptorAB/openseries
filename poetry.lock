@@ -508,24 +508,20 @@ files = [
 
 [[package]]
 name = "narwhals"
-version = "1.31.0"
+version = "1.32.0"
 description = "Extremely lightweight compatibility layer between dataframe libraries"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "narwhals-1.31.0-py3-none-any.whl", hash = "sha256:2a7b79bb5f511055c4c0142121fc0d4171ea171458e12d44dbd9c8fc6488e997"},
-    {file = "narwhals-1.31.0.tar.gz", hash = "sha256:333472e2562343dfdd27407ec9b5114a07c81d0416794e4ac6b703dd925c6a1a"},
+    {file = "narwhals-1.32.0-py3-none-any.whl", hash = "sha256:8bdbf3f76155887412eea04b0b06303856ac1aa3d9e8bda5b5e54612855fa560"},
+    {file = "narwhals-1.32.0.tar.gz", hash = "sha256:bd0aa41434737adb4b26f8593f3559abc7d938730ece010fe727b58bc363580d"},
 ]
 
 [package.extras]
-core = ["duckdb", "pandas", "polars", "pyarrow", "sqlframe"]
 cudf = ["cudf (>=24.10.0)"]
 dask = ["dask[dataframe] (>=2024.8)"]
-dev = ["covdefaults", "hypothesis", "mypy (>=1.15.0,<1.16.0)", "pandas-stubs (==2.2.3.250308)", "polars (==1.25.2)", "pre-commit", "pyarrow-stubs (==17.18)", "pyright", "pytest", "pytest-cov", "pytest-env", "pytest-randomly", "sqlframe (==3.24.1)", "typing-extensions", "uv"]
-docs = ["black", "duckdb", "jinja2", "markdown-exec[ansi]", "mkdocs", "mkdocs-autorefs", "mkdocs-material", "mkdocstrings-python (>=1.16)", "mkdocstrings[python]", "pandas", "polars (>=1.0.0)", "pyarrow"]
 duckdb = ["duckdb (>=1.0)"]
-extra = ["scikit-learn"]
 ibis = ["ibis-framework (>=6.0.0)", "packaging", "pyarrow-hotfix", "rich"]
 modin = ["modin"]
 pandas = ["pandas (>=0.25.3)"]
@@ -533,8 +529,6 @@ polars = ["polars (>=0.20.3)"]
 pyarrow = ["pyarrow (>=11.0.0)"]
 pyspark = ["pyspark (>=3.5.0)"]
 sqlframe = ["sqlframe (>=3.22.0)"]
-tests = ["covdefaults", "hypothesis", "pytest", "pytest-cov", "pytest-env", "pytest-randomly"]
-typing = ["hypothesis", "mypy (>=1.15.0,<1.16.0)", "pandas-stubs (==2.2.3.250308)", "polars (==1.25.2)", "pyarrow-stubs (==17.18)", "pyright", "pytest", "sqlframe (==3.24.1)", "typing-extensions", "uv"]
 
 [[package]]
 name = "nodeenv"
@@ -1351,14 +1345,14 @@ test = ["Cython", "array-api-strict (>=2.0,<2.1.1)", "asv", "gmpy2", "hypothesis
 
 [[package]]
 name = "setuptools"
-version = "77.0.3"
+version = "78.0.1"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "setuptools-77.0.3-py3-none-any.whl", hash = "sha256:67122e78221da5cf550ddd04cf8742c8fe12094483749a792d56cd669d6cf58c"},
-    {file = "setuptools-77.0.3.tar.gz", hash = "sha256:583b361c8da8de57403743e756609670de6fb2345920e36dc5c2d914c319c945"},
+    {file = "setuptools-78.0.1-py3-none-any.whl", hash = "sha256:1cc9b32ee94f93224d6c80193cbb768004667aa2f2732a473d6949b0236c1d4e"},
+    {file = "setuptools-78.0.1.tar.gz", hash = "sha256:4321d2dc2157b976dee03e1037c9f2bc5fea503c0c47d3c9458e0e8e49e659ce"},
 ]
 
 [package.extras]
