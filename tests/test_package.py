@@ -6,8 +6,6 @@ from importlib.metadata import metadata
 from pathlib import Path
 from re import match
 
-from tomllib import load as toml_load
-
 
 class PackageTestError(Exception):
     """Custom exception used for signaling test failures."""
@@ -22,10 +20,10 @@ class TestPackage:
 
         directory = Path(__file__).parent.parent
         pyproject_file = directory.joinpath("pyproject.toml")
-        with pyproject_file.open(mode="rb") as pfile:
-            data = toml_load(pfile)
+        with pyproject_file.open(mode="r", encoding="utf-8") as pfile:
+            lines = pfile.readlines()
 
-        toml_version = data["project"]["version"]
+        toml_version = lines[2].strip()[lines[2].strip().find('"') :].replace('"', "")
 
         attribute_names = [
             "Name",
