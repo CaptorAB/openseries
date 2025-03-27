@@ -12,7 +12,7 @@ from pandas import Timestamp
 from pydantic import BaseModel, Field, StringConstraints, conlist, conset
 
 try:
-    from typing import Self
+    from typing import Self  # mypy: disable-error-code="attr-defined"
 except ImportError:  # pragma: no cover
     from typing_extensions import Self
 
