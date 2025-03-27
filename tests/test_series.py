@@ -1659,12 +1659,12 @@ class TestOpenTimeSeries(CommonTestCase):
             raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("CountriesType", ["SE", "US"])
-        if basecase.countries != {"SE", "US"}:
+        if basecase.countries != {"SE", "US"}:  # type: ignore[comparison-overlap,unused-ignore]
             msg = "Validations base case setup failed"
             raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("CountriesType", ["SE", "SE"])
-        if basecase.countries != {"SE"}:
+        if basecase.countries != {"SE"}:  # type: ignore[comparison-overlap,unused-ignore]
             msg = "Validations base case setup failed"
             raise OpenTimeSeriesTestError(msg)
 
