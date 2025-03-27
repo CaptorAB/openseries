@@ -10,9 +10,14 @@ from typing import Annotated, ClassVar, Literal, Union
 from numpy import datetime64
 from pandas import Timestamp
 from pydantic import BaseModel, Field, StringConstraints, conlist, conset
-from typing_extensions import Self
 
-__all__ = ["ValueType"]
+try:
+    from typing import Self
+except ImportError:  # pragma: no cover
+    from typing_extensions import Self
+
+
+__all__ = ["Self", "ValueType"]
 
 
 CountryStringType = Annotated[

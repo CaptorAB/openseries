@@ -17,6 +17,7 @@ from .owntypes import (
     DateAlignmentError,
     InitialValueZeroError,
     NumberOfItemsAndLabelsNotSameError,
+    Self,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -57,7 +58,6 @@ from scipy.stats import (  # type: ignore[import-untyped,unused-ignore]
     norm,
     skew,
 )
-from typing_extensions import Self
 
 from ._risk import (
     _cvar_down_calc,

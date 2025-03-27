@@ -29,7 +29,6 @@ from pandas import (
     date_range,
 )
 from pydantic import field_validator, model_validator
-from typing_extensions import Self
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends, date_fix
@@ -46,6 +45,7 @@ from .owntypes import (
     LiteralPandasReindexMethod,
     LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
+    Self,
     ValueListType,
     ValueType,
 )
@@ -148,7 +148,7 @@ class OpenTimeSeries(_CommonModel):
 
     @classmethod
     def from_arrays(
-        cls: type[OpenTimeSeries],
+        cls,
         name: str,
         dates: DateListType,
         values: ValueListType,
@@ -159,7 +159,7 @@ class OpenTimeSeries(_CommonModel):
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """Create series from a Pandas DataFrame or Series.
 
         Parameters
@@ -210,14 +210,14 @@ class OpenTimeSeries(_CommonModel):
 
     @classmethod
     def from_df(
-        cls: type[OpenTimeSeries],
+        cls,
         dframe: Series[float] | DataFrame,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """Create series from a Pandas DataFrame or Series.
 
         Parameters
@@ -295,7 +295,7 @@ class OpenTimeSeries(_CommonModel):
 
     @classmethod
     def from_fixed_rate(
-        cls: type[OpenTimeSeries],
+        cls,
         rate: float,
         d_range: DatetimeIndex | None = None,
         days: int | None = None,
@@ -305,7 +305,7 @@ class OpenTimeSeries(_CommonModel):
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """Create series from values accruing with a given fixed rate return.
 
         Providing a date_range of type Pandas DatetimeIndex takes priority over
@@ -770,7 +770,7 @@ def timeseries_chain(
     front: TypeOpenTimeSeries,
     back: TypeOpenTimeSeries,
     old_fee: float = 0.0,
-) -> TypeOpenTimeSeries | OpenTimeSeries:
+) -> TypeOpenTimeSeries:
     """Chain two timeseries together.
 
     The function assumes that the two series have at least one date in common.
@@ -786,7 +786,7 @@ def timeseries_chain(
 
     Returns
     -------
-    TypeOpenTimeSeries | OpenTimeSeries
+    TypeOpenTimeSeries
         An OpenTimeSeries object or a subclass thereof
 
     """
@@ -817,27 +817,6 @@ def timeseries_chain(
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
-    # noinspection PyUnresolvedReferences
-    if back.__class__.__subclasscheck__(
-        OpenTimeSeries,
-    ):
-        return OpenTimeSeries(
-            timeseries_id=new.timeseries_id,
-            instrument_id=new.instrument_id,
-            currency=new.currency,
-            dates=dates,
-            name=new.name,
-            label=new.name,
-            valuetype=new.valuetype,
-            values=list(values),
-            local_ccy=new.local_ccy,
-            tsdf=DataFrame(
-                data=values,
-                index=[d.date() for d in DatetimeIndex(dates)],
-                columns=[[new.label], [new.valuetype]],
-                dtype="float64",
-            ),
-        )
     return back.__class__(
         timeseries_id=new.timeseries_id,
         instrument_id=new.instrument_id,

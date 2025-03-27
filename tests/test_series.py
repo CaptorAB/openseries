@@ -1284,6 +1284,8 @@ class TestOpenTimeSeries(CommonTestCase):
         self: TestOpenTimeSeries,
     ) -> None:
         """Test correct pass-through of classes in timeseries_chain."""
+        msg = "Function timeseries_chain() not working as intended"
+
         base_series_one = self.randomseries.from_deepcopy()
 
         sub_series_one = NewTimeSeries.from_arrays(
@@ -1321,41 +1323,35 @@ class TestOpenTimeSeries(CommonTestCase):
             sub_series_one.extra_info  # type: ignore[attr-defined, unused-ignore]
             != "cool"
         ):
-            msg = "Function timeseries_chain() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
         new_base = timeseries_chain(front=base_series_one, back=base_series_two)
         new_sub = timeseries_chain(front=sub_series_one, back=sub_series_two)
 
-        msg = "Function timeseries_chain() not working as intended"
         if not isinstance(new_base, OpenTimeSeries):
             raise TypeError(msg)
 
         if not isinstance(new_sub, NewTimeSeries):
-            msg = "Function timeseries_chain() not working as intended"
             raise TypeError(msg)
 
         if isinstance(new_base, NewTimeSeries):
-            msg = "Function timeseries_chain() not working as intended"
             raise TypeError(msg)
 
         if new_sub.__class__.__subclasscheck__(OpenTimeSeries):
-            msg = "Function timeseries_chain() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
         if new_base.dates != new_sub.dates:
-            msg = "Function timeseries_chain() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
         if new_base.values != new_sub.values:  # noqa: PD011
-            msg = "Function timeseries_chain() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
     def test_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
         """Test that chained methods on subclass returns subclass and not baseclass."""
+        msg = "chained methods on subclass not working as intended"
+
         cseries = self.randomseries.from_deepcopy()
 
-        msg = "chained methods on subclass not working as intended"
         if not isinstance(cseries, OpenTimeSeries):
             raise TypeError(msg)
 
@@ -1365,14 +1361,12 @@ class TestOpenTimeSeries(CommonTestCase):
             values=list(cseries.tsdf.iloc[:, 0].to_numpy()),
         )
         if not isinstance(copyseries, NewTimeSeries):
-            msg = "chained methods on subclass not working as intended"
             raise TypeError(msg)
 
         copyseries.set_new_label("boo").running_adjustment(0.001).resample(
             "BME",
         ).value_to_ret()
 
-        msg = "chained methods on subclass not working as intended"
         if not isinstance(copyseries, NewTimeSeries):
             raise TypeError(msg)
 

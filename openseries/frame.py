@@ -38,7 +38,6 @@ from pandas import (
     merge,
 )
 from pydantic import field_validator
-from typing_extensions import Self
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends
@@ -60,6 +59,7 @@ from .owntypes import (
     NoWeightsError,
     OpenFramePropertiesList,
     RatioInputError,
+    Self,
     ValueType,
 )
 from .series import OpenTimeSeries
