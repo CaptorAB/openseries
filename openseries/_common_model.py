@@ -1392,7 +1392,7 @@ class _CommonModel(BaseModel):
             deep=True
         )
         result = [
-            cvar_df.loc[:, x]  # type: ignore[call-overload,index]
+            cvar_df.loc[:, x]  # type: ignore[call-overload,index,unused-ignore]
             .ffill()
             .pct_change()
             .sort_values()
