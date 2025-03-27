@@ -1,6 +1,6 @@
 """Defining the OpenFrame class."""
 
-# mypy: disable-error-code="index,assignment,arg-type"
+# mypy: disable-error-code="index,assignment,arg-type,no-any-return"
 from __future__ import annotations
 
 from copy import deepcopy

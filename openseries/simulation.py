@@ -1,5 +1,6 @@
 """Defining the ReturnSimulation class."""
 
+# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast

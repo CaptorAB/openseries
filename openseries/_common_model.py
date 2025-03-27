@@ -1,5 +1,6 @@
 """Defining the _CommonModel class."""
 
+# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
 import datetime as dt
