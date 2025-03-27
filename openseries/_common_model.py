@@ -1399,7 +1399,7 @@ class _CommonModel(BaseModel):
             .iloc[
                 : ceil(
                     (1 - level)
-                    * cvar_df.loc[:, x]  # type: ignore[index]
+                    * cvar_df.loc[:, x]  # type: ignore[index,unused-ignore]
                     .ffill()
                     .pct_change()
                     .count(),
