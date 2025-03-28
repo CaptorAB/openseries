@@ -1645,27 +1645,24 @@ class TestOpenTimeSeries(CommonTestCase):
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
+        msg = "Validations base case setup failed"
         basecase = OpenTimeSeries.from_arrays(
             name="asset",
             dates=["2017-05-29"],
             values=[100.0],
         )
         if basecase.dates != ["2017-05-29"]:
-            msg = "Validations base case setup failed"
             raise OpenTimeSeriesTestError(msg)
 
         if basecase.values != [100.0]:  # noqa: PD011
-            msg = "Validations base case setup failed"
             raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("CountriesType", ["SE", "US"])
-        if basecase.countries != {"SE", "US"}:  # type: ignore[comparison-overlap,unused-ignore]
-            msg = "Validations base case setup failed"
+        if cast("set[str]", basecase.countries) != {"SE", "US"}:
             raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("CountriesType", ["SE", "SE"])
-        if basecase.countries != {"SE"}:  # type: ignore[comparison-overlap,unused-ignore]
-            msg = "Validations base case setup failed"
+        if cast("set[str]", basecase.countries) != {"SE"}:
             raise OpenTimeSeriesTestError(msg)
 
         with pytest.raises(
