@@ -7,6 +7,10 @@ from pathlib import Path
 from re import match
 
 
+class PackageTestError(Exception):
+    """Custom exception used for signaling test failures."""
+
+
 class TestPackage:
     """class to test openseries packaging."""
 
@@ -25,7 +29,6 @@ class TestPackage:
             "Name",
             "Version",
             "Summary",
-            "License",
             "Author",
             "Requires-Python",
             "Project-URL",
@@ -35,10 +38,9 @@ class TestPackage:
             "^(openseries)$",
             f"^({toml_version})$",
             "^(Tools for analyzing financial timeseries.)$",
-            "^(BSD-3-Clause)$",
             "^(Martin Karrin)$",
             "^(>=3.10,<3.14)$",
-            "^(Documentation, https://github.com/CaptorAB/openseries)$",
+            "^(Homepage, https://github.com/CaptorAB/openseries)$",
         ]
 
         for name, value in zip(attribute_names, expected_values, strict=True):
@@ -47,4 +49,4 @@ class TestPackage:
                     f"Package metadata {name} not as "
                     f"expected: {package_metadata[name]}"
                 )
-                raise ValueError(msg)
+                raise PackageTestError(msg)

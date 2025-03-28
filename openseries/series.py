@@ -1,12 +1,15 @@
 """Defining the OpenTimeSeries class."""
 
+# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
-import datetime as dt
 from collections.abc import Iterable
 from copy import deepcopy
-from logging import warning
-from typing import Any, TypeVar, cast
+from logging import getLogger
+from typing import TYPE_CHECKING, Any, TypeVar, cast
+
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime as dt
 
 from numpy import (
     append,
@@ -27,7 +30,6 @@ from pandas import (
     date_range,
 )
 from pydantic import field_validator, model_validator
-from typing_extensions import Self
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends, date_fix
@@ -36,22 +38,27 @@ from .owntypes import (
     CountriesType,
     Currency,
     CurrencyStringType,
+    DateAlignmentError,
     DateListType,
     DaysInYearType,
+    IncorrectArgumentComboError,
     LiteralBizDayFreq,
     LiteralPandasReindexMethod,
     LiteralSeriesProps,
     OpenTimeSeriesPropertiesList,
+    Self,
     ValueListType,
     ValueType,
 )
+
+logger = getLogger(__name__)
 
 __all__ = ["OpenTimeSeries", "timeseries_chain"]
 
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyNestedDecorators
 class OpenTimeSeries(_CommonModel):
     """OpenTimeSeries objects are at the core of the openseries package.
 
@@ -142,7 +149,7 @@ class OpenTimeSeries(_CommonModel):
 
     @classmethod
     def from_arrays(
-        cls: type[OpenTimeSeries],
+        cls,
         name: str,
         dates: DateListType,
         values: ValueListType,
@@ -153,7 +160,7 @@ class OpenTimeSeries(_CommonModel):
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """Create series from a Pandas DataFrame or Series.
 
         Parameters
@@ -204,14 +211,14 @@ class OpenTimeSeries(_CommonModel):
 
     @classmethod
     def from_df(
-        cls: type[OpenTimeSeries],
+        cls,
         dframe: Series[float] | DataFrame,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """Create series from a Pandas DataFrame or Series.
 
         Parameters
@@ -240,7 +247,7 @@ class OpenTimeSeries(_CommonModel):
                 label, _ = dframe.name
             else:
                 label = dframe.name
-            values = cast(list[float], dframe.to_numpy().tolist())
+            values = cast("list[float]", dframe.to_numpy().tolist())
         elif isinstance(dframe, DataFrame):
             values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
@@ -249,7 +256,7 @@ class OpenTimeSeries(_CommonModel):
                 ):
                     label = "Series"
                     msg = f"Label missing. Adding: {label}"
-                    warning(msg=msg)
+                    logger.warning(msg=msg)
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
                 if _check_if_none(
@@ -257,13 +264,13 @@ class OpenTimeSeries(_CommonModel):
                 ):
                     valuetype = ValueType.PRICE
                     msg = f"valuetype missing. Adding: {valuetype.value}"
-                    warning(msg=msg)
+                    logger.warning(msg=msg)
                 else:
                     valuetype = dframe.columns.get_level_values(1).to_numpy()[
                         column_nmbr
                     ]
             else:
-                label = cast(MultiIndex, dframe.columns).to_numpy()[column_nmbr]
+                label = cast("MultiIndex", dframe.columns).to_numpy()[column_nmbr]
         else:
             raise TypeError(msg)
 
@@ -289,7 +296,7 @@ class OpenTimeSeries(_CommonModel):
 
     @classmethod
     def from_fixed_rate(
-        cls: type[OpenTimeSeries],
+        cls,
         rate: float,
         d_range: DatetimeIndex | None = None,
         days: int | None = None,
@@ -299,7 +306,7 @@ class OpenTimeSeries(_CommonModel):
         baseccy: CurrencyStringType = "SEK",
         *,
         local_ccy: bool = True,
-    ) -> OpenTimeSeries:
+    ) -> Self:
         """Create series from values accruing with a given fixed rate return.
 
         Providing a date_range of type Pandas DatetimeIndex takes priority over
@@ -338,7 +345,7 @@ class OpenTimeSeries(_CommonModel):
             )
         elif not isinstance(d_range, Iterable) and not all([days, end_dt]):
             msg = "If d_range is not provided both days and end_dt must be."
-            raise ValueError(msg)
+            raise IncorrectArgumentComboError(msg)
 
         deltas = array(
             [i.days for i in DatetimeIndex(d_range)[1:] - DatetimeIndex(d_range)[:-1]],  # type: ignore[arg-type]
@@ -413,7 +420,7 @@ class OpenTimeSeries(_CommonModel):
         """
         if not properties:
             properties = cast(
-                list[LiteralSeriesProps],
+                "list[LiteralSeriesProps]",
                 OpenTimeSeriesPropertiesList.allowed_strings,
             )
 
@@ -435,7 +442,9 @@ class OpenTimeSeries(_CommonModel):
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
-        returns.columns = MultiIndex.from_arrays(arrays=arrays)
+        returns.columns = MultiIndex.from_arrays(
+            arrays=arrays  # type: ignore[arg-type,unused-ignore]
+        )
         self.tsdf = returns.copy()
         return self
 
@@ -624,26 +633,26 @@ class OpenTimeSeries(_CommonModel):
             time_factor = float(periods_in_a_year_fixed)
         else:
             how_many = self.tsdf.loc[
-                cast(int, earlier) : cast(int, later),
+                cast("int", earlier) : cast("int", later),
                 self.tsdf.columns.to_numpy()[0],
             ].count()
             fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast(int, earlier) : cast(int, later)].copy()
+        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 
         data[self.label, ValueType.RTRN] = (
             data.loc[:, self.tsdf.columns.to_numpy()[0]].apply(log).diff()
         )
 
         rawdata = [
-            data.loc[:, cast(int, (self.label, ValueType.RTRN))]
+            data.loc[:, cast("int", (self.label, ValueType.RTRN))]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, cast(int, (self.label, ValueType.RTRN))].iloc[1:]:
+        for item in data.loc[:, cast("int", (self.label, ValueType.RTRN))].iloc[1:]:
             prev = rawdata[-1]
             rawdata.append(
                 sqrt(
@@ -684,7 +693,7 @@ class OpenTimeSeries(_CommonModel):
             values = [1.0]
             returns_input = True
         else:
-            values = [cast(float, self.tsdf.iloc[0, 0])]
+            values = [cast("float", self.tsdf.iloc[0, 0])]
             ra_df = self.tsdf.ffill().pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
@@ -693,16 +702,16 @@ class OpenTimeSeries(_CommonModel):
         dates: list[dt.date] = [prev]
 
         for idx, row in ra_df.iterrows():
-            dates.append(cast(dt.date, idx))
+            dates.append(cast("dt.date", idx))
             values.append(
                 values[-1]
                 * (
                     1
                     + row.iloc[0]
-                    + adjustment * (cast(dt.date, idx) - prev).days / days_in_year
+                    + adjustment * (cast("dt.date", idx) - prev).days / days_in_year
                 ),
             )
-            prev = cast(dt.date, idx)
+            prev = cast("dt.date", idx)
         self.tsdf = DataFrame(data=values, index=dates)
         self.valuetype = ValueType.PRICE
         self.tsdf.columns = MultiIndex.from_arrays(
@@ -752,7 +761,7 @@ class OpenTimeSeries(_CommonModel):
             self.valuetype = lvl_one
         else:
             self.tsdf.columns = MultiIndex.from_arrays([[lvl_zero], [lvl_one]])
-            self.label, self.valuetype = lvl_zero, cast(ValueType, lvl_one)
+            self.label, self.valuetype = lvl_zero, cast("ValueType", lvl_one)
         if delete_lvl_one:
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
         return self
@@ -762,7 +771,7 @@ def timeseries_chain(
     front: TypeOpenTimeSeries,
     back: TypeOpenTimeSeries,
     old_fee: float = 0.0,
-) -> TypeOpenTimeSeries | OpenTimeSeries:
+) -> TypeOpenTimeSeries:
     """Chain two timeseries together.
 
     The function assumes that the two series have at least one date in common.
@@ -778,7 +787,7 @@ def timeseries_chain(
 
     Returns
     -------
-    TypeOpenTimeSeries | OpenTimeSeries
+    TypeOpenTimeSeries
         An OpenTimeSeries object or a subclass thereof
 
     """
@@ -790,14 +799,14 @@ def timeseries_chain(
 
     if old.last_idx < first:
         msg = "Timeseries dates must overlap to allow them to be chained."
-        raise ValueError(msg)
+        raise DateAlignmentError(msg)
 
     while first not in old.tsdf.index:
         idx += 1
         first = new.tsdf.index[idx]
         if first > old.tsdf.index[-1]:
             msg = "Failed to find a matching date between series"
-            raise ValueError(msg)
+            raise DateAlignmentError(msg)
 
     dates: list[str] = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < first]
 
@@ -809,27 +818,6 @@ def timeseries_chain(
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
-    # noinspection PyUnresolvedReferences
-    if back.__class__.__subclasscheck__(
-        OpenTimeSeries,
-    ):
-        return OpenTimeSeries(
-            timeseries_id=new.timeseries_id,
-            instrument_id=new.instrument_id,
-            currency=new.currency,
-            dates=dates,
-            name=new.name,
-            label=new.name,
-            valuetype=new.valuetype,
-            values=list(values),
-            local_ccy=new.local_ccy,
-            tsdf=DataFrame(
-                data=values,
-                index=[d.date() for d in DatetimeIndex(dates)],
-                columns=[[new.label], [new.valuetype]],
-                dtype="float64",
-            ),
-        )
     return back.__class__(
         timeseries_id=new.timeseries_id,
         instrument_id=new.instrument_id,
@@ -864,7 +852,7 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
 
     """
     try:
-        return cast(bool, isnan(item))
+        return cast("bool", isnan(item))
     except TypeError:
         if item is None:
             return True

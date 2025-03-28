@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "1.8.0"
+version = "1.8.1"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
@@ -8,7 +8,7 @@ authors = [
 maintainers = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
 ]
-license = "BSD-3-Clause"
+license = { file = "LICENSE.md" }
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 
@@ -42,37 +42,38 @@ keywords = [
 dependencies = [
     "holidays (>=0.30,<1.0)",
     "numpy (>=1.23.2,<3.0.0)",
-    "openpyxl (>=3.1.2,<4.0.0)",
+    "openpyxl (>=3.1.2,<5.0.0)",
     "pandas (>=2.1.2,<3.0.0)",
-    "plotly (>=5.18.0,<6.0.0)",
-    "pyarrow (>=14.0.2,<20.0.0)",
+    "plotly (>=5.18.0,<7.0.0)",
+    "pyarrow (>=14.0.2,<21.0.0)",
     "pydantic (>=2.5.2,<3.0.0)",
-    "python-dateutil (>=2.8.2,<3.0.0)",
+    "python-dateutil (>=2.8.2,<4.0.0)",
     "requests (>=2.20.0,<3.0.0)",
     "scipy (>=1.11.4,<2.0.0)",
     "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)"
 ]
 
 [project.urls]
-homepage = "https://github.com/CaptorAB/openseries"
-repository = "https://github.com/CaptorAB/openseries"
-documentation = "https://github.com/CaptorAB/openseries"
+"Homepage" = "https://github.com/CaptorAB/openseries"
+"Source" = "https://github.com/CaptorAB/openseries"
+"Issue Tracker" = "https://github.com/CaptorAB/openseries/issues"
+"Release Notes" = "https://github.com/CaptorAB/openseries/releases"
 
 [tool.poetry.group.dev.dependencies]
-black = ">=24.4.2,<25.0.0"
+black = ">=24.4.2,<27.0.0"
 coverage = ">=7.2.7,<9.0.0"
 genbadge = { version = ">=1.1.1,<2.0.0", extras = ["coverage"] }
-mypy = "1.14.1"
+mypy = "1.15.0"
 pandas-stubs = ">=2.1.2,<3.0.0"
 pre-commit = ">=3.7.1,<6.0.0"
 pytest = ">=8.2.2,<9.0.0"
-ruff = "0.9.3"
-types-openpyxl = ">=3.1.2,<4.0.0"
-types-python-dateutil = ">=2.8.2,<3.0.0"
+ruff = "0.11.2"
+types-openpyxl = ">=3.1.2,<5.0.0"
+types-python-dateutil = ">=2.8.2,<4.0.0"
 types-requests = ">=2.20.0,<3.0.0"
 
 [build-system]
-requires = ["poetry-core>=2.0.1"]
+requires = ["poetry-core>=2.1.1"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.coverage.run]
@@ -118,13 +119,16 @@ line-length = 87
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["COM812", "D203", "D213", "ISC001"]
+ignore = ["COM812", "D203", "D213"]
 fixable = ["ALL"]
 
 [tool.ruff.lint.pylint]
 max-args = 12
 max-branches = 23
 max-statements = 59
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
 
 [tool.pytest.ini_options]
 filterwarnings = [

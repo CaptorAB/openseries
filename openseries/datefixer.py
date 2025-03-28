@@ -21,6 +21,12 @@ from pandas import (
 )
 from pandas.tseries.offsets import CustomBusinessDay
 
+from .owntypes import (
+    BothStartAndEndError,
+    CountriesNotStringNorListStrError,
+    TradingDaysNotAboveZeroError,
+)
+
 if TYPE_CHECKING:
     from .owntypes import (  # pragma: no cover
         CountriesType,
@@ -92,7 +98,7 @@ def holiday_calendar(
             "Argument countries must be a string country code or "
             "a list of string country codes according to ISO 3166-1 alpha-2."
         )
-        raise ValueError(msg)
+        raise CountriesNotStringNorListStrError(msg)
 
     return busdaycalendar(holidays=hols)
 
@@ -296,7 +302,7 @@ def offset_business_days(
 
     idx = where(array(local_bdays) == ddate)[0]
 
-    return cast(dt.date, local_bdays[idx[0] + days])
+    return cast("dt.date", local_bdays[idx[0] + days])
 
 
 def generate_calendar_date_range(
@@ -326,7 +332,7 @@ def generate_calendar_date_range(
     """
     if trading_days < 1:
         msg = "Argument trading_days must be greater than zero."
-        raise ValueError(msg)
+        raise TradingDaysNotAboveZeroError(msg)
 
     if start and not end:
         tmp_range = date_range(
@@ -368,7 +374,7 @@ def generate_calendar_date_range(
         "Provide one of start or end date, but not both. "
         "Date range is inferred from number of trading days."
     )
-    raise ValueError(msg)
+    raise BothStartAndEndError(msg)
 
 
 def _do_resample_to_business_period_ends(

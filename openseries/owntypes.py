@@ -10,9 +10,14 @@ from typing import Annotated, ClassVar, Literal, Union
 from numpy import datetime64
 from pandas import Timestamp
 from pydantic import BaseModel, Field, StringConstraints, conlist, conset
-from typing_extensions import Self
 
-__all__ = ["ValueType"]
+try:
+    from typing import Self  # type: ignore[attr-defined,unused-ignore]
+except ImportError:  # pragma: no cover
+    from typing_extensions import Self
+
+
+__all__ = ["Self", "ValueType"]
 
 
 CountryStringType = Annotated[
@@ -262,7 +267,7 @@ class PropertiesList(list[str]):
         if len(duplicates) != 0:
             msg += f"Duplicate string(s): {list(duplicates)}."
         if len(msg) != 0:
-            raise ValueError(msg)
+            raise PropertiesInputValidationError(msg)
 
 
 class OpenTimeSeriesPropertiesList(PropertiesList):
@@ -316,3 +321,59 @@ class ValueType(str, Enum):
     ROLLRTRN = "Rolling returns"
     ROLLVAR = "Rolling VaR"
     ROLLVOL = "Rolling volatility"
+
+
+class MixedValuetypesError(Exception):
+    """Raised when provided timeseries valuetypes are not the same."""
+
+
+class AtLeastOneFrameError(Exception):
+    """Raised when none of the possible frame inputs is provided."""
+
+
+class DateAlignmentError(Exception):
+    """Raised when date input is not aligned with existing range."""
+
+
+class NumberOfItemsAndLabelsNotSameError(Exception):
+    """Raised when number of labels is not matching the number of timeseries."""
+
+
+class InitialValueZeroError(Exception):
+    """Raised when a calculation cannot be performed due to initial value(s) zero."""
+
+
+class CountriesNotStringNorListStrError(Exception):
+    """Raised when countries argument is not provided in correct format."""
+
+
+class TradingDaysNotAboveZeroError(Exception):
+    """Raised when trading days argument is not above zero."""
+
+
+class BothStartAndEndError(Exception):
+    """Raised when both start and end dates are provided."""
+
+
+class NoWeightsError(Exception):
+    """Raised when no weights are provided to function where necessary."""
+
+
+class LabelsNotUniqueError(Exception):
+    """Raised when provided label names are not unique."""
+
+
+class RatioInputError(Exception):
+    """Raised when ratio keyword not provided correctly."""
+
+
+class MergingResultedInEmptyError(Exception):
+    """Raised when a merge resulted in an empty DataFrame."""
+
+
+class IncorrectArgumentComboError(Exception):
+    """Raised when correct combination of arguments is not provided."""
+
+
+class PropertiesInputValidationError(Exception):
+    """Raised when duplicate strings are provided."""

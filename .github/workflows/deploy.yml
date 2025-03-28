@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-python@v5
         id: setup_python
         with:
-          python-version: '3.10'
+          python-version: '3.13'
 
       - name: Get Python version
         run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
@@ -39,7 +39,7 @@ jobs:
       - name: Activate virtual environment and install Poetry
         run: |
           source venv/bin/activate
-          pip install poetry==2.0.1
+          pip install poetry==2.1.1
 
       - name: Install dependencies with Poetry
         run: |

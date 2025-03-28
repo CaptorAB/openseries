@@ -54,13 +54,13 @@
     "plot_bgcolor": "rgba(0, 0, 0, 0)",
     "showlegend": true,
     "title": {
+      "font": {
+        "size": 24
+      },
       "x": 0.5,
       "xanchor": "center",
       "y": 0.95,
       "yanchor": "top"
-    },
-    "titlefont": {
-      "size": 24
     },
     "xaxis": {
       "gridcolor": "#EEEEEE",

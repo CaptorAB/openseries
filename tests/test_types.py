@@ -11,6 +11,7 @@ from openseries.owntypes import (
     LiteralSeriesProps,
     OpenFramePropertiesList,
     OpenTimeSeriesPropertiesList,
+    PropertiesInputValidationError,
 )
 
 
@@ -19,33 +20,33 @@ class TestTypes:
 
     def test_opentimeseriesproplist_validate(self: TestTypes) -> None:
         """Test that the OpenTimeSeries property input is correctly checked."""
-        subset = cast(LiteralSeriesProps, ["z_score", "kurtosis", "positive_share"])
+        subset = cast("LiteralSeriesProps", ["z_score", "kurtosis", "positive_share"])
         lst = OpenTimeSeriesPropertiesList(*subset)
         msg = "A OpenTimeSeriesPropertiesList was not produced"
         if not isinstance(lst, OpenTimeSeriesPropertiesList):
             raise TypeError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
-                *cast(LiteralSeriesProps, ["z_score", "boo", "positive_share"]),
+                *cast("LiteralSeriesProps", ["z_score", "boo", "positive_share"]),
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Duplicate string\(s\): \['skew'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
-                    LiteralSeriesProps,
+                    "LiteralSeriesProps",
                     ["z_score", "skew", "skew", "positive_share"],
                 ),
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=(
                 r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
                 r"(?=.*Duplicate string\(s\): \['skew'\])"
@@ -53,40 +54,40 @@ class TestTypes:
         ):
             OpenTimeSeriesPropertiesList(
                 *cast(
-                    LiteralSeriesProps,
+                    "LiteralSeriesProps",
                     ["z_score", "skew", "skew", "boo"],
                 ),
             )
 
     def test_openframeproplist_validate(self: TestTypes) -> None:
         """Test that the OpenFrame property input is correctly checked."""
-        subset = cast(LiteralFrameProps, ["z_score", "kurtosis", "positive_share"])
+        subset = cast("LiteralFrameProps", ["z_score", "kurtosis", "positive_share"])
         lst = OpenFramePropertiesList(*subset)
         msg = "A OpenFramePropertiesList was not produced"
         if not isinstance(lst, OpenFramePropertiesList):
             raise TypeError(msg)
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Invalid string\(s\): \['boo'\]\.",
         ):
             OpenFramePropertiesList(
-                *cast(LiteralFrameProps, ["z_score", "boo", "positive_share"]),
+                *cast("LiteralFrameProps", ["z_score", "boo", "positive_share"]),
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=r"Duplicate string\(s\): \['skew'\]\.",
         ):
             OpenFramePropertiesList(
                 *cast(
-                    LiteralFrameProps,
+                    "LiteralFrameProps",
                     ["z_score", "skew", "skew", "positive_share"],
                 ),
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=PropertiesInputValidationError,
             match=(
                 r"(?s)(?=.*Invalid string\(s\): \['boo'\])"
                 r"(?=.*Duplicate string\(s\): \['skew'\])"
@@ -94,7 +95,7 @@ class TestTypes:
         ):
             OpenFramePropertiesList(
                 *cast(
-                    LiteralFrameProps,
+                    "LiteralFrameProps",
                     ["z_score", "skew", "skew", "boo"],
                 ),
             )

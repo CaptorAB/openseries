@@ -17,9 +17,22 @@ from openseries.datefixer import (
     holiday_calendar,
     offset_business_days,
 )
+from openseries.owntypes import (
+    BothStartAndEndError,
+    CountriesNotStringNorListStrError,
+    TradingDaysNotAboveZeroError,
+)
 
 if TYPE_CHECKING:
-    from openseries.owntypes import CountriesType, DateType, HolidayType
+    from openseries.owntypes import (
+        CountriesType,
+        DateType,
+        HolidayType,
+    )
+
+
+class DatefixerTestError(Exception):
+    """Custom exception used for signaling test failures."""
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -51,7 +64,7 @@ def test_offset_business_days(
     )
     if offsetdate != date:
         msg = f"Unintended result from offset_business_days {offsetdate}"
-        raise ValueError(msg)
+        raise DatefixerTestError(msg)
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -79,7 +92,7 @@ def test_date_fix(fixerdate: DateType) -> None:
         expected_exception=TypeError,
         match="Unknown date format 3 of type <class 'int'> encountered",
     ):
-        _ = date_fix(fixerdate=cast(str, int_arg))
+        _ = date_fix(fixerdate=cast("str", int_arg))
 
     str_arg: str = "abcdef"
     with pytest.raises(
@@ -112,7 +125,7 @@ def test_get_previous_business_day_before_today(
     )
     if result != intention:
         msg = f"{result} does not equal {intention}"
-        raise ValueError(msg)
+        raise DatefixerTestError(msg)
 
     before_today_one = get_previous_business_day_before_today(
         today=None,
@@ -130,7 +143,7 @@ def test_get_previous_business_day_before_today(
             "Inconsistent results from get_previous_business_day_before_today "
             "and date_offset_foll methods."
         )
-        raise ValueError(msg)
+        raise DatefixerTestError(msg)
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -157,7 +170,7 @@ def test_offset_business_days_calendar_options(
     )
     if result != intention:
         msg = "Unintended result from offset_business_days"
-        raise ValueError(msg)
+        raise DatefixerTestError(msg)
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -194,7 +207,7 @@ def test_date_offset_foll(
     )
     if result != intention:
         msg = f"Unintended result from date_offset_foll: {result}"
-        raise ValueError(msg)
+        raise DatefixerTestError(msg)
 
     static = date_offset_foll(
         raw_date=raw_date,
@@ -203,7 +216,7 @@ def test_date_offset_foll(
     )
     if raw_date != static:
         msg = "Unintended result from date_offset_foll"
-        raise ValueError(msg)
+        raise DatefixerTestError(msg)
 
     offset = date_offset_foll(
         raw_date=raw_date,
@@ -216,7 +229,7 @@ def test_date_offset_foll(
         raw_date.day,
     ):
         msg = "Unintended result from date_offset_foll"
-        raise ValueError(msg)
+        raise DatefixerTestError(msg)
 
     nonsense: str = "abcdef"
     with pytest.raises(
@@ -228,7 +241,7 @@ def test_date_offset_foll(
         )
 
     with pytest.raises(
-        expected_exception=ValueError,
+        expected_exception=CountriesNotStringNorListStrError,
         match="Argument countries must be a string country code",
     ):
         _ = date_offset_foll(
@@ -261,7 +274,7 @@ class TestDateFixer:
                 for date_str in twentytwentythreeholidays
             ):
                 msg = "holiday_calendar input invalid"
-                raise ValueError(msg)
+                raise DatefixerTestError(msg)
 
     def test_holiday_calendar_with_custom_days(self: TestDateFixer) -> None:
         """Test holiday_calendar with custom input."""
@@ -282,7 +295,7 @@ class TestDateFixer:
         ]
         if twentytwentyoneholidays != hols_without:
             msg = "Holidays not matching as intended"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
         jacks_birthday: HolidayType = {
             f"{year}-02-12": "Jack's birthday",
@@ -299,15 +312,15 @@ class TestDateFixer:
         compared = set(twentytwentyoneholidays).symmetric_difference(set(hols_with))
         if len(compared) == 0:
             msg = f"Holidays not the same are: {compared}"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
-        jbirth = cast(dict[str, str], jacks_birthday)
+        jbirth = cast("dict[str, str]", jacks_birthday)
         twentytwentyoneholidays.append(date_fix(next(iter(jbirth.keys()))))
         twentytwentyoneholidays.sort()
 
         if twentytwentyoneholidays != hols_with:
             msg = "Holidays not matching as intended"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
     def test_offset_business_days_with_custom_days(self: TestDateFixer) -> None:
         """Test offset_business_days function with custom input."""
@@ -320,7 +333,7 @@ class TestDateFixer:
         )
         if offsetdate_without != dt.date(2021, 2, 10):
             msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
         offsetdate_with = offset_business_days(
             ddate=day_after_jacks_birthday,
@@ -330,7 +343,7 @@ class TestDateFixer:
         )
         if offsetdate_with != dt.date(2021, 2, 9):
             msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
     def test_offset_business_days_many_days(self: TestDateFixer) -> None:
         """Test offset_business_days function with many days."""
@@ -350,7 +363,7 @@ class TestDateFixer:
                 "Unintended result from offset_business_days: "
                 f"{offsetdate_forward.strftime('%Y-%m-%d')}"
             )
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
         offsetdate_backward = offset_business_days(
             ddate=startdate,
@@ -359,7 +372,7 @@ class TestDateFixer:
         )
         if offsetdate_backward != backwarddate:
             msg = "Unintended result from offset_business_days"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
     def test_generate_calendar_date_range(self: TestDateFixer) -> None:
         """Test generate_calendar_date_range function with wrong date input."""
@@ -371,15 +384,15 @@ class TestDateFixer:
 
         if len(d_range) != trd_days:
             msg = "Unintended result from generate_calendar_date_range"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
         if d_range[-1] != end:
             msg = "Unintended result from generate_calendar_date_range"
-            raise ValueError(msg)
+            raise DatefixerTestError(msg)
 
         neg_days = -5
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=TradingDaysNotAboveZeroError,
             match="Argument trading_days must be greater than zero.",
         ):
             _ = generate_calendar_date_range(
@@ -388,7 +401,7 @@ class TestDateFixer:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=BothStartAndEndError,
             match=(
                 "Provide one of start or end date, but not both. "
                 "Date range is inferred from number of trading days."
@@ -401,7 +414,7 @@ class TestDateFixer:
             )
 
         with pytest.raises(
-            expected_exception=ValueError,
+            expected_exception=BothStartAndEndError,
             match=(
                 "Provide one of start or end date, but not both. "
                 "Date range is inferred from number of trading days."

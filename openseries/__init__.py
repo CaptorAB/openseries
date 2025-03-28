@@ -10,7 +10,7 @@ from .datefixer import (
 )
 from .frame import OpenFrame
 from .load_plotly import load_plotly_dict
-from .owntypes import ValueType
+from .owntypes import Self, ValueType
 from .portfoliotools import (
     constrain_optimized_portfolios,
     efficient_frontier,
@@ -25,6 +25,7 @@ __all__ = [
     "OpenFrame",
     "OpenTimeSeries",
     "ReturnSimulation",
+    "Self",
     "ValueType",
     "constrain_optimized_portfolios",
     "date_fix",
