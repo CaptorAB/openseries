@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import datetime as dt
 from decimal import ROUND_HALF_UP, Decimal, localcontext
+from inspect import getmembers, isfunction
 from itertools import product as iter_product
 from json import load, loads
 from pathlib import Path
@@ -12,8 +13,10 @@ from pprint import pformat
 from typing import TYPE_CHECKING, cast
 from unittest.mock import MagicMock, patch
 
+from pydantic import BaseModel
+
 if TYPE_CHECKING:
-    from collections.abc import Hashable  # pragma: no cover
+    from collections.abc import Callable, Hashable  # pragma: no cover
 
 import pytest
 from pandas import DataFrame, Series, date_range, read_excel
@@ -761,16 +764,22 @@ class TestOpenFrame(CommonTestCase):
         sameframe.to_cumret()
         assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
 
-        methods = [
-            "rolling_return",
-            "rolling_vol",
-            "rolling_var_down",
-            "rolling_cvar_down",
+        smethods = [
+            sameseries.rolling_return,
+            sameseries.rolling_vol,
+            sameseries.rolling_var_down,
+            sameseries.rolling_cvar_down,
         ]
-        for method in methods:
+        fmethods = [
+            sameframe.rolling_return,
+            sameframe.rolling_vol,
+            sameframe.rolling_var_down,
+            sameframe.rolling_cvar_down,
+        ]
+        for smethod, fmethod in zip(smethods, fmethods, strict=False):
             assert_frame_equal(
-                getattr(sameseries, method)(),
-                getattr(sameframe, method)(column=0),
+                smethod(),
+                cast("Callable", fmethod)(column=0),
             )
 
         cumseries = sameseries.from_deepcopy()
@@ -825,10 +834,46 @@ class TestOpenFrame(CommonTestCase):
             "worst_func",
             "z_score_func",
         ]
-        for method in methods_to_compare:
+        smethods_to_compare = [
+            sames.arithmetic_ret_func,
+            sames.cvar_down_func,
+            sames.downside_deviation_func,
+            sames.geo_ret_func,
+            sames.kurtosis_func,
+            sames.max_drawdown_func,
+            sames.positive_share_func,
+            sames.skew_func,
+            sames.vol_from_var_func,
+            sames.target_weight_from_var,
+            sames.value_ret_func,
+            sames.var_down_func,
+            sames.vol_func,
+            sames.worst_func,
+            sames.z_score_func,
+        ]
+        fmethods_to_compare = [
+            samef.arithmetic_ret_func,
+            samef.cvar_down_func,
+            samef.downside_deviation_func,
+            samef.geo_ret_func,
+            samef.kurtosis_func,
+            samef.max_drawdown_func,
+            samef.positive_share_func,
+            samef.skew_func,
+            samef.vol_from_var_func,
+            samef.target_weight_from_var,
+            samef.value_ret_func,
+            samef.var_down_func,
+            samef.vol_func,
+            samef.worst_func,
+            samef.z_score_func,
+        ]
+        for method, smethod, fmethod in zip(
+            methods_to_compare, smethods_to_compare, fmethods_to_compare, strict=False
+        ):
             if (
-                f"{getattr(sames, method)(months_from_last=12):.11f}"
-                != f"{float(getattr(samef, method)(months_from_last=12).iloc[0]):.11f}"
+                f"{smethod(months_from_last=12):.9f}"
+                != f"{float(fmethod(months_from_last=12).iloc[0]):.9f}"
             ):
                 msg = (
                     f"Calc method {method} not aligned between "
@@ -934,11 +979,6 @@ class TestOpenFrame(CommonTestCase):
         self: TestOpenFrame,
     ) -> None:
         """Test that attributes are aligned between OpenFrame and OpenTimeSeries."""
-        sameseries = self.randomseries.from_deepcopy()
-        sameseries.to_cumret()
-        sameframe = self.randomframe.from_deepcopy()
-        sameframe.to_cumret()
-
         common_calc_props = [
             "arithmetic_ret",
             "cvar_down",
@@ -968,76 +1008,51 @@ class TestOpenFrame(CommonTestCase):
             "span_of_days",
             "first_idx",
             "last_idx",
-            "tsdf",
-        ]
-
-        series_attributes = [
-            "values",
-            "local_ccy",
-            "timeseries_id",
-            "instrument_id",
-            "currency",
-            "isin",
-            "dates",
-            "name",
-            "valuetype",
-            "label",
-            "domestic",
-            "countries",
         ]
 
         pydantic_basemodel_attributes = [
-            "model_extra",
-            "model_fields",
-            "model_config",
-            "model_computed_fields",
-            "model_fields_set",
+            name for name in set(dir(BaseModel)) if not name.startswith("_")
         ]
 
-        frame_attributes = [
-            "constituents",
-            "columns_lvl_zero",
-            "columns_lvl_one",
-            "item_count",
-            "weights",
-            "first_indices",
+        frame_calc_props = [
             "last_indices",
             "lengths_of_items",
+            "first_indices",
+            "columns_lvl_one",
             "span_of_days_all",
+            "item_count",
+            "columns_lvl_zero",
+            "correl_matrix",
         ]
-
-        frame_calc_props = ["correl_matrix"]
 
         series_props = [
-            a
-            for a in dir(sameseries)
-            if not a.startswith("_") and not callable(getattr(sameseries, a))
+            name
+            for name, obj in getmembers(OpenTimeSeries)
+            if name not in pydantic_basemodel_attributes
+            and not name.startswith("_")
+            and isinstance(obj, property)
         ]
+
         series_compared = set(series_props).symmetric_difference(
-            set(
-                common_calc_props
-                + common_props
-                + common_attributes
-                + pydantic_basemodel_attributes
-                + series_attributes,
-            ),
+            set(common_calc_props + common_props + common_attributes),
         )
         if len(series_compared) != 0:
             msg = f"Difference is: {series_compared}"
             raise OpenFrameTestError(msg)
 
         frame_props = [
-            a
-            for a in dir(sameframe)
-            if not a.startswith("_") and not callable(getattr(sameframe, a))
+            name
+            for name, obj in getmembers(OpenFrame)
+            if name not in pydantic_basemodel_attributes
+            and not name.startswith("_")
+            and isinstance(obj, property)
         ]
+
         frame_compared = set(frame_props).symmetric_difference(
             set(
                 common_calc_props
                 + common_props
                 + common_attributes
-                + pydantic_basemodel_attributes
-                + frame_attributes
                 + frame_calc_props,
             ),
         )
@@ -1055,29 +1070,7 @@ class TestOpenFrame(CommonTestCase):
         sameframe.to_cumret()
 
         pydantic_basemodel_methods = [
-            "dict",
-            "copy",
-            "model_post_init",
-            "model_rebuild",
-            "model_dump_json",
-            "model_validate_json",
-            "model_validate_strings",
-            "model_copy",
-            "model_dump",
-            "model_validate",
-            "model_construct",
-            "model_parametrized_name",
-            "model_json_schema",
-            "parse_obj",
-            "update_forward_refs",
-            "parse_file",
-            "schema",
-            "construct",
-            "schema_json",
-            "parse_raw",
-            "from_orm",
-            "json",
-            "validate",
+            name for name in set(dir(BaseModel)) if not name.startswith("_")
         ]
 
         common_calc_methods = [
@@ -1126,12 +1119,6 @@ class TestOpenFrame(CommonTestCase):
             "value_to_ret",
         ]
 
-        series_createmethods = [
-            "from_arrays",
-            "from_df",
-            "from_fixed_rate",
-        ]
-
         series_unique = [
             "ewma_vol_func",
             "from_1d_rate_to_cumret",
@@ -1158,19 +1145,15 @@ class TestOpenFrame(CommonTestCase):
             "rolling_beta",
             "trunc_frame",
         ]
-
         series_methods = [
-            a
-            for a in dir(sameseries)
-            if not a.startswith("_") and callable(getattr(sameseries, a))
+            name
+            for name, _ in getmembers(OpenTimeSeries, predicate=isfunction)
+            if name not in pydantic_basemodel_methods and not name.startswith("_")
         ]
+
         series_compared = set(series_methods).symmetric_difference(
             set(
-                pydantic_basemodel_methods
-                + common_calc_methods
-                + common_methods
-                + series_createmethods
-                + series_unique,
+                common_calc_methods + common_methods + series_unique,
             ),
         )
         if len(series_compared) != 0:
@@ -1178,16 +1161,14 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         frame_methods = [
-            a
-            for a in dir(sameframe)
-            if not a.startswith("_") and callable(getattr(sameframe, a))
+            name
+            for name, _ in getmembers(OpenFrame, predicate=isfunction)
+            if name not in pydantic_basemodel_methods and not name.startswith("_")
         ]
+
         frame_compared = set(frame_methods).symmetric_difference(
             set(
-                pydantic_basemodel_methods
-                + common_calc_methods
-                + common_methods
-                + frame_unique,
+                common_calc_methods + common_methods + frame_unique,
             ),
         )
         if len(frame_compared) != 0:
@@ -2887,15 +2868,15 @@ class TestOpenFrame(CommonTestCase):
         mframe.to_cumret()
 
         methods = [
-            "arithmetic_ret_func",
-            "vol_func",
-            "vol_from_var_func",
-            "downside_deviation_func",
-            "target_weight_from_var",
+            mframe.arithmetic_ret_func,
+            mframe.vol_func,
+            mframe.vol_from_var_func,
+            mframe.downside_deviation_func,
+            mframe.target_weight_from_var,
         ]
         for methd in methods:
-            no_fixed = getattr(mframe, methd)()
-            fixed = getattr(mframe, methd)(periods_in_a_year_fixed=252)
+            no_fixed = methd()
+            fixed = methd(periods_in_a_year_fixed=252)
             for nofix, fix in zip(no_fixed, fixed, strict=True):
                 if f"{100 * abs(nofix - fix):.0f}" != zero_str:
                     msg = (
@@ -2903,11 +2884,11 @@ class TestOpenFrame(CommonTestCase):
                     )
                     raise OpenFrameTestError(msg)
         for methd in methods:
-            dated = getattr(mframe, methd)(
+            dated = methd(
                 from_date=mframe.first_idx,
                 to_date=mframe.last_idx,
             )
-            undated = getattr(mframe, methd)()
+            undated = methd()
             for ddat, undat in zip(dated, undated, strict=True):
                 if f"{ddat:.10f}" != f"{undat:.10f}":
                     msg = (

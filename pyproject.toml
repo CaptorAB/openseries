@@ -133,6 +133,5 @@ max-complexity = 15
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    "ignore::DeprecationWarning:holidays.*",
-    "ignore::pydantic.warnings.PydanticDeprecatedSince211"
+    "ignore::DeprecationWarning:holidays.*"
 ]
