@@ -189,43 +189,43 @@ jobs:
       - name: Create virtual environment and install Poetry
         run: |
           python -m venv venv
-          venv\Scripts\activate
-          python -m pip install --upgrade pip
+          source venv\Scripts\activate
+          python.exe -m pip install --upgrade pip
           pip install poetry==2.0.1
 
       - name: Install dependencies with Poetry
         run: |
-          venv\Scripts\activate
+          source venv\Scripts\activate
           poetry install --with dev
 
       - name: Check and fix with Ruff
         run: |
-          venv\Scripts\activate
+          source venv\Scripts\activate
           poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
         run: |
-          venv\Scripts\activate
+          source venv\Scripts\activate
           poetry run ruff format
 
       - name: Type check with Mypy
         run: |
-          venv\Scripts\activate
+          source venv\Scripts\activate
           poetry run mypy .
 
       - name: Tests with Pytest
         run: |
-          venv\Scripts\activate
+          source venv\Scripts\activate
           set PYTHONPATH=%CD%
-          poetry run coverage run -m pytest --verbose
+          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
 
       - name: Report coverage
         run: |
-          venv\Scripts\activate
+          source venv\Scripts\activate
           poetry run coverage report
 
       - name: Package and check
         run: |
-          venv\Scripts\activate
+          source venv\Scripts\activate
           poetry build
           poetry check
