@@ -4,7 +4,86 @@ on: workflow_dispatch
 
 jobs:
 
+  windows:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
+
+    steps:
+      - name: Check out GitHub repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Get Python version
+        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/AppData/Local/pypoetry/Cache/cache
+            ~/AppData/Local/pypoetry/Cache/artifacts
+          key: poetry-windows-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            poetry-windows-
+
+      - name: Create virtual environment and install Poetry
+        run: |
+          python -m venv venv
+          source venv/Scripts/activate
+          python.exe -m pip install --upgrade pip
+          pip install poetry==2.1.1
+
+      - name: Install dependencies with Poetry
+        run: |
+          source venv/Scripts/activate
+          poetry install --with dev
+
+      - name: Check and fix with Ruff
+        run: |
+          source venv/Scripts/activate
+          poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
+
+      - name: Format with Ruff
+        run: |
+          source venv/Scripts/activate
+          poetry run ruff format
+
+      - name: Type check with Mypy
+        run: |
+          source venv/Scripts/activate
+          poetry run mypy .
+
+      - name: Tests with Pytest
+        run: |
+          source venv/Scripts/activate
+          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
+
+      - name: Report coverage
+        run: |
+          source venv/Scripts/activate
+          poetry run coverage report
+
+      - name: Package and check
+        run: |
+          source venv/Scripts/activate
+          poetry build
+          poetry check
+
+
   ubuntu:
+    needs: windows
     runs-on: ubuntu-latest
 
     strategy:
@@ -39,7 +118,7 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install poetry==2.0.1
+          pip install poetry==2.1.1
 
       - name: Install dependencies with Poetry
         run: |
@@ -113,7 +192,7 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install poetry==2.0.1
+          pip install poetry==2.1.1
 
       - name: Install dependencies with Poetry
         run: |
@@ -148,84 +227,5 @@ jobs:
       - name: Package and check
         run: |
           source venv/bin/activate
-          poetry build
-          poetry check
-
-  windows:
-    needs: macos
-    runs-on: windows-latest
-
-    defaults:
-      run:
-        shell: bash
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
-
-    steps:
-      - name: Check out GitHub repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Get Python version
-        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
-
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~\AppData\Local\pypoetry\Cache\cache
-            ~\AppData\Local\pypoetry\Cache\artifacts
-          key: poetry-windows-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            poetry-windows-
-
-      - name: Create virtual environment and install Poetry
-        run: |
-          python -m venv venv
-          source venv\Scripts\activate
-          python.exe -m pip install --upgrade pip
-          pip install poetry==2.0.1
-
-      - name: Install dependencies with Poetry
-        run: |
-          source venv\Scripts\activate
-          poetry install --with dev
-
-      - name: Check and fix with Ruff
-        run: |
-          source venv\Scripts\activate
-          poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
-
-      - name: Format with Ruff
-        run: |
-          source venv\Scripts\activate
-          poetry run ruff format
-
-      - name: Type check with Mypy
-        run: |
-          source venv\Scripts\activate
-          poetry run mypy .
-
-      - name: Tests with Pytest
-        run: |
-          source venv\Scripts\activate
-          set PYTHONPATH=%CD%
-          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
-
-      - name: Report coverage
-        run: |
-          source venv\Scripts\activate
-          poetry run coverage report
-
-      - name: Package and check
-        run: |
-          source venv\Scripts\activate
           poetry build
           poetry check
