@@ -1224,7 +1224,7 @@ class TestOpenTimeSeries(CommonTestCase):
     def test_timeseries_chain(self: TestOpenTimeSeries) -> None:
         """Test timeseries_chain function."""
         full_series = self.randomseries.from_deepcopy()
-        full_values = [f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0].tolist()]
+        full_values = [f"{nn:.10f}" for nn in full_series.tsdf.iloc[:, 0]]
 
         front_series = OpenTimeSeries.from_df(full_series.tsdf.iloc[:126])
 
@@ -1291,7 +1291,7 @@ class TestOpenTimeSeries(CommonTestCase):
         sub_series_one = NewTimeSeries.from_arrays(
             name="sub_series_one",
             dates=base_series_one.dates,
-            values=list(base_series_one.tsdf.iloc[:, 0].to_numpy()),
+            values=Series(base_series_one.tsdf.iloc[:, 0]).tolist(),
         )
         base_series_two = OpenTimeSeries.from_arrays(
             name="base_series_two",
@@ -1358,7 +1358,7 @@ class TestOpenTimeSeries(CommonTestCase):
         copyseries = NewTimeSeries.from_arrays(
             name="moo",
             dates=cseries.dates,
-            values=list(cseries.tsdf.iloc[:, 0].to_numpy()),
+            values=Series(cseries.tsdf.iloc[:, 0]).tolist(),
         )
         if not isinstance(copyseries, NewTimeSeries):
             raise TypeError(msg)

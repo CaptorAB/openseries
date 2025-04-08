@@ -678,7 +678,7 @@ class _CommonModel(BaseModel):
         output = []
         if "label" in data:
             if what_output == "tsdf":
-                values = self.tsdf.iloc[:, 0].tolist()
+                values = Series(self.tsdf.iloc[:, 0]).tolist()
             else:
                 values = list(cast("list[float]", data.get("values")))
             for item in cleaner_list:
@@ -966,7 +966,7 @@ class _CommonModel(BaseModel):
 
             for item in range(self.tsdf.shape[1]):
                 figure.add_scatter(
-                    x=[self.tsdf.iloc[:, item].index[-1]],
+                    x=[Series(self.tsdf.iloc[:, item]).index[-1]],
                     y=[self.tsdf.iloc[-1, item]],
                     mode="markers + text",
                     marker={"color": "red", "size": 12},
@@ -2204,7 +2204,7 @@ class _CommonModel(BaseModel):
         """
         cvar_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         cvarseries = (
-            self.tsdf.iloc[:, column]
+            Series(self.tsdf.iloc[:, column])
             .rolling(observations, min_periods=observations)
             .apply(lambda x: _cvar_down_calc(x, level=level))
         )
@@ -2235,7 +2235,7 @@ class _CommonModel(BaseModel):
         """
         ret_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         retseries = (
-            self.tsdf.iloc[:, column]
+            Series(self.tsdf.iloc[:, column])
             .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
@@ -2274,7 +2274,7 @@ class _CommonModel(BaseModel):
         """
         var_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         varseries = (
-            self.tsdf.iloc[:, column]
+            Series(self.tsdf.iloc[:, column])
             .rolling(observations, min_periods=observations)
             .apply(
                 lambda x: _var_down_calc(x, level=level, interpolation=interpolation),
@@ -2314,7 +2314,7 @@ class _CommonModel(BaseModel):
         else:
             time_factor = self.periods_in_a_year
         vol_label = cast("tuple[str, ValueType]", self.tsdf.iloc[:, column].name)[0]
-        dframe = self.tsdf.iloc[:, column].ffill().pct_change()
+        dframe = Series(self.tsdf.iloc[:, column]).ffill().pct_change()
         volseries = dframe.rolling(
             observations,
             min_periods=observations,
