@@ -385,14 +385,14 @@ tests = ["defusedxml"]
 
 [[package]]
 name = "holidays"
-version = "0.69"
+version = "0.70"
 description = "Open World Holidays Framework"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "holidays-0.69-py3-none-any.whl", hash = "sha256:c179b46bc6326978adb24da108cc3cd3cf28c297bc212065a1041bb2fff51b99"},
-    {file = "holidays-0.69.tar.gz", hash = "sha256:7dcd213d9c0a39f492f35c75180b6650522c7131cda9f57107a9c16e9a6c0468"},
+    {file = "holidays-0.70-py3-none-any.whl", hash = "sha256:a9306aa836393d1a30bf750774825652dd83f399207617c6ae66577e7e63183f"},
+    {file = "holidays-0.70.tar.gz", hash = "sha256:98b6bd583406e9efcc3a10a33d6b38744719a360c4f2541931a284dff034f89e"},
 ]
 
 [package.dependencies]
@@ -984,14 +984,14 @@ test = ["cffi", "hypothesis", "pandas", "pytest", "pytz"]
 
 [[package]]
 name = "pydantic"
-version = "2.11.2"
+version = "2.11.3"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic-2.11.2-py3-none-any.whl", hash = "sha256:7f17d25846bcdf89b670a86cdfe7b29a9f1c9ca23dee154221c9aa81845cfca7"},
-    {file = "pydantic-2.11.2.tar.gz", hash = "sha256:2138628e050bd7a1e70b91d4bf4a91167f4ad76fdb83209b107c8d84b854917e"},
+    {file = "pydantic-2.11.3-py3-none-any.whl", hash = "sha256:a082753436a07f9ba1289c6ffa01cd93db3548776088aa917cc43b63f68fa60f"},
+    {file = "pydantic-2.11.3.tar.gz", hash = "sha256:7471657138c16adad9322fe3070c0116dd6c3ad8d649300e3cbdfe91f4db4ec3"},
 ]
 
 [package.dependencies]
