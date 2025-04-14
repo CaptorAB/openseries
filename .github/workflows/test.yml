@@ -46,7 +46,7 @@ jobs:
           source venv/bin/activate
           python --version
           pip install --upgrade pip
-          pip install poetry==2.1.1
+          pip install poetry==2.1.2
 
       - name: Install dependencies with Poetry
         run: |
