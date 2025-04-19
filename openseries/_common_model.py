@@ -73,7 +73,7 @@ from .load_plotly import load_plotly_dict
 
 
 # noinspection PyTypeChecker
-class _CommonModel(BaseModel):
+class _CommonModel(BaseModel):  # type: ignore[misc]
     """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
@@ -549,8 +549,8 @@ class _CommonModel(BaseModel):
             An OpenFrame object
 
         """
-        startyear = to_datetime(self.tsdf.index[0]).year
-        endyear = to_datetime(self.tsdf.index[-1]).year
+        startyear = cast("int", to_datetime(self.tsdf.index[0]).year)
+        endyear = cast("int", to_datetime(self.tsdf.index[-1]).year)
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,
@@ -1046,7 +1046,7 @@ class _CommonModel(BaseModel):
                 cast("int", earlier) : cast("int", later),
                 self.tsdf.columns.to_numpy()[0],
             ].count()
-            time_factor = how_many / fraction
+            time_factor = cast("int", how_many) / fraction
 
         result = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]

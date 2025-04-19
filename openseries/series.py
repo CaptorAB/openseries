@@ -112,14 +112,14 @@ class OpenTimeSeries(_CommonModel):
     isin: str | None = None
     label: str | None = None
 
-    @field_validator("domestic", mode="before")
+    @field_validator("domestic", mode="before")  # type: ignore[misc]
     @classmethod
     def _validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
         _ = Currency(ccy=value)
         return value
 
-    @field_validator("countries", mode="before")
+    @field_validator("countries", mode="before")  # type: ignore[misc]
     @classmethod
     def _validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
@@ -266,9 +266,10 @@ class OpenTimeSeries(_CommonModel):
                     msg = f"valuetype missing. Adding: {valuetype.value}"
                     logger.warning(msg=msg)
                 else:
-                    valuetype = dframe.columns.get_level_values(1).to_numpy()[
-                        column_nmbr
-                    ]
+                    valuetype = cast(
+                        "ValueType",
+                        dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
+                    )
             else:
                 label = cast("MultiIndex", dframe.columns).to_numpy()[column_nmbr]
         else:
@@ -637,7 +638,7 @@ class OpenTimeSeries(_CommonModel):
                 self.tsdf.columns.to_numpy()[0],
             ].count()
             fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
+            time_factor = cast("int", how_many) / fraction
 
         data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 

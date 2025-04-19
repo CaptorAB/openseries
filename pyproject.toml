@@ -92,8 +92,13 @@ output = "coverage.xml"
 [tool.mypy]
 mypy_path = ["src"]
 exclude = ["venv/*"]
+cache_dir = ".mypy_cache"
+follow_imports = "skip"
 strict = true
 pretty = true
+cache_fine_grained = true
+incremental = true
+ignore_missing_imports = true
 warn_unreachable = true
 warn_redundant_casts = true
 warn_unused_ignores = false
@@ -101,7 +106,6 @@ disallow_any_generics = true
 check_untyped_defs = true
 no_implicit_reexport = true
 disallow_untyped_defs = true
-follow_imports = "normal"
 plugins = [
     "pydantic.mypy",
     "numpy.typing.mypy_plugin"

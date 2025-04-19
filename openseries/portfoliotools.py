@@ -47,6 +47,7 @@ from .series import OpenTimeSeries
 from .simulation import _random_generator
 
 if TYPE_CHECKING:  # pragma: no cover
+    # noinspection PyUnresolvedReferences
     from collections.abc import Callable
 
     from numpy.typing import NDArray
@@ -192,8 +193,8 @@ def efficient_frontier(
 
     frontier_max = cleaned_arithmetic_means.max()
 
-    def _check_sum(weights: NDArray[float64]) -> float64:
-        return npsum(weights) - 1
+    def _check_sum(weights: NDArray[float64]) -> float:
+        return cast("float", npsum(weights) - 1)
 
     def _get_ret_vol_sr(
         lg_ret: DataFrame,
@@ -559,8 +560,8 @@ def sharpeplot(
             fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]
         for col, clr in zip(point_frame.columns, colorway, strict=True):
-            returns.extend([point_frame.loc["ret", col]])
-            risk.extend([point_frame.loc["stdev", col]])
+            returns.extend([cast("float", point_frame.loc["ret", col])])
+            risk.extend([cast("float", point_frame.loc["stdev", col])])
             figure.add_scatter(
                 x=[point_frame.loc["stdev", col]],
                 y=[point_frame.loc["ret", col]],

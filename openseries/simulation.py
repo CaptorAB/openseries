@@ -54,7 +54,7 @@ def _random_generator(seed: int | None) -> Generator:
     return Generator(bit_generator=bg)
 
 
-class ReturnSimulation(BaseModel):
+class ReturnSimulation(BaseModel):  # type: ignore[misc]
     """The class ReturnSimulation allows for simulating financial timeseries.
 
     Parameters

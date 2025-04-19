@@ -31,7 +31,6 @@ from pandas import (
     DataFrame,
     DatetimeIndex,
     Index,
-    Int64Dtype,
     MultiIndex,
     Series,
     concat,
@@ -94,7 +93,7 @@ class OpenFrame(_CommonModel):
     weights: list[float] | None = None
 
     # noinspection PyMethodParameters
-    @field_validator("constituents")
+    @field_validator("constituents")  # type: ignore[misc]
     def _check_labels_unique(  # type: ignore[misc]
         cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
@@ -239,11 +238,10 @@ class OpenFrame(_CommonModel):
 
         """
         return Series(
-            data=[int(self.tsdf.loc[:, d].count()) for d in self.tsdf],
+            data=[self.tsdf.loc[:, d].count() for d in self.tsdf],
             index=self.tsdf.columns,
             name="observations",
-            dtype=Int64Dtype(),
-        )
+        ).astype(int)
 
     @property
     def item_count(self: Self) -> int:
@@ -330,8 +328,7 @@ class OpenFrame(_CommonModel):
             data=[c.span_of_days for c in self.constituents],
             index=self.tsdf.columns,
             name="span of days",
-            dtype=Int64Dtype(),
-        )
+        ).astype(int)
 
     def value_to_ret(self: Self) -> Self:
         """Convert series of values into series of returns.
