@@ -50,11 +50,11 @@ from pandas import (
     to_datetime,
 )
 from pandas.tseries.offsets import CustomBusinessDay
-from plotly.graph_objs import Figure  # type: ignore[import-untyped,unused-ignore]
-from plotly.io import to_html  # type: ignore[import-untyped,unused-ignore]
-from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
+from plotly.graph_objs import Figure  # type: ignore[import-untyped]
+from plotly.io import to_html  # type: ignore[import-untyped]
+from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
-from scipy.stats import (  # type: ignore[import-untyped,unused-ignore]
+from scipy.stats import (  # type: ignore[import-untyped]
     kurtosis,
     norm,
     skew,
@@ -1392,14 +1392,14 @@ class _CommonModel(BaseModel):
             deep=True
         )
         result = [
-            cvar_df.loc[:, x]  # type: ignore[call-overload,index,unused-ignore]
+            cvar_df.loc[:, x]  # type: ignore[call-overload,index]
             .ffill()
             .pct_change()
             .sort_values()
             .iloc[
                 : ceil(
                     (1 - level)
-                    * cvar_df.loc[:, x]  # type: ignore[index,unused-ignore]
+                    * cvar_df.loc[:, x]  # type: ignore[index]
                     .ffill()
                     .pct_change()
                     .count(),
@@ -1529,7 +1529,7 @@ class _CommonModel(BaseModel):
         fraction = (later - earlier).days / 365.25
 
         any_below_zero = any(
-            self.tsdf.loc[[earlier, later]]  # type: ignore[index,unused-ignore]
+            self.tsdf.loc[[earlier, later]]  # type: ignore[index]
             .lt(0.0)
             .any()
             .to_numpy()

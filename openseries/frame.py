@@ -11,11 +11,11 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
 
-    from statsmodels.regression.linear_model import (  # type: ignore[import-untyped,unused-ignore]
+    from statsmodels.regression.linear_model import (  # type: ignore[import-untyped]
         OLSResults,
     )
 
-import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
+import statsmodels.api as sm  # type: ignore[import-untyped]
 from numpy import (
     array,
     cov,

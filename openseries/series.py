@@ -443,7 +443,7 @@ class OpenTimeSeries(_CommonModel):
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
         returns.columns = MultiIndex.from_arrays(
-            arrays=arrays  # type: ignore[arg-type,unused-ignore]
+            arrays=arrays  # type: ignore[arg-type]
         )
         self.tsdf = returns.copy()
         return self
@@ -522,7 +522,7 @@ class OpenTimeSeries(_CommonModel):
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
         # noinspection PyTypeChecker
-        arr = cumprod(  # type: ignore[assignment,unused-ignore]
+        arr = cumprod(  # type: ignore[assignment]
             a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
         )
 

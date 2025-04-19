@@ -1,6 +1,6 @@
 """Test suite for the openseries/frame.py module."""
 
-# mypy: disable-error-code="operator,type-arg,arg-type,unused-ignore"
+# mypy: disable-error-code="operator,type-arg,arg-type"
 from __future__ import annotations
 
 import datetime as dt

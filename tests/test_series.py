@@ -376,7 +376,7 @@ class TestOpenTimeSeries(CommonTestCase):
         df_data = {"tsdf": dframe, **data}
         serie_data = {"tsdf": serie, **data}
 
-        df_obj = OpenTimeSeries(**df_data)  # type: ignore[arg-type,unused-ignore]
+        df_obj = OpenTimeSeries(**df_data)  # type: ignore[arg-type]
         if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
             msg = "Raw values and DataFrame values not matching"
             raise OpenTimeSeriesTestError(msg)
@@ -385,7 +385,7 @@ class TestOpenTimeSeries(CommonTestCase):
             expected_exception=ValidationError,
             match="Input should be an instance of DataFrame",
         ):
-            OpenTimeSeries(**serie_data)  # type: ignore[arg-type,unused-ignore]
+            OpenTimeSeries(**serie_data)  # type: ignore[arg-type]
 
     def test_create_from_arrays(self: TestOpenTimeSeries) -> None:
         """Test from_arrays construct method."""
@@ -624,12 +624,12 @@ class TestOpenTimeSeries(CommonTestCase):
 
         series_one = next(
             OpenTimeSeries.from_arrays(
-                name=item["name"],  # type: ignore[arg-type,unused-ignore]
-                dates=item["dates"],  # type: ignore[arg-type,unused-ignore]
-                values=item["values"],  # type: ignore[arg-type,unused-ignore]
+                name=item["name"],  # type: ignore[arg-type]
+                dates=item["dates"],  # type: ignore[arg-type]
+                values=item["values"],  # type: ignore[arg-type]
                 valuetype=ValueType.RTRN,
-                baseccy=item["currency"],  # type: ignore[arg-type,unused-ignore]
-                local_ccy=item["local_ccy"],  # type: ignore[arg-type,unused-ignore]
+                baseccy=item["currency"],  # type: ignore[arg-type]
+                local_ccy=item["local_ccy"],  # type: ignore[arg-type]
             ).to_cumret()
             for item in data
         )
@@ -693,12 +693,12 @@ class TestOpenTimeSeries(CommonTestCase):
 
         series_one = next(
             OpenTimeSeries.from_arrays(
-                name=item["name"],  # type: ignore[arg-type,unused-ignore]
-                dates=item["dates"],  # type: ignore[arg-type,unused-ignore]
-                values=item["values"],  # type: ignore[arg-type,unused-ignore]
-                valuetype=item["valuetype"],  # type: ignore[arg-type,unused-ignore]
-                baseccy=item["currency"],  # type: ignore[arg-type,unused-ignore]
-                local_ccy=item["local_ccy"],  # type: ignore[arg-type,unused-ignore]
+                name=item["name"],  # type: ignore[arg-type]
+                dates=item["dates"],  # type: ignore[arg-type]
+                values=item["values"],  # type: ignore[arg-type]
+                valuetype=item["valuetype"],  # type: ignore[arg-type]
+                baseccy=item["currency"],  # type: ignore[arg-type]
+                local_ccy=item["local_ccy"],  # type: ignore[arg-type]
             ).to_cumret()
             for item in data
         )
@@ -1014,7 +1014,7 @@ class TestOpenTimeSeries(CommonTestCase):
                     f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
                 )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
-                result_values[value] = result.loc[  # type: ignore[assignment,unused-ignore]
+                result_values[value] = result.loc[  # type: ignore[assignment]
                     value,
                     ("Asset_0", ValueType.PRICE),
                 ]

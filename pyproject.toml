@@ -90,12 +90,13 @@ fail_under = 99
 output = "coverage.xml"
 
 [tool.mypy]
+mypy_path = ["src"]
 exclude = ["venv/*"]
 strict = true
 pretty = true
 warn_unreachable = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 disallow_any_generics = true
 check_untyped_defs = true
 no_implicit_reexport = true
