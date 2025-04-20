@@ -20,8 +20,8 @@ Pull requests are the best way to propose changes to the codebase and are welcom
 5. Make sure your code lints.
 6. Issue that pull request!
 
-## Any contributions you make will be under the BSD 3-Clause License
-In short, when you submit code changes, your submissions are understood to be under the same [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause/) that covers the project. Feel free to contact the maintainers if that's a concern.
+## Any contributions you make will be under the same license as the existing project
+In short, when you submit code changes, your submissions are understood to be under the same [License](https://github.com/CaptorAB/openseries/blob/master/LICENSE.md) that covers the project. Feel free to contact the maintainers if that's a concern.
 
 ## Report bugs using Github's issues
 GitHub issues are used to track public bugs. Report a bug by [opening a new issue](https://github.com/CaptorAB/openseries/issues/new/choose).
