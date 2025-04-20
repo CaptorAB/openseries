@@ -78,10 +78,11 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.coverage.run]
 branch = true
-omit = ["venv/*"]
+omit = ["venv/*", "tests/*", "**/__init__.py"]
 include = ["openseries/*"]
 
 [tool.coverage.report]
+omit = ["**/__init__.py"]
 skip_empty = true
 show_missing = true
 fail_under = 99
