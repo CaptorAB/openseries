@@ -385,14 +385,14 @@ tests = ["defusedxml"]
 
 [[package]]
 name = "holidays"
-version = "0.70"
+version = "0.71"
 description = "Open World Holidays Framework"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "holidays-0.70-py3-none-any.whl", hash = "sha256:a9306aa836393d1a30bf750774825652dd83f399207617c6ae66577e7e63183f"},
-    {file = "holidays-0.70.tar.gz", hash = "sha256:98b6bd583406e9efcc3a10a33d6b38744719a360c4f2541931a284dff034f89e"},
+    {file = "holidays-0.71-py3-none-any.whl", hash = "sha256:15803b167b71d9ca3e45198db84ed7fce15912b81ab27ba916b088f4a8f704f3"},
+    {file = "holidays-0.71.tar.gz", hash = "sha256:3ebd9c9de0927bee90ea7bfb551c2a030ef139cf6381c7a23add94d061787466"},
 ]
 
 [package.dependencies]
