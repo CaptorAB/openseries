@@ -110,7 +110,7 @@ switch ($task) {
     "clean" {
         # deactivate any active virtual environment (silently if none)
         if ($env:VIRTUAL_ENV) {
-            & "$env:VIRTUAL_ENV\Scripts\Deactivate.ps1" 2>$null
+            & "$env:VIRTUAL_ENV\Scripts\deactivate.bat" 2>$null
         }
         # uninstall hooks, tear down venv & lockfile
         poetry run pre-commit uninstall
