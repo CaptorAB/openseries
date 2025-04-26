@@ -7,7 +7,7 @@ rules:
         github/*: hash-pin
         softprops/*: hash-pin
         astral-sh/*: hash-pin
-  
+
   forbidden-uses:
     config:
       allow:
