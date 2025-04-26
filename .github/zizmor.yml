@@ -3,10 +3,10 @@ rules:
   unpinned-uses:
     config:
       policies:
-        actions/*: ref-pin
-        github/*: ref-pin
-        softprops/*: ref-pin
-        astral-sh/*: ref-pin
+        actions/*: hash-pin
+        github/*: hash-pin
+        softprops/*: hash-pin
+        astral-sh/*: hash-pin
   
   forbidden-uses:
     config:
