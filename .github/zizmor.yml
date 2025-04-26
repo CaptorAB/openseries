@@ -1,0 +1,19 @@
+rules:
+
+  unpinned-uses:
+    config:
+      policies:
+        actions/*: ref-pin
+        github/*: ref-pin
+        softprops/*: ref-pin
+        astral-sh/*: ref-pin
+  
+  forbidden-uses:
+    config:
+      allow:
+        - actions/checkout
+        - actions/cache
+        - actions/setup-python
+        - github/codeql-action/upload-sarif
+        - softprops/action-gh-release
+        - astral-sh/setup-uv
