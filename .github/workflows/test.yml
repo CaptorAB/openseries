@@ -2,6 +2,7 @@ name: tests
 
 permissions:
   contents: read
+  actions: read
 
 on:
   workflow_dispatch:
