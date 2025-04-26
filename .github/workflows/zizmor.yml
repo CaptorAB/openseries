@@ -1,4 +1,4 @@
-name: GitHub Actions Security Analysis with zizmor 🌈
+name: GitHub Actions Security Analysis with zizmor
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 
 jobs:
   zizmor:
-    name: zizmor latest via PyPI
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -20,9 +19,6 @@ jobs:
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v6
-        with:
-          version: '0.6.17'
-          checksum: '720ec28f7a94aa8cd91d3d57dec1434d64b9ae13d1dd6a25f4c0cdb837ba9cf6'
 
       - name: Run zizmor 🌈
         run: uvx zizmor --format=sarif . > results.sarif 
