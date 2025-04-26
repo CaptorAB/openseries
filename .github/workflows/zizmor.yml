@@ -22,7 +22,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           version: '0.6.17'
-          checksum: 'cbd40a6f8bdf7a96145af01dcf54252c0c9ddf749f21bfa5b7510fe7bc6d7880'
+          checksum: '720ec28f7a94aa8cd91d3d57dec1434d64b9ae13d1dd6a25f4c0cdb837ba9cf6'
 
       - name: Run zizmor 🌈
         run: uvx zizmor --format=sarif . > results.sarif 
