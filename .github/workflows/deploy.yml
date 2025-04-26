@@ -1,5 +1,9 @@
 name: deploy
 
+permissions:
+  contents: write
+  actions: read
+
 on: workflow_dispatch
 
 jobs:
@@ -13,6 +17,8 @@ jobs:
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python on ${{ runner.os }}
         uses: actions/setup-python@v5
