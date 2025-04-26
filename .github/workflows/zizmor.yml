@@ -20,6 +20,8 @@ jobs:
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081
+        with:
+          version: v5
 
       - name: Run zizmor 🌈
         run: uvx zizmor --format=sarif . > results.sarif 
