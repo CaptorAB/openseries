@@ -32,7 +32,7 @@ def _cvar_down_calc(
     level: float, default: 0.95
         The sought CVaR level
 
-    Returns
+    Returns:
     -------
     float
         Downside Conditional Value At Risk "CVaR"
@@ -66,7 +66,7 @@ def _var_down_calc(
     interpolation: LiteralQuantileInterp, default: "lower"
         type of interpolation in Pandas.DataFrame.quantile() function.
 
-    Returns
+    Returns:
     -------
     float
         Downside Value At Risk

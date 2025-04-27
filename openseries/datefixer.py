@@ -65,7 +65,7 @@ def holiday_calendar(
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
-    Returns
+    Returns:
     -------
     numpy.busdaycalendar
         Generate a business calendar
@@ -113,7 +113,7 @@ def date_fix(
     fixerdate: DateType
         The data item to parse
 
-    Returns
+    Returns:
     -------
     datetime.date
         Parsed date
@@ -160,7 +160,7 @@ def date_offset_foll(
     following: bool, default: True
         Determines if days should be offset forward (following) or backward
 
-    Returns
+    Returns:
     -------
     datetime.date
         Off-set date
@@ -185,7 +185,7 @@ def date_offset_foll(
         while not is_busday(dates=new_date, busdaycal=calendar):
             new_date += day_delta
 
-    return new_date
+    return cast("dt.date", new_date)
 
 
 def get_previous_business_day_before_today(
@@ -205,7 +205,7 @@ def get_previous_business_day_before_today(
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
-    Returns
+    Returns:
     -------
     datetime.date
         The previous business day
@@ -248,7 +248,7 @@ def offset_business_days(
         Argument where missing holidays can be added as
         {"2021-02-12": "Jack's birthday"} or ["2021-02-12"]
 
-    Returns
+    Returns:
     -------
     datetime.date
         The new offset business day
@@ -324,7 +324,7 @@ def generate_calendar_date_range(
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
 
-    Returns
+    Returns:
     -------
     list[dt.date]
         List of business day calendar dates
@@ -396,7 +396,7 @@ def _do_resample_to_business_period_ends(
         (List of) country code(s) according to ISO 3166-1 alpha-2
         to create a business day calendar used for date adjustments
 
-    Returns
+    Returns:
     -------
     Pandas.DatetimeIndex
         A date range aligned to business period ends
