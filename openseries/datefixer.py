@@ -185,7 +185,7 @@ def date_offset_foll(
         while not is_busday(dates=new_date, busdaycal=calendar):
             new_date += day_delta
 
-    return cast("dt.date", new_date)
+    return new_date  # type: ignore[no-any-return]
 
 
 def get_previous_business_day_before_today(
