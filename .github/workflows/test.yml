@@ -3,14 +3,15 @@ name: tests
 permissions:
   contents: read
   actions: read
+  issues: write   # ← needed to create issues
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - "*" # matches every branch that doesn't contain a '/'
-      - "*/*" # matches every branch containing a single '/'
-      - "**" # matches every branch
+      - "*"
+      - "*/*"
+      - "**"
 
 jobs:
   run_tests:
@@ -85,11 +86,30 @@ jobs:
           poetry run mypy --cache-dir .mypy_cache .
 
       - name: Tests with Pytest
+        id: pytest
+        continue-on-error: true
         run: |
           source venv/bin/activate
           PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --capture=no
 
+      - name: Create GitHub issue on failure
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: 'CaptorAB',
+              repo: 'openseries',
+              title: `Tests failed on ${new Date().toDateString()}`,
+              body: `See the full logs here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+            })
+
       - name: Report coverage
+        if: ${{ steps.pytest.outcome == 'success' }}
         run: |
           source venv/bin/activate
           poetry run coverage report
+
+      - name: Fail job if tests failed
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        run: exit 1

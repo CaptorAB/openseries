@@ -13,6 +13,7 @@ rules:
       allow:
         - actions/checkout
         - actions/cache
+        - actions/github-script
         - actions/setup-python
         - github/codeql-action/upload-sarif
         - softprops/action-gh-release
