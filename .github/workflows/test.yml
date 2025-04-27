@@ -3,10 +3,10 @@ name: tests
 permissions:
   contents: read
   actions: read
-  issues: write   # ← needed to create issues
+  issues: write
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
   push:
     branches:
       - "*"
