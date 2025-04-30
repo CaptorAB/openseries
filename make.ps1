@@ -24,10 +24,10 @@ Push-Location (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 if (Test-Path ".\.python-version") {
     $pythonVersion = (Get-Content ".\.python-version" -ErrorAction Stop).Trim()
     if (-not $pythonVersion) {
-        Throw ".python-version is empty. Please specify a version like '3.13.5'."
+        Throw ".python-version is empty. Write '3.13' in it."
     }
 } else {
-    Throw ".python-version not found. Create one containing e.g. '3.13.5'."
+    Throw "Required file .python-version not found. Create it with '3.13' as it's only content."
 }
 
 function Ensure-PythonPath {
