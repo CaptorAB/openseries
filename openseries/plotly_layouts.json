@@ -43,15 +43,15 @@
       "size": 14
     },
     "legend": {
-      "bgcolor": "rgba(0, 0, 0, 0)",
+      "bgcolor": "rgba(255,255,255,1)",
       "orientation": "h",
       "x": 0.98,
       "xanchor": "right",
       "y": -0.15,
       "yanchor": "bottom"
     },
-    "paper_bgcolor": "rgba(0, 0, 0, 0)",
-    "plot_bgcolor": "rgba(0, 0, 0, 0)",
+    "paper_bgcolor": "rgba(255,255,255,1)",
+    "plot_bgcolor": "rgba(255,255,255,1)",
     "showlegend": true,
     "title": {
       "font": {
