@@ -55,7 +55,7 @@
     "showlegend": true,
     "title": {
       "font": {
-        "size": 24
+        "size": 32
       },
       "x": 0.5,
       "xanchor": "center",
