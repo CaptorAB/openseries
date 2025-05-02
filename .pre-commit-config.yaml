@@ -3,7 +3,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.11.2
+    rev: v0.11.8
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
@@ -49,7 +49,11 @@ repos:
         args: [ --fix=auto ]
       - id: fix-byte-order-marker
         exclude: .gitignore
+  - repo: https://github.com/woodruffw/zizmor-pre-commit
+    rev: v1.6.0
+    hooks:
+      - id: zizmor
   - repo: https://github.com/python-poetry/poetry
-    rev: 2.1.1
+    rev: 2.1.2
     hooks:
       - id: poetry-check

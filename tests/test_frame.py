@@ -1,6 +1,6 @@
 """Test suite for the openseries/frame.py module."""
 
-# mypy: disable-error-code="operator,type-arg,arg-type,unused-ignore"
+# mypy: disable-error-code="operator,type-arg,arg-type"
 from __future__ import annotations
 
 import datetime as dt
@@ -450,13 +450,12 @@ class TestOpenFrame(CommonTestCase):
 
         rs_frame.resample(freq="BME")
 
+        msg = "resample() method generated unexpected result"
         if rs_frame.length != expected:
-            msg = "resample() method generated unexpected result"
             raise OpenFrameTestError(msg)
 
         after = cast("Series", rs_frame.value_ret).to_dict()
         if before != after:
-            msg = "resample() method generated unexpected result"
             raise OpenFrameTestError(msg)
 
     def test_resample_to_business_period_ends(self: TestOpenFrame) -> None:
@@ -562,8 +561,8 @@ class TestOpenFrame(CommonTestCase):
             dt.date(2011, 6, 28),
         ]
 
+        msg = f"max_drawdown_date property generated unexpected result\n{mdates}"
         if mdates != checkdates:
-            msg = f"max_drawdown_date property generated unexpected result\n{mdates}"
             raise OpenFrameTestError(msg)
 
     def test_make_portfolio(self: TestOpenFrame) -> None:
@@ -607,11 +606,11 @@ class TestOpenFrame(CommonTestCase):
             dtype="float64",
         )
 
-        assert_frame_equal(true_tail, mptail, check_exact=True)
-        assert_frame_equal(true_tail, mrtail, check_exact=True)
+        assert_frame_equal(left=true_tail, right=mptail, check_exact=True)
+        assert_frame_equal(left=true_tail, right=mrtail, check_exact=True)
 
         with pytest.raises(expected_exception=AssertionError, match="are different"):
-            assert_frame_equal(false_tail, mptail, check_exact=True)
+            assert_frame_equal(left=false_tail, right=mptail, check_exact=True)
 
         mpframe.weights = None
         with pytest.raises(
@@ -686,14 +685,12 @@ class TestOpenFrame(CommonTestCase):
         seriesas.set_new_label("Asset_6")
         frameas.add_timeseries(seriesas)
 
+        msg = "add_timeseries() method did not work as intended."
         if items + 1 != frameas.item_count:
-            msg = "add_timeseries() method did not work as intended."
             raise OpenFrameTestError(msg)
         if nbr_cols + 1 != len(frameas.columns_lvl_zero):
-            msg = "add_timeseries() method did not work as intended."
             raise OpenFrameTestError(msg)
         if [*cols, "Asset_6"] != frameas.columns_lvl_zero:
-            msg = "add_timeseries() method did not work as intended."
             raise OpenFrameTestError(msg)
 
     def test_delete_timeseries(self: TestOpenFrame) -> None:
@@ -705,11 +702,11 @@ class TestOpenFrame(CommonTestCase):
         frame.delete_timeseries(lbl)
         labels = [ff.label for ff in frame.constituents]
 
+        msg = "delete_timeseries() method did not work as intended."
         if labels != ["Asset_0", "Asset_2", "Asset_3", "Asset_4"]:
-            msg = "delete_timeseries() method did not work as intended."
             raise OpenFrameTestError(msg)
+
         if frame.weights != [0.4, 0.2, 0.1, 0.2]:
-            msg = "delete_timeseries() method did not work as intended."
             raise OpenFrameTestError(msg)
 
     def test_risk_functions_same_as_opentimeseries(
@@ -722,17 +719,15 @@ class TestOpenFrame(CommonTestCase):
         riskseries.to_cumret()
         riskframe.to_cumret()
 
-        if riskseries.cvar_down != _cvar_down_calc(
-            riskseries.tsdf.iloc[:, 0].tolist(),
-        ):
+        if riskseries.cvar_down != _cvar_down_calc(data=riskseries.tsdf.iloc[:, 0]):
             msg = "CVaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
-        if riskseries.var_down != _var_down_calc(riskseries.tsdf.iloc[:, 0].tolist()):
+        if riskseries.var_down != _var_down_calc(data=riskseries.tsdf.iloc[:, 0]):
             msg = "VaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
 
         if cast("Series", riskframe.cvar_down).iloc[0] != _cvar_down_calc(
-            riskframe.tsdf.iloc[:, 0],
+            data=riskframe.tsdf.iloc[:, 0]
         ):
             msg = "CVaR for OpenFrame not equal"
             raise OpenFrameTestError(msg)
@@ -758,11 +753,15 @@ class TestOpenFrame(CommonTestCase):
         sameseries = self.randomseries.from_deepcopy()
         sameseries.value_to_ret()
         sameframe = self.randomframe.from_deepcopy()
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
+        assert_frame_equal(
+            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+        )
 
         sameseries.to_cumret()
         sameframe.to_cumret()
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
+        assert_frame_equal(
+            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+        )
 
         smethods = [
             sameseries.rolling_return,
@@ -778,8 +777,8 @@ class TestOpenFrame(CommonTestCase):
         ]
         for smethod, fmethod in zip(smethods, fmethods, strict=False):
             assert_frame_equal(
-                smethod(),
-                cast("Callable", fmethod)(column=0),
+                left=smethod(),
+                right=cast("Callable", fmethod)(column=0),
             )
 
         cumseries = sameseries.from_deepcopy()
@@ -787,23 +786,33 @@ class TestOpenFrame(CommonTestCase):
 
         cumseries.value_to_log()
         cumframe.value_to_log()
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
+        assert_frame_equal(
+            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+        )
 
         sameseries.value_to_ret()
         sameframe.value_to_ret()
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
+        assert_frame_equal(
+            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+        )
 
         sameseries.to_cumret()
         sameframe.to_cumret()
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
+        assert_frame_equal(
+            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+        )
 
         sameseries.resample()
         sameframe.resample()
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
+        assert_frame_equal(
+            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+        )
 
         sameseries.value_to_diff()
         sameframe.value_to_diff()
-        assert_frame_equal(sameseries.tsdf, sameframe.tsdf.iloc[:, 0].to_frame())
+        assert_frame_equal(
+            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+        )
 
     def test_calc_methods_same_as_opentimeseries(
         self: TestOpenFrame,
@@ -1930,7 +1939,7 @@ class TestOpenFrame(CommonTestCase):
         aframe.merge_series(how="outer")
         labelspostmerge = list(aframe.columns_lvl_zero)
 
-        assert_frame_equal(b4df, aframe.tsdf, check_exact=True)
+        assert_frame_equal(left=b4df, right=aframe.tsdf, check_exact=True)
 
         if newlabels != labelspostmerge:
             msg = "Method merge_series() did not work as intended."
@@ -2679,20 +2688,20 @@ class TestOpenFrame(CommonTestCase):
         dropframe = nanframe.from_deepcopy()
         dropframe.value_nan_handle(method="drop")
 
-        if dropframe.tsdf.iloc[:, 0].tolist() != [1.1, 1.0, 1.0]:
+        if Series(dropframe.tsdf.iloc[:, 0]).tolist() != [1.1, 1.0, 1.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
-        if dropframe.tsdf.iloc[:, 1].tolist() != [2.1, 2.0, 2.0]:
+        if Series(dropframe.tsdf.iloc[:, 1]).tolist() != [2.1, 2.0, 2.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.value_nan_handle(method="fill")
 
-        if fillframe.tsdf.iloc[:, 0].tolist() != [1.1, 1.0, 1.0, 1.1, 1.0]:
+        if Series(fillframe.tsdf.iloc[:, 0]).tolist() != [1.1, 1.0, 1.0, 1.1, 1.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
-        if fillframe.tsdf.iloc[:, 1].tolist() != [2.1, 2.0, 1.8, 1.8, 2.0]:
+        if Series(fillframe.tsdf.iloc[:, 1]).tolist() != [2.1, 2.0, 1.8, 1.8, 2.0]:
             msg = "Method value_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
 
@@ -2733,20 +2742,20 @@ class TestOpenFrame(CommonTestCase):
         dropframe = nanframe.from_deepcopy()
         dropframe.return_nan_handle(method="drop")
 
-        if dropframe.tsdf.iloc[:, 0].tolist() != [0.1, 0.05, 0.04]:
+        if Series(dropframe.tsdf.iloc[:, 0]).tolist() != [0.1, 0.05, 0.04]:
             msg = "Method return_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
-        if dropframe.tsdf.iloc[:, 1].tolist() != [0.01, 0.04, 0.06]:
+        if Series(dropframe.tsdf.iloc[:, 1]).tolist() != [0.01, 0.04, 0.06]:
             msg = "Method return_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
 
         fillframe = nanframe.from_deepcopy()
         fillframe.return_nan_handle(method="fill")
 
-        if fillframe.tsdf.iloc[:, 0].tolist() != [0.1, 0.05, 0.0, 0.01, 0.04]:
+        if Series(fillframe.tsdf.iloc[:, 0]).tolist() != [0.1, 0.05, 0.0, 0.01, 0.04]:
             msg = "Method return_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
-        if fillframe.tsdf.iloc[:, 1].tolist() != [0.01, 0.04, 0.02, 0.0, 0.06]:
+        if Series(fillframe.tsdf.iloc[:, 1]).tolist() != [0.01, 0.04, 0.02, 0.0, 0.06]:
             msg = "Method return_nan_handle() not working as intended"
             raise OpenFrameTestError(msg)
 
@@ -2781,7 +2790,7 @@ class TestOpenFrame(CommonTestCase):
             msg = "Method relative() not working as intended"
             raise OpenFrameTestError(msg)
 
-        rframe.tsdf.iloc[:, -1] = rframe.tsdf.iloc[:, -1].add(1.0)
+        rframe.tsdf.iloc[:, -1] = Series(rframe.tsdf.iloc[:, -1]).add(1.0)
 
         sframe.relative(base_zero=False)
 

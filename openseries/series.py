@@ -112,14 +112,14 @@ class OpenTimeSeries(_CommonModel):
     isin: str | None = None
     label: str | None = None
 
-    @field_validator("domestic", mode="before")
+    @field_validator("domestic", mode="before")  # type: ignore[misc]
     @classmethod
     def _validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
         _ = Currency(ccy=value)
         return value
 
-    @field_validator("countries", mode="before")
+    @field_validator("countries", mode="before")  # type: ignore[misc]
     @classmethod
     def _validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
@@ -184,7 +184,7 @@ class OpenTimeSeries(_CommonModel):
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -234,7 +234,7 @@ class OpenTimeSeries(_CommonModel):
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -266,9 +266,10 @@ class OpenTimeSeries(_CommonModel):
                     msg = f"valuetype missing. Adding: {valuetype.value}"
                     logger.warning(msg=msg)
                 else:
-                    valuetype = dframe.columns.get_level_values(1).to_numpy()[
-                        column_nmbr
-                    ]
+                    valuetype = cast(
+                        "ValueType",
+                        dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
+                    )
             else:
                 label = cast("MultiIndex", dframe.columns).to_numpy()[column_nmbr]
         else:
@@ -333,7 +334,7 @@ class OpenTimeSeries(_CommonModel):
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -374,7 +375,7 @@ class OpenTimeSeries(_CommonModel):
     def from_deepcopy(self: Self) -> Self:
         """Create copy of OpenTimeSeries object.
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -385,7 +386,7 @@ class OpenTimeSeries(_CommonModel):
     def pandas_df(self: Self) -> Self:
         """Populate .tsdf Pandas DataFrame from the .dates and .values lists.
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -412,7 +413,7 @@ class OpenTimeSeries(_CommonModel):
         properties: list[LiteralSeriesProps], optional
             The properties to calculate. Defaults to calculating all available.
 
-        Returns
+        Returns:
         -------
         pandas.DataFrame
             Properties of the OpenTimeSeries
@@ -432,7 +433,7 @@ class OpenTimeSeries(_CommonModel):
     def value_to_ret(self: Self) -> Self:
         """Convert series of values into series of returns.
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             The returns of the values in the series
@@ -443,7 +444,7 @@ class OpenTimeSeries(_CommonModel):
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
         returns.columns = MultiIndex.from_arrays(
-            arrays=arrays  # type: ignore[arg-type,unused-ignore]
+            arrays=arrays  # type: ignore[arg-type]
         )
         self.tsdf = returns.copy()
         return self
@@ -457,7 +458,7 @@ class OpenTimeSeries(_CommonModel):
             The number of periods between observations over which difference
             is calculated
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -477,7 +478,7 @@ class OpenTimeSeries(_CommonModel):
     def to_cumret(self: Self) -> Self:
         """Convert series of returns into cumulative series of values.
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -512,7 +513,7 @@ class OpenTimeSeries(_CommonModel):
         divider: float, default 100.0
             Convenience divider for when the 1-day rate is not scaled correctly
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -522,7 +523,7 @@ class OpenTimeSeries(_CommonModel):
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
         # noinspection PyTypeChecker
-        arr = cumprod(  # type: ignore[assignment,unused-ignore]
+        arr = cumprod(  # type: ignore[assignment]
             a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
         )
 
@@ -549,7 +550,7 @@ class OpenTimeSeries(_CommonModel):
         freq: LiteralBizDayFreq | str, default "BME"
             The date offset string that sets the resampled frequency
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -576,7 +577,7 @@ class OpenTimeSeries(_CommonModel):
         method: LiteralPandasReindexMethod, default: nearest
             Controls the method used to align values across columns
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -622,7 +623,7 @@ class OpenTimeSeries(_CommonModel):
         periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
-        Returns
+        Returns:
         -------
         Pandas.Series[float]
             Series EWMA volatility
@@ -637,7 +638,7 @@ class OpenTimeSeries(_CommonModel):
                 self.tsdf.columns.to_numpy()[0],
             ].count()
             fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
+            time_factor = cast("int", how_many) / fraction
 
         data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 
@@ -682,7 +683,7 @@ class OpenTimeSeries(_CommonModel):
             The calculation divisor and
             assumed number of days in a calendar year
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -743,7 +744,7 @@ class OpenTimeSeries(_CommonModel):
         delete_lvl_one: bool, default: False
             If True the level one label is deleted
 
-        Returns
+        Returns:
         -------
         OpenTimeSeries
             An OpenTimeSeries object
@@ -785,7 +786,7 @@ def timeseries_chain(
     old_fee: float, default: 0.0
         Fee to apply to earlier series
 
-    Returns
+    Returns:
     -------
     TypeOpenTimeSeries
         An OpenTimeSeries object or a subclass thereof
@@ -810,9 +811,10 @@ def timeseries_chain(
 
     dates: list[str] = [x.strftime("%Y-%m-%d") for x in old.tsdf.index if x < first]
 
-    old_values = old.tsdf.iloc[: len(dates), 0]
+    old_values = Series(old.tsdf.iloc[: len(dates), 0])
     old_values = old_values.mul(
-        new.tsdf.iloc[:, 0].loc[first] / old.tsdf.iloc[:, 0].loc[first],
+        Series(new.tsdf.iloc[:, 0]).loc[first]
+        / Series(old.tsdf.iloc[:, 0]).loc[first],
     )
     values = append(old_values, new.tsdf.iloc[:, 0])
 
@@ -845,7 +847,7 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
     item : Any
         variable to be checked
 
-    Returns
+    Returns:
     -------
     bool
         Answer to whether the variable is None or equivalent

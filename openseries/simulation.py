@@ -43,7 +43,7 @@ def _random_generator(seed: int | None) -> Generator:
     seed: int, optional
         Random seed
 
-    Returns
+    Returns:
     -------
     numpy.random.Generator
         Numpy random process generator
@@ -54,7 +54,7 @@ def _random_generator(seed: int | None) -> Generator:
     return Generator(bit_generator=bg)
 
 
-class ReturnSimulation(BaseModel):
+class ReturnSimulation(BaseModel):  # type: ignore[misc]
     """The class ReturnSimulation allows for simulating financial timeseries.
 
     Parameters
@@ -103,7 +103,7 @@ class ReturnSimulation(BaseModel):
     def results(self: Self) -> DataFrame:
         """Simulation data.
 
-        Returns
+        Returns:
         -------
         pandas.DataFrame
             Simulation data
@@ -115,7 +115,7 @@ class ReturnSimulation(BaseModel):
     def realized_mean_return(self: Self) -> float:
         """Annualized arithmetic mean of returns.
 
-        Returns
+        Returns:
         -------
         float
             Annualized arithmetic mean of returns
@@ -132,7 +132,7 @@ class ReturnSimulation(BaseModel):
     def realized_vol(self: Self) -> float:
         """Annualized volatility.
 
-        Returns
+        Returns:
         -------
         float
             Annualized volatility
@@ -176,7 +176,7 @@ class ReturnSimulation(BaseModel):
         randomizer: numpy.random.Generator, optional
             Random process generator
 
-        Returns
+        Returns:
         -------
         ReturnSimulation
             Normal distribution simulation
@@ -231,7 +231,7 @@ class ReturnSimulation(BaseModel):
         randomizer: numpy.random.Generator, optional
             Random process generator
 
-        Returns
+        Returns:
         -------
         ReturnSimulation
             Lognormal distribution simulation
@@ -289,7 +289,7 @@ class ReturnSimulation(BaseModel):
         randomizer: numpy.random.Generator, optional
             Random process generator
 
-        Returns
+        Returns:
         -------
         ReturnSimulation
             Geometric Brownian Motion simulation
@@ -360,7 +360,7 @@ class ReturnSimulation(BaseModel):
         randomizer: numpy.random.Generator, optional
             Random process generator
 
-        Returns
+        Returns:
         -------
         ReturnSimulation
             Merton Jump-Diffusion model simulation
@@ -431,7 +431,7 @@ class ReturnSimulation(BaseModel):
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
 
-        Returns
+        Returns:
         -------
         pandas.DataFrame
             The simulation(s) data

@@ -50,11 +50,11 @@ from pandas import (
     to_datetime,
 )
 from pandas.tseries.offsets import CustomBusinessDay
-from plotly.graph_objs import Figure  # type: ignore[import-untyped,unused-ignore]
-from plotly.io import to_html  # type: ignore[import-untyped,unused-ignore]
-from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
+from plotly.graph_objs import Figure  # type: ignore[import-untyped]
+from plotly.io import to_html  # type: ignore[import-untyped]
+from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
-from scipy.stats import (  # type: ignore[import-untyped,unused-ignore]
+from scipy.stats import (  # type: ignore[import-untyped]
     kurtosis,
     norm,
     skew,
@@ -73,7 +73,7 @@ from .load_plotly import load_plotly_dict
 
 
 # noinspection PyTypeChecker
-class _CommonModel(BaseModel):
+class _CommonModel(BaseModel):  # type: ignore[misc]
     """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
@@ -88,7 +88,7 @@ class _CommonModel(BaseModel):
     def length(self: Self) -> int:
         """Number of observations.
 
-        Returns
+        Returns:
         -------
         int
             Number of observations
@@ -100,7 +100,7 @@ class _CommonModel(BaseModel):
     def first_idx(self: Self) -> dt.date:
         """The first date in the timeseries.
 
-        Returns
+        Returns:
         -------
         datetime.date
             The first date in the timeseries
@@ -112,7 +112,7 @@ class _CommonModel(BaseModel):
     def last_idx(self: Self) -> dt.date:
         """The last date in the timeseries.
 
-        Returns
+        Returns:
         -------
         datetime.date
             The last date in the timeseries
@@ -124,7 +124,7 @@ class _CommonModel(BaseModel):
     def span_of_days(self: Self) -> int:
         """Number of days from the first date to the last.
 
-        Returns
+        Returns:
         -------
         int
             Number of days from the first date to the last
@@ -136,7 +136,7 @@ class _CommonModel(BaseModel):
     def yearfrac(self: Self) -> float:
         """Length of series expressed in years assuming all years have 365.25 days.
 
-        Returns
+        Returns:
         -------
         float
             Length of the timeseries expressed in years assuming all years
@@ -149,7 +149,7 @@ class _CommonModel(BaseModel):
     def periods_in_a_year(self: Self) -> float:
         """The average number of observations per year.
 
-        Returns
+        Returns:
         -------
         float
             The average number of observations per year
@@ -161,7 +161,7 @@ class _CommonModel(BaseModel):
     def max_drawdown_cal_year(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Maximum drawdown in a single calendar year.
@@ -189,7 +189,7 @@ class _CommonModel(BaseModel):
     def geo_ret(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/c/cagr.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Compounded Annual Growth Rate (CAGR)
@@ -201,7 +201,7 @@ class _CommonModel(BaseModel):
     def arithmetic_ret(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Annualized arithmetic mean of returns
@@ -213,7 +213,7 @@ class _CommonModel(BaseModel):
     def value_ret(self: Self) -> float | Series[float]:
         """Simple return.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Simple return
@@ -228,7 +228,7 @@ class _CommonModel(BaseModel):
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
         https://www.investopedia.com/terms/v/volatility.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Annualized volatility
@@ -244,7 +244,7 @@ class _CommonModel(BaseModel):
         of zero. It is used to calculate the Sortino Ratio.
         https://www.investopedia.com/terms/d/downside-deviation.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Downside deviation
@@ -257,7 +257,7 @@ class _CommonModel(BaseModel):
     def ret_vol_ratio(self: Self) -> float | Series[float]:
         """Ratio of annualized arithmetic mean of returns and annualized volatility.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Ratio of the annualized arithmetic mean of returns and annualized
@@ -271,7 +271,7 @@ class _CommonModel(BaseModel):
     def sortino_ratio(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/s/sortinoratio.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Sortino ratio calculated as the annualized arithmetic mean of returns
@@ -290,7 +290,7 @@ class _CommonModel(BaseModel):
     def omega_ratio(self: Self) -> float | Series[float]:
         """https://en.wikipedia.org/wiki/Omega_ratio.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Omega ratio calculation
@@ -303,7 +303,7 @@ class _CommonModel(BaseModel):
     def z_score(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/z/zscore.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Z-score as (last return - mean return) / standard deviation of returns.
@@ -315,7 +315,7 @@ class _CommonModel(BaseModel):
     def max_drawdown(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Maximum drawdown without any limit on date range
@@ -329,7 +329,7 @@ class _CommonModel(BaseModel):
 
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
-        Returns
+        Returns:
         -------
         datetime.date | pandas.Series[dt.date]
             Date when the maximum drawdown occurred
@@ -352,7 +352,7 @@ class _CommonModel(BaseModel):
     def worst(self: Self) -> float | Series[float]:
         """Most negative percentage change.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Most negative percentage change
@@ -365,7 +365,7 @@ class _CommonModel(BaseModel):
     def worst_month(self: Self) -> float | Series[float]:
         """Most negative month.
 
-        Returns
+        Returns:
         -------
         Pandas.Series[float]
             Most negative month
@@ -396,7 +396,7 @@ class _CommonModel(BaseModel):
     def positive_share(self: Self) -> float | Series[float]:
         """The share of percentage changes that are greater than zero.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             The share of percentage changes that are greater than zero
@@ -408,7 +408,7 @@ class _CommonModel(BaseModel):
     def skew(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/s/skewness.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Skew of the return distribution
@@ -420,7 +420,7 @@ class _CommonModel(BaseModel):
     def kurtosis(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/k/kurtosis.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Kurtosis of the return distribution
@@ -432,7 +432,7 @@ class _CommonModel(BaseModel):
     def cvar_down(self: Self) -> float | Series[float]:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Downside 95% Conditional Value At Risk "CVaR"
@@ -448,7 +448,7 @@ class _CommonModel(BaseModel):
         The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
         https://www.investopedia.com/terms/v/var.asp.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Downside 95% Value At Risk (VaR)
@@ -464,7 +464,7 @@ class _CommonModel(BaseModel):
 
         Assumes that returns are normally distributed.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Implied annualized volatility from the Downside 95% VaR using the
@@ -493,7 +493,7 @@ class _CommonModel(BaseModel):
         to_dt: datetime.date, optional
             Specific from date
 
-        Returns
+        Returns:
         -------
         tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
@@ -543,14 +543,14 @@ class _CommonModel(BaseModel):
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
 
         """
-        startyear = to_datetime(self.tsdf.index[0]).year
-        endyear = to_datetime(self.tsdf.index[-1]).year
+        startyear = cast("int", to_datetime(self.tsdf.index[0]).year)
+        endyear = cast("int", to_datetime(self.tsdf.index[-1]).year)
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,
@@ -574,7 +574,7 @@ class _CommonModel(BaseModel):
 
         Equivalent to LN(value[t] / value[t=0]) in Excel.
 
-        Returns
+        Returns:
         -------
         self
             An object of the same class
@@ -595,7 +595,7 @@ class _CommonModel(BaseModel):
         method: LiteralNanMethod, default: "fill"
             Method used to handle NaN. Either fill with last known or drop
 
-        Returns
+        Returns:
         -------
         self
             An object of the same class
@@ -615,7 +615,7 @@ class _CommonModel(BaseModel):
         method: LiteralNanMethod, default: "fill"
             Method used to handle NaN. Either fill with zero or drop
 
-        Returns
+        Returns:
         -------
         self
             An object of the same class
@@ -630,7 +630,7 @@ class _CommonModel(BaseModel):
     def to_drawdown_series(self: Self) -> Self:
         """Convert timeseries into a drawdown series.
 
-        Returns
+        Returns:
         -------
         self
             An object of the same class
@@ -660,7 +660,7 @@ class _CommonModel(BaseModel):
         directory: DirectoryPath, optional
             File folder location
 
-        Returns
+        Returns:
         -------
         list[dict[str, str | bool | ValueType | list[str] | list[float]]]
             A list of dictionaries with the data of the series
@@ -678,7 +678,7 @@ class _CommonModel(BaseModel):
         output = []
         if "label" in data:
             if what_output == "tsdf":
-                values = self.tsdf.iloc[:, 0].tolist()
+                values = Series(self.tsdf.iloc[:, 0]).tolist()
             else:
                 values = list(cast("list[float]", data.get("values")))
             for item in cleaner_list:
@@ -727,7 +727,7 @@ class _CommonModel(BaseModel):
         overwrite: bool, default: True
             Flag whether to overwrite an existing file
 
-        Returns
+        Returns:
         -------
         str
             The Excel file path
@@ -802,7 +802,7 @@ class _CommonModel(BaseModel):
         add_logo: bool, default: True
             If True a Captor logo is added to the plot
 
-        Returns
+        Returns:
         -------
         tuple[plotly.go.Figure, str]
             Plotly Figure and a div section or a html filename with location
@@ -917,7 +917,7 @@ class _CommonModel(BaseModel):
         show_last: bool, default: False
             If True the last self.tsdf point is highlighted as red dot with a label
 
-        Returns
+        Returns:
         -------
         tuple[plotly.go.Figure, str]
             Plotly Figure and a div section or a html filename with location
@@ -966,7 +966,7 @@ class _CommonModel(BaseModel):
 
             for item in range(self.tsdf.shape[1]):
                 figure.add_scatter(
-                    x=[self.tsdf.iloc[:, item].index[-1]],
+                    x=[Series(self.tsdf.iloc[:, item]).index[-1]],
                     y=[self.tsdf.iloc[-1, item]],
                     mode="markers + text",
                     marker={"color": "red", "size": 12},
@@ -1027,7 +1027,7 @@ class _CommonModel(BaseModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Annualized arithmetic mean of returns
@@ -1046,7 +1046,7 @@ class _CommonModel(BaseModel):
                 cast("int", earlier) : cast("int", later),
                 self.tsdf.columns.to_numpy()[0],
             ].count()
-            time_factor = how_many / fraction
+            time_factor = cast("int", how_many) / fraction
 
         result = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
@@ -1089,7 +1089,7 @@ class _CommonModel(BaseModel):
         periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Annualized volatility
@@ -1158,7 +1158,7 @@ class _CommonModel(BaseModel):
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Implied annualized volatility from the Downside VaR using the
@@ -1219,7 +1219,7 @@ class _CommonModel(BaseModel):
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             A position weight multiplier from the ratio between a VaR implied
@@ -1285,7 +1285,7 @@ class _CommonModel(BaseModel):
         drift_adjust: bool, default: False
             An adjustment to remove the bias implied by the average return
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Target volatility if target_vol is provided otherwise the VaR
@@ -1377,7 +1377,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Downside Conditional Value At Risk "CVaR"
@@ -1392,14 +1392,14 @@ class _CommonModel(BaseModel):
             deep=True
         )
         result = [
-            cvar_df.loc[:, x]  # type: ignore[call-overload,index,unused-ignore]
+            cvar_df.loc[:, x]  # type: ignore[call-overload,index]
             .ffill()
             .pct_change()
             .sort_values()
             .iloc[
                 : ceil(
                     (1 - level)
-                    * cvar_df.loc[:, x]  # type: ignore[index,unused-ignore]
+                    * cvar_df.loc[:, x]  # type: ignore[index]
                     .ffill()
                     .pct_change()
                     .count(),
@@ -1446,7 +1446,7 @@ class _CommonModel(BaseModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Downside deviation
@@ -1514,7 +1514,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Compounded Annual Growth Rate (CAGR)
@@ -1529,7 +1529,7 @@ class _CommonModel(BaseModel):
         fraction = (later - earlier).days / 365.25
 
         any_below_zero = any(
-            self.tsdf.loc[[earlier, later]]  # type: ignore[index,unused-ignore]
+            self.tsdf.loc[[earlier, later]]  # type: ignore[index]
             .lt(0.0)
             .any()
             .to_numpy()
@@ -1572,7 +1572,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Skew of the return distribution
@@ -1621,7 +1621,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Kurtosis of the return distribution
@@ -1675,7 +1675,7 @@ class _CommonModel(BaseModel):
         min_periods: int, default: 1
             Smallest number of observations to use to find the maximum drawdown
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Maximum drawdown without any limit on date range
@@ -1719,7 +1719,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Calculate share of percentage changes that are greater than zero
@@ -1789,7 +1789,7 @@ class _CommonModel(BaseModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Ratio of the annualized arithmetic mean of returns and annualized
@@ -1854,7 +1854,7 @@ class _CommonModel(BaseModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Sortino ratio calculated as ( return - riskfree return ) /
@@ -1912,7 +1912,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Omega ratio calculation
@@ -1959,7 +1959,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Calculate simple return
@@ -2003,7 +2003,7 @@ class _CommonModel(BaseModel):
         month : int, optional
             Calendar month of the period to calculate.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Calculate simple return for a specific calendar period
@@ -2054,7 +2054,7 @@ class _CommonModel(BaseModel):
         interpolation: LiteralQuantileInterp, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Downside Value At Risk
@@ -2102,7 +2102,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Most negative percentage change over a rolling number of observations
@@ -2152,7 +2152,7 @@ class _CommonModel(BaseModel):
         to_date : datetime.date, optional
             Specific to date
 
-        Returns
+        Returns:
         -------
         float | Pandas.Series[float]
             Z-score as (last return - mean return) / standard deviation of returns
@@ -2196,7 +2196,7 @@ class _CommonModel(BaseModel):
         observations: int, default: 252
             Number of observations in the overlapping window.
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Calculate rolling annualized downside CVaR
@@ -2204,7 +2204,7 @@ class _CommonModel(BaseModel):
         """
         cvar_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         cvarseries = (
-            self.tsdf.iloc[:, column]
+            Series(self.tsdf.iloc[:, column])
             .rolling(observations, min_periods=observations)
             .apply(lambda x: _cvar_down_calc(x, level=level))
         )
@@ -2227,7 +2227,7 @@ class _CommonModel(BaseModel):
         observations: int, default: 21
             Number of observations in the overlapping window.
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Calculate rolling returns
@@ -2235,7 +2235,7 @@ class _CommonModel(BaseModel):
         """
         ret_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         retseries = (
-            self.tsdf.iloc[:, column]
+            Series(self.tsdf.iloc[:, column])
             .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
@@ -2266,7 +2266,7 @@ class _CommonModel(BaseModel):
         interpolation: LiteralQuantileInterp, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
            Calculate rolling annualized downside Value At Risk "VaR"
@@ -2274,7 +2274,7 @@ class _CommonModel(BaseModel):
         """
         var_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         varseries = (
-            self.tsdf.iloc[:, column]
+            Series(self.tsdf.iloc[:, column])
             .rolling(observations, min_periods=observations)
             .apply(
                 lambda x: _var_down_calc(x, level=level, interpolation=interpolation),
@@ -2303,7 +2303,7 @@ class _CommonModel(BaseModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Calculate rolling annualised volatilities
@@ -2314,7 +2314,7 @@ class _CommonModel(BaseModel):
         else:
             time_factor = self.periods_in_a_year
         vol_label = cast("tuple[str, ValueType]", self.tsdf.iloc[:, column].name)[0]
-        dframe = self.tsdf.iloc[:, column].ffill().pct_change()
+        dframe = Series(self.tsdf.iloc[:, column]).ffill().pct_change()
         volseries = dframe.rolling(
             observations,
             min_periods=observations,

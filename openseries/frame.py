@@ -11,11 +11,11 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
 
-    from statsmodels.regression.linear_model import (  # type: ignore[import-untyped,unused-ignore]
+    from statsmodels.regression.linear_model import (  # type: ignore[import-untyped]
         OLSResults,
     )
 
-import statsmodels.api as sm  # type: ignore[import-untyped,unused-ignore]
+import statsmodels.api as sm  # type: ignore[import-untyped]
 from numpy import (
     array,
     cov,
@@ -31,7 +31,6 @@ from pandas import (
     DataFrame,
     DatetimeIndex,
     Index,
-    Int64Dtype,
     MultiIndex,
     Series,
     concat,
@@ -82,7 +81,7 @@ class OpenFrame(_CommonModel):
     weights: list[float], optional
         List of weights in float format.
 
-    Returns
+    Returns:
     -------
     OpenFrame
         Object of the class OpenFrame
@@ -94,7 +93,7 @@ class OpenFrame(_CommonModel):
     weights: list[float] | None = None
 
     # noinspection PyMethodParameters
-    @field_validator("constituents")
+    @field_validator("constituents")  # type: ignore[misc]
     def _check_labels_unique(  # type: ignore[misc]
         cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
@@ -122,7 +121,7 @@ class OpenFrame(_CommonModel):
         weights: list[float], optional
             List of weights in float format.
 
-        Returns
+        Returns:
         -------
         OpenFrame
             Object of the class OpenFrame
@@ -150,7 +149,7 @@ class OpenFrame(_CommonModel):
     def from_deepcopy(self: Self) -> Self:
         """Create copy of the OpenFrame object.
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -169,7 +168,7 @@ class OpenFrame(_CommonModel):
         how: LiteralHowMerge, default: "outer"
             The Pandas merge method.
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -213,7 +212,7 @@ class OpenFrame(_CommonModel):
         properties: list[LiteralFrameProps], optional
             The properties to calculate. Defaults to calculating all available.
 
-        Returns
+        Returns:
         -------
         pandas.DataFrame
             Properties of the contituent OpenTimeSeries
@@ -232,24 +231,23 @@ class OpenFrame(_CommonModel):
     def lengths_of_items(self: Self) -> Series[int]:
         """Number of observations of all constituents.
 
-        Returns
+        Returns:
         -------
         Pandas.Series[int]
             Number of observations of all constituents
 
         """
         return Series(
-            data=[int(self.tsdf.loc[:, d].count()) for d in self.tsdf],
+            data=[self.tsdf.loc[:, d].count() for d in self.tsdf],
             index=self.tsdf.columns,
             name="observations",
-            dtype=Int64Dtype(),
-        )
+        ).astype(int)
 
     @property
     def item_count(self: Self) -> int:
         """Number of constituents.
 
-        Returns
+        Returns:
         -------
         int
             Number of constituents
@@ -261,7 +259,7 @@ class OpenFrame(_CommonModel):
     def columns_lvl_zero(self: Self) -> list[str]:
         """Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
-        Returns
+        Returns:
         -------
         list[str]
             Level 0 values of the MultiIndex columns in the .tsdf DataFrame
@@ -273,7 +271,7 @@ class OpenFrame(_CommonModel):
     def columns_lvl_one(self: Self) -> list[ValueType]:
         """Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
-        Returns
+        Returns:
         -------
         list[ValueType]
             Level 1 values of the MultiIndex columns in the .tsdf DataFrame
@@ -285,7 +283,7 @@ class OpenFrame(_CommonModel):
     def first_indices(self: Self) -> Series[dt.date]:
         """The first dates in the timeseries of all constituents.
 
-        Returns
+        Returns:
         -------
         Pandas.Series[dt.date]
             The first dates in the timeseries of all constituents
@@ -302,7 +300,7 @@ class OpenFrame(_CommonModel):
     def last_indices(self: Self) -> Series[dt.date]:
         """The last dates in the timeseries of all constituents.
 
-        Returns
+        Returns:
         -------
         Pandas.Series[dt.date]
             The last dates in the timeseries of all constituents
@@ -319,7 +317,7 @@ class OpenFrame(_CommonModel):
     def span_of_days_all(self: Self) -> Series[int]:
         """Number of days from the first date to the last for all items in the frame.
 
-        Returns
+        Returns:
         -------
         Pandas.Series[int]
             Number of days from the first date to the last for all
@@ -330,13 +328,12 @@ class OpenFrame(_CommonModel):
             data=[c.span_of_days for c in self.constituents],
             index=self.tsdf.columns,
             name="span of days",
-            dtype=Int64Dtype(),
-        )
+        ).astype(int)
 
     def value_to_ret(self: Self) -> Self:
         """Convert series of values into series of returns.
 
-        Returns
+        Returns:
         -------
         OpenFrame
             The returns of the values in the series
@@ -359,7 +356,7 @@ class OpenFrame(_CommonModel):
             The number of periods between observations over which difference
             is calculated
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -375,7 +372,7 @@ class OpenFrame(_CommonModel):
     def to_cumret(self: Self) -> Self:
         """Convert series of returns into cumulative series of values.
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -411,7 +408,7 @@ class OpenFrame(_CommonModel):
         freq: LiteralBizDayFreq | str, default "BME"
             The date offset string that sets the resampled frequency
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -449,7 +446,7 @@ class OpenFrame(_CommonModel):
         method: LiteralPandasReindexMethod, default: nearest
             Controls the method used to align values across columns
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -517,7 +514,7 @@ class OpenFrame(_CommonModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Series volatilities and correlation
@@ -605,7 +602,7 @@ class OpenFrame(_CommonModel):
     def correl_matrix(self: Self) -> DataFrame:
         """Correlation matrix.
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Correlation matrix
@@ -635,7 +632,7 @@ class OpenFrame(_CommonModel):
         new_series: OpenTimeSeries
             The timeseries to add
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -653,7 +650,7 @@ class OpenFrame(_CommonModel):
         lvl_zero_item: str
             The .tsdf column level 0 value of the timeseries to delete
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -692,7 +689,7 @@ class OpenFrame(_CommonModel):
             Determines where dataframe is truncated also when start_cut
             or end_cut is None.
 
-        Returns
+        Returns:
         -------
         OpenFrame
             An OpenFrame object
@@ -793,7 +790,7 @@ class OpenFrame(_CommonModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         Pandas.Series[float]
             Tracking Errors
@@ -885,7 +882,7 @@ class OpenFrame(_CommonModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         Pandas.Series[float]
             Information Ratios
@@ -987,7 +984,7 @@ class OpenFrame(_CommonModel):
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
-        Returns
+        Returns:
         -------
         Pandas.Series[float]
             Capture Ratios
@@ -1169,7 +1166,7 @@ class OpenFrame(_CommonModel):
         dlta_degr_freedms: int, default: 1
             Variance bias factor taking the value 0 or 1.
 
-        Returns
+        Returns:
         -------
         float
             Beta as Co-variance of x & y divided by Variance of x
@@ -1253,7 +1250,7 @@ class OpenFrame(_CommonModel):
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
 
-        Returns
+        Returns:
         -------
         OLSResults
             The Statsmodels regression output
@@ -1318,7 +1315,7 @@ class OpenFrame(_CommonModel):
         dlta_degr_freedms: int, default: 1
             Variance bias factor taking the value 0 or 1.
 
-        Returns
+        Returns:
         -------
         float
             Jensen's alpha
@@ -1438,7 +1435,7 @@ class OpenFrame(_CommonModel):
         weight_strat: LiteralPortfolioWeightings, optional
             weight calculation strategies
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             A basket timeseries
@@ -1503,7 +1500,7 @@ class OpenFrame(_CommonModel):
         periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Rolling Information Ratios
@@ -1569,7 +1566,7 @@ class OpenFrame(_CommonModel):
         dlta_degr_freedms: int, default: 1
             Variance bias factor taking the value 0 or 1.
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Rolling Betas
@@ -1629,7 +1626,7 @@ class OpenFrame(_CommonModel):
         observations: int, default: 21
             The length of the rolling window to use is set as number of observations
 
-        Returns
+        Returns:
         -------
         Pandas.DataFrame
             Rolling Correlations

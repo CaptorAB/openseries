@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "1.8.1"
+version = "1.8.2"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
@@ -67,40 +67,47 @@ mypy = "1.15.0"
 pandas-stubs = ">=2.1.2,<3.0.0"
 pre-commit = ">=3.7.1,<6.0.0"
 pytest = ">=8.2.2,<9.0.0"
-ruff = "0.11.2"
+ruff = "0.11.8"
 types-openpyxl = ">=3.1.2,<5.0.0"
 types-python-dateutil = ">=2.8.2,<4.0.0"
 types-requests = ">=2.20.0,<3.0.0"
 
 [build-system]
-requires = ["poetry-core>=2.1.1"]
+requires = ["poetry-core>=2.1.2"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.coverage.run]
 branch = true
-omit = ["venv/*"]
+omit = ["venv/*", "tests/*", "**/__init__.py"]
 include = ["openseries/*"]
 
 [tool.coverage.report]
+omit = ["**/__init__.py"]
 skip_empty = true
 show_missing = true
 fail_under = 99
+precision = 2
 
 [tool.coverage.xml]
 output = "coverage.xml"
 
 [tool.mypy]
+mypy_path = ["src"]
 exclude = ["venv/*"]
+cache_dir = ".mypy_cache"
+follow_imports = "skip"
 strict = true
 pretty = true
+cache_fine_grained = true
+incremental = true
+ignore_missing_imports = true
 warn_unreachable = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 disallow_any_generics = true
 check_untyped_defs = true
 no_implicit_reexport = true
 disallow_untyped_defs = true
-follow_imports = "normal"
 plugins = [
     "pydantic.mypy",
     "numpy.typing.mypy_plugin"
@@ -115,22 +122,19 @@ warn_required_dynamic_aliases = true
 line-length = 87
 
 [tool.ruff]
+target-version = "py310"
 line-length = 87
 
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = ["COM812", "D203", "D213"]
 fixable = ["ALL"]
-
-[tool.ruff.lint.pylint]
-max-args = 12
-max-branches = 23
-max-statements = 59
-
-[tool.ruff.lint.mccabe]
-max-complexity = 15
+mccabe = { max-complexity = 15 }
+pydocstyle = { convention = "google" }
+pylint = { max-args = 12, max-branches = 23, max-statements = 59 }
 
 [tool.pytest.ini_options]
+testpaths = "tests"
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning:holidays.*"

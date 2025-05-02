@@ -26,10 +26,10 @@ from pandas import (
     Series,
     concat,
 )
-from plotly.graph_objs import Figure  # type: ignore[import-untyped,unused-ignore]
-from plotly.io import to_html  # type: ignore[import-untyped,unused-ignore]
-from plotly.offline import plot  # type: ignore[import-untyped,unused-ignore]
-from scipy.optimize import minimize  # type: ignore[import-untyped,unused-ignore]
+from plotly.graph_objs import Figure  # type: ignore[import-untyped]
+from plotly.io import to_html  # type: ignore[import-untyped]
+from plotly.offline import plot  # type: ignore[import-untyped]
+from scipy.optimize import minimize  # type: ignore[import-untyped]
 
 from .load_plotly import load_plotly_dict
 from .owntypes import (
@@ -47,6 +47,7 @@ from .series import OpenTimeSeries
 from .simulation import _random_generator
 
 if TYPE_CHECKING:  # pragma: no cover
+    # noinspection PyUnresolvedReferences
     from collections.abc import Callable
 
     from numpy.typing import NDArray
@@ -79,7 +80,7 @@ def simulate_portfolios(
     seed: int
         The seed for the random process
 
-    Returns
+    Returns:
     -------
     pandas.DataFrame
         The resulting data
@@ -160,7 +161,7 @@ def efficient_frontier(
     tweak: bool, default: True
         cutting the frontier to exclude multiple points with almost the same risk
 
-    Returns
+    Returns:
     -------
     tuple[DataFrame, DataFrame, NDArray[float]]
         The efficient frontier data, simulation data and optimal portfolio
@@ -192,8 +193,8 @@ def efficient_frontier(
 
     frontier_max = cleaned_arithmetic_means.max()
 
-    def _check_sum(weights: NDArray[float64]) -> float64:
-        return npsum(weights) - 1
+    def _check_sum(weights: NDArray[float64]) -> float:
+        return cast("float", npsum(weights) - 1)
 
     def _get_ret_vol_sr(
         lg_ret: DataFrame,
@@ -347,7 +348,7 @@ def constrain_optimized_portfolios(
     minimize_method: LiteralMinimizeMethods, default: SLSQP
         The method passed into the scipy.minimize function
 
-    Returns
+    Returns:
     -------
     tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]
         The constrained optimal portfolio data
@@ -407,7 +408,7 @@ def prepare_plot_data(
     optimized: DataFrame
         Data optimized with the efficient_frontier method
 
-    Returns
+    Returns:
     -------
     DataFrame
         The data prepared with mean returns, volatility and weights
@@ -492,7 +493,7 @@ def sharpeplot(
     auto_open: bool, default: True
         Determines whether to open a browser window with the plot
 
-    Returns
+    Returns:
     -------
     Figure
         The scatter plot with simulated and optimized results
@@ -559,8 +560,8 @@ def sharpeplot(
             fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]
         for col, clr in zip(point_frame.columns, colorway, strict=True):
-            returns.extend([point_frame.loc["ret", col]])
-            risk.extend([point_frame.loc["stdev", col]])
+            returns.extend([cast("float", point_frame.loc["ret", col])])
+            risk.extend([cast("float", point_frame.loc["stdev", col])])
             figure.add_scatter(
                 x=[point_frame.loc["stdev", col]],
                 y=[point_frame.loc["ret", col]],

@@ -4,7 +4,8 @@ permissions:
   contents: read
   actions: read
 
-on: workflow_dispatch
+on:
+  workflow_dispatch: {}
 
 jobs:
 
@@ -51,7 +52,7 @@ jobs:
           python -m venv venv
           source venv/Scripts/activate
           python.exe -m pip install --upgrade pip
-          pip install poetry==2.1.1
+          pip install poetry==2.1.2
 
       - name: Install dependencies with Poetry
         run: |
@@ -130,7 +131,7 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install poetry==2.1.1
+          pip install poetry==2.1.2
 
       - name: Install dependencies with Poetry
         run: |
@@ -208,7 +209,7 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install poetry==2.1.1
+          pip install poetry==2.1.2
 
       - name: Install dependencies with Poetry
         run: |
