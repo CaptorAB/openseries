@@ -43,7 +43,7 @@
       "size": 14
     },
     "legend": {
-      "bgcolor": "rgba(255,255,255,1)",
+      "bgcolor": "rgba(0,0,0,0)",
       "orientation": "h",
       "x": 0.98,
       "xanchor": "right",
