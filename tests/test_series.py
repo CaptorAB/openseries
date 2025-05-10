@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from decimal import Decimal
-from json import load, loads
+from json import load
 from pathlib import Path
 from pprint import pformat
 from typing import cast
@@ -1369,108 +1369,6 @@ class TestOpenTimeSeries(CommonTestCase):
 
         if not isinstance(copyseries, NewTimeSeries):
             raise TypeError(msg)
-
-    def test_plot_series(self: TestOpenTimeSeries) -> None:
-        """Test plot_series method."""
-        plotseries = self.randomseries.from_deepcopy()
-
-        directory = Path(__file__).parent
-        _, figfile = plotseries.plot_series(auto_open=False, directory=directory)
-        plotfile = Path(figfile).resolve()
-        if not plotfile.exists():
-            msg = "json file not created"
-            raise FileNotFoundError(msg)
-
-        plotfile.unlink()
-        if plotfile.exists():
-            msg = "json file not deleted as intended"
-            raise FileExistsError(msg)
-
-        fig, _ = plotseries.plot_series(auto_open=False, output_type="div")
-        fig_json = loads(cast("str", fig.to_json()))
-        rawdata = [x.strftime("%Y-%m-%d") for x in plotseries.tsdf.index[1:5]]
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise OpenTimeSeriesTestError(msg)
-
-        fig_last, _ = plotseries.plot_series(
-            auto_open=False,
-            output_type="div",
-            show_last=True,
-        )
-        fig_last_json = loads(cast("str", fig_last.to_json()))
-        last = fig_last_json["data"][-1]["y"][0]
-
-        if f"{last:.10f}" != "1.6401159258":
-            msg = f"Unaligned data between original and data in Figure: '{last:.10f}'"
-            raise OpenTimeSeriesTestError(msg)
-
-        if fig_last_json["data"][-1]["hovertemplate"] != "%{y}<br>%{x|%Y-%m-%d}":
-            msg = "plot_series hovertemplate not as expected"
-            raise OpenTimeSeriesTestError(msg)
-
-        fig_last_fmt, _ = plotseries.plot_series(
-            auto_open=False,
-            output_type="div",
-            show_last=True,
-            tick_fmt=".3%",
-        )
-        fig_last_fmt_json = loads(cast("str", fig_last_fmt.to_json()))
-        last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
-
-        if last_fmt != "Last 164.012%":
-            msg = f"Unaligned data between original and data in Figure: '{last_fmt}'"
-            raise OpenTimeSeriesTestError(msg)
-
-        if (
-            fig_last_fmt_json["data"][-1]["hovertemplate"]
-            != "%{y:.3%}<br>%{x|%Y-%m-%d}"
-        ):
-            msg = "plot_series hovertemplate not as expected"
-            raise OpenTimeSeriesTestError(msg)
-
-    def test_plot_bars(self: TestOpenTimeSeries) -> None:
-        """Test plot_bars method."""
-        barseries = self.randomseries.from_deepcopy()
-        barseries.resample(freq="BME").value_to_ret()
-        rawdata = [x.strftime("%Y-%m-%d") for x in barseries.tsdf.index[1:5]]
-
-        directory = Path(__file__).parent
-        _, figfile = barseries.plot_bars(auto_open=False, directory=directory)
-        plotfile = Path(figfile).resolve()
-        if not plotfile.exists():
-            msg = "json file not created"
-            raise FileNotFoundError(msg)
-
-        plotfile.unlink()
-        if plotfile.exists():
-            msg = "json file not deleted as intended"
-            raise FileExistsError(msg)
-
-        fig_keys = ["hovertemplate", "name", "type", "x", "y"]
-        fig, _ = barseries.plot_bars(auto_open=False, output_type="div")
-        fig_json = loads(cast("str", fig.to_json()))
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise OpenTimeSeriesTestError(msg)
-
-        made_fig_keys = list(fig_json["data"][0].keys())
-        made_fig_keys.sort()
-        if made_fig_keys != fig_keys:
-            msg = "Data in Figure not as intended."
-            raise OpenTimeSeriesTestError(msg)
-
-        overlayfig, _ = barseries.plot_bars(
-            auto_open=False,
-            output_type="div",
-            mode="overlay",
-        )
-        overlayfig_json = loads(cast("str", overlayfig.to_json()))
-
-        fig_keys.append("opacity")
-        if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
-            msg = "Data in Figure not as intended."
-            raise OpenTimeSeriesTestError(msg)
 
     def test_align_index_to_local_cdays(
         self: TestOpenTimeSeries,

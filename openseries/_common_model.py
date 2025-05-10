@@ -1005,6 +1005,114 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         return figure, string_output
 
+    def plot_histogram(
+        self: Self,
+        bins: int | None = None,
+        tick_fmt: str | None = None,
+        filename: str | None = None,
+        directory: DirectoryPath | None = None,
+        labels: list[str] | None = None,
+        output_type: LiteralPlotlyOutput = "file",
+        include_plotlyjs: LiteralPlotlyJSlib = "cdn",
+        *,
+        auto_open: bool = True,
+        add_logo: bool = True,
+    ) -> tuple[Figure, str]:
+        """Create a Plotly Histogram Figure.
+
+        Parameters
+        ----------
+        bins: int, optional
+            Number of bins to use in the histogram
+        tick_fmt: str, optional
+            None, '%', '.1%' depending on number of decimals to show on the x-axis
+        filename: str, optional
+            Name of the Plotly html file
+        directory: DirectoryPath, optional
+            Directory where Plotly html file is saved
+        labels: list[str], optional
+            A list of labels to manually override using the names of
+            the input self.tsdf
+        output_type: LiteralPlotlyOutput, default: "file"
+            Determines output type
+        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
+            Determines how the plotly.js library is included in the output
+        auto_open: bool, default: True
+            Determines whether to open a browser window with the plot
+        add_logo: bool, default: True
+            If True a Captor logo is added to the plot
+
+        Returns:
+        -------
+        tuple[plotly.go.Figure, str]
+            Plotly Figure and a div section or a html filename with location
+
+        """
+        if labels:
+            if len(labels) != self.tsdf.shape[1]:
+                msg = "Must provide same number of labels as items in frame."
+                raise NumberOfItemsAndLabelsNotSameError(msg)
+        else:
+            labels = list(self.tsdf.columns.get_level_values(0))
+
+        if directory:
+            dirpath = Path(directory).resolve()
+        elif Path.home().joinpath("Documents").exists():
+            dirpath = Path.home().joinpath("Documents")
+        else:
+            dirpath = Path(stack()[1].filename).parent
+
+        if not filename:
+            filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
+        plotfile = dirpath.joinpath(filename)
+
+        fig_dict, logo = load_plotly_dict()
+        figure = Figure(fig_dict)
+
+        if tick_fmt:
+            hovertemplate = f"Count: %{{y}}<br>%{{x:{tick_fmt}}}"
+        else:
+            hovertemplate = "Count: %{y}<br>%{x}"
+
+        for i in range(self.tsdf.shape[1]):
+            figure.add_histogram(
+                x=self.tsdf.iloc[:, i],
+                nbinsx=bins,
+                name=labels[i],
+                hovertemplate=hovertemplate,
+            )
+
+        if tick_fmt:
+            figure.update_layout(xaxis={"tickformat": tick_fmt})
+
+        if add_logo:
+            figure.add_layout_image(logo)
+
+        if output_type == "file":
+            plot(
+                figure_or_data=figure,
+                filename=str(plotfile),
+                auto_open=auto_open,
+                auto_play=False,
+                link_text="",
+                include_plotlyjs=cast("bool", include_plotlyjs),
+                config=fig_dict["config"],
+                output_type=output_type,
+            )
+            string_output = str(plotfile)
+        else:
+            div_id = filename.rsplit(".", 1)[0]
+            string_output = to_html(
+                fig=figure,
+                config=fig_dict["config"],
+                auto_play=False,
+                include_plotlyjs=cast("bool", include_plotlyjs),
+                full_html=False,
+                div_id=div_id,
+            )
+
+        return figure, string_output
+
     def arithmetic_ret_func(
         self: Self,
         months_from_last: int | None = None,
