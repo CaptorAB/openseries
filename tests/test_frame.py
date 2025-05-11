@@ -32,7 +32,6 @@ from openseries.owntypes import (
     DateAlignmentError,
     InitialValueZeroError,
     LabelsNotUniqueError,
-    LiteralFrameProps,
     LiteralPortfolioWeightings,
     MixedValuetypesError,
     NoWeightsError,
@@ -49,7 +48,7 @@ class OpenFrameTestError(Exception):
 
 
 # noinspection PyTypeChecker
-class TestOpenFrame(CommonTestCase):
+class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
     """class to run tests on the module frame.py."""
 
     def test_to_json(self: TestOpenFrame) -> None:
@@ -1518,21 +1517,28 @@ class TestOpenFrame(CommonTestCase):
     def test_plot_histogram(self: TestOpenFrame) -> None:
         """Test plot_histogram method."""
         plotframe = self.randomframe.from_deepcopy()
-        plotframe.to_cumret()
 
-        fig_keys = ["hovertemplate", "name", "type", "x"]
+        fig_keys = [
+            "cumulative",
+            "histnorm",
+            "hovertemplate",
+            "name",
+            "opacity",
+            "type",
+            "x",
+        ]
         fig, _ = plotframe.plot_histogram(auto_open=False, output_type="div")
         fig_json = loads(cast("str", fig.to_json()))
         made_fig_keys = list(fig_json["data"][0].keys())
         made_fig_keys.sort()
         if made_fig_keys != fig_keys:
-            msg = "Data in Figure not as intended."
+            msg = f"Data in Figure not as intended:\n{made_fig_keys}"
             raise OpenFrameTestError(msg)
 
         fig_fmt, _ = plotframe.plot_histogram(
             auto_open=False,
             output_type="div",
-            tick_fmt=".2%",
+            x_fmt=".2%",
         )
         fig_fmt_json = loads(cast("str", fig_fmt.to_json()))
         x_tickfmt = fig_fmt_json["layout"]["xaxis"].get("tickformat")
@@ -2116,9 +2122,7 @@ class TestOpenFrame(CommonTestCase):
         if not isinstance(result, DataFrame):
             raise TypeError(msg)
 
-        result_arg = apframe.all_properties(
-            properties=cast("list[LiteralFrameProps]", ["geo_ret"]),
-        )
+        result_arg = apframe.all_properties(properties=["geo_ret"])
 
         msg = "Method all_properties() not working as intended."
         if not isinstance(result_arg, DataFrame):

@@ -10,7 +10,7 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, SupportsFloat, cast
+from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
 
@@ -50,6 +50,7 @@ from pandas import (
     to_datetime,
 )
 from pandas.tseries.offsets import CustomBusinessDay
+from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.io import to_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
@@ -1007,14 +1008,29 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
     def plot_histogram(
         self: Self,
-        bins: int | None = None,
-        tick_fmt: str | None = None,
+        plot_type: Literal["bars", "lines"] = "bars",
+        histnorm: Literal[
+            "percent",
+            "probability",
+            "density",
+            "probability density",
+        ] = "percent",
+        barmode: Literal["stack", "group", "overlay", "relative"] = "overlay",
+        xbins_size: float | None = None,
+        opacity: float = 0.75,
+        bargap: float = 0.0,
+        bargroupgap: float = 0.0,
+        curve_type: Literal["normal", "kde"] = "kde",
+        x_fmt: str | None = None,
+        y_fmt: str | None = None,
         filename: str | None = None,
         directory: DirectoryPath | None = None,
         labels: list[str] | None = None,
         output_type: LiteralPlotlyOutput = "file",
         include_plotlyjs: LiteralPlotlyJSlib = "cdn",
         *,
+        cumulative: bool = False,
+        show_rug: bool = False,
         auto_open: bool = True,
         add_logo: bool = True,
     ) -> tuple[Figure, str]:
@@ -1067,23 +1083,53 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         plotfile = dirpath.joinpath(filename)
 
         fig_dict, logo = load_plotly_dict()
-        figure = Figure(fig_dict)
 
-        if tick_fmt:
-            hovertemplate = f"Count: %{{y}}<br>%{{x:{tick_fmt}}}"
+        hovertemplate = f"Count: %{{y:{y_fmt}}}" if y_fmt else "Count: %{y}"
+
+        if x_fmt:
+            hovertemplate += f"<br>%{{x:{x_fmt}}}"
         else:
-            hovertemplate = "Count: %{y}<br>%{x}"
+            hovertemplate += "<br>%{x}"
 
-        for i in range(self.tsdf.shape[1]):
-            figure.add_histogram(
-                x=self.tsdf.iloc[:, i],
-                nbinsx=bins,
-                name=labels[i],
-                hovertemplate=hovertemplate,
+        msg = "plot_type must be 'bars' or 'lines'."
+        if plot_type == "bars":
+            figure = Figure(fig_dict)
+            for item in range(self.tsdf.shape[1]):
+                figure.add_histogram(
+                    x=self.tsdf.iloc[:, item],
+                    cumulative={"enabled": cumulative},
+                    histnorm=histnorm,
+                    name=labels[item],
+                    xbins={"size": xbins_size},
+                    opacity=opacity,
+                    hovertemplate=hovertemplate,
+                )
+            figure.update_layout(
+                barmode=barmode,
+                bargap=bargap,
+                bargroupgap=bargroupgap,
             )
+        elif plot_type == "lines":
+            hist_data = [
+                cast("Series[float]", self.tsdf.loc[:, ds]).dropna().tolist()
+                for ds in self.tsdf
+            ]
+            figure = create_distplot(
+                hist_data=hist_data,
+                curve_type=curve_type,
+                group_labels=labels,
+                show_hist=False,
+                show_rug=show_rug,
+                histnorm=histnorm,
+            )
+            figure.update_layout(dict1=fig_dict["layout"])
+        else:
+            raise TypeError(msg)
 
-        if tick_fmt:
-            figure.update_layout(xaxis={"tickformat": tick_fmt})
+        figure.update_layout(xaxis={"tickformat": x_fmt}, yaxis={"tickformat": y_fmt})
+
+        figure.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
+        figure.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
 
         if add_logo:
             figure.add_layout_image(logo)
