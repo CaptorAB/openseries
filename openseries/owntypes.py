@@ -135,6 +135,15 @@ LiteralCaptureRatio = Literal["up", "down", "both"]
 LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]
 LiteralPlotlyOutput = Literal["file", "div"]
 LiteralPlotlyJSlib = Literal[True, False, "cdn"]
+LiteralPlotlyHistogramPlotType = Literal["bars", "lines"]
+LiteralPlotlyHistogramBarMode = Literal["stack", "group", "overlay", "relative"]
+LiteralPlotlyHistogramCurveType = Literal["normal", "kde"]
+LiteralPlotlyHistogramHistNorm = Literal[
+    "percent",
+    "probability",
+    "density",
+    "probability density",
+]
 LiteralOlsFitMethod = Literal["pinv", "qr"]
 LiteralPortfolioWeightings = Literal["eq_weights", "inv_vol"]
 LiteralOlsFitCovType = Literal[

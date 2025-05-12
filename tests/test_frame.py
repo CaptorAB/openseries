@@ -1514,8 +1514,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         mockfilepath.unlink()
 
-    def test_plot_histogram(self: TestOpenFrame) -> None:
-        """Test plot_histogram method."""
+    def test_plot_histogram_bars(self: TestOpenFrame) -> None:
+        """Test plot_histogram method with plot_type bars."""
         plotframe = self.randomframe.from_deepcopy()
 
         fig_keys = [
@@ -1588,6 +1588,51 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_histogram add_logo argument not setup correctly"
             raise OpenFrameTestError(msg)
+
+    def test_plot_histogram_lines(self: TestOpenFrame) -> None:
+        """Test plot_histogram method with plot_type lines."""
+        plotframe = self.randomframe.from_deepcopy()
+
+        fig_keys = [
+            "legendgroup",
+            "marker",
+            "mode",
+            "name",
+            "showlegend",
+            "type",
+            "x",
+            "xaxis",
+            "y",
+            "yaxis",
+        ]
+        fig, _ = plotframe.plot_histogram(
+            plot_type="lines", auto_open=False, output_type="div"
+        )
+        fig_json = loads(cast("str", fig.to_json()))
+        made_fig_keys = list(fig_json["data"][0].keys())
+        made_fig_keys.sort()
+        if made_fig_keys != fig_keys:
+            msg = f"Data in Figure not as intended:\n{made_fig_keys}"
+            raise OpenFrameTestError(msg)
+
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_histogram(
+            plot_type="lines",
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
+        )
+        fig_labels_json = loads(cast("str", fig_labels.to_json()))
+        labels = [trace["name"] for trace in fig_labels_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise OpenFrameTestError(msg)
+
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="plot_type must be 'bars' or 'lines'.",
+        ):
+            _, _ = plotframe.plot_histogram(plot_type="triangles", auto_open=False)
 
     def test_plot_histogram_filefolders(self: TestOpenFrame) -> None:
         """Test plot_histogram method with different file folder options."""

@@ -10,7 +10,7 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
+from typing import TYPE_CHECKING, Any, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
 
@@ -33,6 +33,10 @@ if TYPE_CHECKING:  # pragma: no cover
         LiteralLinePlotMode,
         LiteralNanMethod,
         LiteralPandasReindexMethod,
+        LiteralPlotlyHistogramBarMode,
+        LiteralPlotlyHistogramCurveType,
+        LiteralPlotlyHistogramHistNorm,
+        LiteralPlotlyHistogramPlotType,
         LiteralPlotlyJSlib,
         LiteralPlotlyOutput,
         LiteralQuantileInterp,
@@ -1008,19 +1012,14 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
     def plot_histogram(
         self: Self,
-        plot_type: Literal["bars", "lines"] = "bars",
-        histnorm: Literal[
-            "percent",
-            "probability",
-            "density",
-            "probability density",
-        ] = "percent",
-        barmode: Literal["stack", "group", "overlay", "relative"] = "overlay",
+        plot_type: LiteralPlotlyHistogramPlotType = "bars",
+        histnorm: LiteralPlotlyHistogramHistNorm = "percent",
+        barmode: LiteralPlotlyHistogramBarMode = "overlay",
         xbins_size: float | None = None,
         opacity: float = 0.75,
         bargap: float = 0.0,
         bargroupgap: float = 0.0,
-        curve_type: Literal["normal", "kde"] = "kde",
+        curve_type: LiteralPlotlyHistogramCurveType = "kde",
         x_fmt: str | None = None,
         y_fmt: str | None = None,
         filename: str | None = None,
@@ -1038,9 +1037,25 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         Parameters
         ----------
-        bins: int, optional
-            Number of bins to use in the histogram
-        tick_fmt: str, optional
+        plot_type: LiteralPlotlyHistogramPlotType, default: bars
+            Type of plot
+        histnorm: LiteralPlotlyHistogramHistNorm, default: percent
+            Sets the normalization mode
+        barmode: LiteralPlotlyHistogramBarMode, default: overlay
+            Specifies how bar traces are displayed relative to one another
+        xbins_size: float, optional
+            Explicitly sets the width of each bin along the x-axis in data units
+        opacity: float, default: 0.75
+            Sets the trace opacity, must be between 0 (fully transparent) and 1
+        bargap: float, default: 0.0
+            Sets the gap between bars of adjacent location coordinates
+        bargroupgap: float, default: 0.0
+            Sets the gap between bar “groups” at the same location coordinate
+        curve_type: LiteralPlotlyHistogramCurveType, default: kde
+            Specifies the type of distribution curve to overlay on the histogram
+        y_fmt: str, optional
+            None, '%', '.1%' depending on number of decimals to show on the y-axis
+        x_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show on the x-axis
         filename: str, optional
             Name of the Plotly html file
@@ -1053,6 +1068,10 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             Determines output type
         include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
             Determines how the plotly.js library is included in the output
+        cumulative: bool, default: False
+            Determines whether to compute a cumulative histogram
+        show_rug: bool, default: False
+            Determines whether to draw a rug plot alongside the distribution
         auto_open: bool, default: True
             Determines whether to open a browser window with the plot
         add_logo: bool, default: True
