@@ -32,7 +32,6 @@ from openseries.owntypes import (
     DateAlignmentError,
     InitialValueZeroError,
     LabelsNotUniqueError,
-    LiteralFrameProps,
     LiteralPortfolioWeightings,
     MixedValuetypesError,
     NoWeightsError,
@@ -49,7 +48,7 @@ class OpenFrameTestError(Exception):
 
 
 # noinspection PyTypeChecker
-class TestOpenFrame(CommonTestCase):
+class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
     """class to run tests on the module frame.py."""
 
     def test_to_json(self: TestOpenFrame) -> None:
@@ -1110,6 +1109,7 @@ class TestOpenFrame(CommonTestCase):
             "from_deepcopy",
             "plot_bars",
             "plot_series",
+            "plot_histogram",
             "resample",
             "resample_to_business_period_ends",
             "return_nan_handle",
@@ -1513,6 +1513,171 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         mockfilepath.unlink()
+
+    def test_plot_histogram_bars(self: TestOpenFrame) -> None:
+        """Test plot_histogram method with plot_type bars."""
+        plotframe = self.randomframe.from_deepcopy()
+
+        fig_keys = [
+            "cumulative",
+            "histnorm",
+            "hovertemplate",
+            "name",
+            "opacity",
+            "type",
+            "x",
+        ]
+        fig, _ = plotframe.plot_histogram(auto_open=False, output_type="div")
+        fig_json = loads(cast("str", fig.to_json()))
+        made_fig_keys = list(fig_json["data"][0].keys())
+        made_fig_keys.sort()
+        if made_fig_keys != fig_keys:
+            msg = f"Data in Figure not as intended:\n{made_fig_keys}"
+            raise OpenFrameTestError(msg)
+
+        fig_fmt, _ = plotframe.plot_histogram(
+            auto_open=False,
+            output_type="div",
+            x_fmt=".2%",
+        )
+        fig_fmt_json = loads(cast("str", fig_fmt.to_json()))
+        x_tickfmt = fig_fmt_json["layout"]["xaxis"].get("tickformat")
+        if x_tickfmt != ".2%":
+            msg = f"X axis tick format not working: '{x_tickfmt}'"
+            raise OpenFrameTestError(msg)
+
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_histogram(
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
+        )
+        fig_labels_json = loads(cast("str", fig_labels.to_json()))
+        labels = [trace["name"] for trace in fig_labels_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise OpenFrameTestError(msg)
+
+        with pytest.raises(
+            expected_exception=NumberOfItemsAndLabelsNotSameError,
+            match="Must provide same number of labels as items in frame.",
+        ):
+            _, _ = plotframe.plot_histogram(auto_open=False, labels=["a", "b"])
+
+        _, logo = load_plotly_dict()
+        fig_logo, _ = plotframe.plot_histogram(
+            auto_open=False,
+            add_logo=True,
+            output_type="div",
+        )
+        fig_logo_json = loads(cast("str", fig_logo.to_json()))
+        if logo == {}:
+            if fig_logo_json["layout"]["images"][0] != logo:
+                msg = "plot_histogram add_logo argument not setup correctly"
+                raise OpenFrameTestError(msg)
+        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
+            msg = "plot_histogram add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        fig_nologo, _ = plotframe.plot_histogram(
+            auto_open=False,
+            add_logo=False,
+            output_type="div",
+        )
+        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
+        if fig_nologo_json["layout"].get("images", None):
+            msg = "plot_histogram add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+    def test_plot_histogram_lines(self: TestOpenFrame) -> None:
+        """Test plot_histogram method with plot_type lines."""
+        plotframe = self.randomframe.from_deepcopy()
+
+        fig_keys = [
+            "legendgroup",
+            "marker",
+            "mode",
+            "name",
+            "showlegend",
+            "type",
+            "x",
+            "xaxis",
+            "y",
+            "yaxis",
+        ]
+        fig, _ = plotframe.plot_histogram(
+            plot_type="lines", auto_open=False, output_type="div"
+        )
+        fig_json = loads(cast("str", fig.to_json()))
+        made_fig_keys = list(fig_json["data"][0].keys())
+        made_fig_keys.sort()
+        if made_fig_keys != fig_keys:
+            msg = f"Data in Figure not as intended:\n{made_fig_keys}"
+            raise OpenFrameTestError(msg)
+
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_histogram(
+            plot_type="lines",
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
+        )
+        fig_labels_json = loads(cast("str", fig_labels.to_json()))
+        labels = [trace["name"] for trace in fig_labels_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise OpenFrameTestError(msg)
+
+        with pytest.raises(
+            expected_exception=TypeError,
+            match="plot_type must be 'bars' or 'lines'.",
+        ):
+            _, _ = plotframe.plot_histogram(plot_type="triangles", auto_open=False)
+
+    def test_plot_histogram_filefolders(self: TestOpenFrame) -> None:
+        """Test plot_histogram method with different file folder options."""
+        plotframe = self.randomframe.from_deepcopy()
+        plotframe.to_cumret()
+
+        directory = Path(__file__).parent
+        _, figfile = plotframe.plot_histogram(auto_open=False, directory=directory)
+        plotfile = Path(figfile).resolve()
+        if not plotfile.exists():
+            msg = "html file not created"
+            raise FileNotFoundError(msg)
+        plotfile.unlink()
+        if plotfile.exists():
+            msg = "html file not deleted as intended"
+            raise FileExistsError(msg)
+
+        if figfile.startswith("<div>"):
+            msg = "plot_histogram method not working as intended"
+            raise OpenFrameTestError(msg)
+
+        _, divstring = plotframe.plot_histogram(auto_open=False, output_type="div")
+        if not (divstring.startswith("<div>") and divstring.endswith("</div>")):
+            msg = "Html div section not created"
+            raise OpenFrameTestError(msg)
+
+        with patch("pathlib.Path.exists") as mock_exists:
+            mock_exists.return_value = True
+            homefig, _ = plotframe.plot_histogram(auto_open=False, output_type="div")
+            homefig_json = loads(cast("str", homefig.to_json()))
+        if homefig_json["data"][0]["name"] != "Asset_0":
+            msg = "plot_histogram method not working as intended"
+            raise OpenFrameTestError(msg)
+
+        with patch("pathlib.Path.exists") as mock_exists:
+            mock_exists.return_value = False
+            _, mockfile = plotframe.plot_histogram(
+                filename="histfile.html",
+                auto_open=False,
+            )
+            mockpath = Path(mockfile).resolve()
+        if mockpath.parts[-2:] != ("tests", "histfile.html"):
+            msg = "plot_histogram method not working as intended"
+            raise OpenFrameTestError(msg)
+        mockpath.unlink()
 
     def test_plot_methods_mock_logo_url_fail(self: TestOpenFrame) -> None:
         """Test plot_series and plot_bars methods with mock logo file URL fail."""
@@ -2002,9 +2167,7 @@ class TestOpenFrame(CommonTestCase):
         if not isinstance(result, DataFrame):
             raise TypeError(msg)
 
-        result_arg = apframe.all_properties(
-            properties=cast("list[LiteralFrameProps]", ["geo_ret"]),
-        )
+        result_arg = apframe.all_properties(properties=["geo_ret"])
 
         msg = "Method all_properties() not working as intended."
         if not isinstance(result_arg, DataFrame):

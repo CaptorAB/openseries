@@ -33,6 +33,10 @@ if TYPE_CHECKING:  # pragma: no cover
         LiteralLinePlotMode,
         LiteralNanMethod,
         LiteralPandasReindexMethod,
+        LiteralPlotlyHistogramBarMode,
+        LiteralPlotlyHistogramCurveType,
+        LiteralPlotlyHistogramHistNorm,
+        LiteralPlotlyHistogramPlotType,
         LiteralPlotlyJSlib,
         LiteralPlotlyOutput,
         LiteralQuantileInterp,
@@ -50,6 +54,7 @@ from pandas import (
     to_datetime,
 )
 from pandas.tseries.offsets import CustomBusinessDay
+from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.io import to_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
@@ -997,6 +1002,174 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             string_output = to_html(
                 fig=figure,
                 config=fig["config"],
+                auto_play=False,
+                include_plotlyjs=cast("bool", include_plotlyjs),
+                full_html=False,
+                div_id=div_id,
+            )
+
+        return figure, string_output
+
+    def plot_histogram(
+        self: Self,
+        plot_type: LiteralPlotlyHistogramPlotType = "bars",
+        histnorm: LiteralPlotlyHistogramHistNorm = "percent",
+        barmode: LiteralPlotlyHistogramBarMode = "overlay",
+        xbins_size: float | None = None,
+        opacity: float = 0.75,
+        bargap: float = 0.0,
+        bargroupgap: float = 0.0,
+        curve_type: LiteralPlotlyHistogramCurveType = "kde",
+        x_fmt: str | None = None,
+        y_fmt: str | None = None,
+        filename: str | None = None,
+        directory: DirectoryPath | None = None,
+        labels: list[str] | None = None,
+        output_type: LiteralPlotlyOutput = "file",
+        include_plotlyjs: LiteralPlotlyJSlib = "cdn",
+        *,
+        cumulative: bool = False,
+        show_rug: bool = False,
+        auto_open: bool = True,
+        add_logo: bool = True,
+    ) -> tuple[Figure, str]:
+        """Create a Plotly Histogram Figure.
+
+        Parameters
+        ----------
+        plot_type: LiteralPlotlyHistogramPlotType, default: bars
+            Type of plot
+        histnorm: LiteralPlotlyHistogramHistNorm, default: percent
+            Sets the normalization mode
+        barmode: LiteralPlotlyHistogramBarMode, default: overlay
+            Specifies how bar traces are displayed relative to one another
+        xbins_size: float, optional
+            Explicitly sets the width of each bin along the x-axis in data units
+        opacity: float, default: 0.75
+            Sets the trace opacity, must be between 0 (fully transparent) and 1
+        bargap: float, default: 0.0
+            Sets the gap between bars of adjacent location coordinates
+        bargroupgap: float, default: 0.0
+            Sets the gap between bar “groups” at the same location coordinate
+        curve_type: LiteralPlotlyHistogramCurveType, default: kde
+            Specifies the type of distribution curve to overlay on the histogram
+        y_fmt: str, optional
+            None, '%', '.1%' depending on number of decimals to show on the y-axis
+        x_fmt: str, optional
+            None, '%', '.1%' depending on number of decimals to show on the x-axis
+        filename: str, optional
+            Name of the Plotly html file
+        directory: DirectoryPath, optional
+            Directory where Plotly html file is saved
+        labels: list[str], optional
+            A list of labels to manually override using the names of
+            the input self.tsdf
+        output_type: LiteralPlotlyOutput, default: "file"
+            Determines output type
+        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
+            Determines how the plotly.js library is included in the output
+        cumulative: bool, default: False
+            Determines whether to compute a cumulative histogram
+        show_rug: bool, default: False
+            Determines whether to draw a rug plot alongside the distribution
+        auto_open: bool, default: True
+            Determines whether to open a browser window with the plot
+        add_logo: bool, default: True
+            If True a Captor logo is added to the plot
+
+        Returns:
+        -------
+        tuple[plotly.go.Figure, str]
+            Plotly Figure and a div section or a html filename with location
+
+        """
+        if labels:
+            if len(labels) != self.tsdf.shape[1]:
+                msg = "Must provide same number of labels as items in frame."
+                raise NumberOfItemsAndLabelsNotSameError(msg)
+        else:
+            labels = list(self.tsdf.columns.get_level_values(0))
+
+        if directory:
+            dirpath = Path(directory).resolve()
+        elif Path.home().joinpath("Documents").exists():
+            dirpath = Path.home().joinpath("Documents")
+        else:
+            dirpath = Path(stack()[1].filename).parent
+
+        if not filename:
+            filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
+        plotfile = dirpath.joinpath(filename)
+
+        fig_dict, logo = load_plotly_dict()
+
+        hovertemplate = f"Count: %{{y:{y_fmt}}}" if y_fmt else "Count: %{y}"
+
+        if x_fmt:
+            hovertemplate += f"<br>%{{x:{x_fmt}}}"
+        else:
+            hovertemplate += "<br>%{x}"
+
+        msg = "plot_type must be 'bars' or 'lines'."
+        if plot_type == "bars":
+            figure = Figure(fig_dict)
+            for item in range(self.tsdf.shape[1]):
+                figure.add_histogram(
+                    x=self.tsdf.iloc[:, item],
+                    cumulative={"enabled": cumulative},
+                    histnorm=histnorm,
+                    name=labels[item],
+                    xbins={"size": xbins_size},
+                    opacity=opacity,
+                    hovertemplate=hovertemplate,
+                )
+            figure.update_layout(
+                barmode=barmode,
+                bargap=bargap,
+                bargroupgap=bargroupgap,
+            )
+        elif plot_type == "lines":
+            hist_data = [
+                cast("Series[float]", self.tsdf.loc[:, ds]).dropna().tolist()
+                for ds in self.tsdf
+            ]
+            figure = create_distplot(
+                hist_data=hist_data,
+                curve_type=curve_type,
+                group_labels=labels,
+                show_hist=False,
+                show_rug=show_rug,
+                histnorm=histnorm,
+            )
+            figure.update_layout(dict1=fig_dict["layout"])
+        else:
+            raise TypeError(msg)
+
+        figure.update_layout(xaxis={"tickformat": x_fmt}, yaxis={"tickformat": y_fmt})
+
+        figure.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
+        figure.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
+
+        if add_logo:
+            figure.add_layout_image(logo)
+
+        if output_type == "file":
+            plot(
+                figure_or_data=figure,
+                filename=str(plotfile),
+                auto_open=auto_open,
+                auto_play=False,
+                link_text="",
+                include_plotlyjs=cast("bool", include_plotlyjs),
+                config=fig_dict["config"],
+                output_type=output_type,
+            )
+            string_output = str(plotfile)
+        else:
+            div_id = filename.rsplit(".", 1)[0]
+            string_output = to_html(
+                fig=figure,
+                config=fig_dict["config"],
                 auto_play=False,
                 include_plotlyjs=cast("bool", include_plotlyjs),
                 full_html=False,
