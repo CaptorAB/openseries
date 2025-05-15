@@ -90,7 +90,7 @@ jobs:
         continue-on-error: true
         run: |
           source venv/bin/activate
-          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose --capture=no
+          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}
