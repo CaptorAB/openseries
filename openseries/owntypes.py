@@ -356,6 +356,10 @@ class CountriesNotStringNorListStrError(Exception):
     """Raised when countries argument is not provided in correct format."""
 
 
+class MarketsNotStringNorListStrError(Exception):
+    """Raised when markets argument is not provided in correct format."""
+
+
 class TradingDaysNotAboveZeroError(Exception):
     """Raised when trading days argument is not above zero."""
 

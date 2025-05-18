@@ -50,7 +50,8 @@ dependencies = [
     "python-dateutil (>=2.8.2,<4.0.0)",
     "requests (>=2.20.0,<3.0.0)",
     "scipy (>=1.11.4,<2.0.0)",
-    "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)"
+    "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)",
+    "pandas-market-calendars (>=5.1.0,<7.0.0)"
 ]
 
 [project.urls]

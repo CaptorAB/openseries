@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import TYPE_CHECKING, cast
 
+import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
 from holidays import (
     country_holidays,
@@ -24,6 +25,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from .owntypes import (
     BothStartAndEndError,
     CountriesNotStringNorListStrError,
+    MarketsNotStringNorListStrError,
     TradingDaysNotAboveZeroError,
 )
 
@@ -43,6 +45,53 @@ __all__ = [
     "holiday_calendar",
     "offset_business_days",
 ]
+
+
+def market_holidays(
+    startyear: int,
+    endyear: int,
+    markets: str | list[str],
+) -> list[dt.date]:
+    """Return a dict of holiday dates mapping to list of markets closed.
+
+    Parameters
+    ----------
+    startyear: int
+        First year (inclusive) to consider.
+    endyear: int
+        Last year (inclusive) to consider.
+    markets: str | list[str]
+        String or list of market codes supported by pandas_market_calendars.
+
+    Returns:
+    -------
+    list[str]
+        list of holiday dates.
+    """
+    market_list = [markets] if isinstance(markets, str) else list(markets)
+
+    supported = mcal.get_calendar_names()
+
+    if not all(m in supported for m in market_list):
+        msg = (
+            "Argument markets must be a string market code or a list of market "
+            "codes supported by pandas_market_calendars."
+        )
+        raise MarketsNotStringNorListStrError(msg)
+
+    holidays: list[dt.date] = []
+    for m in market_list:
+        cal = mcal.get_calendar(m)
+        # noinspection PyUnresolvedReferences
+        cal_hols = cal.holidays().calendar.holidays
+        my_hols: list[dt.date] = [
+            dt.datetime.strptime(str(date), "%Y-%m-%d").astimezone().date()
+            for date in cal_hols
+            if (startyear <= int(str(date)[:4]) <= endyear)
+        ]
+        holidays.extend(my_hols)
+
+    return list(set(holidays))
 
 
 def holiday_calendar(
@@ -82,7 +131,7 @@ def holiday_calendar(
         if custom_holidays is not None:
             staging.update(custom_holidays)
         hols = array(sorted(staging.keys()), dtype="datetime64[D]")
-    elif isinstance(countries, list) and all(
+    elif isinstance(countries, (list, set)) and all(
         country in list_supported_countries() for country in countries
     ):
         country: str

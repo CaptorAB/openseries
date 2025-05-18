@@ -15,13 +15,16 @@ from openseries.datefixer import (
     generate_calendar_date_range,
     get_previous_business_day_before_today,
     holiday_calendar,
+    market_holidays,
     offset_business_days,
 )
 from openseries.owntypes import (
     BothStartAndEndError,
     CountriesNotStringNorListStrError,
+    MarketsNotStringNorListStrError,
     TradingDaysNotAboveZeroError,
 )
+from openseries.series import OpenTimeSeries
 
 if TYPE_CHECKING:
     from openseries.owntypes import (
@@ -256,6 +259,28 @@ class TestDateFixer:
 
     def test_holiday_calendar(self: TestDateFixer) -> None:
         """Test holiday_calendar function."""
+        date = dt.date(2025, 5, 18)
+        series = OpenTimeSeries.from_fixed_rate(
+            rate=0.02, days=1000, end_dt=date, baseccy="USD"
+        )
+
+        msg = "holiday_calendar not working as intended"
+
+        caldays_limit = 360
+        if not (series.periods_in_a_year > caldays_limit and series.countries == "SE"):
+            raise DatefixerTestError(msg)
+
+        countries = ["ID", "US"]
+        series.countries = countries
+        series.align_index_to_local_cdays()
+
+        trddays_limit = 260
+        if not (
+            series.periods_in_a_year < trddays_limit
+            and series.countries == set(countries)  # type: ignore[comparison-overlap]
+        ):
+            raise DatefixerTestError(msg)
+
         twentytwentythreeholidays = [
             datetime64("2023-01-06"),
             datetime64("2023-04-07"),
@@ -267,14 +292,15 @@ class TestDateFixer:
             datetime64("2023-12-25"),
             datetime64("2023-12-26"),
         ]
+
+        msg_inv = "holiday_calendar input invalid"
         for start, end in zip([2023, 2024], [2023, 2022], strict=True):
             cdr = holiday_calendar(startyear=start, endyear=end, countries="SE")
             if not all(
                 date_str in list(cdr.holidays)
                 for date_str in twentytwentythreeholidays
             ):
-                msg = "holiday_calendar input invalid"
-                raise DatefixerTestError(msg)
+                raise DatefixerTestError(msg_inv)
 
     def test_holiday_calendar_with_custom_days(self: TestDateFixer) -> None:
         """Test holiday_calendar with custom input."""
@@ -321,6 +347,48 @@ class TestDateFixer:
         if twentytwentyoneholidays != hols_with:
             msg = "Holidays not matching as intended"
             raise DatefixerTestError(msg)
+
+    def test_market_holidays_as_custom_days(self: TestDateFixer) -> None:
+        """Test holiday_calendar with custom input."""
+        start = 2025
+        end = 2025
+        markets = ["NYSE", "LSE"]
+        countries = ["US", "GB"]
+        exchange_holidays = market_holidays(
+            startyear=start, endyear=end, markets=markets
+        )
+
+        calendar = holiday_calendar(
+            startyear=start,
+            endyear=end,
+            countries=countries,
+            custom_holidays=exchange_holidays,  # type: ignore[arg-type]
+        )
+        country_holidays = [date_fix(fixerdate=date) for date in calendar.holidays]
+
+        expected_diff = 16
+
+        msg = "market_holidays() not working as intended"
+        if len(country_holidays) - len(exchange_holidays) != expected_diff:
+            raise DatefixerTestError(msg)
+
+        exchange_holidays.extend(country_holidays)
+        holidays_combined = list(set(exchange_holidays))
+
+        new_expected_diff = 0
+
+        if len(country_holidays) - len(holidays_combined) != new_expected_diff:
+            raise DatefixerTestError(msg)
+
+        xmarkets = ["STO", "XSTO"]
+        with pytest.raises(
+            expected_exception=MarketsNotStringNorListStrError,
+            match=(
+                "Argument markets must be a string market code or a list "
+                "of market codes supported by pandas_market_calendars."
+            ),
+        ):
+            _ = market_holidays(startyear=start, endyear=end, markets=xmarkets)
 
     def test_offset_business_days_with_custom_days(self: TestDateFixer) -> None:
         """Test offset_business_days function with custom input."""
