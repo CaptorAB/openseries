@@ -271,7 +271,7 @@ class TestDateFixer:
             raise DatefixerTestError(msg)
 
         countries = ["ID", "US"]
-        series.countries = countries
+        series.countries = countries  # type: ignore[assignment]
         series.align_index_to_local_cdays()
 
         trddays_limit = 260
