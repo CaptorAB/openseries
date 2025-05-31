@@ -31,7 +31,7 @@ from openseries.series import (
 from tests.test_common_sim import CommonTestCase
 
 
-class NewTimeSeries(OpenTimeSeries):
+class NewTimeSeries(OpenTimeSeries):  # type: ignore[misc]
     """class to test correct pass-through of classes."""
 
     extra_info: str = "cool"
@@ -131,6 +131,24 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         match="type=set_type|type=string_type",
     ):
         serie.countries = countries
+
+
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    "markets",
+    ["XSTO", ["NYSE", "LSE"], None],
+)
+def test_opentimeseries_valid_markets(markets: list[str] | str | None) -> None:
+    """Pytest on valid markets as input."""
+    series = OpenTimeSeries.from_arrays(
+        name="Asset",
+        dates=["2023-01-01", "2023-01-02"],
+        valuetype=ValueType.PRICE,
+        values=[1.0, 1.1],
+    )
+    series.markets = markets
+    if series.markets != markets:
+        msg = "Valid markets input rendered unexpected error"
+        raise TypeError(msg)
 
 
 @pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
@@ -1445,6 +1463,8 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             columns=[["Asset_0"], [ValueType.PRICE]],
         )
         aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        anotherseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        yetoneseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
 
         if aseries.countries != "SE":
             msg = "Base case test_align_index_to_local_cdays not set up as intended"
@@ -1455,8 +1475,18 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             msg = "Date range generation not run as intended"
             raise OpenTimeSeriesTestError(msg)
 
-        aseries.align_index_to_local_cdays()
+        aseries.align_index_to_local_cdays(countries="SE")
         if midsummer in aseries.tsdf.index:
+            msg = "Method align_index_to_local_cdays() not working as intended"
+            raise OpenTimeSeriesTestError(msg)
+
+        anotherseries.align_index_to_local_cdays(countries="US", markets="XSTO")
+        if midsummer in anotherseries.tsdf.index:
+            msg = "Method align_index_to_local_cdays() not working as intended"
+            raise OpenTimeSeriesTestError(msg)
+
+        yetoneseries.align_index_to_local_cdays(countries="US")
+        if midsummer not in yetoneseries.tsdf.index:
             msg = "Method align_index_to_local_cdays() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 

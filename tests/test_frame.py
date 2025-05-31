@@ -2246,6 +2246,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         aframe = OpenFrame([aseries, bseries])
         anotherframe = OpenFrame([aseries, bseries])
         yetoneframe = OpenFrame([aseries, bseries])
+        noneframe = OpenFrame([aseries, bseries])
 
         swedennationalday = dt.date(2022, 6, 6)
         if swedennationalday not in d_range:
@@ -2265,6 +2266,11 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         yetoneframe.align_index_to_local_cdays(countries="US")
         if swedennationalday not in yetoneframe.tsdf.index:
             msg = "Sweden National Day not in date range"
+            raise OpenFrameTestError(msg)
+
+        noneframe.align_index_to_local_cdays(countries=None)  # default option
+        if swedennationalday in noneframe.tsdf.index:
+            msg = "Sweden National Day in date range"
             raise OpenFrameTestError(msg)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:
