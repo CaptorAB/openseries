@@ -86,16 +86,6 @@ DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 
 DateType = str | dt.date | dt.datetime | datetime64 | Timestamp
 
-HolidayType = (
-    dict[dt.date | dt.datetime | str | float | int, str]
-    | list[dt.date | dt.datetime | str | float | int]
-    | dt.date
-    | dt.datetime
-    | str
-    | float
-    | int
-)
-
 PlotlyLayoutType = dict[
     str,
     str

@@ -27,11 +27,7 @@ from openseries.owntypes import (
 from openseries.series import OpenTimeSeries
 
 if TYPE_CHECKING:
-    from openseries.owntypes import (
-        CountriesType,
-        DateType,
-        HolidayType,
-    )
+    from openseries.owntypes import CountriesType, DateType
 
 
 class DatefixerTestError(Exception):
@@ -323,9 +319,7 @@ class TestDateFixer:
             msg = "Holidays not matching as intended"
             raise DatefixerTestError(msg)
 
-        jacks_birthday: HolidayType = {
-            f"{year}-02-12": "Jack's birthday",
-        }
+        jacks_birthday = f"{year}-02-12"
         cdr_with = holiday_calendar(
             startyear=year,
             endyear=year,
@@ -340,8 +334,7 @@ class TestDateFixer:
             msg = f"Holidays not the same are: {compared}"
             raise DatefixerTestError(msg)
 
-        jbirth = cast("dict[str, str]", jacks_birthday)
-        twentytwentyoneholidays.append(date_fix(next(iter(jbirth.keys()))))
+        twentytwentyoneholidays.append(date_fix(fixerdate=jacks_birthday))
         twentytwentyoneholidays.sort()
 
         if twentytwentyoneholidays != hols_with:
@@ -409,7 +402,7 @@ class TestDateFixer:
             ddate=day_after_jacks_birthday,
             days=-2,
             countries=["SE", "US"],
-            custom_holidays={"2021-02-12": "Jack's birthday"},
+            custom_holidays="2021-02-12",  # Jack's birthday
         )
         if offsetdate_with != dt.date(2021, 2, 9):
             msg = "Unintended result from offset_business_days"

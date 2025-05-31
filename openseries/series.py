@@ -112,7 +112,7 @@ class OpenTimeSeries(_CommonModel):
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
     countries: CountriesType = "SE"
-    markets: list[str] | str | None = None
+    markets: list[str] | str | None = None  # type: ignore[assignment]
     isin: str | None = None
     label: str | None = None
 
