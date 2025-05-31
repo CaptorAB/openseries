@@ -18,7 +18,7 @@ class SimulationTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestSimulation(CommonTestCase):
+class TestSimulation(CommonTestCase):  # type: ignore[misc]
     """class to run tests on the module simulation.py."""
 
     def test_processes(self: TestSimulation) -> None:
@@ -222,11 +222,25 @@ class TestSimulation(CommonTestCase):
             trading_days_in_year=self.seriesim.trading_days_in_year,
             seed=self.seed,
         )
+        framesim_mkt = ReturnSimulation.from_merton_jump_gbm(
+            number_of_sims=five,
+            trading_days=self.seriesim.trading_days,
+            mean_annual_return=self.seriesim.mean_annual_return,
+            mean_annual_vol=self.seriesim.mean_annual_vol,
+            jumps_lamda=self.seriesim.jumps_lamda,
+            jumps_sigma=self.seriesim.jumps_sigma,
+            jumps_mu=self.seriesim.jumps_mu,
+            trading_days_in_year=self.seriesim.trading_days_in_year,
+            seed=self.seed,
+        )
 
         start = dt.date(2009, 6, 30)
 
         onedf = seriesim.to_dataframe(name="Asset", start=start)
         fivedf = framesim.to_dataframe(name="Asset", start=start)
+        fivedf_mkt = framesim_mkt.to_dataframe(
+            name="Asset", start=start, markets=["XSTO"]
+        )
 
         returnseries = OpenTimeSeries.from_df(onedf)
         startseries = returnseries.from_deepcopy()
@@ -237,6 +251,10 @@ class TestSimulation(CommonTestCase):
             raise SimulationTestError(msg)
 
         if fivedf.shape != (self.seriesim.trading_days, five):
+            msg = "Method to_dataframe() not working as intended"
+            raise SimulationTestError(msg)
+
+        if fivedf_mkt.shape != (self.seriesim.trading_days, five):
             msg = "Method to_dataframe() not working as intended"
             raise SimulationTestError(msg)
 

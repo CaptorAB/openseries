@@ -18,7 +18,6 @@
 This is a project with tools to analyze financial timeseries of a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
-
 ## Basic Usage
 
 To install:
@@ -54,6 +53,7 @@ _,_=series.plot_series()
 ```
 
 ### Sample output using the OpenFrame.all_properties() method:
+
 ```
                        Scilla Global Equity C (simulation+fund) Global Low Volatility index, SEK
                                                 ValueType.PRICE                  ValueType.PRICE
@@ -90,7 +90,6 @@ your machine and that you are OK to install this project in a virtual environmen
 The OpenTimeSeries and OpenFrame classes are both subclasses of
 the [Pydantic BaseModel](https://docs.pydantic.dev/usage/models/). Please refer to its documentation for information
 on any attributes or methods inherited from this model.
-
 
 ### Windows Powershell
 
@@ -137,7 +136,6 @@ make lint
 
 ```
 
-
 ## Table of Contents
 
 - [Basic Usage](#basic-usage)
@@ -174,34 +172,35 @@ make lint
 
 ### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) class.
 
-| Property        | type            | Applies to       | Description                                                                                                                                  |
-|:----------------|:----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
-| `timeseries_id` | `str`           | `OpenTimeSeries` | Placeholder for database identifier for the timeseries. Can be left as empty string.                                                         |
-| `instrument_id` | `str`           | `OpenTimeSeries` | Placeholder for database identifier for the instrument associated with the timeseries. Can be left as empty string.                          |
-| `dates`         | `list[str]`     | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                            |
-| `values`        | `list[float]`   | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                           |
-| `currency`      | `str`           | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                               |
-| `domestic`      | `str`           | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                 |
-| `local_ccy`     | `bool`          | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added. |
-| `name`          | `str`           | `OpenTimeSeries` | An identifier field.                                                                                                                         |
-| `isin`          | `str`           | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                              |
-| `label`         | `str`           | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                         |
-| `countries`     | `list` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used to generate business days.                                                    |
-| `valuetype`     | `ValueType`     | `OpenTimeSeries` | Field identifies the type of values in the series. ValueType is an Enum.                                                                     |
+| Property        | type                 | Applies to       | Description                                                                                                                                                       |
+|:----------------|:---------------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `timeseries_id` | `str`                | `OpenTimeSeries` | Placeholder for database identifier for the timeseries. Can be left as empty string.                                                                              |
+| `instrument_id` | `str`                | `OpenTimeSeries` | Placeholder for database identifier for the instrument associated with the timeseries. Can be left as empty string.                                               |
+| `dates`         | `list[str]`          | `OpenTimeSeries` | Dates of the timeseries. Not edited by any method to allow reversion to original.                                                                                 |
+| `values`        | `list[float]`        | `OpenTimeSeries` | Values of the timeseries. Not edited by any method to allow reversion to original.                                                                                |
+| `currency`      | `str`                | `OpenTimeSeries` | Currency of the timeseries. Only used if conversion/hedging methods are added.                                                                                    |
+| `domestic`      | `str`                | `OpenTimeSeries` | Domestic currency of the user / investor. Only used if conversion/hedging methods are added.                                                                      |
+| `local_ccy`     | `bool`               | `OpenTimeSeries` | Indicates if series should be in its local currency or the domestic currency of the user. Only used if conversion/hedging methods are added.                      |
+| `name`          | `str`                | `OpenTimeSeries` | An identifier field.                                                                                                                                              |
+| `isin`          | `str`                | `OpenTimeSeries` | ISIN code of the associated instrument. If any.                                                                                                                   |
+| `label`         | `str`                | `OpenTimeSeries` | Field used in outputs. Derived from name as default.                                                                                                              |
+| `countries`     | `list[str]` or `str` | `OpenTimeSeries` | (List of) country code(s) according to ISO 3166-1 alpha-2 used in the [holidays](https://github.com/vacanza/holidays/) package to generate business days.         |
+| `markets`       | `list[str]` or `str` | `OpenTimeSeries` | (List of) markets code(s) according to market code(s) input for the [pandas-market-calendars](https://pandas-market-calendars.readthedocs.io/en/latest/) package. |
+| `valuetype`     | `ValueType`          | `OpenTimeSeries` | Field identifies the type of values in the series. ValueType is an Enum.                                                                                          |
 
 ### Non-numerical or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
 
-| Property           | type                   | Applies to  | Description                                                              |
-|:-------------------|:-----------------------|:------------|:-------------------------------------------------------------------------|
-| `constituents`     | `list[OpenTimeSeries]` | `OpenFrame` | A list of the OpenTimeSeries that make up an OpenFrame.                  |
-| `columns_lvl_zero` | `list`                 | `OpenFrame` | A list of the level zero column names in the OpenFrame pandas.DataFrame. |
-| `columns_lvl_one`  | `list`                 | `OpenFrame` | A list of the level one column names in the OpenFrame pandas.DataFrame.  |
-| `item_count`       | `int`                  | `OpenFrame` | Number of columns in the OpenFrame pandas.DataFrame.                     |
-| `weights`          | `list[float]`          | `OpenFrame` | Weights used in the method `make_portfolio`.                             |
-| `first_indices`    | `pandas.Series`        | `OpenFrame` | First dates of all the series in the OpenFrame.                          |
-| `last_indices`     | `pandas.Series`        | `OpenFrame` | Last dates of all the series in the OpenFrame.                           |
-| `lengths_of_items` | `pandas.Series`        | `OpenFrame` | Number of items in each of the series in the OpenFrame.                  |
-| `span_of_days_all` | `pandas.Series`        | `OpenFrame` | Number of days from the first to the last in each of the series.         |
+| Property           | type                             | Applies to  | Description                                                              |
+|:-------------------|:---------------------------------|:------------|:-------------------------------------------------------------------------|
+| `constituents`     | `list[OpenTimeSeries]`           | `OpenFrame` | A list of the OpenTimeSeries that make up an OpenFrame.                  |
+| `columns_lvl_zero` | `list[str]`                      | `OpenFrame` | A list of the level zero column names in the OpenFrame pandas.DataFrame. |
+| `columns_lvl_one`  | `list[ValueType]` or `list[str]` | `OpenFrame` | A list of the level one column names in the OpenFrame pandas.DataFrame.  |
+| `item_count`       | `int`                            | `OpenFrame` | Number of columns in the OpenFrame pandas.DataFrame.                     |
+| `weights`          | `list[float]`                    | `OpenFrame` | Weights used in the method `make_portfolio`.                             |
+| `first_indices`    | `pandas.Series[dt.date]`         | `OpenFrame` | First dates of all the series in the OpenFrame.                          |
+| `last_indices`     | `pandas.Series[dt.date]`         | `OpenFrame` | Last dates of all the series in the OpenFrame.                           |
+| `lengths_of_items` | `pandas.Series[int]`             | `OpenFrame` | Number of items in each of the series in the OpenFrame.                  |
+| `span_of_days_all` | `pandas.Series[int]`             | `OpenFrame` | Number of days from the first to the last in each of the series.         |
 
 ### Non-numerical or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
 
@@ -225,7 +224,7 @@ make lint
 | `running_adjustment`     | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
 | `ewma_vol_func`          | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 | `from_1d_rate_to_cumret` | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
-                                                                           |
+|
 
 ### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
 
@@ -263,11 +262,11 @@ make lint
 | `to_xlsx`                          | `OpenTimeSeries`, `OpenFrame` | Method to save the data in the .tsdf DataFrame to an Excel file.                                                                                         |
 | `value_to_ret`                     | `OpenTimeSeries`, `OpenFrame` | Converts a value series into a percentage return series.                                                                                                 |
 | `value_to_diff`                    | `OpenTimeSeries`, `OpenFrame` | Converts a value series into a series of differences.                                                                                                    |
-| `value_to_log`                     | `OpenTimeSeries`, `OpenFrame` | Converts a value series into a logarithmic return series.                                                                                                |
+| `value_to_log`                     | `OpenTimeSeries`, `OpenFrame` | Converts a value series into a cumulative log return series, useful for plotting growth relative to the starting point.                                  |
 | `value_ret_calendar_period`        | `OpenTimeSeries`, `OpenFrame` | Returns the series simple return for a specific calendar period.                                                                                         |
-| `plot_series`                      | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly Scatter](https://plotly.com/python/line-and-scatter/) plot of the serie(s) in a browser window.                                       |
-| `plot_bars`                        | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly Bar](https://plotly.com/python/bar-charts/) plot of the serie(s) in a browser window.                                                 |
-| `plot_histogram`                   | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly Histogram](https://plotly.com/python/histograms/) plot of the serie(s) in a browser window.                                           |
+| `plot_series`                      | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly Scatter](https://plotly.com/python/line-and-scatter/) plot of the serie(s) in a browser window.                                     |
+| `plot_bars`                        | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly Bar](https://plotly.com/python/bar-charts/) plot of the serie(s) in a browser window.                                               |
+| `plot_histogram`                   | `OpenTimeSeries`, `OpenFrame` | Opens a HTML [Plotly Histogram](https://plotly.com/python/histograms/) plot of the serie(s) in a browser window.                                         |
 | `to_drawdown_series`               | `OpenTimeSeries`, `OpenFrame` | Converts the series into drawdown series.                                                                                                                |
 | `rolling_return`                   | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling returns.                                                                                                         |
 | `rolling_vol`                      | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling volatilities.                                                                                                    |

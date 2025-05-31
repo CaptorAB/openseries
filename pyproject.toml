@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "1.8.3"
+version = "1.8.4"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
@@ -50,7 +50,8 @@ dependencies = [
     "python-dateutil (>=2.8.2,<4.0.0)",
     "requests (>=2.20.0,<3.0.0)",
     "scipy (>=1.11.4,<2.0.0)",
-    "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)"
+    "statsmodels (>=0.14.0,!=0.14.2,<1.0.0)",
+    "pandas-market-calendars (>=5.1.0,<7.0.0)"
 ]
 
 [project.urls]
@@ -63,11 +64,11 @@ dependencies = [
 black = ">=24.4.2,<27.0.0"
 coverage = ">=7.2.7,<9.0.0"
 genbadge = { version = ">=1.1.1,<2.0.0", extras = ["coverage"] }
-mypy = "1.15.0"
+mypy = "1.16.0"
 pandas-stubs = ">=2.1.2,<3.0.0"
 pre-commit = ">=3.7.1,<6.0.0"
 pytest = ">=8.2.2,<9.0.0"
-ruff = "0.11.9"
+ruff = "0.11.12"
 types-openpyxl = ">=3.1.2,<5.0.0"
 types-python-dateutil = ">=2.8.2,<4.0.0"
 types-requests = ">=2.20.0,<3.0.0"

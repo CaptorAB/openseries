@@ -2244,15 +2244,33 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         bseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
         bseries.set_new_label("Asset_b")
         aframe = OpenFrame([aseries, bseries])
+        anotherframe = OpenFrame([aseries, bseries])
+        yetoneframe = OpenFrame([aseries, bseries])
+        noneframe = OpenFrame([aseries, bseries])
 
-        midsummer = dt.date(2022, 6, 6)
-        if midsummer not in d_range:
-            msg = "Midsummer not in date range"
+        swedennationalday = dt.date(2022, 6, 6)
+        if swedennationalday not in d_range:
+            msg = "Sweden National Day not in date range"
             raise OpenFrameTestError(msg)
 
-        aframe.align_index_to_local_cdays()
-        if midsummer in aframe.tsdf.index:
-            msg = "Midsummer in date range"
+        aframe.align_index_to_local_cdays(countries="SE")
+        if swedennationalday in aframe.tsdf.index:
+            msg = "Sweden National Day in date range"
+            raise OpenFrameTestError(msg)
+
+        anotherframe.align_index_to_local_cdays(countries="US", markets="XSTO")
+        if swedennationalday in anotherframe.tsdf.index:
+            msg = "Sweden National Day in date range"
+            raise OpenFrameTestError(msg)
+
+        yetoneframe.align_index_to_local_cdays(countries="US")
+        if swedennationalday not in yetoneframe.tsdf.index:
+            msg = "Sweden National Day not in date range"
+            raise OpenFrameTestError(msg)
+
+        noneframe.align_index_to_local_cdays(countries=None)  # default option
+        if swedennationalday in noneframe.tsdf.index:
+            msg = "Sweden National Day in date range"
             raise OpenFrameTestError(msg)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:

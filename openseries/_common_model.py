@@ -58,7 +58,7 @@ from plotly.figure_factory import create_distplot  # type: ignore[import-untyped
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.io import to_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
-from pydantic import BaseModel, ConfigDict, DirectoryPath
+from pydantic import BaseModel, ConfigDict, DirectoryPath, ValidationError
 from scipy.stats import (  # type: ignore[import-untyped]
     kurtosis,
     norm,
@@ -377,13 +377,23 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         """
         method: LiteralPandasReindexMethod = "nearest"
-        countries = "SE"
+
+        try:
+            countries = self.countries
+            markets = self.markets
+        except AttributeError:
+            countries = self.constituents[0].countries
+            markets = self.constituents[0].markets
+
         wmdf = self.tsdf.copy()
+
         dates = _do_resample_to_business_period_ends(
             data=wmdf,
             freq="BME",
             countries=countries,
+            markets=markets,
         )
+
         wmdf = wmdf.reindex(index=[deyt.date() for deyt in dates], method=method)
         wmdf.index = DatetimeIndex(wmdf.index)
         result = wmdf.ffill().pct_change().min()
@@ -539,14 +549,20 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
     def align_index_to_local_cdays(
         self: Self,
-        countries: CountriesType = "SE",
+        countries: CountriesType | None = None,
+        markets: list[str] | str | None = None,
+        custom_holidays: list[str] | str | None = None,
     ) -> Self:
         """Align the index of .tsdf with local calendar business days.
 
         Parameters
         ----------
-        countries: CountriesType, default: "SE"
+        countries: CountriesType, optional
             (List of) country code(s) according to ISO 3166-1 alpha-2
+        markets: list[str] | str, optional
+            (List of) markets code(s) according to pandas-market-calendars
+        custom_holidays: list[str] | str, optional
+            Argument where missing holidays can be added
 
         Returns:
         -------
@@ -556,10 +572,37 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         """
         startyear = cast("int", to_datetime(self.tsdf.index[0]).year)
         endyear = cast("int", to_datetime(self.tsdf.index[-1]).year)
+
+        if countries:
+            try:
+                self.countries = countries
+            except ValidationError:
+                for serie in self.constituents:
+                    serie.countries = countries
+        else:
+            try:
+                countries = self.countries
+            except AttributeError:
+                countries = self.constituents[0].countries
+
+        if markets:
+            try:
+                self.markets = markets
+            except ValidationError:
+                for serie in self.constituents:
+                    serie.markets = markets
+        else:
+            try:
+                markets = self.markets
+            except AttributeError:
+                markets = self.constituents[0].markets
+
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,
             countries=countries,
+            markets=markets,
+            custom_holidays=custom_holidays,
         )
 
         d_range = [
