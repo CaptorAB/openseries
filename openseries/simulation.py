@@ -417,6 +417,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         start: dt.date | None = None,
         end: dt.date | None = None,
         countries: CountriesType = "SE",
+        markets: list[str] | str | None = None,
     ) -> DataFrame:
         """Create a pandas.DataFrame from simulation(s).
 
@@ -430,6 +431,8 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
             Date when the simulation ends
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
+        markets: list[str] | str, optional
+            (List of) markets code(s) according to pandas-market-calendars
 
         Returns:
         -------
@@ -442,6 +445,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
             start=start,
             end=end,
             countries=countries,
+            markets=markets,
         )
 
         if self.number_of_sims == 1:

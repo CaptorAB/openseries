@@ -364,7 +364,9 @@ class TestDateFixer:
             countries=countries,
             custom_holidays=exchange_holidays,  # type: ignore[arg-type]
         )
-        country_holidays = [date_fix(fixerdate=date) for date in calendar.holidays]
+        country_holidays = [
+            date_fix(fixerdate=date).strftime("%Y-%m-%d") for date in calendar.holidays
+        ]
 
         expected_diff = 16
 
@@ -448,7 +450,9 @@ class TestDateFixer:
         trd_days: int = 506
         end = dt.date(2011, 6, 30)
 
-        d_range = generate_calendar_date_range(trading_days=trd_days, start=start)
+        d_range = generate_calendar_date_range(
+            trading_days=trd_days, start=start, markets=["XSTO"]
+        )
 
         if len(d_range) != trd_days:
             msg = "Unintended result from generate_calendar_date_range"

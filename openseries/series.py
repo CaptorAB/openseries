@@ -45,6 +45,7 @@ from .owntypes import (
     LiteralBizDayFreq,
     LiteralPandasReindexMethod,
     LiteralSeriesProps,
+    MarketsNotStringNorListStrError,
     OpenTimeSeriesPropertiesList,
     Self,
     ValueListType,
@@ -91,6 +92,8 @@ class OpenTimeSeries(_CommonModel):
         ISO 4217 currency code of the user's home currency
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
+    markets: list[str] | str, optional
+        (List of) markets code(s) according to pandas-market-calendars
     isin : str, optional
         ISO 6166 identifier code of the associated instrument
     label : str, optional
@@ -109,6 +112,7 @@ class OpenTimeSeries(_CommonModel):
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
     countries: CountriesType = "SE"
+    markets: list[str] | str | None = None
     isin: str | None = None
     label: str | None = None
 
@@ -125,6 +129,25 @@ class OpenTimeSeries(_CommonModel):
         """Pydantic validator to ensure countries field is validated."""
         _ = Countries(countryinput=value)
         return value
+
+    @field_validator("markets", mode="before")  # type: ignore[misc]
+    @classmethod
+    def _validate_markets(
+        cls, value: list[str] | str | None
+    ) -> list[str] | str | None:
+        """Pydantic validator to ensure markets field is validated."""
+        msg = (
+            "'markets' must be a string or list of strings, "
+            f"got {type(value).__name__!r}"
+        )
+        if value is None or isinstance(value, str):
+            return value
+        if isinstance(value, list):
+            if all(isinstance(item, str) for item in value) and len(value) != 0:
+                return value
+            item_msg = "All items in 'markets' must be strings."
+            raise MarketsNotStringNorListStrError(item_msg)
+        raise MarketsNotStringNorListStrError(msg)
 
     @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
     def _dates_and_values_validate(self: Self) -> Self:
@@ -587,6 +610,7 @@ class OpenTimeSeries(_CommonModel):
             data=self.tsdf,
             freq=freq,
             countries=self.countries,
+            markets=self.markets,
         )
         self.tsdf = self.tsdf.reindex([deyt.date() for deyt in dates], method=method)
         return self

@@ -18,6 +18,7 @@ from openseries.owntypes import (
     DateAlignmentError,
     IncorrectArgumentComboError,
     InitialValueZeroError,
+    MarketsNotStringNorListStrError,
     ValueType,
 )
 
@@ -132,7 +133,25 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         serie.countries = countries
 
 
-class TestOpenTimeSeries(CommonTestCase):
+@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+    "markets",
+    [True, 1, [True], [1], [None], []],
+)
+def test_opentimeseries_invalid_markets(markets: list[str] | str | None) -> None:
+    """Pytest on invalid market codes as input."""
+    serie = OpenTimeSeries.from_arrays(
+        name="Asset",
+        dates=["2023-01-01", "2023-01-02"],
+        values=[1.0, 1.1],
+    )
+    with pytest.raises(
+        expected_exception=MarketsNotStringNorListStrError,
+        match=r"'markets' must be",
+    ):
+        serie.markets = markets
+
+
+class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
     """class to run tests on the module series.py."""
 
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
@@ -852,6 +871,50 @@ class TestOpenTimeSeries(CommonTestCase):
             end_dt=dt.date(2023, 4, 28),
         )
 
+        rsb_series.resample_to_business_period_ends(freq="BME")
+        new_dates = rsb_series.tsdf.index.tolist()
+
+        if new_dates != [
+            dt.date(2023, 1, 31),
+            dt.date(2023, 2, 28),
+            dt.date(2023, 3, 31),
+            dt.date(2023, 4, 28),
+        ]:
+            msg = "Method resample_to_business_period_ends() not working as intended"
+            raise OpenTimeSeriesTestError(msg)
+
+    def test_resample_to_business_period_ends_markets_set(
+        self: TestOpenTimeSeries,
+    ) -> None:
+        """Test resample_to_business_period_ends method."""
+        rsb_stubs_series = OpenTimeSeries.from_fixed_rate(
+            rate=0.01,
+            days=121,
+            end_dt=dt.date(2023, 5, 15),
+        )
+        rsb_stubs_series.markets = "XSTO"
+
+        rsb_stubs_series.resample_to_business_period_ends(freq="BME")
+        new_stubs_dates = rsb_stubs_series.tsdf.index.tolist()
+
+        if new_stubs_dates != [
+            dt.date(2023, 1, 15),
+            dt.date(2023, 1, 31),
+            dt.date(2023, 2, 28),
+            dt.date(2023, 3, 31),
+            dt.date(2023, 4, 28),
+            dt.date(2023, 5, 15),
+        ]:
+            msg = "Method resample_to_business_period_ends() not working as intended"
+            raise OpenTimeSeriesTestError(msg)
+
+        rsb_series = OpenTimeSeries.from_fixed_rate(
+            rate=0.01,
+            days=88,
+            end_dt=dt.date(2023, 4, 28),
+        )
+
+        rsb_series.markets = "XSTO"
         rsb_series.resample_to_business_period_ends(freq="BME")
         new_dates = rsb_series.tsdf.index.tolist()
 

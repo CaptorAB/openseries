@@ -41,7 +41,6 @@ from pydantic import field_validator
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends
 from .owntypes import (
-    CountriesType,
     DaysInYearType,
     LabelsNotUniqueError,
     LiteralBizDayFreq,
@@ -429,7 +428,6 @@ class OpenFrame(_CommonModel):
     def resample_to_business_period_ends(
         self: Self,
         freq: LiteralBizDayFreq = "BME",
-        countries: CountriesType = "SE",
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
         """Resamples timeseries frequency to the business calendar month end dates.
@@ -440,9 +438,6 @@ class OpenFrame(_CommonModel):
         ----------
         freq: LiteralBizDayFreq, default "BME"
             The date offset string that sets the resampled frequency
-        countries: CountriesType, default: "SE"
-            (List of) country code(s) according to ISO 3166-1 alpha-2
-            to create a business day calendar used for date adjustments
         method: LiteralPandasReindexMethod, default: nearest
             Controls the method used to align values across columns
 
@@ -456,7 +451,8 @@ class OpenFrame(_CommonModel):
             dates = _do_resample_to_business_period_ends(
                 data=xerie.tsdf,
                 freq=freq,
-                countries=countries,
+                countries=xerie.countries,
+                markets=xerie.markets,
             )
             xerie.tsdf = xerie.tsdf.reindex(
                 [deyt.date() for deyt in dates],

@@ -28,6 +28,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .owntypes import (
         CountriesType,
         DaysInYearType,
+        HolidayType,
         LiteralBarPlotMode,
         LiteralJsonOutput,
         LiteralLinePlotMode,
@@ -73,6 +74,7 @@ from .datefixer import (
     _do_resample_to_business_period_ends,
     date_offset_foll,
     holiday_calendar,
+    market_holidays,
 )
 from .load_plotly import load_plotly_dict
 
@@ -377,13 +379,23 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         """
         method: LiteralPandasReindexMethod = "nearest"
-        countries = "SE"
+
+        try:
+            countries = self.countries
+            markets = self.markets
+        except AttributeError:
+            countries = self.constituents[0].countries
+            markets = self.constituents[0].markets
+
         wmdf = self.tsdf.copy()
+
         dates = _do_resample_to_business_period_ends(
             data=wmdf,
             freq="BME",
             countries=countries,
+            markets=markets,
         )
+
         wmdf = wmdf.reindex(index=[deyt.date() for deyt in dates], method=method)
         wmdf.index = DatetimeIndex(wmdf.index)
         result = wmdf.ffill().pct_change().min()
@@ -540,6 +552,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
     def align_index_to_local_cdays(
         self: Self,
         countries: CountriesType = "SE",
+        markets: list[str] | str | None = None,
     ) -> Self:
         """Align the index of .tsdf with local calendar business days.
 
@@ -547,6 +560,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         ----------
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
+        markets: list[str] | str, optional
+            (List of) markets code(s) according to pandas-market-calendars
 
         Returns:
         -------
@@ -556,10 +571,18 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         """
         startyear = cast("int", to_datetime(self.tsdf.index[0]).year)
         endyear = cast("int", to_datetime(self.tsdf.index[-1]).year)
+        if markets:
+            mkt_holidays = market_holidays(
+                startyear=startyear, endyear=endyear, markets=markets
+            )
+        else:
+            mkt_holidays = None
+
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,
             countries=countries,
+            custom_holidays=cast("HolidayType", mkt_holidays),
         )
 
         d_range = [

@@ -51,7 +51,7 @@ def market_holidays(
     startyear: int,
     endyear: int,
     markets: str | list[str],
-) -> list[dt.date]:
+) -> list[str]:
     """Return a dict of holiday dates mapping to list of markets closed.
 
     Parameters
@@ -79,13 +79,13 @@ def market_holidays(
         )
         raise MarketsNotStringNorListStrError(msg)
 
-    holidays: list[dt.date] = []
+    holidays: list[str] = []
     for m in market_list:
         cal = mcal.get_calendar(m)
         # noinspection PyUnresolvedReferences
         cal_hols = cal.holidays().calendar.holidays
-        my_hols: list[dt.date] = [
-            dt.datetime.strptime(str(date), "%Y-%m-%d").astimezone().date()
+        my_hols: list[str] = [
+            str(date)
             for date in cal_hols
             if (startyear <= int(str(date)[:4]) <= endyear)
         ]
@@ -359,6 +359,7 @@ def generate_calendar_date_range(
     start: dt.date | None = None,
     end: dt.date | None = None,
     countries: CountriesType = "SE",
+    markets: list[str] | str | None = None,
 ) -> list[dt.date]:
     """Generate a list of business day calendar dates.
 
@@ -372,6 +373,8 @@ def generate_calendar_date_range(
         Date when the range ends
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
+    markets: list[str] | str, optional
+        (List of) markets code(s) according to pandas-market-calendars
 
     Returns:
     -------
@@ -389,10 +392,21 @@ def generate_calendar_date_range(
             periods=trading_days * 365 // 252,
             freq="D",
         )
+
+        if markets:
+            mkt_holidays = market_holidays(
+                startyear=start.year,
+                endyear=date_fix(tmp_range.tolist()[-1]).year,
+                markets=markets,
+            )
+        else:
+            mkt_holidays = None
+
         calendar = holiday_calendar(
             startyear=start.year,
             endyear=date_fix(tmp_range.tolist()[-1]).year,
             countries=countries,
+            custom_holidays=cast("HolidayType", mkt_holidays),
         )
         return [
             d.date()
@@ -405,10 +419,21 @@ def generate_calendar_date_range(
 
     if end and not start:
         tmp_range = date_range(end=end, periods=trading_days * 365 // 252, freq="D")
+
+        if markets:
+            mkt_holidays = market_holidays(
+                startyear=date_fix(tmp_range.tolist()[0]).year,
+                endyear=end.year,
+                markets=markets,
+            )
+        else:
+            mkt_holidays = None
+
         calendar = holiday_calendar(
             startyear=date_fix(tmp_range.tolist()[0]).year,
             endyear=end.year,
             countries=countries,
+            custom_holidays=cast("HolidayType", mkt_holidays),
         )
         return [
             d.date()
@@ -430,6 +455,7 @@ def _do_resample_to_business_period_ends(
     data: DataFrame,
     freq: LiteralBizDayFreq,
     countries: CountriesType,
+    markets: list[str] | str | None,
 ) -> DatetimeIndex:
     """Resample timeseries frequency to business calendar month end dates.
 
@@ -443,7 +469,8 @@ def _do_resample_to_business_period_ends(
         The date offset string that sets the resampled frequency
     countries: CountriesType
         (List of) country code(s) according to ISO 3166-1 alpha-2
-        to create a business day calendar used for date adjustments
+    markets: list[str] | str, optional
+        (List of) markets code(s) according to pandas-market-calendars
 
     Returns:
     -------
@@ -459,15 +486,25 @@ def _do_resample_to_business_period_ends(
 
     copydata = concat([data.head(n=1), copydata, data.tail(n=1)]).sort_index()
 
+    if markets:
+        mkt_holidays = market_holidays(
+            startyear=cast("dt.date", copydata.index[0]).year,
+            endyear=cast("dt.date", copydata.index[-1]).year,
+            markets=markets,
+        )
+    else:
+        mkt_holidays = None
+
     dates = DatetimeIndex(
         [copydata.index[0]]
         + [
-            date_offset_foll(
-                dt.date(d.year, d.month, 1)
+            date_offset_foll(  # type: ignore[misc]
+                raw_date=dt.date(d.year, d.month, 1)
                 + relativedelta(months=1)
                 - dt.timedelta(days=1),
-                countries=countries,
                 months_offset=0,
+                countries=countries,
+                custom_holidays=cast("HolidayType", mkt_holidays),
                 adjust=True,
                 following=False,
             )
