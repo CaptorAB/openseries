@@ -765,27 +765,6 @@ test = ["hypothesis (>=6.46.1)", "pytest (>=7.3.2)", "pytest-xdist (>=2.2.0)"]
 xml = ["lxml (>=4.9.2)"]
 
 [[package]]
-name = "pandas-market-calendars"
-version = "5.1.0"
-description = "Market and exchange trading calendars for pandas"
-optional = false
-python-versions = ">=3.8"
-groups = ["main"]
-files = [
-    {file = "pandas_market_calendars-5.1.0-py3-none-any.whl", hash = "sha256:5cb30c35bb828f25814bed8214be7319e170a644cd14a929edf302334aa208ac"},
-    {file = "pandas_market_calendars-5.1.0.tar.gz", hash = "sha256:edd3de544e91b339d03aa332e5adcf0c6f425ee7a19100630f27bb6499777afb"},
-]
-
-[package.dependencies]
-exchange-calendars = ">=3.3"
-pandas = ">=1.1"
-python-dateutil = "*"
-tzdata = "*"
-
-[package.extras]
-dev = ["black", "build", "pre-commit", "pytest"]
-
-[[package]]
 name = "pandas-stubs"
 version = "2.2.3.250527"
 description = "Type annotations for pandas"
@@ -1721,4 +1700,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "0d12e7cc307aa548dd3e1a559970210ac61fc19168212ae659ae5a0035819edd"
+content-hash = "fbe35cf104324455d316a9f8d3c4c9b3d75df3ffac2b8742ee815fdbd9543e17"

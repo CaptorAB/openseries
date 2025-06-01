@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import TYPE_CHECKING, cast
 
-import pandas_market_calendars as mcal
+import exchange_calendars as exchcal
 from dateutil.relativedelta import relativedelta
 from holidays import (
     country_holidays,
@@ -69,7 +69,7 @@ def market_holidays(
     """
     market_list = [markets] if isinstance(markets, str) else list(markets)
 
-    supported = mcal.get_calendar_names()
+    supported = exchcal.get_calendar_names()
 
     if not all(m in supported for m in market_list):
         msg = (
@@ -80,13 +80,12 @@ def market_holidays(
 
     holidays: list[str] = []
     for m in market_list:
-        cal = mcal.get_calendar(m)
-        # noinspection PyUnresolvedReferences
-        cal_hols = cal.holidays().calendar.holidays
+        cal = exchcal.get_calendar(m)
+        cal_hols = cal.regular_holidays.holidays()
         my_hols: list[str] = [
-            str(date)
+            date.date().strftime("%Y-%m-%d")
             for date in cal_hols
-            if (startyear <= int(str(date)[:4]) <= endyear)
+            if (startyear <= date.date().year <= endyear)
         ]
         holidays.extend(my_hols)
 
