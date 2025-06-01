@@ -105,9 +105,8 @@ cd openseries
 ```bash
 git clone https://github.com/CaptorAB/openseries.git
 cd openseries
-make
-source source_me
 make install
+source source_to_activate_venv
 
 ```
 

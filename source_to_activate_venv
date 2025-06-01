@@ -1,10 +1,9 @@
 source venv/bin/activate
+echo ""
 if [[ ":$PYTHONPATH:" != *":$PWD:"* ]]; then
     export PYTHONPATH=${PWD}:$PYTHONPATH
-    echo ""
     echo "PYTHONPATH changed. It is '$PYTHONPATH'"
 else
-    echo ""
     echo "PYTHONPATH not changed. It is '$PYTHONPATH'"
 fi
 echo ""
