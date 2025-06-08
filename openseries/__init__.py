@@ -25,6 +25,7 @@ from .portfoliotools import (
     sharpeplot,
     simulate_portfolios,
 )
+from .report import report_html
 from .series import OpenTimeSeries, timeseries_chain
 from .simulation import ReturnSimulation
 
@@ -44,6 +45,7 @@ __all__ = [
     "load_plotly_dict",
     "offset_business_days",
     "prepare_plot_data",
+    "report_html",
     "sharpeplot",
     "simulate_portfolios",
     "timeseries_chain",

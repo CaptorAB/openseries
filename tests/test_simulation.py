@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING
 from openseries.owntypes import ValueType
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation, _random_generator
-from tests.test_common_sim import CommonTestCase
+
+from .test_common_sim import CommonTestCase
 
 if TYPE_CHECKING:
     from numpy.random import Generator

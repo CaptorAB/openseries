@@ -47,7 +47,8 @@ from openseries.owntypes import (
     ValueType,
 )
 from openseries.series import OpenTimeSeries
-from tests.test_common_sim import CommonTestCase
+
+from .test_common_sim import CommonTestCase
 
 
 class OpenFrameTestError(Exception):

@@ -29,14 +29,15 @@ from openseries.portfoliotools import (
     simulate_portfolios,
 )
 from openseries.series import OpenTimeSeries
-from tests.test_common_sim import CommonTestCase
+
+from .test_common_sim import CommonTestCase
 
 
 class PortfoliotoolsTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestPortfoliotools(CommonTestCase):
+class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
     """class to run tests on the module portfoliotools.py."""
 
     def test_simulate_portfolios(self: TestPortfoliotools) -> None:

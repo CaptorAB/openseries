@@ -35,7 +35,8 @@ from openseries.series import (
     _check_if_none,
     timeseries_chain,
 )
-from tests.test_common_sim import CommonTestCase
+
+from .test_common_sim import CommonTestCase
 
 
 class NewTimeSeries(OpenTimeSeries):  # type: ignore[misc]
