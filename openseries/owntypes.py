@@ -387,7 +387,3 @@ class IncorrectArgumentComboError(Exception):
 
 class PropertiesInputValidationError(Exception):
     """Raised when duplicate strings are provided."""
-
-
-class NumberOfTableItemsNotMatchingError(Exception):
-    """Raised when the number of table items are not matching."""
