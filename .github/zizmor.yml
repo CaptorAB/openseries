@@ -7,6 +7,7 @@ rules:
         github/*: hash-pin
         softprops/*: hash-pin
         astral-sh/*: hash-pin
+        codecov/*: hash-pin
 
   forbidden-uses:
     config:
@@ -18,3 +19,4 @@ rules:
         - github/codeql-action/upload-sarif
         - softprops/action-gh-release
         - astral-sh/setup-uv
+        - codecov/codecov-action
