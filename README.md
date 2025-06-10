@@ -52,35 +52,9 @@ _,_=series.plot_series()
 
 ```
 
-### Sample output using the OpenFrame.all_properties() method:
+### Sample output using the report_html() function:
 
-```
-                       Scilla Global Equity C (simulation+fund) Global Low Volatility index, SEK
-                                                ValueType.PRICE                  ValueType.PRICE
-Total return                                           3.641282                         1.946319
-Arithmetic return                                      0.096271                         0.069636
-Geometric return                                       0.093057                          0.06464
-Volatility                                             0.120279                         0.117866
-Return vol ratio                                       0.800396                          0.59081
-Downside deviation                                     0.085956                         0.086723
-Sortino ratio                                          1.119993                         0.802975
-Positive share                                         0.541783                         0.551996
-Worst                                                 -0.071616                        -0.089415
-Worst month                                           -0.122503                        -0.154485
-Max drawdown                                          -0.309849                        -0.435444
-Max drawdown in cal yr                                -0.309849                        -0.348681
-Max drawdown dates                                   2020-03-23                       2009-03-09
-CVaR 95.0%                                             -0.01793                        -0.018429
-VaR 95.0%                                             -0.011365                        -0.010807
-Imp vol from VaR 95%                                   0.109204                         0.103834
-Z-score                                                0.587905                         0.103241
-Skew                                                  -0.650782                        -0.888109
-Kurtosis                                               8.511166                        17.527367
-observations                                               4309                             4309
-span of days                                               6301                             6301
-first indices                                        2006-01-03                       2006-01-03
-last indices                                         2023-04-05                       2023-04-05
-```
+<img src="./captor_plot_image.png" alt="Two Assets Compared" width="1000" />
 
 ## Development Instructions
 
@@ -153,12 +127,13 @@ make lint
 
 ### On some files in the project
 
-| File                                                                                                 | Description                                                                                                                                                                                         |
-|:-----------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [series.py](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py)                 | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together. |
-| [frame.py](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py)                   | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                         |
-| [portfoliotools.py](https://github.com/CaptorAB/openseries/blob/master/openseries/portfoliotools.py) | Defines functions to simulate, optimize, and plot portfolios.                                                                                                                                       |
-| [simulation.py](https://github.com/CaptorAB/openseries/blob/master/openseries/simulation.py)         | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                     |
+| File                                                                                                 | Description                                                                                                                                                                                           |
+|:-----------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [series.py](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py)                 | Defines the class _OpenTimeSeries_ for managing and analyzing a single timeseries. The module also defines a function `timeseries_chain` that can be used to chain two timeseries objects together.   |
+| [frame.py](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py)                   | Defines the class _OpenFrame_ for managing a group of timeseries, and e.g. calculate a portfolio timeseries from a rebalancing strategy between timeseries.                                           |
+| [portfoliotools.py](https://github.com/CaptorAB/openseries/blob/master/openseries/portfoliotools.py) | Defines functions to simulate, optimize, and plot portfolios.                                                                                                                                         |
+| [report.py](https://github.com/CaptorAB/openseries/blob/master/openseries/report.py)                 | Defines the _report_html_ function that is used to create a landscape orientation report on at least two assets. All preceding assets will be measured against the last asset in the input OpenFrame. |
+| [simulation.py](https://github.com/CaptorAB/openseries/blob/master/openseries/simulation.py)         | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                       |
 
 ### Class methods used to construct objects.
 
