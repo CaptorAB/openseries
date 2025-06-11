@@ -17,7 +17,6 @@ test:
 	poetry run coverage run -m pytest --verbose
 	poetry run coverage xml --quiet
 	poetry run coverage report
-	poetry run genbadge coverage --silent --local --input-file coverage.xml --output-file coverage.svg
 
 lint:
 	poetry run ruff check . --fix --exit-non-zero-on-fix
