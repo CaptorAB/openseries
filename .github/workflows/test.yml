@@ -104,15 +104,17 @@ jobs:
               body: `See the full logs here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
             })
 
+      - name: Fail job if tests failed
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        run: exit 1
+
       - name: Report coverage
-        if: ${{ steps.pytest.outcome == 'success' }}
         run: |
           source venv/bin/activate
           poetry run coverage xml --quiet
           poetry run coverage report
 
       - name: Upload coverage to Codecov.io
-        if: ${{ steps.pytest.outcome == 'success' }}
         uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -120,7 +122,3 @@ jobs:
           fail_ci_if_error: true
           files: ./coverage.xml
           verbose: true
-
-      - name: Fail job if tests failed
-        if: ${{ steps.pytest.outcome == 'failure' }}
-        run: exit 1
