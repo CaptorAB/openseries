@@ -6,7 +6,6 @@ __pycache__/
 
 # Coverage files
 .coverage
-coverage.xml
 
 # Environments
 /venv/

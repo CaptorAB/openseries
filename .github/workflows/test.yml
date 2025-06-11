@@ -108,8 +108,18 @@ jobs:
         if: ${{ steps.pytest.outcome == 'success' }}
         run: |
           source venv/bin/activate
+          poetry run coverage xml --quiet
           poetry run coverage report
 
       - name: Fail job if tests failed
         if: ${{ steps.pytest.outcome == 'failure' }}
         run: exit 1
+
+      - name: Report coverage to Codecov.io
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: CaptorAB/openseries
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          verbose: true
