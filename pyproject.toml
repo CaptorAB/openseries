@@ -42,7 +42,7 @@ keywords = [
 dependencies = [
     "exchange-calendars (>=4.10.1,<6.0)",
     "holidays (>=0.30,<1.0)",
-    "numpy (>=1.23.2,<3.0.0)",
+    "numpy (>=1.23.2,!=2.3.0,<3.0.0)",
     "openpyxl (>=3.1.2,<5.0.0)",
     "pandas (>=2.1.2,<3.0.0)",
     "plotly (>=5.18.0,<7.0.0)",
