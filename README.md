@@ -80,7 +80,7 @@ cd openseries
 git clone https://github.com/CaptorAB/openseries.git
 cd openseries
 make install
-source source_to_activate_venv
+source source_me
 
 ```
 
