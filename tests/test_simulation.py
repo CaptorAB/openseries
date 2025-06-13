@@ -1,4 +1,11 @@
-"""Test suite for the openseries/simulation.py module."""
+"""Test suite for the openseries/simulation.py module.
+
+Copyright (c) Captor Fund Management AB. This file is part of the openseries project.
+
+Licensed under the BSD 3-Clause License. You may obtain a copy of the License at:
+https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
+SPDX-License-Identifier: BSD-3-Clause
+"""
 
 from __future__ import annotations
 
@@ -8,7 +15,8 @@ from typing import TYPE_CHECKING
 from openseries.owntypes import ValueType
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation, _random_generator
-from tests.test_common_sim import CommonTestCase
+
+from .test_common_sim import CommonTestCase
 
 if TYPE_CHECKING:
     from numpy.random import Generator

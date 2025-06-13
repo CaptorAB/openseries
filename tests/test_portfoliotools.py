@@ -1,4 +1,11 @@
-"""Test suite for the openseries/portfoliotools.py module."""
+"""Test suite for the openseries/portfoliotools.py module.
+
+Copyright (c) Captor Fund Management AB. This file is part of the openseries project.
+
+Licensed under the BSD 3-Clause License. You may obtain a copy of the License at:
+https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
+SPDX-License-Identifier: BSD-3-Clause
+"""
 
 # mypy: disable-error-code="arg-type"
 from __future__ import annotations
@@ -22,14 +29,15 @@ from openseries.portfoliotools import (
     simulate_portfolios,
 )
 from openseries.series import OpenTimeSeries
-from tests.test_common_sim import CommonTestCase
+
+from .test_common_sim import CommonTestCase
 
 
 class PortfoliotoolsTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestPortfoliotools(CommonTestCase):
+class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
     """class to run tests on the module portfoliotools.py."""
 
     def test_simulate_portfolios(self: TestPortfoliotools) -> None:

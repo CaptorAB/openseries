@@ -1,4 +1,11 @@
-"""openseries.openseries.__init__.py."""
+"""openseries.openseries.__init__.py.
+
+Copyright (c) Captor Fund Management AB. This file is part of the openseries project.
+
+Licensed under the BSD 3-Clause License. You may obtain a copy of the License at:
+https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
+SPDX-License-Identifier: BSD-3-Clause
+"""
 
 from .datefixer import (
     date_fix,
@@ -18,6 +25,7 @@ from .portfoliotools import (
     sharpeplot,
     simulate_portfolios,
 )
+from .report import report_html
 from .series import OpenTimeSeries, timeseries_chain
 from .simulation import ReturnSimulation
 
@@ -37,6 +45,7 @@ __all__ = [
     "load_plotly_dict",
     "offset_business_days",
     "prepare_plot_data",
+    "report_html",
     "sharpeplot",
     "simulate_portfolios",
     "timeseries_chain",
