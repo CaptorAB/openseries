@@ -19,6 +19,10 @@ jobs:
     defaults:
       run:
         shell: bash
+    strategy:
+      matrix:
+        shard_index: [0, 1, 2, 3]
+        total_shards: [4]
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
@@ -90,7 +94,17 @@ jobs:
         continue-on-error: true
         run: |
           source venv/bin/activate
-          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
+          PYTHONPATH=${PWD} poetry run pytest \
+            --split-index=${{ matrix.shard_index }} \
+            --split-total=${{ matrix.total_shards }} \
+            -n auto \
+            --dist loadscope \
+            --cov=openseries \
+            --cov-append \
+            --cov-report=term \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --junitxml=junit-${{ matrix.shard_index }}.xml
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}
@@ -108,17 +122,16 @@ jobs:
         if: ${{ steps.pytest.outcome == 'failure' }}
         run: exit 1
 
-      - name: Report coverage
-        run: |
-          source venv/bin/activate
-          poetry run coverage xml --quiet
-          poetry run coverage report
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: junit-${{ matrix.shard_index }}.xml
+          verbose: true
 
       - name: Upload coverage to Codecov.io
         uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CaptorAB/openseries
-          fail_ci_if_error: true
-          files: ./coverage.xml
           verbose: true
