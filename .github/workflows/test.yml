@@ -19,10 +19,6 @@ jobs:
     defaults:
       run:
         shell: bash
-    strategy:
-      matrix:
-        shard_index: [0, 1, 2, 3]
-        total_shards: [4]
 
     steps:
       - name: Check out GitHub repository ${{ github.repository }}
@@ -95,16 +91,13 @@ jobs:
         run: |
           source venv/bin/activate
           PYTHONPATH=${PWD} poetry run pytest \
-            --split-index=${{ matrix.shard_index }} \
-            --split-total=${{ matrix.total_shards }} \
             -n auto \
             --dist loadscope \
             --cov=openseries \
-            --cov-append \
             --cov-report=term \
             --cov-report=term-missing \
             --cov-report=xml \
-            --junitxml=junit-${{ matrix.shard_index }}.xml
+            --junitxml=junit.xml
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}
@@ -126,7 +119,7 @@ jobs:
         uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: junit-${{ matrix.shard_index }}.xml
+          files: junit.xml
           verbose: true
 
       - name: Upload coverage to Codecov.io
