@@ -114,17 +114,3 @@ jobs:
       - name: Fail job if tests failed
         if: ${{ steps.pytest.outcome == 'failure' }}
         run: exit 1
-
-      - name: Upload test results to Codecov
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: junit.xml
-          verbose: true
-
-      - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: CaptorAB/openseries
-          verbose: true

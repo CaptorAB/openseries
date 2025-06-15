@@ -75,14 +75,34 @@ jobs:
           poetry run mypy .
 
       - name: Tests with Pytest
+        id: pytest
+        continue-on-error: true
         run: |
           source venv/Scripts/activate
-          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
+          PYTHONPATH=${PWD} poetry run pytest \
+            -n auto \
+            --dist loadscope \
+            --cov=openseries \
+            --cov-report=term \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --junitxml=junit.xml
 
-      - name: Report coverage
-        run: |
-          source venv/Scripts/activate
-          poetry run coverage report
+      - name: Create GitHub issue on failure
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: 'CaptorAB',
+              repo: 'openseries',
+              title: `Tests failed on ${new Date().toDateString()}`,
+              body: `See the full logs here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+            })
+
+      - name: Fail job if tests failed
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        run: exit 1
 
       - name: Package and check
         run: |
@@ -154,14 +174,34 @@ jobs:
           poetry run mypy .
 
       - name: Tests with Pytest
+        id: pytest
+        continue-on-error: true
         run: |
           source venv/bin/activate
-          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
+          PYTHONPATH=${PWD} poetry run pytest \
+            -n auto \
+            --dist loadscope \
+            --cov=openseries \
+            --cov-report=term \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --junitxml=junit.xml
 
-      - name: Report coverage
-        run: |
-          source venv/bin/activate
-          poetry run coverage report
+      - name: Create GitHub issue on failure
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: 'CaptorAB',
+              repo: 'openseries',
+              title: `Tests failed on ${new Date().toDateString()}`,
+              body: `See the full logs here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+            })
+
+      - name: Fail job if tests failed
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        run: exit 1
 
       - name: Package and check
         run: |
@@ -232,14 +272,34 @@ jobs:
           poetry run mypy .
 
       - name: Tests with Pytest
+        id: pytest
+        continue-on-error: true
         run: |
           source venv/bin/activate
-          PYTHONPATH=${PWD} poetry run coverage run -m pytest --verbose
+          PYTHONPATH=${PWD} poetry run pytest \
+            -n auto \
+            --dist loadscope \
+            --cov=openseries \
+            --cov-report=term \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --junitxml=junit.xml
 
-      - name: Report coverage
-        run: |
-          source venv/bin/activate
-          poetry run coverage report
+      - name: Create GitHub issue on failure
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: 'CaptorAB',
+              repo: 'openseries',
+              title: `Tests failed on ${new Date().toDateString()}`,
+              body: `See the full logs here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+            })
+
+      - name: Fail job if tests failed
+        if: ${{ steps.pytest.outcome == 'failure' }}
+        run: exit 1
 
       - name: Package and check
         run: |
