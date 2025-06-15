@@ -14,9 +14,7 @@ install:
 	poetry run pre-commit install
 
 test:
-	poetry run coverage run -m pytest --verbose
-	poetry run coverage xml --quiet
-	poetry run coverage report
+	poetry run pytest --cov=openseries --cov-report=term --cov-report=term-missing -n auto
 
 lint:
 	poetry run ruff check . --fix --exit-non-zero-on-fix

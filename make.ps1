@@ -95,10 +95,7 @@ switch ($task) {
     }
 
     "test" {
-        poetry run coverage run -m pytest --verbose
-        poetry run coverage xml --quiet
-        poetry run coverage report
-        poetry run genbadge coverage --silent --local --input-file coverage.xml --output-file coverage.svg
+        poetry run pytest --cov=openseries --cov-report=term --cov-report=term-missing -n auto
     }
 
     "lint" {
