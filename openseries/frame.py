@@ -18,11 +18,6 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
 
-    from statsmodels.regression.linear_model import (  # type: ignore[import-untyped]
-        OLSResults,
-    )
-
-import statsmodels.api as sm  # type: ignore[import-untyped]
 from numpy import (
     array,
     cov,
@@ -44,6 +39,7 @@ from pandas import (
     merge,
 )
 from pydantic import field_validator
+from sklearn.linear_model import LinearRegression
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends
@@ -54,8 +50,6 @@ from .owntypes import (
     LiteralCaptureRatio,
     LiteralFrameProps,
     LiteralHowMerge,
-    LiteralOlsFitCovType,
-    LiteralOlsFitMethod,
     LiteralPandasReindexMethod,
     LiteralPortfolioWeightings,
     LiteralTrunc,
@@ -75,7 +69,7 @@ __all__ = ["OpenFrame"]
 
 
 # noinspection PyUnresolvedReferences,PyTypeChecker
-class OpenFrame(_CommonModel):
+class OpenFrame(_CommonModel):  # type: ignore[misc]
     """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
     The intended use is to allow comparisons across these timeseries.
@@ -1229,16 +1223,13 @@ class OpenFrame(_CommonModel):
         self: Self,
         y_column: tuple[str, ValueType] | int,
         x_column: tuple[str, ValueType] | int,
-        method: LiteralOlsFitMethod = "pinv",
-        cov_type: LiteralOlsFitCovType = "nonrobust",
         *,
         fitted_series: bool = True,
-    ) -> OLSResults:
+    ) -> dict[str, float]:
         """Ordinary Least Squares fit.
 
         Performs a linear regression and adds a new column with a fitted line
         using Ordinary Least Squares fit
-        https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html.
 
         Parameters
         ----------
@@ -1246,50 +1237,50 @@ class OpenFrame(_CommonModel):
             The column level values of the dependent variable y
         x_column: tuple[str, ValueType] | int
             The column level values of the exogenous variable x
-        method: LiteralOlsFitMethod, default: pinv
-            Method to solve least squares problem
-        cov_type: LiteralOlsFitCovType, default: nonrobust
-            Covariance estimator
         fitted_series: bool, default: True
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
 
         Returns:
         -------
-        OLSResults
-            The Statsmodels regression output
+        dict[str, float]
+            A dictionary with the coefficient, intercept and rsquared outputs.
 
         """
         msg = "y_column should be a tuple[str, ValueType] or an integer."
         if isinstance(y_column, tuple):
-            y_value = self.tsdf.loc[:, y_column]
+            y_value = self.tsdf.loc[:, y_column].to_numpy()
             y_label = cast(
                 "tuple[str, str]",
                 self.tsdf.loc[:, y_column].name,
             )[0]
         elif isinstance(y_column, int):
-            y_value = self.tsdf.iloc[:, y_column]
+            y_value = self.tsdf.iloc[:, y_column].to_numpy()
             y_label = cast("tuple[str, str]", self.tsdf.iloc[:, y_column].name)[0]
         else:
             raise TypeError(msg)
 
         msg = "x_column should be a tuple[str, ValueType] or an integer."
         if isinstance(x_column, tuple):
-            x_value = self.tsdf.loc[:, x_column]
+            x_value = self.tsdf.loc[:, x_column].to_numpy().reshape(-1, 1)
             x_label = cast(
                 "tuple[str, str]",
                 self.tsdf.loc[:, x_column].name,
             )[0]
         elif isinstance(x_column, int):
-            x_value = self.tsdf.iloc[:, x_column]
+            x_value = self.tsdf.iloc[:, x_column].to_numpy().reshape(-1, 1)
             x_label = cast("tuple[str, str]", self.tsdf.iloc[:, x_column].name)[0]
         else:
             raise TypeError(msg)
 
-        results = sm.OLS(y_value, x_value).fit(method=method, cov_type=cov_type)
+        model = LinearRegression(fit_intercept=True)
+        model.fit(x_value, y_value)
         if fitted_series:
-            self.tsdf[y_label, x_label] = results.predict(x_value)
-
-        return cast("OLSResults", results)
+            self.tsdf[y_label, x_label] = model.predict(x_value)
+        return {
+            "coefficient": model.coef_[0],
+            "intercept": model.intercept_,
+            "rsquared": model.score(x_value, y_value),
+        }
 
     def jensen_alpha(
         self: Self,
