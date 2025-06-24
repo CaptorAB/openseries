@@ -70,7 +70,7 @@ class TestReport(CommonTestCase):  # type: ignore[misc]
             raise ReportTestError(msg)
 
         returns = calendar_period_returns(data=frame, relabel=True, freq="BQE")
-        last_quarter = [f"{nbr:.8f}" for nbr in returns.loc["Jun 19"]]
+        last_quarter = [f"{nbr:.8f}" for nbr in returns.loc["Q2 2019"]]
 
         expected_three = [
             "-2.51705728",
@@ -93,6 +93,11 @@ class TestReport(CommonTestCase):  # type: ignore[misc]
             data=plotframe, auto_open=False, output_type="div", vertical_legend=True
         )
         fig_json = loads(cast("str", figure.to_json()))
+        bar_x_axis_item = "'dtype': 'i2'"
+
+        if bar_x_axis_item not in str(fig_json):
+            msg = "report_html bar_freq argument not setup correctly."
+            raise ReportTestError(msg)
 
         rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
         if rawdata != fig_json["data"][0]["x"][1:5]:
@@ -119,6 +124,32 @@ class TestReport(CommonTestCase):  # type: ignore[misc]
             raise ReportTestError(msg)
 
         _, logo = load_plotly_dict()
+
+        figure_bqe, _ = report_html(
+            data=plotframe,
+            auto_open=False,
+            output_type="div",
+            bar_freq="BQE",
+        )
+        fig_bqe_json = loads(cast("str", figure_bqe.to_json()))
+
+        bar_x_axis_item_bqe = "'x': ['Q3 2009'"
+        if bar_x_axis_item_bqe not in str(fig_bqe_json):
+            msg = "report_html bar_freq argument not setup correctly."
+            raise ReportTestError(msg)
+
+        figure_bme, _ = report_html(
+            data=plotframe,
+            auto_open=False,
+            output_type="div",
+            bar_freq="BME",
+        )
+        fig_bme_json = loads(cast("str", figure_bme.to_json()))
+
+        bar_x_axis_item_bme = "'x': ['Jul 09'"
+        if bar_x_axis_item_bme not in str(fig_bme_json):
+            msg = "report_html bar_freq argument not setup correctly."
+            raise ReportTestError(msg)
 
         fig_logo, _ = report_html(
             data=plotframe,

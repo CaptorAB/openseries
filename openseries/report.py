@@ -26,7 +26,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .owntypes import LiteralPlotlyJSlib, LiteralPlotlyOutput
 
 
-from pandas import DataFrame, Series, concat
+from pandas import DataFrame, Series, Timestamp, concat
 from plotly.io import to_html
 from plotly.offline import plot
 from plotly.subplots import make_subplots
@@ -73,8 +73,12 @@ def calendar_period_returns(
         copied.value_to_ret()
     cldr = copied.tsdf.iloc[1:].copy()
     if relabel:
-        if freq == "BYE":
+        if freq.upper() == "BYE":
             cldr.index = [d.year for d in cldr.index]
+        elif freq.upper() == "BQE":
+            cldr.index = [
+                Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index
+            ]
         else:
             cldr.index = [d.strftime("%b %y") for d in cldr.index]
 
