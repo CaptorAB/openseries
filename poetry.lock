@@ -544,14 +544,14 @@ files = [
 
 [[package]]
 name = "narwhals"
-version = "1.43.1"
+version = "1.44.0"
 description = "Extremely lightweight compatibility layer between dataframe libraries"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "narwhals-1.43.1-py3-none-any.whl", hash = "sha256:1ee508fa4dc0e05aa5b88717ba11613d8d9ccf0dd1e48513d4a3afb237dba9f2"},
-    {file = "narwhals-1.43.1.tar.gz", hash = "sha256:6ff56d600da67a0a0980b83bd5577d076772fdba96474076ba4e76c920dbc1e5"},
+    {file = "narwhals-1.44.0-py3-none-any.whl", hash = "sha256:a170ea0bab4cf1f323d9f8bf17f2d7042c3d73802bea321996b39bf075d57de5"},
+    {file = "narwhals-1.44.0.tar.gz", hash = "sha256:8cf0616d4f6f21225b3b56fcde96ccab6d05023561a0f162402aa9b8c33ad31d"},
 ]
 
 [package.extras]
@@ -642,6 +642,7 @@ files = [
     {file = "numpy-2.2.6-pp310-pypy310_pp73-macosx_14_0_x86_64.whl", hash = "sha256:7befc596a7dc9da8a337f79802ee8adb30a552a94f792b9c9d18c840055907db"},
     {file = "numpy-2.2.6-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ce47521a4754c8f4593837384bd3424880629f718d87c5d44f8ed763edd63543"},
     {file = "numpy-2.2.6-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:d042d24c90c41b54fd506da306759e06e568864df8ec17ccc17e9e884634fd00"},
+    {file = "numpy-2.2.6.tar.gz", hash = "sha256:e29554e2bef54a90aa5cc07da6ce955accb83f21ab5de01a62c8478897b264fd"},
 ]
 
 [[package]]
