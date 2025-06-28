@@ -3257,35 +3257,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             msg = "Method ord_least_squares_fit() not working as intended"
             raise OpenFrameTestError(msg)
 
-        old_intended = [  # noqa: F841
-            "1.00000000000",
-            "1.37862724760",
-            "0.56028811567",
-            "0.69603804963",
-            "0.46400465988",
-            "0.65027591851",
-            "1.00000000000",
-            "0.38009173429",
-            "0.46384576412",
-            "0.22803974704",
-            "1.66624847545",
-            "2.39643672361",
-            "1.00000000000",
-            "1.20106034055",
-            "0.40261757732",
-            "1.35912552734",
-            "1.92021284114",
-            "0.78861141738",
-            "1.00000000000",
-            "0.70469281021",
-            "0.09471012260",
-            "0.09868105726",
-            "0.02763366151",
-            "0.07366264502",
-            "1.00000000000",
-        ]
-
-        new_intended = [
+        intended = [
             "1.00000000000",
             "1.30086569003",
             "0.70760700025",
@@ -3313,7 +3285,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             "1.00000000000",
         ]
 
-        if results != new_intended:
+        if results != intended:
             msg = f"Method ord_least_squares_fit() not working as intended\n{results}"
             raise OpenFrameTestError(msg)
 
