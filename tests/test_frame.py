@@ -3234,56 +3234,58 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results = []
         for i in range(oframe.item_count):
             for j in range(oframe.item_count):
-                tmp = oframe.ord_least_squares_fit(
+                ols = oframe.ord_least_squares_fit(
                     y_column=i,
                     x_column=j,
                     fitted_series=False,
                 )
-                results.append(f"{float(tmp.params.iloc[0]):.11f}")
+                results.append(f"{ols['coefficient']:.11f}")
 
         results_tuple = []
         k_tuple: Hashable
         l_tuple: Hashable
         for k_tuple in oframe.tsdf:
             for l_tuple in oframe.tsdf:
-                tmp = oframe.ord_least_squares_fit(
+                ols = oframe.ord_least_squares_fit(
                     y_column=cast("tuple[str, ValueType]", k_tuple),
                     x_column=cast("tuple[str, ValueType]", l_tuple),
                     fitted_series=False,
                 )
-                results_tuple.append(f"{float(tmp.params.iloc[0]):.11f}")
+                results_tuple.append(f"{ols['coefficient']:.11f}")
 
         if results != results_tuple:
             msg = "Method ord_least_squares_fit() not working as intended"
             raise OpenFrameTestError(msg)
 
-        if results != [
+        intended = [
             "1.00000000000",
-            "1.37862724760",
-            "0.56028811567",
-            "0.69603804963",
-            "0.46400465988",
-            "0.65027591851",
+            "1.30086569003",
+            "0.70760700025",
+            "0.67465227245",
+            "1.10187251514",
+            "0.58311900396",
             "1.00000000000",
-            "0.38009173429",
-            "0.46384576412",
-            "0.22803974704",
-            "1.66624847545",
-            "2.39643672361",
+            "0.44879185229",
+            "0.41664068548",
+            "0.66341168704",
+            "1.26345414943",
+            "1.78767099287",
             "1.00000000000",
-            "1.20106034055",
-            "0.40261757732",
-            "1.35912552734",
-            "1.92021284114",
-            "0.78861141738",
+            "0.92874072536",
+            "1.59673304423",
+            "1.29428495525",
+            "1.78314580648",
+            "0.99787706235",
             "1.00000000000",
-            "0.70469281021",
-            "0.09471012260",
-            "0.09868105726",
-            "0.02763366151",
-            "0.07366264502",
+            "1.60740416727",
+            "0.48167638079",
+            "0.64696737805",
+            "0.39092095264",
+            "0.36626816720",
             "1.00000000000",
-        ]:
+        ]
+
+        if results != intended:
             msg = f"Method ord_least_squares_fit() not working as intended\n{results}"
             raise OpenFrameTestError(msg)
 

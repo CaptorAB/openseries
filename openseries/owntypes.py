@@ -141,21 +141,7 @@ LiteralPlotlyHistogramHistNorm = Literal[
     "density",
     "probability density",
 ]
-LiteralOlsFitMethod = Literal["pinv", "qr"]
 LiteralPortfolioWeightings = Literal["eq_weights", "inv_vol"]
-LiteralOlsFitCovType = Literal[
-    "nonrobust",
-    "fixed scale",
-    "HC0",
-    "HC1",
-    "HC2",
-    "HC3",
-    "HAC",
-    "hac-panel",
-    "hac-groupsum",
-    "cluster",
-]
-
 LiteralMinimizeMethods = Literal[
     "SLSQP",
     "Nelder-Mead",
