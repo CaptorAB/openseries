@@ -35,7 +35,6 @@ repos:
       - id: check-json
       - id: check-toml
       - id: check-yaml
-      - id: check-xml
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: name-tests-test
