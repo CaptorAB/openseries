@@ -341,14 +341,14 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "exchange-calendars"
-version = "4.10.1"
+version = "4.11"
 description = "Calendars for securities exchanges"
 optional = false
 python-versions = "~=3.10"
 groups = ["main"]
 files = [
-    {file = "exchange_calendars-4.10.1-py3-none-any.whl", hash = "sha256:efb5a1665b6c6bf09ea621f4f0be39ed961de69db6355d1e0e4ad3d1b584525b"},
-    {file = "exchange_calendars-4.10.1.tar.gz", hash = "sha256:32885a58557cee82359f8b54f396616fde1ee0df05911f67416934d58bcd13e1"},
+    {file = "exchange_calendars-4.11-py3-none-any.whl", hash = "sha256:893f618042492a3e99bc7bb6792533f2a8c2e2172ef9aff36c58a68b331e62d5"},
+    {file = "exchange_calendars-4.11.tar.gz", hash = "sha256:d6c873f8a7c3d1fb88c442c93a5c99e2c7c0a65b49afca93e8836d4aebab3cbe"},
 ]
 
 [package.dependencies]
