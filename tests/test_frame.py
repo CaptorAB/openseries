@@ -1528,6 +1528,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         fig_keys = [
             "cumulative",
+            "histfunc",
             "histnorm",
             "hovertemplate",
             "name",
