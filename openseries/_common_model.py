@@ -559,6 +559,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         countries: CountriesType | None = None,
         markets: list[str] | str | None = None,
         custom_holidays: list[str] | str | None = None,
+        method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
         """Align the index of .tsdf with local calendar business days.
 
@@ -570,6 +571,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             (List of) markets code(s) according to pandas-market-calendars
         custom_holidays: list[str] | str, optional
             Argument where missing holidays can be added
+        method: LiteralPandasReindexMethod, default: "nearest"
 
         Returns:
         -------
@@ -620,7 +622,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
-        self.tsdf = self.tsdf.reindex(d_range, method=None, copy=False)
+        self.tsdf = self.tsdf.reindex(labels=d_range, method=method, copy=False)
 
         return self
 
@@ -1016,7 +1018,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             )
         figure.update_layout(yaxis={"tickformat": tick_fmt})
 
-        if show_last is True:
+        if show_last:
             txt = f"Last {{:{tick_fmt}}}" if tick_fmt else "Last {}"
 
             for item in range(self.tsdf.shape[1]):
@@ -1063,7 +1065,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
     def plot_histogram(
         self: Self,
         plot_type: LiteralPlotlyHistogramPlotType = "bars",
-        histnorm: LiteralPlotlyHistogramHistNorm = "percent",
+        histnorm: LiteralPlotlyHistogramHistNorm = "probability",
         barmode: LiteralPlotlyHistogramBarMode = "overlay",
         xbins_size: float | None = None,
         opacity: float = 0.75,
@@ -1167,6 +1169,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 figure.add_histogram(
                     x=self.tsdf.iloc[:, item],
                     cumulative={"enabled": cumulative},
+                    histfunc="count",
                     histnorm=histnorm,
                     name=labels[item],
                     xbins={"size": xbins_size},
