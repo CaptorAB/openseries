@@ -8,7 +8,7 @@ install:
 	python3 -m venv ./venv
 	venv/bin/python --version
 	venv/bin/python -m pip install --upgrade pip
-	venv/bin/pip install poetry==2.1.3
+	venv/bin/pip install poetry==2.1.4
 	@. venv/bin/activate && \
 	poetry install --with dev && \
 	poetry run pre-commit install

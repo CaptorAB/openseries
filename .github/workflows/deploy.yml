@@ -37,7 +37,7 @@ jobs:
       - name: Activate virtual environment and install Poetry
         run: |
           source venv/bin/activate
-          pip install poetry==2.1.3
+          pip install poetry==2.1.4
 
       - name: Install dependencies with Poetry
         run: |
