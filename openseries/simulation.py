@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
@@ -116,7 +115,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
             Simulation data
 
         """
-        return self.dframe.add(1.0).cumprod(axis="columns").T
+        return self.dframe.add(1.0).cumprod(axis="columns").T  # type: ignore[no-any-return]
 
     @property
     def realized_mean_return(self: Self) -> float:
@@ -130,9 +129,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         """
         return cast(
             "float",
-            (
-                self.results.ffill().pct_change().mean() * self.trading_days_in_year
-            ).iloc[0],
+            (self.results.pct_change().mean() * self.trading_days_in_year).iloc[0],
         )
 
     @property
@@ -147,10 +144,9 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
         """
         return cast(
             "float",
-            (
-                self.results.ffill().pct_change().std()
-                * sqrt(self.trading_days_in_year)
-            ).iloc[0],
+            (self.results.pct_change().std() * sqrt(self.trading_days_in_year)).iloc[
+                0
+            ],
         )
 
     @classmethod
@@ -464,7 +460,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
                     [ValueType.RTRN],
                 ],
             )
-            return sdf
+            return sdf  # type: ignore[no-any-return]
 
         fdf = DataFrame()
         for item in range(self.number_of_sims):

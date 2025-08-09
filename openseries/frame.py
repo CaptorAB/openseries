@@ -7,13 +7,13 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="index,assignment,arg-type,no-any-return"
+# mypy: disable-error-code="assignment,no-any-return"
 from __future__ import annotations
 
 from copy import deepcopy
 from functools import reduce
 from logging import getLogger
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
@@ -339,10 +339,13 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             The returns of the values in the series
 
         """
-        returns = self.tsdf.ffill().pct_change()
+        returns = self.tsdf.pct_change()
         returns.iloc[0] = 0
-        new_labels = [ValueType.RTRN] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        new_labels: list[ValueType] = [ValueType.RTRN] * self.item_count
+        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
+            self.tsdf.columns.get_level_values(0),
+            new_labels,
+        ]
         returns.columns = MultiIndex.from_arrays(arrays=arrays)
         self.tsdf = returns.copy()
         return self
@@ -364,8 +367,11 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         """
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
-        new_labels = [ValueType.RTRN] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        new_labels: list[ValueType] = [ValueType.RTRN] * self.item_count
+        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
+            self.tsdf.columns.get_level_values(0),
+            new_labels,
+        ]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
@@ -380,7 +386,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
-            returns = self.tsdf.ffill().pct_change()
+            returns = self.tsdf.pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):
             returns = self.tsdf.copy()
@@ -392,8 +398,11 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         returns = returns.add(1.0)
         self.tsdf = returns.cumprod(axis=0) / returns.iloc[0]
 
-        new_labels = [ValueType.PRICE] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        new_labels: list[ValueType] = [ValueType.PRICE] * self.item_count
+        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
+            self.tsdf.columns.get_level_values(0),
+            new_labels,
+        ]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
@@ -605,13 +614,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Correlation matrix
 
         """
-        corr_matrix = (
-            self.tsdf.ffill()
-            .pct_change()
-            .corr(
-                method="pearson",
-                min_periods=1,
-            )
+        corr_matrix = self.tsdf.pct_change().corr(
+            method="pearson",
+            min_periods=1,
         )
         corr_matrix.columns = corr_matrix.columns.droplevel(level=1)
         corr_matrix.index = corr_matrix.index.droplevel(level=1)
@@ -838,7 +843,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 ]
                 relative = 1.0 + longdf - shortdf
                 vol = float(
-                    relative.ffill().pct_change().std() * sqrt(time_factor),
+                    relative.pct_change().std() * sqrt(time_factor),
                 )
                 terrors.append(vol)
 
@@ -930,10 +935,10 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 ]
                 relative = 1.0 + longdf - shortdf
                 ret = float(
-                    relative.ffill().pct_change().mean() * time_factor,
+                    relative.pct_change().mean() * time_factor,
                 )
                 vol = float(
-                    relative.ffill().pct_change().std() * sqrt(time_factor),
+                    relative.pct_change().std() * sqrt(time_factor),
                 )
                 ratios.append(ret / vol)
 
@@ -1034,18 +1039,16 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 msg = "ratio must be one of 'up', 'down' or 'both'."
                 if ratio == "up":
                     uparray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1056,9 +1059,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     ratios.append(up_rtrn / up_idx_return)
                 elif ratio == "down":
                     downarray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1067,9 +1069,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1081,18 +1082,16 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     ratios.append(down_return / down_idx_return)
                 elif ratio == "both":
                     uparray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1101,9 +1100,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     downarray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1112,9 +1110,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1444,7 +1441,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
 
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
-            returns = self.tsdf.ffill().pct_change()
+            returns = self.tsdf.pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):
             returns = self.tsdf.copy()
@@ -1519,14 +1516,11 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
 
         retseries = (
-            relative.ffill()
-            .pct_change()
-            .rolling(observations, min_periods=observations)
-            .sum()
+            relative.pct_change().rolling(observations, min_periods=observations).sum()
         )
         retdf = retseries.dropna().to_frame()
 
-        voldf = relative.ffill().pct_change().rolling(
+        voldf = relative.pct_change().rolling(
             observations,
             min_periods=observations,
         ).std() * sqrt(time_factor)
@@ -1572,13 +1566,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         asset_label = cast("tuple[str, str]", self.tsdf.iloc[:, asset_column].name)[0]
         beta_label = f"{asset_label} / {market_label}"
 
-        rolling = (
-            self.tsdf.ffill()
-            .pct_change()
-            .rolling(
-                observations,
-                min_periods=observations,
-            )
+        rolling = self.tsdf.pct_change().rolling(
+            observations,
+            min_periods=observations,
         )
 
         rcov = rolling.cov(ddof=dlta_degr_freedms)
@@ -1633,11 +1623,10 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
         first_series = (
             self.tsdf.iloc[:, first_column]
-            .ffill()
             .pct_change()[1:]
             .rolling(observations, min_periods=observations)
         )
-        second_series = self.tsdf.iloc[:, second_column].ffill().pct_change()[1:]
+        second_series = self.tsdf.iloc[:, second_column].pct_change()[1:]
         corrdf = first_series.corr(other=second_series).dropna().to_frame()
         corrdf.columns = MultiIndex.from_arrays(
             [
