@@ -836,7 +836,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         methods_to_compare = [
             "arithmetic_ret_func",
             "cvar_down_func",
-            "downside_deviation_func",
+            "lower_partial_moment_func",
             "geo_ret_func",
             "kurtosis_func",
             "max_drawdown_func",
@@ -853,7 +853,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         smethods_to_compare = [
             sames.arithmetic_ret_func,
             sames.cvar_down_func,
-            sames.downside_deviation_func,
+            sames.lower_partial_moment_func,
             sames.geo_ret_func,
             sames.kurtosis_func,
             sames.max_drawdown_func,
@@ -870,7 +870,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         fmethods_to_compare = [
             samef.arithmetic_ret_func,
             samef.cvar_down_func,
-            samef.downside_deviation_func,
+            samef.lower_partial_moment_func,
             samef.geo_ret_func,
             samef.kurtosis_func,
             samef.max_drawdown_func,
@@ -1092,7 +1092,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         common_calc_methods = [
             "arithmetic_ret_func",
             "cvar_down_func",
-            "downside_deviation_func",
+            "lower_partial_moment_func",
             "geo_ret_func",
             "kurtosis_func",
             "max_drawdown_func",
@@ -3070,7 +3070,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             mframe.arithmetic_ret_func,
             mframe.vol_func,
             mframe.vol_from_var_func,
-            mframe.downside_deviation_func,
+            mframe.lower_partial_moment_func,
             mframe.target_weight_from_var,
         ]
         for methd in methods:

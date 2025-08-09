@@ -26,7 +26,6 @@ from numpy import (
     log,
     nan,
     sqrt,
-    square,
     std,
 )
 from pandas import (
@@ -487,6 +486,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         dlta_degr_freedms: int = 0,
         first_column: int = 0,
         second_column: int = 1,
+        corr_scale: float = 2.0,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -509,6 +509,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Column of first timeseries.
         second_column: int, default: 1
             Column of second timeseries.
+        corr_scale: float, default: 2.0
+            Correlation scale factor.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -551,9 +553,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 
         for rtn in cols:
-            data[rtn, ValueType.RTRN] = (
-                data.loc[:, (rtn, ValueType.PRICE)].apply(log).diff()
-            )
+            data[rtn, ValueType.RTRN] = log(data.loc[:, (rtn, ValueType.PRICE)]).diff()
 
         raw_one = [
             data.loc[:, (cols[0], ValueType.RTRN)]
@@ -574,34 +574,39 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 ddof=dlta_degr_freedms,
             )[0][1],
         ]
-        raw_corr = [raw_cov[0] / (2 * raw_one[0] * raw_two[0])]
 
-        for _, row in data.iloc[1:].iterrows():
-            tmp_raw_one = sqrt(
-                square(row.loc[cols[0], ValueType.RTRN]) * time_factor * (1 - lmbda)
-                + square(raw_one[-1]) * lmbda,
-            )
-            tmp_raw_two = sqrt(
-                square(row.loc[cols[1], ValueType.RTRN]) * time_factor * (1 - lmbda)
-                + square(raw_two[-1]) * lmbda,
-            )
-            tmp_raw_cov = (
-                row.loc[cols[0], ValueType.RTRN]
-                * row.loc[cols[1], ValueType.RTRN]
-                * time_factor
-                * (1 - lmbda)
-                + raw_cov[-1] * lmbda
-            )
-            tmp_raw_corr = tmp_raw_cov / (2 * tmp_raw_one * tmp_raw_two)
-            raw_one.append(tmp_raw_one)
-            raw_two.append(tmp_raw_two)
-            raw_cov.append(tmp_raw_cov)
-            raw_corr.append(tmp_raw_corr)
+        r1 = data.loc[:, (cols[0], ValueType.RTRN)]
+        r2 = data.loc[:, (cols[1], ValueType.RTRN)]
+
+        alpha = 1.0 - lmbda
+
+        s1 = (r1.pow(2) * time_factor).copy()
+        s2 = (r2.pow(2) * time_factor).copy()
+        sc = (r1 * r2 * time_factor).copy()
+
+        s1.iloc[0] = float(raw_one[0] ** 2)
+        s2.iloc[0] = float(raw_two[0] ** 2)
+        sc.iloc[0] = float(raw_cov[0])
+
+        m1 = s1.ewm(alpha=alpha, adjust=False).mean()
+        m2 = s2.ewm(alpha=alpha, adjust=False).mean()
+        mc = sc.ewm(alpha=alpha, adjust=False).mean()
+
+        m1v = m1.to_numpy(copy=False)
+        m2v = m2.to_numpy(copy=False)
+        mcv = mc.to_numpy(copy=False)
+
+        vol1 = sqrt(m1v)
+        vol2 = sqrt(m2v)
+        denom = corr_scale * vol1 * vol2
+
+        corr = mcv / denom
+        corr[denom == 0.0] = nan
 
         return DataFrame(
             index=[*cols, corr_label],
             columns=data.index,
-            data=[raw_one, raw_two, raw_corr],
+            data=[vol1, vol2, corr],
         ).T
 
     @property

@@ -1216,7 +1216,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
         checks = {
             "arithmetic_ret_func": "0.03770656022",
             "cvar_down_func": "-0.01265870645",
-            "downside_deviation_func": "0.06871856382",
+            "lower_partial_moment_func": "0.06871856382",
             "geo_ret_func": f"{excel_geo_ret:.11f}",
             "kurtosis_func": "-0.07991363073",
             "max_drawdown_func": "-0.12512526696",
@@ -1534,7 +1534,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             raise OpenTimeSeriesTestError(msg)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
-        """Test downside_deviation_func method.
+        """Test lower_partial_moment_func method.
 
         Source: https://www.investopedia.com/terms/d/downside-deviation.asp.
         """
@@ -1569,13 +1569,13 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
         ).to_cumret()
 
         mar = 0.01
-        downdev = dd_asset.downside_deviation_func(
+        downdev = dd_asset.lower_partial_moment_func(
             min_accepted_return=mar,
             periods_in_a_year_fixed=1,
         )
 
         if f"{downdev:.10f}" != "0.0433333333":
-            msg = f"Unexpected result from downside_deviation_func() {downdev:.10f}"
+            msg = f"Unexpected result from lower_partial_moment_func() {downdev:.10f}"
             raise OpenTimeSeriesTestError(msg)
 
     def test_omega_ratio(self: TestOpenTimeSeries) -> None:
@@ -1848,7 +1848,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             "arithmetic_ret_func",
             "vol_func",
             "vol_from_var_func",
-            "downside_deviation_func",
+            "lower_partial_moment_func",
             "target_weight_from_var",
         ]
         for methd in methods:

@@ -263,7 +263,10 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         """
         min_accepted_return: float = 0.0
-        return self.downside_deviation_func(min_accepted_return=min_accepted_return)
+        order = 2
+        return self.lower_partial_moment_func(
+            min_accepted_return=min_accepted_return, order=order
+        )
 
     @property
     def ret_vol_ratio(self: Self) -> float | Series[float]:
@@ -1637,17 +1640,19 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             dtype="float64",
         )
 
-    def downside_deviation_func(
+    def lower_partial_moment_func(
         self: Self,
         min_accepted_return: float = 0.0,
+        order: int = 2,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
-        """Downside Deviation.
+        """Downside Deviation if order set to 2.
 
-        The standard deviation of returns that are below a Minimum Accepted
+        If order is set to 2 the function calculates the standard
+        deviation of returns that are below a Minimum Accepted
         Return of zero. It is used to calculate the Sortino Ratio.
         https://www.investopedia.com/terms/d/downside-deviation.asp.
 
@@ -1655,6 +1660,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         ----------
         min_accepted_return : float, optional
             The annualized Minimum Accepted Return (MAR)
+        order: int, default: 2
+            Order of partial moment
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -1669,7 +1676,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         Returns:
         -------
         float | Pandas.Series[float]
-            Downside deviation
+            Downside deviation if order set to 2
 
         """
         zero: float = 0.0
@@ -1699,7 +1706,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             .sub(min_accepted_return / time_factor)
         )
 
-        result = sqrt((dddf[dddf < zero] ** 2).sum() / how_many) * sqrt(
+        result = ((dddf[dddf < zero] ** order).sum() / how_many) ** (1 / order) * sqrt(
             time_factor,
         )
 
@@ -2080,7 +2087,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 periods_in_a_year_fixed=periods_in_a_year_fixed,
             )
             - riskfree_rate,
-        ) / self.downside_deviation_func(
+        ) / self.lower_partial_moment_func(
             min_accepted_return=min_accepted_return,
             months_from_last=months_from_last,
             from_date=from_date,

@@ -672,9 +672,9 @@ class OpenTimeSeries(_CommonModel):
 
         data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 
-        data[self.label, ValueType.RTRN] = (
-            data.loc[:, self.tsdf.columns.to_numpy()[0]].apply(log).diff()
-        )
+        data[self.label, ValueType.RTRN] = log(
+            data.loc[:, self.tsdf.columns.to_numpy()[0]]
+        ).diff()
 
         rawdata = [
             data.loc[:, cast("int", (self.label, ValueType.RTRN))]
