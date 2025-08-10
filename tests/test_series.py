@@ -1638,9 +1638,27 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             min_accepted_return=mar,
         )
 
+        msg = f"Unexpected result from omega_ratio_func(): {omega:.10f}"
         if f"{omega:.10f}" != "3.1163413842":
-            msg = f"Unexpected result from omega_ratio_func(): {omega:.10f}"
             raise OpenTimeSeriesTestError(msg)
+
+    def test_sortino_as_kappa3(self: TestOpenTimeSeries) -> None:
+        """Test sortino_ratio_func() setting order to 3 to get kappa3 ratio."""
+        sortino = self.randomseries.sortino_ratio_func(order=2)
+        msg = f"Unexpected result from sortino_ratio_func(): {sortino:.10f}"
+        if f"{sortino:.10f}" != "0.8768329634":
+            raise OpenTimeSeriesTestError(msg)
+
+        kappa3 = self.randomseries.sortino_ratio_func(order=3)
+        msg = f"Unexpected result from sortino_ratio_func(): {kappa3:.10f}"
+        if f"{kappa3:.10f}" != "0.6671520235":
+            raise OpenTimeSeriesTestError(msg)
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="'order' must be 2 or 3, got 4.",
+        ):
+            _ = self.randomseries.sortino_ratio_func(order=4)  # type: ignore[arg-type]
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""

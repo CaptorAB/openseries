@@ -17,7 +17,7 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, SupportsFloat, cast
+from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
 
@@ -263,7 +263,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         """
         min_accepted_return: float = 0.0
-        order = 2
+        order: Literal[2, 3] = 2
         return self.lower_partial_moment_func(
             min_accepted_return=min_accepted_return, order=order
         )
@@ -1643,7 +1643,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
     def lower_partial_moment_func(
         self: Self,
         min_accepted_return: float = 0.0,
-        order: int = 2,
+        order: Literal[2, 3] = 2,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -1653,8 +1653,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         If order is set to 2 the function calculates the standard
         deviation of returns that are below a Minimum Accepted
-        Return of zero. It is used to calculate the Sortino Ratio.
-        https://www.investopedia.com/terms/d/downside-deviation.asp.
+        Return of zero. For general order p, it returns LPM_p^(1/p),
+        i.e., the rooted lower partial moment of order p.
 
         Parameters
         ----------
@@ -1679,12 +1679,17 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             Downside deviation if order set to 2
 
         """
+        msg = f"'order' must be 2 or 3, got {order!r}."
+        if order not in (2, 3):
+            raise ValueError(msg)
+
         zero: float = 0.0
         earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
         )
+
         how_many = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .pct_change()
@@ -1700,22 +1705,26 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             fraction = (later - earlier).days / 365.25
             time_factor = how_many.div(fraction)
 
-        dddf = (
+        per_period_mar = min_accepted_return / time_factor
+        diff = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
             .pct_change()
-            .sub(min_accepted_return / time_factor)
+            .sub(per_period_mar)
         )
 
-        result = ((dddf[dddf < zero] ** order).sum() / how_many) ** (1 / order) * sqrt(
-            time_factor,
-        )
+        shortfall = (-diff).clip(lower=zero)
+        base = shortfall.pow(order).sum() / how_many
+        result = base.pow(1.0 / float(order))
+        result *= sqrt(time_factor)
+
+        dd_order = 2
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
         return Series(
             data=result,
             index=self.tsdf.columns,
-            name="Downside deviation",
+            name="Downside deviation" if order == dd_order else f"LPM{order}",
             dtype="float64",
         )
 
@@ -2042,18 +2051,22 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         self: Self,
         riskfree_rate: float = 0.0,
         min_accepted_return: float = 0.0,
+        order: Literal[2, 3] = 2,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
-        """Sortino Ratio.
+        """Sortino Ratio or Kappa3 Ratio.
 
         The Sortino ratio calculated as ( return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has zero
         volatility, and a minimum acceptable return of zero. The ratio is
         calculated using the annualized arithmetic mean of returns.
         https://www.investopedia.com/terms/s/sortinoratio.asp.
+        If order is set to 3 the ratio calculated becomes Kappa3 which
+        penalizes larger downside outcomes more heavily than the Sortino
+        ratio (which uses order 2).
 
         Parameters
         ----------
@@ -2061,6 +2074,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             The return of the zero volatility asset
         min_accepted_return : float, optional
             The annualized Minimum Accepted Return (MAR)
+        order: int, default: 2
+            Order of partial moment
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -2089,6 +2104,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             - riskfree_rate,
         ) / self.lower_partial_moment_func(
             min_accepted_return=min_accepted_return,
+            order=order,
             months_from_last=months_from_last,
             from_date=from_date,
             to_date=to_date,
