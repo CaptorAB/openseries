@@ -2542,6 +2542,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         column: int = 0,
         observations: int = 21,
         periods_in_a_year_fixed: DaysInYearType | None = None,
+        dlta_degr_freedms: int = 1,
     ) -> DataFrame:
         """Calculate rolling annualised volatilities.
 
@@ -2554,6 +2555,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
+        dlta_degr_freedms: int, default: 1
+            Variance bias factor taking the value 0 or 1.
 
         Returns:
         -------
@@ -2565,15 +2568,16 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
+
         vol_label = cast("tuple[str, ValueType]", self.tsdf.iloc[:, column].name)[0]
-        dframe = Series(self.tsdf.iloc[:, column]).pct_change()
-        volseries = dframe.rolling(
-            observations,
-            min_periods=observations,
-        ).std() * sqrt(
-            time_factor,
-        )
+
+        s = log(self.tsdf.iloc[:, column]).diff()
+        volseries = s.rolling(window=observations, min_periods=observations).std(
+            ddof=dlta_degr_freedms
+        ) * sqrt(time_factor)
+
         voldf = volseries.dropna().to_frame()
+
         voldf.columns = MultiIndex.from_arrays(
             [
                 [vol_label],

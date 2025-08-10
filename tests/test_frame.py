@@ -2467,15 +2467,15 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.06592263886",
-            "0.06849943405",
-            "0.07131196245",
-            "0.07266936036",
-            "0.07194915928",
+            "0.06597558501",
+            "0.06856064777",
+            "0.07136508824",
+            "0.07272307603",
+            "0.07199918606",
         ]
 
         if values != checkdata:
-            msg = "Result from method rolling_vol() not as intended."
+            msg = f"Result from method rolling_vol() not as intended.\n{values}"
             raise OpenFrameTestError(msg)
 
         simdata_fxd_per_yr = frame.rolling_vol(
@@ -2484,17 +2484,17 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             periods_in_a_year_fixed=251,
         )
 
-        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
-        checkdata_fxd_per_yr = [
-            "0.06587383487",
-            "0.06844872241",
-            "0.07125916863",
-            "0.07261556163",
-            "0.07189589373",
+        values_fxd = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
+        checkdata_fxd = [
+            "0.06592674183",
+            "0.06850989081",
+            "0.07131225509",
+            "0.07266923753",
+            "0.07194588348",
         ]
 
-        if values_fxd_per_yr != checkdata_fxd_per_yr:
-            msg = "Result from method rolling_vol() not as intended."
+        if values_fxd != checkdata_fxd:
+            msg = f"Result from method rolling_vol() not as intended.\n{values_fxd}"
             raise OpenFrameTestError(msg)
 
     def test_rolling_return(self: TestOpenFrame) -> None:
