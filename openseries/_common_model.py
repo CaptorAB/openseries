@@ -302,6 +302,32 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
 
     @property
+    def kappa3_ratio(self: Self) -> float | Series[float]:
+        """Kappa-3 ratio.
+
+        The Kappa-3 ratio is a generalized downside-risk ratio defined as
+        annualized arithmetic return divided by the cubic-root of the
+        lower partial moment of order 3 (with respect to a minimum acceptable
+        return, MAR). It penalizes larger downside outcomes more heavily than
+        the Sortino ratio (which uses order 2).
+
+        Returns:
+        -------
+        float | Pandas.Series[float]
+            Kappa-3 ratio calculation with the riskfree rate and
+            Minimum Acceptable Return (MAR) both set to zero.
+
+        """
+        riskfree_rate: float = 0.0
+        minimum_accepted_return: float = 0.0
+        order: Literal[2, 3] = 3
+        return self.sortino_ratio_func(
+            riskfree_rate=riskfree_rate,
+            min_accepted_return=minimum_accepted_return,
+            order=order,
+        )
+
+    @property
     def omega_ratio(self: Self) -> float | Series[float]:
         """https://en.wikipedia.org/wiki/Omega_ratio.
 
@@ -2111,12 +2137,13 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
+        sortino_order = 2
         if self.tsdf.shape[1] == 1:
             return float(cast("float64", ratio.iloc[0]))
         return Series(
             data=ratio,
             index=self.tsdf.columns,
-            name="Sortino ratio",
+            name="Sortino ratio" if order == sortino_order else "Kappa-3 ratio",
             dtype="float64",
         )
 
