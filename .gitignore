@@ -7,6 +7,7 @@ __pycache__/
 # Coverage files
 .coverage
 coverage.xml
+junit.xml
 
 # Environments
 /venv/

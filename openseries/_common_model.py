@@ -17,7 +17,7 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, SupportsFloat, cast
+from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
 
 from numpy import float64, inf, isnan, log, maximum, sqrt
 
@@ -263,7 +263,10 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         """
         min_accepted_return: float = 0.0
-        return self.downside_deviation_func(min_accepted_return=min_accepted_return)
+        order: Literal[2, 3] = 2
+        return self.lower_partial_moment_func(
+            min_accepted_return=min_accepted_return, order=order
+        )
 
     @property
     def ret_vol_ratio(self: Self) -> float | Series[float]:
@@ -296,6 +299,32 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         return self.sortino_ratio_func(
             riskfree_rate=riskfree_rate,
             min_accepted_return=minimum_accepted_return,
+        )
+
+    @property
+    def kappa3_ratio(self: Self) -> float | Series[float]:
+        """Kappa-3 ratio.
+
+        The Kappa-3 ratio is a generalized downside-risk ratio defined as
+        annualized arithmetic return divided by the cubic-root of the
+        lower partial moment of order 3 (with respect to a minimum acceptable
+        return, MAR). It penalizes larger downside outcomes more heavily than
+        the Sortino ratio (which uses order 2).
+
+        Returns:
+        -------
+        float | Pandas.Series[float]
+            Kappa-3 ratio calculation with the riskfree rate and
+            Minimum Acceptable Return (MAR) both set to zero.
+
+        """
+        riskfree_rate: float = 0.0
+        minimum_accepted_return: float = 0.0
+        order: Literal[2, 3] = 3
+        return self.sortino_ratio_func(
+            riskfree_rate=riskfree_rate,
+            min_accepted_return=minimum_accepted_return,
+            order=order,
         )
 
     @property
@@ -403,7 +432,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         wmdf = wmdf.reindex(index=[deyt.date() for deyt in dates], method=method)
         wmdf.index = DatetimeIndex(wmdf.index)
-        result = wmdf.ffill().pct_change().min()
+        result = wmdf.pct_change().min()
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
@@ -559,6 +588,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         countries: CountriesType | None = None,
         markets: list[str] | str | None = None,
         custom_holidays: list[str] | str | None = None,
+        method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
         """Align the index of .tsdf with local calendar business days.
 
@@ -570,6 +600,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             (List of) markets code(s) according to pandas-market-calendars
         custom_holidays: list[str] | str, optional
             Argument where missing holidays can be added
+        method: LiteralPandasReindexMethod, default: "nearest"
 
         Returns:
         -------
@@ -620,7 +651,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
-        self.tsdf = self.tsdf.reindex(d_range, method=None, copy=False)
+        self.tsdf = self.tsdf.reindex(labels=d_range, method=method, copy=False)
 
         return self
 
@@ -1016,7 +1047,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             )
         figure.update_layout(yaxis={"tickformat": tick_fmt})
 
-        if show_last is True:
+        if show_last:
             txt = f"Last {{:{tick_fmt}}}" if tick_fmt else "Last {}"
 
             for item in range(self.tsdf.shape[1]):
@@ -1063,7 +1094,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
     def plot_histogram(
         self: Self,
         plot_type: LiteralPlotlyHistogramPlotType = "bars",
-        histnorm: LiteralPlotlyHistogramHistNorm = "percent",
+        histnorm: LiteralPlotlyHistogramHistNorm = "probability",
         barmode: LiteralPlotlyHistogramBarMode = "overlay",
         xbins_size: float | None = None,
         opacity: float = 0.75,
@@ -1167,6 +1198,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 figure.add_histogram(
                     x=self.tsdf.iloc[:, item],
                     cumulative={"enabled": cumulative},
+                    histfunc="count",
                     histnorm=histnorm,
                     name=labels[item],
                     xbins={"size": xbins_size},
@@ -1273,7 +1305,6 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         result = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()
             .mean()
             * time_factor
@@ -1335,7 +1366,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             time_factor = how_many / fraction
 
         data = self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-        result = data.ffill().pct_change().std().mul(sqrt(time_factor))
+        result = data.pct_change().std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
             return float(cast("SupportsFloat", result.iloc[0]))
@@ -1533,24 +1564,21 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         if drift_adjust:
             imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
                 self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-                .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
                 - self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-                .ffill()
                 .pct_change()
                 .sum()
                 / len(
-                    self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-                    .ffill()
-                    .pct_change(),
+                    self.tsdf.loc[
+                        cast("int", earlier) : cast("int", later)
+                    ].pct_change(),
                 )
             )
         else:
             imp_vol = (
                 -sqrt(time_factor)
                 * self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-                .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
                 / norm.ppf(level)
@@ -1616,14 +1644,12 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
         result = [
             cvar_df.loc[:, x]  # type: ignore[call-overload,index]
-            .ffill()
             .pct_change()
             .sort_values()
             .iloc[
                 : ceil(
                     (1 - level)
                     * cvar_df.loc[:, x]  # type: ignore[index]
-                    .ffill()
                     .pct_change()
                     .count(),
                 ),
@@ -1640,24 +1666,28 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             dtype="float64",
         )
 
-    def downside_deviation_func(
+    def lower_partial_moment_func(
         self: Self,
         min_accepted_return: float = 0.0,
+        order: Literal[2, 3] = 2,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
-        """Downside Deviation.
+        """Downside Deviation if order set to 2.
 
-        The standard deviation of returns that are below a Minimum Accepted
-        Return of zero. It is used to calculate the Sortino Ratio.
-        https://www.investopedia.com/terms/d/downside-deviation.asp.
+        If order is set to 2 the function calculates the standard
+        deviation of returns that are below a Minimum Accepted
+        Return of zero. For general order p, it returns LPM_p^(1/p),
+        i.e., the rooted lower partial moment of order p.
 
         Parameters
         ----------
         min_accepted_return : float, optional
             The annualized Minimum Accepted Return (MAR)
+        order: int, default: 2
+            Order of partial moment
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -1672,18 +1702,22 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         Returns:
         -------
         float | Pandas.Series[float]
-            Downside deviation
+            Downside deviation if order set to 2
 
         """
+        msg = f"'order' must be 2 or 3, got {order!r}."
+        if order not in (2, 3):
+            raise ValueError(msg)
+
         zero: float = 0.0
         earlier, later = self.calc_range(
             months_offset=months_from_last,
             from_dt=from_date,
             to_dt=to_date,
         )
+
         how_many = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()
             .count(numeric_only=True)
         )
@@ -1697,23 +1731,26 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             fraction = (later - earlier).days / 365.25
             time_factor = how_many.div(fraction)
 
-        dddf = (
+        per_period_mar = min_accepted_return / time_factor
+        diff = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()
-            .sub(min_accepted_return / time_factor)
+            .sub(per_period_mar)
         )
 
-        result = sqrt((dddf[dddf < zero] ** 2).sum() / how_many) * sqrt(
-            time_factor,
-        )
+        shortfall = (-diff).clip(lower=zero)
+        base = shortfall.pow(order).sum() / how_many
+        result = base.pow(1.0 / float(order))
+        result *= sqrt(time_factor)
+
+        dd_order = 2
 
         if self.tsdf.shape[1] == 1:
             return float(result.iloc[0])
         return Series(
             data=result,
             index=self.tsdf.columns,
-            name="Downside deviation",
+            name="Downside deviation" if order == dd_order else f"LPM{order}",
             dtype="float64",
         )
 
@@ -1808,7 +1845,6 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
         result: NDArray[float64] = skew(
             a=self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()
             .to_numpy(),
             bias=True,
@@ -1856,11 +1892,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             to_dt=to_date,
         )
         result: NDArray[float64] = kurtosis(
-            a=(
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-                .ffill()
-                .pct_change()
-            ),
+            a=(self.tsdf.loc[cast("int", earlier) : cast("int", later)].pct_change()),
             fisher=True,
             bias=True,
             nan_policy="omit",
@@ -1956,18 +1988,16 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
         pos = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()[1:][
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-                .ffill()
-                .pct_change()[1:]
+                self.tsdf.loc[cast("int", earlier) : cast("int", later)].pct_change()[
+                    1:
+                ]
                 > zero
             ]
             .count()
         )
         tot = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()
             .count()
         )
@@ -2047,18 +2077,22 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         self: Self,
         riskfree_rate: float = 0.0,
         min_accepted_return: float = 0.0,
+        order: Literal[2, 3] = 2,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> float | Series[float]:
-        """Sortino Ratio.
+        """Sortino Ratio or Kappa3 Ratio.
 
         The Sortino ratio calculated as ( return - risk free return )
         / downside deviation. The ratio implies that the riskfree asset has zero
         volatility, and a minimum acceptable return of zero. The ratio is
         calculated using the annualized arithmetic mean of returns.
         https://www.investopedia.com/terms/s/sortinoratio.asp.
+        If order is set to 3 the ratio calculated becomes Kappa3 which
+        penalizes larger downside outcomes more heavily than the Sortino
+        ratio (which uses order 2).
 
         Parameters
         ----------
@@ -2066,6 +2100,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             The return of the zero volatility asset
         min_accepted_return : float, optional
             The annualized Minimum Accepted Return (MAR)
+        order: int, default: 2
+            Order of partial moment
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -2092,20 +2128,22 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 periods_in_a_year_fixed=periods_in_a_year_fixed,
             )
             - riskfree_rate,
-        ) / self.downside_deviation_func(
+        ) / self.lower_partial_moment_func(
             min_accepted_return=min_accepted_return,
+            order=order,
             months_from_last=months_from_last,
             from_date=from_date,
             to_date=to_date,
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
+        sortino_order = 2
         if self.tsdf.shape[1] == 1:
             return float(cast("float64", ratio.iloc[0]))
         return Series(
             data=ratio,
             index=self.tsdf.columns,
-            name="Sortino ratio",
+            name="Sortino ratio" if order == sortino_order else "Kappa-3 ratio",
             dtype="float64",
         )
 
@@ -2146,11 +2184,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             from_dt=from_date,
             to_dt=to_date,
         )
-        retdf = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
-            .pct_change()
-        )
+        retdf = self.tsdf.loc[cast("int", earlier) : cast("int", later)].pct_change()
         pos = retdf[retdf > min_accepted_return].sub(min_accepted_return).sum()
         neg = retdf[retdf < min_accepted_return].sub(min_accepted_return).sum()
         ratio = pos / -neg
@@ -2238,7 +2272,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             period = "-".join([str(year), str(month).zfill(2)])
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
-        resultdf = DataFrame(vrdf.ffill().pct_change())
+        resultdf = DataFrame(vrdf.pct_change())
         result = resultdf.loc[period] + 1
         cal_period = result.cumprod(axis="index").iloc[-1] - 1
         if self.tsdf.shape[1] == 1:
@@ -2290,7 +2324,6 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
         result = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()
             .quantile(1 - level, interpolation=interpolation)
         )
@@ -2339,7 +2372,6 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
         result = (
             self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
             .sum()
@@ -2386,11 +2418,9 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             from_dt=from_date,
             to_dt=to_date,
         )
-        zscframe = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
-            .pct_change()
-        )
+        zscframe = self.tsdf.loc[
+            cast("int", earlier) : cast("int", later)
+        ].pct_change()
         result = (zscframe.iloc[-1] - zscframe.mean()) / zscframe.std()
 
         if self.tsdf.shape[1] == 1:
@@ -2459,7 +2489,6 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         ret_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         retseries = (
             Series(self.tsdf.iloc[:, column])
-            .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
             .sum()
@@ -2513,6 +2542,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         column: int = 0,
         observations: int = 21,
         periods_in_a_year_fixed: DaysInYearType | None = None,
+        dlta_degr_freedms: int = 1,
     ) -> DataFrame:
         """Calculate rolling annualised volatilities.
 
@@ -2525,6 +2555,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         periods_in_a_year_fixed : DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
+        dlta_degr_freedms: int, default: 1
+            Variance bias factor taking the value 0 or 1.
 
         Returns:
         -------
@@ -2536,15 +2568,16 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             time_factor = float(periods_in_a_year_fixed)
         else:
             time_factor = self.periods_in_a_year
+
         vol_label = cast("tuple[str, ValueType]", self.tsdf.iloc[:, column].name)[0]
-        dframe = Series(self.tsdf.iloc[:, column]).ffill().pct_change()
-        volseries = dframe.rolling(
-            observations,
-            min_periods=observations,
-        ).std() * sqrt(
-            time_factor,
-        )
+
+        s = log(self.tsdf.iloc[:, column]).diff()
+        volseries = s.rolling(window=observations, min_periods=observations).std(
+            ddof=dlta_degr_freedms
+        ) * sqrt(time_factor)
+
         voldf = volseries.dropna().to_frame()
+
         voldf.columns = MultiIndex.from_arrays(
             [
                 [vol_label],

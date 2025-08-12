@@ -76,7 +76,7 @@ def load_plotly_dict(
     with logofile.open(mode="r", encoding="utf-8") as logo_file:
         logo = load(logo_file)
 
-    if _check_remote_file_existence(url=logo["source"]) is False:
+    if not _check_remote_file_existence(url=logo["source"]):
         msg = f"Failed to add logo image from URL {logo['source']}"
         logger.warning(msg)
         logo = {}

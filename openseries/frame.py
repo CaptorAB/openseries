@@ -7,13 +7,13 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="index,assignment,arg-type,no-any-return"
+# mypy: disable-error-code="assignment,no-any-return"
 from __future__ import annotations
 
 from copy import deepcopy
 from functools import reduce
 from logging import getLogger
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
@@ -26,7 +26,6 @@ from numpy import (
     log,
     nan,
     sqrt,
-    square,
     std,
 )
 from pandas import (
@@ -127,12 +126,14 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Object of the class OpenFrame
 
         """
+        copied_constituents = [ts.from_deepcopy() for ts in constituents]
+
         super().__init__(  # type: ignore[call-arg]
-            constituents=constituents,
+            constituents=copied_constituents,
             weights=weights,
         )
 
-        self.constituents = constituents
+        self.constituents = copied_constituents
         self.weights = weights
         self._set_tsdf()
 
@@ -339,10 +340,13 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             The returns of the values in the series
 
         """
-        returns = self.tsdf.ffill().pct_change()
+        returns = self.tsdf.pct_change()
         returns.iloc[0] = 0
-        new_labels = [ValueType.RTRN] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        new_labels: list[ValueType] = [ValueType.RTRN] * self.item_count
+        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
+            self.tsdf.columns.get_level_values(0),
+            new_labels,
+        ]
         returns.columns = MultiIndex.from_arrays(arrays=arrays)
         self.tsdf = returns.copy()
         return self
@@ -364,8 +368,11 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         """
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
-        new_labels = [ValueType.RTRN] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        new_labels: list[ValueType] = [ValueType.RTRN] * self.item_count
+        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
+            self.tsdf.columns.get_level_values(0),
+            new_labels,
+        ]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
@@ -380,7 +387,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
-            returns = self.tsdf.ffill().pct_change()
+            returns = self.tsdf.pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):
             returns = self.tsdf.copy()
@@ -392,8 +399,11 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         returns = returns.add(1.0)
         self.tsdf = returns.cumprod(axis=0) / returns.iloc[0]
 
-        new_labels = [ValueType.PRICE] * self.item_count
-        arrays = [self.tsdf.columns.get_level_values(0), new_labels]
+        new_labels: list[ValueType] = [ValueType.PRICE] * self.item_count
+        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
+            self.tsdf.columns.get_level_values(0),
+            new_labels,
+        ]
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
@@ -478,6 +488,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         dlta_degr_freedms: int = 0,
         first_column: int = 0,
         second_column: int = 1,
+        corr_scale: float = 2.0,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
@@ -500,6 +511,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Column of first timeseries.
         second_column: int, default: 1
             Column of second timeseries.
+        corr_scale: float, default: 2.0
+            Correlation scale factor.
         months_from_last : int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
@@ -542,9 +555,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 
         for rtn in cols:
-            data[rtn, ValueType.RTRN] = (
-                data.loc[:, (rtn, ValueType.PRICE)].apply(log).diff()
-            )
+            data[rtn, ValueType.RTRN] = log(data.loc[:, (rtn, ValueType.PRICE)]).diff()
 
         raw_one = [
             data.loc[:, (cols[0], ValueType.RTRN)]
@@ -565,34 +576,39 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 ddof=dlta_degr_freedms,
             )[0][1],
         ]
-        raw_corr = [raw_cov[0] / (2 * raw_one[0] * raw_two[0])]
 
-        for _, row in data.iloc[1:].iterrows():
-            tmp_raw_one = sqrt(
-                square(row.loc[cols[0], ValueType.RTRN]) * time_factor * (1 - lmbda)
-                + square(raw_one[-1]) * lmbda,
-            )
-            tmp_raw_two = sqrt(
-                square(row.loc[cols[1], ValueType.RTRN]) * time_factor * (1 - lmbda)
-                + square(raw_two[-1]) * lmbda,
-            )
-            tmp_raw_cov = (
-                row.loc[cols[0], ValueType.RTRN]
-                * row.loc[cols[1], ValueType.RTRN]
-                * time_factor
-                * (1 - lmbda)
-                + raw_cov[-1] * lmbda
-            )
-            tmp_raw_corr = tmp_raw_cov / (2 * tmp_raw_one * tmp_raw_two)
-            raw_one.append(tmp_raw_one)
-            raw_two.append(tmp_raw_two)
-            raw_cov.append(tmp_raw_cov)
-            raw_corr.append(tmp_raw_corr)
+        r1 = data.loc[:, (cols[0], ValueType.RTRN)]
+        r2 = data.loc[:, (cols[1], ValueType.RTRN)]
+
+        alpha = 1.0 - lmbda
+
+        s1 = (r1.pow(2) * time_factor).copy()
+        s2 = (r2.pow(2) * time_factor).copy()
+        sc = (r1 * r2 * time_factor).copy()
+
+        s1.iloc[0] = float(raw_one[0] ** 2)
+        s2.iloc[0] = float(raw_two[0] ** 2)
+        sc.iloc[0] = float(raw_cov[0])
+
+        m1 = s1.ewm(alpha=alpha, adjust=False).mean()
+        m2 = s2.ewm(alpha=alpha, adjust=False).mean()
+        mc = sc.ewm(alpha=alpha, adjust=False).mean()
+
+        m1v = m1.to_numpy(copy=False)
+        m2v = m2.to_numpy(copy=False)
+        mcv = mc.to_numpy(copy=False)
+
+        vol1 = sqrt(m1v)
+        vol2 = sqrt(m2v)
+        denom = corr_scale * vol1 * vol2
+
+        corr = mcv / denom
+        corr[denom == 0.0] = nan
 
         return DataFrame(
             index=[*cols, corr_label],
             columns=data.index,
-            data=[raw_one, raw_two, raw_corr],
+            data=[vol1, vol2, corr],
         ).T
 
     @property
@@ -605,13 +621,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Correlation matrix
 
         """
-        corr_matrix = (
-            self.tsdf.ffill()
-            .pct_change()
-            .corr(
-                method="pearson",
-                min_periods=1,
-            )
+        corr_matrix = self.tsdf.pct_change().corr(
+            method="pearson",
+            min_periods=1,
         )
         corr_matrix.columns = corr_matrix.columns.droplevel(level=1)
         corr_matrix.index = corr_matrix.index.droplevel(level=1)
@@ -838,7 +850,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 ]
                 relative = 1.0 + longdf - shortdf
                 vol = float(
-                    relative.ffill().pct_change().std() * sqrt(time_factor),
+                    relative.pct_change().std() * sqrt(time_factor),
                 )
                 terrors.append(vol)
 
@@ -930,10 +942,10 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 ]
                 relative = 1.0 + longdf - shortdf
                 ret = float(
-                    relative.ffill().pct_change().mean() * time_factor,
+                    relative.pct_change().mean() * time_factor,
                 )
                 vol = float(
-                    relative.ffill().pct_change().std() * sqrt(time_factor),
+                    relative.pct_change().std() * sqrt(time_factor),
                 )
                 ratios.append(ret / vol)
 
@@ -1034,18 +1046,16 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 msg = "ratio must be one of 'up', 'down' or 'both'."
                 if ratio == "up":
                     uparray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1056,9 +1066,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     ratios.append(up_rtrn / up_idx_return)
                 elif ratio == "down":
                     downarray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1067,9 +1076,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1081,18 +1089,16 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     ratios.append(down_return / down_idx_return)
                 elif ratio == "both":
                     uparray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1101,9 +1107,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     downarray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        longdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1112,9 +1117,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
+                        shortdf.pct_change()[
+                            shortdf.pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1410,7 +1414,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             msg = "Mix of series types will give inconsistent results"
             raise MixedValuetypesError(msg)
 
-        covariance = cov(asset_log, market_log, ddof=dlta_degr_freedms)
+        covariance = cov(m=asset_log, y=market_log, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
@@ -1444,7 +1448,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
 
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
-            returns = self.tsdf.ffill().pct_change()
+            returns = self.tsdf.pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):
             returns = self.tsdf.copy()
@@ -1519,14 +1523,11 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
 
         retseries = (
-            relative.ffill()
-            .pct_change()
-            .rolling(observations, min_periods=observations)
-            .sum()
+            relative.pct_change().rolling(observations, min_periods=observations).sum()
         )
         retdf = retseries.dropna().to_frame()
 
-        voldf = relative.ffill().pct_change().rolling(
+        voldf = relative.pct_change().rolling(
             observations,
             min_periods=observations,
         ).std() * sqrt(time_factor)
@@ -1572,13 +1573,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         asset_label = cast("tuple[str, str]", self.tsdf.iloc[:, asset_column].name)[0]
         beta_label = f"{asset_label} / {market_label}"
 
-        rolling = (
-            self.tsdf.ffill()
-            .pct_change()
-            .rolling(
-                observations,
-                min_periods=observations,
-            )
+        rolling = self.tsdf.pct_change().rolling(
+            observations,
+            min_periods=observations,
         )
 
         rcov = rolling.cov(ddof=dlta_degr_freedms)
@@ -1633,11 +1630,10 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
         first_series = (
             self.tsdf.iloc[:, first_column]
-            .ffill()
             .pct_change()[1:]
             .rolling(observations, min_periods=observations)
         )
-        second_series = self.tsdf.iloc[:, second_column].ffill().pct_change()[1:]
+        second_series = self.tsdf.iloc[:, second_column].pct_change()[1:]
         corrdf = first_series.corr(other=second_series).dropna().to_frame()
         corrdf.columns = MultiIndex.from_arrays(
             [
@@ -1647,3 +1643,62 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
 
         return DataFrame(corrdf)
+
+    def multi_factor_linear_regression(
+        self: Self,
+        dependent_column: tuple[str, ValueType],
+    ) -> tuple[DataFrame, OpenTimeSeries]:
+        """Perform a multi-factor linear regression.
+
+        This function treats one specified column in the DataFrame as the dependent
+        variable (y) and uses all remaining columns as independent variables (X).
+        It utilizes a scikit-learn LinearRegression model and returns a DataFrame
+        with summary output and an OpenTimeSeries of predicted values.
+
+        Parameters
+        ----------
+        dependent_column: tuple[str, ValueType]
+            A tuple key to select the column in the OpenFrame.tsdf.columns
+            to use as the dependent variable
+
+        Returns:
+        -------
+        tuple[pandas.DataFrame, OpenTimeSeries]
+            - A DataFrame with the R-squared, the intercept
+              and the regression coefficients
+            - An OpenTimeSeries of predicted values
+
+        Raises:
+            KeyError: If the column tuple is not found in the OpenFrame.tsdf.columns
+            ValueError: If not all series are returnseries (ValueType.RTRN)
+        """
+        key_msg = (
+            f"Tuple ({dependent_column[0]}, "
+            f"{dependent_column[1].value}) not found in data."
+        )
+        if dependent_column not in self.tsdf.columns:
+            raise KeyError(key_msg)
+
+        vtype_msg = "All series should be of ValueType.RTRN."
+        if not all(x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)):
+            raise MixedValuetypesError(vtype_msg)
+
+        dependent = self.tsdf[dependent_column]
+        factors = self.tsdf.drop(columns=[dependent_column])
+        indx = ["R-square", "Intercept", *factors.columns.droplevel(level=1)]
+
+        model = LinearRegression()
+        model.fit(factors, dependent)
+
+        predictions = OpenTimeSeries.from_arrays(
+            name=f"Predicted {dependent_column[0]}",
+            dates=[date.strftime("%Y-%m-%d") for date in self.tsdf.index],
+            values=list(model.predict(factors)),
+            valuetype=ValueType.RTRN,
+        )
+
+        output = [model.score(factors, dependent), model.intercept_, *model.coef_]
+
+        result = DataFrame(data=output, index=indx, columns=[dependent_column[0]])
+
+        return result, predictions.to_cumret()

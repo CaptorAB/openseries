@@ -1077,6 +1077,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             "skew",
             "cvar_down",
             "sortino_ratio",
+            "kappa3_ratio",
             "omega_ratio",
             "positive_share",
             "kurtosis",
@@ -1137,6 +1138,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             "ret_vol_ratio": "0.4162058331",
             "skew": "19.1911712502",
             "sortino_ratio": "0.8768329634",
+            "kappa3_ratio": "0.6671520235",
             "span_of_days": 3650,
             "value_ret": "0.6401159258",
             "var_down": "-0.0097182152",
@@ -1173,6 +1175,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             "ret_vol_ratio": "0.4162058331",
             "skew": "19.1911712502",
             "sortino_ratio": "0.8768329634",
+            "kappa3_ratio": "0.6671520235",
             "value_ret": "0.6401159258",
             "var_down": "-0.0097182152",
             "vol": "0.1405668835",
@@ -1216,7 +1219,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
         checks = {
             "arithmetic_ret_func": "0.03770656022",
             "cvar_down_func": "-0.01265870645",
-            "downside_deviation_func": "0.06871856382",
+            "lower_partial_moment_func": "0.06871856382",
             "geo_ret_func": f"{excel_geo_ret:.11f}",
             "kurtosis_func": "-0.07991363073",
             "max_drawdown_func": "-0.12512526696",
@@ -1534,7 +1537,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             raise OpenTimeSeriesTestError(msg)
 
     def test_downside_deviation(self: TestOpenTimeSeries) -> None:
-        """Test downside_deviation_func method.
+        """Test lower_partial_moment_func method.
 
         Source: https://www.investopedia.com/terms/d/downside-deviation.asp.
         """
@@ -1569,13 +1572,13 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
         ).to_cumret()
 
         mar = 0.01
-        downdev = dd_asset.downside_deviation_func(
+        downdev = dd_asset.lower_partial_moment_func(
             min_accepted_return=mar,
             periods_in_a_year_fixed=1,
         )
 
         if f"{downdev:.10f}" != "0.0433333333":
-            msg = f"Unexpected result from downside_deviation_func() {downdev:.10f}"
+            msg = f"Unexpected result from lower_partial_moment_func() {downdev:.10f}"
             raise OpenTimeSeriesTestError(msg)
 
     def test_omega_ratio(self: TestOpenTimeSeries) -> None:
@@ -1638,9 +1641,27 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             min_accepted_return=mar,
         )
 
+        msg = f"Unexpected result from omega_ratio_func(): {omega:.10f}"
         if f"{omega:.10f}" != "3.1163413842":
-            msg = f"Unexpected result from omega_ratio_func(): {omega:.10f}"
             raise OpenTimeSeriesTestError(msg)
+
+    def test_sortino_as_kappa3(self: TestOpenTimeSeries) -> None:
+        """Test sortino_ratio_func() setting order to 3 to get kappa3 ratio."""
+        sortino = self.randomseries.sortino_ratio_func(order=2)
+        msg = f"Unexpected result from sortino_ratio_func(): {sortino:.10f}"
+        if f"{sortino:.10f}" != "0.8768329634":
+            raise OpenTimeSeriesTestError(msg)
+
+        kappa3 = self.randomseries.sortino_ratio_func(order=3)
+        msg = f"Unexpected result from sortino_ratio_func(): {kappa3:.10f}"
+        if f"{kappa3:.10f}" != "0.6671520235":
+            raise OpenTimeSeriesTestError(msg)
+
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="'order' must be 2 or 3, got 4.",
+        ):
+            _ = self.randomseries.sortino_ratio_func(order=4)  # type: ignore[arg-type]
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
@@ -1848,7 +1869,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             "arithmetic_ret_func",
             "vol_func",
             "vol_from_var_func",
-            "downside_deviation_func",
+            "lower_partial_moment_func",
             "target_weight_from_var",
         ]
         for methd in methods:

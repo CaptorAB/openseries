@@ -17,6 +17,7 @@ from itertools import product as iter_product
 from json import load, loads
 from pathlib import Path
 from pprint import pformat
+from re import escape
 from typing import TYPE_CHECKING, cast
 from unittest.mock import MagicMock, patch
 
@@ -836,7 +837,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         methods_to_compare = [
             "arithmetic_ret_func",
             "cvar_down_func",
-            "downside_deviation_func",
+            "lower_partial_moment_func",
             "geo_ret_func",
             "kurtosis_func",
             "max_drawdown_func",
@@ -853,7 +854,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         smethods_to_compare = [
             sames.arithmetic_ret_func,
             sames.cvar_down_func,
-            sames.downside_deviation_func,
+            sames.lower_partial_moment_func,
             sames.geo_ret_func,
             sames.kurtosis_func,
             sames.max_drawdown_func,
@@ -870,7 +871,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         fmethods_to_compare = [
             samef.arithmetic_ret_func,
             samef.cvar_down_func,
-            samef.downside_deviation_func,
+            samef.lower_partial_moment_func,
             samef.geo_ret_func,
             samef.kurtosis_func,
             samef.max_drawdown_func,
@@ -952,6 +953,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             "ret_vol_ratio",
             "skew",
             "sortino_ratio",
+            "kappa3_ratio",
             "value_ret",
             "var_down",
             "vol",
@@ -1008,6 +1010,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             "ret_vol_ratio",
             "skew",
             "sortino_ratio",
+            "kappa3_ratio",
             "value_ret",
             "var_down",
             "vol",
@@ -1092,7 +1095,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         common_calc_methods = [
             "arithmetic_ret_func",
             "cvar_down_func",
-            "downside_deviation_func",
+            "lower_partial_moment_func",
             "geo_ret_func",
             "kurtosis_func",
             "max_drawdown_func",
@@ -1155,6 +1158,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             "tracking_error_func",
             "capture_ratio_func",
             "ord_least_squares_fit",
+            "multi_factor_linear_regression",
             "make_portfolio",
             "merge_series",
             "relative",
@@ -1528,6 +1532,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         fig_keys = [
             "cumulative",
+            "histfunc",
             "histnorm",
             "hovertemplate",
             "name",
@@ -2148,6 +2153,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             "Downside deviation",
             "Return vol ratio",
             "Sortino ratio",
+            "Kappa-3 ratio",
             "Omega ratio",
             "Z-score",
             "Skew",
@@ -2221,6 +2227,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             "Simple return": "0.6401159258",
             "Skew": "19.1911712502",
             "Sortino ratio": "0.8768329634",
+            "Kappa-3 ratio": "0.6671520235",
             "VaR 95.0%": "-0.0097182152",
             "Volatility": "0.1405668835",
             "Worst": "-0.0191572882",
@@ -2462,15 +2469,15 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.06592263886",
-            "0.06849943405",
-            "0.07131196245",
-            "0.07266936036",
-            "0.07194915928",
+            "0.06597558501",
+            "0.06856064777",
+            "0.07136508824",
+            "0.07272307603",
+            "0.07199918606",
         ]
 
         if values != checkdata:
-            msg = "Result from method rolling_vol() not as intended."
+            msg = f"Result from method rolling_vol() not as intended.\n{values}"
             raise OpenFrameTestError(msg)
 
         simdata_fxd_per_yr = frame.rolling_vol(
@@ -2479,17 +2486,17 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             periods_in_a_year_fixed=251,
         )
 
-        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
-        checkdata_fxd_per_yr = [
-            "0.06587383487",
-            "0.06844872241",
-            "0.07125916863",
-            "0.07261556163",
-            "0.07189589373",
+        values_fxd = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5, 0]]
+        checkdata_fxd = [
+            "0.06592674183",
+            "0.06850989081",
+            "0.07131225509",
+            "0.07266923753",
+            "0.07194588348",
         ]
 
-        if values_fxd_per_yr != checkdata_fxd_per_yr:
-            msg = "Result from method rolling_vol() not as intended."
+        if values_fxd != checkdata_fxd:
+            msg = f"Result from method rolling_vol() not as intended.\n{values_fxd}"
             raise OpenFrameTestError(msg)
 
     def test_rolling_return(self: TestOpenFrame) -> None:
@@ -3069,7 +3076,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             mframe.arithmetic_ret_func,
             mframe.vol_func,
             mframe.vol_from_var_func,
-            mframe.downside_deviation_func,
+            mframe.lower_partial_moment_func,
             mframe.target_weight_from_var,
         ]
         for methd in methods:
@@ -3774,3 +3781,60 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{corr_two}"
             raise OpenFrameTestError(msg)
+
+    def test_multi_factor_linear_regression(self: TestOpenFrame) -> None:
+        """Test multi_factor_linear_regression method."""
+        frame = self.randomframe.from_deepcopy()
+        portfolio = OpenTimeSeries.from_df(
+            dframe=frame.make_portfolio(name="Portfolio", weight_strat="eq_weights")
+        ).value_to_ret()
+        frame.add_timeseries(portfolio)
+
+        intended = {
+            "R-square": "1.00000",
+            "Intercept": "0.00000",
+            "Asset_0": "0.20000",
+            "Asset_1": "0.20000",
+            "Asset_2": "0.20000",
+            "Asset_3": "0.20000",
+            "Asset_4": "0.20000",
+        }
+
+        output, _ = frame.multi_factor_linear_regression(
+            dependent_column=(portfolio.label, ValueType.RTRN)
+        )
+        result = output.to_dict()[portfolio.label]
+        rounded = {}
+        for key, value in result.items():
+            rounded[key] = f"{value:.5f}"
+
+        msg = (
+            "Unexpected results from method "
+            f"multi_factor_linear_regression()\n{pformat(rounded)}"
+        )
+        if intended != rounded:
+            raise OpenFrameTestError(msg)
+
+        nonexistantlabel = "nonexistantlabel"
+        with pytest.raises(
+            expected_exception=KeyError,
+            match=escape(
+                f"Tuple ({nonexistantlabel}, Return(Total)) not found in data."
+            ),
+        ):
+            _, _ = frame.multi_factor_linear_regression(
+                dependent_column=(nonexistantlabel, ValueType.RTRN)
+            )
+
+        gframe = self.randomframe.from_deepcopy()
+        gportfolio = OpenTimeSeries.from_df(
+            dframe=gframe.make_portfolio(name="Portfolio", weight_strat="eq_weights")
+        )
+        gframe.add_timeseries(gportfolio)
+        with pytest.raises(
+            expected_exception=MixedValuetypesError,
+            match="All series should be of ValueType.RTRN.",
+        ):
+            _, _ = gframe.multi_factor_linear_regression(
+                dependent_column=(gportfolio.label, ValueType.PRICE)
+            )

@@ -7,7 +7,7 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="index,assignment"
+# mypy: disable-error-code="assignment"
 from __future__ import annotations
 
 from inspect import stack
@@ -320,7 +320,7 @@ def efficient_frontier(
 
     if tweak:
         limit_tweak = 0.001
-        line_df["stdev_diff"] = line_df.stdev.ffill().pct_change()
+        line_df["stdev_diff"] = line_df.stdev.pct_change()
         line_df = line_df.loc[line_df.stdev_diff.abs() > limit_tweak]
         line_df = line_df.drop(columns="stdev_diff")
 
@@ -378,9 +378,11 @@ def constrain_optimized_portfolios(
     condition_least_ret = front_frame.ret > serie.arithmetic_ret
     # noinspection PyArgumentList
     least_ret_frame = front_frame[condition_least_ret].sort_values(by="stdev")
-    least_ret_port = least_ret_frame.iloc[0]
+    least_ret_port: Series[float] = least_ret_frame.iloc[0]
     least_ret_port_name = f"Minimize vol & target return of {portfolioname}"
-    least_ret_weights = [least_ret_port[c] for c in lr_frame.columns_lvl_zero]
+    least_ret_weights: list[float] = [
+        least_ret_port.loc[c] for c in lr_frame.columns_lvl_zero
+    ]
     lr_frame.weights = least_ret_weights
     resleast = OpenTimeSeries.from_df(lr_frame.make_portfolio(least_ret_port_name))
 
@@ -390,9 +392,11 @@ def constrain_optimized_portfolios(
         by="ret",
         ascending=False,
     )
-    most_vol_port = most_vol_frame.iloc[0]
+    most_vol_port: Series[float] = most_vol_frame.iloc[0]
     most_vol_port_name = f"Maximize return & target risk of {portfolioname}"
-    most_vol_weights = [most_vol_port[c] for c in mv_frame.columns_lvl_zero]
+    most_vol_weights: list[float] = [
+        most_vol_port.loc[c] for c in mv_frame.columns_lvl_zero
+    ]
     mv_frame.weights = most_vol_weights
     resmost = OpenTimeSeries.from_df(mv_frame.make_portfolio(most_vol_port_name))
 
@@ -562,7 +566,7 @@ def sharpeplot(
         )
 
     if point_frame is not None:
-        colorway = cast(
+        colorway = cast(  # type: ignore[index]
             "dict[str, str | int | float | bool | list[str]]",
             fig["layout"],
         ).get("colorway")[: len(point_frame.columns)]

@@ -15,7 +15,7 @@ param (
 $ErrorActionPreference = 'Stop'
 
 # Pin your Poetry version here:
-[string]$poetryVersion = '2.1.3'
+[string]$poetryVersion = '2.1.4'
 
 # Ensure we run from repo root
 Push-Location (Split-Path -Parent $MyInvocation.MyCommand.Definition)
@@ -95,7 +95,7 @@ switch ($task) {
     }
 
     "test" {
-        poetry run pytest -n auto --dist loadscope --cov=openseries --cov-report=term --cov-report=term-missing
+        poetry run pytest
     }
 
     "lint" {

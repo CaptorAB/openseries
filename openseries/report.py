@@ -7,7 +7,7 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="assignment,index,arg-type"
+# mypy: disable-error-code="assignment"
 from __future__ import annotations
 
 from inspect import stack
@@ -244,7 +244,7 @@ def report_html(
             x=bdf.index,
             y=bdf.iloc[:, item],
             hovertemplate="%{y:.2%}<br>%{x}",
-            name=bdf.iloc[:, item].name[0],
+            name=bdf.iloc[:, item].name[0],  # type: ignore[index]
             showlegend=False,
             row=2,
             col=1,
@@ -265,7 +265,7 @@ def report_html(
     ]
 
     # noinspection PyTypeChecker
-    rpt_df = data.all_properties(properties=properties)
+    rpt_df = data.all_properties(properties=properties)  # type: ignore[arg-type]
     alpha_frame = data.from_deepcopy()
     alpha_frame.to_cumret()
     with catch_warnings():

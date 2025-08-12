@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -469,7 +468,7 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
-        returns = self.tsdf.ffill().pct_change()
+        returns = self.tsdf.pct_change()
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
@@ -673,9 +672,9 @@ class OpenTimeSeries(_CommonModel):
 
         data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
 
-        data[self.label, ValueType.RTRN] = (
-            data.loc[:, self.tsdf.columns.to_numpy()[0]].apply(log).diff()
-        )
+        data[self.label, ValueType.RTRN] = log(
+            data.loc[:, self.tsdf.columns.to_numpy()[0]]
+        ).diff()
 
         rawdata = [
             data.loc[:, cast("int", (self.label, ValueType.RTRN))]
@@ -726,11 +725,12 @@ class OpenTimeSeries(_CommonModel):
             returns_input = True
         else:
             values = [cast("float", self.tsdf.iloc[0, 0])]
-            ra_df = self.tsdf.ffill().pct_change()
+            ra_df = self.tsdf.pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
 
         prev = self.first_idx
+        # noinspection PyTypeChecker
         dates: list[dt.date] = [prev]
 
         for idx, row in ra_df.iterrows():
