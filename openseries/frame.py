@@ -126,12 +126,14 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Object of the class OpenFrame
 
         """
+        copied_constituents = [ts.from_deepcopy() for ts in constituents]
+
         super().__init__(  # type: ignore[call-arg]
-            constituents=constituents,
+            constituents=copied_constituents,
             weights=weights,
         )
 
-        self.constituents = constituents
+        self.constituents = copied_constituents
         self.weights = weights
         self._set_tsdf()
 
