@@ -5,7 +5,7 @@
 all: install
 
 install:
-	python3 -m venv ./venv
+	python -m venv ./venv
 	venv/bin/python --version
 	venv/bin/python -m pip install --upgrade pip
 	venv/bin/pip install poetry==2.1.4
