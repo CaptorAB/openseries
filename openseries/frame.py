@@ -1414,7 +1414,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             msg = "Mix of series types will give inconsistent results"
             raise MixedValuetypesError(msg)
 
-        covariance = cov(asset_log, market_log, ddof=dlta_degr_freedms)
+        covariance = cov(m=asset_log, y=market_log, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
@@ -1643,3 +1643,62 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
 
         return DataFrame(corrdf)
+
+    def multi_factor_linear_regression(
+        self: Self,
+        dependent_column: tuple[str, ValueType],
+    ) -> tuple[DataFrame, OpenTimeSeries]:
+        """Perform a multi-factor linear regression.
+
+        This function treats one specified column in the DataFrame as the dependent
+        variable (y) and uses all remaining columns as independent variables (X).
+        It utilizes a scikit-learn LinearRegression model and returns a DataFrame
+        with summary output and an OpenTimeSeries of predicted values.
+
+        Parameters
+        ----------
+        dependent_column: tuple[str, ValueType]
+            A tuple key to select the column in the OpenFrame.tsdf.columns
+            to use as the dependent variable
+
+        Returns:
+        -------
+        tuple[pandas.DataFrame, OpenTimeSeries]
+            - A DataFrame with the R-squared, the intercept
+              and the regression coefficients
+            - An OpenTimeSeries of predicted values
+
+        Raises:
+            KeyError: If the column tuple is not found in the OpenFrame.tsdf.columns
+            ValueError: If not all series are returnseries (ValueType.RTRN)
+        """
+        key_msg = (
+            f"Tuple ({dependent_column[0]}, "
+            f"{dependent_column[1].value}) not found in data."
+        )
+        if dependent_column not in self.tsdf.columns:
+            raise KeyError(key_msg)
+
+        vtype_msg = "All series should be of ValueType.RTRN."
+        if not all(x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)):
+            raise MixedValuetypesError(vtype_msg)
+
+        dependent = self.tsdf[dependent_column]
+        factors = self.tsdf.drop(columns=[dependent_column])
+        indx = ["R-square", "Intercept", *factors.columns.droplevel(level=1)]
+
+        model = LinearRegression()
+        model.fit(factors, dependent)
+
+        predictions = OpenTimeSeries.from_arrays(
+            name=f"Predicted {dependent_column[0]}",
+            dates=[date.strftime("%Y-%m-%d") for date in self.tsdf.index],
+            values=list(model.predict(factors)),
+            valuetype=ValueType.RTRN,
+        )
+
+        output = [model.score(factors, dependent), model.intercept_, *model.coef_]
+
+        result = DataFrame(data=output, index=indx, columns=[dependent_column[0]])
+
+        return result, predictions.to_cumret()

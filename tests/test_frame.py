@@ -17,6 +17,7 @@ from itertools import product as iter_product
 from json import load, loads
 from pathlib import Path
 from pprint import pformat
+from re import escape
 from typing import TYPE_CHECKING, cast
 from unittest.mock import MagicMock, patch
 
@@ -1157,6 +1158,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             "tracking_error_func",
             "capture_ratio_func",
             "ord_least_squares_fit",
+            "multi_factor_linear_regression",
             "make_portfolio",
             "merge_series",
             "relative",
@@ -3779,3 +3781,60 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{corr_two}"
             raise OpenFrameTestError(msg)
+
+    def test_multi_factor_linear_regression(self: TestOpenFrame) -> None:
+        """Test multi_factor_linear_regression method."""
+        frame = self.randomframe.from_deepcopy()
+        portfolio = OpenTimeSeries.from_df(
+            dframe=frame.make_portfolio(name="Portfolio", weight_strat="eq_weights")
+        ).value_to_ret()
+        frame.add_timeseries(portfolio)
+
+        intended = {
+            "R-square": "1.00000",
+            "Intercept": "0.00000",
+            "Asset_0": "0.20000",
+            "Asset_1": "0.20000",
+            "Asset_2": "0.20000",
+            "Asset_3": "0.20000",
+            "Asset_4": "0.20000",
+        }
+
+        output, _ = frame.multi_factor_linear_regression(
+            dependent_column=(portfolio.label, ValueType.RTRN)
+        )
+        result = output.to_dict()[portfolio.label]
+        rounded = {}
+        for key, value in result.items():
+            rounded[key] = f"{value:.5f}"
+
+        msg = (
+            "Unexpected results from method "
+            f"multi_factor_linear_regression()\n{pformat(rounded)}"
+        )
+        if intended != rounded:
+            raise OpenFrameTestError(msg)
+
+        nonexistantlabel = "nonexistantlabel"
+        with pytest.raises(
+            expected_exception=KeyError,
+            match=escape(
+                f"Tuple ({nonexistantlabel}, Return(Total)) not found in data."
+            ),
+        ):
+            _, _ = frame.multi_factor_linear_regression(
+                dependent_column=(nonexistantlabel, ValueType.RTRN)
+            )
+
+        gframe = self.randomframe.from_deepcopy()
+        gportfolio = OpenTimeSeries.from_df(
+            dframe=gframe.make_portfolio(name="Portfolio", weight_strat="eq_weights")
+        )
+        gframe.add_timeseries(gportfolio)
+        with pytest.raises(
+            expected_exception=MixedValuetypesError,
+            match="All series should be of ValueType.RTRN.",
+        ):
+            _, _ = gframe.multi_factor_linear_regression(
+                dependent_column=(gportfolio.label, ValueType.PRICE)
+            )
