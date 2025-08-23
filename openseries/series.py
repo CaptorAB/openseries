@@ -53,6 +53,7 @@ from .owntypes import (
     LiteralSeriesProps,
     MarketsNotStringNorListStrError,
     OpenTimeSeriesPropertiesList,
+    ResampleDataLossError,
     Self,
     ValueListType,
     ValueType,
@@ -66,7 +67,7 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
 # noinspection PyUnresolvedReferences,PyNestedDecorators
-class OpenTimeSeries(_CommonModel):
+class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
     """OpenTimeSeries objects are at the core of the openseries package.
 
     The intended use is to allow analyses of financial timeseries.
@@ -468,7 +469,7 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
-        returns = self.tsdf.pct_change()
+        returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
@@ -586,7 +587,10 @@ class OpenTimeSeries(_CommonModel):
 
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
-        self.tsdf = self.tsdf.resample(freq).last()
+        if self.valuetype == ValueType.RTRN:
+            self.tsdf = self.tsdf.resample(freq).sum()
+        else:
+            self.tsdf = self.tsdf.resample(freq).last()
         self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
         return self
 
@@ -612,6 +616,14 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
+        if self.valuetype == ValueType.RTRN:
+            msg = (
+                "Do not run resample_to_business_period_ends on return series. "
+                "The operation will pick the last data point in the sparser series. "
+                "It will not sum returns and therefore data will be lost."
+            )
+            raise ResampleDataLossError(msg)
+
         dates = _do_resample_to_business_period_ends(
             data=self.tsdf,
             freq=freq,
@@ -659,7 +671,9 @@ class OpenTimeSeries(_CommonModel):
             Series EWMA volatility
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
@@ -725,7 +739,7 @@ class OpenTimeSeries(_CommonModel):
             returns_input = True
         else:
             values = [cast("float", self.tsdf.iloc[0, 0])]
-            ra_df = self.tsdf.pct_change()
+            ra_df = self.tsdf.ffill().pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
 

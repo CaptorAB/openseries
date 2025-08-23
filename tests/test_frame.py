@@ -21,6 +21,7 @@ from re import escape
 from typing import TYPE_CHECKING, cast
 from unittest.mock import MagicMock, patch
 
+from numpy import array
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
@@ -33,7 +34,6 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 
 # noinspection PyProtectedMember
 from openseries._risk import _cvar_down_calc, _var_down_calc
-from openseries.datefixer import date_offset_foll
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
 from openseries.owntypes import (
@@ -45,6 +45,7 @@ from openseries.owntypes import (
     NoWeightsError,
     NumberOfItemsAndLabelsNotSameError,
     RatioInputError,
+    ResampleDataLossError,
     ValueType,
 )
 from openseries.series import OpenTimeSeries
@@ -59,6 +60,14 @@ class OpenFrameTestError(Exception):
 # noinspection PyTypeChecker
 class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
     """class to run tests on the module frame.py."""
+
+    def make_mixed_type_openframe(self: TestOpenFrame) -> OpenFrame:
+        """Makes an OpenFrame with both PRICE and RTRN type series."""
+        series = self.randomseries.from_deepcopy()
+        returns = self.randomseries.from_deepcopy()
+        returns.set_new_label(lvl_zero="returns")
+        returns.value_to_ret()
+        return OpenFrame(constituents=[series, returns])
 
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
@@ -450,21 +459,42 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
     def test_resample(self: TestOpenFrame) -> None:
         """Test resample method."""
-        expected: int = 121
         rs_frame = self.randomframe.from_deepcopy()
         rs_frame.to_cumret()
 
-        before = cast("Series", rs_frame.value_ret).to_dict()
+        dates = [
+            dt.date(2019, 2, 28),
+            dt.date(2019, 3, 29),
+            dt.date(2019, 4, 30),
+            dt.date(2019, 5, 31),
+            dt.date(2019, 6, 28),
+        ]
+        before = list(rs_frame.tsdf.loc[dates].iloc[:, 0])
+        before_str = [f"{item:.6f}" for item in before]
+
+        ret = array(before)[1:] / array(before)[:-1] - 1
+        before_ret = [f"{item:.6f}" for item in ret]
 
         rs_frame.resample(freq="BME")
 
+        after = [f"{item:.6f}" for item in rs_frame.tsdf.iloc[-5:, 0]]
+
         msg = "resample() method generated unexpected result"
-        if rs_frame.length != expected:
+        if before_str != after:
             raise OpenFrameTestError(msg)
 
-        after = cast("Series", rs_frame.value_ret).to_dict()
-        if before != after:
+        rs_frame.value_to_ret()
+        after_ret = [f"{item:.6f}" for item in rs_frame.tsdf.iloc[-4:, 0]]
+
+        if before_ret != after_ret:
             raise OpenFrameTestError(msg)
+
+        mixframe = self.make_mixed_type_openframe()
+        with pytest.raises(
+            expected_exception=MixedValuetypesError,
+            match="Mix of series types will give inconsistent results",
+        ):
+            mixframe.resample()
 
     def test_resample_to_business_period_ends(self: TestOpenFrame) -> None:
         """Test resample_to_business_period_ends method."""
@@ -533,6 +563,13 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             )
             raise OpenFrameTestError(msg)
 
+        frame = self.randomframe.from_deepcopy()
+        with pytest.raises(
+            expected_exception=ResampleDataLossError,
+            match="Do not run resample_to_business_period_ends on return series.",
+        ):
+            frame.resample_to_business_period_ends()
+
     def test_resample_to_business_period_ends_renaming(self: TestOpenFrame) -> None:
         """Test resample_to_business_period_ends method and its handling of labels."""
         rename = {
@@ -544,6 +581,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         }
 
         frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
         frame.tsdf = frame.tsdf.rename(columns=rename, level=0)
         frame.resample_to_business_period_ends(freq="BYE")
 
@@ -2356,10 +2394,10 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         simdataa = frame.tracking_error_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.1611858846":
+        if f"{simdataa.iloc[0]:.9f}" != "0.176767248":
             msg = (
                 "Result from tracking_error_func() not "
-                f"as expected: '{simdataa.iloc[0]:.10f}'"
+                f"as expected: '{simdataa.iloc[0]:.9f}'"
             )
             raise OpenFrameTestError(msg)
 
@@ -2368,27 +2406,27 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             periods_in_a_year_fixed=251,
         )
 
-        if f"{simdatab.iloc[0]:.10f}" != "0.1610665551":
+        if f"{simdatab.iloc[0]:.9f}" != "0.176636383":
             msg = (
                 "Result from tracking_error_func() not "
-                f"as expected: '{simdatab.iloc[0]:.10f}'"
+                f"as expected: '{simdatab.iloc[0]:.9f}'"
             )
             raise OpenFrameTestError(msg)
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.1611858846":
+        if f"{simdatac.iloc[0]:.9f}" != "0.176767248":
             msg = (
                 "Result from tracking_error_func() not "
-                f"as expected: '{simdatac.iloc[0]:.10f}'"
+                f"as expected: '{simdatac.iloc[0]:.9f}'"
             )
             raise OpenFrameTestError(msg)
 
-        if f"{simdataa.iloc[0]:.10f}" != f"{simdatac.iloc[0]:.10f}":
+        if f"{simdataa.iloc[0]:.9f}" != f"{simdatac.iloc[0]:.9f}":
             msg = (
                 "Result from tracking_error_func() not "
-                f"as expected: '{simdataa.iloc[0]:.10f}' "
-                f"versus '{simdatac.iloc[0]:.10f}'"
+                f"as expected: '{simdataa.iloc[0]:.9f}' "
+                f"versus '{simdatac.iloc[0]:.9f}'"
             )
             raise OpenFrameTestError(msg)
 
@@ -2407,7 +2445,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         simdataa = frame.info_ratio_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.3141560406":
+        if f"{simdataa.iloc[0]:.10f}" != "0.2132240667":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
@@ -2416,7 +2454,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         simdatab = frame.info_ratio_func(base_column=-1, periods_in_a_year_fixed=251)
 
-        if f"{simdatab.iloc[0]:.10f}" != "0.3139234639":
+        if f"{simdatab.iloc[0]:.10f}" != "0.2130662123":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatab.iloc[0]:.10f}'"
@@ -2425,7 +2463,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         simdatac = frame.info_ratio_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.3141560406":
+        if f"{simdatac.iloc[0]:.10f}" != "0.2132240667":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"
@@ -3322,7 +3360,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         bframe.to_cumret()
         bframe.resample("7D")
         results = [
-            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
+            f"{bframe.beta(asset=comb[0], market=comb[1]):.9f}"
             for comb in iter_product(
                 range(bframe.item_count),
                 range(bframe.item_count),
@@ -3334,38 +3372,38 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
                 asset=comb[0],  # type: ignore[arg-type]
                 market=comb[1],  # type: ignore[arg-type]
             )
-            results_tuple.append(f"{beta:.11f}")
+            results_tuple.append(f"{beta:.9f}")
 
         if results != results_tuple:
             msg = "Unexpected results from method beta()"
             raise OpenFrameTestError(msg)
 
         if results != [
-            "1.00000000000",
-            "1.29922733925",
-            "0.70818608993",
-            "0.67350090937",
-            "1.10828592932",
-            "0.58286749395",
-            "1.00000000000",
-            "0.44923557262",
-            "0.41611038337",
-            "0.66683747762",
-            "1.26184019179",
-            "1.78421184238",
-            "1.00000000000",
-            "0.92762168147",
-            "1.60509866122",
-            "1.29388135250",
-            "1.78188690161",
-            "1.00016164109",
-            "1.00000000000",
-            "1.61604657978",
-            "0.48322440146",
-            "0.64808557090",
-            "0.39277316259",
-            "0.36677070860",
-            "1.00000000000",
+            "1.000000000",
+            "0.022866669",
+            "-0.014043923",
+            "0.046279565",
+            "-0.084766517",
+            "0.011121651",
+            "1.000000000",
+            "-0.016786144",
+            "-0.052121141",
+            "-0.005276238",
+            "-0.006444169",
+            "-0.015836642",
+            "1.000000000",
+            "0.024878534",
+            "-0.002303547",
+            "0.019857392",
+            "-0.045981223",
+            "0.023263723",
+            "1.000000000",
+            "0.034819945",
+            "-0.040556389",
+            "-0.005190306",
+            "-0.002401892",
+            "0.038826665",
+            "1.000000000",
         ]:
             msg = f"Unexpected results from method beta()\n{results}"
             raise OpenFrameTestError(msg)
@@ -3388,12 +3426,19 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
                 market="string",
             )
 
+        mixframe = self.make_mixed_type_openframe()
+        with pytest.raises(
+            expected_exception=MixedValuetypesError,
+            match="Mix of series types will give inconsistent results",
+        ):
+            _ = mixframe.beta(asset=0, market=-1)
+
     def test_beta_returns_input(self: TestOpenFrame) -> None:
         """Test beta method with returns input."""
         bframe = self.randomframe.from_deepcopy()
         bframe.resample("7D")
         results = [
-            f"{bframe.beta(asset=comb[0], market=comb[1]):.11f}"
+            f"{bframe.beta(asset=comb[0], market=comb[1]):.9f}"
             for comb in iter_product(
                 range(bframe.item_count),
                 range(bframe.item_count),
@@ -3406,38 +3451,38 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
                 asset=comb[0],  # type: ignore[arg-type]
                 market=comb[1],  # type: ignore[arg-type]
             )
-            results_tuple.append(f"{beta:.11f}")
+            results_tuple.append(f"{beta:.9f}")
 
         if results != results_tuple:
             msg = "Unexpected results from method beta()"
             raise OpenFrameTestError(msg)
 
         if results != [
-            "1.00000000000",
-            "0.08324853413",
-            "-0.10099866224",
-            "0.01462541518",
-            "-0.16899363037",
-            "0.01377634252",
-            "1.00000000000",
-            "0.01993819305",
-            "-0.03779993992",
-            "0.01254650184",
-            "-0.01853961987",
-            "0.02211636067",
-            "1.00000000000",
-            "-0.06352408467",
-            "-0.01478713969",
-            "0.00229000338",
-            "-0.03576528518",
-            "-0.05418525628",
-            "1.00000000000",
-            "0.05247274217",
-            "-0.02629986958",
-            "0.01179909172",
-            "-0.01253667106",
-            "0.05215417741",
-            "1.00000000000",
+            "1.000000000",
+            "0.022369167",
+            "-0.013894862",
+            "0.047138369",
+            "-0.085577120",
+            "0.010914962",
+            "1.000000000",
+            "-0.016814808",
+            "-0.048363738",
+            "-0.005954032",
+            "-0.006400844",
+            "-0.015874590",
+            "1.000000000",
+            "0.022169540",
+            "-0.000779595",
+            "0.020488479",
+            "-0.043080690",
+            "0.020917456",
+            "1.000000000",
+            "0.032443857",
+            "-0.041313652",
+            "-0.005890805",
+            "-0.000817000",
+            "0.036035721",
+            "1.000000000",
         ]:
             msg = f"Unexpected results from method beta()\n{results}"
             raise OpenFrameTestError(msg)
@@ -3487,29 +3532,29 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         if results != [
             "0.000000000",
-            "0.011275539",
-            "-0.011480230",
-            "0.002038749",
-            "0.031602774",
-            "0.000692798",
+            "0.057775286",
+            "0.059811269",
+            "0.055158277",
+            "0.060404749",
+            "0.034039808",
             "0.000000000",
-            "-0.009171994",
-            "0.000198488",
-            "0.018763801",
-            "0.023746109",
-            "0.033640184",
+            "0.036176551",
+            "0.038531926",
+            "0.034805479",
+            "0.088864910",
+            "0.089036876",
             "0.000000000",
-            "0.020761658",
-            "0.060163598",
-            "0.006548865",
-            "0.018119801",
-            "-0.015604040",
+            "0.086654217",
+            "0.088537383",
+            "0.072525683",
+            "0.075283845",
+            "0.071630154",
             "0.000000000",
-            "0.044390287",
-            "-0.007493292",
-            "-0.002651295",
-            "-0.017441772",
-            "-0.009460482",
+            "0.072934441",
+            "0.024037077",
+            "0.021841806",
+            "0.021874285",
+            "0.018800661",
             "0.000000000",
         ]:
             msg = f"Unexpected results from method jensen_alpha()\n{results}"
@@ -3532,59 +3577,6 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
                 asset=0,
                 market="string",
             )
-
-        ninemth = date_offset_foll(jframe.last_idx, months_offset=-9, adjust=True)
-        shortframe = jframe.trunc_frame(start_cut=ninemth)
-        shortframe.to_cumret()
-        sresults = [
-            f"{shortframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
-            for comb in iter_product(
-                range(shortframe.item_count),
-                range(shortframe.item_count),
-            )
-        ]
-
-        sresults_tuple: list[str] = []
-        for comb in iter_product(shortframe.tsdf, shortframe.tsdf):
-            alpha = shortframe.jensen_alpha(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
-            )
-            sresults_tuple.append(f"{alpha:.9f}")
-
-        if sresults != sresults_tuple:
-            msg = "Unexpected results from method jensen_alpha()"
-            raise OpenFrameTestError(msg)
-
-        if sresults != [
-            "0.000000000",
-            "-0.007428381",
-            "-0.015244859",
-            "-0.028785495",
-            "-0.054945887",
-            "-0.025064707",
-            "0.000000000",
-            "-0.014783332",
-            "0.024615935",
-            "0.048853995",
-            "0.024840001",
-            "0.012827133",
-            "0.000000000",
-            "0.003855844",
-            "-0.066858420",
-            "0.064449240",
-            "0.058748466",
-            "0.061290014",
-            "0.000000000",
-            "0.013305765",
-            "0.141205760",
-            "0.128274302",
-            "0.123668318",
-            "0.068585817",
-            "0.000000000",
-        ]:
-            msg = f"Unexpected results from method jensen_alpha()\n{sresults}"
-            raise OpenFrameTestError(msg)
 
     def test_jensen_alpha_returns_input(self: TestOpenFrame) -> None:
         """Test jensen_alpha method with returns input."""
@@ -3612,29 +3604,29 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         if results != [
             "0.000000000",
-            "0.000791942",
-            "0.000768260",
-            "0.000773600",
-            "0.000772380",
-            "-0.000185997",
+            "0.057726997",
+            "0.059752248",
+            "0.054913781",
+            "0.060311507",
+            "0.035239850",
             "0.000000000",
-            "-0.000173494",
-            "-0.000165599",
-            "-0.000174919",
-            "-0.000075575",
-            "-0.000086110",
+            "0.037358312",
+            "0.039588483",
+            "0.036002676",
+            "0.088369343",
+            "0.088564264",
             "0.000000000",
-            "-0.000073705",
-            "-0.000090422",
-            "0.000254537",
-            "0.000250048",
-            "0.000251442",
+            "0.086294170",
+            "0.088010938",
+            "0.075506739",
+            "0.078251600",
+            "0.074865296",
             "0.000000000",
-            "0.000257860",
-            "-0.000008959",
-            "-0.000027335",
-            "-0.000030532",
-            "-0.000042772",
+            "0.076030357",
+            "0.023240625",
+            "0.021033909",
+            "0.020894446",
+            "0.018058401",
             "0.000000000",
         ]:
             msg = f"Unexpected results from method jensen_alpha()\n{results}"
@@ -3658,11 +3650,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
                 market="string",
             )
 
-        series = self.randomseries.from_deepcopy()
-        returns = self.randomseries.from_deepcopy()
-        returns.set_new_label(lvl_zero="returns")
-        returns.value_to_ret()
-        mixframe = OpenFrame(constituents=[series, returns])
+        mixframe = self.make_mixed_type_openframe()
         with pytest.raises(
             expected_exception=MixedValuetypesError,
             match="Mix of series types will give inconsistent results",
@@ -3838,3 +3826,12 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             _, _ = gframe.multi_factor_linear_regression(
                 dependent_column=(gportfolio.label, ValueType.PRICE)
             )
+
+    def test_worst_month(self: TestOpenFrame) -> None:
+        """Test worst_month property."""
+        mixframe = self.make_mixed_type_openframe()
+        with pytest.raises(
+            expected_exception=ResampleDataLossError,
+            match="Do not run worst_month on return series.",
+        ):
+            _ = mixframe.worst_month

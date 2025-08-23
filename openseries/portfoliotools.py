@@ -320,7 +320,7 @@ def efficient_frontier(
 
     if tweak:
         limit_tweak = 0.001
-        line_df["stdev_diff"] = line_df.stdev.pct_change()
+        line_df["stdev_diff"] = line_df.stdev.ffill().pct_change()
         line_df = line_df.loc[line_df.stdev_diff.abs() > limit_tweak]
         line_df = line_df.drop(columns="stdev_diff")
 

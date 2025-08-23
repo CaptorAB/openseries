@@ -57,6 +57,7 @@ from .owntypes import (
     NoWeightsError,
     OpenFramePropertiesList,
     RatioInputError,
+    ResampleDataLossError,
     Self,
     ValueType,
 )
@@ -340,7 +341,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             The returns of the values in the series
 
         """
-        returns = self.tsdf.pct_change()
+        returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         new_labels: list[ValueType] = [ValueType.RTRN] * self.item_count
         arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
@@ -387,7 +388,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
-            returns = self.tsdf.pct_change()
+            returns = self.tsdf.ffill().pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):
             returns = self.tsdf.copy()
@@ -424,12 +425,27 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             An OpenFrame object
 
         """
+        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        if not any(vtypes):
+            value_type = ValueType.PRICE
+        elif all(vtypes):
+            value_type = ValueType.RTRN
+        else:
+            msg = "Mix of series types will give inconsistent results"
+            raise MixedValuetypesError(msg)
+
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
-        self.tsdf = self.tsdf.resample(freq).last()
+        if value_type == ValueType.PRICE:
+            self.tsdf = self.tsdf.resample(freq).last()
+        else:
+            self.tsdf = self.tsdf.resample(freq).sum()
         self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
         for xerie in self.constituents:
             xerie.tsdf.index = DatetimeIndex(xerie.tsdf.index)
-            xerie.tsdf = xerie.tsdf.resample(freq).last()
+            if value_type == ValueType.PRICE:
+                xerie.tsdf = xerie.tsdf.resample(freq).last()
+            else:
+                xerie.tsdf = xerie.tsdf.resample(freq).sum()
             xerie.tsdf.index = Index(
                 dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)
             )
@@ -458,6 +474,15 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             An OpenFrame object
 
         """
+        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        if any(vtypes):
+            msg = (
+                "Do not run resample_to_business_period_ends on return series. "
+                "The operation will pick the last data point in the sparser series. "
+                "It will not sum returns and therefore data will be lost."
+            )
+            raise ResampleDataLossError(msg)
+
         for xerie in self.constituents:
             dates = _do_resample_to_business_period_ends(
                 data=xerie.tsdf,
@@ -530,7 +555,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Series volatilities and correlation
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         if periods_in_a_year_fixed is None:
             fraction = (later - earlier).days / 365.25
             how_many = (
@@ -621,9 +648,13 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Correlation matrix
 
         """
-        corr_matrix = self.tsdf.pct_change().corr(
-            method="pearson",
-            min_periods=1,
+        corr_matrix = (
+            self.tsdf.ffill()
+            .pct_change()
+            .corr(
+                method="pearson",
+                min_periods=1,
+            )
         )
         corr_matrix.columns = corr_matrix.columns.droplevel(level=1)
         corr_matrix.index = corr_matrix.index.droplevel(level=1)
@@ -805,7 +836,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Tracking Errors
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         fraction = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
@@ -848,10 +881,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     :,
                     item,
                 ]
-                relative = 1.0 + longdf - shortdf
-                vol = float(
-                    relative.pct_change().std() * sqrt(time_factor),
-                )
+                relative = longdf.ffill().pct_change() - shortdf.ffill().pct_change()
+                vol = float(relative.std() * sqrt(time_factor))
                 terrors.append(vol)
 
         return Series(
@@ -897,7 +928,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Information Ratios
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         fraction = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
@@ -940,13 +973,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     :,
                     item,
                 ]
-                relative = 1.0 + longdf - shortdf
-                ret = float(
-                    relative.pct_change().mean() * time_factor,
-                )
-                vol = float(
-                    relative.pct_change().std() * sqrt(time_factor),
-                )
+                relative = longdf.ffill().pct_change() - shortdf.ffill().pct_change()
+                ret = float(relative.mean() * time_factor)
+                vol = float(relative.std() * sqrt(time_factor))
                 ratios.append(ret / vol)
 
         return Series(
@@ -1000,7 +1029,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
 
         """
         loss_limit: float = 0.0
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         fraction = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
@@ -1046,16 +1077,18 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 msg = "ratio must be one of 'up', 'down' or 'both'."
                 if ratio == "up":
                     uparray = (
-                        longdf.pct_change()[
-                            shortdf.pct_change().to_numpy() > loss_limit
+                        longdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.pct_change()[
-                            shortdf.pct_change().to_numpy() > loss_limit
+                        shortdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1066,8 +1099,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     ratios.append(up_rtrn / up_idx_return)
                 elif ratio == "down":
                     downarray = (
-                        longdf.pct_change()[
-                            shortdf.pct_change().to_numpy() < loss_limit
+                        longdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1076,8 +1110,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change()[
-                            shortdf.pct_change().to_numpy() < loss_limit
+                        shortdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1089,16 +1124,18 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     ratios.append(down_return / down_idx_return)
                 elif ratio == "both":
                     uparray = (
-                        longdf.pct_change()[
-                            shortdf.pct_change().to_numpy() > loss_limit
+                        longdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
                     )
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
                     upidxarray = (
-                        shortdf.pct_change()[
-                            shortdf.pct_change().to_numpy() > loss_limit
+                        shortdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() > loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1107,8 +1144,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     downarray = (
-                        longdf.pct_change()[
-                            shortdf.pct_change().to_numpy() < loss_limit
+                        longdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1117,8 +1155,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
                     downidxarray = (
-                        shortdf.pct_change()[
-                            shortdf.pct_change().to_numpy() < loss_limit
+                        shortdf.ffill()
+                        .pct_change()[
+                            shortdf.ffill().pct_change().to_numpy() < loss_limit
                         ]
                         .add(1)
                         .to_numpy()
@@ -1173,10 +1212,8 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Beta as Co-variance of x & y divided by Variance of x
 
         """
-        if all(
-            x_value == ValueType.RTRN
-            for x_value in self.tsdf.columns.get_level_values(1).to_numpy()
-        ):
+        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        if all(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
                 y_value = self.tsdf.loc[:, asset]
@@ -1192,33 +1229,27 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                 x_value = self.tsdf.iloc[:, market]
             else:
                 raise TypeError(msg)
-        else:
+        elif not any(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
-                y_value = log(
-                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
-                )
+                y_value = self.tsdf.loc[:, asset].ffill().pct_change().iloc[1:]
             elif isinstance(asset, int):
-                y_value = log(
-                    self.tsdf.iloc[:, asset] / cast("float", self.tsdf.iloc[0, asset]),
-                )
+                y_value = self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
             else:
                 raise TypeError(msg)
-
             msg = "market should be a tuple[str, ValueType] or an integer."
+
             if isinstance(market, tuple):
-                x_value = log(
-                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
-                )
+                x_value = self.tsdf.loc[:, market].ffill().pct_change().iloc[1:]
             elif isinstance(market, int):
-                x_value = log(
-                    self.tsdf.iloc[:, market]
-                    / cast("float", self.tsdf.iloc[0, market]),
-                )
+                x_value = self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:]
             else:
                 raise TypeError(msg)
+        else:
+            msg = "Mix of series types will give inconsistent results"
+            raise MixedValuetypesError(msg)
 
-        covariance = cov(y_value, x_value, ddof=dlta_degr_freedms)
+        covariance = cov(m=y_value, y=x_value, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(beta)
@@ -1319,105 +1350,57 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Jensen's alpha
 
         """
-        full_year = 1.0
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
-                asset_log = log(
-                    self.tsdf.loc[:, asset] / self.tsdf.loc[:, asset].iloc[0],
-                )
-                if self.yearfrac > full_year:
-                    asset_cagr = (
-                        self.tsdf.loc[:, asset].iloc[-1]
-                        / self.tsdf.loc[:, asset].iloc[0]
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    asset_cagr = (
-                        self.tsdf.loc[:, asset].iloc[-1]
-                        / self.tsdf.loc[:, asset].iloc[0]
-                        - 1
-                    )
+                asset_rtn = self.tsdf.loc[:, asset].ffill().pct_change().iloc[1:]
+                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             elif isinstance(asset, int):
-                asset_log = log(
-                    self.tsdf.iloc[:, asset] / cast("float", self.tsdf.iloc[0, asset]),
-                )
-                if self.yearfrac > full_year:
-                    asset_cagr = (
-                        cast("float", self.tsdf.iloc[-1, asset])
-                        / cast("float", self.tsdf.iloc[0, asset])
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    asset_cagr = (
-                        cast("float", self.tsdf.iloc[-1, asset])
-                        / cast("float", self.tsdf.iloc[0, asset])
-                        - 1
-                    )
+                asset_rtn = self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
+                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
-                market_log = log(
-                    self.tsdf.loc[:, market] / self.tsdf.loc[:, market].iloc[0],
-                )
-                if self.yearfrac > full_year:
-                    market_cagr = (
-                        self.tsdf.loc[:, market].iloc[-1]
-                        / self.tsdf.loc[:, market].iloc[0]
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    market_cagr = (
-                        self.tsdf.loc[:, market].iloc[-1]
-                        / self.tsdf.loc[:, market].iloc[0]
-                        - 1
-                    )
+                market_rtn = self.tsdf.loc[:, market].ffill().pct_change().iloc[1:]
+                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             elif isinstance(market, int):
-                market_log = log(
-                    self.tsdf.iloc[:, market]
-                    / cast("float", self.tsdf.iloc[0, market]),
-                )
-                if self.yearfrac > full_year:
-                    market_cagr = (
-                        cast("float", self.tsdf.iloc[-1, market])
-                        / cast("float", self.tsdf.iloc[0, market])
-                    ) ** (1 / self.yearfrac) - 1
-                else:
-                    market_cagr = (
-                        cast("float", self.tsdf.iloc[-1, market])
-                        / cast("float", self.tsdf.iloc[0, market])
-                        - 1
-                    )
+                market_rtn = self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:]
+                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
         elif all(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
-                asset_log = self.tsdf.loc[:, asset]
-                asset_cagr = asset_log.mean()
+                asset_rtn = self.tsdf.loc[:, asset]
+                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             elif isinstance(asset, int):
-                asset_log = self.tsdf.iloc[:, asset]
-                asset_cagr = asset_log.mean()
+                asset_rtn = self.tsdf.iloc[:, asset]
+                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
-                market_log = self.tsdf.loc[:, market]
-                market_cagr = market_log.mean()
+                market_rtn = self.tsdf.loc[:, market]
+                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             elif isinstance(market, int):
-                market_log = self.tsdf.iloc[:, market]
-                market_cagr = market_log.mean()
+                market_rtn = self.tsdf.iloc[:, market]
+                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
         else:
             msg = "Mix of series types will give inconsistent results"
             raise MixedValuetypesError(msg)
 
-        covariance = cov(m=asset_log, y=market_log, ddof=dlta_degr_freedms)
+        covariance = cov(m=asset_rtn, y=market_rtn, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
 
-        return float(asset_cagr - riskfree_rate - beta * (market_cagr - riskfree_rate))
+        return float(
+            asset_rtn_mean - riskfree_rate - beta * (market_rtn_mean - riskfree_rate)
+        )
 
     def make_portfolio(
         self: Self,
@@ -1448,7 +1431,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
 
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
-            returns = self.tsdf.pct_change()
+            returns = self.tsdf.ffill().pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):
             returns = self.tsdf.copy()
@@ -1523,11 +1506,14 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
 
         retseries = (
-            relative.pct_change().rolling(observations, min_periods=observations).sum()
+            relative.ffill()
+            .pct_change()
+            .rolling(observations, min_periods=observations)
+            .sum()
         )
         retdf = retseries.dropna().to_frame()
 
-        voldf = relative.pct_change().rolling(
+        voldf = relative.ffill().pct_change().rolling(
             observations,
             min_periods=observations,
         ).std() * sqrt(time_factor)
@@ -1573,9 +1559,13 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         asset_label = cast("tuple[str, str]", self.tsdf.iloc[:, asset_column].name)[0]
         beta_label = f"{asset_label} / {market_label}"
 
-        rolling = self.tsdf.pct_change().rolling(
-            observations,
-            min_periods=observations,
+        rolling = (
+            self.tsdf.ffill()
+            .pct_change()
+            .rolling(
+                observations,
+                min_periods=observations,
+            )
         )
 
         rcov = rolling.cov(ddof=dlta_degr_freedms)
@@ -1630,10 +1620,11 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         )
         first_series = (
             self.tsdf.iloc[:, first_column]
+            .ffill()
             .pct_change()[1:]
             .rolling(observations, min_periods=observations)
         )
-        second_series = self.tsdf.iloc[:, second_column].pct_change()[1:]
+        second_series = self.tsdf.iloc[:, second_column].ffill().pct_change()[1:]
         corrdf = first_series.corr(other=second_series).dropna().to_frame()
         corrdf.columns = MultiIndex.from_arrays(
             [

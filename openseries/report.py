@@ -68,9 +68,7 @@ def calendar_period_returns(
     """
     copied = data.from_deepcopy()
     copied.resample_to_business_period_ends(freq=freq)
-    vtypes = [x == ValueType.RTRN for x in copied.tsdf.columns.get_level_values(1)]
-    if not any(vtypes):
-        copied.value_to_ret()
+    copied.value_to_ret()
     cldr = copied.tsdf.iloc[1:].copy()
     if relabel:
         if freq.upper() == "BYE":
