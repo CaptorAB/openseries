@@ -2407,7 +2407,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         simdataa = frame.info_ratio_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.3141560406":
+        if f"{simdataa.iloc[0]:.10f}" != "0.2132240667":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
@@ -2416,7 +2416,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         simdatab = frame.info_ratio_func(base_column=-1, periods_in_a_year_fixed=251)
 
-        if f"{simdatab.iloc[0]:.10f}" != "0.3139234639":
+        if f"{simdatab.iloc[0]:.10f}" != "0.2130662123":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatab.iloc[0]:.10f}'"
@@ -2425,7 +2425,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
 
         simdatac = frame.info_ratio_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.3141560406":
+        if f"{simdatac.iloc[0]:.10f}" != "0.2132240667":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"

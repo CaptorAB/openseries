@@ -530,7 +530,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Series volatilities and correlation
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         if periods_in_a_year_fixed is None:
             fraction = (later - earlier).days / 365.25
             how_many = (
@@ -809,7 +811,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Tracking Errors
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         fraction = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
@@ -901,7 +905,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
             Information Ratios
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         fraction = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
@@ -944,13 +950,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
                     :,
                     item,
                 ]
-                relative = 1.0 + longdf - shortdf
-                ret = float(
-                    relative.ffill().pct_change().mean() * time_factor,
-                )
-                vol = float(
-                    relative.ffill().pct_change().std() * sqrt(time_factor),
-                )
+                relative = longdf.ffill().pct_change() - shortdf.ffill().pct_change()
+                ret = float(relative.mean() * time_factor)
+                vol = float(relative.std() * sqrt(time_factor))
                 ratios.append(ret / vol)
 
         return Series(
@@ -1004,7 +1006,9 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
 
         """
         loss_limit: float = 0.0
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         fraction = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."

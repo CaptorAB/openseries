@@ -12,6 +12,10 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
+        args:
+          - --install-types
+          - --non-interactive
+          - --config-file=pyproject.toml
         additional_dependencies:
           - pandas-stubs
           - pydantic

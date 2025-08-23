@@ -66,7 +66,7 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
 # noinspection PyUnresolvedReferences,PyNestedDecorators
-class OpenTimeSeries(_CommonModel):
+class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
     """OpenTimeSeries objects are at the core of the openseries package.
 
     The intended use is to allow analyses of financial timeseries.
@@ -659,7 +659,9 @@ class OpenTimeSeries(_CommonModel):
             Series EWMA volatility
 
         """
-        earlier, later = self.calc_range(months_from_last, from_date, to_date)
+        earlier, later = self.calc_range(
+            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+        )
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
