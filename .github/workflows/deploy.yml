@@ -28,9 +28,6 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Get Python version
-        run: echo "PYTHON_VERSION=$(python --version)" >> "$GITHUB_ENV"
-
       - name: Create virtual environment
         run: python -m venv venv
 
@@ -115,7 +112,8 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
-          persist-credentials: false
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Import GPG key and create tag
         id: tag
@@ -132,7 +130,8 @@ jobs:
           git config --global user.email "${GITHUB_ACTOR_EMAIL}"
           git config --global user.signingkey 03BE0D766CA0CF9852B592D5BBE8A9CD2E275A01
           git config --global gpg.program gpg
-          git tag -a "$version" -m "Release v$version"
+          git tag -s "$version" -m "Release v$version"
+          git verify-tag "$version"
           git push origin "$version"
           echo "tag_version=$version" >> "$GITHUB_OUTPUT"
 
