@@ -25,7 +25,9 @@ from .owntypes import (
     DateAlignmentError,
     InitialValueZeroError,
     NumberOfItemsAndLabelsNotSameError,
+    ResampleDataLossError,
     Self,
+    ValueType,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -47,7 +49,6 @@ if TYPE_CHECKING:  # pragma: no cover
         LiteralPlotlyJSlib,
         LiteralPlotlyOutput,
         LiteralQuantileInterp,
-        ValueType,
     )
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook.workbook import Workbook
@@ -432,6 +433,16 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         wmdf = wmdf.reindex(index=[deyt.date() for deyt in dates], method=method)
         wmdf.index = DatetimeIndex(wmdf.index)
+
+        vtypes = [x == ValueType.RTRN for x in wmdf.columns.get_level_values(1)]
+        if any(vtypes):
+            msg = (
+                "Do not run worst_month on return series. The operation will "
+                "pick the last data point in the sparser series. It will not sum "
+                "returns and therefore data will be lost and result will be wrong."
+            )
+            raise ResampleDataLossError(msg)
+
         result = wmdf.ffill().pct_change().min()
 
         if self.tsdf.shape[1] == 1:

@@ -53,6 +53,7 @@ from .owntypes import (
     LiteralSeriesProps,
     MarketsNotStringNorListStrError,
     OpenTimeSeriesPropertiesList,
+    ResampleDataLossError,
     Self,
     ValueListType,
     ValueType,
@@ -586,7 +587,10 @@ class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
 
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
-        self.tsdf = self.tsdf.resample(freq).last()
+        if self.valuetype == ValueType.RTRN:
+            self.tsdf = self.tsdf.resample(freq).sum()
+        else:
+            self.tsdf = self.tsdf.resample(freq).last()
         self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
         return self
 
@@ -612,6 +616,14 @@ class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
             An OpenTimeSeries object
 
         """
+        if self.valuetype == ValueType.RTRN:
+            msg = (
+                "Do not run resample_to_business_period_ends on return series. "
+                "The operation will pick the last data point in the sparser series. "
+                "It will not sum returns and therefore data will be lost."
+            )
+            raise ResampleDataLossError(msg)
+
         dates = _do_resample_to_business_period_ends(
             data=self.tsdf,
             freq=freq,

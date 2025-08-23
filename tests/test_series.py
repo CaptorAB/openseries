@@ -17,6 +17,7 @@ from pprint import pformat
 from typing import cast
 
 import pytest
+from numpy import array
 from pandas import DataFrame, DatetimeIndex, Series, date_range
 from pydantic import ValidationError
 
@@ -26,6 +27,7 @@ from openseries.owntypes import (
     IncorrectArgumentComboError,
     InitialValueZeroError,
     MarketsNotStringNorListStrError,
+    ResampleDataLossError,
     ValueType,
 )
 
@@ -853,18 +855,45 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
     def test_resample(self: TestOpenTimeSeries) -> None:
         """Test resample method."""
         rs_series = self.randomseries.from_deepcopy()
-        intended_length: int = 121
+        rr_series = self.randomseries.from_deepcopy()
+        rr_series.value_to_ret()
+        rr_series.resample(freq="BME")
 
-        before = rs_series.value_ret
+        dates = [
+            dt.date(2019, 2, 28),
+            dt.date(2019, 3, 29),
+            dt.date(2019, 4, 30),
+            dt.date(2019, 5, 31),
+            dt.date(2019, 6, 28),
+        ]
+
+        before = list(rs_series.tsdf.loc[dates].iloc[:, 0])
+        before_str = [f"{item:.6f}" for item in before]
+
+        ret = array(before)[1:] / array(before)[:-1] - 1
+        before_ret = [f"{item:.6f}" for item in ret]
+
+        expected_but_not_same = ["0.016315", "0.023237", "-0.024421", "-0.030321"]
+        before_rr_ret = [
+            f"{item:.6f}" for item in rr_series.tsdf.loc[dates].iloc[1:, 0]
+        ]
+
+        msg = "resample() method generated unexpected result"
+
+        if expected_but_not_same != before_rr_ret:
+            raise OpenTimeSeriesTestError(msg)
 
         rs_series.resample(freq="BME")
 
-        if rs_series.length != intended_length:
-            msg = "Method resample() not working as intended"
+        after = [f"{item:.6f}" for item in rs_series.tsdf.iloc[-5:, 0]]
+
+        if before_str != after:
             raise OpenTimeSeriesTestError(msg)
 
-        if before != rs_series.value_ret:
-            msg = "Method resample() not working as intended"
+        rs_series.value_to_ret()
+        after_ret = [f"{item:.6f}" for item in rs_series.tsdf.iloc[-4:, 0]]
+
+        if before_ret != after_ret:
             raise OpenTimeSeriesTestError(msg)
 
     def test_resample_to_business_period_ends(
@@ -908,6 +937,14 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
         ]:
             msg = "Method resample_to_business_period_ends() not working as intended"
             raise OpenTimeSeriesTestError(msg)
+
+        series = self.randomseries.from_deepcopy()
+        series.value_to_ret()
+        with pytest.raises(
+            expected_exception=ResampleDataLossError,
+            match="Do not run resample_to_business_period_ends on return series.",
+        ):
+            series.resample_to_business_period_ends()
 
     def test_resample_to_business_period_ends_markets_set(
         self: TestOpenTimeSeries,

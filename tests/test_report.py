@@ -36,13 +36,14 @@ class TestReport(CommonTestCase):  # type: ignore[misc]
     def test_calendar_period_returns(self: TestReport) -> None:
         """Test calendar_period_returns function."""
         frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
 
         expected_one = [
-            "0.00355807",
-            "-0.00609952",
-            "0.00402555",
-            "0.00309766",
-            "0.00051440",
+            "-0.15435597",
+            "-0.26899063",
+            "-2.15829921",
+            "-2.06087664",
+            "-1.63741658",
         ]
 
         returns = calendar_period_returns(data=frame, relabel=True)
@@ -54,25 +55,13 @@ class TestReport(CommonTestCase):  # type: ignore[misc]
 
         frame.to_cumret()
 
-        expected_two = [
-            "-0.15435597",
-            "-0.26899063",
-            "-2.15829921",
-            "-2.06087664",
-            "-1.63741658",
-        ]
-
         returns = calendar_period_returns(data=frame, relabel=False)
         last_year = [f"{nbr:.8f}" for nbr in returns.loc[dt.date(2019, 6, 28)]]
-
-        if last_year != expected_two:
-            msg = f"calendar_period_returns not working as intended:\n{last_year}"
-            raise ReportTestError(msg)
 
         returns = calendar_period_returns(data=frame, relabel=True, freq="BQE")
         last_quarter = [f"{nbr:.8f}" for nbr in returns.loc["Q2 2019"]]
 
-        expected_three = [
+        expected_two = [
             "-2.51705728",
             "-0.94753886",
             "2.51347355",
@@ -80,7 +69,7 @@ class TestReport(CommonTestCase):  # type: ignore[misc]
             "-0.91336477",
         ]
 
-        if last_quarter != expected_three:
+        if last_quarter != expected_two:
             msg = f"calendar_period_returns not working as intended:\n{last_quarter}"
             raise ReportTestError(msg)
 

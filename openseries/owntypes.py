@@ -376,3 +376,7 @@ class IncorrectArgumentComboError(Exception):
 
 class PropertiesInputValidationError(Exception):
     """Raised when duplicate strings are provided."""
+
+
+class ResampleDataLossError(Exception):
+    """Raised when user attempts to run resample_to_business_period_ends on returns."""
