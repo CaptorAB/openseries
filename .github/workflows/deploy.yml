@@ -148,8 +148,8 @@ jobs:
           tag_name: ${{ needs.version_tag.outputs.tag_version }}
 
   publish_testpypi:
-    needs: build_test
-    if: ${{ needs.build_test.result == 'success' }}
+    needs: release
+    if: ${{ needs.release.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -181,8 +181,8 @@ jobs:
           poetry publish --repository testpypi --skip-existing
 
   publish_pypi:
-    needs: build_test
-    if: ${{ needs.build_test.result == 'success' }}
+    needs: publish_testpypi
+    if: ${{ needs.publish_testpypi.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
