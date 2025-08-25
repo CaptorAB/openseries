@@ -1,4 +1,4 @@
-name: GitHub Actions Security Analysis with zizmor
+name: zizmor.yml
 
 permissions:
   contents: read

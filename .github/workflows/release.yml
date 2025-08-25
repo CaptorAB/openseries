@@ -1,4 +1,4 @@
-name: deploy.yml
+name: release.yml
 
 permissions:
   contents: read
@@ -80,22 +80,6 @@ jobs:
               body: `See the full logs here: ${GH_RUN_URL}`,
             });
 
-      - name: Upload test results to Codecov (JUnit)
-        if: ${{ github.ref_name == 'master' && success() }}
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: junit.xml
-          verbose: true
-
-      - name: Upload coverage to Codecov.io
-        if: ${{ github.ref_name == 'master' && success() }}
-        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: CaptorAB/openseries
-          verbose: true
-
   version_tag:
     needs: build_test
     if: ${{ needs.build_test.result == 'success' }}
@@ -146,69 +130,3 @@ jobs:
         uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8
         with:
           tag_name: ${{ needs.version_tag.outputs.tag_version }}
-
-  publish_testpypi:
-    needs: release
-    if: ${{ needs.release.result == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-        with:
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with:
-          python-version-file: '.python-version'
-
-      - name: Build and Publish to Test PyPI
-        env:
-          TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install poetry==2.1.4
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi "$TEST_PYPI_API_TOKEN"
-          poetry build
-          poetry check
-          poetry publish --repository testpypi --skip-existing
-
-  publish_pypi:
-    needs: publish_testpypi
-    if: ${{ needs.publish_testpypi.result == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-        with:
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with:
-          python-version-file: '.python-version'
-
-      - name: Build and Publish to PyPI
-        env:
-          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install poetry==2.1.4
-          poetry config pyi-pi-token.pypi "$PYPI_API_TOKEN" || true  # compatibility if older poetry config key
-          poetry config pypi-token.pypi "$PYPI_API_TOKEN"
-          poetry build
-          poetry check
-          poetry publish

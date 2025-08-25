@@ -1,4 +1,4 @@
-name: build
+name: build.yml
 
 permissions:
   contents: read
