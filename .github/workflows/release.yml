@@ -107,7 +107,8 @@ jobs:
           GPG_KEY_ID:         ${{ secrets.GPG_KEY_ID }}
           GITHUB_ACTOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
         run: |
-          export GNUPGHOME="${HOME}/.gnupg"
+          set -euo pipefail
+          export GNUPGHOME="$HOME/.gnupg"
           mkdir -p "$GNUPGHOME"
           chmod 700 "$GNUPGHOME"
           printf 'allow-loopback-pinentry\n' > "$GNUPGHOME/gpg-agent.conf"
@@ -115,25 +116,26 @@ jobs:
           gpgconf --reload gpg-agent || true
           echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --pinentry-mode loopback --import
           KEY_ID="${GPG_KEY_ID:-$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/ {print $5; exit}')}"
+          PASSFILE="$GNUPGHOME/.pass"
+          printf %s "$GPG_PASSPHRASE" > "$PASSFILE"
+          chmod 600 "$PASSFILE"
           git config --global user.name  "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR_EMAIL}"
           git config --global user.signingkey "${KEY_ID}"
-          cat > "${HOME}/gpg-wrap.sh" <<'EOF'
+          cat > "$HOME/gpg-wrap.sh" <<'EOF'
           #!/usr/bin/env bash
-          if [ -n "${GPG_PASSPHRASE:-}" ]; then
-            exec gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" "$@"
-          else
-            exec gpg --batch --yes --pinentry-mode loopback "$@"
-          fi
+          set -euo pipefail
+          exec gpg --batch --yes --no-tty --pinentry-mode loopback --passphrase-file "$HOME/.gnupg/.pass" "$@"
           EOF
-          chmod +x "${HOME}/gpg-wrap.sh"
+          chmod +x "$HOME/gpg-wrap.sh"
           echo ok > /tmp/_ok
-          "${HOME}/gpg-wrap.sh" -u "${KEY_ID}" --detach-sign -o /tmp/_ok.sig /tmp/_ok
+          "$HOME/gpg-wrap.sh" -u "$KEY_ID" --detach-sign -o /tmp/_ok.sig /tmp/_ok
           version=$(grep -oPm1 '(?<=version = ").*(?=")' pyproject.toml)
           echo "Version: $version"
-          git -c gpg.program="${HOME}/gpg-wrap.sh" tag -s "$version" -m "Release v$version"
+          git -c gpg.program="$HOME/gpg-wrap.sh" tag -s "$version" -m "Release v$version"
           git verify-tag "$version"
           git push origin "$version"
+          shred -u "$PASSFILE" || rm -f "$PASSFILE"
           echo "tag_version=$version" >> "$GITHUB_OUTPUT"
 
   release:
