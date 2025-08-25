@@ -102,21 +102,50 @@ jobs:
       - name: Import GPG key and create tag
         id: tag
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PRIVATE_KEY:  ${{ secrets.GPG_PRIVATE_KEY }}       # ascii-armored secret key
+          GPG_PASSPHRASE:   ${{ secrets.GPG_PASSPHRASE }}        # passphrase for the key
+          GPG_KEY_ID:       ${{ secrets.GPG_KEY_ID }}            # long id or fingerprint (optional)
           GITHUB_ACTOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
         run: |
           set -euo pipefail
-          export GPG_TTY=$(tty)
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --pinentry-mode loopback --import
+
+          # Ensure non-interactive loopback pinentry
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo 'allow-loopback-pinentry' > ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent || true
+
+          # Import the private key
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --pinentry-mode loopback --import
+
+          # Pick signing key: secret or fallback to your current fingerprint
+          KEY_ID="${GPG_KEY_ID:-03BE0D766CA0CF9852B592D5BBE8A9CD2E275A01}"
+
+          # Git identity & signing config
+          git config --global user.name  "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR_EMAIL}"
+          git config --global user.signingkey "${KEY_ID}"
+
+          # GPG wrapper so git always uses loopback (and passphrase if set)
+          cat > ~/gpg-wrap.sh <<'EOF'
+          #!/usr/bin/env bash
+          if [ -n "${GPG_PASSPHRASE:-}" ]; then
+            exec gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" "$@"
+          else
+            exec gpg --batch --yes --pinentry-mode loopback "$@"
+          fi
+          EOF
+          chmod +x ~/gpg-wrap.sh
+          git config --global gpg.program ~/gpg-wrap.sh
+
+          # Determine version and create the signed tag
           version=$(grep -oPm1 '(?<=version = ").*(?=")' pyproject.toml)
           echo "Version: $version"
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR_EMAIL}"
-          git config --global user.signingkey 03BE0D766CA0CF9852B592D5BBE8A9CD2E275A01
-          git config --global gpg.program gpg
+
           git tag -s "$version" -m "Release v$version"
           git verify-tag "$version"
           git push origin "$version"
+
           echo "tag_version=$version" >> "$GITHUB_OUTPUT"
 
   release:
