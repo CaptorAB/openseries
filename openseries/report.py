@@ -127,9 +127,10 @@ def report_html(
         Plotly Figure and a div section or a html filename with location
 
     """
-    data.trunc_frame().value_nan_handle().to_cumret()
+    copied = data.from_deepcopy()
+    copied.trunc_frame().value_nan_handle().to_cumret()
 
-    if data.yearfrac > 1.0:
+    if copied.yearfrac > 1.0:
         properties = [
             "geo_ret",
             "vol",
@@ -217,10 +218,10 @@ def report_html(
         ],
     )
 
-    for item, lbl in enumerate(data.columns_lvl_zero):
+    for item, lbl in enumerate(copied.columns_lvl_zero):
         figure.add_scatter(
-            x=data.tsdf.index,
-            y=data.tsdf.iloc[:, item],
+            x=copied.tsdf.index,
+            y=copied.tsdf.iloc[:, item],
             hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
             line={"width": 2.5, "dash": "solid"},
             mode="lines",
@@ -231,13 +232,13 @@ def report_html(
         )
 
     quarter_of_year = 0.25
-    if data.yearfrac < quarter_of_year:
-        tmp = data.from_deepcopy()
+    if copied.yearfrac < quarter_of_year:
+        tmp = copied.from_deepcopy()
         bdf = tmp.value_to_ret().tsdf.iloc[1:]
     else:
-        bdf = calendar_period_returns(data, freq=bar_freq)
+        bdf = calendar_period_returns(data=copied, freq=bar_freq)
 
-    for item in range(data.item_count):
+    for item in range(copied.item_count):
         figure.add_bar(
             x=bdf.index,
             y=bdf.iloc[:, item],
@@ -263,8 +264,8 @@ def report_html(
     ]
 
     # noinspection PyTypeChecker
-    rpt_df = data.all_properties(properties=properties)  # type: ignore[arg-type]
-    alpha_frame = data.from_deepcopy()
+    rpt_df = copied.all_properties(properties=properties)  # type: ignore[arg-type]
+    alpha_frame = copied.from_deepcopy()
     alpha_frame.to_cumret()
     with catch_warnings():
         simplefilter("ignore")
@@ -277,14 +278,16 @@ def report_html(
             for aname in alpha_frame.columns_lvl_zero[:-1]
         ]
     alphas.append("")
-    ar = DataFrame(data=alphas, index=data.tsdf.columns, columns=["Jensen's Alpha"]).T
+    ar = DataFrame(
+        data=alphas, index=copied.tsdf.columns, columns=["Jensen's Alpha"]
+    ).T
     rpt_df = concat([rpt_df, ar])
-    ir = data.info_ratio_func()
+    ir = copied.info_ratio_func()
     ir.name = "Information Ratio"
     ir.iloc[-1] = None
     ir = ir.to_frame().T
     rpt_df = concat([rpt_df, ir])
-    te_frame = data.from_deepcopy()
+    te_frame = copied.from_deepcopy()
     te_frame.resample("7D")
     with catch_warnings():
         simplefilter("ignore")
@@ -301,8 +304,8 @@ def report_html(
     te = te.to_frame().T
     rpt_df = concat([rpt_df, te])
 
-    if data.yearfrac > 1.0:
-        crm = data.from_deepcopy()
+    if copied.yearfrac > 1.0:
+        crm = copied.from_deepcopy()
         crm.resample("ME")
         cru_save = Series(
             data=[""] * crm.item_count,
@@ -325,7 +328,7 @@ def report_html(
         cru = cru.to_frame().T
         rpt_df = concat([rpt_df, cru])
         formats.append("{:.2f}")
-    beta_frame = data.from_deepcopy()
+    beta_frame = copied.from_deepcopy()
     beta_frame.resample("7D").value_nan_handle("drop")
     beta_frame.to_cumret()
     betas: list[str | float] = [
@@ -339,7 +342,7 @@ def report_html(
     betas.append("")
     br = DataFrame(
         data=betas,
-        index=data.tsdf.columns,
+        index=copied.tsdf.columns,
         columns=["Index Beta (weekly)"],
     ).T
     rpt_df = concat([rpt_df, br])
@@ -351,15 +354,15 @@ def report_html(
 
     rpt_df.index = labels_init
 
-    this_year = data.last_idx.year
-    this_month = data.last_idx.month
-    ytd = cast("Series[float]", data.value_ret_calendar_period(year=this_year)).map(
+    this_year = copied.last_idx.year
+    this_month = copied.last_idx.month
+    ytd = cast("Series[float]", copied.value_ret_calendar_period(year=this_year)).map(
         "{:.2%}".format
     )
     ytd.name = "Year-to-Date"
     mtd = cast(
         "Series[float]",
-        data.value_ret_calendar_period(year=this_year, month=this_month),
+        copied.value_ret_calendar_period(year=this_year, month=this_month),
     ).map(
         "{:.2%}".format,
     )
@@ -373,13 +376,13 @@ def report_html(
     rpt_df.index = [f"<b>{x}</b>" for x in rpt_df.index]
     rpt_df = rpt_df.reset_index()
 
-    colmns = ["", *data.columns_lvl_zero]
+    colmns = ["", *copied.columns_lvl_zero]
     columns = [f"<b>{x}</b>" for x in colmns]
     aligning = ["left"] + ["center"] * (len(columns) - 1)
 
     col_even_color = "lightgrey"
     col_odd_color = "white"
-    color_lst = ["grey"] + [col_odd_color] * (data.item_count - 1) + [col_even_color]
+    color_lst = ["grey"] + [col_odd_color] * (copied.item_count - 1) + [col_even_color]
 
     tablevalues = rpt_df.transpose().to_numpy().tolist()
     cleanedtablevalues = list(tablevalues)[:-1]
@@ -445,7 +448,7 @@ def report_html(
 
     figure.update_layout(
         legend=legend,
-        colorway=colorway[: data.item_count],
+        colorway=colorway[: copied.item_count],
     )
     figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
     figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
