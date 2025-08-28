@@ -253,7 +253,7 @@ def efficient_frontier(
         bounds = tuple((0.0, 1.0) for _ in range(eframe.item_count))
     init_guess = array(eframe.weights)
 
-    opt_results = minimize(
+    opt_results = minimize(  # type: ignore[call-overload]
         fun=_neg_sharpe,
         x0=init_guess,
         method=minimize_method,
@@ -288,7 +288,7 @@ def efficient_frontier(
             ),
         )
 
-        result = minimize(
+        result = minimize(  # type: ignore[call-overload]
             fun=_minimize_volatility,
             x0=init_guess,
             method=minimize_method,

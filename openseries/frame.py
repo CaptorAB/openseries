@@ -870,7 +870,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = float(shortdf.count() / fraction)
+            time_factor = float(shortdf.count() / fraction)  # type: ignore[arg-type]
 
         terrors = []
         for item in self.tsdf:
@@ -962,7 +962,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = float(shortdf.count() / fraction)
+            time_factor = float(shortdf.count() / fraction)  # type: ignore[arg-type]
 
         ratios = []
         for item in self.tsdf:
@@ -1063,7 +1063,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = float(shortdf.count() / fraction)
+            time_factor = float(shortdf.count() / fraction)  # type: ignore[arg-type]
 
         ratios = []
         for item in self.tsdf:

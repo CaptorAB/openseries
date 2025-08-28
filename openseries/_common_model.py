@@ -1664,11 +1664,10 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             .sort_values()
             .iloc[
                 : ceil(
-                    (1 - level)
-                    * cvar_df.loc[:, x]  # type: ignore[index]
-                    .ffill()
-                    .pct_change()
-                    .count(),
+                    cast(
+                        "int",
+                        (1 - level) * cvar_df.loc[:, x].ffill().pct_change().count(),
+                    )
                 ),
             ]
             .mean()

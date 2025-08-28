@@ -3511,7 +3511,9 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         jframe.to_cumret()
         jframe.resample("7D")
         results = [
-            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}".replace(
+                "-0.000000000", "0.000000000"
+            )
             for comb in iter_product(
                 range(jframe.item_count),
                 range(jframe.item_count),
@@ -3524,7 +3526,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
                 asset=comb[0],  # type: ignore[arg-type]
                 market=comb[1],  # type: ignore[arg-type]
             )
-            results_tuple.append(f"{alpha:.9f}")
+            results_tuple.append(f"{alpha:.9f}".replace("-0.000000000", "0.000000000"))
 
         if results != results_tuple:
             msg = "Unexpected results from method jensen_alpha()"

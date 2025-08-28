@@ -372,7 +372,7 @@ class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
         """
         if not isinstance(d_range, Iterable) and all([days, end_dt]):
             d_range = DatetimeIndex(
-                [d.date() for d in date_range(periods=days, end=end_dt, freq="D")],
+                [d.date() for d in date_range(periods=days, end=end_dt, freq="D")],  # type: ignore[arg-type]
             )
         elif not isinstance(d_range, Iterable) and not all([days, end_dt]):
             msg = "If d_range is not provided both days and end_dt must be."
