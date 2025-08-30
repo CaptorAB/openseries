@@ -35,9 +35,6 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Get Python version
-        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
-
       - name: Manage Poetry cache
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         id: poetry-cache
@@ -53,24 +50,24 @@ jobs:
 
       - name: Activate venv and install Poetry
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           python --version
           pip install --upgrade pip
           pip install poetry==2.1.4
 
       - name: Install dependencies with Poetry
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry install --with dev
 
       - name: Check and fix with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff format
 
       - name: Manage Mypy cache
@@ -83,14 +80,14 @@ jobs:
 
       - name: Type check with Mypy
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run mypy --cache-dir .mypy_cache .
 
       - name: Tests with Pytest
         id: pytest
         continue-on-error: true
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           PYTHONPATH=${PWD} poetry run pytest
 
       - name: Create GitHub issue on failure

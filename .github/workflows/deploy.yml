@@ -33,34 +33,34 @@ jobs:
 
       - name: Install Poetry
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           pip install poetry==2.1.4
 
       - name: Install dependencies with Poetry
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry install --with dev
           poetry show -l
 
       - name: Check and fix with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff format
 
       - name: Type check with Mypy
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run mypy .
 
       - name: Tests with Pytest
         id: pytest
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           PYTHONPATH=${PWD} poetry run pytest
 
       - name: Create GitHub issue on failure
@@ -184,7 +184,7 @@ jobs:
           TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           python -m venv venv
-          source venv/bin/activate
+          . venv/bin/activate
           pip install poetry==2.1.4
           poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry config pypi-token.testpypi "$TEST_PYPI_API_TOKEN"
@@ -217,7 +217,7 @@ jobs:
           PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           python -m venv venv
-          source venv/bin/activate
+          . venv/bin/activate
           pip install poetry==2.1.4
           poetry config pyi-pi-token.pypi "$PYPI_API_TOKEN" || true  # compatibility if older poetry config key
           poetry config pypi-token.pypi "$PYPI_API_TOKEN"
