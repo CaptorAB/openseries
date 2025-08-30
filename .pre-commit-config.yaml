@@ -19,6 +19,7 @@ repos:
         additional_dependencies:
           - pandas-stubs
           - pydantic
+          - scipy-stubs
           - types-openpyxl
           - types-python-dateutil
           - types-requests
