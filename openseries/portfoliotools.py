@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="assignment"
 from __future__ import annotations
 
 from inspect import stack
@@ -143,7 +142,7 @@ def efficient_frontier(
     eframe: OpenFrame,
     num_ports: int = 5000,
     seed: int = 71,
-    bounds: tuple[tuple[float]] | None = None,
+    bounds: tuple[tuple[float, float], ...] | None = None,
     frontier_points: int = 200,
     minimize_method: LiteralMinimizeMethods = "SLSQP",
     *,
@@ -159,7 +158,7 @@ def efficient_frontier(
         Number of possible portfolios to simulate
     seed: int, default: 71
         The seed for the random process
-    bounds: tuple[tuple[float]], optional
+    bounds: tuple[tuple[float, float], ...], optional
         The range of minumum and maximum allowed allocations for each asset
     frontier_points: int, default: 200
         number of points along frontier to optimize
@@ -333,7 +332,7 @@ def constrain_optimized_portfolios(
     portfolioname: str = "Current Portfolio",
     simulations: int = 10000,
     curve_points: int = 200,
-    bounds: tuple[tuple[float]] | None = None,
+    bounds: tuple[tuple[float, float], ...] | None = None,
     minimize_method: LiteralMinimizeMethods = "SLSQP",
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
     """Constrain optimized portfolios to those that improve on the current one.
@@ -350,7 +349,7 @@ def constrain_optimized_portfolios(
         Number of possible portfolios to simulate
     curve_points: int, default: 200
         Number of optimal portfolios on the efficient frontier
-    bounds: tuple[tuple[float]], optional
+    bounds: tuple[tuple[float, float], ...], optional
         The range of minumum and maximum allowed allocations for each asset
     minimize_method: LiteralMinimizeMethods, default: SLSQP
         The method passed into the scipy.minimize function
@@ -441,7 +440,7 @@ def prepare_plot_data(
         for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero, strict=True)
     ]
     opt_text = "<br><br>Weights:<br>" + "<br>".join(opt_text_list)
-    vol: Series[float] = assets.vol
+    vol = cast("Series[float]", assets.vol)
     plotframe = DataFrame(
         data=[
             assets.arithmetic_ret,

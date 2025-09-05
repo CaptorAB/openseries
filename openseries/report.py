@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="assignment"
 from __future__ import annotations
 
 from inspect import stack
@@ -26,7 +25,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .owntypes import LiteralPlotlyJSlib, LiteralPlotlyOutput
 
 
-from pandas import DataFrame, Series, Timestamp, concat
+from pandas import DataFrame, Index, Series, Timestamp, concat
 from plotly.io import to_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
 from plotly.subplots import make_subplots  # type: ignore[import-untyped]
@@ -72,13 +71,13 @@ def calendar_period_returns(
     cldr = copied.tsdf.iloc[1:].copy()
     if relabel:
         if freq.upper() == "BYE":
-            cldr.index = [d.year for d in cldr.index]
+            cldr.index = Index([d.year for d in cldr.index])
         elif freq.upper() == "BQE":
-            cldr.index = [
-                Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index
-            ]
+            cldr.index = Index(
+                [Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index]
+            )
         else:
-            cldr.index = [d.strftime("%b %y") for d in cldr.index]
+            cldr.index = Index([d.strftime("%b %y") for d in cldr.index])
 
     return cldr  # type: ignore[no-any-return]
 
@@ -285,8 +284,8 @@ def report_html(
     ir = copied.info_ratio_func()
     ir.name = "Information Ratio"
     ir.iloc[-1] = None
-    ir = ir.to_frame().T
-    rpt_df = concat([rpt_df, ir])
+    ir_df = ir.to_frame().T
+    rpt_df = concat([rpt_df, ir_df])
     te_frame = copied.from_deepcopy()
     te_frame.resample("7D")
     with catch_warnings():
@@ -301,8 +300,8 @@ def report_html(
     else:
         te.iloc[-1] = None
         te.name = "Tracking Error (weekly)"
-    te = te.to_frame().T
-    rpt_df = concat([rpt_df, te])
+    te_df = te.to_frame().T
+    rpt_df = concat([rpt_df, te_df])
 
     if copied.yearfrac > 1.0:
         crm = copied.from_deepcopy()
@@ -325,8 +324,8 @@ def report_html(
         else:
             cru.iloc[-1] = None
             cru.name = "Capture Ratio (monthly)"
-        cru = cru.to_frame().T
-        rpt_df = concat([rpt_df, cru])
+        cru_df = cru.to_frame().T
+        rpt_df = concat([rpt_df, cru_df])
         formats.append("{:.2f}")
     beta_frame = copied.from_deepcopy()
     beta_frame.resample("7D").value_nan_handle("drop")
@@ -351,7 +350,7 @@ def report_html(
             lambda x, fmt=f: x if (isinstance(x, str) or x is None) else fmt.format(x),
         )
 
-    rpt_df.index = labels_init
+    rpt_df.index = Index(labels_init)
 
     this_year = copied.last_idx.year
     this_month = copied.last_idx.month
@@ -366,13 +365,13 @@ def report_html(
         "{:.2%}".format,
     )
     mtd.name = "Month-to-Date"
-    ytd = ytd.to_frame().T
-    mtd = mtd.to_frame().T
-    rpt_df = concat([rpt_df, ytd])
-    rpt_df = concat([rpt_df, mtd])
+    ytd_df = ytd.to_frame().T
+    mtd_df = mtd.to_frame().T
+    rpt_df = concat([rpt_df, ytd_df])
+    rpt_df = concat([rpt_df, mtd_df])
     rpt_df = rpt_df.reindex(labels_final)
 
-    rpt_df.index = [f"<b>{x}</b>" for x in rpt_df.index]
+    rpt_df.index = Index([f"<b>{x}</b>" for x in rpt_df.index])
     rpt_df = rpt_df.reset_index()
 
     colmns = ["", *copied.columns_lvl_zero]
@@ -426,7 +425,9 @@ def report_html(
         figure.add_layout_image(logo)
 
     figure.update_layout(fig.get("layout"))
-    colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get("colorway")
+    colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
+        "colorway", []
+    )
 
     if vertical_legend:
         legend = {
