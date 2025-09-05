@@ -9,13 +9,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from copy import deepcopy
 from logging import getLogger
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
+    from collections.abc import Callable
 
 from numpy import (
     append,
@@ -58,6 +58,9 @@ from .owntypes import (
     ValueListType,
     ValueType,
 )
+
+FieldValidator = cast("Callable[..., Callable[..., Any]]", field_validator)
+ModelValidator = cast("Callable[..., Callable[..., Any]]", model_validator)
 
 logger = getLogger(__name__)
 
@@ -123,21 +126,21 @@ class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
     isin: str | None = None
     label: str | None = None
 
-    @field_validator("domestic", mode="before")  # type: ignore[misc]
+    @FieldValidator("domestic", mode="before")
     @classmethod
     def _validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
         _ = Currency(ccy=value)
         return value
 
-    @field_validator("countries", mode="before")  # type: ignore[misc]
+    @FieldValidator("countries", mode="before")
     @classmethod
     def _validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
         _ = Countries(countryinput=value)
         return value
 
-    @field_validator("markets", mode="before")  # type: ignore[misc]
+    @FieldValidator("markets", mode="before")
     @classmethod
     def _validate_markets(
         cls, value: list[str] | str | None
@@ -156,7 +159,7 @@ class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
             raise MarketsNotStringNorListStrError(item_msg)
         raise MarketsNotStringNorListStrError(msg)
 
-    @model_validator(mode="after")  # type: ignore[misc,unused-ignore]
+    @ModelValidator(mode="after")
     def _dates_and_values_validate(self: Self) -> Self:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)
@@ -370,19 +373,17 @@ class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
             An OpenTimeSeries object
 
         """
-        if not isinstance(d_range, Iterable) and all([days, end_dt]):
-            d_range = DatetimeIndex(
-                [d.date() for d in date_range(periods=days, end=end_dt, freq="D")],  # type: ignore[arg-type]
-            )
-        elif not isinstance(d_range, Iterable) and not all([days, end_dt]):
-            msg = "If d_range is not provided both days and end_dt must be."
-            raise IncorrectArgumentComboError(msg)
-
-        deltas = array(
-            [i.days for i in DatetimeIndex(d_range)[1:] - DatetimeIndex(d_range)[:-1]],  # type: ignore[arg-type]
-        )
+        if d_range is None:
+            if days is not None and end_dt is not None:
+                d_range = DatetimeIndex(
+                    [d.date() for d in date_range(periods=days, end=end_dt, freq="D")],
+                )
+            else:
+                msg = "If d_range is not provided both days and end_dt must be."
+                raise IncorrectArgumentComboError(msg)
+        deltas = array([i.days for i in d_range[1:] - d_range[:-1]])
         arr: list[float] = list(cumprod(insert(1 + deltas * rate / 365, 0, 1.0)))
-        dates = [d.strftime("%Y-%m-%d") for d in DatetimeIndex(d_range)]  # type: ignore[arg-type]
+        dates = [d.strftime("%Y-%m-%d") for d in d_range]
 
         return cls(
             timeseries_id="",

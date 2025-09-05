@@ -33,6 +33,7 @@ from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 from .load_plotly import load_plotly_dict
 from .owntypes import (
     LiteralBizDayFreq,
+    LiteralFrameProps,
     ValueType,
 )
 
@@ -238,11 +239,12 @@ def report_html(
         bdf = calendar_period_returns(data=copied, freq=bar_freq)
 
     for item in range(copied.item_count):
+        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
         figure.add_bar(
             x=bdf.index,
             y=bdf.iloc[:, item],
             hovertemplate="%{y:.2%}<br>%{x}",
-            name=bdf.iloc[:, item].name[0],  # type: ignore[index]
+            name=col_name[0],
             showlegend=False,
             row=2,
             col=1,
@@ -263,7 +265,9 @@ def report_html(
     ]
 
     # noinspection PyTypeChecker
-    rpt_df = copied.all_properties(properties=properties)  # type: ignore[arg-type]
+    rpt_df = copied.all_properties(
+        properties=cast("list[LiteralFrameProps]", properties)
+    )
     alpha_frame = copied.from_deepcopy()
     alpha_frame.to_cumret()
     with catch_warnings():
