@@ -12,13 +12,19 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
+        language_version: python3.13
         args:
           - --install-types
           - --non-interactive
           - --config-file=pyproject.toml
         additional_dependencies:
+          - exchange_calendars
+          - holidays
+          - pytest
           - pandas-stubs
+          - plotly
           - pydantic
+          - scikit-learn
           - scipy-stubs
           - types-openpyxl
           - types-python-dateutil

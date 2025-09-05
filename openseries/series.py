@@ -552,8 +552,7 @@ class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
         arr = array(self.values) / divider
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
-        # noinspection PyTypeChecker
-        arr = cumprod(  # type: ignore[assignment]
+        arr = cumprod(
             a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
         )
 

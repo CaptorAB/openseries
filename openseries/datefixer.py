@@ -12,7 +12,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import TYPE_CHECKING, cast
 
-import exchange_calendars as exchcal
+import exchange_calendars as exchcal  # type: ignore[import-untyped]
 from dateutil.relativedelta import relativedelta
 from holidays import (
     country_holidays,
@@ -163,7 +163,7 @@ def holiday_calendar(
         custom_list = (
             [custom_holidays]
             if isinstance(custom_holidays, str)
-            else list(custom_holidays)  # type: ignore[arg-type]
+            else list(custom_holidays)
         )
         hols.extend([date_fix(fixerdate=ddate) for ddate in custom_list])
 

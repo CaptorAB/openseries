@@ -94,7 +94,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ]
 
         for kwarg in kwargs:
-            data = self.randomframe.to_json(**kwarg)  # type: ignore[arg-type]
+            data = self.randomframe.to_json(**kwarg)
             if [item.get("name") for item in data] != [
                 "Asset_0",
                 "Asset_1",
@@ -1841,7 +1841,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
+                cast("int", dt.date(2017, 6, 27)) : cast(
                     "int",
                     dt.date(2018, 6, 27),
                 ),
@@ -1891,7 +1891,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
+                cast("int", dt.date(2017, 6, 27)) : cast(
                     "int",
                     dt.date(2018, 6, 27),
                 ),
@@ -3369,8 +3369,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(bframe.tsdf, bframe.tsdf):
             beta = bframe.beta(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=comb[0],
+                market=comb[1],
             )
             results_tuple.append(f"{beta:.9f}")
 
@@ -3448,8 +3448,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(bframe.tsdf, bframe.tsdf):
             beta = bframe.beta(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=comb[0],
+                market=comb[1],
             )
             results_tuple.append(f"{beta:.9f}")
 
@@ -3523,8 +3523,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(jframe.tsdf, jframe.tsdf):
             alpha = jframe.jensen_alpha(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=comb[0],
+                market=comb[1],
             )
             results_tuple.append(f"{alpha:.9f}".replace("-0.000000000", "0.000000000"))
 
@@ -3595,8 +3595,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(jframe.tsdf, jframe.tsdf):
             alpha = jframe.jensen_alpha(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=comb[0],
+                market=comb[1],
             )
             results_tuple.append(f"{alpha:.9f}")
 

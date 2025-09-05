@@ -36,7 +36,7 @@ from pandas import (
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.io import to_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
-from scipy.optimize import minimize  # type: ignore[import-untyped]
+from scipy.optimize import minimize
 
 from .load_plotly import load_plotly_dict
 from .owntypes import (

@@ -38,7 +38,7 @@ from pandas import (
     merge,
 )
 from pydantic import field_validator
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression  # type: ignore[import-untyped]
 
 from ._common_model import _CommonModel
 from .datefixer import _do_resample_to_business_period_ends
@@ -94,7 +94,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
 
     # noinspection PyMethodParameters
     @field_validator("constituents")  # type: ignore[misc]
-    def _check_labels_unique(  # type: ignore[misc]
+    def _check_labels_unique(
         cls: OpenFrame,  # noqa: N805
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:
@@ -129,7 +129,7 @@ class OpenFrame(_CommonModel):  # type: ignore[misc]
         """
         copied_constituents = [ts.from_deepcopy() for ts in constituents]
 
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             constituents=copied_constituents,
             weights=weights,
         )

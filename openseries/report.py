@@ -20,16 +20,16 @@ from warnings import catch_warnings, simplefilter
 
 if TYPE_CHECKING:  # pragma: no cover
     from pandas import Series
-    from plotly.graph_objs import Figure
+    from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 
     from .frame import OpenFrame
     from .owntypes import LiteralPlotlyJSlib, LiteralPlotlyOutput
 
 
 from pandas import DataFrame, Series, Timestamp, concat
-from plotly.io import to_html
-from plotly.offline import plot
-from plotly.subplots import make_subplots
+from plotly.io import to_html  # type: ignore[import-untyped]
+from plotly.offline import plot  # type: ignore[import-untyped]
+from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 
 from .load_plotly import load_plotly_dict
 from .owntypes import (
@@ -338,7 +338,6 @@ def report_html(
         )
         for bname in beta_frame.columns_lvl_zero[:-1]
     ]
-    # noinspection PyTypeChecker
     betas.append("")
     br = DataFrame(
         data=betas,
@@ -349,7 +348,7 @@ def report_html(
 
     for item, f in zip(rpt_df.index, formats, strict=False):
         rpt_df.loc[item] = rpt_df.loc[item].apply(
-            lambda x, fmt=f: x if (isinstance(x, str) or x is None) else fmt.format(x),  # type: ignore[return-value]
+            lambda x, fmt=f: x if (isinstance(x, str) or x is None) else fmt.format(x),
         )
 
     rpt_df.index = labels_init
