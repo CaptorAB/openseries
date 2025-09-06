@@ -41,7 +41,7 @@ from openseries.series import (
 from .test_common_sim import CommonTestCase
 
 
-class NewTimeSeries(OpenTimeSeries):  # type: ignore[misc]
+class NewTimeSeries(OpenTimeSeries):
     """class to test correct pass-through of classes."""
 
     extra_info: str = "cool"
@@ -179,7 +179,7 @@ def test_opentimeseries_invalid_markets(markets: list[str] | str | None) -> None
         serie.markets = markets
 
 
-class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
+class TestOpenTimeSeries(CommonTestCase):
     """class to run tests on the module series.py."""
 
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:

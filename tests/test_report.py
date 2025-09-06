@@ -30,7 +30,7 @@ class ReportTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestReport(CommonTestCase):  # type: ignore[misc]
+class TestReport(CommonTestCase):
     """class to run tests on the module report.py."""
 
     def test_calendar_period_returns(self: TestReport) -> None:

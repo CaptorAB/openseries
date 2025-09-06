@@ -80,7 +80,7 @@ def calendar_period_returns(
         else:
             cldr.index = Index([d.strftime("%b %y") for d in cldr.index])
 
-    return cldr  # type: ignore[no-any-return]
+    return cldr
 
 
 def report_html(

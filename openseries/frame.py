@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
 from copy import deepcopy
@@ -71,7 +70,7 @@ __all__ = ["OpenFrame"]
 
 
 # noinspection PyUnresolvedReferences,PyTypeChecker
-class OpenFrame(_CommonModel):  # type: ignore[misc]
+class OpenFrame(_CommonModel):
     """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
     The intended use is to allow comparisons across these timeseries.

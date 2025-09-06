@@ -70,7 +70,7 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
 # noinspection PyUnresolvedReferences,PyNestedDecorators
-class OpenTimeSeries(_CommonModel):  # type: ignore[misc]
+class OpenTimeSeries(_CommonModel):
     """OpenTimeSeries objects are at the core of the openseries package.
 
     The intended use is to allow analyses of financial timeseries.

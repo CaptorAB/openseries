@@ -7,14 +7,16 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="arg-type"
 from __future__ import annotations
 
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable  # pragma: no cover
 
 import pytest
 
@@ -37,7 +39,7 @@ class PortfoliotoolsTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
+class TestPortfoliotools(CommonTestCase):
     """class to run tests on the module portfoliotools.py."""
 
     def test_simulate_portfolios(self: TestPortfoliotools) -> None:
@@ -142,7 +144,9 @@ class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
                 msg = "Function efficient_frontier not working as intended"
                 raise PortfoliotoolsTestError(msg)
 
-            frt_most_sharpe = round(Decimal(frontier.loc[:, "sharpe"].max()), 6)
+            frt_most_sharpe = round(
+                Decimal(cast("float", frontier.loc[:, "sharpe"].max())), 6
+            )
             frt_return_where_most_sharpe = round(
                 Decimal(float(frontier.loc[frontier["sharpe"].idxmax()]["ret"])),
                 6,
@@ -158,7 +162,9 @@ class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
                 )
                 raise PortfoliotoolsTestError(msg)
 
-            sim_least_vol = round(Decimal(result.loc[:, "stdev"].min()), 6)
+            sim_least_vol = round(
+                Decimal(cast("float", result.loc[:, "stdev"].min())), 6
+            )
             sim_return_where_least_vol = round(
                 Decimal(float(result.loc[result["stdev"].idxmin()]["ret"])),
                 6,
@@ -235,7 +241,7 @@ class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
             portfolioname=org_port_name,
             simulations=simulations,
             curve_points=curve_points,
-            bounds=bounds,
+            bounds=cast("tuple[tuple[float, float], ...] | None", bounds),
         )
 
         minframe_nb, _, _, _ = constrain_optimized_portfolios(
@@ -246,14 +252,16 @@ class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
             curve_points=curve_points,
         )
 
-        if round(sum(minframe.weights), 7) != 1.0:
+        if round(sum(cast("Iterable[bool]", minframe.weights)), 7) != 1.0:
             msg = (
                 "Function constrain_optimized_portfolios not working as "
-                f"intended\n{round(sum(minframe.weights), 7)}"
+                f"intended\n{round(sum(cast('Iterable[bool]', minframe.weights)), 7)}"
             )
             raise PortfoliotoolsTestError(msg)
 
-        minframe_weights = [f"{minw:.7f}" for minw in list(minframe.weights)]
+        minframe_weights = [
+            f"{minw:.7f}" for minw in list(cast("Iterable[float]", minframe.weights))
+        ]
         if minframe_weights != [
             "0.1150512",
             "0.2045890",
@@ -267,14 +275,17 @@ class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
             )
             raise PortfoliotoolsTestError(msg)
 
-        if round(sum(minframe_nb.weights), 7) != 1.0:
+        if round(sum(cast("Iterable[bool]", minframe_nb.weights)), 7) != 1.0:
             msg = (
-                "Function constrain_optimized_portfolios not working as "
-                f"intended\n{round(sum(minframe_nb.weights), 7)}"
+                "Function constrain_optimized_portfolios not working as intended\n"
+                f"{round(sum(cast('Iterable[bool]', minframe_nb.weights)), 7)}"
             )
             raise PortfoliotoolsTestError(msg)
 
-        minframe_nb_weights = [f"{minw:.7f}" for minw in list(minframe_nb.weights)]
+        minframe_nb_weights = [
+            f"{minw:.7f}"
+            for minw in list(cast("Iterable[float]", minframe_nb.weights))
+        ]
         if minframe_nb_weights != [
             "0.1150512",
             "0.2045890",
@@ -299,14 +310,16 @@ class TestPortfoliotools(CommonTestCase):  # type: ignore[misc]
 
             raise PortfoliotoolsTestError(msg)
 
-        if round(sum(maxframe.weights), 7) != 1.0:
+        if round(sum(cast("Iterable[bool]", maxframe.weights)), 7) != 1.0:
             msg = (
                 "Function constrain_optimized_portfolios not working as "
-                f"intended\n{round(sum(maxframe.weights), 7)}"
+                f"intended\n{round(sum(cast('Iterable[bool]', maxframe.weights)), 7)}"
             )
             raise PortfoliotoolsTestError(msg)
 
-        maxframe_weights = [f"{maxw:.7f}" for maxw in list(maxframe.weights)]
+        maxframe_weights = [
+            f"{maxw:.7f}" for maxw in list(cast("Iterable[float]", maxframe.weights))
+        ]
         if maxframe_weights != [
             "0.1151792",
             "0.1738639",
