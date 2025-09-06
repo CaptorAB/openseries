@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
 import datetime as dt
