@@ -15,7 +15,6 @@ repos:
         language_version: python3.13
         pass_filenames: false
         args:
-          - .
           - --install-types
           - --non-interactive
           - --config-file=pyproject.toml
