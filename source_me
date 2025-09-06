@@ -1,4 +1,4 @@
-source venv/bin/activate
+. venv/bin/activate
 echo ""
 if [[ ":$PYTHONPATH:" != *":$PWD:"* ]]; then
     export PYTHONPATH=${PWD}:$PYTHONPATH
