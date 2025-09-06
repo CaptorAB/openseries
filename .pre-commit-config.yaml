@@ -12,7 +12,6 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
-        language_version: python3.13
         pass_filenames: false
         args:
           - .
