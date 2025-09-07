@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "1.9.4"
+version = "1.9.5"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
