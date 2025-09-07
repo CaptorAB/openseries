@@ -25,7 +25,6 @@ repos:
           - pandas-stubs
           - plotly
           - pydantic
-          - scikit-learn
           - scipy-stubs
           - types-openpyxl
           - types-python-dateutil
