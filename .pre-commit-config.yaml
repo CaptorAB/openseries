@@ -23,7 +23,6 @@ repos:
         additional_dependencies:
           - pytest
           - pandas-stubs
-          - plotly
           - pydantic
           - scipy-stubs
           - types-openpyxl
