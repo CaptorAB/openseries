@@ -21,7 +21,6 @@ repos:
           - --non-interactive
           - --config-file=pyproject.toml
         additional_dependencies:
-          - pytest
           - pandas-stubs
           - pydantic
           - scipy-stubs
