@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="operator,type-arg,arg-type"
 from __future__ import annotations
 
 import datetime as dt
@@ -18,14 +17,15 @@ from json import load, loads
 from pathlib import Path
 from pprint import pformat
 from re import escape
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, patch
 
 from numpy import array
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Hashable  # pragma: no cover
+    from collections.abc import Hashable, Mapping  # pragma: no cover
+    from typing import Literal
 
 import pytest
 from pandas import DataFrame, Series, date_range, read_excel
@@ -58,7 +58,7 @@ class OpenFrameTestError(Exception):
 
 
 # noinspection PyTypeChecker
-class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
+class TestOpenFrame(CommonTestCase):
     """class to run tests on the module frame.py."""
 
     def make_mixed_type_openframe(self: TestOpenFrame) -> OpenFrame:
@@ -83,7 +83,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             msg = "test_to_json test case setup failed."
             raise FileExistsError(msg)
 
-        kwargs = [
+        kwargs: list[Mapping[str, Any]] = [
             {"what_output": "values", "filename": str(framefile)},
             {"what_output": "values", "filename": filename},
             {
@@ -94,7 +94,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ]
 
         for kwarg in kwargs:
-            data = self.randomframe.to_json(**kwarg)  # type: ignore[arg-type]
+            data = self.randomframe.to_json(**kwarg)
             if [item.get("name") for item in data] != [
                 "Asset_0",
                 "Asset_1",
@@ -174,12 +174,12 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         frame_one = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
-                    name=item["name"],
-                    dates=item["dates"],
-                    values=item["values"],
-                    valuetype=item["valuetype"],
-                    baseccy=item["currency"],
-                    local_ccy=item["local_ccy"],
+                    name=cast("str", item["name"]),
+                    dates=cast("list[str]", item["dates"]),
+                    values=cast("list[float]", item["values"]),
+                    valuetype=cast("ValueType", item["valuetype"]),
+                    baseccy=cast("str", item["currency"]),
+                    local_ccy=cast("bool", item["local_ccy"]),
                 )
                 for item in data
             ],
@@ -197,12 +197,12 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         frame_two = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
-                    name=item["name"],
-                    dates=item["dates"],
-                    values=item["values"],
-                    valuetype=item["valuetype"],
-                    baseccy=item["currency"],
-                    local_ccy=item["local_ccy"],
+                    name=cast("str", item["name"]),
+                    dates=cast("list[str]", item["dates"]),
+                    values=cast("list[float]", item["values"]),
+                    valuetype=cast("ValueType", item["valuetype"]),
+                    baseccy=cast("str", item["currency"]),
+                    local_ccy=cast("bool", item["local_ccy"]),
                 )
                 for item in output
             ],
@@ -241,12 +241,12 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         frame_one = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
-                    name=item["name"],
-                    dates=item["dates"],
-                    values=item["values"],
-                    valuetype=item["valuetype"],
-                    baseccy=item["currency"],
-                    local_ccy=item["local_ccy"],
+                    name=cast("str", item["name"]),
+                    dates=cast("list[str]", item["dates"]),
+                    values=cast("list[float]", item["values"]),
+                    valuetype=cast("ValueType", item["valuetype"]),
+                    baseccy=cast("str", item["currency"]),
+                    local_ccy=cast("bool", item["local_ccy"]),
                 )
                 for item in data
             ],
@@ -264,12 +264,12 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         frame_two = OpenFrame(
             [
                 OpenTimeSeries.from_arrays(
-                    name=item["name"],
-                    dates=item["dates"],
-                    values=item["values"],
-                    valuetype=item["valuetype"],
-                    baseccy=item["currency"],
-                    local_ccy=item["local_ccy"],
+                    name=cast("str", item["name"]),
+                    dates=cast("list[str]", item["dates"]),
+                    values=cast("list[float]", item["values"]),
+                    valuetype=cast("ValueType", item["valuetype"]),
+                    baseccy=cast("str", item["currency"]),
+                    local_ccy=cast("bool", item["local_ccy"]),
                 )
                 for item in output
             ],
@@ -823,8 +823,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ]
         for smethod, fmethod in zip(smethods, fmethods, strict=False):
             assert_frame_equal(
-                left=smethod(),
-                right=cast("Callable", fmethod)(column=0),
+                left=smethod(),  # type: ignore[operator]
+                right=fmethod(column=0),  # type: ignore[operator]
             )
 
         cumseries = sameseries.from_deepcopy()
@@ -927,8 +927,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             methods_to_compare, smethods_to_compare, fmethods_to_compare, strict=False
         ):
             if (
-                f"{smethod(months_from_last=12):.9f}"
-                != f"{float(fmethod(months_from_last=12).iloc[0]):.9f}"
+                f"{smethod(months_from_last=12):.9f}"  # type: ignore[operator]
+                != f"{float(fmethod(months_from_last=12).iloc[0]):.9f}"  # type: ignore[operator]
             ):
                 msg = (
                     f"Calc method {method} not aligned between "
@@ -1683,7 +1683,10 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             expected_exception=TypeError,
             match="plot_type must be 'bars' or 'lines'.",
         ):
-            _, _ = plotframe.plot_histogram(plot_type="triangles", auto_open=False)
+            _, _ = plotframe.plot_histogram(
+                plot_type=cast("Literal['bars', 'lines']", "triangles"),
+                auto_open=False,
+            )
 
     def test_plot_histogram_filefolders(self: TestOpenFrame) -> None:
         """Test plot_histogram method with different file folder options."""
@@ -1841,7 +1844,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
+                cast("int", dt.date(2017, 6, 27)) : cast(
                     "int",
                     dt.date(2018, 6, 27),
                 ),
@@ -1891,7 +1894,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
             tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(  # type: ignore[index]
+                cast("int", dt.date(2017, 6, 27)) : cast(
                     "int",
                     dt.date(2018, 6, 27),
                 ),
@@ -2435,7 +2438,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="base_column should be a tuple",
         ):
             _ = frame.tracking_error_func(
-                base_column="string",
+                base_column=cast("tuple[str, ValueType] | int", "string"),
             )
 
     def test_info_ratio_func(self: TestOpenFrame) -> None:
@@ -2475,7 +2478,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="base_column should be a tuple",
         ):
             _ = frame.info_ratio_func(
-                base_column="string",
+                base_column=cast("tuple[str, ValueType] | int", "string"),
             )
 
     def test_rolling_corr(self: TestOpenFrame) -> None:
@@ -2786,7 +2789,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ):
             _ = cframe.capture_ratio_func(
                 ratio="up",
-                base_column="string",
+                base_column=cast("tuple[str, ValueType] | int", "string"),
             )
 
         with pytest.raises(
@@ -2794,7 +2797,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="ratio must be one of 'up', 'down' or 'both'.",
         ):
             _ = cframe.capture_ratio_func(
-                ratio="boo",
+                ratio=cast("Literal['up', 'down', 'both']", "boo"),
             )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
@@ -3118,8 +3121,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             mframe.target_weight_from_var,
         ]
         for methd in methods:
-            no_fixed = methd()
-            fixed = methd(periods_in_a_year_fixed=252)
+            no_fixed = methd()  # type: ignore[operator]
+            fixed = methd(periods_in_a_year_fixed=252)  # type: ignore[operator]
             for nofix, fix in zip(no_fixed, fixed, strict=True):
                 if f"{100 * abs(nofix - fix):.0f}" != zero_str:
                     msg = (
@@ -3127,11 +3130,11 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
                     )
                     raise OpenFrameTestError(msg)
         for methd in methods:
-            dated = methd(
+            dated = methd(  # type: ignore[operator]
                 from_date=mframe.first_idx,
                 to_date=mframe.last_idx,
             )
-            undated = methd()
+            undated = methd()  # type: ignore[operator]
             for ddat, undat in zip(dated, undated, strict=True):
                 if f"{ddat:.10f}" != f"{undat:.10f}":
                     msg = (
@@ -3340,7 +3343,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ):
             _ = oframe.ord_least_squares_fit(
                 y_column=0,
-                x_column="string",
+                x_column=cast("tuple[str, ValueType] | int", "string"),
                 fitted_series=False,
             )
 
@@ -3349,7 +3352,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="y_column should be a tuple",
         ):
             _ = oframe.ord_least_squares_fit(
-                y_column="string",
+                y_column=cast("tuple[str, ValueType] | int", "string"),
                 x_column=1,
                 fitted_series=False,
             )
@@ -3369,8 +3372,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(bframe.tsdf, bframe.tsdf):
             beta = bframe.beta(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=cast("tuple[str, ValueType] | int", comb[0]),
+                market=cast("tuple[str, ValueType] | int", comb[1]),
             )
             results_tuple.append(f"{beta:.9f}")
 
@@ -3413,7 +3416,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="asset should be a tuple",
         ):
             _ = bframe.beta(
-                asset="string",
+                asset=cast("tuple[str, ValueType] | int", "string"),
                 market=1,
             )
 
@@ -3423,7 +3426,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ):
             _ = bframe.beta(
                 asset=0,
-                market="string",
+                market=cast("tuple[str, ValueType] | int", "string"),
             )
 
         mixframe = self.make_mixed_type_openframe()
@@ -3448,8 +3451,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(bframe.tsdf, bframe.tsdf):
             beta = bframe.beta(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=cast("tuple[str, ValueType] | int", comb[0]),
+                market=cast("tuple[str, ValueType] | int", comb[1]),
             )
             results_tuple.append(f"{beta:.9f}")
 
@@ -3492,7 +3495,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="asset should be a tuple",
         ):
             _ = bframe.beta(
-                asset="string",
+                asset=cast("tuple[str, ValueType] | int", "string"),
                 market=1,
             )
 
@@ -3502,7 +3505,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ):
             _ = bframe.beta(
                 asset=0,
-                market="string",
+                market=cast("tuple[str, ValueType] | int", "string"),
             )
 
     def test_jensen_alpha(self: TestOpenFrame) -> None:
@@ -3511,7 +3514,9 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         jframe.to_cumret()
         jframe.resample("7D")
         results = [
-            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}"
+            f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}".replace(
+                "-0.000000000", "0.000000000"
+            )
             for comb in iter_product(
                 range(jframe.item_count),
                 range(jframe.item_count),
@@ -3521,10 +3526,10 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(jframe.tsdf, jframe.tsdf):
             alpha = jframe.jensen_alpha(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=cast("tuple[str, ValueType] | int", comb[0]),
+                market=cast("tuple[str, ValueType] | int", comb[1]),
             )
-            results_tuple.append(f"{alpha:.9f}")
+            results_tuple.append(f"{alpha:.9f}".replace("-0.000000000", "0.000000000"))
 
         if results != results_tuple:
             msg = "Unexpected results from method jensen_alpha()"
@@ -3565,7 +3570,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="asset should be a tuple",
         ):
             _ = jframe.jensen_alpha(
-                asset="string",
+                asset=cast("tuple[str, ValueType] | int", "string"),
                 market=1,
             )
 
@@ -3575,7 +3580,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ):
             _ = jframe.jensen_alpha(
                 asset=0,
-                market="string",
+                market=cast("tuple[str, ValueType] | int", "string"),
             )
 
     def test_jensen_alpha_returns_input(self: TestOpenFrame) -> None:
@@ -3593,8 +3598,8 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         results_tuple = []
         for comb in iter_product(jframe.tsdf, jframe.tsdf):
             alpha = jframe.jensen_alpha(
-                asset=comb[0],  # type: ignore[arg-type]
-                market=comb[1],  # type: ignore[arg-type]
+                asset=cast("tuple[str, ValueType] | int", comb[0]),
+                market=cast("tuple[str, ValueType] | int", comb[1]),
             )
             results_tuple.append(f"{alpha:.9f}")
 
@@ -3637,7 +3642,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="asset should be a tuple",
         ):
             _ = jframe.jensen_alpha(
-                asset="string",
+                asset=cast("tuple[str, ValueType] | int", "string"),
                 market=1,
             )
 
@@ -3647,7 +3652,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         ):
             _ = jframe.jensen_alpha(
                 asset=0,
-                market="string",
+                market=cast("tuple[str, ValueType] | int", "string"),
             )
 
         mixframe = self.make_mixed_type_openframe()
@@ -3789,7 +3794,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
         }
 
         output, _ = frame.multi_factor_linear_regression(
-            dependent_column=(portfolio.label, ValueType.RTRN)
+            dependent_column=(cast("str", portfolio.label), ValueType.RTRN)
         )
         result = output.to_dict()[portfolio.label]
         rounded = {}
@@ -3824,7 +3829,7 @@ class TestOpenFrame(CommonTestCase):  # type: ignore[misc]
             match="All series should be of ValueType.RTRN.",
         ):
             _, _ = gframe.multi_factor_linear_regression(
-                dependent_column=(gportfolio.label, ValueType.PRICE)
+                dependent_column=(cast("str", gportfolio.label), ValueType.PRICE)
             )
 
     def test_worst_month(self: TestOpenFrame) -> None:

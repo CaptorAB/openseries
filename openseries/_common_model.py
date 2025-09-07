@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="no-any-return"
 from __future__ import annotations
 
 import datetime as dt
@@ -67,7 +66,7 @@ from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.io import to_html  # type: ignore[import-untyped]
 from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath, ValidationError
-from scipy.stats import (  # type: ignore[import-untyped]
+from scipy.stats import (
     kurtosis,
     norm,
     skew,
@@ -1658,17 +1657,16 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             deep=True
         )
         result = [
-            cvar_df.loc[:, x]  # type: ignore[call-overload,index]
+            cvar_df.loc[:, x]  # type: ignore[call-overload]
             .ffill()
             .pct_change()
             .sort_values()
             .iloc[
                 : ceil(
-                    (1 - level)
-                    * cvar_df.loc[:, x]  # type: ignore[index]
-                    .ffill()
-                    .pct_change()
-                    .count(),
+                    cast(
+                        "int",
+                        (1 - level) * cvar_df.loc[:, x].ffill().pct_change().count(),
+                    )
                 ),
             ]
             .mean()
@@ -1807,12 +1805,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
         fraction = (later - earlier).days / 365.25
 
-        any_below_zero = any(
-            self.tsdf.loc[[earlier, later]]  # type: ignore[index]
-            .lt(0.0)
-            .any()
-            .to_numpy()
-        )
+        any_below_zero = any(self.tsdf.loc[[earlier, later]].lt(0.0).any().to_numpy())
         if zero in self.tsdf.loc[earlier].to_numpy() or any_below_zero:
             msg = (
                 "Geometric return cannot be calculated due to "

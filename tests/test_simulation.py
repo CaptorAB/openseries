@@ -26,7 +26,7 @@ class SimulationTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestSimulation(CommonTestCase):  # type: ignore[misc]
+class TestSimulation(CommonTestCase):
     """class to run tests on the module simulation.py."""
 
     def test_processes(self: TestSimulation) -> None:

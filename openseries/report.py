@@ -7,7 +7,6 @@ https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
 SPDX-License-Identifier: BSD-3-Clause
 """
 
-# mypy: disable-error-code="assignment"
 from __future__ import annotations
 
 from inspect import stack
@@ -20,20 +19,21 @@ from warnings import catch_warnings, simplefilter
 
 if TYPE_CHECKING:  # pragma: no cover
     from pandas import Series
-    from plotly.graph_objs import Figure
+    from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 
     from .frame import OpenFrame
     from .owntypes import LiteralPlotlyJSlib, LiteralPlotlyOutput
 
 
-from pandas import DataFrame, Series, Timestamp, concat
-from plotly.io import to_html
-from plotly.offline import plot
-from plotly.subplots import make_subplots
+from pandas import DataFrame, Index, Series, Timestamp, concat
+from plotly.io import to_html  # type: ignore[import-untyped]
+from plotly.offline import plot  # type: ignore[import-untyped]
+from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 
 from .load_plotly import load_plotly_dict
 from .owntypes import (
     LiteralBizDayFreq,
+    LiteralFrameProps,
     ValueType,
 )
 
@@ -72,15 +72,15 @@ def calendar_period_returns(
     cldr = copied.tsdf.iloc[1:].copy()
     if relabel:
         if freq.upper() == "BYE":
-            cldr.index = [d.year for d in cldr.index]
+            cldr.index = Index([d.year for d in cldr.index])
         elif freq.upper() == "BQE":
-            cldr.index = [
-                Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index
-            ]
+            cldr.index = Index(
+                [Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index]
+            )
         else:
-            cldr.index = [d.strftime("%b %y") for d in cldr.index]
+            cldr.index = Index([d.strftime("%b %y") for d in cldr.index])
 
-    return cldr  # type: ignore[no-any-return]
+    return cldr
 
 
 def report_html(
@@ -127,9 +127,10 @@ def report_html(
         Plotly Figure and a div section or a html filename with location
 
     """
-    data.trunc_frame().value_nan_handle().to_cumret()
+    copied = data.from_deepcopy()
+    copied.trunc_frame().value_nan_handle().to_cumret()
 
-    if data.yearfrac > 1.0:
+    if copied.yearfrac > 1.0:
         properties = [
             "geo_ret",
             "vol",
@@ -217,10 +218,10 @@ def report_html(
         ],
     )
 
-    for item, lbl in enumerate(data.columns_lvl_zero):
+    for item, lbl in enumerate(copied.columns_lvl_zero):
         figure.add_scatter(
-            x=data.tsdf.index,
-            y=data.tsdf.iloc[:, item],
+            x=copied.tsdf.index,
+            y=copied.tsdf.iloc[:, item],
             hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
             line={"width": 2.5, "dash": "solid"},
             mode="lines",
@@ -231,18 +232,19 @@ def report_html(
         )
 
     quarter_of_year = 0.25
-    if data.yearfrac < quarter_of_year:
-        tmp = data.from_deepcopy()
+    if copied.yearfrac < quarter_of_year:
+        tmp = copied.from_deepcopy()
         bdf = tmp.value_to_ret().tsdf.iloc[1:]
     else:
-        bdf = calendar_period_returns(data, freq=bar_freq)
+        bdf = calendar_period_returns(data=copied, freq=bar_freq)
 
-    for item in range(data.item_count):
+    for item in range(copied.item_count):
+        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
         figure.add_bar(
             x=bdf.index,
             y=bdf.iloc[:, item],
             hovertemplate="%{y:.2%}<br>%{x}",
-            name=bdf.iloc[:, item].name[0],  # type: ignore[index]
+            name=col_name[0],
             showlegend=False,
             row=2,
             col=1,
@@ -263,8 +265,10 @@ def report_html(
     ]
 
     # noinspection PyTypeChecker
-    rpt_df = data.all_properties(properties=properties)  # type: ignore[arg-type]
-    alpha_frame = data.from_deepcopy()
+    rpt_df = copied.all_properties(
+        properties=cast("list[LiteralFrameProps]", properties)
+    )
+    alpha_frame = copied.from_deepcopy()
     alpha_frame.to_cumret()
     with catch_warnings():
         simplefilter("ignore")
@@ -277,14 +281,16 @@ def report_html(
             for aname in alpha_frame.columns_lvl_zero[:-1]
         ]
     alphas.append("")
-    ar = DataFrame(data=alphas, index=data.tsdf.columns, columns=["Jensen's Alpha"]).T
+    ar = DataFrame(
+        data=alphas, index=copied.tsdf.columns, columns=["Jensen's Alpha"]
+    ).T
     rpt_df = concat([rpt_df, ar])
-    ir = data.info_ratio_func()
+    ir = copied.info_ratio_func()
     ir.name = "Information Ratio"
     ir.iloc[-1] = None
-    ir = ir.to_frame().T
-    rpt_df = concat([rpt_df, ir])
-    te_frame = data.from_deepcopy()
+    ir_df = ir.to_frame().T
+    rpt_df = concat([rpt_df, ir_df])
+    te_frame = copied.from_deepcopy()
     te_frame.resample("7D")
     with catch_warnings():
         simplefilter("ignore")
@@ -298,11 +304,11 @@ def report_html(
     else:
         te.iloc[-1] = None
         te.name = "Tracking Error (weekly)"
-    te = te.to_frame().T
-    rpt_df = concat([rpt_df, te])
+    te_df = te.to_frame().T
+    rpt_df = concat([rpt_df, te_df])
 
-    if data.yearfrac > 1.0:
-        crm = data.from_deepcopy()
+    if copied.yearfrac > 1.0:
+        crm = copied.from_deepcopy()
         crm.resample("ME")
         cru_save = Series(
             data=[""] * crm.item_count,
@@ -322,10 +328,10 @@ def report_html(
         else:
             cru.iloc[-1] = None
             cru.name = "Capture Ratio (monthly)"
-        cru = cru.to_frame().T
-        rpt_df = concat([rpt_df, cru])
+        cru_df = cru.to_frame().T
+        rpt_df = concat([rpt_df, cru_df])
         formats.append("{:.2f}")
-    beta_frame = data.from_deepcopy()
+    beta_frame = copied.from_deepcopy()
     beta_frame.resample("7D").value_nan_handle("drop")
     beta_frame.to_cumret()
     betas: list[str | float] = [
@@ -335,51 +341,50 @@ def report_html(
         )
         for bname in beta_frame.columns_lvl_zero[:-1]
     ]
-    # noinspection PyTypeChecker
     betas.append("")
     br = DataFrame(
         data=betas,
-        index=data.tsdf.columns,
+        index=copied.tsdf.columns,
         columns=["Index Beta (weekly)"],
     ).T
     rpt_df = concat([rpt_df, br])
 
     for item, f in zip(rpt_df.index, formats, strict=False):
         rpt_df.loc[item] = rpt_df.loc[item].apply(
-            lambda x, fmt=f: x if (isinstance(x, str) or x is None) else fmt.format(x),  # type: ignore[return-value]
+            lambda x, fmt=f: x if (isinstance(x, str) or x is None) else fmt.format(x),
         )
 
-    rpt_df.index = labels_init
+    rpt_df.index = Index(labels_init)
 
-    this_year = data.last_idx.year
-    this_month = data.last_idx.month
-    ytd = cast("Series[float]", data.value_ret_calendar_period(year=this_year)).map(
+    this_year = copied.last_idx.year
+    this_month = copied.last_idx.month
+    ytd = cast("Series[float]", copied.value_ret_calendar_period(year=this_year)).map(
         "{:.2%}".format
     )
     ytd.name = "Year-to-Date"
     mtd = cast(
         "Series[float]",
-        data.value_ret_calendar_period(year=this_year, month=this_month),
+        copied.value_ret_calendar_period(year=this_year, month=this_month),
     ).map(
         "{:.2%}".format,
     )
     mtd.name = "Month-to-Date"
-    ytd = ytd.to_frame().T
-    mtd = mtd.to_frame().T
-    rpt_df = concat([rpt_df, ytd])
-    rpt_df = concat([rpt_df, mtd])
+    ytd_df = ytd.to_frame().T
+    mtd_df = mtd.to_frame().T
+    rpt_df = concat([rpt_df, ytd_df])
+    rpt_df = concat([rpt_df, mtd_df])
     rpt_df = rpt_df.reindex(labels_final)
 
-    rpt_df.index = [f"<b>{x}</b>" for x in rpt_df.index]
+    rpt_df.index = Index([f"<b>{x}</b>" for x in rpt_df.index])
     rpt_df = rpt_df.reset_index()
 
-    colmns = ["", *data.columns_lvl_zero]
+    colmns = ["", *copied.columns_lvl_zero]
     columns = [f"<b>{x}</b>" for x in colmns]
     aligning = ["left"] + ["center"] * (len(columns) - 1)
 
     col_even_color = "lightgrey"
     col_odd_color = "white"
-    color_lst = ["grey"] + [col_odd_color] * (data.item_count - 1) + [col_even_color]
+    color_lst = ["grey"] + [col_odd_color] * (copied.item_count - 1) + [col_even_color]
 
     tablevalues = rpt_df.transpose().to_numpy().tolist()
     cleanedtablevalues = list(tablevalues)[:-1]
@@ -424,7 +429,9 @@ def report_html(
         figure.add_layout_image(logo)
 
     figure.update_layout(fig.get("layout"))
-    colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get("colorway")
+    colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
+        "colorway", []
+    )
 
     if vertical_legend:
         legend = {
@@ -445,7 +452,7 @@ def report_html(
 
     figure.update_layout(
         legend=legend,
-        colorway=colorway[: data.item_count],
+        colorway=colorway[: copied.item_count],
     )
     figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
     figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)

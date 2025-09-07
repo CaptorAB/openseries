@@ -41,7 +41,7 @@ from openseries.series import (
 from .test_common_sim import CommonTestCase
 
 
-class NewTimeSeries(OpenTimeSeries):  # type: ignore[misc]
+class NewTimeSeries(OpenTimeSeries):
     """class to test correct pass-through of classes."""
 
     extra_info: str = "cool"
@@ -179,7 +179,7 @@ def test_opentimeseries_invalid_markets(markets: list[str] | str | None) -> None
         serie.markets = markets
 
 
-class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
+class TestOpenTimeSeries(CommonTestCase):
     """class to run tests on the module series.py."""
 
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
@@ -423,7 +423,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
         df_data = {"tsdf": dframe, **data}
         serie_data = {"tsdf": serie, **data}
 
-        df_obj = OpenTimeSeries(**df_data)  # type: ignore[arg-type]
+        df_obj = OpenTimeSeries(**df_data)
         if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
             msg = "Raw values and DataFrame values not matching"
             raise OpenTimeSeriesTestError(msg)
@@ -432,7 +432,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
             expected_exception=ValidationError,
             match="Input should be an instance of DataFrame",
         ):
-            OpenTimeSeries(**serie_data)  # type: ignore[arg-type]
+            OpenTimeSeries(**serie_data)
 
     def test_create_from_arrays(self: TestOpenTimeSeries) -> None:
         """Test from_arrays construct method."""
@@ -1141,7 +1141,7 @@ class TestOpenTimeSeries(CommonTestCase):  # type: ignore[misc]
                     f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
                 )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
-                result_values[value] = result.loc[  # type: ignore[assignment]
+                result_values[value] = result.loc[
                     value,
                     ("Asset_0", ValueType.PRICE),
                 ]

@@ -12,7 +12,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import TYPE_CHECKING, cast
 
-import exchange_calendars as exchcal
+import exchange_calendars as exchcal  # type: ignore[import-untyped]
 from dateutil.relativedelta import relativedelta
 from holidays import (
     country_holidays,
@@ -163,7 +163,7 @@ def holiday_calendar(
         custom_list = (
             [custom_holidays]
             if isinstance(custom_holidays, str)
-            else list(custom_holidays)  # type: ignore[arg-type]
+            else list(custom_holidays)
         )
         hols.extend([date_fix(fixerdate=ddate) for ddate in custom_list])
 
@@ -255,7 +255,7 @@ def date_offset_foll(
         while not is_busday(dates=new_date, busdaycal=calendar):
             new_date += day_delta
 
-    return new_date  # type: ignore[no-any-return]
+    return new_date
 
 
 def get_previous_business_day_before_today(
@@ -505,7 +505,7 @@ def _do_resample_to_business_period_ends(
     dates = DatetimeIndex(
         [copydata.index[0]]
         + [
-            date_offset_foll(  # type: ignore[misc]
+            date_offset_foll(
                 raw_date=dt.date(d.year, d.month, 1)
                 + relativedelta(months=1)
                 - dt.timedelta(days=1),

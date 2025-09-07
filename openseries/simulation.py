@@ -115,7 +115,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
             Simulation data
 
         """
-        return self.dframe.add(1.0).cumprod(axis="columns").T  # type: ignore[no-any-return]
+        return self.dframe.add(1.0).cumprod(axis="columns").T
 
     @property
     def realized_mean_return(self: Self) -> float:
@@ -463,7 +463,7 @@ class ReturnSimulation(BaseModel):  # type: ignore[misc]
                     [ValueType.RTRN],
                 ],
             )
-            return sdf  # type: ignore[no-any-return]
+            return sdf
 
         fdf = DataFrame()
         for item in range(self.number_of_sims):

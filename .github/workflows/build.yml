@@ -35,9 +35,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Get Python version
-        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
-
       - name: Cache Poetry dependencies
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         with:
@@ -50,35 +47,35 @@ jobs:
       - name: Create virtual environment and install Poetry
         run: |
           python -m venv venv
-          source venv/Scripts/activate
+          . venv/Scripts/activate
           python.exe -m pip install --upgrade pip
           pip install poetry==2.1.4
 
       - name: Install dependencies with Poetry
         run: |
-          source venv/Scripts/activate
+          . venv/Scripts/activate
           poetry install --with dev
 
       - name: Check and fix with Ruff
         run: |
-          source venv/Scripts/activate
+          . venv/Scripts/activate
           poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
         run: |
-          source venv/Scripts/activate
+          . venv/Scripts/activate
           poetry run ruff format
 
       - name: Type check with Mypy
         run: |
-          source venv/Scripts/activate
+          . venv/Scripts/activate
           poetry run mypy .
 
       - name: Tests with Pytest
         id: pytest
         continue-on-error: true
         run: |
-          source venv/Scripts/activate
+          . venv/Scripts/activate
           PYTHONPATH=${PWD} poetry run pytest
 
       - name: Create GitHub issue on failure
@@ -104,7 +101,7 @@ jobs:
 
       - name: Package and check
         run: |
-          source venv/Scripts/activate
+          . venv/Scripts/activate
           poetry build
           poetry check
 
@@ -132,9 +129,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Get Python version
-        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
-
       - name: Cache Poetry dependencies
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         with:
@@ -147,35 +141,35 @@ jobs:
       - name: Create virtual environment and install Poetry
         run: |
           python -m venv venv
-          source venv/bin/activate
+          . venv/bin/activate
           pip install --upgrade pip
           pip install poetry==2.1.4
 
       - name: Install dependencies with Poetry
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry install --with dev
 
       - name: Check and fix with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff format
 
       - name: Type check with Mypy
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run mypy .
 
       - name: Tests with Pytest
         id: pytest
         continue-on-error: true
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           PYTHONPATH=${PWD} poetry run pytest \
             -n auto \
             --dist loadscope \
@@ -208,7 +202,7 @@ jobs:
 
       - name: Package and check
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry build
           poetry check
 
@@ -236,9 +230,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Get Python version
-        run: echo "PYTHON_VERSION=$(python --version)" >> $GITHUB_ENV
-
       - name: Cache Poetry dependencies
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         with:
@@ -251,35 +242,35 @@ jobs:
       - name: Create virtual environment and install Poetry
         run: |
           python -m venv venv
-          source venv/bin/activate
+          . venv/bin/activate
           pip install --upgrade pip
           pip install poetry==2.1.4
 
       - name: Install dependencies with Poetry
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry install --with dev
 
       - name: Check and fix with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run ruff format
 
       - name: Type check with Mypy
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry run mypy .
 
       - name: Tests with Pytest
         id: pytest
         continue-on-error: true
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           PYTHONPATH=${PWD} poetry run pytest --cov=openseries --dist loadscope -n auto
 
       - name: Create GitHub issue on failure
@@ -305,6 +296,6 @@ jobs:
 
       - name: Package and check
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           poetry build
           poetry check

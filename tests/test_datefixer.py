@@ -362,7 +362,7 @@ class TestDateFixer:
             startyear=start,
             endyear=end,
             countries=countries,
-            custom_holidays=exchange_holidays,  # type: ignore[arg-type]
+            custom_holidays=exchange_holidays,
         )
         country_holidays = [
             date_fix(fixerdate=date).strftime("%Y-%m-%d") for date in calendar.holidays

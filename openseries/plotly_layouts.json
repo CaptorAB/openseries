@@ -16,7 +16,7 @@
     ],
     "responsive": true,
     "toImageButtonOptions": {
-      "filename": "captor_plot_image",
+      "filename": "openseries_plot",
       "format": "png"
     }
   },
