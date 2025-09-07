@@ -14,14 +14,11 @@ repos:
       - id: mypy
         pass_filenames: false
         args:
-          - .
+          - --all-files
           - --install-types
           - --non-interactive
           - --config-file=pyproject.toml
         additional_dependencies:
-          - .
-          - exchange_calendars
-          - holidays
           - pytest
           - pandas-stubs
           - plotly
