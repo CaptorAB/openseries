@@ -54,7 +54,7 @@ _,_=series.plot_series()
 
 ### Sample output using the report_html() function:
 
-<img src="https://raw.githubusercontent.com/CaptorAB/openseries/master/captor_plot_image.png" alt="Two Assets Compared" width="1000" />
+<img src="https://raw.githubusercontent.com/CaptorAB/openseries/master/openseries_plot.png" alt="Two Assets Compared" width="1000" />
 
 ## Development Instructions
 
