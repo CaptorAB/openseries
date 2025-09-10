@@ -78,7 +78,7 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
     """Pytest on invalid valuetype as input."""
     with pytest.raises(
         expected_exception=ValidationError,
-        match="type=enum|type=string_type",
+        match=r"type=enum|type=string_type",
     ):
         OpenTimeSeries.from_arrays(
             name="Asset",
@@ -96,7 +96,7 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
     """Pytest on invalid currency code as input for currency."""
     with pytest.raises(
         expected_exception=ValidationError,
-        match="type=string_too_short|type=string_type",
+        match=r"type=string_too_short|type=string_type",
     ):
         OpenTimeSeries.from_arrays(
             name="Asset",
@@ -120,7 +120,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
     )
     with pytest.raises(
         expected_exception=ValidationError,
-        match="type=string_too_short|type=string_type",
+        match=r"type=string_too_short|type=string_type",
     ):
         serie.domestic = domestic
 
@@ -138,7 +138,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
     )
     with pytest.raises(
         expected_exception=ValidationError,
-        match="type=set_type|type=string_type",
+        match=r"type=set_type|type=string_type",
     ):
         serie.countries = countries
 
@@ -590,7 +590,7 @@ class TestOpenTimeSeries(CommonTestCase):
         wrongtype = [["2023-01-01", "2023-01-02"], [1.0, 1.1]]
         with pytest.raises(
             expected_exception=TypeError,
-            match="Argument dframe must be pandas Series or DataFrame.",
+            match=r"Argument dframe must be pandas Series or DataFrame.",
         ):
             _ = OpenTimeSeries.from_df(
                 dframe=wrongtype,  # type: ignore[arg-type]
@@ -813,13 +813,13 @@ class TestOpenTimeSeries(CommonTestCase):
 
         with pytest.raises(
             expected_exception=IncorrectArgumentComboError,
-            match="If d_range is not provided both days and end_dt must be.",
+            match=r"If d_range is not provided both days and end_dt must be.",
         ):
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03)
 
         with pytest.raises(
             expected_exception=IncorrectArgumentComboError,
-            match="If d_range is not provided both days and end_dt must be.",
+            match=r"If d_range is not provided both days and end_dt must be.",
         ):
             _ = OpenTimeSeries.from_fixed_rate(rate=0.03, days=30)
 
@@ -942,7 +942,7 @@ class TestOpenTimeSeries(CommonTestCase):
         series.value_to_ret()
         with pytest.raises(
             expected_exception=ResampleDataLossError,
-            match="Do not run resample_to_business_period_ends on return series.",
+            match=r"Do not run resample_to_business_period_ends on return series.",
         ):
             series.resample_to_business_period_ends()
 
@@ -1380,7 +1380,7 @@ class TestOpenTimeSeries(CommonTestCase):
         )
         with pytest.raises(
             expected_exception=DateAlignmentError,
-            match="Timeseries dates must overlap to allow them to be chained.",
+            match=r"Timeseries dates must overlap to allow them to be chained.",
         ):
             _ = timeseries_chain(front_series, no_overlap_series)
 
@@ -1696,7 +1696,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="'order' must be 2 or 3, got 4.",
+            match=r"'order' must be 2 or 3, got 4.",
         ):
             _ = self.randomseries.sortino_ratio_func(order=4)  # type: ignore[arg-type]
 
@@ -1843,8 +1843,8 @@ class TestOpenTimeSeries(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = zeroseries.geo_ret
@@ -1852,8 +1852,8 @@ class TestOpenTimeSeries(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = zeroseries.geo_ret_func()
@@ -1882,8 +1882,8 @@ class TestOpenTimeSeries(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = negseries.geo_ret
@@ -1891,8 +1891,8 @@ class TestOpenTimeSeries(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = negseries.geo_ret_func()

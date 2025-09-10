@@ -576,7 +576,7 @@ class TestPortfoliotools(CommonTestCase):
 
         with pytest.raises(
             expected_exception=AtLeastOneFrameError,
-            match="One of sim_frame, line_frame or point_frame must be provided.",
+            match=r"One of sim_frame, line_frame or point_frame must be provided.",
         ):
             _, _ = sharpeplot(
                 auto_open=False,

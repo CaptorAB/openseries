@@ -107,26 +107,23 @@ CaptorLogoType = dict[str, str | float]
 
 LiteralJsonOutput = Literal["values", "tsdf"]
 LiteralTrunc = Literal["before", "after", "both"]
-LiteralLinePlotMode = Literal[
-    "lines",
-    "markers",
-    "lines+markers",
-    "lines+text",
-    "markers+text",
-    "lines+markers+text",
-    None,
-]
+LiteralLinePlotMode = (
+    Literal[
+        "lines",
+        "markers",
+        "lines+markers",
+        "lines+text",
+        "markers+text",
+        "lines+markers+text",
+    ]
+    | None
+)
 LiteralHowMerge = Literal["outer", "inner"]
 LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "nearest"]
 LiteralBizDayFreq = Literal["B", "BME", "BQE", "BYE"]
-LiteralPandasReindexMethod = Literal[
-    None,
-    "pad",
-    "ffill",
-    "backfill",
-    "bfill",
-    "nearest",
-]
+LiteralPandasReindexMethod = (
+    Literal["pad", "ffill", "backfill", "bfill", "nearest"] | None
+)
 LiteralNanMethod = Literal["fill", "drop"]
 LiteralCaptureRatio = Literal["up", "down", "both"]
 LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]

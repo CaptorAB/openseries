@@ -386,8 +386,8 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=MarketsNotStringNorListStrError,
             match=(
-                "Argument markets must be a string market code or a list "
-                "of market codes supported by pandas_market_calendars."
+                r"Argument markets must be a string market code or a list "
+                r"of market codes supported by pandas_market_calendars."
             ),
         ):
             _ = market_holidays(startyear=start, endyear=end, markets=xmarkets)
@@ -465,7 +465,7 @@ class TestDateFixer:
         neg_days = -5
         with pytest.raises(
             expected_exception=TradingDaysNotAboveZeroError,
-            match="Argument trading_days must be greater than zero.",
+            match=r"Argument trading_days must be greater than zero.",
         ):
             _ = generate_calendar_date_range(
                 trading_days=neg_days,
@@ -475,8 +475,8 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=BothStartAndEndError,
             match=(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
+                r"Provide one of start or end date, but not both. "
+                r"Date range is inferred from number of trading days."
             ),
         ):
             _ = generate_calendar_date_range(
@@ -488,8 +488,8 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=BothStartAndEndError,
             match=(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
+                r"Provide one of start or end date, but not both. "
+                r"Date range is inferred from number of trading days."
             ),
         ):
             _ = generate_calendar_date_range(trading_days=trd_days)

@@ -330,7 +330,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NameError,
-            match="Filename must end with .xlsx",
+            match=r"Filename must end with .xlsx",
         ):
             _ = self.randomframe.to_xlsx(filename="trial.pdf")
 
@@ -404,7 +404,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=DateAlignmentError,
             match=(
-                "Argument months_offset implies startdate before first date in series."
+                r"Argument months_offset implies startdate "
+                r"before first date in series."
             ),
         ):
             _, _ = crframe.calc_range(months_offset=125)
@@ -566,7 +567,7 @@ class TestOpenFrame(CommonTestCase):
         frame = self.randomframe.from_deepcopy()
         with pytest.raises(
             expected_exception=ResampleDataLossError,
-            match="Do not run resample_to_business_period_ends on return series.",
+            match=r"Do not run resample_to_business_period_ends on return series.",
         ):
             frame.resample_to_business_period_ends()
 
@@ -662,8 +663,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=NoWeightsError,
             match=(
-                "OpenFrame weights property must be provided "
-                "to run the make_portfolio method."
+                r"OpenFrame weights property must be provided "
+                r"to run the make_portfolio method."
             ),
         ):
             _ = mpframe.make_portfolio(name=name)
@@ -1354,7 +1355,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
-            match="Must provide same number of labels as items in frame.",
+            match=r"Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
 
@@ -1470,7 +1471,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
-            match="Must provide same number of labels as items in frame.",
+            match=r"Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_bars(auto_open=False, labels=["a", "b"])
 
@@ -1611,7 +1612,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
-            match="Must provide same number of labels as items in frame.",
+            match=r"Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_histogram(auto_open=False, labels=["a", "b"])
 
@@ -1681,7 +1682,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=TypeError,
-            match="plot_type must be 'bars' or 'lines'.",
+            match=r"plot_type must be 'bars' or 'lines'.",
         ):
             _, _ = plotframe.plot_histogram(
                 plot_type=cast("Literal['bars', 'lines']", "triangles"),
@@ -2178,8 +2179,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=Exception,
             match=(
-                "Merging OpenTimeSeries DataFrames with argument "
-                "how=inner produced an empty DataFrame."
+                r"Merging OpenTimeSeries DataFrames with argument "
+                r"how=inner produced an empty DataFrame."
             ),
         ):
             aframe.merge_series(how="inner")
@@ -2785,7 +2786,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=TypeError,
-            match="base_column should be a tuple",
+            match=r"base_column should be a tuple",
         ):
             _ = cframe.capture_ratio_func(
                 ratio="up",
@@ -2794,7 +2795,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=RatioInputError,
-            match="ratio must be one of 'up', 'down' or 'both'.",
+            match=r"ratio must be one of 'up', 'down' or 'both'.",
         ):
             _ = cframe.capture_ratio_func(
                 ratio=cast("Literal['up', 'down', 'both']", "boo"),
@@ -2841,8 +2842,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret
@@ -2850,8 +2851,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret_func()
@@ -2875,8 +2876,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret
@@ -2884,8 +2885,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret_func()
@@ -3826,7 +3827,7 @@ class TestOpenFrame(CommonTestCase):
         gframe.add_timeseries(gportfolio)
         with pytest.raises(
             expected_exception=MixedValuetypesError,
-            match="All series should be of ValueType.RTRN.",
+            match=r"All series should be of ValueType.RTRN.",
         ):
             _, _ = gframe.multi_factor_linear_regression(
                 dependent_column=(cast("str", gportfolio.label), ValueType.PRICE)
@@ -3837,6 +3838,6 @@ class TestOpenFrame(CommonTestCase):
         mixframe = self.make_mixed_type_openframe()
         with pytest.raises(
             expected_exception=ResampleDataLossError,
-            match="Do not run worst_month on return series.",
+            match=r"Do not run worst_month on return series.",
         ):
             _ = mixframe.worst_month
