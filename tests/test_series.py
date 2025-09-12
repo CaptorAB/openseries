@@ -14,13 +14,16 @@ from decimal import Decimal
 from json import load
 from pathlib import Path
 from pprint import pformat
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from numpy import array
 from pandas import DataFrame, DatetimeIndex, Series, date_range
 from pydantic import ValidationError
 from typing_extensions import TypedDict
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pandas import Timestamp
 
 from openseries.owntypes import (
     CountriesType,
@@ -1393,7 +1396,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         pushed_date = front_series.last_idx + dt.timedelta(days=10)
         no_overlap_series = OpenTimeSeries.from_df(
-            full_series.tsdf.loc[cast("int", pushed_date) :],
+            full_series.tsdf.loc[cast("Timestamp", pushed_date) :],
         )
         with pytest.raises(
             expected_exception=DateAlignmentError,

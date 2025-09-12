@@ -1327,15 +1327,16 @@ class _CommonModel(BaseModel):
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
+            how_many = (
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+                .count()
+                .iloc[0]
+            )
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[
-                cast("int", earlier) : cast("int", later),
-                self.tsdf.columns.to_numpy()[0],
-            ].count()
-            time_factor = cast("int", how_many) / fraction
+            time_factor = how_many / fraction
 
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .mean()
@@ -1389,15 +1390,15 @@ class _CommonModel(BaseModel):
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .count()
                 .iloc[0]
             )
+            fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
         result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
@@ -1588,23 +1589,25 @@ class _CommonModel(BaseModel):
         else:
             fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .count()
                 .iloc[0]
             )
             time_factor = how_many / fraction
         if drift_adjust:
             imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
-                - self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                - self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
                 .sum()
                 / len(
-                    self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                    self.tsdf.loc[
+                        cast("Timestamp", earlier) : cast("Timestamp", later)
+                    ]
                     .ffill()
                     .pct_change(),
                 )
@@ -1612,7 +1615,7 @@ class _CommonModel(BaseModel):
         else:
             imp_vol = (
                 -sqrt(time_factor)
-                * self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                * self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
@@ -1674,9 +1677,9 @@ class _CommonModel(BaseModel):
             from_dt=from_date,
             to_dt=to_date,
         )
-        cvar_df = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy(
-            deep=True
-        )
+        cvar_df = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].copy(deep=True)
         result = [
             (r := cvar_df[col].ffill().pct_change().sort_values())[
                 : ceil((1 - level) * r.count())
@@ -1743,7 +1746,7 @@ class _CommonModel(BaseModel):
         )
 
         how_many = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .count(numeric_only=True)
@@ -1760,7 +1763,7 @@ class _CommonModel(BaseModel):
 
         per_period_mar = min_accepted_return / time_factor
         diff = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .sub(per_period_mar)
@@ -1973,8 +1976,8 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            / self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+            / self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .expanding(min_periods=min_periods)
             .max()
         ).min() - 1
@@ -2018,10 +2021,10 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         pos = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()[1:][
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()[1:]
                 > zero
@@ -2029,7 +2032,7 @@ class _CommonModel(BaseModel):
             .count()
         )
         tot = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .count()
@@ -2218,7 +2221,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         retdf = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
         )
@@ -2360,7 +2363,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .quantile(1 - level, interpolation=interpolation)
@@ -2409,7 +2412,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
@@ -2458,7 +2461,7 @@ class _CommonModel(BaseModel):
             to_dt=to_date,
         )
         zscframe = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
         )

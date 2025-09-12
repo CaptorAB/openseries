@@ -565,7 +565,7 @@ class OpenFrame(_CommonModel):
         if periods_in_a_year_fixed is None:
             fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .count()
                 .iloc[0]
             )
@@ -583,7 +583,9 @@ class OpenFrame(_CommonModel):
             cast("tuple[str, str]", self.tsdf.iloc[:, second_column].name)[0],
         ]
 
-        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].copy()
 
         for rtn in cols:
             arr = concatenate([array([nan]), diff(log(data[(rtn, ValueType.PRICE)]))])

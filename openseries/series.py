@@ -18,6 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
     from numpy.typing import NDArray
+    from pandas import Timestamp
 
 from numpy import (
     append,
@@ -684,27 +685,30 @@ class OpenTimeSeries(_CommonModel):
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            how_many = self.tsdf.loc[
-                cast("int", earlier) : cast("int", later),
-                self.tsdf.columns.to_numpy()[0],
-            ].count()
+            how_many = (
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+                .count()
+                .iloc[0]
+            )
             fraction = (later - earlier).days / 365.25
-            time_factor = cast("int", how_many) / fraction
+            time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].copy()
 
         data[self.label, ValueType.RTRN] = log(
             data.loc[:, self.tsdf.columns.to_numpy()[0]]
         ).diff()
 
         rawdata = [
-            data.loc[:, cast("int", (self.label, ValueType.RTRN))]
+            data[(self.label, ValueType.RTRN)]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, cast("int", (self.label, ValueType.RTRN))].iloc[1:]:
+        for item in data[(self.label, ValueType.RTRN)].iloc[1:]:
             prev = rawdata[-1]
             rawdata.append(
                 sqrt(
