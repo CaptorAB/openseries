@@ -45,7 +45,7 @@ CountryListType = conset(
 CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]  # noqa: UP007
 
 
-class Countries(BaseModel):  # type: ignore[misc]
+class Countries(BaseModel):
     """Declare Countries."""
 
     countryinput: CountriesType
@@ -64,7 +64,7 @@ CurrencyStringType = Annotated[
 ]
 
 
-class Currency(BaseModel):  # type: ignore[misc]
+class Currency(BaseModel):
     """Declare Currency."""
 
     ccy: CurrencyStringType

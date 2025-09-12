@@ -20,6 +20,7 @@ import pytest
 from numpy import array
 from pandas import DataFrame, DatetimeIndex, Series, date_range
 from pydantic import ValidationError
+from typing_extensions import TypedDict
 
 from openseries.owntypes import (
     CountriesType,
@@ -39,6 +40,25 @@ from openseries.series import (
 )
 
 from .test_common_sim import CommonTestCase
+
+
+class OpenTimeSeriesInput(TypedDict, total=False):
+    """class to test dataframe validation."""
+
+    name: str
+    timeseries_id: str
+    instrument_id: str
+    valuetype: ValueType
+    dates: list[str]
+    values: list[float]
+    local_ccy: bool
+    tsdf: DataFrame
+    currency: str
+    domestic: str
+    countries: list[str] | str
+    markets: list[str] | str | None
+    isin: str | None
+    label: str | None
 
 
 class NewTimeSeries(OpenTimeSeries):
@@ -403,7 +423,7 @@ class TestOpenTimeSeries(CommonTestCase):
             name=("Asset_0", ValueType.PRICE),
             dtype="float64",
         )
-        data = {
+        data: OpenTimeSeriesInput = {
             "timeseries_id": "",
             "currency": "SEK",
             "dates": [
@@ -420,8 +440,8 @@ class TestOpenTimeSeries(CommonTestCase):
             "values": [1.0, 1.01, 0.99, 1.015, 1.003],
             "valuetype": ValueType.PRICE,
         }
-        df_data = {"tsdf": dframe, **data}
-        serie_data = {"tsdf": serie, **data}
+        df_data: OpenTimeSeriesInput = {"tsdf": dframe, **data}
+        serie_data: OpenTimeSeriesInput = {"tsdf": cast("DataFrame", serie), **data}
 
         df_obj = OpenTimeSeries(**df_data)
         if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
@@ -1141,10 +1161,7 @@ class TestOpenTimeSeries(CommonTestCase):
                     f"{result.loc[value, ('Asset_0', ValueType.PRICE)]:.10f}"
                 )
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], int):
-                result_values[value] = result.loc[
-                    value,
-                    ("Asset_0", ValueType.PRICE),
-                ]
+                result_values[value] = result.loc[value][("Asset_0", ValueType.PRICE)]
             elif isinstance(result.loc[value, ("Asset_0", ValueType.PRICE)], dt.date):
                 result_values[value] = cast(
                     "dt.date",

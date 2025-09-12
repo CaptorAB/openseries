@@ -23,9 +23,11 @@ from unittest.mock import MagicMock, patch
 from numpy import array
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from collections.abc import Hashable, Mapping  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Hashable, Mapping
     from typing import Literal
+
+    from pandas import Timestamp
 
 import pytest
 from pandas import DataFrame, Series, date_range, read_excel
@@ -1844,13 +1846,12 @@ class TestOpenFrame(CommonTestCase):
         series_long.set_new_label("Long")
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
-            tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(
-                    "int",
+            dframe=tmp_series.tsdf.loc[
+                cast("Timestamp", dt.date(2017, 6, 27)) : cast(
+                    "Timestamp",
                     dt.date(2018, 6, 27),
-                ),
-                ("Asset_0", ValueType.PRICE),
-            ],
+                )
+            ][("Asset_0", ValueType.PRICE)],
         )
         series_short.set_new_label("Short")
         frame = OpenFrame([series_long, series_short])
@@ -1894,13 +1895,11 @@ class TestOpenFrame(CommonTestCase):
         series_long.set_new_label("Long")
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
-            tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(
-                    "int",
-                    dt.date(2018, 6, 27),
-                ),
-                ("Asset_0", ValueType.PRICE),
-            ],
+            dframe=tmp_series.tsdf.loc[
+                cast("Timestamp", dt.date(2017, 6, 27)) : cast(
+                    "Timestamp", dt.date(2018, 6, 27)
+                )
+            ][("Asset_0", ValueType.PRICE)]
         )
         series_short.set_new_label("Short")
         frame = OpenFrame([series_long, series_short])

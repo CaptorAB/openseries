@@ -17,10 +17,13 @@ if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
     from collections.abc import Callable
 
+    from numpy.typing import NDArray
+
 from numpy import (
     append,
     array,
     cumprod,
+    float64,
     insert,
     isnan,
     log,
@@ -470,6 +473,7 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
+        # noinspection PyCallingNonCallable
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
@@ -550,11 +554,14 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        arr = array(self.values) / divider
+        arr: NDArray[float64] = array(self.values) / divider
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
-        arr = cumprod(
-            a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
+        arr = cast(
+            "NDArray[float64]",
+            cumprod(
+                a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
+            ),
         )
 
         self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
@@ -865,6 +872,7 @@ def timeseries_chain(
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
+    # noinspection PyTypeChecker
     return back.__class__(
         timeseries_id=new.timeseries_id,
         instrument_id=new.instrument_id,

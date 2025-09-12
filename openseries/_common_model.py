@@ -18,7 +18,7 @@ from secrets import choice
 from string import ascii_letters
 from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
 
-from numpy import float64, inf, isnan, log, maximum, sqrt
+from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
 from .owntypes import (
     DateAlignmentError,
@@ -30,8 +30,8 @@ from .owntypes import (
 )
 
 if TYPE_CHECKING:  # pragma: no cover
-    from numpy.typing import NDArray
     from openpyxl.worksheet.worksheet import Worksheet
+    from pandas import Timestamp
 
     from .owntypes import (
         CountriesType,
@@ -85,7 +85,7 @@ from .load_plotly import load_plotly_dict
 
 
 # noinspection PyTypeChecker
-class _CommonModel(BaseModel):  # type: ignore[misc]
+class _CommonModel(BaseModel):
     """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
@@ -418,8 +418,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             countries = self.countries
             markets = self.markets
         except AttributeError:
-            countries = self.constituents[0].countries
-            markets = self.constituents[0].markets
+            countries = self.constituents[0].countries  # type: ignore[attr-defined]
+            markets = self.constituents[0].markets  # type: ignore[attr-defined]
 
         wmdf = self.tsdf.copy()
 
@@ -625,25 +625,25 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             try:
                 self.countries = countries
             except ValidationError:
-                for serie in self.constituents:
+                for serie in self.constituents:  # type: ignore[attr-defined]
                     serie.countries = countries
         else:
             try:
                 countries = self.countries
             except AttributeError:
-                countries = self.constituents[0].countries
+                countries = self.constituents[0].countries  # type: ignore[attr-defined]
 
         if markets:
             try:
                 self.markets = markets
             except ValidationError:
-                for serie in self.constituents:
+                for serie in self.constituents:  # type: ignore[attr-defined]
                     serie.markets = markets
         else:
             try:
                 markets = self.markets
             except AttributeError:
-                markets = self.constituents[0].markets
+                markets = self.constituents[0].markets  # type: ignore[attr-defined]
 
         calendar = holiday_calendar(
             startyear=startyear,
@@ -1221,10 +1221,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 bargroupgap=bargroupgap,
             )
         elif plot_type == "lines":
-            hist_data = [
-                cast("Series[float]", self.tsdf.loc[:, ds]).dropna().tolist()
-                for ds in self.tsdf
-            ]
+            hist_data = [self.tsdf[col] for col in self.tsdf.columns]
             figure = create_distplot(
                 hist_data=hist_data,
                 curve_type=curve_type,
@@ -1657,20 +1654,10 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             deep=True
         )
         result = [
-            cvar_df.loc[:, x]  # type: ignore[call-overload]
-            .ffill()
-            .pct_change()
-            .sort_values()
-            .iloc[
-                : ceil(
-                    cast(
-                        "int",
-                        (1 - level) * cvar_df.loc[:, x].ffill().pct_change().count(),
-                    )
-                ),
-            ]
-            .mean()
-            for x in self.tsdf
+            (r := cvar_df[col].ffill().pct_change().sort_values())[
+                : ceil((1 - level) * r.count())
+            ].mean()
+            for col in cvar_df.columns
         ]
         if self.tsdf.shape[1] == 1:
             return float(result[0])
@@ -1855,17 +1842,19 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             from_dt=from_date,
             to_dt=to_date,
         )
-        result: NDArray[float64] = skew(
-            a=self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
-            .pct_change()
-            .to_numpy(),
+        result = skew(
+            a=(
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+                .ffill()
+                .pct_change()
+            ),
             bias=True,
             nan_policy="omit",
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(result[0])
+            arr = asarray(a=result, dtype=float64).squeeze()
+            return arr.item()
         return Series(
             data=result,
             index=self.tsdf.columns,
@@ -1904,9 +1893,9 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             from_dt=from_date,
             to_dt=to_date,
         )
-        result: NDArray[float64] = kurtosis(
+        result = kurtosis(
             a=(
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
             ),
@@ -1916,7 +1905,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(result[0])
+            arr = asarray(a=result, dtype=float64).squeeze()
+            return arr.item()
         return Series(
             data=result,
             index=self.tsdf.columns,
