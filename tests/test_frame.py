@@ -768,10 +768,14 @@ class TestOpenFrame(CommonTestCase):
         riskseries.to_cumret()
         riskframe.to_cumret()
 
-        if riskseries.cvar_down != _cvar_down_calc(data=riskseries.tsdf.iloc[:, 0]):
+        if cast("float", riskseries.cvar_down) != _cvar_down_calc(
+            data=riskseries.tsdf.iloc[:, 0]
+        ):
             msg = "CVaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
-        if riskseries.var_down != _var_down_calc(data=riskseries.tsdf.iloc[:, 0]):
+        if cast("float", riskseries.var_down) != _var_down_calc(
+            data=riskseries.tsdf.iloc[:, 0]
+        ):
             msg = "VaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
 
@@ -2374,29 +2378,42 @@ class TestOpenFrame(CommonTestCase):
         noneframe = OpenFrame([aseries, bseries])
 
         swedennationalday = dt.date(2022, 6, 6)
+
+        msg = "align_index_to_local_cdays not working as intended"
+        msg_in = "Sweden National Day in date range"
+        msg_notin = "Sweden National Day not in date range"
+
         if swedennationalday not in d_range:
-            msg = "Sweden National Day not in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_notin)
 
         aframe.align_index_to_local_cdays(countries="SE")
         if swedennationalday in aframe.tsdf.index:
             msg = "Sweden National Day in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_in)
 
         anotherframe.align_index_to_local_cdays(countries="US", markets="XSTO")
         if swedennationalday in anotherframe.tsdf.index:
             msg = "Sweden National Day in date range"
+            raise OpenFrameTestError(msg_in)
+
+        ctries = [ctry.countries for ctry in anotherframe.constituents]
+        mkts = [mkt.markets for mkt in anotherframe.constituents]
+
+        if ctries != ["US", "US"]:
+            raise OpenFrameTestError(msg)
+
+        if mkts != ["XSTO", "XSTO"]:
             raise OpenFrameTestError(msg)
 
         yetoneframe.align_index_to_local_cdays(countries="US")
         if swedennationalday not in yetoneframe.tsdf.index:
             msg = "Sweden National Day not in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_notin)
 
         noneframe.align_index_to_local_cdays(countries=None)  # default option
         if swedennationalday in noneframe.tsdf.index:
             msg = "Sweden National Day in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_in)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:
         """Test rolling_info_ratio method."""

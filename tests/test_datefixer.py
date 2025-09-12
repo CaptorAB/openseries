@@ -280,7 +280,7 @@ class TestDateFixer:
         trddays_limit = 260
         if not (
             series.periods_in_a_year < trddays_limit
-            and series.countries == set(countries)  # type: ignore[comparison-overlap]
+            and series.countries == set(countries)
         ):
             raise DatefixerTestError(msg)
 
@@ -359,7 +359,7 @@ class TestDateFixer:
         start = 2025
         end = 2025
         markets = ["NYSE", "LSE"]
-        countries = ["US", "GB"]
+        countries = {"US", "GB"}
         exchange_holidays = market_holidays(
             startyear=start, endyear=end, markets=markets
         )
@@ -405,7 +405,7 @@ class TestDateFixer:
         offsetdate_without = offset_business_days(
             ddate=day_after_jacks_birthday,
             days=-2,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
         )
         if offsetdate_without != dt.date(2021, 2, 10):
             msg = "Unintended result from offset_business_days"
@@ -414,7 +414,7 @@ class TestDateFixer:
         offsetdate_with = offset_business_days(
             ddate=day_after_jacks_birthday,
             days=-2,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
             custom_holidays="2021-02-12",  # Jack's birthday
         )
         if offsetdate_with != dt.date(2021, 2, 9):
@@ -432,7 +432,7 @@ class TestDateFixer:
         offsetdate_forward = offset_business_days(
             ddate=startdate,
             days=forward,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
         )
         if offsetdate_forward != forwarddate:
             msg = (
@@ -444,7 +444,7 @@ class TestDateFixer:
         offsetdate_backward = offset_business_days(
             ddate=startdate,
             days=backward,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
         )
         if offsetdate_backward != backwarddate:
             msg = "Unintended result from offset_business_days"

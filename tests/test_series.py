@@ -58,7 +58,7 @@ class OpenTimeSeriesInput(TypedDict, total=False):
     tsdf: DataFrame
     currency: str
     domestic: str
-    countries: list[str] | str
+    countries: set[str] | str
     markets: list[str] | str | None
     isin: str | None
     label: str | None
@@ -1734,8 +1734,8 @@ class TestOpenTimeSeries(CommonTestCase):
         if basecase.values != [100.0]:  # noqa: PD011
             raise OpenTimeSeriesTestError(msg)
 
-        basecase.countries = cast("CountriesType", ["SE", "US"])
-        if cast("set[str]", basecase.countries) != {"SE", "US"}:
+        basecase.countries = cast("set[str]", ["SE", "US"])
+        if basecase.countries != {"SE", "US"}:
             raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("CountriesType", ["SE", "SE"])
