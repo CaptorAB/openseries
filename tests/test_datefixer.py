@@ -305,6 +305,12 @@ class TestDateFixer:
             ):
                 raise DatefixerTestError(msg_inv)
 
+        deries = series.from_deepcopy()
+        deries.align_index_to_local_cdays(countries=None)
+
+        if series.tsdf.index.tolist() != deries.tsdf.index.tolist():
+            raise DatefixerTestError(msg)
+
     def test_holiday_calendar_with_custom_days(self: TestDateFixer) -> None:
         """Test holiday_calendar with custom input."""
         year = 2021

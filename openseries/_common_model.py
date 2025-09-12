@@ -658,7 +658,9 @@ class _CommonModel(BaseModel):
             for d in date_range(
                 start=cast("dt.date", self.tsdf.first_valid_index()),
                 end=cast("dt.date", self.tsdf.last_valid_index()),
-                freq=CustomBusinessDay(calendar=calendar),
+                freq=CustomBusinessDay(calendar=calendar)
+                if any([countries, markets, custom_holidays])
+                else None,
             )
         ]
         self.tsdf = self.tsdf.reindex(labels=d_range, method=method, copy=False)
