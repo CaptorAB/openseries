@@ -1388,6 +1388,29 @@ class TestOpenFrame(CommonTestCase):
             msg = "plot_series add_logo argument not setup correctly"
             raise OpenFrameTestError(msg)
 
+        title = "My Plot"
+        fig_title, _ = plotframe.plot_series(
+            auto_open=False,
+            title=title,
+            output_type="div",
+        )
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+
+        if title not in fig_title_json["layout"]["title"]["text"]:
+            msg = "plot_series title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        fig_no_title, _ = plotframe.plot_series(
+            auto_open=False,
+            title=None,
+            output_type="div",
+        )
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+
+        if fig_no_title_json["layout"]["title"].get("text", None):
+            msg = "plot_series title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
     def test_plot_series_filefolders(self: TestOpenFrame) -> None:
         """Test plot_series method with different file folder options."""
         plotframe = self.randomframe.from_deepcopy()
@@ -1516,6 +1539,29 @@ class TestOpenFrame(CommonTestCase):
             msg = "plot_bars add_logo argument not setup correctly"
             raise OpenFrameTestError(msg)
 
+        title = "My Plot"
+        fig_title, _ = plotframe.plot_bars(
+            auto_open=False,
+            title=title,
+            output_type="div",
+        )
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+
+        if title not in fig_title_json["layout"]["title"]["text"]:
+            msg = "plot_bars title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        fig_no_title, _ = plotframe.plot_bars(
+            auto_open=False,
+            title=None,
+            output_type="div",
+        )
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+
+        if fig_no_title_json["layout"]["title"].get("text", None):
+            msg = "plot_bars title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
     def test_plot_bars_filefolders(self: TestOpenFrame) -> None:
         """Test plot_bars method with different file folder options."""
         plotframe = self.randomframe.from_deepcopy()
@@ -1641,6 +1687,29 @@ class TestOpenFrame(CommonTestCase):
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_histogram add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        title = "My Plot"
+        fig_title, _ = plotframe.plot_histogram(
+            auto_open=False,
+            title=title,
+            output_type="div",
+        )
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+
+        if title not in fig_title_json["layout"]["title"]["text"]:
+            msg = "plot_histogram title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        fig_no_title, _ = plotframe.plot_histogram(
+            auto_open=False,
+            title=None,
+            output_type="div",
+        )
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+
+        if fig_no_title_json["layout"]["title"].get("text", None):
+            msg = "plot_histogram title argument not setup correctly"
             raise OpenFrameTestError(msg)
 
     def test_plot_histogram_lines(self: TestOpenFrame) -> None:

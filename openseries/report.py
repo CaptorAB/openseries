@@ -457,7 +457,7 @@ def report_html(
     figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
     figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
 
-    if isinstance(title, str):
+    if title:
         figure.update_layout(
             {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
         )

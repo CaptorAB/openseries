@@ -862,6 +862,7 @@ class _CommonModel(BaseModel):
     def plot_bars(
         self: Self,
         mode: LiteralBarPlotMode = "group",
+        title: str | None = None,
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: DirectoryPath | None = None,
@@ -880,6 +881,8 @@ class _CommonModel(BaseModel):
             The timeseries self.tsdf
         mode: LiteralBarPlotMode
             The type of bar to use
+        title: str, optional
+            A title above the plot
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
         filename: str, optional
@@ -946,6 +949,11 @@ class _CommonModel(BaseModel):
         if add_logo:
             figure.add_layout_image(logo)
 
+        if title:
+            figure.update_layout(
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
+            )
+
         if output_type == "file":
             plot(
                 figure_or_data=figure,
@@ -974,6 +982,7 @@ class _CommonModel(BaseModel):
     def plot_series(
         self: Self,
         mode: LiteralLinePlotMode = "lines",
+        title: str | None = None,
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: DirectoryPath | None = None,
@@ -993,6 +1002,8 @@ class _CommonModel(BaseModel):
             The timeseries self.tsdf
         mode: LiteralLinePlotMode, default: "lines"
             The type of scatter to use
+        title: str, optional
+            A title above the plot
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
         filename: str, optional
@@ -1076,6 +1087,11 @@ class _CommonModel(BaseModel):
         if add_logo:
             figure.add_layout_image(logo)
 
+        if title:
+            figure.update_layout(
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
+            )
+
         if output_type == "file":
             plot(
                 figure_or_data=figure,
@@ -1111,6 +1127,7 @@ class _CommonModel(BaseModel):
         bargap: float = 0.0,
         bargroupgap: float = 0.0,
         curve_type: LiteralPlotlyHistogramCurveType = "kde",
+        title: str | None = None,
         x_fmt: str | None = None,
         y_fmt: str | None = None,
         filename: str | None = None,
@@ -1144,6 +1161,8 @@ class _CommonModel(BaseModel):
             Sets the gap between bar “groups” at the same location coordinate
         curve_type: LiteralPlotlyHistogramCurveType, default: kde
             Specifies the type of distribution curve to overlay on the histogram
+        title: str, optional
+            A title above the plot
         y_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show on the y-axis
         x_fmt: str, optional
@@ -1241,6 +1260,11 @@ class _CommonModel(BaseModel):
 
         if add_logo:
             figure.add_layout_image(logo)
+
+        if title:
+            figure.update_layout(
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
+            )
 
         if output_type == "file":
             plot(

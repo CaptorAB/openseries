@@ -111,7 +111,7 @@ ignore = ["COM812", "D203", "D213"]
 fixable = ["ALL"]
 mccabe = { max-complexity = 18 }
 pydocstyle = { convention = "google" }
-pylint = { max-args = 19, max-branches = 24, max-statements = 130 }
+pylint = { max-args = 20, max-branches = 24, max-statements = 130 }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
