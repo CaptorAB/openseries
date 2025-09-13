@@ -144,7 +144,7 @@ def holiday_calendar(
         for country in countries:
             staging = country_holidays(country=country, years=years)
             countryholidays += list(staging)
-        hols = list(countryholidays)
+        hols = cast("list[dt.date]", list(countryholidays))
     else:
         msg = (
             "Argument countries must be a string country code or "

@@ -330,4 +330,4 @@ class TestReport(CommonTestCase):
         with pytest.raises(
             expected_exception=ZeroDivisionError, match=r"float division by zero"
         ):
-            figure, _ = report_html(data=frame, auto_open=False, output_type="div")
+            _, _ = report_html(data=frame, auto_open=False, output_type="div")

@@ -280,7 +280,7 @@ class TestDateFixer:
         trddays_limit = 260
         if not (
             series.periods_in_a_year < trddays_limit
-            and series.countries == set(countries)  # type: ignore[comparison-overlap]
+            and series.countries == set(countries)
         ):
             raise DatefixerTestError(msg)
 
@@ -304,6 +304,12 @@ class TestDateFixer:
                 for date_str in twentytwentythreeholidays
             ):
                 raise DatefixerTestError(msg_inv)
+
+        deries = series.from_deepcopy()
+        deries.align_index_to_local_cdays(countries=None)
+
+        if series.tsdf.index.tolist() != deries.tsdf.index.tolist():
+            raise DatefixerTestError(msg)
 
     def test_holiday_calendar_with_custom_days(self: TestDateFixer) -> None:
         """Test holiday_calendar with custom input."""
@@ -353,7 +359,7 @@ class TestDateFixer:
         start = 2025
         end = 2025
         markets = ["NYSE", "LSE"]
-        countries = ["US", "GB"]
+        countries = {"US", "GB"}
         exchange_holidays = market_holidays(
             startyear=start, endyear=end, markets=markets
         )
@@ -386,8 +392,8 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=MarketsNotStringNorListStrError,
             match=(
-                "Argument markets must be a string market code or a list "
-                "of market codes supported by pandas_market_calendars."
+                r"Argument markets must be a string market code or a list "
+                r"of market codes supported by pandas_market_calendars."
             ),
         ):
             _ = market_holidays(startyear=start, endyear=end, markets=xmarkets)
@@ -399,7 +405,7 @@ class TestDateFixer:
         offsetdate_without = offset_business_days(
             ddate=day_after_jacks_birthday,
             days=-2,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
         )
         if offsetdate_without != dt.date(2021, 2, 10):
             msg = "Unintended result from offset_business_days"
@@ -408,7 +414,7 @@ class TestDateFixer:
         offsetdate_with = offset_business_days(
             ddate=day_after_jacks_birthday,
             days=-2,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
             custom_holidays="2021-02-12",  # Jack's birthday
         )
         if offsetdate_with != dt.date(2021, 2, 9):
@@ -426,7 +432,7 @@ class TestDateFixer:
         offsetdate_forward = offset_business_days(
             ddate=startdate,
             days=forward,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
         )
         if offsetdate_forward != forwarddate:
             msg = (
@@ -438,7 +444,7 @@ class TestDateFixer:
         offsetdate_backward = offset_business_days(
             ddate=startdate,
             days=backward,
-            countries=["SE", "US"],
+            countries={"SE", "US"},
         )
         if offsetdate_backward != backwarddate:
             msg = "Unintended result from offset_business_days"
@@ -465,7 +471,7 @@ class TestDateFixer:
         neg_days = -5
         with pytest.raises(
             expected_exception=TradingDaysNotAboveZeroError,
-            match="Argument trading_days must be greater than zero.",
+            match=r"Argument trading_days must be greater than zero.",
         ):
             _ = generate_calendar_date_range(
                 trading_days=neg_days,
@@ -475,8 +481,8 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=BothStartAndEndError,
             match=(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
+                r"Provide one of start or end date, but not both. "
+                r"Date range is inferred from number of trading days."
             ),
         ):
             _ = generate_calendar_date_range(
@@ -488,8 +494,8 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=BothStartAndEndError,
             match=(
-                "Provide one of start or end date, but not both. "
-                "Date range is inferred from number of trading days."
+                r"Provide one of start or end date, but not both. "
+                r"Date range is inferred from number of trading days."
             ),
         ):
             _ = generate_calendar_date_range(trading_days=trd_days)

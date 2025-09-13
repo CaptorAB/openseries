@@ -23,9 +23,11 @@ from unittest.mock import MagicMock, patch
 from numpy import array
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from collections.abc import Hashable, Mapping  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Hashable, Mapping
     from typing import Literal
+
+    from pandas import Timestamp
 
 import pytest
 from pandas import DataFrame, Series, date_range, read_excel
@@ -330,7 +332,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NameError,
-            match="Filename must end with .xlsx",
+            match=r"Filename must end with .xlsx",
         ):
             _ = self.randomframe.to_xlsx(filename="trial.pdf")
 
@@ -404,7 +406,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=DateAlignmentError,
             match=(
-                "Argument months_offset implies startdate before first date in series."
+                r"Argument months_offset implies startdate "
+                r"before first date in series."
             ),
         ):
             _, _ = crframe.calc_range(months_offset=125)
@@ -566,7 +569,7 @@ class TestOpenFrame(CommonTestCase):
         frame = self.randomframe.from_deepcopy()
         with pytest.raises(
             expected_exception=ResampleDataLossError,
-            match="Do not run resample_to_business_period_ends on return series.",
+            match=r"Do not run resample_to_business_period_ends on return series.",
         ):
             frame.resample_to_business_period_ends()
 
@@ -662,8 +665,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=NoWeightsError,
             match=(
-                "OpenFrame weights property must be provided "
-                "to run the make_portfolio method."
+                r"OpenFrame weights property must be provided "
+                r"to run the make_portfolio method."
             ),
         ):
             _ = mpframe.make_portfolio(name=name)
@@ -765,10 +768,14 @@ class TestOpenFrame(CommonTestCase):
         riskseries.to_cumret()
         riskframe.to_cumret()
 
-        if riskseries.cvar_down != _cvar_down_calc(data=riskseries.tsdf.iloc[:, 0]):
+        if cast("float", riskseries.cvar_down) != _cvar_down_calc(
+            data=riskseries.tsdf.iloc[:, 0]
+        ):
             msg = "CVaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
-        if riskseries.var_down != _var_down_calc(data=riskseries.tsdf.iloc[:, 0]):
+        if cast("float", riskseries.var_down) != _var_down_calc(
+            data=riskseries.tsdf.iloc[:, 0]
+        ):
             msg = "VaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
 
@@ -1354,7 +1361,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
-            match="Must provide same number of labels as items in frame.",
+            match=r"Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
 
@@ -1383,6 +1390,29 @@ class TestOpenFrame(CommonTestCase):
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_series add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        title = "My Plot"
+        fig_title, _ = plotframe.plot_series(
+            auto_open=False,
+            title=title,
+            output_type="div",
+        )
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+
+        if title not in fig_title_json["layout"]["title"]["text"]:
+            msg = "plot_series title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        fig_no_title, _ = plotframe.plot_series(
+            auto_open=False,
+            title=None,
+            output_type="div",
+        )
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+
+        if fig_no_title_json["layout"]["title"].get("text", None):
+            msg = "plot_series title argument not setup correctly"
             raise OpenFrameTestError(msg)
 
     def test_plot_series_filefolders(self: TestOpenFrame) -> None:
@@ -1470,7 +1500,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
-            match="Must provide same number of labels as items in frame.",
+            match=r"Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_bars(auto_open=False, labels=["a", "b"])
 
@@ -1511,6 +1541,29 @@ class TestOpenFrame(CommonTestCase):
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_bars add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        title = "My Plot"
+        fig_title, _ = plotframe.plot_bars(
+            auto_open=False,
+            title=title,
+            output_type="div",
+        )
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+
+        if title not in fig_title_json["layout"]["title"]["text"]:
+            msg = "plot_bars title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        fig_no_title, _ = plotframe.plot_bars(
+            auto_open=False,
+            title=None,
+            output_type="div",
+        )
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+
+        if fig_no_title_json["layout"]["title"].get("text", None):
+            msg = "plot_bars title argument not setup correctly"
             raise OpenFrameTestError(msg)
 
     def test_plot_bars_filefolders(self: TestOpenFrame) -> None:
@@ -1611,7 +1664,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
-            match="Must provide same number of labels as items in frame.",
+            match=r"Must provide same number of labels as items in frame.",
         ):
             _, _ = plotframe.plot_histogram(auto_open=False, labels=["a", "b"])
 
@@ -1638,6 +1691,29 @@ class TestOpenFrame(CommonTestCase):
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_histogram add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        title = "My Plot"
+        fig_title, _ = plotframe.plot_histogram(
+            auto_open=False,
+            title=title,
+            output_type="div",
+        )
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+
+        if title not in fig_title_json["layout"]["title"]["text"]:
+            msg = "plot_histogram title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+        fig_no_title, _ = plotframe.plot_histogram(
+            auto_open=False,
+            title=None,
+            output_type="div",
+        )
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+
+        if fig_no_title_json["layout"]["title"].get("text", None):
+            msg = "plot_histogram title argument not setup correctly"
             raise OpenFrameTestError(msg)
 
     def test_plot_histogram_lines(self: TestOpenFrame) -> None:
@@ -1681,7 +1757,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=TypeError,
-            match="plot_type must be 'bars' or 'lines'.",
+            match=r"plot_type must be 'bars' or 'lines'.",
         ):
             _, _ = plotframe.plot_histogram(
                 plot_type=cast("Literal['bars', 'lines']", "triangles"),
@@ -1843,13 +1919,12 @@ class TestOpenFrame(CommonTestCase):
         series_long.set_new_label("Long")
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
-            tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(
-                    "int",
+            dframe=tmp_series.tsdf.loc[
+                cast("Timestamp", dt.date(2017, 6, 27)) : cast(
+                    "Timestamp",
                     dt.date(2018, 6, 27),
-                ),
-                ("Asset_0", ValueType.PRICE),
-            ],
+                )
+            ][("Asset_0", ValueType.PRICE)],
         )
         series_short.set_new_label("Short")
         frame = OpenFrame([series_long, series_short])
@@ -1893,13 +1968,11 @@ class TestOpenFrame(CommonTestCase):
         series_long.set_new_label("Long")
         tmp_series = self.randomseries.from_deepcopy()
         series_short = OpenTimeSeries.from_df(
-            tmp_series.tsdf.loc[
-                cast("int", dt.date(2017, 6, 27)) : cast(
-                    "int",
-                    dt.date(2018, 6, 27),
-                ),
-                ("Asset_0", ValueType.PRICE),
-            ],
+            dframe=tmp_series.tsdf.loc[
+                cast("Timestamp", dt.date(2017, 6, 27)) : cast(
+                    "Timestamp", dt.date(2018, 6, 27)
+                )
+            ][("Asset_0", ValueType.PRICE)]
         )
         series_short.set_new_label("Short")
         frame = OpenFrame([series_long, series_short])
@@ -2178,8 +2251,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=Exception,
             match=(
-                "Merging OpenTimeSeries DataFrames with argument "
-                "how=inner produced an empty DataFrame."
+                r"Merging OpenTimeSeries DataFrames with argument "
+                r"how=inner produced an empty DataFrame."
             ),
         ):
             aframe.merge_series(how="inner")
@@ -2305,29 +2378,42 @@ class TestOpenFrame(CommonTestCase):
         noneframe = OpenFrame([aseries, bseries])
 
         swedennationalday = dt.date(2022, 6, 6)
+
+        msg = "align_index_to_local_cdays not working as intended"
+        msg_in = "Sweden National Day in date range"
+        msg_notin = "Sweden National Day not in date range"
+
         if swedennationalday not in d_range:
-            msg = "Sweden National Day not in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_notin)
 
         aframe.align_index_to_local_cdays(countries="SE")
         if swedennationalday in aframe.tsdf.index:
             msg = "Sweden National Day in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_in)
 
         anotherframe.align_index_to_local_cdays(countries="US", markets="XSTO")
         if swedennationalday in anotherframe.tsdf.index:
             msg = "Sweden National Day in date range"
+            raise OpenFrameTestError(msg_in)
+
+        ctries = [ctry.countries for ctry in anotherframe.constituents]
+        mkts = [mkt.markets for mkt in anotherframe.constituents]
+
+        if ctries != ["US", "US"]:
+            raise OpenFrameTestError(msg)
+
+        if mkts != ["XSTO", "XSTO"]:
             raise OpenFrameTestError(msg)
 
         yetoneframe.align_index_to_local_cdays(countries="US")
         if swedennationalday not in yetoneframe.tsdf.index:
             msg = "Sweden National Day not in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_notin)
 
         noneframe.align_index_to_local_cdays(countries=None)  # default option
         if swedennationalday in noneframe.tsdf.index:
             msg = "Sweden National Day in date range"
-            raise OpenFrameTestError(msg)
+            raise OpenFrameTestError(msg_in)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:
         """Test rolling_info_ratio method."""
@@ -2785,7 +2871,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=TypeError,
-            match="base_column should be a tuple",
+            match=r"base_column should be a tuple",
         ):
             _ = cframe.capture_ratio_func(
                 ratio="up",
@@ -2794,7 +2880,7 @@ class TestOpenFrame(CommonTestCase):
 
         with pytest.raises(
             expected_exception=RatioInputError,
-            match="ratio must be one of 'up', 'down' or 'both'.",
+            match=r"ratio must be one of 'up', 'down' or 'both'.",
         ):
             _ = cframe.capture_ratio_func(
                 ratio=cast("Literal['up', 'down', 'both']", "boo"),
@@ -2841,8 +2927,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret
@@ -2850,8 +2936,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret_func()
@@ -2875,8 +2961,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret
@@ -2884,8 +2970,8 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=InitialValueZeroError,
             match=(
-                "Geometric return cannot be calculated due to an "
-                "initial value being zero or a negative value."
+                r"Geometric return cannot be calculated due to an "
+                r"initial value being zero or a negative value."
             ),
         ):
             _ = geoframe.geo_ret_func()
@@ -3826,7 +3912,7 @@ class TestOpenFrame(CommonTestCase):
         gframe.add_timeseries(gportfolio)
         with pytest.raises(
             expected_exception=MixedValuetypesError,
-            match="All series should be of ValueType.RTRN.",
+            match=r"All series should be of ValueType.RTRN.",
         ):
             _, _ = gframe.multi_factor_linear_regression(
                 dependent_column=(cast("str", gportfolio.label), ValueType.PRICE)
@@ -3837,6 +3923,6 @@ class TestOpenFrame(CommonTestCase):
         mixframe = self.make_mixed_type_openframe()
         with pytest.raises(
             expected_exception=ResampleDataLossError,
-            match="Do not run worst_month on return series.",
+            match=r"Do not run worst_month on return series.",
         ):
             _ = mixframe.worst_month

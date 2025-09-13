@@ -12,14 +12,15 @@ from __future__ import annotations
 import datetime as dt
 from enum import Enum
 from pprint import pformat
-from typing import Annotated, ClassVar, Literal, Union
+from typing import Annotated, ClassVar, Literal, TypeAlias
 
+from annotated_types import MinLen
 from numpy import datetime64
 from pandas import Timestamp
-from pydantic import BaseModel, Field, StringConstraints, conlist, conset
+from pydantic import BaseModel, Field, StringConstraints, conlist
 
 try:
-    from typing import Self  # type: ignore[attr-defined,unused-ignore]
+    from typing import Self
 except ImportError:  # pragma: no cover
     from typing_extensions import Self
 
@@ -38,14 +39,11 @@ CountryStringType = Annotated[
         strict=True,
     ),
 ]
-CountryListType = conset(
-    item_type=CountryStringType,
-    min_length=1,
-)
-CountriesType = Union[CountryListType, CountryStringType]  # type: ignore[valid-type]  # noqa: UP007
+CountrySetType: TypeAlias = Annotated[set[CountryStringType], MinLen(1)]
+CountriesType: TypeAlias = CountrySetType | CountryStringType
 
 
-class Countries(BaseModel):  # type: ignore[misc]
+class Countries(BaseModel):
     """Declare Countries."""
 
     countryinput: CountriesType
@@ -64,28 +62,23 @@ CurrencyStringType = Annotated[
 ]
 
 
-class Currency(BaseModel):  # type: ignore[misc]
+class Currency(BaseModel):
     """Declare Currency."""
 
     ccy: CurrencyStringType
 
 
-DateListType = Annotated[
-    list[str],
-    conset(
-        Annotated[
-            str,
-            StringConstraints(
-                pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$",
-                strip_whitespace=True,
-                strict=True,
-                min_length=10,
-                max_length=10,
-            ),
-        ],
-        min_length=1,
+DateStringType = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$",
+        strip_whitespace=True,
+        strict=True,
+        min_length=10,
+        max_length=10,
     ),
 ]
+DateListType: TypeAlias = Annotated[list[DateStringType], MinLen(1)]
 
 ValueListType = Annotated[list[float], conlist(float, min_length=1)]
 
@@ -107,26 +100,23 @@ CaptorLogoType = dict[str, str | float]
 
 LiteralJsonOutput = Literal["values", "tsdf"]
 LiteralTrunc = Literal["before", "after", "both"]
-LiteralLinePlotMode = Literal[
-    "lines",
-    "markers",
-    "lines+markers",
-    "lines+text",
-    "markers+text",
-    "lines+markers+text",
-    None,
-]
+LiteralLinePlotMode = (
+    Literal[
+        "lines",
+        "markers",
+        "lines+markers",
+        "lines+text",
+        "markers+text",
+        "lines+markers+text",
+    ]
+    | None
+)
 LiteralHowMerge = Literal["outer", "inner"]
 LiteralQuantileInterp = Literal["linear", "lower", "higher", "midpoint", "nearest"]
 LiteralBizDayFreq = Literal["B", "BME", "BQE", "BYE"]
-LiteralPandasReindexMethod = Literal[
-    None,
-    "pad",
-    "ffill",
-    "backfill",
-    "bfill",
-    "nearest",
-]
+LiteralPandasReindexMethod = (
+    Literal["pad", "ffill", "backfill", "bfill", "nearest"] | None
+)
 LiteralNanMethod = Literal["fill", "drop"]
 LiteralCaptureRatio = Literal["up", "down", "both"]
 LiteralBarPlotMode = Literal["stack", "group", "overlay", "relative"]

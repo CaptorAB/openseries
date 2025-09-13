@@ -294,7 +294,7 @@ def report_html(
     te_frame.resample("7D")
     with catch_warnings():
         simplefilter("ignore")
-        te = te_frame.tracking_error_func()
+        te: Series[float] | Series[str] = te_frame.tracking_error_func()
     if te.hasnans:
         te = Series(
             data=[""] * te_frame.item_count,
@@ -318,7 +318,7 @@ def report_html(
         with catch_warnings():
             simplefilter("ignore")
             try:
-                cru = crm.capture_ratio_func(ratio="both")
+                cru: Series[float] | Series[str] = crm.capture_ratio_func(ratio="both")
             except ZeroDivisionError as exc:  # pragma: no cover
                 msg = f"Capture ratio calculation error: {exc!s}"  # pragma: no cover
                 logger.warning(msg=msg)  # pragma: no cover
@@ -457,7 +457,7 @@ def report_html(
     figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
     figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
 
-    if isinstance(title, str):
+    if title:
         figure.update_layout(
             {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
         )

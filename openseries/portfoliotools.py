@@ -366,7 +366,7 @@ def constrain_optimized_portfolios(
     if not bounds:
         bounds = tuple((0.0, 1.0) for _ in range(data.item_count))
 
-    front_frame, sim_frame, optimal = efficient_frontier(
+    front_frame, _, _ = efficient_frontier(
         eframe=data,
         num_ports=simulations,
         frontier_points=curve_points,

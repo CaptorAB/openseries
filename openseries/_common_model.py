@@ -18,7 +18,7 @@ from secrets import choice
 from string import ascii_letters
 from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
 
-from numpy import float64, inf, isnan, log, maximum, sqrt
+from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
 from .owntypes import (
     DateAlignmentError,
@@ -30,8 +30,8 @@ from .owntypes import (
 )
 
 if TYPE_CHECKING:  # pragma: no cover
-    from numpy.typing import NDArray
     from openpyxl.worksheet.worksheet import Worksheet
+    from pandas import Timestamp
 
     from .owntypes import (
         CountriesType,
@@ -85,7 +85,7 @@ from .load_plotly import load_plotly_dict
 
 
 # noinspection PyTypeChecker
-class _CommonModel(BaseModel):  # type: ignore[misc]
+class _CommonModel(BaseModel):
     """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
@@ -418,8 +418,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             countries = self.countries
             markets = self.markets
         except AttributeError:
-            countries = self.constituents[0].countries
-            markets = self.constituents[0].markets
+            countries = self.constituents[0].countries  # type: ignore[attr-defined]
+            markets = self.constituents[0].markets  # type: ignore[attr-defined]
 
         wmdf = self.tsdf.copy()
 
@@ -625,25 +625,25 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             try:
                 self.countries = countries
             except ValidationError:
-                for serie in self.constituents:
+                for serie in self.constituents:  # type: ignore[attr-defined]
                     serie.countries = countries
         else:
             try:
                 countries = self.countries
             except AttributeError:
-                countries = self.constituents[0].countries
+                countries = self.constituents[0].countries  # type: ignore[attr-defined]
 
         if markets:
             try:
                 self.markets = markets
             except ValidationError:
-                for serie in self.constituents:
+                for serie in self.constituents:  # type: ignore[attr-defined]
                     serie.markets = markets
         else:
             try:
                 markets = self.markets
             except AttributeError:
-                markets = self.constituents[0].markets
+                markets = self.constituents[0].markets  # type: ignore[attr-defined]
 
         calendar = holiday_calendar(
             startyear=startyear,
@@ -658,7 +658,9 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             for d in date_range(
                 start=cast("dt.date", self.tsdf.first_valid_index()),
                 end=cast("dt.date", self.tsdf.last_valid_index()),
-                freq=CustomBusinessDay(calendar=calendar),
+                freq=CustomBusinessDay(calendar=calendar)
+                if any([countries, markets, custom_holidays])
+                else None,
             )
         ]
         self.tsdf = self.tsdf.reindex(labels=d_range, method=method, copy=False)
@@ -862,6 +864,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
     def plot_bars(
         self: Self,
         mode: LiteralBarPlotMode = "group",
+        title: str | None = None,
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: DirectoryPath | None = None,
@@ -880,6 +883,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             The timeseries self.tsdf
         mode: LiteralBarPlotMode
             The type of bar to use
+        title: str, optional
+            A title above the plot
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
         filename: str, optional
@@ -946,6 +951,11 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         if add_logo:
             figure.add_layout_image(logo)
 
+        if title:
+            figure.update_layout(
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
+            )
+
         if output_type == "file":
             plot(
                 figure_or_data=figure,
@@ -974,6 +984,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
     def plot_series(
         self: Self,
         mode: LiteralLinePlotMode = "lines",
+        title: str | None = None,
         tick_fmt: str | None = None,
         filename: str | None = None,
         directory: DirectoryPath | None = None,
@@ -993,6 +1004,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             The timeseries self.tsdf
         mode: LiteralLinePlotMode, default: "lines"
             The type of scatter to use
+        title: str, optional
+            A title above the plot
         tick_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show
         filename: str, optional
@@ -1076,6 +1089,11 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         if add_logo:
             figure.add_layout_image(logo)
 
+        if title:
+            figure.update_layout(
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
+            )
+
         if output_type == "file":
             plot(
                 figure_or_data=figure,
@@ -1111,6 +1129,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         bargap: float = 0.0,
         bargroupgap: float = 0.0,
         curve_type: LiteralPlotlyHistogramCurveType = "kde",
+        title: str | None = None,
         x_fmt: str | None = None,
         y_fmt: str | None = None,
         filename: str | None = None,
@@ -1144,6 +1163,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             Sets the gap between bar “groups” at the same location coordinate
         curve_type: LiteralPlotlyHistogramCurveType, default: kde
             Specifies the type of distribution curve to overlay on the histogram
+        title: str, optional
+            A title above the plot
         y_fmt: str, optional
             None, '%', '.1%' depending on number of decimals to show on the y-axis
         x_fmt: str, optional
@@ -1221,10 +1242,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
                 bargroupgap=bargroupgap,
             )
         elif plot_type == "lines":
-            hist_data = [
-                cast("Series[float]", self.tsdf.loc[:, ds]).dropna().tolist()
-                for ds in self.tsdf
-            ]
+            hist_data = [self.tsdf[col] for col in self.tsdf.columns]
             figure = create_distplot(
                 hist_data=hist_data,
                 curve_type=curve_type,
@@ -1244,6 +1262,11 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         if add_logo:
             figure.add_layout_image(logo)
+
+        if title:
+            figure.update_layout(
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
+            )
 
         if output_type == "file":
             plot(
@@ -1306,15 +1329,16 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
+            how_many = (
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+                .count()
+                .iloc[0]
+            )
             fraction = (later - earlier).days / 365.25
-            how_many = self.tsdf.loc[
-                cast("int", earlier) : cast("int", later),
-                self.tsdf.columns.to_numpy()[0],
-            ].count()
-            time_factor = cast("int", how_many) / fraction
+            time_factor = how_many / fraction
 
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .mean()
@@ -1368,15 +1392,15 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .count()
                 .iloc[0]
             )
+            fraction = (later - earlier).days / 365.25
             time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
         result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
         if self.tsdf.shape[1] == 1:
@@ -1567,23 +1591,25 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         else:
             fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .count()
                 .iloc[0]
             )
             time_factor = how_many / fraction
         if drift_adjust:
             imp_vol = (-sqrt(time_factor) / norm.ppf(level)) * (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
-                - self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                - self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
                 .sum()
                 / len(
-                    self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                    self.tsdf.loc[
+                        cast("Timestamp", earlier) : cast("Timestamp", later)
+                    ]
                     .ffill()
                     .pct_change(),
                 )
@@ -1591,7 +1617,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         else:
             imp_vol = (
                 -sqrt(time_factor)
-                * self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                * self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
                 .quantile(1 - level, interpolation=interpolation)
@@ -1653,24 +1679,14 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             from_dt=from_date,
             to_dt=to_date,
         )
-        cvar_df = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy(
-            deep=True
-        )
+        cvar_df = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].copy(deep=True)
         result = [
-            cvar_df.loc[:, x]  # type: ignore[call-overload]
-            .ffill()
-            .pct_change()
-            .sort_values()
-            .iloc[
-                : ceil(
-                    cast(
-                        "int",
-                        (1 - level) * cvar_df.loc[:, x].ffill().pct_change().count(),
-                    )
-                ),
-            ]
-            .mean()
-            for x in self.tsdf
+            (r := cvar_df[col].ffill().pct_change().sort_values())[
+                : ceil((1 - level) * r.count())
+            ].mean()
+            for col in cvar_df.columns
         ]
         if self.tsdf.shape[1] == 1:
             return float(result[0])
@@ -1732,7 +1748,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
 
         how_many = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .count(numeric_only=True)
@@ -1749,7 +1765,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
 
         per_period_mar = min_accepted_return / time_factor
         diff = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .sub(per_period_mar)
@@ -1855,17 +1871,19 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             from_dt=from_date,
             to_dt=to_date,
         )
-        result: NDArray[float64] = skew(
-            a=self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            .ffill()
-            .pct_change()
-            .to_numpy(),
+        result = skew(
+            a=(
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+                .ffill()
+                .pct_change()
+            ),
             bias=True,
             nan_policy="omit",
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(result[0])
+            arr = asarray(a=result, dtype=float64).squeeze()
+            return arr.item()
         return Series(
             data=result,
             index=self.tsdf.columns,
@@ -1904,9 +1922,9 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             from_dt=from_date,
             to_dt=to_date,
         )
-        result: NDArray[float64] = kurtosis(
+        result = kurtosis(
             a=(
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()
             ),
@@ -1916,7 +1934,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
         )
 
         if self.tsdf.shape[1] == 1:
-            return float(result[0])
+            arr = asarray(a=result, dtype=float64).squeeze()
+            return arr.item()
         return Series(
             data=result,
             index=self.tsdf.columns,
@@ -1959,8 +1978,8 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
-            / self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+            / self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .expanding(min_periods=min_periods)
             .max()
         ).min() - 1
@@ -2004,10 +2023,10 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             to_dt=to_date,
         )
         pos = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()[1:][
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .ffill()
                 .pct_change()[1:]
                 > zero
@@ -2015,7 +2034,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             .count()
         )
         tot = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .count()
@@ -2204,7 +2223,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             to_dt=to_date,
         )
         retdf = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
         )
@@ -2346,7 +2365,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .quantile(1 - level, interpolation=interpolation)
@@ -2395,7 +2414,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             to_dt=to_date,
         )
         result = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
             .rolling(observations, min_periods=observations)
@@ -2444,7 +2463,7 @@ class _CommonModel(BaseModel):  # type: ignore[misc]
             to_dt=to_date,
         )
         zscframe = (
-            self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
             .ffill()
             .pct_change()
         )
