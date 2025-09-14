@@ -96,15 +96,16 @@ DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 
 DateType = str | dt.date | dt.datetime | datetime64 | Timestamp
 
-PlotlyLayoutType = dict[
-    str,
+PlotlyConfigType = (
     str
     | int
     | float
     | bool
     | list[str]
-    | dict[str, str | int | float | bool | list[str]],
-]
+    | dict[str, str | int | float | bool | list[str]]
+)
+
+PlotlyLayoutType = dict[str, PlotlyConfigType]
 
 CaptorLogoType = dict[str, str | float]
 

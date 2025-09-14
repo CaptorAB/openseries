@@ -21,10 +21,12 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, cast
 from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
 from .owntypes import (
+    CaptorLogoType,
     Combo_co,
     DateAlignmentError,
     InitialValueZeroError,
     NumberOfItemsAndLabelsNotSameError,
+    PlotlyConfigType,
     ResampleDataLossError,
     Self,
     ValueType,
@@ -862,6 +864,99 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         return str(sheetfile)
 
+    @staticmethod
+    def _ensure_labels(
+        ncols: int,
+        labels: list[str] | None,
+        default_labels: list[str],
+    ) -> list[str]:
+        """Validate or infer labels for plotting."""
+        if labels:
+            if len(labels) != ncols:
+                msg = "Must provide same number of labels as items in frame."
+                raise NumberOfItemsAndLabelsNotSameError(msg)
+            return labels
+        return default_labels
+
+    @staticmethod
+    def _resolve_dir(directory: DirectoryPath | None) -> Path:
+        """Resolve output directory for plot files."""
+        if directory:
+            return Path(directory).resolve()
+        if (Path.home() / "Documents").exists():
+            return Path.home() / "Documents"
+        return Path(stack()[2].filename).parent
+
+    @staticmethod
+    def _hover_xy(tick_fmt: str | None) -> str:
+        """Create hovertemplate for y-value and date x-axis."""
+        return (
+            f"%{{y:{tick_fmt}}}<br>%{{x|{'%Y-%m-%d'}}}"
+            if tick_fmt
+            else "%{y}<br>%{x|%Y-%m-%d}"
+        )
+
+    @staticmethod
+    def _hover_hist(x_fmt: str | None, y_fmt: str | None) -> str:
+        """Create hovertemplate for histogram plots."""
+        y = f"%{{y:{y_fmt}}}" if y_fmt else "%{y}"
+        x = f"%{{x:{x_fmt}}}" if x_fmt else "%{x}"
+        return f"Count: {y}<br>{x}"
+
+    @staticmethod
+    def _apply_title_logo(
+        figure: Figure,
+        logo: CaptorLogoType,
+        title: str | None,
+        *,
+        add_logo: bool,
+    ) -> None:
+        """Apply optional title and logo to a Plotly Figure."""
+        if add_logo:
+            figure.add_layout_image(logo)
+        if title:
+            figure.update_layout(
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}}
+            )
+
+    @staticmethod
+    def _emit_output(
+        figure: Figure,
+        fig_config: PlotlyConfigType,
+        output_type: LiteralPlotlyOutput,
+        plotfile: Path,
+        filename: str,
+        *,
+        include_plotlyjs_bool: bool,
+        auto_open: bool,
+    ) -> str:
+        """Write a file or return inline HTML string from a Plotly Figure."""
+        if output_type == "file":
+            plot(
+                figure_or_data=figure,
+                filename=str(plotfile),
+                auto_open=auto_open,
+                auto_play=False,
+                link_text="",
+                include_plotlyjs=include_plotlyjs_bool,
+                config=fig_config,
+                output_type=output_type,
+            )
+            return str(plotfile)
+
+        div_id = filename.rsplit(".", 1)[0]
+        return cast(
+            "str",
+            to_html(
+                fig=figure,
+                config=fig_config,
+                auto_play=False,
+                include_plotlyjs=include_plotlyjs_bool,
+                full_html=False,
+                div_id=div_id,
+            ),
+        )
+
     def plot_bars(
         self: Self,
         mode: LiteralBarPlotMode = "group",
@@ -910,34 +1005,22 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             Plotly Figure and a div section or a html filename with location
 
         """
-        if labels:
-            if len(labels) != self.tsdf.shape[1]:
-                msg = "Must provide same number of labels as items in frame."
-                raise NumberOfItemsAndLabelsNotSameError(msg)
-        else:
-            labels = list(self.tsdf.columns.get_level_values(0))
+        labels = self._ensure_labels(
+            ncols=self.tsdf.shape[1],
+            labels=labels,
+            default_labels=list(self.tsdf.columns.get_level_values(0)),
+        )
 
-        if directory:
-            dirpath = Path(directory).resolve()
-        elif Path.home().joinpath("Documents").exists():
-            dirpath = Path.home().joinpath("Documents")
-        else:
-            dirpath = Path(stack()[1].filename).parent
-
+        dirpath = self._resolve_dir(directory=directory)
         if not filename:
-            filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
-        plotfile = dirpath.joinpath(filename)
+            filename = f"{''.join(choice(ascii_letters) for _ in range(6))}.html"
+        plotfile = dirpath / filename
 
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
 
         opacity = 0.7 if mode == "overlay" else None
-
-        hovertemplate = (
-            f"%{{y:{tick_fmt}}}<br>%{{x|{'%Y-%m-%d'}}}"
-            if tick_fmt
-            else "%{y}<br>%{x|%Y-%m-%d}"
-        )
+        hovertemplate = self._hover_xy(tick_fmt=tick_fmt)
 
         for item in range(self.tsdf.shape[1]):
             figure.add_bar(
@@ -949,36 +1032,19 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             )
         figure.update_layout(barmode=mode, yaxis={"tickformat": tick_fmt})
 
-        if add_logo:
-            figure.add_layout_image(logo)
+        self._apply_title_logo(
+            figure=figure, title=title, add_logo=add_logo, logo=logo
+        )
 
-        if title:
-            figure.update_layout(
-                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
-            )
-
-        if output_type == "file":
-            plot(
-                figure_or_data=figure,
-                filename=str(plotfile),
-                auto_open=auto_open,
-                auto_play=False,
-                link_text="",
-                include_plotlyjs=cast("bool", include_plotlyjs),
-                config=fig["config"],
-                output_type=output_type,
-            )
-            string_output = str(plotfile)
-        else:
-            div_id = filename.split(sep=".")[0]
-            string_output = to_html(
-                fig=figure,
-                config=fig["config"],
-                auto_play=False,
-                include_plotlyjs=cast("bool", include_plotlyjs),
-                full_html=False,
-                div_id=div_id,
-            )
+        string_output = self._emit_output(
+            figure=figure,
+            fig_config=fig["config"],
+            include_plotlyjs_bool=cast("bool", include_plotlyjs),
+            output_type=output_type,
+            auto_open=auto_open,
+            plotfile=plotfile,
+            filename=filename,
+        )
 
         return figure, string_output
 
@@ -1033,32 +1099,21 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             Plotly Figure and a div section or a html filename with location
 
         """
-        if labels:
-            if len(labels) != self.tsdf.shape[1]:
-                msg = "Must provide same number of labels as items in frame."
-                raise NumberOfItemsAndLabelsNotSameError(msg)
-        else:
-            labels = list(self.tsdf.columns.get_level_values(0))
+        labels = self._ensure_labels(
+            ncols=self.tsdf.shape[1],
+            labels=labels,
+            default_labels=list(self.tsdf.columns.get_level_values(0)),
+        )
 
-        if directory:
-            dirpath = Path(directory).resolve()
-        elif Path.home().joinpath("Documents").exists():
-            dirpath = Path.home().joinpath("Documents")
-        else:
-            dirpath = Path(stack()[1].filename).parent
-
+        dirpath = self._resolve_dir(directory=directory)
         if not filename:
-            filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
-        plotfile = dirpath.joinpath(filename)
+            filename = f"{''.join(choice(ascii_letters) for _ in range(6))}.html"
+        plotfile = dirpath / filename
 
         fig, logo = load_plotly_dict()
         figure = Figure(fig)
 
-        hovertemplate = (
-            f"%{{y:{tick_fmt}}}<br>%{{x|{'%Y-%m-%d'}}}"
-            if tick_fmt
-            else "%{y}<br>%{x|%Y-%m-%d}"
-        )
+        hovertemplate = self._hover_xy(tick_fmt=tick_fmt)
 
         for item in range(self.tsdf.shape[1]):
             figure.add_scatter(
@@ -1073,7 +1128,6 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         if show_last:
             txt = f"Last {{:{tick_fmt}}}" if tick_fmt else "Last {}"
-
             for item in range(self.tsdf.shape[1]):
                 figure.add_scatter(
                     x=[Series(self.tsdf.iloc[:, item]).index[-1]],
@@ -1087,36 +1141,19 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
                     textposition="top center",
                 )
 
-        if add_logo:
-            figure.add_layout_image(logo)
+        self._apply_title_logo(
+            figure=figure, title=title, add_logo=add_logo, logo=logo
+        )
 
-        if title:
-            figure.update_layout(
-                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
-            )
-
-        if output_type == "file":
-            plot(
-                figure_or_data=figure,
-                filename=str(plotfile),
-                auto_open=auto_open,
-                auto_play=False,
-                link_text="",
-                include_plotlyjs=cast("bool", include_plotlyjs),
-                config=fig["config"],
-                output_type=output_type,
-            )
-            string_output = str(plotfile)
-        else:
-            div_id = filename.split(sep=".")[0]
-            string_output = to_html(
-                fig=figure,
-                config=fig["config"],
-                auto_play=False,
-                include_plotlyjs=cast("bool", include_plotlyjs),
-                full_html=False,
-                div_id=div_id,
-            )
+        string_output = self._emit_output(
+            figure=figure,
+            fig_config=fig["config"],
+            include_plotlyjs_bool=cast("bool", include_plotlyjs),
+            output_type=output_type,
+            auto_open=auto_open,
+            plotfile=plotfile,
+            filename=filename,
+        )
 
         return figure, string_output
 
@@ -1196,32 +1233,19 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             Plotly Figure and a div section or a html filename with location
 
         """
-        if labels:
-            if len(labels) != self.tsdf.shape[1]:
-                msg = "Must provide same number of labels as items in frame."
-                raise NumberOfItemsAndLabelsNotSameError(msg)
-        else:
-            labels = list(self.tsdf.columns.get_level_values(0))
+        labels = self._ensure_labels(
+            ncols=self.tsdf.shape[1],
+            labels=labels,
+            default_labels=list(self.tsdf.columns.get_level_values(0)),
+        )
 
-        if directory:
-            dirpath = Path(directory).resolve()
-        elif Path.home().joinpath("Documents").exists():
-            dirpath = Path.home().joinpath("Documents")
-        else:
-            dirpath = Path(stack()[1].filename).parent
-
+        dirpath = self._resolve_dir(directory=directory)
         if not filename:
-            filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
-        plotfile = dirpath.joinpath(filename)
+            filename = f"{''.join(choice(ascii_letters) for _ in range(6))}.html"
+        plotfile = dirpath / filename
 
         fig_dict, logo = load_plotly_dict()
-
-        hovertemplate = f"Count: %{{y:{y_fmt}}}" if y_fmt else "Count: %{y}"
-
-        if x_fmt:
-            hovertemplate += f"<br>%{{x:{x_fmt}}}"
-        else:
-            hovertemplate += "<br>%{x}"
+        hovertemplate = self._hover_hist(x_fmt=x_fmt, y_fmt=y_fmt)
 
         msg = "plot_type must be 'bars' or 'lines'."
         if plot_type == "bars":
@@ -1257,40 +1281,22 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             raise TypeError(msg)
 
         figure.update_layout(xaxis={"tickformat": x_fmt}, yaxis={"tickformat": y_fmt})
-
         figure.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
         figure.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
 
-        if add_logo:
-            figure.add_layout_image(logo)
+        self._apply_title_logo(
+            figure=figure, title=title, add_logo=add_logo, logo=logo
+        )
 
-        if title:
-            figure.update_layout(
-                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
-            )
-
-        if output_type == "file":
-            plot(
-                figure_or_data=figure,
-                filename=str(plotfile),
-                auto_open=auto_open,
-                auto_play=False,
-                link_text="",
-                include_plotlyjs=cast("bool", include_plotlyjs),
-                config=fig_dict["config"],
-                output_type=output_type,
-            )
-            string_output = str(plotfile)
-        else:
-            div_id = filename.rsplit(".", 1)[0]
-            string_output = to_html(
-                fig=figure,
-                config=fig_dict["config"],
-                auto_play=False,
-                include_plotlyjs=cast("bool", include_plotlyjs),
-                full_html=False,
-                div_id=div_id,
-            )
+        string_output = self._emit_output(
+            figure=figure,
+            fig_config=fig_dict["config"],
+            include_plotlyjs_bool=cast("bool", include_plotlyjs),
+            output_type=output_type,
+            auto_open=auto_open,
+            plotfile=plotfile,
+            filename=filename,
+        )
 
         return figure, string_output
 
