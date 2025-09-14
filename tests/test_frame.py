@@ -174,7 +174,7 @@ class TestOpenFrame(CommonTestCase):
         )
 
         frame_one = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name=cast("str", item["name"]),
                     dates=cast("list[str]", item["dates"]),
@@ -197,7 +197,7 @@ class TestOpenFrame(CommonTestCase):
             output = load(jsonfile)
 
         frame_two = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name=cast("str", item["name"]),
                     dates=cast("list[str]", item["dates"]),
@@ -241,7 +241,7 @@ class TestOpenFrame(CommonTestCase):
         )
 
         frame_one = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name=cast("str", item["name"]),
                     dates=cast("list[str]", item["dates"]),
@@ -264,7 +264,7 @@ class TestOpenFrame(CommonTestCase):
             output = load(jsonfile)
 
         frame_two = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name=cast("str", item["name"]),
                     dates=cast("list[str]", item["dates"]),
@@ -502,7 +502,7 @@ class TestOpenFrame(CommonTestCase):
     def test_resample_to_business_period_ends(self: TestOpenFrame) -> None:
         """Test resample_to_business_period_ends method."""
         rsb_stubs_frame = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_fixed_rate(
                     rate=0.01,
                     days=121,
@@ -536,7 +536,7 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         rsb_frame = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_fixed_rate(
                     rate=0.01,
                     days=88,
@@ -1899,7 +1899,7 @@ class TestOpenFrame(CommonTestCase):
     def test_passed_empty_list(self: TestOpenFrame) -> None:
         """Test warning on object construct with empty list."""
         with self.assertLogs() as contextmgr:
-            OpenFrame([])
+            OpenFrame(constituents=[])
         if contextmgr.output != [
             "WARNING:openseries.frame:OpenFrame() was passed an empty list."
         ]:
@@ -1923,7 +1923,7 @@ class TestOpenFrame(CommonTestCase):
             ][("Asset_0", ValueType.PRICE)],
         )
         series_short.set_new_label("Short")
-        frame = OpenFrame([series_long, series_short])
+        frame = OpenFrame(constituents=[series_long, series_short])
 
         firsts = [
             dt.date(2017, 6, 27),
@@ -1971,7 +1971,7 @@ class TestOpenFrame(CommonTestCase):
             ][("Asset_0", ValueType.PRICE)]
         )
         series_short.set_new_label("Short")
-        frame = OpenFrame([series_long, series_short])
+        frame = OpenFrame(constituents=[series_long, series_short])
 
         firsts = [
             dt.date(2017, 6, 27),
@@ -2023,7 +2023,7 @@ class TestOpenFrame(CommonTestCase):
     def test_trunc_frame_start_fail(self: TestOpenFrame) -> None:
         """Test trunc_frame method start fail scenario."""
         frame = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
                         columns=["a"],
@@ -2090,7 +2090,7 @@ class TestOpenFrame(CommonTestCase):
     def test_trunc_frame_end_fail(self: TestOpenFrame) -> None:
         """Test trunc_frame method end fail scenario."""
         frame = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_df(
                     dframe=DataFrame(
                         columns=["a"],
@@ -2156,7 +2156,7 @@ class TestOpenFrame(CommonTestCase):
     def test_merge_series(self: TestOpenFrame) -> None:
         """Test merge_series method."""
         aframe = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name="Asset_one",
                     dates=[
@@ -2182,7 +2182,7 @@ class TestOpenFrame(CommonTestCase):
             ],
         )
         bframe = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name="Asset_one",
                     dates=[
@@ -2368,10 +2368,10 @@ class TestOpenFrame(CommonTestCase):
         aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
         bseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
         bseries.set_new_label("Asset_b")
-        aframe = OpenFrame([aseries, bseries])
-        anotherframe = OpenFrame([aseries, bseries])
-        yetoneframe = OpenFrame([aseries, bseries])
-        noneframe = OpenFrame([aseries, bseries])
+        aframe = OpenFrame(constituents=[aseries, bseries])
+        anotherframe = OpenFrame(constituents=[aseries, bseries])
+        yetoneframe = OpenFrame(constituents=[aseries, bseries])
+        noneframe = OpenFrame(constituents=[aseries, bseries])
 
         swedennationalday = dt.date(2022, 6, 6)
 
@@ -2691,10 +2691,10 @@ class TestOpenFrame(CommonTestCase):
             expected_exception=LabelsNotUniqueError,
             match="TimeSeries names/labels must be unique",
         ):
-            OpenFrame([aseries, bseries])
+            OpenFrame(constituents=[aseries, bseries])
 
         bseries.set_new_label("other_name")
-        uframe = OpenFrame([aseries, bseries])
+        uframe = OpenFrame(constituents=[aseries, bseries])
 
         if uframe.columns_lvl_zero != ["Asset_0", "other_name"]:
             msg = "Fix of non-unique labels unsuccessful."
@@ -2826,7 +2826,7 @@ class TestOpenFrame(CommonTestCase):
                 0.0193,
             ],
         )
-        cframe = OpenFrame([asset, indxx]).to_cumret()
+        cframe = OpenFrame(constituents=[asset, indxx]).to_cumret()
 
         upp = cframe.capture_ratio_func(ratio="up")
         down = cframe.capture_ratio_func(ratio="down")
@@ -2885,7 +2885,7 @@ class TestOpenFrame(CommonTestCase):
     def test_georet_exceptions(self: TestOpenFrame) -> None:
         """Test georet property raising exceptions on bad input data."""
         geoframe = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name="geoseries1",
                     dates=["2022-07-01", "2023-07-01"],
@@ -2975,7 +2975,7 @@ class TestOpenFrame(CommonTestCase):
     def test_value_nan_handle(self: TestOpenFrame) -> None:
         """Test value_nan_handle method."""
         nanframe = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name="nanseries1",
                     dates=[
@@ -3027,7 +3027,7 @@ class TestOpenFrame(CommonTestCase):
     def test_return_nan_handle(self: TestOpenFrame) -> None:
         """Test return_nan_handle method."""
         nanframe = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_arrays(
                     name="nanseries1",
                     dates=[
@@ -3133,9 +3133,9 @@ class TestOpenFrame(CommonTestCase):
         ccseries = cseries.from_deepcopy()
         ccseries.set_new_label(lvl_zero="Casset")
 
-        mframe = OpenFrame([rseries, cseries])
-        cframe = OpenFrame([cseries, ccseries])
-        rframe = OpenFrame([rseries, rrseries])
+        mframe = OpenFrame(constituents=[rseries, cseries])
+        cframe = OpenFrame(constituents=[cseries, ccseries])
+        rframe = OpenFrame(constituents=[rseries, rrseries])
 
         if mframe.columns_lvl_one != [ValueType.RTRN, ValueType.PRICE]:
             msg = "Method to_cumret() not working as intended"
