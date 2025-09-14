@@ -17,7 +17,7 @@ from typing import Annotated, ClassVar, Literal, TypeAlias
 from annotated_types import MinLen
 from numpy import datetime64
 from pandas import Timestamp
-from pydantic import BaseModel, Field, StringConstraints, conlist
+from pydantic import BaseModel, Field, StringConstraints
 
 try:
     from typing import Self
@@ -80,7 +80,7 @@ DateStringType = Annotated[
 ]
 DateListType: TypeAlias = Annotated[list[DateStringType], MinLen(1)]
 
-ValueListType = Annotated[list[float], conlist(float, min_length=1)]
+ValueListType: TypeAlias = Annotated[list[float], MinLen(1)]
 
 DaysInYearType = Annotated[int, Field(strict=True, ge=1, le=366)]
 

@@ -301,7 +301,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         with pytest.raises(
             expected_exception=ValidationError,
-            match="There must be at least 1 value",
+            match="List should have at least 1 item after validation",
         ):
             OpenTimeSeries.from_arrays(
                 name="Asset_0",
@@ -1318,7 +1318,9 @@ class TestOpenTimeSeries(CommonTestCase):
 
     def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
         """Test max_drawdown_date property."""
-        if self.randomseries.max_drawdown_date != dt.date(2012, 11, 21):
+        if cast("dt.date", self.randomseries.max_drawdown_date) != dt.date(
+            2012, 11, 21
+        ):
             msg = (
                 "Unexpected max_drawdown_date: "
                 f"'{self.randomseries.max_drawdown_date}'"
@@ -1326,7 +1328,7 @@ class TestOpenTimeSeries(CommonTestCase):
             raise OpenTimeSeriesTestError(msg)
 
         all_prop = self.random_properties["max_drawdown_date"]
-        if self.randomseries.max_drawdown_date != all_prop:
+        if cast("dt.date", self.randomseries.max_drawdown_date) != all_prop:
             msg = (
                 "Unexpected max_drawdown_date: "
                 f"'{self.randomseries.max_drawdown_date}'"
@@ -1744,7 +1746,7 @@ class TestOpenTimeSeries(CommonTestCase):
 
         with pytest.raises(
             expected_exception=ValueError,
-            match="There must be at least 1 value",
+            match="List should have at least 1 item after validation",
         ):
             OpenTimeSeries.from_arrays(
                 name="asset",

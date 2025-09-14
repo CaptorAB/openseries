@@ -172,9 +172,6 @@ class OpenTimeSeries(_CommonModel):
         if dates_list_length != dates_set_length:
             msg = "Dates are not unique"
             raise ValueError(msg)
-        if values_list_length < 1:
-            msg = "There must be at least 1 value"
-            raise ValueError(msg)
         if (
             (dates_list_length != values_list_length)
             or (len(self.tsdf.index) != self.tsdf.shape[0])
