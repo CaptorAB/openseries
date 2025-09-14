@@ -358,15 +358,10 @@ def report_html(
 
     this_year = copied.last_idx.year
     this_month = copied.last_idx.month
-    ytd = cast("Series[float]", copied.value_ret_calendar_period(year=this_year)).map(
-        "{:.2%}".format
-    )
+    ytd = copied.value_ret_calendar_period(year=this_year).map("{:.2%}".format)
     ytd.name = "Year-to-Date"
-    mtd = cast(
-        "Series[float]",
-        copied.value_ret_calendar_period(year=this_year, month=this_month),
-    ).map(
-        "{:.2%}".format,
+    mtd = copied.value_ret_calendar_period(year=this_year, month=this_month).map(
+        "{:.2%}".format
     )
     mtd.name = "Month-to-Date"
     ytd_df = ytd.to_frame().T

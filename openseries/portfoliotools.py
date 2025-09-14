@@ -440,14 +440,13 @@ def prepare_plot_data(
         for wgt, nm in zip(optimized[3:], assets.columns_lvl_zero, strict=True)
     ]
     opt_text = "<br><br>Weights:<br>" + "<br>".join(opt_text_list)
-    vol = cast("Series[float]", assets.vol)
     plotframe = DataFrame(
         data=[
             assets.arithmetic_ret,
-            vol,
+            assets.vol,
             Series(
                 data=[""] * assets.item_count,
-                index=vol.index,
+                index=assets.vol.index,
             ),
         ],
         index=["ret", "stdev", "text"],

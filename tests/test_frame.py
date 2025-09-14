@@ -768,14 +768,10 @@ class TestOpenFrame(CommonTestCase):
         riskseries.to_cumret()
         riskframe.to_cumret()
 
-        if cast("float", riskseries.cvar_down) != _cvar_down_calc(
-            data=riskseries.tsdf.iloc[:, 0]
-        ):
+        if riskseries.cvar_down != _cvar_down_calc(data=riskseries.tsdf.iloc[:, 0]):
             msg = "CVaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
-        if cast("float", riskseries.var_down) != _var_down_calc(
-            data=riskseries.tsdf.iloc[:, 0]
-        ):
+        if riskseries.var_down != _var_down_calc(data=riskseries.tsdf.iloc[:, 0]):
             msg = "VaR for OpenTimeSeries not equal"
             raise OpenFrameTestError(msg)
 

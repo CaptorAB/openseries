@@ -14,11 +14,6 @@ from functools import reduce
 from logging import getLogger
 from typing import TYPE_CHECKING, Any, cast
 
-if TYPE_CHECKING:  # pragma: no cover
-    import datetime as dt
-
-    from pandas import Timestamp
-
 from numpy import (
     array,
     concatenate,
@@ -40,6 +35,17 @@ from pandas import (
     concat,
     merge,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime as dt
+
+    from pandas import Series as _Series
+    from pandas import Timestamp
+
+    SeriesFloat = _Series[float]
+else:
+    SeriesFloat = Series
+
 from pydantic import field_validator
 from sklearn.linear_model import LinearRegression  # type: ignore[import-untyped]
 
@@ -72,7 +78,7 @@ __all__ = ["OpenFrame"]
 
 
 # noinspection PyUnresolvedReferences,PyTypeChecker
-class OpenFrame(_CommonModel):
+class OpenFrame(_CommonModel[SeriesFloat]):
     """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
     The intended use is to allow comparisons across these timeseries.

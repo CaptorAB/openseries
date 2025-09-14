@@ -12,12 +12,19 @@ from __future__ import annotations
 import datetime as dt
 from enum import Enum
 from pprint import pformat
-from typing import Annotated, ClassVar, Literal, TypeAlias
+from typing import TYPE_CHECKING, Annotated, ClassVar, Literal, TypeAlias, TypeVar
 
 from annotated_types import MinLen
 from numpy import datetime64
-from pandas import Timestamp
+from pandas import Series, Timestamp
 from pydantic import BaseModel, Field, StringConstraints
+
+if TYPE_CHECKING:
+    from pandas import Series as _Series
+
+    SeriesFloat = _Series[float]
+else:
+    SeriesFloat = Series
 
 try:
     from typing import Self
@@ -26,6 +33,9 @@ except ImportError:  # pragma: no cover
 
 
 __all__ = ["Self", "ValueType"]
+
+
+Combo_co = TypeVar("Combo_co", float, SeriesFloat, covariant=True)
 
 
 CountryStringType = Annotated[

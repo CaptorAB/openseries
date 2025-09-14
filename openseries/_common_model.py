@@ -16,11 +16,12 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, Literal, SupportsFloat, cast
+from typing import TYPE_CHECKING, Any, Generic, Literal, cast
 
 from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
 from .owntypes import (
+    Combo_co,
     DateAlignmentError,
     InitialValueZeroError,
     NumberOfItemsAndLabelsNotSameError,
@@ -85,7 +86,7 @@ from .load_plotly import load_plotly_dict
 
 
 # noinspection PyTypeChecker
-class _CommonModel(BaseModel):
+class _CommonModel(BaseModel, Generic[Combo_co]):
     """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
@@ -95,6 +96,20 @@ class _CommonModel(BaseModel):
         validate_assignment=True,
         revalidate_instances="always",
     )
+
+    def _coerce_result(self: Self, result: Series[float], name: str) -> Combo_co:
+        if self.tsdf.shape[1] == 1:
+            arr = float(asarray(a=result, dtype=float64).squeeze())
+            return cast("Combo_co", arr)  # type: ignore[redundant-cast]
+        return cast(
+            "Combo_co",
+            Series(
+                data=result,
+                index=self.tsdf.columns,
+                name=name,
+                dtype="float64",
+            ),
+        )
 
     @property
     def length(self: Self) -> int:
@@ -170,12 +185,12 @@ class _CommonModel(BaseModel):
         return self.length / self.yearfrac
 
     @property
-    def max_drawdown_cal_year(self: Self) -> float | Series[float]:
+    def max_drawdown_cal_year(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Maximum drawdown in a single calendar year.
 
         """
@@ -188,53 +203,46 @@ class _CommonModel(BaseModel):
             )
             .min()
         )
-        if self.tsdf.shape[1] == 1:
-            return float(mddc.iloc[0])
-        return Series(
-            data=mddc,
-            index=self.tsdf.columns,
-            name="Max drawdown in cal yr",
-            dtype="float64",
-        )
+        return self._coerce_result(result=mddc, name="Max drawdown in cal yr")
 
     @property
-    def geo_ret(self: Self) -> float | Series[float]:
+    def geo_ret(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/c/cagr.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Compounded Annual Growth Rate (CAGR)
 
         """
         return self.geo_ret_func()
 
     @property
-    def arithmetic_ret(self: Self) -> float | Series[float]:
+    def arithmetic_ret(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Annualized arithmetic mean of returns
 
         """
         return self.arithmetic_ret_func()
 
     @property
-    def value_ret(self: Self) -> float | Series[float]:
+    def value_ret(self: Self) -> Combo_co:
         """Simple return.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Simple return
 
         """
         return self.value_ret_func()
 
     @property
-    def vol(self: Self) -> float | Series[float]:
+    def vol(self: Self) -> Combo_co:
         """Annualized volatility.
 
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
@@ -242,14 +250,14 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Annualized volatility
 
         """
         return self.vol_func()
 
     @property
-    def downside_deviation(self: Self) -> float | Series[float]:
+    def downside_deviation(self: Self) -> Combo_co:
         """Downside Deviation.
 
         Standard deviation of returns that are below a Minimum Accepted Return
@@ -258,7 +266,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Downside deviation
 
         """
@@ -269,12 +277,12 @@ class _CommonModel(BaseModel):
         )
 
     @property
-    def ret_vol_ratio(self: Self) -> float | Series[float]:
+    def ret_vol_ratio(self: Self) -> Combo_co:
         """Ratio of annualized arithmetic mean of returns and annualized volatility.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility.
 
@@ -283,12 +291,12 @@ class _CommonModel(BaseModel):
         return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
-    def sortino_ratio(self: Self) -> float | Series[float]:
+    def sortino_ratio(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
@@ -302,7 +310,7 @@ class _CommonModel(BaseModel):
         )
 
     @property
-    def kappa3_ratio(self: Self) -> float | Series[float]:
+    def kappa3_ratio(self: Self) -> Combo_co:
         """Kappa-3 ratio.
 
         The Kappa-3 ratio is a generalized downside-risk ratio defined as
@@ -313,7 +321,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Kappa-3 ratio calculation with the riskfree rate and
             Minimum Acceptable Return (MAR) both set to zero.
 
@@ -328,12 +336,12 @@ class _CommonModel(BaseModel):
         )
 
     @property
-    def omega_ratio(self: Self) -> float | Series[float]:
+    def omega_ratio(self: Self) -> Combo_co:
         """https://en.wikipedia.org/wiki/Omega_ratio.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Omega ratio calculation
 
         """
@@ -341,24 +349,24 @@ class _CommonModel(BaseModel):
         return self.omega_ratio_func(min_accepted_return=minimum_accepted_return)
 
     @property
-    def z_score(self: Self) -> float | Series[float]:
+    def z_score(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/z/zscore.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Z-score as (last return - mean return) / standard deviation of returns.
 
         """
         return self.z_score_func()
 
     @property
-    def max_drawdown(self: Self) -> float | Series[float]:
+    def max_drawdown(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Maximum drawdown without any limit on date range
 
         """
@@ -390,12 +398,12 @@ class _CommonModel(BaseModel):
         ).dt.date
 
     @property
-    def worst(self: Self) -> float | Series[float]:
+    def worst(self: Self) -> Combo_co:
         """Most negative percentage change.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Most negative percentage change
 
         """
@@ -403,7 +411,7 @@ class _CommonModel(BaseModel):
         return self.worst_func(observations=observations)
 
     @property
-    def worst_month(self: Self) -> float | Series[float]:
+    def worst_month(self: Self) -> Combo_co:
         """Most negative month.
 
         Returns:
@@ -444,58 +452,51 @@ class _CommonModel(BaseModel):
 
         result = wmdf.ffill().pct_change().min()
 
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Worst month",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name="Worst month")
 
     @property
-    def positive_share(self: Self) -> float | Series[float]:
+    def positive_share(self: Self) -> Combo_co:
         """The share of percentage changes that are greater than zero.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             The share of percentage changes that are greater than zero
 
         """
         return self.positive_share_func()
 
     @property
-    def skew(self: Self) -> float | Series[float]:
+    def skew(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/s/skewness.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Skew of the return distribution
 
         """
         return self.skew_func()
 
     @property
-    def kurtosis(self: Self) -> float | Series[float]:
+    def kurtosis(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Kurtosis of the return distribution
 
         """
         return self.kurtosis_func()
 
     @property
-    def cvar_down(self: Self) -> float | Series[float]:
+    def cvar_down(self: Self) -> Combo_co:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Downside 95% Conditional Value At Risk "CVaR"
 
         """
@@ -503,7 +504,7 @@ class _CommonModel(BaseModel):
         return self.cvar_down_func(level=level)
 
     @property
-    def var_down(self: Self) -> float | Series[float]:
+    def var_down(self: Self) -> Combo_co:
         """Downside 95% Value At Risk (VaR).
 
         The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
@@ -511,7 +512,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Downside 95% Value At Risk (VaR)
 
         """
@@ -520,14 +521,14 @@ class _CommonModel(BaseModel):
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
-    def vol_from_var(self: Self) -> float | Series[float]:
+    def vol_from_var(self: Self) -> Combo_co:
         """Implied annualized volatility from Downside 95% Value at Risk.
 
         Assumes that returns are normally distributed.
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Implied annualized volatility from the Downside 95% VaR using the
             assumption that returns are normally distributed.
 
@@ -1299,7 +1300,7 @@ class _CommonModel(BaseModel):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Parameters
@@ -1317,7 +1318,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Annualized arithmetic mean of returns
 
         """
@@ -1345,14 +1346,7 @@ class _CommonModel(BaseModel):
             * time_factor
         )
 
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Arithmetic return",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name="Arithmetic return")
 
     def vol_func(
         self: Self,
@@ -1360,7 +1354,7 @@ class _CommonModel(BaseModel):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Annualized volatility.
 
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
@@ -1380,7 +1374,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Annualized volatility
 
         """
@@ -1403,14 +1397,7 @@ class _CommonModel(BaseModel):
         data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
         result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
-        if self.tsdf.shape[1] == 1:
-            return float(cast("SupportsFloat", result.iloc[0]))
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Volatility",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name="Volatility")
 
     def vol_from_var_func(
         self: Self,
@@ -1422,7 +1409,7 @@ class _CommonModel(BaseModel):
         periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Implied annualized volatility.
 
         Implied annualized volatility from the Downside VaR using the assumption
@@ -1449,7 +1436,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
 
@@ -1477,7 +1464,7 @@ class _CommonModel(BaseModel):
         periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Target weight from VaR.
 
         A position weight multiplier from the ratio between a VaR implied
@@ -1510,7 +1497,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             A position weight multiplier from the ratio between a VaR implied
             volatility and a given target volatility. Multiplier = 1.0 -> target met
 
@@ -1541,7 +1528,7 @@ class _CommonModel(BaseModel):
         periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Volatility implied from VaR or Target Weight.
 
         The function returns a position weight multiplier from the ratio between
@@ -1576,7 +1563,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Target volatility if target_vol is provided otherwise the VaR
             implied volatility.
 
@@ -1636,14 +1623,7 @@ class _CommonModel(BaseModel):
             result = imp_vol
             label = f"Imp vol from VaR {level:.0%}"
 
-        if self.tsdf.shape[1] == 1:
-            return float(cast("SupportsFloat", result.iloc[0]))
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name=label,
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name=label)
 
     def cvar_down_func(
         self: Self,
@@ -1651,7 +1631,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Downside Conditional Value At Risk "CVaR".
 
         https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
@@ -1670,7 +1650,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Downside Conditional Value At Risk "CVaR"
 
         """
@@ -1688,13 +1668,9 @@ class _CommonModel(BaseModel):
             ].mean()
             for col in cvar_df.columns
         ]
-        if self.tsdf.shape[1] == 1:
-            return float(result[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name=f"CVaR {level:.1%}",
-            dtype="float64",
+
+        return self._coerce_result(
+            result=cast("Series[float]", result), name=f"CVaR {level:.1%}"
         )
 
     def lower_partial_moment_func(
@@ -1705,7 +1681,7 @@ class _CommonModel(BaseModel):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Downside Deviation if order set to 2.
 
         If order is set to 2 the function calculates the standard
@@ -1732,7 +1708,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Downside deviation if order set to 2
 
         """
@@ -1778,13 +1754,9 @@ class _CommonModel(BaseModel):
 
         dd_order = 2
 
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
+        return self._coerce_result(
+            result=result,
             name="Downside deviation" if order == dd_order else f"LPM{order}",
-            dtype="float64",
         )
 
     def geo_ret_func(
@@ -1792,7 +1764,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Compounded Annual Growth Rate (CAGR).
 
         https://www.investopedia.com/terms/c/cagr.asp.
@@ -1809,7 +1781,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Compounded Annual Growth Rate (CAGR)
 
         """
@@ -1831,13 +1803,8 @@ class _CommonModel(BaseModel):
 
         result = (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
 
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result.to_numpy(),
-            index=self.tsdf.columns,
-            name="Geometric return",
-            dtype="float64",
+        return self._coerce_result(
+            result=cast("Series[float]", result), name="Geometric return"
         )
 
     def skew_func(
@@ -1845,7 +1812,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Skew of the return distribution.
 
         https://www.investopedia.com/terms/s/skewness.asp.
@@ -1862,7 +1829,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Skew of the return distribution
 
         """
@@ -1881,22 +1848,14 @@ class _CommonModel(BaseModel):
             nan_policy="omit",
         )
 
-        if self.tsdf.shape[1] == 1:
-            arr = asarray(a=result, dtype=float64).squeeze()
-            return arr.item()
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Skew",
-            dtype="float64",
-        )
+        return self._coerce_result(result=cast("Series[float]", result), name="Skew")
 
     def kurtosis_func(
         self: Self,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Kurtosis of the return distribution.
 
         https://www.investopedia.com/terms/k/kurtosis.asp.
@@ -1913,7 +1872,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Kurtosis of the return distribution
 
         """
@@ -1933,14 +1892,8 @@ class _CommonModel(BaseModel):
             nan_policy="omit",
         )
 
-        if self.tsdf.shape[1] == 1:
-            arr = asarray(a=result, dtype=float64).squeeze()
-            return arr.item()
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Kurtosis",
-            dtype="float64",
+        return self._coerce_result(
+            result=cast("Series[float]", result), name="Kurtosis"
         )
 
     def max_drawdown_func(
@@ -1949,7 +1902,7 @@ class _CommonModel(BaseModel):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         min_periods: int = 1,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Maximum drawdown without any limit on date range.
 
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
@@ -1968,7 +1921,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Maximum drawdown without any limit on date range
 
         """
@@ -1983,21 +1936,15 @@ class _CommonModel(BaseModel):
             .expanding(min_periods=min_periods)
             .max()
         ).min() - 1
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Max drawdown",
-            dtype="float64",
-        )
+
+        return self._coerce_result(result=result, name="Max drawdown")
 
     def positive_share_func(
         self: Self,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Calculate share of percentage changes that are greater than zero.
 
         Parameters
@@ -2012,7 +1959,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Calculate share of percentage changes that are greater than zero
 
         """
@@ -2039,15 +1986,9 @@ class _CommonModel(BaseModel):
             .pct_change()
             .count()
         )
-        share = pos / tot
-        if self.tsdf.shape[1] == 1:
-            return float(share.iloc[0])
-        return Series(
-            data=share,
-            index=self.tsdf.columns,
-            name="Positive share",
-            dtype="float64",
-        )
+        result = pos / tot
+
+        return self._coerce_result(result=result, name="Positive share")
 
     def ret_vol_ratio_func(
         self: Self,
@@ -2056,7 +1997,7 @@ class _CommonModel(BaseModel):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Ratio between arithmetic mean of returns and annualized volatility.
 
         The ratio of annualized arithmetic mean of returns and annualized
@@ -2082,12 +2023,12 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Ratio of the annualized arithmetic mean of returns and annualized
             volatility or, if risk-free return provided, Sharpe ratio
 
         """
-        ratio = Series(
+        result = Series(
             self.arithmetic_ret_func(
                 months_from_last=months_from_last,
                 from_date=from_date,
@@ -2102,14 +2043,7 @@ class _CommonModel(BaseModel):
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
-        if self.tsdf.shape[1] == 1:
-            return float(cast("float64", ratio.iloc[0]))
-        return Series(
-            data=ratio,
-            index=self.tsdf.columns,
-            name="Return vol ratio",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name="Return vol ratio")
 
     def sortino_ratio_func(
         self: Self,
@@ -2120,7 +2054,7 @@ class _CommonModel(BaseModel):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Sortino Ratio or Kappa3 Ratio.
 
         The Sortino ratio calculated as ( return - risk free return )
@@ -2153,12 +2087,12 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Sortino ratio calculated as ( return - riskfree return ) /
             downside deviation (std dev of returns below MAR)
 
         """
-        ratio = Series(
+        result = Series(
             self.arithmetic_ret_func(
                 months_from_last=months_from_last,
                 from_date=from_date,
@@ -2176,14 +2110,9 @@ class _CommonModel(BaseModel):
         )
 
         sortino_order = 2
-        if self.tsdf.shape[1] == 1:
-            return float(cast("float64", ratio.iloc[0]))
-        return Series(
-            data=ratio,
-            index=self.tsdf.columns,
-            name="Sortino ratio" if order == sortino_order else "Kappa-3 ratio",
-            dtype="float64",
-        )
+        name = "Sortino ratio" if order == sortino_order else "Kappa-3 ratio"
+
+        return self._coerce_result(result=result, name=name)
 
     def omega_ratio_func(
         self: Self,
@@ -2191,7 +2120,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Omega Ratio.
 
         The Omega Ratio compares returns above a certain target level
@@ -2213,7 +2142,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Omega ratio calculation
 
         """
@@ -2229,23 +2158,16 @@ class _CommonModel(BaseModel):
         )
         pos = retdf[retdf > min_accepted_return].sub(min_accepted_return).sum()
         neg = retdf[retdf < min_accepted_return].sub(min_accepted_return).sum()
-        ratio = pos / -neg
+        result = pos / -neg
 
-        if self.tsdf.shape[1] == 1:
-            return float(cast("float64", ratio.iloc[0]))
-        return Series(
-            data=ratio,
-            index=self.tsdf.columns,
-            name="Omega ratio",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name="Omega ratio")
 
     def value_ret_func(
         self: Self,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Calculate simple return.
 
         Parameters
@@ -2260,7 +2182,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Calculate simple return
 
         """
@@ -2277,22 +2199,17 @@ class _CommonModel(BaseModel):
             )
             raise InitialValueZeroError(msg)
 
-        result = self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
-
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result.to_numpy(),
-            index=self.tsdf.columns,
-            name="Simple return",
-            dtype="float64",
+        result = cast(
+            "Series[float]", self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
         )
+
+        return self._coerce_result(result=result, name="Simple return")
 
     def value_ret_calendar_period(
         self: Self,
         year: int,
         month: int | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Calculate simple return for a specific calendar period.
 
         Parameters
@@ -2304,7 +2221,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Calculate simple return for a specific calendar period
 
         """
@@ -2315,16 +2232,10 @@ class _CommonModel(BaseModel):
         vrdf = self.tsdf.copy()
         vrdf.index = DatetimeIndex(vrdf.index)
         resultdf = DataFrame(vrdf.ffill().pct_change())
-        result = resultdf.loc[period] + 1
-        cal_period = result.cumprod(axis="index").iloc[-1] - 1
-        if self.tsdf.shape[1] == 1:
-            return float(cal_period.iloc[0])
-        return Series(
-            data=cal_period,
-            index=self.tsdf.columns,
-            name=period,
-            dtype="float64",
-        )
+        plus_one = resultdf.loc[period] + 1
+        result = plus_one.cumprod(axis="index").iloc[-1] - 1
+
+        return self._coerce_result(result=result, name=period)
 
     def var_down_func(
         self: Self,
@@ -2333,7 +2244,7 @@ class _CommonModel(BaseModel):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         interpolation: LiteralQuantileInterp = "lower",
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Downside Value At Risk, "VaR".
 
         The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
@@ -2355,7 +2266,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Downside Value At Risk
 
         """
@@ -2371,14 +2282,7 @@ class _CommonModel(BaseModel):
             .quantile(1 - level, interpolation=interpolation)
         )
 
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name=f"VaR {level:.1%}",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name=f"VaR {level:.1%}")
 
     def worst_func(
         self: Self,
@@ -2386,7 +2290,7 @@ class _CommonModel(BaseModel):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Most negative percentage change over a rolling number of observations.
 
         Parameters
@@ -2403,7 +2307,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Most negative percentage change over a rolling number of observations
             within a chosen date range
 
@@ -2422,21 +2326,14 @@ class _CommonModel(BaseModel):
             .min()
         )
 
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Worst",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name="Worst")
 
     def z_score_func(
         self: Self,
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> float | Series[float]:
+    ) -> Combo_co:
         """Z-score as (last return - mean return) / standard deviation of returns.
 
         https://www.investopedia.com/terms/z/zscore.asp.
@@ -2453,7 +2350,7 @@ class _CommonModel(BaseModel):
 
         Returns:
         -------
-        float | Pandas.Series[float]
+        Combo_co
             Z-score as (last return - mean return) / standard deviation of returns
 
         """
@@ -2469,14 +2366,7 @@ class _CommonModel(BaseModel):
         )
         result = (zscframe.iloc[-1] - zscframe.mean()) / zscframe.std()
 
-        if self.tsdf.shape[1] == 1:
-            return float(result.iloc[0])
-        return Series(
-            data=result,
-            index=self.tsdf.columns,
-            name="Z-score",
-            dtype="float64",
-        )
+        return self._coerce_result(result=result, name="Z-score")
 
     def rolling_cvar_down(
         self: Self,
