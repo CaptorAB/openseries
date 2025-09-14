@@ -953,14 +953,14 @@ virtualenv = ">=20.10.0"
 
 [[package]]
 name = "pydantic"
-version = "2.11.8"
+version = "2.11.9"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic-2.11.8-py3-none-any.whl", hash = "sha256:830ec4cccc3cf21be1ef5aec1d3348a179c92a61a7dab0e59837f9cc9fa93351"},
-    {file = "pydantic-2.11.8.tar.gz", hash = "sha256:3d080f4a3ac6bde98e959ba552124d46be9f565b7be67769e49fcb286bae1bfb"},
+    {file = "pydantic-2.11.9-py3-none-any.whl", hash = "sha256:c42dd626f5cfc1c6950ce6205ea58c93efa406da65f479dcb4029d5934857da2"},
+    {file = "pydantic-2.11.9.tar.gz", hash = "sha256:6b8ffda597a14812a7975c90b82a8a2e777d9257aba3453f973acd3c032a18e2"},
 ]
 
 [package.dependencies]
@@ -1642,14 +1642,14 @@ files = [
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.5.20250822"
+version = "3.1.5.20250914"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "types_openpyxl-3.1.5.20250822-py3-none-any.whl", hash = "sha256:da7a430d99c48347acf2dc351695f9db6ff90ecb761fed577b4a98fef2d0f831"},
-    {file = "types_openpyxl-3.1.5.20250822.tar.gz", hash = "sha256:c8704a163e3798290d182c13c75da85f68cd97ff9b35f0ebfb94cf72f8b67bb3"},
+    {file = "types_openpyxl-3.1.5.20250914-py3-none-any.whl", hash = "sha256:61763fa44414011acd87a42d4058dd221a4fe6e6efd105b7d35f5d5a194fef26"},
+    {file = "types_openpyxl-3.1.5.20250914.tar.gz", hash = "sha256:74602c740d4bfe628b258f67d7173eca34aefa472eb74579487df834f93837c2"},
 ]
 
 [[package]]
