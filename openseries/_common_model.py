@@ -197,7 +197,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         """
         years = Index(d.year for d in self.tsdf.index)
-        mddc = (
+        result = (
             self.tsdf.groupby(years)
             .apply(
                 lambda prices: (prices / prices.expanding(min_periods=1).max()).min()
@@ -205,7 +205,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             )
             .min()
         )
-        return self._coerce_result(result=mddc, name="Max drawdown in cal yr")
+        return self._coerce_result(result=result, name="Max drawdown in cal yr")
 
     @property
     def geo_ret(self: Self) -> Combo_co:
