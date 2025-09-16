@@ -107,19 +107,15 @@ line-length = 87
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["COM812", "D203", "D213"]
+ignore = ["COM812"]
 fixable = ["ALL"]
-mccabe = { max-complexity = 18 }
+mccabe = { max-complexity = 17 }
 pydocstyle = { convention = "google" }
-pylint = { max-args = 20, max-branches = 24, max-statements = 130 }
+pylint = { max-args = 20, max-branches = 23, max-statements = 130 }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-filterwarnings = [
-    "error",
-    "ignore::DeprecationWarning:holidays.*"
-]
 addopts = [
   "-n", "auto",
   "--dist=loadscope",

@@ -547,7 +547,7 @@ class TestOpenTimeSeries(CommonTestCase):
             _ = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
 
         if contextmgr.output != [
-            "WARNING:openseries.series:Label missing. Adding: Series"
+            "WARNING:openseries.series:Label missing. Adding: Series",
         ]:
             msgl = "OpenTimeSeries failed to log warning about label missing."
             raise OpenTimeSeriesTestError(msgl)
@@ -1319,7 +1319,9 @@ class TestOpenTimeSeries(CommonTestCase):
     def test_max_drawdown_date(self: TestOpenTimeSeries) -> None:
         """Test max_drawdown_date property."""
         if cast("dt.date", self.randomseries.max_drawdown_date) != dt.date(
-            2012, 11, 21
+            2012,
+            11,
+            21,
         ):
             msg = (
                 "Unexpected max_drawdown_date: "

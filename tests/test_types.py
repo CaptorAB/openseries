@@ -40,7 +40,7 @@ class TestTypes:
             match=r"Duplicate string\(s\): \['skew'\]\.",
         ):
             OpenTimeSeriesPropertiesList(
-                *["z_score", "skew", "skew", "positive_share"]  # type: ignore[arg-type]
+                *["z_score", "skew", "skew", "positive_share"],  # type: ignore[arg-type]
             )
 
         with pytest.raises(

@@ -154,7 +154,9 @@ def holiday_calendar(
 
     if markets:
         market_hols = market_holidays(
-            startyear=startyear, endyear=endyear, markets=markets
+            startyear=startyear,
+            endyear=endyear,
+            markets=markets,
         )
         dt_mkt_hols = [date_fix(fixerdate=ddate) for ddate in market_hols]
         hols.extend(dt_mkt_hols)

@@ -75,7 +75,7 @@ def calendar_period_returns(
             cldr.index = Index([d.year for d in cldr.index])
         elif freq.upper() == "BQE":
             cldr.index = Index(
-                [Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index]
+                [Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index],
             )
         else:
             cldr.index = Index([d.strftime("%b %y") for d in cldr.index])
@@ -266,7 +266,7 @@ def report_html(
 
     # noinspection PyTypeChecker
     rpt_df = copied.all_properties(
-        properties=cast("list[LiteralFrameProps]", properties)
+        properties=cast("list[LiteralFrameProps]", properties),
     )
     alpha_frame = copied.from_deepcopy()
     alpha_frame.to_cumret()
@@ -282,7 +282,9 @@ def report_html(
         ]
     alphas.append("")
     ar = DataFrame(
-        data=alphas, index=copied.tsdf.columns, columns=["Jensen's Alpha"]
+        data=alphas,
+        index=copied.tsdf.columns,
+        columns=["Jensen's Alpha"],
     ).T
     rpt_df = concat([rpt_df, ar])
     ir = copied.info_ratio_func()
@@ -361,7 +363,7 @@ def report_html(
     ytd = copied.value_ret_calendar_period(year=this_year).map("{:.2%}".format)
     ytd.name = "Year-to-Date"
     mtd = copied.value_ret_calendar_period(year=this_year, month=this_month).map(
-        "{:.2%}".format
+        "{:.2%}".format,
     )
     mtd.name = "Month-to-Date"
     ytd_df = ytd.to_frame().T
@@ -425,7 +427,8 @@ def report_html(
 
     figure.update_layout(fig.get("layout"))
     colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
-        "colorway", []
+        "colorway",
+        [],
     )
 
     if vertical_legend:

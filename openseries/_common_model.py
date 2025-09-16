@@ -275,7 +275,8 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         min_accepted_return: float = 0.0
         order: Literal[2, 3] = 2
         return self.lower_partial_moment_func(
-            min_accepted_return=min_accepted_return, order=order
+            min_accepted_return=min_accepted_return,
+            order=order,
         )
 
     @property
@@ -916,7 +917,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             figure.add_layout_image(logo)
         if title:
             figure.update_layout(
-                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}}
+                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
             )
 
     @staticmethod
@@ -1033,7 +1034,10 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         figure.update_layout(barmode=mode, yaxis={"tickformat": tick_fmt})
 
         self._apply_title_logo(
-            figure=figure, title=title, add_logo=add_logo, logo=logo
+            figure=figure,
+            title=title,
+            add_logo=add_logo,
+            logo=logo,
         )
 
         string_output = self._emit_output(
@@ -1142,7 +1146,10 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
                 )
 
         self._apply_title_logo(
-            figure=figure, title=title, add_logo=add_logo, logo=logo
+            figure=figure,
+            title=title,
+            add_logo=add_logo,
+            logo=logo,
         )
 
         string_output = self._emit_output(
@@ -1285,7 +1292,10 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         figure.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
 
         self._apply_title_logo(
-            figure=figure, title=title, add_logo=add_logo, logo=logo
+            figure=figure,
+            title=title,
+            add_logo=add_logo,
+            logo=logo,
         )
 
         string_output = self._emit_output(
@@ -1676,7 +1686,8 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         ]
 
         return self._coerce_result(
-            result=cast("Series[float]", result), name=f"CVaR {level:.1%}"
+            result=cast("Series[float]", result),
+            name=f"CVaR {level:.1%}",
         )
 
     def lower_partial_moment_func(
@@ -1810,7 +1821,8 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         result = (self.tsdf.loc[later] / self.tsdf.loc[earlier]) ** (1 / fraction) - 1
 
         return self._coerce_result(
-            result=cast("Series[float]", result), name="Geometric return"
+            result=cast("Series[float]", result),
+            name="Geometric return",
         )
 
     def skew_func(
@@ -1899,7 +1911,8 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         )
 
         return self._coerce_result(
-            result=cast("Series[float]", result), name="Kurtosis"
+            result=cast("Series[float]", result),
+            name="Kurtosis",
         )
 
     def max_drawdown_func(
@@ -2206,7 +2219,8 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             raise InitialValueZeroError(msg)
 
         result = cast(
-            "Series[float]", self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1
+            "Series[float]",
+            self.tsdf.loc[later] / self.tsdf.loc[earlier] - 1,
         )
 
         return self._coerce_result(result=result, name="Simple return")
@@ -2516,7 +2530,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         s = log(self.tsdf.iloc[:, column]).diff()
         volseries = s.rolling(window=observations, min_periods=observations).std(
-            ddof=dlta_degr_freedms
+            ddof=dlta_degr_freedms,
         ) * sqrt(time_factor)
 
         voldf = volseries.dropna().to_frame()

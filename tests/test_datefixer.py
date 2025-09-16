@@ -264,7 +264,10 @@ class TestDateFixer:
         """Test holiday_calendar function."""
         date = dt.date(2025, 5, 18)
         series = OpenTimeSeries.from_fixed_rate(
-            rate=0.02, days=1000, end_dt=date, baseccy="USD"
+            rate=0.02,
+            days=1000,
+            end_dt=date,
+            baseccy="USD",
         )
 
         msg = "holiday_calendar not working as intended"
@@ -361,7 +364,9 @@ class TestDateFixer:
         markets = ["NYSE", "LSE"]
         countries = {"US", "GB"}
         exchange_holidays = market_holidays(
-            startyear=start, endyear=end, markets=markets
+            startyear=start,
+            endyear=end,
+            markets=markets,
         )
 
         calendar = holiday_calendar(
@@ -457,7 +462,9 @@ class TestDateFixer:
         end = dt.date(2011, 6, 30)
 
         d_range = generate_calendar_date_range(
-            trading_days=trd_days, start=start, markets=["XSTO"]
+            trading_days=trd_days,
+            start=start,
+            markets=["XSTO"],
         )
 
         if len(d_range) != trd_days:

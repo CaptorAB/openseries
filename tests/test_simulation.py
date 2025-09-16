@@ -247,7 +247,9 @@ class TestSimulation(CommonTestCase):
         onedf = seriesim.to_dataframe(name="Asset", start=start)
         fivedf = framesim.to_dataframe(name="Asset", start=start)
         fivedf_mkt = framesim_mkt.to_dataframe(
-            name="Asset", start=start, markets=["XSTO"]
+            name="Asset",
+            start=start,
+            markets=["XSTO"],
         )
 
         returnseries = OpenTimeSeries.from_df(onedf)

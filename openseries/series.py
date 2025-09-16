@@ -147,7 +147,8 @@ class OpenTimeSeries(_CommonModel[float]):
     @FieldValidator("markets", mode="before")
     @classmethod
     def _validate_markets(
-        cls, value: list[str] | str | None
+        cls,
+        value: list[str] | str | None,
     ) -> list[str] | str | None:
         """Pydantic validator to ensure markets field is validated."""
         msg = (
@@ -477,7 +478,7 @@ class OpenTimeSeries(_CommonModel[float]):
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
         returns.columns = MultiIndex.from_arrays(
-            arrays=arrays  # type: ignore[arg-type]
+            arrays=arrays,  # type: ignore[arg-type]
         )
         self.tsdf = returns.copy()
         return self
@@ -558,7 +559,9 @@ class OpenTimeSeries(_CommonModel[float]):
         arr = cast(
             "NDArray[float64]",
             cumprod(
-                a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
+                a=insert(
+                    arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0
+                ),
             ),
         )
 
@@ -677,7 +680,9 @@ class OpenTimeSeries(_CommonModel[float]):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -695,7 +700,7 @@ class OpenTimeSeries(_CommonModel[float]):
         ].copy()
 
         data[self.label, ValueType.RTRN] = log(
-            data.loc[:, self.tsdf.columns.to_numpy()[0]]
+            data.loc[:, self.tsdf.columns.to_numpy()[0]],
         ).diff()
 
         rawdata = [

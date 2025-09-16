@@ -445,7 +445,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         if value_type == ValueType.PRICE:
-            # noinspection PyCallingNonCallable
             self.tsdf = self.tsdf.resample(freq).last()
         else:
             self.tsdf = self.tsdf.resample(freq).sum()
@@ -566,7 +565,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
         if periods_in_a_year_fixed is None:
             fraction = (later - earlier).days / 365.25
@@ -850,7 +851,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
         fraction: float = (later - earlier).days / 365.25
 
@@ -869,7 +872,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 cast("Timestamp", earlier) : cast("Timestamp", later)
             ].iloc[:, base_column]
             short_item = cast(
-                "tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name
+                "tuple[str, ValueType]",
+                self.tsdf.iloc[:, base_column].name,
             )
             short_label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[
                 0
@@ -938,7 +942,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
         fraction: float = (later - earlier).days / 365.25
 
@@ -1039,7 +1045,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """
         loss_limit: float = 0.0
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
         fraction: float = (later - earlier).days / 365.25
 
@@ -1408,7 +1416,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(
-            asset_rtn_mean - riskfree_rate - beta * (market_rtn_mean - riskfree_rate)
+            asset_rtn_mean - riskfree_rate - beta * (market_rtn_mean - riskfree_rate),
         )
 
     def make_portfolio(

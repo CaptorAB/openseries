@@ -776,7 +776,7 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
 
         if cast("Series", riskframe.cvar_down).iloc[0] != _cvar_down_calc(
-            data=riskframe.tsdf.iloc[:, 0]
+            data=riskframe.tsdf.iloc[:, 0],
         ):
             msg = "CVaR for OpenFrame not equal"
             raise OpenFrameTestError(msg)
@@ -803,13 +803,15 @@ class TestOpenFrame(CommonTestCase):
         sameseries.value_to_ret()
         sameframe = self.randomframe.from_deepcopy()
         assert_frame_equal(
-            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+            left=sameseries.tsdf,
+            right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
         sameseries.to_cumret()
         sameframe.to_cumret()
         assert_frame_equal(
-            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+            left=sameseries.tsdf,
+            right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
         smethods = [
@@ -836,31 +838,36 @@ class TestOpenFrame(CommonTestCase):
         cumseries.value_to_log()
         cumframe.value_to_log()
         assert_frame_equal(
-            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+            left=sameseries.tsdf,
+            right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
         sameseries.value_to_ret()
         sameframe.value_to_ret()
         assert_frame_equal(
-            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+            left=sameseries.tsdf,
+            right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
         sameseries.to_cumret()
         sameframe.to_cumret()
         assert_frame_equal(
-            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+            left=sameseries.tsdf,
+            right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
         sameseries.resample()
         sameframe.resample()
         assert_frame_equal(
-            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+            left=sameseries.tsdf,
+            right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
         sameseries.value_to_diff()
         sameframe.value_to_diff()
         assert_frame_equal(
-            left=sameseries.tsdf, right=Series(sameframe.tsdf.iloc[:, 0]).to_frame()
+            left=sameseries.tsdf,
+            right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
     def test_calc_methods_same_as_opentimeseries(
@@ -927,7 +934,10 @@ class TestOpenFrame(CommonTestCase):
             samef.z_score_func,
         ]
         for method, smethod, fmethod in zip(
-            methods_to_compare, smethods_to_compare, fmethods_to_compare, strict=False
+            methods_to_compare,
+            smethods_to_compare,
+            fmethods_to_compare,
+            strict=False,
         ):
             if (
                 f"{smethod(months_from_last=12):.9f}"  # type: ignore[operator]
@@ -1729,7 +1739,9 @@ class TestOpenFrame(CommonTestCase):
             "yaxis",
         ]
         fig, _ = plotframe.plot_histogram(
-            plot_type="lines", auto_open=False, output_type="div"
+            plot_type="lines",
+            auto_open=False,
+            output_type="div",
         )
         fig_json = loads(cast("str", fig.to_json()))
         made_fig_keys = list(fig_json["data"][0].keys())
@@ -1901,7 +1913,7 @@ class TestOpenFrame(CommonTestCase):
         with self.assertLogs() as contextmgr:
             OpenFrame(constituents=[])
         if contextmgr.output != [
-            "WARNING:openseries.frame:OpenFrame() was passed an empty list."
+            "WARNING:openseries.frame:OpenFrame() was passed an empty list.",
         ]:
             msg = (
                 "OpenFrame failed to log warning about "
@@ -1966,9 +1978,10 @@ class TestOpenFrame(CommonTestCase):
         series_short = OpenTimeSeries.from_df(
             dframe=tmp_series.tsdf.loc[
                 cast("Timestamp", dt.date(2017, 6, 27)) : cast(
-                    "Timestamp", dt.date(2018, 6, 27)
+                    "Timestamp",
+                    dt.date(2018, 6, 27),
                 )
-            ][("Asset_0", ValueType.PRICE)]
+            ][("Asset_0", ValueType.PRICE)],
         )
         series_short.set_new_label("Short")
         frame = OpenFrame(constituents=[series_long, series_short])
@@ -3597,7 +3610,8 @@ class TestOpenFrame(CommonTestCase):
         jframe.resample("7D")
         results = [
             f"{jframe.jensen_alpha(asset=comb[0], market=comb[1]):.9f}".replace(
-                "-0.000000000", "0.000000000"
+                "-0.000000000",
+                "0.000000000",
             )
             for comb in iter_product(
                 range(jframe.item_count),
@@ -3861,7 +3875,7 @@ class TestOpenFrame(CommonTestCase):
         """Test multi_factor_linear_regression method."""
         frame = self.randomframe.from_deepcopy()
         portfolio = OpenTimeSeries.from_df(
-            dframe=frame.make_portfolio(name="Portfolio", weight_strat="eq_weights")
+            dframe=frame.make_portfolio(name="Portfolio", weight_strat="eq_weights"),
         ).value_to_ret()
         frame.add_timeseries(portfolio)
 
@@ -3876,7 +3890,7 @@ class TestOpenFrame(CommonTestCase):
         }
 
         output, _ = frame.multi_factor_linear_regression(
-            dependent_column=(cast("str", portfolio.label), ValueType.RTRN)
+            dependent_column=(cast("str", portfolio.label), ValueType.RTRN),
         )
         result = output.to_dict()[portfolio.label]
         rounded = {}
@@ -3894,16 +3908,16 @@ class TestOpenFrame(CommonTestCase):
         with pytest.raises(
             expected_exception=KeyError,
             match=escape(
-                f"Tuple ({nonexistantlabel}, Return(Total)) not found in data."
+                f"Tuple ({nonexistantlabel}, Return(Total)) not found in data.",
             ),
         ):
             _, _ = frame.multi_factor_linear_regression(
-                dependent_column=(nonexistantlabel, ValueType.RTRN)
+                dependent_column=(nonexistantlabel, ValueType.RTRN),
             )
 
         gframe = self.randomframe.from_deepcopy()
         gportfolio = OpenTimeSeries.from_df(
-            dframe=gframe.make_portfolio(name="Portfolio", weight_strat="eq_weights")
+            dframe=gframe.make_portfolio(name="Portfolio", weight_strat="eq_weights"),
         )
         gframe.add_timeseries(gportfolio)
         with pytest.raises(
@@ -3911,7 +3925,7 @@ class TestOpenFrame(CommonTestCase):
             match=r"All series should be of ValueType.RTRN.",
         ):
             _, _ = gframe.multi_factor_linear_regression(
-                dependent_column=(cast("str", gportfolio.label), ValueType.PRICE)
+                dependent_column=(cast("str", gportfolio.label), ValueType.PRICE),
             )
 
     def test_worst_month(self: TestOpenFrame) -> None:
