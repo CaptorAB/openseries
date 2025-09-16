@@ -54,7 +54,7 @@ class CommonTestCase(TestCase):
         cls.seriesim = seriesim
         cls.randomseries = randomseries.from_deepcopy()
         cls.randomframe = OpenFrame(
-            [
+            constituents=[
                 OpenTimeSeries.from_df(
                     dframe=seriesim.to_dataframe(name="Asset", end=end_date),
                     column_nmbr=serie,

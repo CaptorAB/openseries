@@ -79,7 +79,10 @@ class TestReport(CommonTestCase):
         plotframe.to_cumret()
 
         figure, _ = report_html(
-            data=plotframe, auto_open=False, output_type="div", vertical_legend=True
+            data=plotframe,
+            auto_open=False,
+            output_type="div",
+            vertical_legend=True,
         )
         fig_json = loads(cast("str", figure.to_json()))
         bar_x_axis_item = "'dtype': 'i2'"
@@ -94,7 +97,10 @@ class TestReport(CommonTestCase):
             raise ReportTestError(msg)
 
         figure, _ = report_html(
-            data=plotframe, auto_open=False, output_type="div", vertical_legend=False
+            data=plotframe,
+            auto_open=False,
+            output_type="div",
+            vertical_legend=False,
         )
         fig_json = loads(cast("str", figure.to_json()))
 
@@ -104,7 +110,10 @@ class TestReport(CommonTestCase):
             raise ReportTestError(msg)
 
         figure, _ = report_html(
-            data=plotframe, auto_open=False, output_type="div", title="test_title"
+            data=plotframe,
+            auto_open=False,
+            output_type="div",
+            title="test_title",
         )
         fig_json = loads(cast("str", figure.to_json()))
 
@@ -241,7 +250,7 @@ class TestReport(CommonTestCase):
                     if "cells" in item
                 ),
                 None,  # type: ignore[arg-type]
-            )
+            ),
         )
 
         if "Return (simple)" in labels:
@@ -265,7 +274,7 @@ class TestReport(CommonTestCase):
                     if "cells" in item
                 ),
                 None,  # type: ignore[arg-type]
-            )
+            ),
         )
 
         if "Return (simple)" not in labels:
@@ -324,10 +333,11 @@ class TestReport(CommonTestCase):
                     values=[1.0, 1.0, 1.0],
                 )
                 for nbr in range(5)
-            ]
+            ],
         )
 
         with pytest.raises(
-            expected_exception=ZeroDivisionError, match=r"float division by zero"
+            expected_exception=ZeroDivisionError,
+            match=r"float division by zero",
         ):
-            figure, _ = report_html(data=frame, auto_open=False, output_type="div")
+            _, _ = report_html(data=frame, auto_open=False, output_type="div")

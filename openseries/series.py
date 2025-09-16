@@ -17,10 +17,14 @@ if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
     from collections.abc import Callable
 
+    from numpy.typing import NDArray
+    from pandas import Timestamp
+
 from numpy import (
     append,
     array,
     cumprod,
+    float64,
     insert,
     isnan,
     log,
@@ -70,7 +74,7 @@ TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
 # noinspection PyUnresolvedReferences,PyNestedDecorators
-class OpenTimeSeries(_CommonModel):
+class OpenTimeSeries(_CommonModel[float]):
     """OpenTimeSeries objects are at the core of the openseries package.
 
     The intended use is to allow analyses of financial timeseries.
@@ -143,7 +147,8 @@ class OpenTimeSeries(_CommonModel):
     @FieldValidator("markets", mode="before")
     @classmethod
     def _validate_markets(
-        cls, value: list[str] | str | None
+        cls,
+        value: list[str] | str | None,
     ) -> list[str] | str | None:
         """Pydantic validator to ensure markets field is validated."""
         msg = (
@@ -167,9 +172,6 @@ class OpenTimeSeries(_CommonModel):
         dates_set_length = len(set(self.dates))
         if dates_list_length != dates_set_length:
             msg = "Dates are not unique"
-            raise ValueError(msg)
-        if values_list_length < 1:
-            msg = "There must be at least 1 value"
             raise ValueError(msg)
         if (
             (dates_list_length != values_list_length)
@@ -470,12 +472,13 @@ class OpenTimeSeries(_CommonModel):
             The returns of the values in the series
 
         """
+        # noinspection PyCallingNonCallable
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
         arrays = [[self.label], [self.valuetype]]
         returns.columns = MultiIndex.from_arrays(
-            arrays=arrays  # type: ignore[arg-type]
+            arrays=arrays,  # type: ignore[arg-type]
         )
         self.tsdf = returns.copy()
         return self
@@ -550,11 +553,16 @@ class OpenTimeSeries(_CommonModel):
             An OpenTimeSeries object
 
         """
-        arr = array(self.values) / divider
+        arr: NDArray[float64] = array(self.values) / divider
 
         deltas = array([i.days for i in self.tsdf.index[1:] - self.tsdf.index[:-1]])
-        arr = cumprod(
-            a=insert(arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0)
+        arr = cast(
+            "NDArray[float64]",
+            cumprod(
+                a=insert(
+                    arr=1.0 + deltas * arr[:-1] / days_in_year, obj=0, values=1.0
+                ),
+            ),
         )
 
         self.dates = [d.strftime("%Y-%m-%d") for d in self.tsdf.index]
@@ -672,32 +680,37 @@ class OpenTimeSeries(_CommonModel):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            how_many = self.tsdf.loc[
-                cast("int", earlier) : cast("int", later),
-                self.tsdf.columns.to_numpy()[0],
-            ].count()
+            how_many = (
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+                .count()
+                .iloc[0]
+            )
             fraction = (later - earlier).days / 365.25
-            time_factor = cast("int", how_many) / fraction
+            time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].copy()
 
         data[self.label, ValueType.RTRN] = log(
-            data.loc[:, self.tsdf.columns.to_numpy()[0]]
+            data.loc[:, self.tsdf.columns.to_numpy()[0]],
         ).diff()
 
         rawdata = [
-            data.loc[:, cast("int", (self.label, ValueType.RTRN))]
+            data[(self.label, ValueType.RTRN)]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
 
-        for item in data.loc[:, cast("int", (self.label, ValueType.RTRN))].iloc[1:]:
+        for item in data[(self.label, ValueType.RTRN)].iloc[1:]:
             prev = rawdata[-1]
             rawdata.append(
                 sqrt(
@@ -865,6 +878,7 @@ def timeseries_chain(
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
+    # noinspection PyTypeChecker
     return back.__class__(
         timeseries_id=new.timeseries_id,
         instrument_id=new.instrument_id,

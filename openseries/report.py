@@ -75,7 +75,7 @@ def calendar_period_returns(
             cldr.index = Index([d.year for d in cldr.index])
         elif freq.upper() == "BQE":
             cldr.index = Index(
-                [Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index]
+                [Timestamp(d).to_period("Q").strftime("Q%q %Y") for d in cldr.index],
             )
         else:
             cldr.index = Index([d.strftime("%b %y") for d in cldr.index])
@@ -266,7 +266,7 @@ def report_html(
 
     # noinspection PyTypeChecker
     rpt_df = copied.all_properties(
-        properties=cast("list[LiteralFrameProps]", properties)
+        properties=cast("list[LiteralFrameProps]", properties),
     )
     alpha_frame = copied.from_deepcopy()
     alpha_frame.to_cumret()
@@ -282,7 +282,9 @@ def report_html(
         ]
     alphas.append("")
     ar = DataFrame(
-        data=alphas, index=copied.tsdf.columns, columns=["Jensen's Alpha"]
+        data=alphas,
+        index=copied.tsdf.columns,
+        columns=["Jensen's Alpha"],
     ).T
     rpt_df = concat([rpt_df, ar])
     ir = copied.info_ratio_func()
@@ -294,7 +296,7 @@ def report_html(
     te_frame.resample("7D")
     with catch_warnings():
         simplefilter("ignore")
-        te = te_frame.tracking_error_func()
+        te: Series[float] | Series[str] = te_frame.tracking_error_func()
     if te.hasnans:
         te = Series(
             data=[""] * te_frame.item_count,
@@ -318,7 +320,7 @@ def report_html(
         with catch_warnings():
             simplefilter("ignore")
             try:
-                cru = crm.capture_ratio_func(ratio="both")
+                cru: Series[float] | Series[str] = crm.capture_ratio_func(ratio="both")
             except ZeroDivisionError as exc:  # pragma: no cover
                 msg = f"Capture ratio calculation error: {exc!s}"  # pragma: no cover
                 logger.warning(msg=msg)  # pragma: no cover
@@ -358,14 +360,9 @@ def report_html(
 
     this_year = copied.last_idx.year
     this_month = copied.last_idx.month
-    ytd = cast("Series[float]", copied.value_ret_calendar_period(year=this_year)).map(
-        "{:.2%}".format
-    )
+    ytd = copied.value_ret_calendar_period(year=this_year).map("{:.2%}".format)
     ytd.name = "Year-to-Date"
-    mtd = cast(
-        "Series[float]",
-        copied.value_ret_calendar_period(year=this_year, month=this_month),
-    ).map(
+    mtd = copied.value_ret_calendar_period(year=this_year, month=this_month).map(
         "{:.2%}".format,
     )
     mtd.name = "Month-to-Date"
@@ -430,7 +427,8 @@ def report_html(
 
     figure.update_layout(fig.get("layout"))
     colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
-        "colorway", []
+        "colorway",
+        [],
     )
 
     if vertical_legend:
@@ -457,7 +455,7 @@ def report_html(
     figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
     figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
 
-    if isinstance(title, str):
+    if title:
         figure.update_layout(
             {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
         )

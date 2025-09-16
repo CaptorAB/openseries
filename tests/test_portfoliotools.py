@@ -145,7 +145,8 @@ class TestPortfoliotools(CommonTestCase):
                 raise PortfoliotoolsTestError(msg)
 
             frt_most_sharpe = round(
-                Decimal(cast("float", frontier.loc[:, "sharpe"].max())), 6
+                Decimal(cast("float", frontier.loc[:, "sharpe"].max())),
+                6,
             )
             frt_return_where_most_sharpe = round(
                 Decimal(float(frontier.loc[frontier["sharpe"].idxmax()]["ret"])),
@@ -163,7 +164,8 @@ class TestPortfoliotools(CommonTestCase):
                 raise PortfoliotoolsTestError(msg)
 
             sim_least_vol = round(
-                Decimal(cast("float", result.loc[:, "stdev"].min())), 6
+                Decimal(cast("float", result.loc[:, "stdev"].min())),
+                6,
             )
             sim_return_where_least_vol = round(
                 Decimal(float(result.loc[result["stdev"].idxmin()]["ret"])),
@@ -576,7 +578,7 @@ class TestPortfoliotools(CommonTestCase):
 
         with pytest.raises(
             expected_exception=AtLeastOneFrameError,
-            match="One of sim_frame, line_frame or point_frame must be provided.",
+            match=r"One of sim_frame, line_frame or point_frame must be provided.",
         ):
             _, _ = sharpeplot(
                 auto_open=False,

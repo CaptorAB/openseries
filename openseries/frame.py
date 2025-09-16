@@ -14,14 +14,11 @@ from functools import reduce
 from logging import getLogger
 from typing import TYPE_CHECKING, Any, cast
 
-if TYPE_CHECKING:  # pragma: no cover
-    import datetime as dt
-
-    from numpy import dtype, int64, ndarray
-
 from numpy import (
     array,
+    concatenate,
     cov,
+    diff,
     divide,
     isinf,
     log,
@@ -38,6 +35,17 @@ from pandas import (
     concat,
     merge,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime as dt
+
+    from pandas import Series as _Series
+    from pandas import Timestamp
+
+    SeriesFloat = _Series[float]
+else:
+    SeriesFloat = Series
+
 from pydantic import field_validator
 from sklearn.linear_model import LinearRegression  # type: ignore[import-untyped]
 
@@ -70,7 +78,7 @@ __all__ = ["OpenFrame"]
 
 
 # noinspection PyUnresolvedReferences,PyTypeChecker
-class OpenFrame(_CommonModel):
+class OpenFrame(_CommonModel[SeriesFloat]):
     """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
     The intended use is to allow comparisons across these timeseries.
@@ -94,9 +102,9 @@ class OpenFrame(_CommonModel):
     weights: list[float] | None = None
 
     # noinspection PyMethodParameters
-    @field_validator("constituents")  # type: ignore[misc]
+    @field_validator("constituents")
     def _check_labels_unique(
-        cls: OpenFrame,  # noqa: N805
+        cls: type[OpenFrame],  # noqa: N805
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique."""
@@ -130,7 +138,7 @@ class OpenFrame(_CommonModel):
         """
         copied_constituents = [ts.from_deepcopy() for ts in constituents]
 
-        super().__init__(
+        super().__init__(  # type: ignore[call-arg]
             constituents=copied_constituents,
             weights=weights,
         )
@@ -241,7 +249,7 @@ class OpenFrame(_CommonModel):
 
         """
         return Series(
-            data=[self.tsdf.loc[:, d].count() for d in self.tsdf],
+            data=[self.tsdf[col].count() for col in self.tsdf.columns],
             index=self.tsdf.columns,
             name="observations",
         ).astype(int)
@@ -557,12 +565,14 @@ class OpenFrame(_CommonModel):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
         if periods_in_a_year_fixed is None:
             fraction = (later - earlier).days / 365.25
             how_many = (
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)]
+                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
                 .count()
                 .iloc[0]
             )
@@ -580,33 +590,36 @@ class OpenFrame(_CommonModel):
             cast("tuple[str, str]", self.tsdf.iloc[:, second_column].name)[0],
         ]
 
-        data = self.tsdf.loc[cast("int", earlier) : cast("int", later)].copy()
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].copy()
 
         for rtn in cols:
-            data[rtn, ValueType.RTRN] = log(data.loc[:, (rtn, ValueType.PRICE)]).diff()
+            arr = concatenate([array([nan]), diff(log(data[(rtn, ValueType.PRICE)]))])
+            data[rtn, ValueType.RTRN] = arr
 
         raw_one = [
-            data.loc[:, (cols[0], ValueType.RTRN)]
+            data[(cols[0], ValueType.RTRN)]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_two = [
-            data.loc[:, (cols[1], ValueType.RTRN)]
+            data[(cols[1], ValueType.RTRN)]
             .iloc[1:day_chunk]
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
         raw_cov = [
             cov(
-                m=data.loc[:, (cols[0], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
-                y=data.loc[:, (cols[1], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
+                m=data[(cols[0], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
+                y=data[(cols[1], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
                 ddof=dlta_degr_freedms,
             )[0][1],
         ]
 
-        r1 = data.loc[:, (cols[0], ValueType.RTRN)]
-        r2 = data.loc[:, (cols[1], ValueType.RTRN)]
+        r1 = data[(cols[0], ValueType.RTRN)]
+        r2 = data[(cols[1], ValueType.RTRN)]
 
         alpha = 1.0 - lmbda
 
@@ -838,30 +851,29 @@ class OpenFrame(_CommonModel):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
-        fraction = (later - earlier).days / 365.25
+        fraction: float = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
         if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[cast("int", earlier) : cast("int", later)].loc[
-                :,
-                base_column,
-            ]
+            shortdf = self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ][base_column]
             short_item = base_column
             short_label = cast(
                 "tuple[str, ValueType]",
-                self.tsdf.loc[:, base_column].name,
+                self.tsdf[base_column].name,
             )[0]
         elif isinstance(base_column, int):
-            shortdf = cast(
-                "DataFrame",
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)].iloc[
-                    :, base_column
-                ],
-            )
+            shortdf = self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ].iloc[:, base_column]
             short_item = cast(
-                "tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name
+                "tuple[str, ValueType]",
+                self.tsdf.iloc[:, base_column].name,
             )
             short_label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[
                 0
@@ -872,17 +884,16 @@ class OpenFrame(_CommonModel):
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = float(cast("int64", shortdf.count()) / fraction)
+            time_factor = shortdf.count() / fraction
 
         terrors = []
         for item in self.tsdf:
             if item == short_item:
                 terrors.append(0.0)
             else:
-                longdf = self.tsdf.loc[cast("int", earlier) : cast("int", later)].loc[
-                    :,
-                    item,
-                ]
+                longdf = self.tsdf.loc[
+                    cast("Timestamp", earlier) : cast("Timestamp", later)
+                ][item]
                 relative = longdf.ffill().pct_change() - shortdf.ffill().pct_change()
                 vol = float(relative.std() * sqrt(time_factor))
                 terrors.append(vol)
@@ -931,29 +942,26 @@ class OpenFrame(_CommonModel):
 
         """
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
-        fraction = (later - earlier).days / 365.25
+        fraction: float = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
         if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[cast("int", earlier) : cast("int", later)].loc[
-                :,
-                base_column,
-            ]
+            shortdf = self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ][base_column]
             short_item = base_column
             short_label = cast(
                 "tuple[str, str]",
-                self.tsdf.loc[:, base_column].name,
+                self.tsdf[base_column].name,
             )[0]
         elif isinstance(base_column, int):
-            shortdf = cast(
-                "DataFrame",
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)].iloc[
-                    :,
-                    base_column,
-                ],
-            )
+            shortdf = self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ].iloc[:, base_column]
             short_item = cast(
                 "tuple[str, ValueType]",
                 self.tsdf.iloc[
@@ -970,17 +978,16 @@ class OpenFrame(_CommonModel):
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = float(shortdf.count() / fraction)  # type: ignore[arg-type]
+            time_factor = shortdf.count() / fraction
 
         ratios = []
         for item in self.tsdf:
             if item == short_item:
                 ratios.append(0.0)
             else:
-                longdf = self.tsdf.loc[cast("int", earlier) : cast("int", later)].loc[
-                    :,
-                    item,
-                ]
+                longdf = self.tsdf.loc[
+                    cast("Timestamp", earlier) : cast("Timestamp", later)
+                ][item]
                 relative = longdf.ffill().pct_change() - shortdf.ffill().pct_change()
                 ret = float(relative.mean() * time_factor)
                 vol = float(relative.std() * sqrt(time_factor))
@@ -1038,29 +1045,26 @@ class OpenFrame(_CommonModel):
         """
         loss_limit: float = 0.0
         earlier, later = self.calc_range(
-            months_offset=months_from_last, from_dt=from_date, to_dt=to_date
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
         )
-        fraction = (later - earlier).days / 365.25
+        fraction: float = (later - earlier).days / 365.25
 
         msg = "base_column should be a tuple[str, ValueType] or an integer."
         if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[cast("int", earlier) : cast("int", later)].loc[
-                :,
-                base_column,
-            ]
+            shortdf = self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ][base_column]
             short_item = base_column
             short_label = cast(
                 "tuple[str, str]",
-                self.tsdf.loc[:, base_column].name,
+                self.tsdf[base_column].name,
             )[0]
         elif isinstance(base_column, int):
-            shortdf = cast(
-                "DataFrame",
-                self.tsdf.loc[cast("int", earlier) : cast("int", later)].iloc[
-                    :,
-                    base_column,
-                ],
-            )
+            shortdf = self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ].iloc[:, base_column]
             short_item = cast(
                 "tuple[str, ValueType]",
                 self.tsdf.iloc[
@@ -1077,17 +1081,16 @@ class OpenFrame(_CommonModel):
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
         else:
-            time_factor = float(shortdf.count() / fraction)  # type: ignore[arg-type]
+            time_factor = shortdf.count() / fraction
 
         ratios = []
         for item in self.tsdf:
             if item == short_item:
                 ratios.append(0.0)
             else:
-                longdf = self.tsdf.loc[cast("int", earlier) : cast("int", later)].loc[
-                    :,
-                    item,
-                ]
+                longdf = self.tsdf.loc[
+                    cast("Timestamp", earlier) : cast("Timestamp", later)
+                ][item]
                 msg = "ratio must be one of 'up', 'down' or 'both'."
                 if ratio == "up":
                     uparray = (
@@ -1230,38 +1233,33 @@ class OpenFrame(_CommonModel):
         if all(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
-                y_value = self.tsdf.loc[:, asset]
+                y_value = self.tsdf[asset]
             elif isinstance(asset, int):
-                y_value = cast("DataFrame", self.tsdf.iloc[:, asset])
+                y_value = self.tsdf.iloc[:, asset]
             else:
                 raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
-                x_value = self.tsdf.loc[:, market]
+                x_value = self.tsdf[market]
             elif isinstance(market, int):
-                x_value = cast("DataFrame", self.tsdf.iloc[:, market])
+                x_value = self.tsdf.iloc[:, market]
             else:
                 raise TypeError(msg)
         elif not any(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
-                y_value = self.tsdf.loc[:, asset].ffill().pct_change().iloc[1:]
+                y_value = self.tsdf[asset].ffill().pct_change().iloc[1:]
             elif isinstance(asset, int):
-                y_value = cast(
-                    "DataFrame", self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
-                )
+                y_value = self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
             else:
                 raise TypeError(msg)
             msg = "market should be a tuple[str, ValueType] or an integer."
 
             if isinstance(market, tuple):
-                x_value = self.tsdf.loc[:, market].ffill().pct_change().iloc[1:]
+                x_value = self.tsdf[market].ffill().pct_change().iloc[1:]
             elif isinstance(market, int):
-                x_value = cast(
-                    "DataFrame",
-                    self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:],
-                )
+                x_value = self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:]
             else:
                 raise TypeError(msg)
         else:
@@ -1302,26 +1300,23 @@ class OpenFrame(_CommonModel):
         """
         msg = "y_column should be a tuple[str, ValueType] or an integer."
         if isinstance(y_column, tuple):
-            y_value = self.tsdf.loc[:, y_column].to_numpy()
+            y_value = self.tsdf[y_column].to_numpy()
             y_label = cast(
                 "tuple[str, str]",
-                self.tsdf.loc[:, y_column].name,
+                self.tsdf[y_column].name,
             )[0]
         elif isinstance(y_column, int):
-            y_value = cast(
-                "ndarray[tuple[int, int], dtype[Any]]",
-                self.tsdf.iloc[:, y_column].to_numpy(),
-            )
+            y_value = self.tsdf.iloc[:, y_column].to_numpy()
             y_label = cast("tuple[str, str]", self.tsdf.iloc[:, y_column].name)[0]
         else:
             raise TypeError(msg)
 
         msg = "x_column should be a tuple[str, ValueType] or an integer."
         if isinstance(x_column, tuple):
-            x_value = self.tsdf.loc[:, x_column].to_numpy().reshape(-1, 1)
+            x_value = self.tsdf[x_column].to_numpy().reshape(-1, 1)
             x_label = cast(
                 "tuple[str, str]",
-                self.tsdf.loc[:, x_column].name,
+                self.tsdf[x_column].name,
             )[0]
         elif isinstance(x_column, int):
             x_value = self.tsdf.iloc[:, x_column].to_numpy().reshape(-1, 1)
@@ -1376,45 +1371,40 @@ class OpenFrame(_CommonModel):
         if not any(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
-                asset_rtn = self.tsdf.loc[:, asset].ffill().pct_change().iloc[1:]
+                asset_rtn = self.tsdf[asset].ffill().pct_change().iloc[1:]
                 asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             elif isinstance(asset, int):
-                asset_rtn = cast(
-                    "DataFrame", self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
-                )
+                asset_rtn = self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
                 asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
-                market_rtn = self.tsdf.loc[:, market].ffill().pct_change().iloc[1:]
+                market_rtn = self.tsdf[market].ffill().pct_change().iloc[1:]
                 market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             elif isinstance(market, int):
-                market_rtn = cast(
-                    "DataFrame",
-                    self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:],
-                )
+                market_rtn = self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:]
                 market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
         elif all(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
-                asset_rtn = self.tsdf.loc[:, asset]
+                asset_rtn = self.tsdf[asset]
                 asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             elif isinstance(asset, int):
-                asset_rtn = cast("DataFrame", self.tsdf.iloc[:, asset])
+                asset_rtn = self.tsdf.iloc[:, asset]
                 asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
 
             msg = "market should be a tuple[str, ValueType] or an integer."
             if isinstance(market, tuple):
-                market_rtn = self.tsdf.loc[:, market]
+                market_rtn = self.tsdf[market]
                 market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             elif isinstance(market, int):
-                market_rtn = cast("DataFrame", self.tsdf.iloc[:, market])
+                market_rtn = self.tsdf.iloc[:, market]
                 market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
             else:
                 raise TypeError(msg)
@@ -1426,7 +1416,7 @@ class OpenFrame(_CommonModel):
         beta = covariance[0, 1] / covariance[1, 1]
 
         return float(
-            asset_rtn_mean - riskfree_rate - beta * (market_rtn_mean - riskfree_rate)
+            asset_rtn_mean - riskfree_rate - beta * (market_rtn_mean - riskfree_rate),
         )
 
     def make_portfolio(
@@ -1612,7 +1602,7 @@ class OpenFrame(_CommonModel):
         rollbeta.index = rollbeta.index.droplevel(level=1)
         rollbeta.columns = MultiIndex.from_arrays([[beta_label], ["Beta"]])
 
-        return cast("DataFrame", rollbeta)
+        return rollbeta
 
     def rolling_corr(
         self: Self,
