@@ -3,18 +3,15 @@ default_language_version:
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.0
+    rev: v0.13.1
     hooks:
       - id: ruff-check
-        always_run: true
         args: [ --fix, --exit-non-zero-on-fix ]
       - id: ruff-format
-        always_run: true
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.1
+    rev: v1.18.2
     hooks:
       - id: mypy
-        always_run: true
         pass_filenames: false
         args:
           - --install-types
@@ -31,50 +28,31 @@ repos:
     rev: v1.10.0
     hooks:
       - id: python-use-type-annotations
-        always_run: true
       - id: python-check-blanket-noqa
-        always_run: true
       - id: python-check-blanket-type-ignore
-        always_run: true
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
       - id: check-ast
-        always_run: true
       - id: check-added-large-files
-        always_run: true
       - id: check-merge-conflict
-        always_run: true
       - id: check-case-conflict
-        always_run: true
       - id: check-docstring-first
-        always_run: true
       - id: check-json
-        always_run: true
       - id: check-toml
-        always_run: true
       - id: check-yaml
-        always_run: true
       - id: detect-private-key
-        always_run: true
       - id: end-of-file-fixer
-        always_run: true
       - id: name-tests-test
-        always_run: true
         args: [ --pytest-test-first ]
       - id: no-commit-to-branch
-        always_run: true
         args: [ '--branch', 'master' ]
       - id: pretty-format-json
-        always_run: true
         args: [ --autofix ]
       - id: trailing-whitespace
-        always_run: true
       - id: mixed-line-ending
-        always_run: true
         args: [ --fix=auto ]
       - id: fix-byte-order-marker
-        always_run: true
         exclude: .gitignore
   - repo: https://github.com/woodruffw/zizmor-pre-commit
     rev: v1.13.0
@@ -84,4 +62,3 @@ repos:
     rev: 2.2.0
     hooks:
       - id: poetry-check
-        always_run: true
