@@ -79,22 +79,24 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 python_version = "3.13"
 mypy_path = ["src"]
-exclude = ["venv/*"]
 cache_dir = ".mypy_cache"
+exclude = ["venv/*"]
 follow_imports = "normal"
-strict = true
-pretty = true
-cache_fine_grained = true
-incremental = true
-ignore_missing_imports = false
-warn_unreachable = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-disallow_any_generics = true
-check_untyped_defs = true
-no_implicit_reexport = true
-disallow_untyped_defs = true
 plugins = ["pydantic.mypy"]
+cache_fine_grained = true
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+ignore_missing_imports = false
+incremental = true
+no_implicit_reexport = true
+pretty = true
+strict = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
@@ -120,6 +122,7 @@ addopts = [
   "-n", "auto",
   "--dist=loadscope",
   "--cov=openseries",
+  "--strict-markers",
   "--cov-fail-under=99",
   "--cov-branch",
   "--cov-report=term",
