@@ -1,0 +1,50 @@
+{
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "cSpell.enabled": false,
+  "editor.detectIndentation": true,
+  "editor.rulers": [
+    87
+  ],
+  "editor.tabSize": 4,
+  "files.associations": {
+    "*.py": "python"
+  },
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/.mypy_cache/**": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache/**": true,
+    "**/__pycache__/**": true,
+    "**/venv/**": true
+  },
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/src"
+  ],
+  "python.analysis.typeCheckingMode": "off",
+  "python.defaultInterpreterPath": "${workspaceFolder}/venv",
+  "python.terminal.activateEnvironment": true,
+  "python.testing.cwd": "${workspaceFolder}",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+  "ruff.configurationPreference": "filesystemFirst",
+  "search.exclude": {
+    "**/.git": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/__pycache__": true,
+    "**/venv": true
+  }
+}

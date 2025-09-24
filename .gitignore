@@ -18,6 +18,3 @@ junit.xml
 
 # Mac OSX
 .DS_Store
-
-# Visual Studio Code
-/.vscode/
