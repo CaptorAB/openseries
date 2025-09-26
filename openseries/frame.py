@@ -77,7 +77,78 @@ logger = getLogger(__name__)
 __all__ = ["OpenFrame"]
 
 
-# noinspection PyUnresolvedReferences,PyTypeChecker
+def _get_base_column_data_frame(
+    self: OpenFrame,
+    base_column: tuple[str, ValueType] | int,
+    earlier: dt.date,
+    later: dt.date,
+) -> tuple[Series[float], tuple[str, ValueType], str]:
+    """Common logic for base column data extraction in OpenFrame.
+
+    Parameters
+    ----------
+    base_column : tuple[str, ValueType] | int
+        Column reference
+    earlier : dt.date
+        Start date
+    later : dt.date
+        End date
+
+    Returns:
+    -------
+    tuple[Series[float], tuple[str, ValueType], str]
+        data, item, label
+    """
+    if isinstance(base_column, tuple):
+        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)][
+            base_column
+        ]
+        item = base_column
+        label = cast("tuple[str, str]", self.tsdf[base_column].name)[0]
+    elif isinstance(base_column, int):
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].iloc[:, base_column]
+        item = cast("tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name)
+        label = cast("tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name)[0]
+    else:
+        msg = "base_column should be a tuple[str, ValueType] or an integer."  # type: ignore[unreachable]
+        raise TypeError(msg)
+
+    return data, item, label
+
+
+def _calculate_time_factor_frame(
+    data: Series[float],
+    earlier: dt.date,
+    later: dt.date,
+    periods_in_a_year_fixed: DaysInYearType | None = None,
+) -> float:
+    """Common time factor calculation for OpenFrame.
+
+    Parameters
+    ----------
+    data : Series[float]
+        Data series for counting observations
+    earlier : dt.date
+        Start date
+    later : dt.date
+        End date
+    periods_in_a_year_fixed : DaysInYearType, optional
+        Fixed periods in year
+
+    Returns:
+    -------
+    float
+        Time factor
+    """
+    if periods_in_a_year_fixed:
+        return float(periods_in_a_year_fixed)
+
+    fraction = (later - earlier).days / 365.25
+    return data.count() / fraction
+
+
 class OpenFrame(_CommonModel[SeriesFloat]):
     """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
@@ -101,7 +172,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     tsdf: DataFrame = DataFrame(dtype="float64")
     weights: list[float] | None = None
 
-    # noinspection PyMethodParameters
     @field_validator("constituents")
     def _check_labels_unique(
         cls: type[OpenFrame],  # noqa: N805
@@ -855,36 +925,20 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             from_dt=from_date,
             to_dt=to_date,
         )
-        fraction: float = (later - earlier).days / 365.25
 
-        msg = "base_column should be a tuple[str, ValueType] or an integer."
-        if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ][base_column]
-            short_item = base_column
-            short_label = cast(
-                "tuple[str, ValueType]",
-                self.tsdf[base_column].name,
-            )[0]
-        elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ].iloc[:, base_column]
-            short_item = cast(
-                "tuple[str, ValueType]",
-                self.tsdf.iloc[:, base_column].name,
-            )
-            short_label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[
-                0
-            ]
-        else:
-            raise TypeError(msg)
+        shortdf, short_item, short_label = _get_base_column_data_frame(
+            self=self,
+            base_column=base_column,
+            earlier=earlier,
+            later=later,
+        )
 
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            time_factor = shortdf.count() / fraction
+        time_factor = _calculate_time_factor_frame(
+            data=shortdf,
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
         terrors = []
         for item in self.tsdf:
@@ -946,39 +1000,20 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             from_dt=from_date,
             to_dt=to_date,
         )
-        fraction: float = (later - earlier).days / 365.25
 
-        msg = "base_column should be a tuple[str, ValueType] or an integer."
-        if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ][base_column]
-            short_item = base_column
-            short_label = cast(
-                "tuple[str, str]",
-                self.tsdf[base_column].name,
-            )[0]
-        elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ].iloc[:, base_column]
-            short_item = cast(
-                "tuple[str, ValueType]",
-                self.tsdf.iloc[
-                    :,
-                    base_column,
-                ].name,
-            )
-            short_label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[
-                0
-            ]
-        else:
-            raise TypeError(msg)
+        shortdf, short_item, short_label = _get_base_column_data_frame(
+            self=self,
+            base_column=base_column,
+            earlier=earlier,
+            later=later,
+        )
 
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            time_factor = shortdf.count() / fraction
+        time_factor = _calculate_time_factor_frame(
+            data=shortdf,
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
         ratios = []
         for item in self.tsdf:

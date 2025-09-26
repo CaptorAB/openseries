@@ -48,12 +48,9 @@ from .owntypes import (
     ValueType,
 )
 from .series import OpenTimeSeries
-
-# noinspection PyProtectedMember
 from .simulation import _random_generator
 
 if TYPE_CHECKING:  # pragma: no cover
-    # noinspection PyUnresolvedReferences
     from collections.abc import Callable
 
     from numpy.typing import NDArray
@@ -137,7 +134,6 @@ def simulate_portfolios(
     return simdf.dropna()
 
 
-# noinspection PyUnusedLocal
 def efficient_frontier(
     eframe: OpenFrame,
     num_ports: int = 5000,
@@ -375,7 +371,6 @@ def constrain_optimized_portfolios(
     )
 
     condition_least_ret = front_frame.ret > serie.arithmetic_ret
-    # noinspection PyArgumentList
     least_ret_frame = front_frame[condition_least_ret].sort_values(by="stdev")
     least_ret_port: Series[float] = least_ret_frame.iloc[0]
     least_ret_port_name = f"Minimize vol & target return of {portfolioname}"
@@ -386,7 +381,6 @@ def constrain_optimized_portfolios(
     resleast = OpenTimeSeries.from_df(lr_frame.make_portfolio(least_ret_port_name))
 
     condition_most_vol = front_frame.stdev < serie.vol
-    # noinspection PyArgumentList
     most_vol_frame = front_frame[condition_most_vol].sort_values(
         by="ret",
         ascending=False,

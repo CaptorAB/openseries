@@ -87,7 +87,95 @@ from .datefixer import (
 from .load_plotly import load_plotly_dict
 
 
-# noinspection PyTypeChecker
+def _get_date_range_and_factor(
+    self: _CommonModel[Combo_co],
+    months_from_last: int | None = None,
+    from_date: dt.date | None = None,
+    to_date: dt.date | None = None,
+    periods_in_a_year_fixed: DaysInYearType | None = None,
+) -> tuple[dt.date, dt.date, float, DataFrame]:
+    """Common logic for date range and time factor calculation.
+
+    Parameters
+    ----------
+    months_from_last : int, optional
+        Number of months offset as positive integer. Overrides use of from_date
+        and to_date
+    from_date : datetime.date, optional
+        Specific from date
+    to_date : datetime.date, optional
+        Specific to date
+    periods_in_a_year_fixed : DaysInYearType, optional
+        Allows locking the periods-in-a-year to simplify test cases and
+        comparisons
+
+    Returns:
+    -------
+    tuple[dt.date, dt.date, float, DataFrame]
+        earlier, later, time_factor, data
+    """
+    earlier, later = self.calc_range(
+        months_offset=months_from_last,
+        from_dt=from_date,
+        to_dt=to_date,
+    )
+
+    if periods_in_a_year_fixed:
+        time_factor = float(periods_in_a_year_fixed)
+    else:
+        how_many = (
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+            .count()
+            .iloc[0]
+        )
+        fraction = (later - earlier).days / 365.25
+        time_factor = how_many / fraction
+
+    data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+    return earlier, later, time_factor, data
+
+
+def _get_base_column_data(
+    self: _CommonModel[Combo_co],
+    base_column: tuple[str, ValueType] | int,
+    earlier: dt.date,
+    later: dt.date,
+) -> tuple[Series[float], tuple[str, ValueType], str]:
+    """Common logic for base column data extraction.
+
+    Parameters
+    ----------
+    base_column : tuple[str, ValueType] | int
+        Column reference
+    earlier : dt.date
+        Start date
+    later : dt.date
+        End date
+
+    Returns:
+    -------
+    tuple[Series[float], tuple[str, ValueType], str]
+        data, item, label
+    """
+    if isinstance(base_column, tuple):
+        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)][
+            base_column
+        ]
+        item = base_column
+        label = cast("tuple[str, str]", self.tsdf[base_column].name)[0]
+    elif isinstance(base_column, int):
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].iloc[:, base_column]
+        item = cast("tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name)
+        label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[0]
+    else:
+        msg = "base_column should be a tuple[str, ValueType] or an integer."
+        raise TypeError(msg)
+
+    return data, item, label
+
+
 class _CommonModel(BaseModel, Generic[Combo_co]):
     """Declare _CommonModel."""
 
@@ -1338,29 +1426,15 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             Annualized arithmetic mean of returns
 
         """
-        earlier, later = self.calc_range(
-            months_offset=months_from_last,
-            from_dt=from_date,
-            to_dt=to_date,
+        _earlier, _later, time_factor, data = _get_date_range_and_factor(
+            self=self,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            how_many = (
-                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-                .count()
-                .iloc[0]
-            )
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
 
-        result = (
-            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-            .ffill()
-            .pct_change()
-            .mean()
-            * time_factor
-        )
+        result = data.ffill().pct_change().mean() * time_factor
 
         return self._coerce_result(result=result, name="Arithmetic return")
 
@@ -1394,23 +1468,14 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
             Annualized volatility
 
         """
-        earlier, later = self.calc_range(
-            months_offset=months_from_last,
-            from_dt=from_date,
-            to_dt=to_date,
+        _earlier, _later, time_factor, data = _get_date_range_and_factor(
+            self=self,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            how_many = (
-                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-                .count()
-                .iloc[0]
-            )
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
         result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
         return self._coerce_result(result=result, name="Volatility")

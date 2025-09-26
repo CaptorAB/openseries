@@ -73,7 +73,6 @@ __all__ = ["OpenTimeSeries", "timeseries_chain"]
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-# noinspection PyUnresolvedReferences,PyNestedDecorators
 class OpenTimeSeries(_CommonModel[float]):
     """OpenTimeSeries objects are at the core of the openseries package.
 
@@ -472,7 +471,6 @@ class OpenTimeSeries(_CommonModel[float]):
             The returns of the values in the series
 
         """
-        # noinspection PyCallingNonCallable
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
@@ -757,7 +755,6 @@ class OpenTimeSeries(_CommonModel[float]):
         ra_df = ra_df.dropna()
 
         prev = self.first_idx
-        # noinspection PyTypeChecker
         dates: list[dt.date] = [prev]
 
         for idx, row in ra_df.iterrows():
@@ -878,7 +875,6 @@ def timeseries_chain(
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
-    # noinspection PyTypeChecker
     return back.__class__(
         timeseries_id=new.timeseries_id,
         instrument_id=new.instrument_id,
