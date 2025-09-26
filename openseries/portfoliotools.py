@@ -16,13 +16,13 @@ from typing import TYPE_CHECKING, cast
 from numpy import (
     append,
     array,
+    einsum,
     float64,
     inf,
     isnan,
     linspace,
     nan,
     sqrt,
-    zeros,
 )
 from numpy import (
     sum as npsum,
@@ -103,25 +103,16 @@ def simulate_portfolios(
 
     log_ret.columns = log_ret.columns.droplevel(level=1)
 
+    cov_matrix = log_ret.cov() * simframe.periods_in_a_year
+    mean_returns = log_ret.mean() * simframe.periods_in_a_year
+
     randomizer = _random_generator(seed=seed)
+    all_weights = randomizer.random((num_ports, simframe.item_count))
+    all_weights = all_weights / all_weights.sum(axis=1, keepdims=True)
 
-    all_weights = zeros((num_ports, simframe.item_count))
-    ret_arr = zeros(num_ports)
-    vol_arr = zeros(num_ports)
-    sharpe_arr = zeros(num_ports)
-
-    for x in range(num_ports):
-        weights = array(randomizer.random(simframe.item_count))
-        weights = weights / npsum(weights)
-        all_weights[x, :] = weights
-
-        vol_arr[x] = sqrt(
-            weights.T @ (log_ret.cov() * simframe.periods_in_a_year @ weights),
-        )
-
-        ret_arr[x] = npsum(log_ret.mean() * weights * simframe.periods_in_a_year)
-
-        sharpe_arr[x] = ret_arr[x] / vol_arr[x]
+    ret_arr = all_weights @ mean_returns
+    vol_arr = sqrt(einsum("ij,jk,ik->i", all_weights, cov_matrix, all_weights))
+    sharpe_arr = ret_arr / vol_arr
 
     simdf = concat(
         [
@@ -226,7 +217,7 @@ def efficient_frontier(
             _get_ret_vol_sr(
                 lg_ret=log_ret,
                 weights=weights,
-                per_in_yr=eframe.periods_in_a_year,
+                per_in_yr=copi.periods_in_a_year,
             )[2]
             * -1,
         )
@@ -239,7 +230,7 @@ def efficient_frontier(
             _get_ret_vol_sr(
                 lg_ret=log_ret,
                 weights=weights,
-                per_in_yr=eframe.periods_in_a_year,
+                per_in_yr=copi.periods_in_a_year,
             )[1],
         )
 
@@ -259,7 +250,7 @@ def efficient_frontier(
     optimal = _get_ret_vol_sr(
         lg_ret=log_ret,
         weights=opt_results.x,
-        per_in_yr=eframe.periods_in_a_year,
+        per_in_yr=copi.periods_in_a_year,
     )
 
     frontier_y = linspace(start=frontier_min, stop=frontier_max, num=frontier_points)
@@ -276,7 +267,7 @@ def efficient_frontier(
                     "fun": lambda w, poss_return=possible_return: _diff_return(
                         lg_ret=log_ret,
                         weights=w,
-                        per_in_yr=eframe.periods_in_a_year,
+                        per_in_yr=copi.periods_in_a_year,
                         poss_return=poss_return,
                     ),
                 },
