@@ -52,7 +52,7 @@ _,_=series.plot_series()
 
 ```
 
-### Sample output using the report_html() function:
+### Sample output using the report_html() function
 
 <img src="https://raw.githubusercontent.com/CaptorAB/openseries/master/openseries_plot.png" alt="Two Assets Compared" width="1000" />
 
@@ -86,10 +86,7 @@ source source_me
 
 ## Testing and Linting / Type-checking
 
-Ruff and Mypy checking is embedded in the pre-commit hook. Both
-are also used in the project's GitHub workflows and are run when the `lint`
-alternative is chosen in the below commands.
-Any silenced error codes can be found in the
+[Ruff](https://docs.astral.sh/ruff/) and [mypy](https://mypy-lang.org/) checking is embedded in the pre-commit hook. Both are also used in the project's GitHub workflows and are run when the `lint` alternative is chosen in the below commands. Any silenced error codes can be found in the
 [pyproject.toml](https://github.com/CaptorAB/openseries/blob/master/pyproject.toml)
 file or in in-line comments.
 
@@ -135,7 +132,7 @@ make lint
 | [report.py](https://github.com/CaptorAB/openseries/blob/master/openseries/report.py)                 | Defines the _report_html_ function that is used to create a landscape orientation report on at least two assets. All preceding assets will be measured against the last asset in the input OpenFrame. |
 | [simulation.py](https://github.com/CaptorAB/openseries/blob/master/openseries/simulation.py)         | Defines the class _ReturnSimulation_ to create simulated financial timeseries. Used in the project's test suite                                                                                       |
 
-### Class methods used to construct objects.
+### Class methods used to construct objects
 
 | Method            | Applies to                    | Description                                                                                        |
 |:------------------|:------------------------------|:---------------------------------------------------------------------------------------------------|
@@ -144,7 +141,7 @@ make lint
 | `from_fixed_rate` | `OpenTimeSeries`              | Class method to create an OpenTimeSeries object from a fixed rate, number of days and an end date. |
 | `from_deepcopy`   | `OpenTimeSeries`, `OpenFrame` | Creates a copy of an OpenTimeSeries object.                                                        |
 
-### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) class.
+### Non-numerical or "helper" properties that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) class
 
 | Property        | type                 | Applies to       | Description                                                                                                                                                       |
 |:----------------|:---------------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -162,7 +159,7 @@ make lint
 | `markets`       | `list[str]` or `str` | `OpenTimeSeries` | (List of) markets code(s) according to market code(s) input for the [pandas-market-calendars](https://pandas-market-calendars.readthedocs.io/en/latest/) package. |
 | `valuetype`     | `ValueType`          | `OpenTimeSeries` | Field identifies the type of values in the series. ValueType is an Enum.                                                                                          |
 
-### Non-numerical or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
+### Non-numerical or "helper" properties that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class
 
 | Property           | type                             | Applies to  | Description                                                              |
 |:-------------------|:---------------------------------|:------------|:-------------------------------------------------------------------------|
@@ -176,7 +173,7 @@ make lint
 | `lengths_of_items` | `pandas.Series[int]`             | `OpenFrame` | Number of items in each of the series in the OpenFrame.                  |
 | `span_of_days_all` | `pandas.Series[int]`             | `OpenFrame` | Number of days from the first to the last in each of the series.         |
 
-### Non-numerical or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
+### Non-numerical or "helper" properties that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class
 
 | Property            | type                             | Applies to                    | Description                                                                       |
 |:--------------------|:---------------------------------|:------------------------------|:----------------------------------------------------------------------------------|
@@ -189,7 +186,7 @@ make lint
 | `periods_in_a_year` | `float`                          | `OpenTimeSeries`, `OpenFrame` | The number of observations in an average year for all days in the data.           |
 | `yearfrac`          | `float`                          | `OpenTimeSeries`, `OpenFrame` | Length of timeseries expressed as np.float64 fraction of a year with 365.25 days. |
 
-### Methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) class.
+### Methods that apply only to the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) class
 
 | Method                   | Applies to       | Description                                                                                                                                    |
 |:-------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -198,9 +195,8 @@ make lint
 | `running_adjustment`     | `OpenTimeSeries` | Adjusts the series performance with a `float` factor.                                                                                          |
 | `ewma_vol_func`          | `OpenTimeSeries` | Returns a `pandas.Series` with volatility based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp). |
 | `from_1d_rate_to_cumret` | `OpenTimeSeries` | Converts a series of 1-day rates into a cumulative valueseries.                                                                                |
-|
 
-### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
+### Methods that apply only to the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class
 
 | Method                           | Applies to  | Description                                                                                                                                                                                                               |
 |:---------------------------------|:------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -209,7 +205,7 @@ make lint
 | `add_timeseries`                 | `OpenFrame` | Adds a given OpenTimeSeries to the OpenFrame.                                                                                                                                                                             |
 | `delete_timeseries`              | `OpenFrame` | Deletes an OpenTimeSeries from the OpenFrame.                                                                                                                                                                             |
 | `relative`                       | `OpenFrame` | Calculates a new series that is the relative performance of two others.                                                                                                                                                   |
-| `make_portfolio`                 | `OpenFrame` | Calculates a portfolio timeseries based on the series and weights. Weights can be provided as a list, or a weight strategy can be set as *equal weights* or *inverted volatility*.                                        |
+| `make_portfolio`                 | `OpenFrame` | Calculates a portfolio timeseries based on the series and weights. Weights an be provided as a list, or a weight strategy can be set as _equal weights_ or _inverted volatility_. |
 | `ord_least_squares_fit`          | `OpenFrame` | Performs a regression and an [Ordinary Least Squares](https://www.statsmodels.org/stable/examples/notebooks/generated/ols.html) fit.                                                                                      |
 | `beta`                           | `OpenFrame` | Calculates [Beta](https://www.investopedia.com/terms/b/beta.asp) of an asset relative a market.                                                                                                                           |
 | `jensen_alpha`                   | `OpenFrame` | Calculates [Jensen's Alpha](https://www.investopedia.com/terms/j/jensensmeasure.asp) of an asset relative a market.                                                                                                       |
@@ -223,7 +219,7 @@ make lint
 | `ewma_risk`                      | `OpenFrame` | Returns a `pandas.DataFrame` with volatility and correlation based on [Exponentially Weighted Moving Average](https://www.investopedia.com/articles/07/ewma.asp).                                                         |
 | `multi_factor_linear_regression` | `OpenFrame` | Treats one specified series as the dependent variable (y) and uses all remaining series as independent variables (X) in a linear regression and returns a DataFrame with summary output and a series of predicted values. |
 
-### Methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class.
+### Methods that apply to both the [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) and the [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py) class
 
 | Method                             | Applies to                    | Description                                                                                                                                              |
 |:-----------------------------------|:------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -249,7 +245,7 @@ make lint
 | `rolling_cvar_down`                | `OpenTimeSeries`, `OpenFrame` | Returns a pandas.DataFrame with rolling CVaR figures.                                                                                                    |
 | `calc_range`                       | `OpenTimeSeries`, `OpenFrame` | Returns the start and end dates of a range from specific period definitions. Used by the below numerical methods and not meant to be used independently. |
 
-### Numerical properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py).
+### Numerical properties available for individual [OpenTimeSeries](https://github.com/CaptorAB/openseries/blob/master/openseries/series.py) or on all series in an [OpenFrame](https://github.com/CaptorAB/openseries/blob/master/openseries/frame.py)
 
 | Property                | type                     | Applies to                    | Description                                                                                                                                                                                                                                                                                |
 |:------------------------|:-------------------------|:------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -275,7 +271,7 @@ make lint
 | `kurtosis`              | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Kurtosis](https://www.investopedia.com/terms/k/kurtosis.asp) of the return distribution.                                                                                                                                                                                                  |
 | `z_score`               | `float`, `pandas.Series` | `OpenTimeSeries`, `OpenFrame` | [Z-score](https://www.investopedia.com/terms/z/zscore.asp) as (last return - mean return) / standard deviation of returns.                                                                                                                                                                 |
 
-### Methods below are identical to the Numerical Properties above.
+### Methods below are identical to the Numerical Properties above
 
 _They are simply methods that take different date or length inputs to return the
 properties for subset periods._
