@@ -3013,7 +3013,6 @@ class TestOpenFrame(CommonTestCase):
         )
 
         nanframe.tsdf.iloc[2, 0] = None
-
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.value_nan_handle(method="drop")
@@ -3067,7 +3066,6 @@ class TestOpenFrame(CommonTestCase):
         )
 
         nanframe.tsdf.iloc[2, 0] = None
-
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.return_nan_handle(method="drop")
