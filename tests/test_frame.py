@@ -69,6 +69,14 @@ class TestOpenFrame(CommonTestCase):
         returns.value_to_ret()
         return OpenFrame(constituents=[series, returns])
 
+    def test_single_serie_openframe(self: TestOpenFrame) -> None:
+        """Test if else on single series in _set_tsdf."""
+        series = self.randomseries.from_deepcopy()
+        frame = OpenFrame(constituents=[series])
+        if series.tsdf.shape != frame.tsdf.shape:
+            msg = "_set_tsdf not working as intended."
+            raise OpenFrameTestError(msg)
+
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
         filename = "framesaved.json"

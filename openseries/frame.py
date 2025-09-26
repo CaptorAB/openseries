@@ -206,7 +206,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Object of the class OpenFrame
 
         """
-        # Only deep copy if necessary (avoid unnecessary copying)
         copied_constituents = [ts.from_deepcopy() for ts in constituents]
 
         super().__init__(  # type: ignore[call-arg]
@@ -221,7 +220,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     def _set_tsdf(self: Self) -> None:
         """Set the tsdf DataFrame."""
         if self.constituents is not None and len(self.constituents) != 0:
-            # Use concat directly instead of reduce for better performance
             if len(self.constituents) == 1:
                 self.tsdf = self.constituents[0].tsdf.copy()
             else:
@@ -1487,7 +1485,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
-            # Use in-place operations to avoid copying
             returns = self.tsdf.ffill().pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):

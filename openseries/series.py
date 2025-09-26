@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
-    from collections.abc import Callable
 
     from numpy.typing import NDArray
     from pandas import Timestamp
@@ -62,9 +61,6 @@ from .owntypes import (
     ValueListType,
     ValueType,
 )
-
-FieldValidator = cast("Callable[..., Callable[..., Any]]", field_validator)
-ModelValidator = cast("Callable[..., Callable[..., Any]]", model_validator)
 
 logger = getLogger(__name__)
 
@@ -129,21 +125,21 @@ class OpenTimeSeries(_CommonModel[float]):
     isin: str | None = None
     label: str | None = None
 
-    @FieldValidator("domestic", mode="before")
+    @field_validator("domestic", mode="before")
     @classmethod
     def _validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
         _ = Currency(ccy=value)
         return value
 
-    @FieldValidator("countries", mode="before")
+    @field_validator("countries", mode="before")
     @classmethod
     def _validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
         _ = Countries(countryinput=value)
         return value
 
-    @FieldValidator("markets", mode="before")
+    @field_validator("markets", mode="before")
     @classmethod
     def _validate_markets(
         cls,
@@ -163,7 +159,7 @@ class OpenTimeSeries(_CommonModel[float]):
             raise MarketsNotStringNorListStrError(item_msg)
         raise MarketsNotStringNorListStrError(msg)
 
-    @ModelValidator(mode="after")
+    @model_validator(mode="after")
     def _dates_and_values_validate(self: Self) -> Self:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)
@@ -281,7 +277,7 @@ class OpenTimeSeries(_CommonModel[float]):
                 label, _ = dframe.name
             else:
                 label = dframe.name
-            values = cast("list[float]", dframe.to_numpy().tolist())
+            values = dframe.to_numpy().tolist()
         elif isinstance(dframe, DataFrame):
             values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
@@ -300,12 +296,11 @@ class OpenTimeSeries(_CommonModel[float]):
                     msg = f"valuetype missing. Adding: {valuetype.value}"
                     logger.warning(msg=msg)
                 else:
-                    valuetype = cast(
-                        "ValueType",
-                        dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
-                    )
+                    valuetype = dframe.columns.get_level_values(1).to_numpy()[
+                        column_nmbr
+                    ]
             else:
-                label = cast("MultiIndex", dframe.columns).to_numpy()[column_nmbr]
+                label = dframe.columns.to_numpy()[column_nmbr]
         else:
             raise TypeError(msg)
 
