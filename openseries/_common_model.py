@@ -652,7 +652,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,
-            countries=countries,
+            countries=countries or "SE",
             markets=markets,
             custom_holidays=custom_holidays,
         )
