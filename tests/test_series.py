@@ -34,8 +34,6 @@ from openseries.owntypes import (
     ResampleDataLossError,
     ValueType,
 )
-
-# noinspection PyProtectedMember
 from openseries.series import (
     OpenTimeSeries,
     _check_if_none,

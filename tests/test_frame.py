@@ -34,7 +34,6 @@ from pandas import DataFrame, Series, date_range, read_excel
 from pandas.testing import assert_frame_equal
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
-# noinspection PyProtectedMember
 from openseries._risk import _cvar_down_calc, _var_down_calc
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
@@ -59,7 +58,6 @@ class OpenFrameTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-# noinspection PyTypeChecker
 class TestOpenFrame(CommonTestCase):
     """class to run tests on the module frame.py."""
 
@@ -70,6 +68,14 @@ class TestOpenFrame(CommonTestCase):
         returns.set_new_label(lvl_zero="returns")
         returns.value_to_ret()
         return OpenFrame(constituents=[series, returns])
+
+    def test_single_serie_openframe(self: TestOpenFrame) -> None:
+        """Test if else on single series in _set_tsdf."""
+        series = self.randomseries.from_deepcopy()
+        frame = OpenFrame(constituents=[series])
+        if series.tsdf.shape != frame.tsdf.shape:
+            msg = "_set_tsdf not working as intended."
+            raise OpenFrameTestError(msg)
 
     def test_to_json(self: TestOpenFrame) -> None:
         """Test to_json method."""
@@ -3013,9 +3019,8 @@ class TestOpenFrame(CommonTestCase):
                 ),
             ],
         )
-        # noinspection PyTypeChecker
+
         nanframe.tsdf.iloc[2, 0] = None
-        # noinspection PyTypeChecker
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.value_nan_handle(method="drop")
@@ -3067,9 +3072,8 @@ class TestOpenFrame(CommonTestCase):
                 ),
             ],
         )
-        # noinspection PyTypeChecker
+
         nanframe.tsdf.iloc[2, 0] = None
-        # noinspection PyTypeChecker
         nanframe.tsdf.iloc[3, 1] = None
         dropframe = nanframe.from_deepcopy()
         dropframe.return_nan_handle(method="drop")
@@ -3278,7 +3282,6 @@ class TestOpenFrame(CommonTestCase):
             msg = f"Results from vol_from_var_func() not as expected\n{impvoldrifted}"
             raise OpenFrameTestError(msg)
 
-        # noinspection PyTypeChecker
         mframe.tsdf.iloc[0, 2] = zero_float
 
         with pytest.raises(

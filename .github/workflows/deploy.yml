@@ -34,7 +34,7 @@ jobs:
       - name: Install Poetry
         run: |
           . venv/bin/activate
-          pip install poetry==2.2.0
+          pip install poetry==2.2.1
 
       - name: Install dependencies with Poetry
         run: |
@@ -185,7 +185,7 @@ jobs:
         run: |
           python -m venv venv
           . venv/bin/activate
-          pip install poetry==2.2.0
+          pip install poetry==2.2.1
           poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry config pypi-token.testpypi "$TEST_PYPI_API_TOKEN"
           poetry build
@@ -218,7 +218,7 @@ jobs:
         run: |
           python -m venv venv
           . venv/bin/activate
-          pip install poetry==2.2.0
+          pip install poetry==2.2.1
           poetry config pyi-pi-token.pypi "$PYPI_API_TOKEN" || true  # compatibility if older poetry config key
           poetry config pypi-token.pypi "$PYPI_API_TOKEN"
           poetry build

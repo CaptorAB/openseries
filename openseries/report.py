@@ -264,7 +264,6 @@ def report_html(
         "{:.2f}",
     ]
 
-    # noinspection PyTypeChecker
     rpt_df = copied.all_properties(
         properties=cast("list[LiteralFrameProps]", properties),
     )
@@ -353,7 +352,9 @@ def report_html(
 
     for item, f in zip(rpt_df.index, formats, strict=False):
         rpt_df.loc[item] = rpt_df.loc[item].apply(
-            lambda x, fmt=f: x if (isinstance(x, str) or x is None) else fmt.format(x),
+            lambda x, fmt=f: str(x)
+            if (isinstance(x, str) or x is None)
+            else fmt.format(x),
         )
 
     rpt_df.index = Index(labels_init)
