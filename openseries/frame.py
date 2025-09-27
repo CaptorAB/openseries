@@ -16,10 +16,12 @@ from typing import TYPE_CHECKING, Any, cast
 
 from numpy import (
     array,
+    asarray,
     concatenate,
     cov,
     diff,
     divide,
+    float64,
     isinf,
     log,
     nan,
@@ -39,6 +41,7 @@ from pandas import (
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
 
+    from numpy.typing import NDArray
     from pandas import Series as _Series
     from pandas import Timestamp
 
@@ -682,13 +685,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
-        raw_cov = [
-            cov(
-                m=data[(cols[0], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
-                y=data[(cols[1], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
-                ddof=dlta_degr_freedms,
-            )[0][1],
-        ]
+        rm = data[(cols[0], ValueType.RTRN)].iloc[1:day_chunk]
+        m: NDArray[float64] = asarray(rm, dtype=float64)
+        ry = data[(cols[1], ValueType.RTRN)].iloc[1:day_chunk]
+        y: NDArray[float64] = asarray(ry, dtype=float64)
+
+        raw_cov = [cov(m=m, y=y, ddof=dlta_degr_freedms)[0][1]]
 
         r1 = data[(cols[0], ValueType.RTRN)]
         r2 = data[(cols[1], ValueType.RTRN)]
