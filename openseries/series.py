@@ -40,7 +40,7 @@ from pandas import (
 )
 from pydantic import field_validator, model_validator
 
-from ._common_model import _CommonModel
+from ._common_model import _calculate_time_factor, _CommonModel
 from .datefixer import _do_resample_to_business_period_ends, date_fix
 from .owntypes import (
     Countries,
@@ -677,16 +677,14 @@ class OpenTimeSeries(_CommonModel[float]):
             from_dt=from_date,
             to_dt=to_date,
         )
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            how_many = (
-                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-                .count()
-                .iloc[0]
-            )
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
+        time_factor = _calculate_time_factor(
+            data=self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ].iloc[:, 0],
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
         data = self.tsdf.loc[
             cast("Timestamp", earlier) : cast("Timestamp", later)

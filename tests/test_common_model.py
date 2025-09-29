@@ -15,7 +15,7 @@ from typing import cast
 import pytest
 from pandas import Series
 
-from openseries._common_model import _get_base_column_data
+from openseries._common_model import _calculate_time_factor, _get_base_column_data
 
 from .test_common_sim import CommonTestCase
 
@@ -166,7 +166,6 @@ class TestOpenFrame(CommonTestCase):
             )
             raise OpenFrameTestError(msg)
 
-        # Test error case with invalid column type
         with pytest.raises(
             expected_exception=TypeError,
             match=r"base_column should be a tuple\[str, ValueType\] or an integer\.",
@@ -177,3 +176,51 @@ class TestOpenFrame(CommonTestCase):
                 earlier=earlier,
                 later=later,
             )
+
+    def test_calculate_time_factor(self: TestOpenFrame) -> None:
+        """Test _calculate_time_factor function."""
+        frame = self.randomframe
+        earlier = frame.first_idx
+        later = frame.last_idx
+        expected_fixed_periods = 252.0
+
+        time_factor_fixed = _calculate_time_factor(
+            data=frame.tsdf.iloc[:, 0],
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=252,
+        )
+        if time_factor_fixed != expected_fixed_periods:
+            msg = (
+                f"Fixed periods should return the fixed value: "
+                f"expected {expected_fixed_periods}, got {time_factor_fixed}"
+            )
+            raise OpenFrameTestError(msg)
+
+        time_factor_calc = _calculate_time_factor(
+            data=frame.tsdf.iloc[:, 0],
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=None,
+        )
+
+        msg = f"Time factor should be a float, got {type(time_factor_calc)}"
+        if not isinstance(time_factor_calc, float):
+            raise OpenFrameTestError(msg)
+        if time_factor_calc <= 0:
+            msg = f"Time factor should be positive, got {time_factor_calc}"
+            raise OpenFrameTestError(msg)
+
+        mid_date = frame.tsdf.index[len(frame.tsdf.index) // 2]
+        time_factor_half = _calculate_time_factor(
+            data=frame.tsdf.iloc[:, 0],
+            earlier=earlier,
+            later=mid_date,
+            periods_in_a_year_fixed=None,
+        )
+        msg = f"Time factor should be a float, got {type(time_factor_half)}"
+        if not isinstance(time_factor_half, float):
+            raise OpenFrameTestError(msg)
+        if time_factor_half <= 0:
+            msg = f"Time factor should be positive, got {time_factor_half}"
+            raise OpenFrameTestError(msg)

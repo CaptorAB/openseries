@@ -52,7 +52,7 @@ else:
 from pydantic import field_validator
 from sklearn.linear_model import LinearRegression  # type: ignore[import-untyped]
 
-from ._common_model import _CommonModel
+from ._common_model import _calculate_time_factor, _CommonModel, _get_base_column_data
 from .datefixer import _do_resample_to_business_period_ends
 from .owntypes import (
     DaysInYearType,
@@ -78,78 +78,6 @@ from .series import OpenTimeSeries
 logger = getLogger(__name__)
 
 __all__ = ["OpenFrame"]
-
-
-def _get_base_column_data_frame(
-    self: OpenFrame,
-    base_column: tuple[str, ValueType] | int,
-    earlier: dt.date,
-    later: dt.date,
-) -> tuple[Series[float], tuple[str, ValueType], str]:
-    """Common logic for base column data extraction in OpenFrame.
-
-    Parameters
-    ----------
-    base_column : tuple[str, ValueType] | int
-        Column reference
-    earlier : dt.date
-        Start date
-    later : dt.date
-        End date
-
-    Returns:
-    -------
-    tuple[Series[float], tuple[str, ValueType], str]
-        data, item, label
-    """
-    if isinstance(base_column, tuple):
-        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)][
-            base_column
-        ]
-        item = base_column
-        label = cast("tuple[str, str]", self.tsdf[base_column].name)[0]
-    elif isinstance(base_column, int):
-        data = self.tsdf.loc[
-            cast("Timestamp", earlier) : cast("Timestamp", later)
-        ].iloc[:, base_column]
-        item = cast("tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name)
-        label = cast("tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name)[0]
-    else:
-        msg = "base_column should be a tuple[str, ValueType] or an integer."  # type: ignore[unreachable]
-        raise TypeError(msg)
-
-    return data, item, label
-
-
-def _calculate_time_factor_frame(
-    data: Series[float],
-    earlier: dt.date,
-    later: dt.date,
-    periods_in_a_year_fixed: DaysInYearType | None = None,
-) -> float:
-    """Common time factor calculation for OpenFrame.
-
-    Parameters
-    ----------
-    data : Series[float]
-        Data series for counting observations
-    earlier : dt.date
-        Start date
-    later : dt.date
-        End date
-    periods_in_a_year_fixed : DaysInYearType, optional
-        Fixed periods in year
-
-    Returns:
-    -------
-    float
-        Time factor
-    """
-    if periods_in_a_year_fixed:
-        return float(periods_in_a_year_fixed)
-
-    fraction = (later - earlier).days / 365.25
-    return data.count() / fraction
 
 
 class OpenFrame(_CommonModel[SeriesFloat]):
@@ -930,14 +858,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             to_dt=to_date,
         )
 
-        shortdf, short_item, short_label = _get_base_column_data_frame(
+        shortdf, short_item, short_label = _get_base_column_data(
             self=self,
             base_column=base_column,
             earlier=earlier,
             later=later,
         )
 
-        time_factor = _calculate_time_factor_frame(
+        time_factor = _calculate_time_factor(
             data=shortdf,
             earlier=earlier,
             later=later,
@@ -1005,14 +933,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             to_dt=to_date,
         )
 
-        shortdf, short_item, short_label = _get_base_column_data_frame(
+        shortdf, short_item, short_label = _get_base_column_data(
             self=self,
             base_column=base_column,
             earlier=earlier,
             later=later,
         )
 
-        time_factor = _calculate_time_factor_frame(
+        time_factor = _calculate_time_factor(
             data=shortdf,
             earlier=earlier,
             later=later,

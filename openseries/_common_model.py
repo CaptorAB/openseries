@@ -176,6 +176,37 @@ def _get_base_column_data(
     return data, item, label
 
 
+def _calculate_time_factor(
+    data: Series[float],
+    earlier: dt.date,
+    later: dt.date,
+    periods_in_a_year_fixed: DaysInYearType | None = None,
+) -> float:
+    """Calculate time factor for annualization.
+
+    Parameters
+    ----------
+    data : Series[float]
+        Data series for counting observations
+    earlier : dt.date
+        Start date
+    later : dt.date
+        End date
+    periods_in_a_year_fixed : DaysInYearType, optional
+        Fixed periods in year
+
+    Returns:
+    -------
+    float
+        Time factor
+    """
+    if periods_in_a_year_fixed:
+        return float(periods_in_a_year_fixed)
+
+    fraction = (later - earlier).days / 365.25
+    return data.count() / fraction
+
+
 class _CommonModel(BaseModel, Generic[Combo_co]):
     """Declare _CommonModel."""
 
