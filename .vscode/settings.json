@@ -33,16 +33,9 @@
     "MD033": false,
     "MD041": false
   },
-  "python.analysis.autoImportCompletions": true,
-  "python.analysis.extraPaths": [
-    "${workspaceFolder}/src"
-  ],
-  "python.analysis.typeCheckingMode": "off",
   "python.defaultInterpreterPath": "${workspaceFolder}/venv",
   "python.terminal.activateEnvironment": true,
   "python.testing.cwd": "${workspaceFolder}",
-  "python.testing.pytestEnabled": true,
-  "python.testing.unittestEnabled": false,
   "ruff.configuration": "${workspaceFolder}/pyproject.toml",
   "ruff.configurationPreference": "filesystemFirst",
   "search.exclude": {

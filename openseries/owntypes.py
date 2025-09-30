@@ -35,7 +35,7 @@ except ImportError:  # pragma: no cover
 __all__ = ["Self", "ValueType"]
 
 
-Combo_co = TypeVar("Combo_co", float, SeriesFloat, covariant=True)
+SeriesOrFloat_co = TypeVar("SeriesOrFloat_co", float, SeriesFloat, covariant=True)
 
 
 CountryStringType = Annotated[
