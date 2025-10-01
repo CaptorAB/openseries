@@ -10,7 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, TypedDict, Unpack, cast
+from typing import TYPE_CHECKING, TypedDict, cast
+
+try:
+    from typing import Unpack
+except ImportError:
+    from typing_extensions import Unpack
 
 if TYPE_CHECKING:
     import datetime as dt  # pragma: no cover
