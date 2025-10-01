@@ -27,16 +27,15 @@
     "**/__pycache__/**": true,
     "**/venv/**": true
   },
-  "python.analysis.autoImportCompletions": true,
-  "python.analysis.extraPaths": [
-    "${workspaceFolder}/src"
-  ],
-  "python.analysis.typeCheckingMode": "off",
+  "markdownlint.config": {
+    "MD013": false,
+    "MD024": false,
+    "MD033": false,
+    "MD041": false
+  },
   "python.defaultInterpreterPath": "${workspaceFolder}/venv",
   "python.terminal.activateEnvironment": true,
   "python.testing.cwd": "${workspaceFolder}",
-  "python.testing.pytestEnabled": true,
-  "python.testing.unittestEnabled": false,
   "ruff.configuration": "${workspaceFolder}/pyproject.toml",
   "ruff.configurationPreference": "filesystemFirst",
   "search.exclude": {

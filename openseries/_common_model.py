@@ -22,13 +22,13 @@ from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
 from .owntypes import (
     CaptorLogoType,
-    Combo_co,
     DateAlignmentError,
     InitialValueZeroError,
     NumberOfItemsAndLabelsNotSameError,
     PlotlyConfigType,
     ResampleDataLossError,
     Self,
+    SeriesOrFloat_co,
     ValueType,
 )
 
@@ -87,8 +87,127 @@ from .datefixer import (
 from .load_plotly import load_plotly_dict
 
 
-# noinspection PyTypeChecker
-class _CommonModel(BaseModel, Generic[Combo_co]):
+def _get_date_range_and_factor(
+    self: _CommonModel[SeriesOrFloat_co],
+    months_from_last: int | None = None,
+    from_date: dt.date | None = None,
+    to_date: dt.date | None = None,
+    periods_in_a_year_fixed: DaysInYearType | None = None,
+) -> tuple[dt.date, dt.date, float, DataFrame]:
+    """Common logic for date range and time factor calculation.
+
+    Parameters
+    ----------
+    months_from_last : int, optional
+        Number of months offset as positive integer. Overrides use of from_date
+        and to_date
+    from_date : datetime.date, optional
+        Specific from date
+    to_date : datetime.date, optional
+        Specific to date
+    periods_in_a_year_fixed : DaysInYearType, optional
+        Allows locking the periods-in-a-year to simplify test cases and
+        comparisons
+
+    Returns:
+    -------
+    tuple[dt.date, dt.date, float, DataFrame]
+        earlier, later, time_factor, data
+    """
+    earlier, later = self.calc_range(
+        months_offset=months_from_last,
+        from_dt=from_date,
+        to_dt=to_date,
+    )
+
+    if periods_in_a_year_fixed:
+        time_factor = float(periods_in_a_year_fixed)
+    else:
+        how_many = (
+            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+            .count()
+            .iloc[0]
+        )
+        fraction = (later - earlier).days / 365.25
+        time_factor = how_many / fraction
+
+    data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+    return earlier, later, time_factor, data
+
+
+def _get_base_column_data(
+    self: _CommonModel[SeriesOrFloat_co],
+    base_column: tuple[str, ValueType] | int,
+    earlier: dt.date,
+    later: dt.date,
+) -> tuple[Series[float], tuple[str, ValueType], str]:
+    """Common logic for base column data extraction.
+
+    Parameters
+    ----------
+    base_column : tuple[str, ValueType] | int
+        Column reference
+    earlier : dt.date
+        Start date
+    later : dt.date
+        End date
+
+    Returns:
+    -------
+    tuple[Series[float], tuple[str, ValueType], str]
+        data, item, label
+    """
+    if isinstance(base_column, tuple):
+        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)][
+            base_column
+        ]
+        item = base_column
+        label = cast("tuple[str, str]", self.tsdf[base_column].name)[0]
+    elif isinstance(base_column, int):
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].iloc[:, base_column]
+        item = cast("tuple[str, ValueType]", self.tsdf.iloc[:, base_column].name)
+        label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[0]
+    else:
+        msg = "base_column should be a tuple[str, ValueType] or an integer."
+        raise TypeError(msg)
+
+    return data, item, label
+
+
+def _calculate_time_factor(
+    data: Series[float],
+    earlier: dt.date,
+    later: dt.date,
+    periods_in_a_year_fixed: DaysInYearType | None = None,
+) -> float:
+    """Calculate time factor for annualization.
+
+    Parameters
+    ----------
+    data : Series[float]
+        Data series for counting observations
+    earlier : dt.date
+        Start date
+    later : dt.date
+        End date
+    periods_in_a_year_fixed : DaysInYearType, optional
+        Fixed periods in year
+
+    Returns:
+    -------
+    float
+        Time factor
+    """
+    if periods_in_a_year_fixed:
+        return float(periods_in_a_year_fixed)
+
+    fraction = (later - earlier).days / 365.25
+    return data.count() / fraction
+
+
+class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     """Declare _CommonModel."""
 
     tsdf: DataFrame = DataFrame(dtype="float64")
@@ -99,12 +218,14 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         revalidate_instances="always",
     )
 
-    def _coerce_result(self: Self, result: Series[float], name: str) -> Combo_co:
+    def _coerce_result(
+        self: Self, result: Series[float], name: str
+    ) -> SeriesOrFloat_co:
         if self.tsdf.shape[1] == 1:
             arr = float(asarray(a=result, dtype=float64).squeeze())
-            return cast("Combo_co", arr)  # type: ignore[redundant-cast]
+            return cast("SeriesOrFloat_co", arr)  # type: ignore[redundant-cast]
         return cast(
-            "Combo_co",
+            "SeriesOrFloat_co",
             Series(
                 data=result,
                 index=self.tsdf.columns,
@@ -187,13 +308,14 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         return self.length / self.yearfrac
 
     @property
-    def max_drawdown_cal_year(self: Self) -> Combo_co:
+    def max_drawdown_cal_year(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
         -------
-        Combo_co
+        SeriesOrFloat_co
             Maximum drawdown in a single calendar year.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         years = Index(d.year for d in self.tsdf.index)
@@ -208,43 +330,49 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         return self._coerce_result(result=result, name="Max drawdown in cal yr")
 
     @property
-    def geo_ret(self: Self) -> Combo_co:
+    def geo_ret(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/c/cagr.asp.
 
         Returns:
         -------
-        Combo_co
-            Compounded Annual Growth Rate (CAGR)
+        SeriesOrFloat_co
+            Compounded Annual Growth Rate (CAGR).
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.geo_ret_func()
 
     @property
-    def arithmetic_ret(self: Self) -> Combo_co:
+    def arithmetic_ret(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Returns:
         -------
-        Combo_co
-            Annualized arithmetic mean of returns
+        SeriesOrFloat_co
+            Annualized arithmetic mean of returns.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.arithmetic_ret_func()
 
     @property
-    def value_ret(self: Self) -> Combo_co:
+    def value_ret(self: Self) -> SeriesOrFloat_co:
         """Simple return.
 
         Returns:
         -------
-        Combo_co
-            Simple return
+        SeriesOrFloat_co
+            Simple return.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.value_ret_func()
 
     @property
-    def vol(self: Self) -> Combo_co:
+    def vol(self: Self) -> SeriesOrFloat_co:
         """Annualized volatility.
 
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
@@ -252,14 +380,16 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Annualized volatility
+        SeriesOrFloat_co
+            Annualized volatility.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.vol_func()
 
     @property
-    def downside_deviation(self: Self) -> Combo_co:
+    def downside_deviation(self: Self) -> SeriesOrFloat_co:
         """Downside Deviation.
 
         Standard deviation of returns that are below a Minimum Accepted Return
@@ -268,8 +398,10 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Downside deviation
+        SeriesOrFloat_co
+            Downside deviation.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         min_accepted_return: float = 0.0
@@ -280,29 +412,33 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         )
 
     @property
-    def ret_vol_ratio(self: Self) -> Combo_co:
+    def ret_vol_ratio(self: Self) -> SeriesOrFloat_co:
         """Ratio of annualized arithmetic mean of returns and annualized volatility.
 
         Returns:
         -------
-        Combo_co
-            Ratio of the annualized arithmetic mean of returns and annualized
+        SeriesOrFloat_co
+            Ratio of the annualized arithmetic mean of returns and annualized.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             volatility.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         riskfree_rate: float = 0.0
         return self.ret_vol_ratio_func(riskfree_rate=riskfree_rate)
 
     @property
-    def sortino_ratio(self: Self) -> Combo_co:
+    def sortino_ratio(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Returns:
         -------
-        Combo_co
-            Sortino ratio calculated as the annualized arithmetic mean of returns
+        SeriesOrFloat_co
+            Sortino ratio calculated as the annualized arithmetic mean of returns.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         riskfree_rate: float = 0.0
@@ -313,7 +449,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         )
 
     @property
-    def kappa3_ratio(self: Self) -> Combo_co:
+    def kappa3_ratio(self: Self) -> SeriesOrFloat_co:
         """Kappa-3 ratio.
 
         The Kappa-3 ratio is a generalized downside-risk ratio defined as
@@ -324,9 +460,11 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Kappa-3 ratio calculation with the riskfree rate and
+        SeriesOrFloat_co
+            Kappa-3 ratio calculation with the riskfree rate and.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame
             Minimum Acceptable Return (MAR) both set to zero.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         riskfree_rate: float = 0.0
@@ -339,38 +477,44 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         )
 
     @property
-    def omega_ratio(self: Self) -> Combo_co:
+    def omega_ratio(self: Self) -> SeriesOrFloat_co:
         """https://en.wikipedia.org/wiki/Omega_ratio.
 
         Returns:
         -------
-        Combo_co
-            Omega ratio calculation
+        SeriesOrFloat_co
+            Omega ratio calculation.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         minimum_accepted_return: float = 0.0
         return self.omega_ratio_func(min_accepted_return=minimum_accepted_return)
 
     @property
-    def z_score(self: Self) -> Combo_co:
+    def z_score(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/z/zscore.asp.
 
         Returns:
         -------
-        Combo_co
+        SeriesOrFloat_co
             Z-score as (last return - mean return) / standard deviation of returns.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.z_score_func()
 
     @property
-    def max_drawdown(self: Self) -> Combo_co:
+    def max_drawdown(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
         -------
-        Combo_co
-            Maximum drawdown without any limit on date range
+        SeriesOrFloat_co
+            Maximum drawdown without any limit on date range.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.max_drawdown_func()
@@ -401,26 +545,30 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         ).dt.date
 
     @property
-    def worst(self: Self) -> Combo_co:
+    def worst(self: Self) -> SeriesOrFloat_co:
         """Most negative percentage change.
 
         Returns:
         -------
-        Combo_co
-            Most negative percentage change
+        SeriesOrFloat_co
+            Most negative percentage change.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         observations: int = 1
         return self.worst_func(observations=observations)
 
     @property
-    def worst_month(self: Self) -> Combo_co:
+    def worst_month(self: Self) -> SeriesOrFloat_co:
         """Most negative month.
 
         Returns:
         -------
-        Pandas.Series[float]
-            Most negative month
+        SeriesOrFloat_co
+            Most negative month.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         method: LiteralPandasReindexMethod = "nearest"
@@ -458,56 +606,64 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         return self._coerce_result(result=result, name="Worst month")
 
     @property
-    def positive_share(self: Self) -> Combo_co:
+    def positive_share(self: Self) -> SeriesOrFloat_co:
         """The share of percentage changes that are greater than zero.
 
         Returns:
         -------
-        Combo_co
-            The share of percentage changes that are greater than zero
+        SeriesOrFloat_co
+            The share of percentage changes that are greater than zero.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.positive_share_func()
 
     @property
-    def skew(self: Self) -> Combo_co:
+    def skew(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/s/skewness.asp.
 
         Returns:
         -------
-        Combo_co
-            Skew of the return distribution
+        SeriesOrFloat_co
+            Skew of the return distribution.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.skew_func()
 
     @property
-    def kurtosis(self: Self) -> Combo_co:
+    def kurtosis(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Returns:
         -------
-        Combo_co
-            Kurtosis of the return distribution
+        SeriesOrFloat_co
+            Kurtosis of the return distribution.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         return self.kurtosis_func()
 
     @property
-    def cvar_down(self: Self) -> Combo_co:
+    def cvar_down(self: Self) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Returns:
         -------
-        Combo_co
-            Downside 95% Conditional Value At Risk "CVaR"
+        SeriesOrFloat_co
+            Downside 95% Conditional Value At Risk "CVaR".
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         level: float = 0.95
         return self.cvar_down_func(level=level)
 
     @property
-    def var_down(self: Self) -> Combo_co:
+    def var_down(self: Self) -> SeriesOrFloat_co:
         """Downside 95% Value At Risk (VaR).
 
         The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
@@ -515,8 +671,10 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Downside 95% Value At Risk (VaR)
+        SeriesOrFloat_co
+            Downside 95% Value At Risk (VaR).
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
         level: float = 0.95
@@ -524,16 +682,18 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         return self.var_down_func(level=level, interpolation=interpolation)
 
     @property
-    def vol_from_var(self: Self) -> Combo_co:
+    def vol_from_var(self: Self) -> SeriesOrFloat_co:
         """Implied annualized volatility from Downside 95% Value at Risk.
 
         Assumes that returns are normally distributed.
 
         Returns:
         -------
-        Combo_co
-            Implied annualized volatility from the Downside 95% VaR using the
+        SeriesOrFloat_co
+            Implied annualized volatility from the Downside 95% VaR using the.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             assumption that returns are normally distributed.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         level: float = 0.95
@@ -652,7 +812,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         calendar = holiday_calendar(
             startyear=startyear,
             endyear=endyear,
-            countries=countries,
+            countries=countries or "SE",
             markets=markets,
             custom_holidays=custom_holidays,
         )
@@ -1316,7 +1476,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Parameters
@@ -1334,33 +1494,21 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Annualized arithmetic mean of returns
+        SeriesOrFloat_co
+            Annualized arithmetic mean of returns.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
 
         """
-        earlier, later = self.calc_range(
-            months_offset=months_from_last,
-            from_dt=from_date,
-            to_dt=to_date,
+        _earlier, _later, time_factor, data = _get_date_range_and_factor(
+            self=self,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            how_many = (
-                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-                .count()
-                .iloc[0]
-            )
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
 
-        result = (
-            self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-            .ffill()
-            .pct_change()
-            .mean()
-            * time_factor
-        )
+        result = data.ffill().pct_change().mean() * time_factor
 
         return self._coerce_result(result=result, name="Arithmetic return")
 
@@ -1370,7 +1518,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Annualized volatility.
 
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
@@ -1390,27 +1538,19 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Annualized volatility
+        SeriesOrFloat_co
+            Annualized volatility.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
-        earlier, later = self.calc_range(
-            months_offset=months_from_last,
-            from_dt=from_date,
-            to_dt=to_date,
+        _earlier, _later, time_factor, data = _get_date_range_and_factor(
+            self=self,
+            months_from_last=months_from_last,
+            from_date=from_date,
+            to_date=to_date,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            how_many = (
-                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-                .count()
-                .iloc[0]
-            )
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
 
-        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
         result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
         return self._coerce_result(result=result, name="Volatility")
@@ -1425,7 +1565,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Implied annualized volatility.
 
         Implied annualized volatility from the Downside VaR using the assumption
@@ -1452,8 +1592,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Implied annualized volatility from the Downside VaR using the
+        SeriesOrFloat_co
+            Implied annualized volatility from the Downside VaR using the.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             assumption that returns are normally distributed.
 
         """
@@ -1480,7 +1621,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Target weight from VaR.
 
         A position weight multiplier from the ratio between a VaR implied
@@ -1513,8 +1654,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            A position weight multiplier from the ratio between a VaR implied
+        SeriesOrFloat_co
+            A position weight multiplier from the ratio between a VaR implied.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             volatility and a given target volatility. Multiplier = 1.0 -> target met
 
         """
@@ -1544,7 +1686,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         periods_in_a_year_fixed: DaysInYearType | None = None,
         *,
         drift_adjust: bool = False,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Volatility implied from VaR or Target Weight.
 
         The function returns a position weight multiplier from the ratio between
@@ -1579,8 +1721,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Target volatility if target_vol is provided otherwise the VaR
+        SeriesOrFloat_co
+            Target volatility if target_vol is provided otherwise the VaR.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             implied volatility.
 
         """
@@ -1647,7 +1790,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Downside Conditional Value At Risk "CVaR".
 
         https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
@@ -1666,8 +1809,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Downside Conditional Value At Risk "CVaR"
+        SeriesOrFloat_co
+            Downside Conditional Value At Risk "CVaR".
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(
@@ -1698,7 +1842,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Downside Deviation if order set to 2.
 
         If order is set to 2 the function calculates the standard
@@ -1725,8 +1869,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Downside deviation if order set to 2
+        SeriesOrFloat_co
+            Downside deviation if order set to 2.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         msg = f"'order' must be 2 or 3, got {order!r}."
@@ -1781,7 +1926,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Compounded Annual Growth Rate (CAGR).
 
         https://www.investopedia.com/terms/c/cagr.asp.
@@ -1798,8 +1943,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Compounded Annual Growth Rate (CAGR)
+        SeriesOrFloat_co
+            Compounded Annual Growth Rate (CAGR).
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         zero = 0.0
@@ -1830,7 +1976,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Skew of the return distribution.
 
         https://www.investopedia.com/terms/s/skewness.asp.
@@ -1847,8 +1993,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Skew of the return distribution
+        SeriesOrFloat_co
+            Skew of the return distribution.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(
@@ -1873,7 +2020,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Kurtosis of the return distribution.
 
         https://www.investopedia.com/terms/k/kurtosis.asp.
@@ -1890,8 +2037,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Kurtosis of the return distribution
+        SeriesOrFloat_co
+            Kurtosis of the return distribution.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(
@@ -1921,7 +2069,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         min_periods: int = 1,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Maximum drawdown without any limit on date range.
 
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
@@ -1940,8 +2088,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Maximum drawdown without any limit on date range
+        SeriesOrFloat_co
+            Maximum drawdown without any limit on date range.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(
@@ -1963,7 +2112,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Calculate share of percentage changes that are greater than zero.
 
         Parameters
@@ -1978,8 +2127,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Calculate share of percentage changes that are greater than zero
+        SeriesOrFloat_co
+            Calculate share of percentage changes that are greater than zero.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         zero: float = 0.0
@@ -2016,7 +2166,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Ratio between arithmetic mean of returns and annualized volatility.
 
         The ratio of annualized arithmetic mean of returns and annualized
@@ -2042,8 +2192,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Ratio of the annualized arithmetic mean of returns and annualized
+        SeriesOrFloat_co
+            Ratio of the annualized arithmetic mean of returns and annualized.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             volatility or, if risk-free return provided, Sharpe ratio
 
         """
@@ -2073,7 +2224,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Sortino Ratio or Kappa3 Ratio.
 
         The Sortino ratio calculated as ( return - risk free return )
@@ -2106,8 +2257,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Sortino ratio calculated as ( return - riskfree return ) /
+        SeriesOrFloat_co
+            Sortino ratio calculated as ( return - riskfree return ) /.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             downside deviation (std dev of returns below MAR)
 
         """
@@ -2139,7 +2291,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Omega Ratio.
 
         The Omega Ratio compares returns above a certain target level
@@ -2161,8 +2313,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Omega ratio calculation
+        SeriesOrFloat_co
+            Omega ratio calculation.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(
@@ -2186,7 +2339,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Calculate simple return.
 
         Parameters
@@ -2201,8 +2354,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Calculate simple return
+        SeriesOrFloat_co
+            Calculate simple return.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         zero: float = 0.0
@@ -2229,7 +2383,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         self: Self,
         year: int,
         month: int | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Calculate simple return for a specific calendar period.
 
         Parameters
@@ -2241,8 +2395,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Calculate simple return for a specific calendar period
+        SeriesOrFloat_co
+            Calculate simple return for a specific calendar period.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         if month is None:
@@ -2264,7 +2419,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
         interpolation: LiteralQuantileInterp = "lower",
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Downside Value At Risk, "VaR".
 
         The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
@@ -2286,8 +2441,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Downside Value At Risk
+        SeriesOrFloat_co
+            Downside Value At Risk.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(
@@ -2310,7 +2466,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Most negative percentage change over a rolling number of observations.
 
         Parameters
@@ -2327,8 +2483,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Most negative percentage change over a rolling number of observations
+        SeriesOrFloat_co
+            Most negative percentage change over a rolling number of observations.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
             within a chosen date range
 
         """
@@ -2353,7 +2510,7 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
         months_from_last: int | None = None,
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
-    ) -> Combo_co:
+    ) -> SeriesOrFloat_co:
         """Z-score as (last return - mean return) / standard deviation of returns.
 
         https://www.investopedia.com/terms/z/zscore.asp.
@@ -2370,8 +2527,9 @@ class _CommonModel(BaseModel, Generic[Combo_co]):
 
         Returns:
         -------
-        Combo_co
-            Z-score as (last return - mean return) / standard deviation of returns
+        SeriesOrFloat_co
+            Z-score as (last return - mean return) / standard deviation of returns.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(

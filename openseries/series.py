@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
-    from collections.abc import Callable
 
     from numpy.typing import NDArray
     from pandas import Timestamp
@@ -41,7 +40,7 @@ from pandas import (
 )
 from pydantic import field_validator, model_validator
 
-from ._common_model import _CommonModel
+from ._common_model import _calculate_time_factor, _CommonModel
 from .datefixer import _do_resample_to_business_period_ends, date_fix
 from .owntypes import (
     Countries,
@@ -63,9 +62,6 @@ from .owntypes import (
     ValueType,
 )
 
-FieldValidator = cast("Callable[..., Callable[..., Any]]", field_validator)
-ModelValidator = cast("Callable[..., Callable[..., Any]]", model_validator)
-
 logger = getLogger(__name__)
 
 __all__ = ["OpenTimeSeries", "timeseries_chain"]
@@ -73,7 +69,6 @@ __all__ = ["OpenTimeSeries", "timeseries_chain"]
 TypeOpenTimeSeries = TypeVar("TypeOpenTimeSeries", bound="OpenTimeSeries")
 
 
-# noinspection PyUnresolvedReferences,PyNestedDecorators
 class OpenTimeSeries(_CommonModel[float]):
     """OpenTimeSeries objects are at the core of the openseries package.
 
@@ -130,21 +125,21 @@ class OpenTimeSeries(_CommonModel[float]):
     isin: str | None = None
     label: str | None = None
 
-    @FieldValidator("domestic", mode="before")
+    @field_validator("domestic", mode="before")
     @classmethod
     def _validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
         _ = Currency(ccy=value)
         return value
 
-    @FieldValidator("countries", mode="before")
+    @field_validator("countries", mode="before")
     @classmethod
     def _validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
         _ = Countries(countryinput=value)
         return value
 
-    @FieldValidator("markets", mode="before")
+    @field_validator("markets", mode="before")
     @classmethod
     def _validate_markets(
         cls,
@@ -164,7 +159,7 @@ class OpenTimeSeries(_CommonModel[float]):
             raise MarketsNotStringNorListStrError(item_msg)
         raise MarketsNotStringNorListStrError(msg)
 
-    @ModelValidator(mode="after")
+    @model_validator(mode="after")
     def _dates_and_values_validate(self: Self) -> Self:
         """Pydantic validator to ensure dates and values are validated."""
         values_list_length = len(self.values)
@@ -282,7 +277,7 @@ class OpenTimeSeries(_CommonModel[float]):
                 label, _ = dframe.name
             else:
                 label = dframe.name
-            values = cast("list[float]", dframe.to_numpy().tolist())
+            values = dframe.to_numpy().tolist()
         elif isinstance(dframe, DataFrame):
             values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
@@ -301,12 +296,11 @@ class OpenTimeSeries(_CommonModel[float]):
                     msg = f"valuetype missing. Adding: {valuetype.value}"
                     logger.warning(msg=msg)
                 else:
-                    valuetype = cast(
-                        "ValueType",
-                        dframe.columns.get_level_values(1).to_numpy()[column_nmbr],
-                    )
+                    valuetype = dframe.columns.get_level_values(1).to_numpy()[
+                        column_nmbr
+                    ]
             else:
-                label = cast("MultiIndex", dframe.columns).to_numpy()[column_nmbr]
+                label = dframe.columns.to_numpy()[column_nmbr]
         else:
             raise TypeError(msg)
 
@@ -472,7 +466,6 @@ class OpenTimeSeries(_CommonModel[float]):
             The returns of the values in the series
 
         """
-        # noinspection PyCallingNonCallable
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
@@ -684,16 +677,14 @@ class OpenTimeSeries(_CommonModel[float]):
             from_dt=from_date,
             to_dt=to_date,
         )
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            how_many = (
-                self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
-                .count()
-                .iloc[0]
-            )
-            fraction = (later - earlier).days / 365.25
-            time_factor = how_many / fraction
+        time_factor = _calculate_time_factor(
+            data=self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ].iloc[:, 0],
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
         data = self.tsdf.loc[
             cast("Timestamp", earlier) : cast("Timestamp", later)
@@ -757,7 +748,6 @@ class OpenTimeSeries(_CommonModel[float]):
         ra_df = ra_df.dropna()
 
         prev = self.first_idx
-        # noinspection PyTypeChecker
         dates: list[dt.date] = [prev]
 
         for idx, row in ra_df.iterrows():
@@ -878,7 +868,6 @@ def timeseries_chain(
 
     dates.extend([x.strftime("%Y-%m-%d") for x in new.tsdf.index])
 
-    # noinspection PyTypeChecker
     return back.__class__(
         timeseries_id=new.timeseries_id,
         instrument_id=new.instrument_id,

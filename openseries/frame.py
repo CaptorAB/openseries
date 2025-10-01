@@ -16,10 +16,12 @@ from typing import TYPE_CHECKING, Any, cast
 
 from numpy import (
     array,
+    asarray,
     concatenate,
     cov,
     diff,
     divide,
+    float64,
     isinf,
     log,
     nan,
@@ -39,6 +41,7 @@ from pandas import (
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
 
+    from numpy.typing import NDArray
     from pandas import Series as _Series
     from pandas import Timestamp
 
@@ -49,7 +52,7 @@ else:
 from pydantic import field_validator
 from sklearn.linear_model import LinearRegression  # type: ignore[import-untyped]
 
-from ._common_model import _CommonModel
+from ._common_model import _calculate_time_factor, _CommonModel, _get_base_column_data
 from .datefixer import _do_resample_to_business_period_ends
 from .owntypes import (
     DaysInYearType,
@@ -77,7 +80,6 @@ logger = getLogger(__name__)
 __all__ = ["OpenFrame"]
 
 
-# noinspection PyUnresolvedReferences,PyTypeChecker
 class OpenFrame(_CommonModel[SeriesFloat]):
     """OpenFrame objects hold OpenTimeSeries in the list constituents.
 
@@ -101,7 +103,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     tsdf: DataFrame = DataFrame(dtype="float64")
     weights: list[float] | None = None
 
-    # noinspection PyMethodParameters
     @field_validator("constituents")
     def _check_labels_unique(
         cls: type[OpenFrame],  # noqa: N805
@@ -150,10 +151,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     def _set_tsdf(self: Self) -> None:
         """Set the tsdf DataFrame."""
         if self.constituents is not None and len(self.constituents) != 0:
-            self.tsdf = reduce(
-                lambda left, right: concat([left, right], axis="columns", sort=True),
-                [x.tsdf for x in self.constituents],
-            )
+            if len(self.constituents) == 1:
+                self.tsdf = self.constituents[0].tsdf.copy()
+            else:
+                self.tsdf = concat(
+                    [x.tsdf for x in self.constituents], axis="columns", sort=True
+                )
         else:
             logger.warning("OpenFrame() was passed an empty list.")
 
@@ -610,13 +613,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             .std(ddof=dlta_degr_freedms)
             * sqrt(time_factor),
         ]
-        raw_cov = [
-            cov(
-                m=data[(cols[0], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
-                y=data[(cols[1], ValueType.RTRN)].iloc[1:day_chunk].to_numpy(),
-                ddof=dlta_degr_freedms,
-            )[0][1],
-        ]
+        rm = data[(cols[0], ValueType.RTRN)].iloc[1:day_chunk]
+        m: NDArray[float64] = asarray(rm, dtype=float64)
+        ry = data[(cols[1], ValueType.RTRN)].iloc[1:day_chunk]
+        y: NDArray[float64] = asarray(ry, dtype=float64)
+
+        raw_cov = [cov(m=m, y=y, ddof=dlta_degr_freedms)[0][1]]
 
         r1 = data[(cols[0], ValueType.RTRN)]
         r2 = data[(cols[1], ValueType.RTRN)]
@@ -855,36 +857,20 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             from_dt=from_date,
             to_dt=to_date,
         )
-        fraction: float = (later - earlier).days / 365.25
 
-        msg = "base_column should be a tuple[str, ValueType] or an integer."
-        if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ][base_column]
-            short_item = base_column
-            short_label = cast(
-                "tuple[str, ValueType]",
-                self.tsdf[base_column].name,
-            )[0]
-        elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ].iloc[:, base_column]
-            short_item = cast(
-                "tuple[str, ValueType]",
-                self.tsdf.iloc[:, base_column].name,
-            )
-            short_label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[
-                0
-            ]
-        else:
-            raise TypeError(msg)
+        shortdf, short_item, short_label = _get_base_column_data(
+            self=self,
+            base_column=base_column,
+            earlier=earlier,
+            later=later,
+        )
 
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            time_factor = shortdf.count() / fraction
+        time_factor = _calculate_time_factor(
+            data=shortdf,
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
         terrors = []
         for item in self.tsdf:
@@ -946,39 +932,20 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             from_dt=from_date,
             to_dt=to_date,
         )
-        fraction: float = (later - earlier).days / 365.25
 
-        msg = "base_column should be a tuple[str, ValueType] or an integer."
-        if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ][base_column]
-            short_item = base_column
-            short_label = cast(
-                "tuple[str, str]",
-                self.tsdf[base_column].name,
-            )[0]
-        elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ].iloc[:, base_column]
-            short_item = cast(
-                "tuple[str, ValueType]",
-                self.tsdf.iloc[
-                    :,
-                    base_column,
-                ].name,
-            )
-            short_label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[
-                0
-            ]
-        else:
-            raise TypeError(msg)
+        shortdf, short_item, short_label = _get_base_column_data(
+            self=self,
+            base_column=base_column,
+            earlier=earlier,
+            later=later,
+        )
 
-        if periods_in_a_year_fixed:
-            time_factor = float(periods_in_a_year_fixed)
-        else:
-            time_factor = shortdf.count() / fraction
+        time_factor = _calculate_time_factor(
+            data=shortdf,
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
 
         ratios = []
         for item in self.tsdf:
@@ -1451,7 +1418,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             returns = self.tsdf.ffill().pct_change()
             returns.iloc[0] = 0
         elif all(vtypes):
-            returns = self.tsdf.copy()
+            returns = self.tsdf
         else:
             msg = "Mix of series types will give inconsistent results"
             raise MixedValuetypesError(msg)

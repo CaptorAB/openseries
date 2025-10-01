@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "1.9.6"
+version = "1.9.7"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
@@ -66,15 +66,24 @@ pre-commit = ">=3.7.1,<6.0.0"
 pytest = ">=8.2.2,<9.0.0"
 pytest-cov = ">=5.0.0,<8.0.0"
 pytest-xdist = ">=3.3.1,<5.0.0"
-ruff = "0.13.1"
+ruff = "0.13.2"
 types-openpyxl = ">=3.1.2,<5.0.0"
 scipy-stubs = ">=1.14.1.0,<2.0.0"
 types-python-dateutil = ">=2.8.2,<4.0.0"
 types-requests = ">=2.20.0,<3.0.0"
 
 [build-system]
-requires = ["poetry-core>=2.2.0"]
+requires = ["poetry-core>=2.2.1"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.setuptools.package-data]
+openseries = ["py.typed"]
+
+packages = [
+  { include = "openseries", from = "src" }
+]
+
+include = [{ path = "src/openseries/py.typed", format = ["sdist", "wheel"] }]
 
 [tool.mypy]
 python_version = "3.13"
