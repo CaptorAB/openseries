@@ -2,7 +2,6 @@
 __pycache__/
 /.mypy_cache/
 /.pytest_cache/
-/.pytype/
 /.ruff_cache/
 
 # Coverage files
@@ -14,7 +13,7 @@ junit.xml
 /venv/
 
 # Pycharm
-/.idea/*
+/.idea/
 
 # Mac OSX
 .DS_Store
