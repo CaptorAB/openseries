@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Handling &mdash; openseries 1.9.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=0f42b3e6"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Basic Financial Analysis" href="../tutorials/basic_analysis.html" />
+    <link rel="prev" title="Core Concepts" href="core_concepts.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            openseries
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core_concepts.html">Core Concepts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Handling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#loading-data">Loading Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#from-pandas-dataframe-series">From pandas DataFrame/Series</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-arrays">From Arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-fixed-rate">From Fixed Rate</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-validation">Data Validation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#date-format-validation">Date Format Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#value-validation">Value Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#length-consistency">Length Consistency</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-transformations">Data Transformations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#price-and-return-conversions">Price and Return Conversions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resampling">Resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#business-day-alignment">Business Day Alignment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#handling-missing-data">Handling Missing Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nan-handling-strategies">NaN Handling Strategies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dropping-missing-data">Dropping Missing Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-multiple-assets">Working with Multiple Assets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-openframe">Creating OpenFrame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#handling-different-date-ranges">Handling Different Date Ranges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-and-removing-series">Adding and Removing Series</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-export-and-import">Data Export and Import</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#excel-export">Excel Export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#json-export">JSON Export</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-real-data-sources">Working with Real Data Sources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#yahoo-finance-integration">Yahoo Finance Integration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#csv-data">CSV Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#database-integration">Database Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-quality-checks">Data Quality Checks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#validation-methods">Validation Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#outlier-detection">Outlier Detection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#performance-considerations">Performance Considerations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#memory-usage">Memory Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#efficient-data-loading">Efficient Data Loading</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/basic_analysis.html">Basic Financial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/portfolio_analysis.html">Portfolio Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/risk_management.html">Risk Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/advanced_features.html">Advanced Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Custom Reports</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/openseries.html">openseries package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/series.html">OpenTimeSeries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/frame.html">OpenFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/portfoliotools.html">Portfolio Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/simulation.html">Simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/report.html">Report Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/datefixer.html">Date Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/types.html">Types and Enums</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../development/contributing.html">Contributing to openseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">openseries</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data Handling</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/data_handling.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="data-handling">
+<h1>Data Handling<a class="headerlink" href="#data-handling" title="Link to this heading"></a></h1>
+<p>This guide covers data loading, validation, transformation, and management in openseries.</p>
+<section id="loading-data">
+<h2>Loading Data<a class="headerlink" href="#loading-data" title="Link to this heading"></a></h2>
+<section id="from-pandas-dataframe-series">
+<h3>From pandas DataFrame/Series<a class="headerlink" href="#from-pandas-dataframe-series" title="Link to this heading"></a></h3>
+<p>The most common way to load data is from pandas objects:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span>
+
+<span class="c1"># From pandas Series with DatetimeIndex</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample&quot;</span><span class="p">)</span>
+
+<span class="c1"># From pandas DataFrame column</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+    <span class="s1">&#39;Close&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span>
+    <span class="s1">&#39;Volume&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1100</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">1200</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="from-arrays">
+<h3>From Arrays<a class="headerlink" href="#from-arrays" title="Link to this heading"></a></h3>
+<p>For custom data or when working with lists:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># From date strings and values</span>
+<span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">]</span>
+<span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>
+
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
+    <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Data&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="from-fixed-rate">
+<h3>From Fixed Rate<a class="headerlink" href="#from-fixed-rate" title="Link to this heading"></a></h3>
+<p>Generate synthetic data from a fixed rate:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+
+<span class="c1"># Create 252 trading days at 5% annual rate</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_fixed_rate</span><span class="p">(</span>
+    <span class="n">rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">days</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
+    <span class="n">end_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;5</span><span class="si">% F</span><span class="s2">ixed Rate&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="data-validation">
+<h2>Data Validation<a class="headerlink" href="#data-validation" title="Link to this heading"></a></h2>
+<section id="date-format-validation">
+<h3>Date Format Validation<a class="headerlink" href="#date-format-validation" title="Link to this heading"></a></h3>
+<p>openseries enforces strict date formats:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Valid date formats</span>
+<span class="n">valid_dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-12-31&#39;</span><span class="p">,</span> <span class="s1">&#39;2024-02-29&#39;</span><span class="p">]</span>  <span class="c1"># ISO format</span>
+
+<span class="c1"># Invalid formats will raise ValidationError</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+        <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;01/01/2023&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-1-1&#39;</span><span class="p">],</span>  <span class="c1"># Wrong format</span>
+        <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">]</span>
+    <span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date validation error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="value-validation">
+<h3>Value Validation<a class="headerlink" href="#value-validation" title="Link to this heading"></a></h3>
+<p>Values must be numeric and finite:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># Valid values</span>
+<span class="n">valid_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.5</span><span class="p">,</span> <span class="mf">99.25</span><span class="p">,</span> <span class="mf">102.75</span><span class="p">]</span>
+
+<span class="c1"># Handle NaN values appropriately</span>
+<span class="n">values_with_nan</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="n">values_with_nan</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Data with NaN&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Clean NaN values</span>
+<span class="n">clean_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span>  <span class="c1"># Forward fill</span>
+</pre></div>
+</div>
+</section>
+<section id="length-consistency">
+<h3>Length Consistency<a class="headerlink" href="#length-consistency" title="Link to this heading"></a></h3>
+<p>Dates and values must have the same length:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This will raise an error</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+        <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
+        <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>  <span class="c1"># Different length</span>
+    <span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length mismatch error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="data-transformations">
+<h2>Data Transformations<a class="headerlink" href="#data-transformations" title="Link to this heading"></a></h2>
+<section id="price-and-return-conversions">
+<h3>Price and Return Conversions<a class="headerlink" href="#price-and-return-conversions" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assume we have a price series</span>
+<span class="n">prices</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock Price&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Convert to simple returns</span>
+<span class="n">returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns: </span><span class="si">{</span><span class="n">returns</span><span class="o">.</span><span class="n">values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># [0.02, -0.0294...]</span>
+
+<span class="c1"># Convert to log returns</span>
+<span class="n">log_returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
+
+<span class="c1"># Convert returns back to cumulative values</span>
+<span class="n">cumulative</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
+
+<span class="c1"># Convert to differences (absolute changes)</span>
+<span class="n">differences</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">value_to_diff</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="resampling">
+<h3>Resampling<a class="headerlink" href="#resampling" title="Link to this heading"></a></h3>
+<p>Change the frequency of your data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Daily to monthly (business month end)</span>
+<span class="n">monthly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+
+<span class="c1"># Daily to quarterly</span>
+<span class="n">quarterly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
+
+<span class="c1"># Daily to annual</span>
+<span class="n">annual</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BYE&quot;</span><span class="p">)</span>
+
+<span class="c1"># Custom resampling with pandas frequency strings</span>
+<span class="n">weekly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
+
+<span class="c1"># Resample with specific method</span>
+<span class="n">weekly_mean</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="business-day-alignment">
+<h3>Business Day Alignment<a class="headerlink" href="#business-day-alignment" title="Link to this heading"></a></h3>
+<p>Align data to business day calendars:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Align to US business days</span>
+<span class="n">us_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
+
+<span class="c1"># Align to multiple countries (intersection)</span>
+<span class="n">global_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;JP&quot;</span><span class="p">])</span>
+
+<span class="c1"># Align to specific market calendar</span>
+<span class="n">nyse_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">markets</span><span class="o">=</span><span class="s2">&quot;NYSE&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="handling-missing-data">
+<h2>Handling Missing Data<a class="headerlink" href="#handling-missing-data" title="Link to this heading"></a></h2>
+<section id="nan-handling-strategies">
+<h3>NaN Handling Strategies<a class="headerlink" href="#nan-handling-strategies" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># Create series with missing values</span>
+<span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">]</span>
+<span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span>
+
+<span class="n">series_with_nan</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;With NaN&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Forward fill missing values (for price series)</span>
+<span class="n">filled_series</span> <span class="o">=</span> <span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span>
+
+<span class="c1"># For return series, replace NaN with 0.0</span>
+<span class="n">return_series</span> <span class="o">=</span> <span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="n">clean_returns</span> <span class="o">=</span> <span class="n">return_series</span><span class="o">.</span><span class="n">return_nan_handle</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="dropping-missing-data">
+<h3>Dropping Missing Data<a class="headerlink" href="#dropping-missing-data" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remove NaN values entirely</span>
+<span class="n">clean_series</span> <span class="o">=</span> <span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="working-with-multiple-assets">
+<h2>Working with Multiple Assets<a class="headerlink" href="#working-with-multiple-assets" title="Link to this heading"></a></h2>
+<section id="creating-openframe">
+<h3>Creating OpenFrame<a class="headerlink" href="#creating-openframe" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenFrame</span>
+
+<span class="c1"># Create multiple series</span>
+<span class="n">series1</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset A&quot;</span>
+<span class="p">)</span>
+
+<span class="n">series2</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">49</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset B&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Create frame</span>
+<span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">series1</span><span class="p">,</span> <span class="n">series2</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="handling-different-date-ranges">
+<h3>Handling Different Date Ranges<a class="headerlink" href="#handling-different-date-ranges" title="Link to this heading"></a></h3>
+<p>OpenFrame automatically handles series with different date ranges:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Series with different start/end dates</span>
+<span class="n">early_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2022-12-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">95</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Early Start&quot;</span>
+<span class="p">)</span>
+
+<span class="n">late_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">51</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">52</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Late Start&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Frame will align to common date range</span>
+<span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">early_series</span><span class="p">,</span> <span class="n">late_series</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frame date range: </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="adding-and-removing-series">
+<h3>Adding and Removing Series<a class="headerlink" href="#adding-and-removing-series" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a new series</span>
+<span class="n">new_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">198</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset C&quot;</span>
+<span class="p">)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">new_series</span><span class="p">)</span>
+
+<span class="c1"># Remove a series by index</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">delete_timeseries</span><span class="p">(</span><span class="n">item_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="data-export-and-import">
+<h2>Data Export and Import<a class="headerlink" href="#data-export-and-import" title="Link to this heading"></a></h2>
+<section id="excel-export">
+<h3>Excel Export<a class="headerlink" href="#excel-export" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export single series</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">&quot;single_series.xlsx&quot;</span><span class="p">)</span>
+
+<span class="c1"># Export frame (multiple series)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">&quot;multiple_series.xlsx&quot;</span><span class="p">)</span>
+
+<span class="c1"># Custom Excel export with formatting</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span>
+    <span class="s2">&quot;formatted_export.xlsx&quot;</span><span class="p">,</span>
+    <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Analysis&quot;</span><span class="p">,</span>
+    <span class="n">startrow</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">startcol</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="json-export">
+<h3>JSON Export<a class="headerlink" href="#json-export" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export series data</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;series_data.json&quot;</span><span class="p">)</span>
+
+<span class="c1"># Export with specific output format</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;values_only.json&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;values&quot;</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;full_dataframe.json&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;tsdf&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="working-with-real-data-sources">
+<h2>Working with Real Data Sources<a class="headerlink" href="#working-with-real-data-sources" title="Link to this heading"></a></h2>
+<section id="yahoo-finance-integration">
+<h3>Yahoo Finance Integration<a class="headerlink" href="#yahoo-finance-integration" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
+
+<span class="c1"># Single asset</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s2">&quot;AAPL&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)</span>
+
+<span class="n">apple</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+    <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Apple Inc.&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Multiple assets</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AAPL&quot;</span><span class="p">,</span> <span class="s2">&quot;GOOGL&quot;</span><span class="p">,</span> <span class="s2">&quot;MSFT&quot;</span><span class="p">]</span>
+<span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">ticker_symbol</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
+    <span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker_symbol</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;1y&quot;</span><span class="p">)</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+        <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">ticker_symbol</span>
+    <span class="p">)</span>
+    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+
+<span class="n">tech_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="csv-data">
+<h3>CSV Data<a class="headerlink" href="#csv-data" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load from CSV</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;stock_data.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+    <span class="n">dframe</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock from CSV&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="database-integration">
+<h3>Database Integration<a class="headerlink" href="#database-integration" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+
+<span class="c1"># Example with SQLite</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;financial_data.db&quot;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT date, close_price</span>
+<span class="s2">FROM stock_prices</span>
+<span class="s2">WHERE symbol = &#39;AAPL&#39;</span>
+<span class="s2">ORDER BY date</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span>
+
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+    <span class="n">dframe</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;close_price&#39;</span><span class="p">],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Apple from DB&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="data-quality-checks">
+<h2>Data Quality Checks<a class="headerlink" href="#data-quality-checks" title="Link to this heading"></a></h2>
+<section id="validation-methods">
+<h3>Validation Methods<a class="headerlink" href="#validation-methods" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check for data quality issues</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Series length: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date range: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Span of days: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">span_of_days</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Check for gaps in data</span>
+<span class="n">expected_length</span> <span class="o">=</span> <span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">-</span> <span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">actual_length</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">length</span>
+
+<span class="k">if</span> <span class="n">expected_length</span> <span class="o">!=</span> <span class="n">actual_length</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data gaps detected: expected </span><span class="si">{</span><span class="n">expected_length</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">actual_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="outlier-detection">
+<h3>Outlier Detection<a class="headerlink" href="#outlier-detection" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns for outlier analysis</span>
+<span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+
+<span class="c1"># Calculate z-scores</span>
+<span class="n">returns_df</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span>
+<span class="n">mean_return</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">std_return</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">z_scores</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_df</span> <span class="o">-</span> <span class="n">mean_return</span><span class="p">)</span> <span class="o">/</span> <span class="n">std_return</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="n">z_scores</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">z_scores</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span><span class="si">}</span><span class="s2"> outliers (|z| &gt; 3)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="performance-considerations">
+<h2>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h2>
+<section id="memory-usage">
+<h3>Memory Usage<a class="headerlink" href="#memory-usage" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># For large datasets, consider resampling</span>
+<span class="n">large_series</span> <span class="o">=</span> <span class="n">series</span>  <span class="c1"># Assume this is large daily data</span>
+
+<span class="c1"># Reduce to monthly for analysis</span>
+<span class="n">monthly_series</span> <span class="o">=</span> <span class="n">large_series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+
+<span class="c1"># Use monthly for computationally intensive operations</span>
+<span class="n">monthly_metrics</span> <span class="o">=</span> <span class="n">monthly_series</span><span class="o">.</span><span class="n">all_properties</span>
+</pre></div>
+</div>
+</section>
+<section id="efficient-data-loading">
+<h3>Efficient Data Loading<a class="headerlink" href="#efficient-data-loading" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># When loading multiple assets, batch the operations</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AAPL&quot;</span><span class="p">,</span> <span class="s2">&quot;GOOGL&quot;</span><span class="p">,</span> <span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="s2">&quot;AMZN&quot;</span><span class="p">,</span> <span class="s2">&quot;TSLA&quot;</span><span class="p">]</span>
+
+<span class="c1"># Download all at once</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
+
+<span class="c1"># Create series efficiently</span>
+<span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+        <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">ticker</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">ticker</span>
+    <span class="p">)</span>
+    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+
+<span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This comprehensive guide should help you handle various data scenarios effectively with openseries.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="core_concepts.html" class="btn btn-neutral float-left" title="Core Concepts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tutorials/basic_analysis.html" class="btn btn-neutral float-right" title="Basic Financial Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Captor Fund Management AB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

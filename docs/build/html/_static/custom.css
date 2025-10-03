@@ -1,0 +1,217 @@
+/* Custom CSS for openseries documentation */
+
+/* Improve code block styling */
+.highlight {
+    background: #f8f9fa !important;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1em 0;
+}
+
+/* Better table styling */
+table.docutils {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    margin: 1em 0;
+}
+
+table.docutils th,
+table.docutils td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+table.docutils th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+/* Improve admonition styling */
+.admonition {
+    margin: 1em 0;
+    padding: 1em;
+    border-left: 4px solid #007bff;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.admonition.note {
+    border-left-color: #17a2b8;
+}
+
+.admonition.warning {
+    border-left-color: #ffc107;
+    background-color: #fff3cd;
+}
+
+.admonition.danger {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+/* Better spacing for method signatures */
+.sig {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    font-family: 'Courier New', monospace;
+}
+
+/* Improve navigation */
+.wy-nav-content {
+    max-width: 1200px;
+}
+
+/* Better mobile responsiveness */
+@media screen and (max-width: 768px) {
+    .wy-nav-content {
+        margin-left: 0;
+    }
+
+    .wy-nav-side {
+        left: -300px;
+    }
+}
+
+/* Custom styling for API documentation */
+.class > dt {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 0.5em;
+    margin-top: 1em;
+}
+
+.method > dt {
+    background-color: #f3e5f5;
+    border-left: 4px solid #9c27b0;
+    padding: 0.5em;
+    margin-top: 0.5em;
+}
+
+.function > dt {
+    background-color: #e8f5e8;
+    border-left: 4px solid #4caf50;
+    padding: 0.5em;
+    margin-top: 0.5em;
+}
+
+/* Improve readability of parameter lists */
+.field-list {
+    margin: 1em 0;
+}
+
+.field-list dt {
+    font-weight: bold;
+    margin-top: 0.5em;
+}
+
+.field-list dd {
+    margin-left: 2em;
+    margin-bottom: 0.5em;
+}
+
+/* Style for version badges */
+.version-badge {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    background-color: #007bff;
+    color: white;
+    border-radius: 3px;
+    font-size: 0.8em;
+    margin-left: 0.5em;
+}
+
+/* Improve search results */
+.search-results .highlighted {
+    background-color: #fff3cd;
+    padding: 0.1em 0.2em;
+    border-radius: 2px;
+}
+
+/* Better styling for toctree */
+.toctree-wrapper ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.toctree-wrapper li {
+    margin: 0.5em 0;
+    padding-left: 1em;
+    border-left: 2px solid #e9ecef;
+}
+
+.toctree-wrapper a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.toctree-wrapper a:hover {
+    text-decoration: underline;
+}
+
+/* Custom styling for examples */
+.example-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.5em;
+    margin: 1em 0;
+}
+
+.example-title {
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 1em;
+    font-size: 1.1em;
+}
+
+/* Improve inline code styling */
+code.literal {
+    background-color: #f8f9fa;
+    color: #e83e8c;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+/* Better styling for definition lists */
+dl dt {
+    font-weight: bold;
+    margin-top: 1em;
+    color: #495057;
+}
+
+dl dd {
+    margin-left: 2em;
+    margin-bottom: 0.5em;
+}
+
+/* Improve header hierarchy */
+h1 {
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 0.5em;
+}
+
+h2 {
+    border-bottom: 2px solid #6c757d;
+    padding-bottom: 0.3em;
+}
+
+h3 {
+    color: #495057;
+    margin-top: 1.5em;
+}
+
+/* Custom footer styling */
+.footer {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid #dee2e6;
+    color: #6c757d;
+    font-size: 0.9em;
+}

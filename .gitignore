@@ -17,3 +17,8 @@ junit.xml
 
 # Mac OSX
 .DS_Store
+
+# Documentation build artifacts
+docs/build/
+docs/_build/
+docs/source/api/generated/
