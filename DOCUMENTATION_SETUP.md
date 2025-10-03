@@ -105,9 +105,11 @@ openseries/
 
 ### Local Development
 ```bash
-cd docs
-pip install -r requirements.txt
-make html
+# Install documentation dependencies
+poetry install --with docs
+
+# Build documentation
+make builddocs
 ```
 
 ### ReadTheDocs Integration
@@ -115,6 +117,7 @@ make html
 - **Multiple Formats**: HTML, PDF, and ePub
 - **Version Management**: Automatic versioning from Git tags
 - **Configuration**: `.readthedocs.yaml` in project root
+- **Dependencies**: Managed through Poetry groups
 
 ### Build Requirements
 - **Python 3.10+**: Compatible with project requirements

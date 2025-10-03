@@ -23,7 +23,10 @@ help:
 clean-build:
 	rm -rf $(BUILDDIR)/*
 
-livehtml:
+builddocs html:
+	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" $(SPHINXOPTS) $(O)
+
+livehtml servedocs:
 	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)/html" $(SPHINXOPTS) $(O)
 
 linkcheck:

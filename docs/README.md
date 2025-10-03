@@ -6,10 +6,10 @@ This directory contains the documentation for the openseries project, built usin
 
 ### Prerequisites
 
-Install the documentation dependencies:
+Install the documentation dependencies using Poetry:
 
 ```bash
-pip install -r requirements.txt
+poetry install --with docs
 ```
 
 ### Building HTML Documentation
@@ -17,7 +17,9 @@ pip install -r requirements.txt
 To build the HTML documentation:
 
 ```bash
-make html
+make builddocs
+# or directly with Poetry:
+poetry run sphinx-build -b html source build/html
 ```
 
 The built documentation will be available in `build/html/index.html`.
@@ -34,8 +36,9 @@ The built documentation will be available in `build/html/index.html`.
 For development with auto-reload:
 
 ```bash
-pip install sphinx-autobuild
-make livehtml
+make servedocs
+# or directly with Poetry:
+poetry run sphinx-autobuild source build/html --host 127.0.0.1 --port 8000
 ```
 
 This will start a local server at `http://localhost:8000` that automatically rebuilds when files change.
@@ -83,8 +86,8 @@ docs/
 This documentation is configured for [ReadTheDocs](https://readthedocs.org/) hosting:
 
 - Configuration: `.readthedocs.yaml` in the project root
-- Dependencies: `docs/requirements.txt`
-- Build process: Automated on ReadTheDocs
+- Dependencies: Managed through Poetry in `pyproject.toml` docs group
+- Build process: Automated on ReadTheDocs using Poetry
 
 ## Writing Documentation
 

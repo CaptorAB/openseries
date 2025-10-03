@@ -21,3 +21,6 @@ rules:
         - astral-sh/setup-uv
         - codecov/codecov-action
         - codecov/test-results-action
+        - actions/configure-pages
+        - actions/upload-pages-artifact
+        - actions/deploy-pages
