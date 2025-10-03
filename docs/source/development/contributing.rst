@@ -1,5 +1,5 @@
 Contributing to openseries
-=========================
+==========================
 
 We welcome contributions to openseries! This guide will help you get started with contributing to the project.
 
