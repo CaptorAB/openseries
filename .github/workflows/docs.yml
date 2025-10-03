@@ -43,8 +43,9 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        id: setup_python
         with:
-          python-version: "3.11"
+          python-version-file: '.python-version'
 
       - name: Cache Poetry dependencies
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
@@ -110,8 +111,9 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        id: setup_python
         with:
-          python-version: "3.11"
+          python-version-file: '.python-version'
 
       - name: Cache Poetry dependencies
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809

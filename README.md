@@ -18,6 +18,18 @@
 This is a project with tools to analyze financial timeseries of a single
 asset or a group of assets. It is solely made for daily or less frequent data.
 
+## Documentation
+
+📚 **Complete documentation is available at:**
+- **Online**: https://openseries.readthedocs.io/
+- **Source**: Available in the `docs/` directory
+
+The documentation includes:
+- Quick start guide
+- API reference
+- Tutorials and examples
+- Installation instructions
+
 ## Basic Usage
 
 To install:
