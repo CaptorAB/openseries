@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openseries.owntypes &mdash; openseries 1.9.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b3da7c01" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=0f42b3e6"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            openseries
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/core_concepts.html">Core Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/data_handling.html">Data Handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/basic_analysis.html">Basic Financial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/portfolio_analysis.html">Portfolio Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/risk_management.html">Risk Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/advanced_features.html">Advanced Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/single_asset.html">Single Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/multi_asset.html">Multi-Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/custom_reports.html">Custom Reports</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/openseries.html">openseries package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/series.html">OpenTimeSeries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/frame.html">OpenFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/portfoliotools.html">Portfolio Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/simulation.html">Simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/report.html">Report Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/datefixer.html">Date Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/types.html">Types and Enums</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../development/contributing.html">Contributing to openseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">openseries</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openseries.owntypes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for openseries.owntypes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Declaring types used throughout the project.</span>
+
+<span class="sd">Copyright (c) Captor Fund Management AB. This file is part of the openseries project.</span>
+
+<span class="sd">Licensed under the BSD 3-Clause License. You may obtain a copy of the License at:</span>
+<span class="sd">https://github.com/CaptorAB/openseries/blob/master/LICENSE.md</span>
+<span class="sd">SPDX-License-Identifier: BSD-3-Clause</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pformat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">annotated_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinLen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime64</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">Timestamp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">StringConstraints</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Series</span> <span class="k">as</span> <span class="n">_Series</span>
+
+    <span class="n">SeriesFloat</span> <span class="o">=</span> <span class="n">_Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">SeriesFloat</span> <span class="o">=</span> <span class="n">Series</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Self&quot;</span><span class="p">,</span> <span class="s2">&quot;ValueType&quot;</span><span class="p">]</span>
+
+
+<span class="n">SeriesOrFloat_co</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;SeriesOrFloat_co&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">SeriesFloat</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="n">CountryStringType</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span>
+    <span class="n">StringConstraints</span><span class="p">(</span>
+        <span class="n">strip_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[A-Z]</span><span class="si">{2}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">to_upper</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+<span class="n">CountrySetType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="n">CountryStringType</span><span class="p">],</span> <span class="n">MinLen</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">CountriesType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">CountrySetType</span> <span class="o">|</span> <span class="n">CountryStringType</span>
+
+
+<div class="viewcode-block" id="Countries">
+<a class="viewcode-back" href="../../api/types.html#openseries.Countries">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Countries</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Declare Countries.&quot;&quot;&quot;</span>
+
+    <span class="n">countryinput</span><span class="p">:</span> <span class="n">CountriesType</span></div>
+
+
+
+<span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span>
+    <span class="n">StringConstraints</span><span class="p">(</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[A-Z]</span><span class="si">{3}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">to_upper</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">strip_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="Currency">
+<a class="viewcode-back" href="../../api/types.html#openseries.Currency">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Currency</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Declare Currency.&quot;&quot;&quot;</span>
+
+    <span class="n">ccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span></div>
+
+
+
+<span class="n">DateStringType</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span>
+    <span class="n">StringConstraints</span><span class="p">(</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^\d</span><span class="si">{4}</span><span class="s2">-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$&quot;</span><span class="p">,</span>
+        <span class="n">strip_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+<span class="n">DateListType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DateStringType</span><span class="p">],</span> <span class="n">MinLen</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+
+<span class="n">ValueListType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">MinLen</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+
+<span class="n">DaysInYearType</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">366</span><span class="p">)]</span>
+
+<span class="n">DateType</span> <span class="o">=</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span> <span class="o">|</span> <span class="n">datetime64</span> <span class="o">|</span> <span class="n">Timestamp</span>
+
+<span class="n">PlotlyConfigType</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="nb">str</span>
+    <span class="o">|</span> <span class="nb">int</span>
+    <span class="o">|</span> <span class="nb">float</span>
+    <span class="o">|</span> <span class="nb">bool</span>
+    <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+<span class="p">)</span>
+
+<span class="n">PlotlyLayoutType</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PlotlyConfigType</span><span class="p">]</span>
+
+<span class="n">CaptorLogoType</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span>
+
+<span class="n">LiteralJsonOutput</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">,</span> <span class="s2">&quot;tsdf&quot;</span><span class="p">]</span>
+<span class="n">LiteralTrunc</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;before&quot;</span><span class="p">,</span> <span class="s2">&quot;after&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">]</span>
+<span class="n">LiteralLinePlotMode</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lines+markers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lines+text&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;markers+text&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lines+markers+text&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">|</span> <span class="kc">None</span>
+<span class="p">)</span>
+<span class="n">LiteralHowMerge</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span> <span class="s2">&quot;inner&quot;</span><span class="p">]</span>
+<span class="n">LiteralQuantileInterp</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;higher&quot;</span><span class="p">,</span> <span class="s2">&quot;midpoint&quot;</span><span class="p">,</span> <span class="s2">&quot;nearest&quot;</span><span class="p">]</span>
+<span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;BME&quot;</span><span class="p">,</span> <span class="s2">&quot;BQE&quot;</span><span class="p">,</span> <span class="s2">&quot;BYE&quot;</span><span class="p">]</span>
+<span class="n">LiteralPandasReindexMethod</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;pad&quot;</span><span class="p">,</span> <span class="s2">&quot;ffill&quot;</span><span class="p">,</span> <span class="s2">&quot;backfill&quot;</span><span class="p">,</span> <span class="s2">&quot;bfill&quot;</span><span class="p">,</span> <span class="s2">&quot;nearest&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+<span class="p">)</span>
+<span class="n">LiteralNanMethod</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="s2">&quot;drop&quot;</span><span class="p">]</span>
+<span class="n">LiteralCaptureRatio</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;up&quot;</span><span class="p">,</span> <span class="s2">&quot;down&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">]</span>
+<span class="n">LiteralBarPlotMode</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;stack&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;overlay&quot;</span><span class="p">,</span> <span class="s2">&quot;relative&quot;</span><span class="p">]</span>
+<span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">]</span>
+<span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;cdn&quot;</span><span class="p">]</span>
+<span class="n">LiteralPlotlyHistogramPlotType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;bars&quot;</span><span class="p">,</span> <span class="s2">&quot;lines&quot;</span><span class="p">]</span>
+<span class="n">LiteralPlotlyHistogramBarMode</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;stack&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;overlay&quot;</span><span class="p">,</span> <span class="s2">&quot;relative&quot;</span><span class="p">]</span>
+<span class="n">LiteralPlotlyHistogramCurveType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;kde&quot;</span><span class="p">]</span>
+<span class="n">LiteralPlotlyHistogramHistNorm</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span>
+    <span class="s2">&quot;percent&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;probability&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;density&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;probability density&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">LiteralPortfolioWeightings</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">,</span> <span class="s2">&quot;inv_vol&quot;</span><span class="p">]</span>
+<span class="n">LiteralMinimizeMethods</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span>
+    <span class="s2">&quot;SLSQP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Powell&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CG&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BFGS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Newton-CG&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TNC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;COBYLA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;trust-constr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dogleg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;trust-ncg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;trust-exact&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;trust-krylov&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">LiteralSeriesProps</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span>
+    <span class="s2">&quot;value_ret&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;geo_ret&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arithmetic_ret&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;vol&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;downside_deviation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ret_vol_ratio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sortino_ratio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;kappa3_ratio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;z_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;skew&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;kurtosis&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;positive_share&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;var_down&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cvar_down&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;vol_from_var&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;worst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;worst_month&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;max_drawdown_cal_year&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;max_drawdown&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;max_drawdown_date&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;first_idx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_idx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;length&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;span_of_days&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yearfrac&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;periods_in_a_year&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">LiteralFrameProps</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span>
+    <span class="s2">&quot;value_ret&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;geo_ret&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;arithmetic_ret&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;vol&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;downside_deviation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ret_vol_ratio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sortino_ratio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;kappa3_ratio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;z_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;skew&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;kurtosis&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;positive_share&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;var_down&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cvar_down&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;vol_from_var&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;worst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;worst_month&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;max_drawdown&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;max_drawdown_date&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;max_drawdown_cal_year&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;first_indices&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_indices&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lengths_of_items&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;span_of_days_all&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="PropertiesList">
+<a class="viewcode-back" href="../../api/types.html#openseries.PropertiesList">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PropertiesList</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for allowed property arguments definition.&quot;&quot;&quot;</span>
+
+    <span class="n">allowed_strings</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;value_ret&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;geo_ret&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;arithmetic_ret&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;vol&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;downside_deviation&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ret_vol_ratio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sortino_ratio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kappa3_ratio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;omega_ratio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;z_score&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;skew&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kurtosis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;positive_share&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;var_down&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cvar_down&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;vol_from_var&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;worst&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;worst_month&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;max_drawdown&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;max_drawdown_date&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;max_drawdown_cal_year&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate the string input of the all_properties method.&quot;&quot;&quot;</span>
+        <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">invalids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">duplicates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_strings</span><span class="p">:</span>
+                <span class="n">invalids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="n">duplicates</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalids</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid string(s): </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">invalids</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">Allowed strings are:&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allowed_strings</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">duplicates</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Duplicate string(s): </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">duplicates</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PropertiesInputValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OpenTimeSeriesPropertiesList">
+<a class="viewcode-back" href="../../api/types.html#openseries.OpenTimeSeriesPropertiesList">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OpenTimeSeriesPropertiesList</span><span class="p">(</span><span class="n">PropertiesList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allowed property arguments for the OpenTimeSeries class.&quot;&quot;&quot;</span>
+
+    <span class="n">allowed_strings</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">PropertiesList</span><span class="o">.</span><span class="n">allowed_strings</span> <span class="o">|</span> <span class="p">{</span>
+        <span class="s2">&quot;first_idx&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;last_idx&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;length&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;span_of_days&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yearfrac&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;periods_in_a_year&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="OpenTimeSeriesPropertiesList.__init__">
+<a class="viewcode-back" href="../../api/types.html#openseries.OpenTimeSeriesPropertiesList.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">LiteralSeriesProps</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Property arguments for the OpenTimeSeries class.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OpenFramePropertiesList">
+<a class="viewcode-back" href="../../api/types.html#openseries.OpenFramePropertiesList">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OpenFramePropertiesList</span><span class="p">(</span><span class="n">PropertiesList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allowed property arguments for the OpenFrame class.&quot;&quot;&quot;</span>
+
+    <span class="n">allowed_strings</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">PropertiesList</span><span class="o">.</span><span class="n">allowed_strings</span> <span class="o">|</span> <span class="p">{</span>
+        <span class="s2">&quot;first_indices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;last_indices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lengths_of_items&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;span_of_days_all&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="OpenFramePropertiesList.__init__">
+<a class="viewcode-back" href="../../api/types.html#openseries.OpenFramePropertiesList.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">LiteralFrameProps</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Property arguments for the OpenFrame class.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ValueType">
+<a class="viewcode-back" href="../../api/types.html#openseries.ValueType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ValueType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum types of OpenTimeSeries to identify the output.&quot;&quot;&quot;</span>
+
+    <span class="n">EWMA</span> <span class="o">=</span> <span class="s2">&quot;EWMA&quot;</span>
+    <span class="n">PRICE</span> <span class="o">=</span> <span class="s2">&quot;Price(Close)&quot;</span>
+    <span class="n">RTRN</span> <span class="o">=</span> <span class="s2">&quot;Return(Total)&quot;</span>
+    <span class="n">RELRTRN</span> <span class="o">=</span> <span class="s2">&quot;Relative return&quot;</span>
+    <span class="n">ROLLBETA</span> <span class="o">=</span> <span class="s2">&quot;Beta&quot;</span>
+    <span class="n">ROLLCORR</span> <span class="o">=</span> <span class="s2">&quot;Rolling correlation&quot;</span>
+    <span class="n">ROLLCVAR</span> <span class="o">=</span> <span class="s2">&quot;Rolling CVaR&quot;</span>
+    <span class="n">ROLLINFORATIO</span> <span class="o">=</span> <span class="s2">&quot;Information Ratio&quot;</span>
+    <span class="n">ROLLRTRN</span> <span class="o">=</span> <span class="s2">&quot;Rolling returns&quot;</span>
+    <span class="n">ROLLVAR</span> <span class="o">=</span> <span class="s2">&quot;Rolling VaR&quot;</span>
+    <span class="n">ROLLVOL</span> <span class="o">=</span> <span class="s2">&quot;Rolling volatility&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MixedValuetypesError">
+<a class="viewcode-back" href="../../api/types.html#openseries.MixedValuetypesError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MixedValuetypesError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when provided timeseries valuetypes are not the same.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="AtLeastOneFrameError">
+<a class="viewcode-back" href="../../api/types.html#openseries.AtLeastOneFrameError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AtLeastOneFrameError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when none of the possible frame inputs is provided.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="DateAlignmentError">
+<a class="viewcode-back" href="../../api/types.html#openseries.DateAlignmentError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DateAlignmentError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when date input is not aligned with existing range.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="NumberOfItemsAndLabelsNotSameError">
+<a class="viewcode-back" href="../../api/types.html#openseries.NumberOfItemsAndLabelsNotSameError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NumberOfItemsAndLabelsNotSameError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when number of labels is not matching the number of timeseries.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="InitialValueZeroError">
+<a class="viewcode-back" href="../../api/types.html#openseries.InitialValueZeroError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InitialValueZeroError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a calculation cannot be performed due to initial value(s) zero.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="CountriesNotStringNorListStrError">
+<a class="viewcode-back" href="../../api/types.html#openseries.CountriesNotStringNorListStrError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CountriesNotStringNorListStrError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when countries argument is not provided in correct format.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MarketsNotStringNorListStrError">
+<a class="viewcode-back" href="../../api/types.html#openseries.MarketsNotStringNorListStrError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MarketsNotStringNorListStrError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when markets argument is not provided in correct format.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="TradingDaysNotAboveZeroError">
+<a class="viewcode-back" href="../../api/types.html#openseries.TradingDaysNotAboveZeroError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TradingDaysNotAboveZeroError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when trading days argument is not above zero.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="BothStartAndEndError">
+<a class="viewcode-back" href="../../api/types.html#openseries.BothStartAndEndError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BothStartAndEndError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when both start and end dates are provided.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="NoWeightsError">
+<a class="viewcode-back" href="../../api/types.html#openseries.NoWeightsError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoWeightsError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when no weights are provided to function where necessary.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LabelsNotUniqueError">
+<a class="viewcode-back" href="../../api/types.html#openseries.LabelsNotUniqueError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LabelsNotUniqueError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when provided label names are not unique.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RatioInputError">
+<a class="viewcode-back" href="../../api/types.html#openseries.RatioInputError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RatioInputError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when ratio keyword not provided correctly.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MergingResultedInEmptyError">
+<a class="viewcode-back" href="../../api/types.html#openseries.MergingResultedInEmptyError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MergingResultedInEmptyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a merge resulted in an empty DataFrame.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="IncorrectArgumentComboError">
+<a class="viewcode-back" href="../../api/types.html#openseries.IncorrectArgumentComboError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IncorrectArgumentComboError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when correct combination of arguments is not provided.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="PropertiesInputValidationError">
+<a class="viewcode-back" href="../../api/types.html#openseries.PropertiesInputValidationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PropertiesInputValidationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when duplicate strings are provided.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ResampleDataLossError">
+<a class="viewcode-back" href="../../api/types.html#openseries.ResampleDataLossError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResampleDataLossError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when user attempts to run resample_to_business_period_ends on returns.&quot;&quot;&quot;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Captor Fund Management AB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

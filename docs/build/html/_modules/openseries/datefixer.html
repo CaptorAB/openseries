@@ -1,0 +1,678 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openseries.datefixer &mdash; openseries 1.9.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=0f42b3e6"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            openseries
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/core_concepts.html">Core Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/data_handling.html">Data Handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/basic_analysis.html">Basic Financial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/portfolio_analysis.html">Portfolio Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/risk_management.html">Risk Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/advanced_features.html">Advanced Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/single_asset.html">Single Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/multi_asset.html">Multi-Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/custom_reports.html">Custom Reports</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/openseries.html">openseries package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/series.html">OpenTimeSeries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/frame.html">OpenFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/portfoliotools.html">Portfolio Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/simulation.html">Simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/report.html">Report Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/datefixer.html">Date Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/types.html">Types and Enums</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../development/contributing.html">Contributing to openseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">openseries</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openseries.datefixer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openseries.datefixer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Date related utilities.</span>
+
+<span class="sd">Copyright (c) Captor Fund Management AB. This file is part of the openseries project.</span>
+
+<span class="sd">Licensed under the BSD 3-Clause License. You may obtain a copy of the License at:</span>
+<span class="sd">https://github.com/CaptorAB/openseries/blob/master/LICENSE.md</span>
+<span class="sd">SPDX-License-Identifier: BSD-3-Clause</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">exchange_calendars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">exchcal</span>  <span class="c1"># type: ignore[import-untyped]</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dateutil.relativedelta</span><span class="w"> </span><span class="kn">import</span> <span class="n">relativedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">holidays</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">country_holidays</span><span class="p">,</span>
+    <span class="n">list_supported_countries</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">busdaycalendar</span><span class="p">,</span> <span class="n">datetime64</span><span class="p">,</span> <span class="n">is_busday</span><span class="p">,</span> <span class="n">where</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">DatetimeIndex</span><span class="p">,</span>
+    <span class="n">Index</span><span class="p">,</span>
+    <span class="n">Timestamp</span><span class="p">,</span>
+    <span class="n">concat</span><span class="p">,</span>
+    <span class="n">date_range</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas.tseries.offsets</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomBusinessDay</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BothStartAndEndError</span><span class="p">,</span>
+    <span class="n">CountriesNotStringNorListStrError</span><span class="p">,</span>
+    <span class="n">MarketsNotStringNorListStrError</span><span class="p">,</span>
+    <span class="n">TradingDaysNotAboveZeroError</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">CountriesType</span><span class="p">,</span>
+        <span class="n">DateType</span><span class="p">,</span>
+        <span class="n">LiteralBizDayFreq</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;date_fix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;date_offset_foll&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;generate_calendar_date_range&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_previous_business_day_before_today&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;holiday_calendar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;offset_business_days&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">market_holidays</span><span class="p">(</span>
+    <span class="n">startyear</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">endyear</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">markets</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a dict of holiday dates mapping to list of markets closed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    startyear: int</span>
+<span class="sd">        First year (inclusive) to consider.</span>
+<span class="sd">    endyear: int</span>
+<span class="sd">        Last year (inclusive) to consider.</span>
+<span class="sd">    markets: str | list[str]</span>
+<span class="sd">        String or list of market codes supported by pandas_market_calendars.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    list[str]</span>
+<span class="sd">        list of holiday dates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">market_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">markets</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">markets</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">markets</span><span class="p">)</span>
+
+    <span class="n">supported</span> <span class="o">=</span> <span class="n">exchcal</span><span class="o">.</span><span class="n">get_calendar_names</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">m</span> <span class="ow">in</span> <span class="n">supported</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">market_list</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Argument markets must be a string market code or a list of market &quot;</span>
+            <span class="s2">&quot;codes supported by pandas_market_calendars.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">MarketsNotStringNorListStrError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="n">holidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">market_list</span><span class="p">:</span>
+        <span class="n">cal</span> <span class="o">=</span> <span class="n">exchcal</span><span class="o">.</span><span class="n">get_calendar</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">cal_hols</span> <span class="o">=</span> <span class="n">cal</span><span class="o">.</span><span class="n">regular_holidays</span><span class="o">.</span><span class="n">holidays</span><span class="p">()</span>
+        <span class="n">my_hols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">cal_hols</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">startyear</span> <span class="o">&lt;=</span> <span class="n">date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">&lt;=</span> <span class="n">endyear</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">holidays</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">my_hols</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">holidays</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="holiday_calendar">
+<a class="viewcode-back" href="../../api/openseries.html#openseries.datefixer.holiday_calendar">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">holiday_calendar</span><span class="p">(</span>
+    <span class="n">startyear</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">endyear</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span>
+    <span class="n">markets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_holidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">busdaycalendar</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a business calendar.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    startyear: int</span>
+<span class="sd">        First year in date range generated</span>
+<span class="sd">    endyear: int</span>
+<span class="sd">        Last year in date range generated</span>
+<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
+<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
+<span class="sd">    markets: list[str] | str, optional</span>
+<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
+<span class="sd">    custom_holidays: list[str] | str, optional</span>
+<span class="sd">        Argument where missing holidays can be added</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.busdaycalendar</span>
+<span class="sd">        Generate a business calendar</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">startyear</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">endyear</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">startyear</span> <span class="o">==</span> <span class="n">endyear</span><span class="p">:</span>
+        <span class="n">endyear</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">years</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">startyear</span><span class="p">,</span> <span class="n">endyear</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">countries</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">countries</span> <span class="ow">in</span> <span class="n">list_supported_countries</span><span class="p">():</span>
+        <span class="n">staging</span> <span class="o">=</span> <span class="n">country_holidays</span><span class="p">(</span><span class="n">country</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span> <span class="n">years</span><span class="o">=</span><span class="n">years</span><span class="p">)</span>
+        <span class="n">hols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">staging</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">countries</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">country</span> <span class="ow">in</span> <span class="n">list_supported_countries</span><span class="p">()</span> <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">countries</span>
+    <span class="p">):</span>
+        <span class="n">country</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">countryholidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">countries</span><span class="p">:</span>
+            <span class="n">staging</span> <span class="o">=</span> <span class="n">country_holidays</span><span class="p">(</span><span class="n">country</span><span class="o">=</span><span class="n">country</span><span class="p">,</span> <span class="n">years</span><span class="o">=</span><span class="n">years</span><span class="p">)</span>
+            <span class="n">countryholidays</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">staging</span><span class="p">)</span>
+        <span class="n">hols</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[dt.date]&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">countryholidays</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Argument countries must be a string country code or &quot;</span>
+            <span class="s2">&quot;a list of string country codes according to ISO 3166-1 alpha-2.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">CountriesNotStringNorListStrError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">markets</span><span class="p">:</span>
+        <span class="n">market_hols</span> <span class="o">=</span> <span class="n">market_holidays</span><span class="p">(</span>
+            <span class="n">startyear</span><span class="o">=</span><span class="n">startyear</span><span class="p">,</span>
+            <span class="n">endyear</span><span class="o">=</span><span class="n">endyear</span><span class="p">,</span>
+            <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">dt_mkt_hols</span> <span class="o">=</span> <span class="p">[</span><span class="n">date_fix</span><span class="p">(</span><span class="n">fixerdate</span><span class="o">=</span><span class="n">ddate</span><span class="p">)</span> <span class="k">for</span> <span class="n">ddate</span> <span class="ow">in</span> <span class="n">market_hols</span><span class="p">]</span>
+        <span class="n">hols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dt_mkt_hols</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">custom_holidays</span><span class="p">:</span>
+        <span class="n">custom_list</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">custom_holidays</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">custom_holidays</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">custom_holidays</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">hols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">date_fix</span><span class="p">(</span><span class="n">fixerdate</span><span class="o">=</span><span class="n">ddate</span><span class="p">)</span> <span class="k">for</span> <span class="n">ddate</span> <span class="ow">in</span> <span class="n">custom_list</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">busdaycalendar</span><span class="p">(</span><span class="n">holidays</span><span class="o">=</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">hols</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;datetime64[D]&quot;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="date_fix">
+<a class="viewcode-back" href="../../api/openseries.html#openseries.datefixer.date_fix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">date_fix</span><span class="p">(</span>
+    <span class="n">fixerdate</span><span class="p">:</span> <span class="n">DateType</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse different date formats into datetime.date.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fixerdate: DateType</span>
+<span class="sd">        The data item to parse</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    datetime.date</span>
+<span class="sd">        Parsed date</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown date format </span><span class="si">{</span><span class="n">fixerdate</span><span class="si">!s}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">)</span><span class="si">!s}</span><span class="s2"> encountered&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">,</span> <span class="n">Timestamp</span> <span class="o">|</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fixerdate</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fixerdate</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">,</span> <span class="n">datetime64</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">)[:</span><span class="mi">10</span><span class="p">],</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="date_offset_foll">
+<a class="viewcode-back" href="../../api/openseries.html#openseries.datefixer.date_offset_foll">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">date_offset_foll</span><span class="p">(</span>
+    <span class="n">raw_date</span><span class="p">:</span> <span class="n">DateType</span><span class="p">,</span>
+    <span class="n">months_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span>
+    <span class="n">markets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_holidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">adjust</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">following</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Offset dates according to a given calendar.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    raw_date: DateType</span>
+<span class="sd">        The date to offset from</span>
+<span class="sd">    months_offset: int, default: 12</span>
+<span class="sd">        Number of months as integer</span>
+<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
+<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
+<span class="sd">    markets: list[str] | str, optional</span>
+<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
+<span class="sd">    custom_holidays: list[str] | str, optional</span>
+<span class="sd">        Argument where missing holidays can be added</span>
+<span class="sd">    adjust: bool, default: False</span>
+<span class="sd">        Determines if offset should adjust for business days</span>
+<span class="sd">    following: bool, default: True</span>
+<span class="sd">        Determines if days should be offset forward (following) or backward</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    datetime.date</span>
+<span class="sd">        Off-set date</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">raw_date</span> <span class="o">=</span> <span class="n">date_fix</span><span class="p">(</span><span class="n">raw_date</span><span class="p">)</span>
+    <span class="n">month_delta</span> <span class="o">=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="n">months_offset</span><span class="p">)</span>
+
+    <span class="n">day_delta</span> <span class="o">=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">following</span> <span class="k">else</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">new_date</span> <span class="o">=</span> <span class="n">raw_date</span> <span class="o">+</span> <span class="n">month_delta</span>
+
+    <span class="k">if</span> <span class="n">adjust</span><span class="p">:</span>
+        <span class="n">startyear</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">raw_date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">new_date</span><span class="o">.</span><span class="n">year</span><span class="p">])</span>
+        <span class="n">endyear</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">raw_date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">new_date</span><span class="o">.</span><span class="n">year</span><span class="p">])</span>
+        <span class="n">calendar</span> <span class="o">=</span> <span class="n">holiday_calendar</span><span class="p">(</span>
+            <span class="n">startyear</span><span class="o">=</span><span class="n">startyear</span><span class="p">,</span>
+            <span class="n">endyear</span><span class="o">=</span><span class="n">endyear</span><span class="p">,</span>
+            <span class="n">countries</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+            <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+            <span class="n">custom_holidays</span><span class="o">=</span><span class="n">custom_holidays</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">is_busday</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">new_date</span><span class="p">,</span> <span class="n">busdaycal</span><span class="o">=</span><span class="n">calendar</span><span class="p">):</span>
+            <span class="n">new_date</span> <span class="o">+=</span> <span class="n">day_delta</span>
+
+    <span class="k">return</span> <span class="n">new_date</span></div>
+
+
+
+<div class="viewcode-block" id="get_previous_business_day_before_today">
+<a class="viewcode-back" href="../../api/openseries.html#openseries.datefixer.get_previous_business_day_before_today">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_previous_business_day_before_today</span><span class="p">(</span>
+    <span class="n">today</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span>
+    <span class="n">markets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_holidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bump date backwards to find the previous business day.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    today: datetime.date, optional</span>
+<span class="sd">        Manual input of the day from where the previous business day is found</span>
+<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
+<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
+<span class="sd">    markets: list[str] | str, optional</span>
+<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
+<span class="sd">    custom_holidays: list[str] | str, optional</span>
+<span class="sd">        Argument where missing holidays can be added</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    datetime.date</span>
+<span class="sd">        The previous business day</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">today</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">astimezone</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">date_offset_foll</span><span class="p">(</span>
+        <span class="n">raw_date</span><span class="o">=</span><span class="n">today</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">months_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">countries</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+        <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+        <span class="n">custom_holidays</span><span class="o">=</span><span class="n">custom_holidays</span><span class="p">,</span>
+        <span class="n">adjust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">following</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="offset_business_days">
+<a class="viewcode-back" href="../../api/openseries.html#openseries.datefixer.offset_business_days">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">offset_business_days</span><span class="p">(</span>
+    <span class="n">ddate</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+    <span class="n">days</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span>
+    <span class="n">markets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_holidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bump date by business days.</span>
+
+<span class="sd">    It first adjusts to a valid business day and then bumps with given</span>
+<span class="sd">    number of business days from there.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ddate: datetime.date</span>
+<span class="sd">        A starting date that does not have to be a business day</span>
+<span class="sd">    days: int</span>
+<span class="sd">        The number of business days to offset from the business day that is given</span>
+<span class="sd">        If days is set as anything other than an integer its value is set to zero</span>
+<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
+<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
+<span class="sd">    markets: list[str] | str, optional</span>
+<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
+<span class="sd">    custom_holidays: list[str] | str, optional</span>
+<span class="sd">        Argument where missing holidays can be added</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    datetime.date</span>
+<span class="sd">        The new offset business day</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">days</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">days</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">days</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">days</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">scaledtoyeardays</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">days</span> <span class="o">*</span> <span class="mi">372</span> <span class="o">/</span> <span class="mi">250</span><span class="p">)</span> <span class="o">//</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">365</span>
+        <span class="n">ndate</span> <span class="o">=</span> <span class="n">ddate</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">scaledtoyeardays</span><span class="p">)</span>
+        <span class="n">calendar</span> <span class="o">=</span> <span class="n">holiday_calendar</span><span class="p">(</span>
+            <span class="n">startyear</span><span class="o">=</span><span class="n">ndate</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">endyear</span><span class="o">=</span><span class="n">ddate</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">countries</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+            <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+            <span class="n">custom_holidays</span><span class="o">=</span><span class="n">custom_holidays</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">local_bdays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">bday</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">bday</span> <span class="ow">in</span> <span class="n">date_range</span><span class="p">(</span>
+                <span class="n">periods</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="n">scaledtoyeardays</span><span class="p">),</span>
+                <span class="n">end</span><span class="o">=</span><span class="n">ddate</span><span class="p">,</span>
+                <span class="n">freq</span><span class="o">=</span><span class="n">CustomBusinessDay</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="n">calendar</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scaledtoyeardays</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">days</span> <span class="o">*</span> <span class="mi">372</span> <span class="o">/</span> <span class="mi">250</span><span class="p">)</span> <span class="o">//</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">365</span>
+        <span class="n">ndate</span> <span class="o">=</span> <span class="n">ddate</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">scaledtoyeardays</span><span class="p">)</span>
+        <span class="n">calendar</span> <span class="o">=</span> <span class="n">holiday_calendar</span><span class="p">(</span>
+            <span class="n">startyear</span><span class="o">=</span><span class="n">ddate</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">endyear</span><span class="o">=</span><span class="n">ndate</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">countries</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+            <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+            <span class="n">custom_holidays</span><span class="o">=</span><span class="n">custom_holidays</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">local_bdays</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">bday</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">bday</span> <span class="ow">in</span> <span class="n">date_range</span><span class="p">(</span>
+                <span class="n">start</span><span class="o">=</span><span class="n">ddate</span><span class="p">,</span>
+                <span class="n">periods</span><span class="o">=</span><span class="n">scaledtoyeardays</span><span class="p">,</span>
+                <span class="n">freq</span><span class="o">=</span><span class="n">CustomBusinessDay</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="n">calendar</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="k">while</span> <span class="n">ddate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">local_bdays</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">days</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ddate</span> <span class="o">-=</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ddate</span> <span class="o">+=</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">where</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">local_bdays</span><span class="p">)</span> <span class="o">==</span> <span class="n">ddate</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dt.date&quot;</span><span class="p">,</span> <span class="n">local_bdays</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">days</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="generate_calendar_date_range">
+<a class="viewcode-back" href="../../api/openseries.html#openseries.datefixer.generate_calendar_date_range">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_calendar_date_range</span><span class="p">(</span>
+    <span class="n">trading_days</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">start</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">end</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span>
+    <span class="n">markets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_holidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a list of business day calendar dates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trading_days: int</span>
+<span class="sd">        Number of days to generate. Must be greater than zero</span>
+<span class="sd">    start: datetime.date, optional</span>
+<span class="sd">        Date when the range starts</span>
+<span class="sd">    end: datetime.date, optional</span>
+<span class="sd">        Date when the range ends</span>
+<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
+<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
+<span class="sd">    markets: list[str] | str, optional</span>
+<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
+<span class="sd">    custom_holidays: list[str] | str, optional</span>
+<span class="sd">        Argument where missing holidays can be added</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    list[dt.date]</span>
+<span class="sd">        List of business day calendar dates</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">trading_days</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Argument trading_days must be greater than zero.&quot;</span>
+        <span class="k">raise</span> <span class="n">TradingDaysNotAboveZeroError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">end</span><span class="p">:</span>
+        <span class="n">tmp_range</span> <span class="o">=</span> <span class="n">date_range</span><span class="p">(</span>
+            <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+            <span class="n">periods</span><span class="o">=</span><span class="n">trading_days</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">//</span> <span class="mi">252</span><span class="p">,</span>
+            <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">calendar</span> <span class="o">=</span> <span class="n">holiday_calendar</span><span class="p">(</span>
+            <span class="n">startyear</span><span class="o">=</span><span class="n">start</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">endyear</span><span class="o">=</span><span class="n">date_fix</span><span class="p">(</span><span class="n">tmp_range</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">countries</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+            <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+            <span class="n">custom_holidays</span><span class="o">=</span><span class="n">custom_holidays</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">date_range</span><span class="p">(</span>
+                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                <span class="n">periods</span><span class="o">=</span><span class="n">trading_days</span><span class="p">,</span>
+                <span class="n">freq</span><span class="o">=</span><span class="n">CustomBusinessDay</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="n">calendar</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">end</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">start</span><span class="p">:</span>
+        <span class="n">tmp_range</span> <span class="o">=</span> <span class="n">date_range</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="n">trading_days</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">//</span> <span class="mi">252</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
+        <span class="n">calendar</span> <span class="o">=</span> <span class="n">holiday_calendar</span><span class="p">(</span>
+            <span class="n">startyear</span><span class="o">=</span><span class="n">date_fix</span><span class="p">(</span><span class="n">tmp_range</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">endyear</span><span class="o">=</span><span class="n">end</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="n">countries</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+            <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+            <span class="n">custom_holidays</span><span class="o">=</span><span class="n">custom_holidays</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">date_range</span><span class="p">(</span>
+                <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+                <span class="n">periods</span><span class="o">=</span><span class="n">trading_days</span><span class="p">,</span>
+                <span class="n">freq</span><span class="o">=</span><span class="n">CustomBusinessDay</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="n">calendar</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Provide one of start or end date, but not both. &quot;</span>
+        <span class="s2">&quot;Date range is inferred from number of trading days.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">raise</span> <span class="n">BothStartAndEndError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_do_resample_to_business_period_ends</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span><span class="p">,</span>
+    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span><span class="p">,</span>
+    <span class="n">markets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_holidays</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatetimeIndex</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resample timeseries frequency to business calendar month end dates.</span>
+
+<span class="sd">    Stubs left in place. Stubs will be aligned to the shortest stub.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: pandas.DataFrame</span>
+<span class="sd">        The timeseries data</span>
+<span class="sd">    freq: LiteralBizDayFreq</span>
+<span class="sd">        The date offset string that sets the resampled frequency</span>
+<span class="sd">    countries: CountriesType</span>
+<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
+<span class="sd">    markets: list[str] | str, optional</span>
+<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
+<span class="sd">    custom_holidays: list[str] | str, optional</span>
+<span class="sd">        Argument where missing holidays can be added</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    Pandas.DatetimeIndex</span>
+<span class="sd">        A date range aligned to business period ends</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">copydata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">copydata</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">copydata</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">copydata</span> <span class="o">=</span> <span class="n">copydata</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">rule</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+    <span class="n">copydata</span> <span class="o">=</span> <span class="n">copydata</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">copydata</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">copydata</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">copydata</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+
+    <span class="n">copydata</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">copydata</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+
+    <span class="n">dates</span> <span class="o">=</span> <span class="n">DatetimeIndex</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">copydata</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="o">+</span> <span class="p">[</span>
+            <span class="n">date_offset_foll</span><span class="p">(</span>
+                <span class="n">raw_date</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">months_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">countries</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+                <span class="n">markets</span><span class="o">=</span><span class="n">markets</span><span class="p">,</span>
+                <span class="n">custom_holidays</span><span class="o">=</span><span class="n">custom_holidays</span><span class="p">,</span>
+                <span class="n">adjust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">following</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">copydata</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="n">copydata</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dates</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Captor Fund Management AB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

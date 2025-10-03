@@ -1,0 +1,899 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Reports &mdash; openseries 1.9.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=0f42b3e6"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openseries package" href="../api/openseries.html" />
+    <link rel="prev" title="Portfolio Optimization" href="portfolio_optimization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            openseries
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/core_concepts.html">Core Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/data_handling.html">Data Handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/basic_analysis.html">Basic Financial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/portfolio_analysis.html">Portfolio Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/risk_management.html">Risk Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/advanced_features.html">Advanced Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="single_asset.html">Single Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multi_asset.html">Multi-Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Custom Reports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-built-in-html-report">Using the Built-in HTML Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-custom-analysis-reports">Creating Custom Analysis Reports</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#custom-performance-report">Custom Performance Report</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#portfolio-comparison-report">Portfolio Comparison Report</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#risk-assessment-report">Risk Assessment Report</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#executive-summary-report">Executive Summary Report</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#batch-report-generation">Batch Report Generation</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/openseries.html">openseries package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/series.html">OpenTimeSeries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/frame.html">OpenFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/portfoliotools.html">Portfolio Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/simulation.html">Simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/report.html">Report Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/datefixer.html">Date Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/types.html">Types and Enums</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../development/contributing.html">Contributing to openseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">openseries</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Custom Reports</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/custom_reports.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="custom-reports">
+<h1>Custom Reports<a class="headerlink" href="#custom-reports" title="Link to this heading"></a></h1>
+<p>This example demonstrates how to create custom analysis reports using openseries and the built-in report functionality.</p>
+<section id="using-the-built-in-html-report">
+<h2>Using the Built-in HTML Report<a class="headerlink" href="#using-the-built-in-html-report" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span><span class="p">,</span> <span class="n">OpenFrame</span><span class="p">,</span> <span class="n">report_html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># Load sample data for comparison</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AAPL&quot;</span><span class="p">,</span> <span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="s2">&quot;GOOGL&quot;</span><span class="p">,</span> <span class="s2">&quot;SPY&quot;</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Apple&quot;</span><span class="p">,</span> <span class="s2">&quot;Microsoft&quot;</span><span class="p">,</span> <span class="s2">&quot;Google&quot;</span><span class="p">,</span> <span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">]</span>
+
+<span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+
+<span class="c1"># Create frame for report</span>
+<span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
+
+<span class="c1"># Generate HTML report</span>
+<span class="c1"># The last asset in the frame is used as the benchmark</span>
+<span class="n">report_html</span><span class="p">(</span>
+    <span class="n">frame</span><span class="o">=</span><span class="n">comparison_frame</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+    <span class="n">file_name</span><span class="o">=</span><span class="s2">&quot;stock_comparison_report.html&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HTML report generated: stock_comparison_report.html&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-custom-analysis-reports">
+<h2>Creating Custom Analysis Reports<a class="headerlink" href="#creating-custom-analysis-reports" title="Link to this heading"></a></h2>
+<section id="custom-performance-report">
+<h3>Custom Performance Report<a class="headerlink" href="#custom-performance-report" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_performance_report</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;performance_report.html&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a custom performance analysis report&quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate comprehensive metrics</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">all_properties</span>
+
+    <span class="c1"># Additional custom calculations</span>
+    <span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+    <span class="n">returns_data</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Monthly statistics</span>
+    <span class="n">monthly_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+    <span class="n">monthly_returns</span> <span class="o">=</span> <span class="n">monthly_series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+    <span class="n">monthly_data</span> <span class="o">=</span> <span class="n">monthly_returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Create HTML content</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;!DOCTYPE html&gt;</span>
+<span class="s2">    &lt;html&gt;</span>
+<span class="s2">    &lt;head&gt;</span>
+<span class="s2">        &lt;title&gt;Performance Report - </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/title&gt;</span>
+<span class="s2">        &lt;style&gt;</span>
+<span class="s2">            body </span><span class="se">{{</span><span class="s2"> font-family: &#39;Segoe UI&#39;, Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; </span><span class="se">}}</span>
+<span class="s2">            .container </span><span class="se">{{</span><span class="s2"> max-width: 1200px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); </span><span class="se">}}</span>
+<span class="s2">            .header </span><span class="se">{{</span><span class="s2"> text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; </span><span class="se">}}</span>
+<span class="s2">            .metric-grid </span><span class="se">{{</span><span class="s2"> display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0; </span><span class="se">}}</span>
+<span class="s2">            .metric-card </span><span class="se">{{</span><span class="s2"> background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #007bff; </span><span class="se">}}</span>
+<span class="s2">            .metric-title </span><span class="se">{{</span><span class="s2"> font-weight: bold; color: #495057; margin-bottom: 10px; </span><span class="se">}}</span>
+<span class="s2">            .metric-value </span><span class="se">{{</span><span class="s2"> font-size: 1.5em; font-weight: bold; color: #007bff; </span><span class="se">}}</span>
+<span class="s2">            .section </span><span class="se">{{</span><span class="s2"> margin: 30px 0; </span><span class="se">}}</span>
+<span class="s2">            .section-title </span><span class="se">{{</span><span class="s2"> font-size: 1.3em; font-weight: bold; margin-bottom: 15px; color: #495057; border-bottom: 2px solid #007bff; padding-bottom: 5px; </span><span class="se">}}</span>
+<span class="s2">            table </span><span class="se">{{</span><span class="s2"> width: 100%; border-collapse: collapse; margin: 15px 0; </span><span class="se">}}</span>
+<span class="s2">            th, td </span><span class="se">{{</span><span class="s2"> padding: 12px; text-align: left; border-bottom: 1px solid #dee2e6; </span><span class="se">}}</span>
+<span class="s2">            th </span><span class="se">{{</span><span class="s2"> background-color: #f8f9fa; font-weight: bold; </span><span class="se">}}</span>
+<span class="s2">            .positive </span><span class="se">{{</span><span class="s2"> color: #28a745; </span><span class="se">}}</span>
+<span class="s2">            .negative </span><span class="se">{{</span><span class="s2"> color: #dc3545; </span><span class="se">}}</span>
+<span class="s2">            .neutral </span><span class="se">{{</span><span class="s2"> color: #6c757d; </span><span class="se">}}</span>
+<span class="s2">        &lt;/style&gt;</span>
+<span class="s2">    &lt;/head&gt;</span>
+<span class="s2">    &lt;body&gt;</span>
+<span class="s2">        &lt;div class=&quot;container&quot;&gt;</span>
+<span class="s2">            &lt;div class=&quot;header&quot;&gt;</span>
+<span class="s2">                &lt;h1&gt;Performance Analysis Report&lt;/h1&gt;</span>
+<span class="s2">                &lt;h2&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/h2&gt;</span>
+<span class="s2">                &lt;p&gt;Analysis Period: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&lt;/p&gt;</span>
+<span class="s2">                &lt;p&gt;Total Observations: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&lt;/p&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Key Performance Metrics&lt;/div&gt;</span>
+<span class="s2">                &lt;div class=&quot;metric-grid&quot;&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-card&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-title&quot;&gt;Total Return&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value </span><span class="si">{</span><span class="s1">&#39;positive&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">value_ret</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;negative&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-card&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-title&quot;&gt;Annualized Return&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value </span><span class="si">{</span><span class="s1">&#39;positive&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;negative&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-card&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-title&quot;&gt;Volatility&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-card&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-title&quot;&gt;Sharpe Ratio&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value </span><span class="si">{</span><span class="s1">&#39;positive&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;negative&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-card&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-title&quot;&gt;Maximum Drawdown&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value negative&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-card&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-title&quot;&gt;Sortino Ratio&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value </span><span class="si">{</span><span class="s1">&#39;positive&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;negative&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                &lt;/div&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Risk Metrics&lt;/div&gt;</span>
+<span class="s2">                &lt;table&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;th&gt;Metric&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;th&gt;Interpretation&lt;/th&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;95% VaR (daily)&lt;/td&gt;&lt;td class=&quot;negative&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;Expected worst daily loss (95% confidence)&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;95% CVaR (daily)&lt;/td&gt;&lt;td class=&quot;negative&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;Average loss beyond VaR&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Downside Deviation&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">downside_deviation</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;Volatility of negative returns only&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Worst Single Day&lt;/td&gt;&lt;td class=&quot;negative&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">worst</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;Largest single-day loss&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Positive Days&lt;/td&gt;&lt;td class=&quot;</span><span class="si">{</span><span class="s1">&#39;positive&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">positive_share</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;negative&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">positive_share</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;Percentage of positive return days&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                &lt;/table&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Distribution Analysis&lt;/div&gt;</span>
+<span class="s2">                &lt;table&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;th&gt;Statistic&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;th&gt;Interpretation&lt;/th&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Skewness&lt;/td&gt;&lt;td class=&quot;</span><span class="si">{</span><span class="s1">&#39;negative&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;positive&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;neutral&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="s1">&#39;Negative skew - more extreme losses&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">-</span><span class="mf">0.5</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;Positive skew - more extreme gains&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;Approximately symmetric&#39;</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Kurtosis&lt;/td&gt;&lt;td class=&quot;</span><span class="si">{</span><span class="s1">&#39;negative&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">kurtosis</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;neutral&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="s1">&#39;Fat tails - more extreme events than normal&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">kurtosis</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;Normal tail behavior&#39;</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Z-Score (last return)&lt;/td&gt;&lt;td class=&quot;</span><span class="si">{</span><span class="s1">&#39;negative&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">z_score</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;neutral&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">z_score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="s1">&#39;Unusual recent return&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">z_score</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;Normal recent return&#39;</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                &lt;/table&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Monthly Performance Summary&lt;/div&gt;</span>
+<span class="s2">                &lt;table&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;th&gt;Metric&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Number of Months&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">monthly_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Positive Months&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="p">(</span><span class="n">monthly_data</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="p">(</span><span class="n">monthly_data</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">)&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Average Monthly Return&lt;/td&gt;&lt;td class=&quot;</span><span class="si">{</span><span class="s1">&#39;positive&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">monthly_data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;negative&#39;</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">monthly_data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Best Month&lt;/td&gt;&lt;td class=&quot;positive&quot;&gt;</span><span class="si">{</span><span class="n">monthly_data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Worst Month&lt;/td&gt;&lt;td class=&quot;negative&quot;&gt;</span><span class="si">{</span><span class="n">monthly_data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Monthly Volatility&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">monthly_data</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                &lt;/table&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Investment Summary&lt;/div&gt;</span>
+<span class="s2">                &lt;p&gt;Based on the analysis of &lt;strong&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/strong&gt; over the period from </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">:&lt;/p&gt;</span>
+<span class="s2">                &lt;ul&gt;</span>
+<span class="s2">                    &lt;li&gt;The investment </span><span class="si">{</span><span class="s1">&#39;generated&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">series</span><span class="o">.</span><span class="n">value_ret</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;lost&#39;</span><span class="si">}</span><span class="s2"> a total return of &lt;strong&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Annualized return was &lt;strong&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/strong&gt; with volatility of &lt;strong&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Risk-adjusted performance (Sharpe ratio) was &lt;strong&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Maximum drawdown reached &lt;strong&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/strong&gt; on </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown_date</span><span class="si">}</span><span class="s2">&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;The investment had positive returns on &lt;strong&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">positive_share</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/strong&gt; of trading days&lt;/li&gt;</span>
+<span class="s2">                &lt;/ul&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+<span class="s2">        &lt;/div&gt;</span>
+<span class="s2">    &lt;/body&gt;</span>
+<span class="s2">    &lt;/html&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Write to file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Custom performance report saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate custom report for Apple</span>
+<span class="n">apple</span> <span class="o">=</span> <span class="n">series_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Apple from our earlier example</span>
+<span class="n">create_performance_report</span><span class="p">(</span><span class="n">apple</span><span class="p">,</span> <span class="s2">&quot;apple_custom_report.html&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="portfolio-comparison-report">
+<h3>Portfolio Comparison Report<a class="headerlink" href="#portfolio-comparison-report" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_portfolio_comparison_report</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;portfolio_comparison.html&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a comprehensive portfolio comparison report&quot;&quot;&quot;</span>
+
+    <span class="c1"># Get metrics for all assets</span>
+    <span class="n">all_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span>
+
+    <span class="c1"># Calculate correlations</span>
+    <span class="n">correlations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">correl_matrix</span><span class="p">()</span>
+
+    <span class="c1"># Create HTML content</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;!DOCTYPE html&gt;</span>
+<span class="s2">    &lt;html&gt;</span>
+<span class="s2">    &lt;head&gt;</span>
+<span class="s2">        &lt;title&gt;Portfolio Comparison Report&lt;/title&gt;</span>
+<span class="s2">        &lt;style&gt;</span>
+<span class="s2">            body </span><span class="se">{{</span><span class="s2"> font-family: &#39;Segoe UI&#39;, Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; </span><span class="se">}}</span>
+<span class="s2">            .container </span><span class="se">{{</span><span class="s2"> max-width: 1400px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); </span><span class="se">}}</span>
+<span class="s2">            .header </span><span class="se">{{</span><span class="s2"> text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; </span><span class="se">}}</span>
+<span class="s2">            .section </span><span class="se">{{</span><span class="s2"> margin: 30px 0; </span><span class="se">}}</span>
+<span class="s2">            .section-title </span><span class="se">{{</span><span class="s2"> font-size: 1.3em; font-weight: bold; margin-bottom: 15px; color: #495057; border-bottom: 2px solid #007bff; padding-bottom: 5px; </span><span class="se">}}</span>
+<span class="s2">            table </span><span class="se">{{</span><span class="s2"> width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; </span><span class="se">}}</span>
+<span class="s2">            th, td </span><span class="se">{{</span><span class="s2"> padding: 8px; text-align: right; border-bottom: 1px solid #dee2e6; </span><span class="se">}}</span>
+<span class="s2">            th </span><span class="se">{{</span><span class="s2"> background-color: #f8f9fa; font-weight: bold; position: sticky; top: 0; </span><span class="se">}}</span>
+<span class="s2">            .asset-name </span><span class="se">{{</span><span class="s2"> text-align: left; font-weight: bold; </span><span class="se">}}</span>
+<span class="s2">            .best </span><span class="se">{{</span><span class="s2"> background-color: #d4edda; color: #155724; </span><span class="se">}}</span>
+<span class="s2">            .worst </span><span class="se">{{</span><span class="s2"> background-color: #f8d7da; color: #721c24; </span><span class="se">}}</span>
+<span class="s2">            .correlation-matrix </span><span class="se">{{</span><span class="s2"> font-size: 0.8em; </span><span class="se">}}</span>
+<span class="s2">            .correlation-matrix td </span><span class="se">{{</span><span class="s2"> text-align: center; </span><span class="se">}}</span>
+<span class="s2">            .high-corr </span><span class="se">{{</span><span class="s2"> background-color: #fff3cd; </span><span class="se">}}</span>
+<span class="s2">            .low-corr </span><span class="se">{{</span><span class="s2"> background-color: #d1ecf1; </span><span class="se">}}</span>
+<span class="s2">        &lt;/style&gt;</span>
+<span class="s2">    &lt;/head&gt;</span>
+<span class="s2">    &lt;body&gt;</span>
+<span class="s2">        &lt;div class=&quot;container&quot;&gt;</span>
+<span class="s2">            &lt;div class=&quot;header&quot;&gt;</span>
+<span class="s2">                &lt;h1&gt;Portfolio Comparison Report&lt;/h1&gt;</span>
+<span class="s2">                &lt;p&gt;Analysis Period: </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&lt;/p&gt;</span>
+<span class="s2">                &lt;p&gt;Number of Assets: </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">item_count</span><span class="si">}</span><span class="s2">&lt;/p&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Performance Comparison&lt;/div&gt;</span>
+<span class="s2">                &lt;table&gt;</span>
+<span class="s2">                    &lt;thead&gt;</span>
+<span class="s2">                        &lt;tr&gt;</span>
+<span class="s2">                            &lt;th class=&quot;asset-name&quot;&gt;Asset&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Total Return&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Annual Return&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Volatility&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Sharpe Ratio&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Max Drawdown&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Sortino Ratio&lt;/th&gt;</span>
+<span class="s2">                        &lt;/tr&gt;</span>
+<span class="s2">                    &lt;/thead&gt;</span>
+<span class="s2">                    &lt;tbody&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add performance data for each asset</span>
+    <span class="k">for</span> <span class="n">asset_name</span> <span class="ow">in</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">total_ret</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;value_ret&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">annual_ret</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">volatility</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">sharpe</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">max_dd</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;max_drawdown&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">sortino</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;sortino_ratio&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        &lt;tr&gt;</span>
+<span class="s2">                            &lt;td class=&quot;asset-name&quot;&gt;</span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">total_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">annual_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">volatility</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">sharpe</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">max_dd</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">sortino</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                        &lt;/tr&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    &lt;/tbody&gt;</span>
+<span class="s2">                &lt;/table&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Risk Metrics Comparison&lt;/div&gt;</span>
+<span class="s2">                &lt;table&gt;</span>
+<span class="s2">                    &lt;thead&gt;</span>
+<span class="s2">                        &lt;tr&gt;</span>
+<span class="s2">                            &lt;th class=&quot;asset-name&quot;&gt;Asset&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;95% VaR&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;95% CVaR&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Downside Dev&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Skewness&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Kurtosis&lt;/th&gt;</span>
+<span class="s2">                            &lt;th&gt;Positive Days&lt;/th&gt;</span>
+<span class="s2">                        &lt;/tr&gt;</span>
+<span class="s2">                    &lt;/thead&gt;</span>
+<span class="s2">                    &lt;tbody&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add risk data for each asset</span>
+    <span class="k">for</span> <span class="n">asset_name</span> <span class="ow">in</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">var_95</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;var_down&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">cvar_95</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;cvar_down&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">downside_dev</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;downside_deviation&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">skewness</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;skew&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">kurtosis</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;kurtosis&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+        <span class="n">positive_share</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;positive_share&#39;</span><span class="p">,</span> <span class="n">asset_name</span><span class="p">]</span>
+
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        &lt;tr&gt;</span>
+<span class="s2">                            &lt;td class=&quot;asset-name&quot;&gt;</span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">var_95</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">cvar_95</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">downside_dev</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">skewness</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                            &lt;td&gt;</span><span class="si">{</span><span class="n">positive_share</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">                        &lt;/tr&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    &lt;/tbody&gt;</span>
+<span class="s2">                &lt;/table&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Correlation Matrix&lt;/div&gt;</span>
+<span class="s2">                &lt;table class=&quot;correlation-matrix&quot;&gt;</span>
+<span class="s2">                    &lt;thead&gt;</span>
+<span class="s2">                        &lt;tr&gt;</span>
+<span class="s2">                            &lt;th class=&quot;asset-name&quot;&gt;Asset&lt;/th&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add correlation matrix headers</span>
+    <span class="k">for</span> <span class="n">asset_name</span> <span class="ow">in</span> <span class="n">correlations</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;th&gt;</span><span class="si">{</span><span class="n">asset_name</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/th&gt;&quot;</span>  <span class="c1"># Truncate long names</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        &lt;/tr&gt;</span>
+<span class="s2">                    &lt;/thead&gt;</span>
+<span class="s2">                    &lt;tbody&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add correlation matrix data</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">asset_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">correlations</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;&lt;tr&gt;&lt;td class=&quot;asset-name&quot;&gt;</span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s1">&lt;/td&gt;&#39;</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">corr_value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">correlations</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+            <span class="n">css_class</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>  <span class="c1"># Don&#39;t highlight diagonal</span>
+                <span class="k">if</span> <span class="n">corr_value</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+                    <span class="n">css_class</span> <span class="o">=</span> <span class="s2">&quot;high-corr&quot;</span>
+                <span class="k">elif</span> <span class="n">corr_value</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">:</span>
+                    <span class="n">css_class</span> <span class="o">=</span> <span class="s2">&quot;low-corr&quot;</span>
+            <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;&lt;td class=&quot;</span><span class="si">{</span><span class="n">css_class</span><span class="si">}</span><span class="s1">&quot;&gt;</span><span class="si">{</span><span class="n">corr_value</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&lt;/td&gt;&#39;</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/tr&gt;&#39;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    &lt;/tbody&gt;</span>
+<span class="s2">                &lt;/table&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Summary and Recommendations&lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add summary analysis</span>
+    <span class="n">best_return</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+    <span class="n">best_sharpe</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+    <span class="n">lowest_vol</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+    <span class="n">lowest_dd</span> <span class="o">=</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;max_drawdown&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>  <span class="c1"># Highest (least negative) drawdown</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;h3&gt;Key Findings:&lt;/h3&gt;</span>
+<span class="s2">                &lt;ul&gt;</span>
+<span class="s2">                    &lt;li&gt;&lt;strong&gt;Best Performer:&lt;/strong&gt; </span><span class="si">{</span><span class="n">best_return</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">best_return</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> annual return&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;&lt;strong&gt;Best Risk-Adjusted Return:&lt;/strong&gt; </span><span class="si">{</span><span class="n">best_sharpe</span><span class="si">}</span><span class="s2"> with Sharpe ratio of </span><span class="si">{</span><span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">best_sharpe</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;&lt;strong&gt;Lowest Volatility:&lt;/strong&gt; </span><span class="si">{</span><span class="n">lowest_vol</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">lowest_vol</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> volatility&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;&lt;strong&gt;Smallest Drawdown:&lt;/strong&gt; </span><span class="si">{</span><span class="n">lowest_dd</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">all_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;max_drawdown&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">lowest_dd</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> maximum drawdown&lt;/li&gt;</span>
+<span class="s2">                &lt;/ul&gt;</span>
+
+<span class="s2">                &lt;h3&gt;Correlation Insights:&lt;/h3&gt;</span>
+<span class="s2">                &lt;ul&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add correlation insights</span>
+    <span class="n">high_corr_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">low_corr_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">correlations</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">correlations</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+            <span class="n">corr_val</span> <span class="o">=</span> <span class="n">correlations</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">asset1</span> <span class="o">=</span> <span class="n">correlations</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">asset2</span> <span class="o">=</span> <span class="n">correlations</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">corr_val</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+                <span class="n">high_corr_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">asset1</span><span class="p">,</span> <span class="n">asset2</span><span class="p">,</span> <span class="n">corr_val</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">corr_val</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                <span class="n">low_corr_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">asset1</span><span class="p">,</span> <span class="n">asset2</span><span class="p">,</span> <span class="n">corr_val</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">high_corr_pairs</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;li&gt;&lt;strong&gt;Highly Correlated Pairs:&lt;/strong&gt;&lt;ul&gt;&quot;</span>
+        <span class="k">for</span> <span class="n">asset1</span><span class="p">,</span> <span class="n">asset2</span><span class="p">,</span> <span class="n">corr</span> <span class="ow">in</span> <span class="n">high_corr_pairs</span><span class="p">[:</span><span class="mi">3</span><span class="p">]:</span>  <span class="c1"># Show top 3</span>
+            <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;li&gt;</span><span class="si">{</span><span class="n">asset1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">asset2</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">corr</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/li&gt;&quot;</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/ul&gt;&lt;/li&gt;&quot;</span>
+
+    <span class="k">if</span> <span class="n">low_corr_pairs</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;li&gt;&lt;strong&gt;Low Correlation Pairs (Good for Diversification):&lt;/strong&gt;&lt;ul&gt;&quot;</span>
+        <span class="k">for</span> <span class="n">asset1</span><span class="p">,</span> <span class="n">asset2</span><span class="p">,</span> <span class="n">corr</span> <span class="ow">in</span> <span class="n">low_corr_pairs</span><span class="p">[:</span><span class="mi">3</span><span class="p">]:</span>  <span class="c1"># Show top 3</span>
+            <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;li&gt;</span><span class="si">{</span><span class="n">asset1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">asset2</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">corr</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&lt;/li&gt;&quot;</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/ul&gt;&lt;/li&gt;&quot;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;/ul&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+<span class="s2">        &lt;/div&gt;</span>
+<span class="s2">    &lt;/body&gt;</span>
+<span class="s2">    &lt;/html&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Write to file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio comparison report saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate comparison report</span>
+<span class="n">create_portfolio_comparison_report</span><span class="p">(</span><span class="n">comparison_frame</span><span class="p">,</span> <span class="s2">&quot;portfolio_comparison_report.html&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="risk-assessment-report">
+<h3>Risk Assessment Report<a class="headerlink" href="#risk-assessment-report" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_risk_assessment_report</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;risk_assessment.html&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a detailed risk assessment report&quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate additional risk metrics</span>
+    <span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+    <span class="n">returns_data</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="c1"># Rolling metrics</span>
+    <span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+    <span class="n">rolling_var</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_var_down</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+
+    <span class="c1"># Stress test scenarios</span>
+    <span class="n">worst_5pct</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">worst_1pct</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+    <span class="n">html_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;!DOCTYPE html&gt;</span>
+<span class="s2">    &lt;html&gt;</span>
+<span class="s2">    &lt;head&gt;</span>
+<span class="s2">        &lt;title&gt;Risk Assessment Report - </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/title&gt;</span>
+<span class="s2">        &lt;style&gt;</span>
+<span class="s2">            body </span><span class="se">{{</span><span class="s2"> font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; </span><span class="se">}}</span>
+<span class="s2">            .container </span><span class="se">{{</span><span class="s2"> max-width: 1000px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); </span><span class="se">}}</span>
+<span class="s2">            .header </span><span class="se">{{</span><span class="s2"> text-align: center; margin-bottom: 30px; padding: 20px; background-color: #dc3545; color: white; border-radius: 8px; </span><span class="se">}}</span>
+<span class="s2">            .risk-level </span><span class="se">{{</span><span class="s2"> padding: 10px; border-radius: 5px; margin: 10px 0; font-weight: bold; text-align: center; </span><span class="se">}}</span>
+<span class="s2">            .low-risk </span><span class="se">{{</span><span class="s2"> background-color: #d4edda; color: #155724; </span><span class="se">}}</span>
+<span class="s2">            .medium-risk </span><span class="se">{{</span><span class="s2"> background-color: #fff3cd; color: #856404; </span><span class="se">}}</span>
+<span class="s2">            .high-risk </span><span class="se">{{</span><span class="s2"> background-color: #f8d7da; color: #721c24; </span><span class="se">}}</span>
+<span class="s2">            .metric-grid </span><span class="se">{{</span><span class="s2"> display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; </span><span class="se">}}</span>
+<span class="s2">            .metric-box </span><span class="se">{{</span><span class="s2"> background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545; </span><span class="se">}}</span>
+<span class="s2">            table </span><span class="se">{{</span><span class="s2"> width: 100%; border-collapse: collapse; margin: 15px 0; </span><span class="se">}}</span>
+<span class="s2">            th, td </span><span class="se">{{</span><span class="s2"> padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6; </span><span class="se">}}</span>
+<span class="s2">            th </span><span class="se">{{</span><span class="s2"> background-color: #f8f9fa; </span><span class="se">}}</span>
+<span class="s2">            .section </span><span class="se">{{</span><span class="s2"> margin: 25px 0; </span><span class="se">}}</span>
+<span class="s2">            .section-title </span><span class="se">{{</span><span class="s2"> font-size: 1.2em; font-weight: bold; margin-bottom: 15px; color: #495057; </span><span class="se">}}</span>
+<span class="s2">        &lt;/style&gt;</span>
+<span class="s2">    &lt;/head&gt;</span>
+<span class="s2">    &lt;body&gt;</span>
+<span class="s2">        &lt;div class=&quot;container&quot;&gt;</span>
+<span class="s2">            &lt;div class=&quot;header&quot;&gt;</span>
+<span class="s2">                &lt;h1&gt;Risk Assessment Report&lt;/h1&gt;</span>
+<span class="s2">                &lt;h2&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/h2&gt;</span>
+<span class="s2">                &lt;p&gt;Assessment Date: </span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/p&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Risk level assessment</span>
+    <span class="n">risk_score</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">vol</span> <span class="o">&gt;</span> <span class="mf">0.25</span><span class="p">:</span> <span class="n">risk_score</span> <span class="o">+=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">series</span><span class="o">.</span><span class="n">vol</span> <span class="o">&gt;</span> <span class="mf">0.15</span><span class="p">:</span> <span class="n">risk_score</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.30</span><span class="p">:</span> <span class="n">risk_score</span> <span class="o">+=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.20</span><span class="p">:</span> <span class="n">risk_score</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span> <span class="n">risk_score</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">risk_score</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">risk_level</span> <span class="o">=</span> <span class="s2">&quot;HIGH RISK&quot;</span>
+        <span class="n">risk_class</span> <span class="o">=</span> <span class="s2">&quot;high-risk&quot;</span>
+    <span class="k">elif</span> <span class="n">risk_score</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">risk_level</span> <span class="o">=</span> <span class="s2">&quot;MEDIUM RISK&quot;</span>
+        <span class="n">risk_class</span> <span class="o">=</span> <span class="s2">&quot;medium-risk&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">risk_level</span> <span class="o">=</span> <span class="s2">&quot;LOW RISK&quot;</span>
+        <span class="n">risk_class</span> <span class="o">=</span> <span class="s2">&quot;low-risk&quot;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;div class=&quot;risk-level </span><span class="si">{</span><span class="n">risk_class</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
+<span class="s2">                OVERALL RISK ASSESSMENT: </span><span class="si">{</span><span class="n">risk_level</span><span class="si">}</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Key Risk Metrics&lt;/div&gt;</span>
+<span class="s2">                &lt;div class=&quot;metric-grid&quot;&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-box&quot;&gt;</span>
+<span class="s2">                        &lt;strong&gt;Volatility&lt;/strong&gt;&lt;br&gt;</span>
+<span class="s2">                        </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-box&quot;&gt;</span>
+<span class="s2">                        &lt;strong&gt;Maximum Drawdown&lt;/strong&gt;&lt;br&gt;</span>
+<span class="s2">                        </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-box&quot;&gt;</span>
+<span class="s2">                        &lt;strong&gt;95% VaR (Daily)&lt;/strong&gt;&lt;br&gt;</span>
+<span class="s2">                        </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric-box&quot;&gt;</span>
+<span class="s2">                        &lt;strong&gt;95% CVaR (Daily)&lt;/strong&gt;&lt;br&gt;</span>
+<span class="s2">                        </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                &lt;/div&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Stress Test Results&lt;/div&gt;</span>
+<span class="s2">                &lt;table&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;th&gt;Scenario&lt;/th&gt;&lt;th&gt;Threshold&lt;/th&gt;&lt;th&gt;Frequency&lt;/th&gt;&lt;th&gt;Impact&lt;/th&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Worst 5% Days&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">worst_5pct</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="p">(</span><span class="n">returns_data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">worst_5pct</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2"> days&lt;/td&gt;&lt;td&gt;Moderate stress&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Worst 1% Days&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">worst_1pct</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="p">(</span><span class="n">returns_data</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">worst_1pct</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2"> days&lt;/td&gt;&lt;td&gt;Severe stress&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                    &lt;tr&gt;&lt;td&gt;Maximum Single Day Loss&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">worst</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;1 day&lt;/td&gt;&lt;td&gt;Extreme event&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="s2">                &lt;/table&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Risk Monitoring Alerts&lt;/div&gt;</span>
+<span class="s2">                &lt;ul&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add risk alerts</span>
+    <span class="n">alerts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">vol</span> <span class="o">&gt;</span> <span class="mf">0.30</span><span class="p">:</span>
+        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;⚠️ ALERT: Very high volatility (&gt;30%)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.40</span><span class="p">:</span>
+        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;🚨 WARNING: Extreme drawdown (&gt;40%)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">:</span>
+        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;⚠️ ALERT: Poor risk-adjusted returns (Sharpe &lt; 0.3)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;⚠️ ALERT: Highly skewed return distribution&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">kurtosis</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;⚠️ ALERT: Fat-tailed distribution (high kurtosis)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">alerts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="n">alerts</span><span class="p">:</span>
+            <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;li&gt;</span><span class="si">{</span><span class="n">alert</span><span class="si">}</span><span class="s2">&lt;/li&gt;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;li&gt;✅ No immediate risk alerts&lt;/li&gt;&quot;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;/ul&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Risk Management Recommendations&lt;/div&gt;</span>
+<span class="s2">                &lt;ul&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add recommendations based on risk profile</span>
+    <span class="k">if</span> <span class="n">risk_score</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    &lt;li&gt;Consider reducing position size due to high risk profile&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Implement strict stop-loss levels&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Monitor daily for unusual price movements&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Consider hedging strategies&lt;/li&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="k">elif</span> <span class="n">risk_score</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    &lt;li&gt;Maintain moderate position sizing&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Set appropriate stop-loss levels&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Monitor weekly for risk changes&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Consider diversification benefits&lt;/li&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    &lt;li&gt;Suitable for larger position sizes&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Standard risk monitoring procedures&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Good candidate for core portfolio holding&lt;/li&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;/ul&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+<span class="s2">        &lt;/div&gt;</span>
+<span class="s2">    &lt;/body&gt;</span>
+<span class="s2">    &lt;/html&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk assessment report saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate risk assessment for Apple</span>
+<span class="n">create_risk_assessment_report</span><span class="p">(</span><span class="n">apple</span><span class="p">,</span> <span class="s2">&quot;apple_risk_assessment.html&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="executive-summary-report">
+<h3>Executive Summary Report<a class="headerlink" href="#executive-summary-report" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_executive_summary</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;executive_summary.html&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an executive summary report for portfolio&quot;&quot;&quot;</span>
+
+    <span class="c1"># Create equal-weighted portfolio for summary</span>
+    <span class="n">n_assets</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">item_count</span>
+    <span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
+    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Portfolio&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get individual asset metrics</span>
+    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span>
+
+    <span class="n">html_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;!DOCTYPE html&gt;</span>
+<span class="s2">    &lt;html&gt;</span>
+<span class="s2">    &lt;head&gt;</span>
+<span class="s2">        &lt;title&gt;Executive Summary&lt;/title&gt;</span>
+<span class="s2">        &lt;style&gt;</span>
+<span class="s2">            body </span><span class="se">{{</span><span class="s2"> font-family: &#39;Segoe UI&#39;, Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; </span><span class="se">}}</span>
+<span class="s2">            .container </span><span class="se">{{</span><span class="s2"> max-width: 800px; margin: 0 auto; </span><span class="se">}}</span>
+<span class="s2">            .header </span><span class="se">{{</span><span class="s2"> text-align: center; margin-bottom: 30px; padding: 30px; background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; border-radius: 10px; </span><span class="se">}}</span>
+<span class="s2">            .summary-box </span><span class="se">{{</span><span class="s2"> background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid #007bff; </span><span class="se">}}</span>
+<span class="s2">            .key-metrics </span><span class="se">{{</span><span class="s2"> display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; </span><span class="se">}}</span>
+<span class="s2">            .metric </span><span class="se">{{</span><span class="s2"> text-align: center; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); </span><span class="se">}}</span>
+<span class="s2">            .metric-value </span><span class="se">{{</span><span class="s2"> font-size: 1.8em; font-weight: bold; color: #007bff; </span><span class="se">}}</span>
+<span class="s2">            .metric-label </span><span class="se">{{</span><span class="s2"> color: #6c757d; margin-top: 5px; </span><span class="se">}}</span>
+<span class="s2">            .section </span><span class="se">{{</span><span class="s2"> margin: 25px 0; </span><span class="se">}}</span>
+<span class="s2">            .section-title </span><span class="se">{{</span><span class="s2"> font-size: 1.3em; font-weight: bold; margin-bottom: 15px; color: #2c3e50; </span><span class="se">}}</span>
+<span class="s2">        &lt;/style&gt;</span>
+<span class="s2">    &lt;/head&gt;</span>
+<span class="s2">    &lt;body&gt;</span>
+<span class="s2">        &lt;div class=&quot;container&quot;&gt;</span>
+<span class="s2">            &lt;div class=&quot;header&quot;&gt;</span>
+<span class="s2">                &lt;h1&gt;Investment Portfolio&lt;/h1&gt;</span>
+<span class="s2">                &lt;h2&gt;Executive Summary&lt;/h2&gt;</span>
+<span class="s2">                &lt;p&gt;</span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%B %Y&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/p&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;summary-box&quot;&gt;</span>
+<span class="s2">                &lt;h3&gt;Portfolio Overview&lt;/h3&gt;</span>
+<span class="s2">                &lt;p&gt;This report summarizes the performance of a diversified portfolio containing </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">item_count</span><span class="si">}</span><span class="s2"> assets</span>
+<span class="s2">                over the period from </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">. The portfolio demonstrates</span>
+<span class="s2">                </span><span class="si">{</span><span class="s1">&#39;strong&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;moderate&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;weak&#39;</span><span class="si">}</span>
+<span class="s2">                risk-adjusted performance with a Sharpe ratio of </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">.&lt;/p&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Key Performance Indicators&lt;/div&gt;</span>
+<span class="s2">                &lt;div class=&quot;key-metrics&quot;&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value&quot;&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-label&quot;&gt;Annual Return&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value&quot;&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-label&quot;&gt;Volatility&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value&quot;&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-label&quot;&gt;Sharpe Ratio&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                    &lt;div class=&quot;metric&quot;&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-value&quot;&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">                        &lt;div class=&quot;metric-label&quot;&gt;Max Drawdown&lt;/div&gt;</span>
+<span class="s2">                    &lt;/div&gt;</span>
+<span class="s2">                &lt;/div&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Investment Highlights&lt;/div&gt;</span>
+<span class="s2">                &lt;ul&gt;</span>
+<span class="s2">                    &lt;li&gt;Portfolio generated &lt;strong&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/strong&gt; total return over the analysis period&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Annualized return of &lt;strong&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/strong&gt; with &lt;strong&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/strong&gt; volatility&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Maximum drawdown was limited to &lt;strong&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&lt;/li&gt;</span>
+<span class="s2">                    &lt;li&gt;Risk-adjusted performance (Sharpe ratio) of &lt;strong&gt;</span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&lt;/strong&gt;&lt;/li&gt;</span>
+<span class="s2">                &lt;/ul&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Risk Assessment&lt;/div&gt;</span>
+<span class="s2">                &lt;p&gt;The portfolio exhibits &lt;strong&gt;</span><span class="si">{</span><span class="s1">&#39;low&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.15</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;moderate&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.25</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;high&#39;</span><span class="si">}</span><span class="s2">&lt;/strong&gt;</span>
+<span class="s2">                volatility at </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> annually. Daily Value at Risk (95% confidence) is </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">                indicating potential daily losses could reach this level in 1 out of 20 trading days.&lt;/p&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+
+<span class="s2">            &lt;div class=&quot;section&quot;&gt;</span>
+<span class="s2">                &lt;div class=&quot;section-title&quot;&gt;Recommendations&lt;/div&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Add recommendations based on performance</span>
+    <span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;p&gt;&lt;strong&gt;POSITIVE:&lt;/strong&gt; Strong risk-adjusted performance suggests effective portfolio construction.&lt;/p&gt;&quot;</span>
+    <span class="k">elif</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;p&gt;&lt;strong&gt;NEUTRAL:&lt;/strong&gt; Moderate risk-adjusted performance. Consider optimization opportunities.&lt;/p&gt;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;p&gt;&lt;strong&gt;CAUTION:&lt;/strong&gt; Weak risk-adjusted performance. Portfolio review recommended.&lt;/p&gt;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.25</span><span class="p">:</span>
+        <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;p&gt;&lt;strong&gt;RISK:&lt;/strong&gt; Significant drawdown experienced. Consider risk management enhancements.&lt;/p&gt;&quot;</span>
+
+    <span class="n">html_content</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;/div&gt;</span>
+<span class="s2">        &lt;/div&gt;</span>
+<span class="s2">    &lt;/body&gt;</span>
+<span class="s2">    &lt;/html&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executive summary saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate executive summary</span>
+<span class="n">create_executive_summary</span><span class="p">(</span><span class="n">comparison_frame</span><span class="p">,</span> <span class="s2">&quot;executive_summary.html&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="batch-report-generation">
+<h2>Batch Report Generation<a class="headerlink" href="#batch-report-generation" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">generate_all_reports</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">base_filename</span><span class="o">=</span><span class="s2">&quot;analysis&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate all types of reports for a given frame&quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating comprehensive report suite...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Built-in HTML report</span>
+    <span class="n">report_html</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">_builtin.html&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Custom reports for individual assets</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">series</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">constituents</span><span class="p">):</span>
+        <span class="n">asset_name</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">create_performance_report</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">_performance.html&quot;</span><span class="p">)</span>
+        <span class="n">create_risk_assessment_report</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">_risk.html&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Portfolio-level reports</span>
+    <span class="n">create_portfolio_comparison_report</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">_comparison.html&quot;</span><span class="p">)</span>
+    <span class="n">create_executive_summary</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">_executive_summary.html&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All reports generated with base filename: </span><span class="si">{</span><span class="n">base_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate all reports for our comparison frame</span>
+<span class="n">generate_all_reports</span><span class="p">(</span><span class="n">comparison_frame</span><span class="p">,</span> <span class="s2">&quot;stock_analysis&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== CUSTOM REPORTS TUTORIAL COMPLETE ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated reports:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;• Built-in HTML report using report_html()&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;• Custom performance reports for individual assets&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;• Portfolio comparison report&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;• Risk assessment reports&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;• Executive summary report&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;• Batch report generation function&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="portfolio_optimization.html" class="btn btn-neutral float-left" title="Portfolio Optimization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api/openseries.html" class="btn btn-neutral float-right" title="openseries package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Captor Fund Management AB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

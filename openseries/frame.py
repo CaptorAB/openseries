@@ -93,7 +93,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         List of weights in float format.
 
     Returns:
-    -------
+    --------
     OpenFrame
         Object of the class OpenFrame
 
@@ -132,7 +132,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             List of weights in float format.
 
         Returns:
-        -------
+        --------
         OpenFrame
             Object of the class OpenFrame
 
@@ -164,7 +164,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Create copy of the OpenFrame object.
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -183,7 +183,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The Pandas merge method.
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -227,7 +227,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The properties to calculate. Defaults to calculating all available.
 
         Returns:
-        -------
+        --------
         pandas.DataFrame
             Properties of the contituent OpenTimeSeries
 
@@ -246,7 +246,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Number of observations of all constituents.
 
         Returns:
-        -------
+        --------
         Pandas.Series[int]
             Number of observations of all constituents
 
@@ -262,7 +262,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Number of constituents.
 
         Returns:
-        -------
+        --------
         int
             Number of constituents
 
@@ -274,7 +274,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns:
-        -------
+        --------
         list[str]
             Level 0 values of the MultiIndex columns in the .tsdf DataFrame
 
@@ -286,7 +286,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns:
-        -------
+        --------
         list[ValueType]
             Level 1 values of the MultiIndex columns in the .tsdf DataFrame
 
@@ -298,7 +298,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """The first dates in the timeseries of all constituents.
 
         Returns:
-        -------
+        --------
         Pandas.Series[dt.date]
             The first dates in the timeseries of all constituents
 
@@ -315,7 +315,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """The last dates in the timeseries of all constituents.
 
         Returns:
-        -------
+        --------
         Pandas.Series[dt.date]
             The last dates in the timeseries of all constituents
 
@@ -332,7 +332,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Number of days from the first date to the last for all items in the frame.
 
         Returns:
-        -------
+        --------
         Pandas.Series[int]
             Number of days from the first date to the last for all
             items in the frame.
@@ -348,7 +348,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Convert series of values into series of returns.
 
         Returns:
-        -------
+        --------
         OpenFrame
             The returns of the values in the series
 
@@ -374,7 +374,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             is calculated
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -393,7 +393,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Convert series of returns into cumulative series of values.
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -432,7 +432,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The date offset string that sets the resampled frequency
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -481,7 +481,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Controls the method used to align values across columns
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -562,7 +562,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             comparisons
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Series volatilities and correlation
 
@@ -659,7 +659,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Correlation matrix.
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Correlation matrix
 
@@ -689,7 +689,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The timeseries to add
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -707,7 +707,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The .tsdf column level 0 value of the timeseries to delete
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -746,7 +746,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             or end_cut is None.
 
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -847,7 +847,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             comparisons
 
         Returns:
-        -------
+        --------
         Pandas.Series[float]
             Tracking Errors
 
@@ -922,7 +922,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             comparisons
 
         Returns:
-        -------
+        --------
         Pandas.Series[float]
             Information Ratios
 
@@ -1005,7 +1005,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             comparisons
 
         Returns:
-        -------
+        --------
         Pandas.Series[float]
             Capture Ratios
 
@@ -1191,7 +1191,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Variance bias factor taking the value 0 or 1.
 
         Returns:
-        -------
+        --------
         float
             Beta as Co-variance of x & y divided by Variance of x
 
@@ -1260,7 +1260,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             If True the fit is added as a new column in the .tsdf Pandas.DataFrame
 
         Returns:
-        -------
+        --------
         dict[str, float]
             A dictionary with the coefficient, intercept and rsquared outputs.
 
@@ -1329,7 +1329,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Variance bias factor taking the value 0 or 1.
 
         Returns:
-        -------
+        --------
         float
             Jensen's alpha
 
@@ -1401,7 +1401,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             weight calculation strategies
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             A basket timeseries
 
@@ -1466,7 +1466,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Rolling Information Ratios
 
@@ -1532,7 +1532,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Variance bias factor taking the value 0 or 1.
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Rolling Betas
 
@@ -1592,7 +1592,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The length of the rolling window to use is set as number of observations
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Rolling Correlations
 
@@ -1637,7 +1637,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             to use as the dependent variable
 
         Returns:
-        -------
+        --------
         tuple[pandas.DataFrame, OpenTimeSeries]
             - A DataFrame with the R-squared, the intercept
               and the regression coefficients

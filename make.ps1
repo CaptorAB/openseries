@@ -3,12 +3,12 @@
     Admin script for setting up, activating, testing, linting, and cleaning your project venv with Poetry.
 
 .PARAMETER task
-    What to do: 'active', 'make', 'test', 'lint', or 'clean'.
+    What to do: 'active', 'make', 'test', 'lint', 'builddocs', 'servedocs', or 'clean'.
     Defaults to 'active'.
 #>
 
 param (
-    [ValidateSet("active","make","test","lint","clean")]
+    [ValidateSet("active","make","test","lint","builddocs","servedocs","clean")]
     [string]$task = "active"
 )
 
@@ -104,7 +104,44 @@ switch ($task) {
         poetry run mypy .
     }
 
+    "builddocs" {
+        Write-Host "📚 Building documentation..." -ForegroundColor Cyan
+        Push-Location docs
+        try {
+            poetry run sphinx-build -b html source build/html
+            Write-Host "✅ Documentation built in docs/build/html/" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "❌ Documentation build failed: $_" -ForegroundColor Red
+            exit 1
+        }
+        finally {
+            Pop-Location
+        }
+    }
+
+    "servedocs" {
+        Write-Host "📚 Starting live documentation server..." -ForegroundColor Cyan
+        Push-Location docs
+        try {
+            Write-Host "🌐 Documentation server will run at http://127.0.0.1:8000" -ForegroundColor Yellow
+            Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
+            poetry run sphinx-autobuild source build/html --host 127.0.0.1 --port 8000 --re-ignore ".*\..*"
+        }
+        catch {
+            Write-Host "❌ Failed to start documentation server: $_" -ForegroundColor Red
+            exit 1
+        }
+        finally {
+            Pop-Location
+        }
+    }
+
     "clean" {
+        Write-Host "🧹 Cleaning documentation artifacts..." -ForegroundColor Cyan
+        if (Test-Path ".\docs\build") { Remove-Item ".\docs\build" -Recurse -Force }
+        if (Test-Path ".\docs\source\api\generated") { Remove-Item ".\docs\source\api\generated" -Recurse -Force }
+
         . .\venv\Scripts\Activate.ps1
         poetry run pre-commit uninstall
         if ($env:VIRTUAL_ENV) {
@@ -116,11 +153,11 @@ switch ($task) {
         if (Test-Path 'poetry.lock') {
             Remove-Item 'poetry.lock' -Force -ErrorAction SilentlyContinue
         }
-        Write-Output "🧹 Clean complete."
+        Write-Host "🧹 Clean complete." -ForegroundColor Green
     }
 
     default {
-        Write-Error "Invalid task '$task'. Use active, make, test, lint, or clean."
+        Write-Error "Invalid task '$task'. Use active, make, test, lint, builddocs, servedocs, or clean."
         exit 1
     }
 }

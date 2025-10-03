@@ -1,0 +1,442 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openseries Documentation &mdash; openseries 1.9.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b36c5fd4" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=0f42b3e6"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="user_guide/installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            openseries
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/core_concepts.html">Core Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/data_handling.html">Data Handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/basic_analysis.html">Basic Financial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/portfolio_analysis.html">Portfolio Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/risk_management.html">Risk Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/advanced_features.html">Advanced Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/single_asset.html">Single Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/multi_asset.html">Multi-Asset Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/custom_reports.html">Custom Reports</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/openseries.html">openseries package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/series.html">OpenTimeSeries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/frame.html">OpenFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/portfoliotools.html">Portfolio Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/simulation.html">Simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/report.html">Report Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/datefixer.html">Date Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/types.html">Types and Enums</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development/contributing.html">Contributing to openseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">openseries</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">openseries Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="openseries-documentation">
+<h1>openseries Documentation<a class="headerlink" href="#openseries-documentation" title="Link to this heading"></a></h1>
+<a class="reference external image-reference" href="https://pypi.org/project/openseries/"><img alt="PyPI version" src="https://img.shields.io/pypi/v/openseries.svg" />
+</a>
+<a class="reference external image-reference" href="https://anaconda.org/conda-forge/openseries"><img alt="Conda Version" src="https://img.shields.io/conda/vn/conda-forge/openseries.svg" />
+</a>
+<img alt="Platform" src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-blue" />
+<a class="reference external image-reference" href="https://www.python.org/"><img alt="Python version" src="https://img.shields.io/pypi/pyversions/openseries.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/CaptorAB/openseries/actions/workflows/test.yml"><img alt="GitHub Action Test Suite" src="https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://codecov.io/gh/CaptorAB/openseries/branch/master"><img alt="codecov" src="https://img.shields.io/codecov/c/gh/CaptorAB/openseries?logo=codecov" />
+</a>
+<a class="reference external image-reference" href="https://github.com/CaptorAB/openseries/blob/master/LICENSE.md"><img alt="GitHub License" src="https://img.shields.io/github/license/CaptorAB/openseries" />
+</a>
+<p><strong>openseries</strong> is a Python library for analyzing financial time series data. It provides tools to work with single assets or groups of assets, designed specifically for daily or less frequent data.</p>
+<p>The library is built around two main classes:</p>
+<ul class="simple">
+<li><p><strong>OpenTimeSeries</strong>: For managing and analyzing individual time series</p></li>
+<li><p><strong>OpenFrame</strong>: For managing groups of time series and portfolio analysis</p></li>
+</ul>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Financial Analysis</strong>: Comprehensive set of financial metrics and ratios</p></li>
+<li><p><strong>Risk Management</strong>: VaR, CVaR, drawdown analysis, and risk-adjusted returns</p></li>
+<li><p><strong>Portfolio Tools</strong>: Portfolio optimization, rebalancing, and performance attribution</p></li>
+<li><p><strong>Visualization</strong>: Interactive plots using Plotly</p></li>
+<li><p><strong>Data Handling</strong>: Robust date handling and business day calendars</p></li>
+<li><p><strong>Type Safety</strong>: Built with Pydantic for data validation and type safety</p></li>
+</ul>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p>Install openseries using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>openseries
+</pre></div>
+</div>
+<p>Or using conda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>openseries
+</pre></div>
+</div>
+<p>Here’s a simple example to get you started:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
+
+<span class="c1"># Download data</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s2">&quot;^GSPC&quot;</span><span class="p">)</span>
+<span class="n">history</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;5y&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create OpenTimeSeries</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">history</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;Close&quot;</span><span class="p">])</span>
+<span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">)</span>
+
+<span class="c1"># Calculate key metrics</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annual Return: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Ratio: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Drawdown: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create interactive plot</span>
+<span class="n">series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="documentation-contents">
+<h2>Documentation Contents<a class="headerlink" href="#documentation-contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/installation.html#system-requirements">System Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/installation.html#installing-openseries">Installing openseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/installation.html#verifying-installation">Verifying Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/installation.html#development-installation">Development Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/installation.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/installation.html#platform-specific-notes">Platform-Specific Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/quickstart.html">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#your-first-opentimeseries">Your First OpenTimeSeries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#loading-data-from-pandas">Loading Data from pandas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#basic-financial-metrics">Basic Financial Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#creating-visualizations">Creating Visualizations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#working-with-multiple-assets-openframe">Working with Multiple Assets (OpenFrame)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#portfolio-analysis">Portfolio Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#data-transformations">Data Transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#exporting-results">Exporting Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#working-with-business-days">Working with Business Days</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#key-concepts-to-remember">Key Concepts to Remember</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/quickstart.html#common-patterns">Common Patterns</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/core_concepts.html">Core Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#the-opentimeseries-class">The OpenTimeSeries Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#the-openframe-class">The OpenFrame Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#financial-calculations">Financial Calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#date-handling">Date Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#data-validation">Data Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#method-categories">Method Categories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/core_concepts.html#best-practices">Best Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/data_handling.html">Data Handling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#loading-data">Loading Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#data-validation">Data Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#data-transformations">Data Transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#handling-missing-data">Handling Missing Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#working-with-multiple-assets">Working with Multiple Assets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#data-export-and-import">Data Export and Import</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#working-with-real-data-sources">Working with Real Data Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#data-quality-checks">Data Quality Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/data_handling.html#performance-considerations">Performance Considerations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/basic_analysis.html">Basic Financial Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#setting-up">Setting Up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#basic-performance-metrics">Basic Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#risk-analysis">Risk Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#risk-adjusted-returns">Risk-Adjusted Returns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#drawdown-analysis">Drawdown Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#distribution-analysis">Distribution Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#monthly-and-annual-analysis">Monthly and Annual Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#rolling-analysis">Rolling Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#comprehensive-report">Comprehensive Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#visualization">Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#comparison-with-benchmark">Comparison with Benchmark</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#advanced-risk-metrics">Advanced Risk Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_analysis.html#summary-and-interpretation">Summary and Interpretation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/portfolio_analysis.html">Portfolio Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#setting-up-the-data">Setting Up the Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#asset-analysis">Asset Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#correlation-analysis">Correlation Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#simple-portfolio-construction">Simple Portfolio Construction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#portfolio-optimization">Portfolio Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#portfolio-comparison">Portfolio Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#risk-attribution">Risk Attribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#performance-attribution">Performance Attribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#rolling-portfolio-analysis">Rolling Portfolio Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#rebalancing-analysis">Rebalancing Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#stress-testing">Stress Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/portfolio_analysis.html#summary-report">Summary Report</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/risk_management.html">Risk Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#setting-up-risk-analysis">Setting Up Risk Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#basic-risk-metrics">Basic Risk Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#value-at-risk-var-analysis">Value at Risk (VaR) Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#conditional-value-at-risk-cvar">Conditional Value at Risk (CVaR)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#rolling-risk-analysis">Rolling Risk Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#stress-testing">Stress Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#monte-carlo-risk-simulation">Monte Carlo Risk Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#risk-decomposition">Risk Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#risk-adjusted-performance">Risk-Adjusted Performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#risk-monitoring-dashboard">Risk Monitoring Dashboard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#risk-limits-and-controls">Risk Limits and Controls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/risk_management.html#export-risk-report">Export Risk Report</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/advanced_features.html">Advanced Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#custom-analysis-functions">Custom Analysis Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#factor-analysis-and-regression">Factor Analysis and Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#advanced-portfolio-techniques">Advanced Portfolio Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#advanced-visualization">Advanced Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#integration-with-external-libraries">Integration with External Libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#custom-data-sources">Custom Data Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#performance-optimization">Performance Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/advanced_features.html#export-and-reporting">Export and Reporting</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/single_asset.html">Single Asset Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#basic-setup">Basic Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#performance-analysis">Performance Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#risk-analysis">Risk Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#time-series-transformations">Time Series Transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#rolling-analysis">Rolling Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#visualization">Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#calendar-analysis">Calendar Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#export-results">Export Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_asset.html#complete-example">Complete Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/multi_asset.html">Multi-Asset Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#setting-up-multi-asset-analysis">Setting Up Multi-Asset Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#comparative-analysis">Comparative Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#ranking-analysis">Ranking Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#correlation-analysis">Correlation Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#risk-return-analysis">Risk-Return Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#sector-style-analysis">Sector/Style Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#time-series-analysis">Time Series Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#performance-attribution">Performance Attribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#stress-testing">Stress Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#export-multi-asset-results">Export Multi-Asset Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multi_asset.html#complete-multi-asset-analysis-function">Complete Multi-Asset Analysis Function</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/portfolio_optimization.html">Portfolio Optimization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#basic-portfolio-optimization-setup">Basic Portfolio Optimization Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#mean-variance-optimization">Mean-Variance Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#monte-carlo-portfolio-simulation">Monte Carlo Portfolio Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#risk-based-portfolio-strategies">Risk-Based Portfolio Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#target-risk-portfolio">Target Risk Portfolio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#portfolio-comparison">Portfolio Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#backtesting-framework">Backtesting Framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#risk-budgeting">Risk Budgeting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#export-optimization-results">Export Optimization Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/portfolio_optimization.html#complete-optimization-function">Complete Optimization Function</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/custom_reports.html">Custom Reports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/custom_reports.html#using-the-built-in-html-report">Using the Built-in HTML Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/custom_reports.html#creating-custom-analysis-reports">Creating Custom Analysis Reports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/custom_reports.html#batch-report-generation">Batch Report Generation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/openseries.html">openseries package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/openseries.html#main-classes">Main Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/openseries.html#utility-functions">Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/openseries.html#portfolio-tools">Portfolio Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/openseries.html#date-utilities">Date Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/openseries.html#simulation">Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/openseries.html#types-and-enums">Types and Enums</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/openseries.html#other-utilities">Other Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/series.html">OpenTimeSeries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/series.html#class-methods-for-construction">Class Methods for Construction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/series.html#properties">Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/series.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/series.html#utility-functions">Utility Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/frame.html">OpenFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/frame.html#class-methods-for-construction">Class Methods for Construction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/frame.html#properties">Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/frame.html#methods">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/portfoliotools.html">Portfolio Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/portfoliotools.html#portfolio-optimization">Portfolio Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/portfoliotools.html#portfolio-simulation">Portfolio Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/portfoliotools.html#portfolio-constraints">Portfolio Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/portfoliotools.html#visualization">Visualization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/simulation.html">Simulation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/simulation.html#returnsimulation-class">ReturnSimulation Class</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/report.html">Report Generation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/report.html#html-report-function">HTML Report Function</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/datefixer.html">Date Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/datefixer.html#date-handling-functions">Date Handling Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/types.html">Types and Enums</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/types.html#value-types">Value Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/types.html#type-aliases">Type Aliases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/types.html#literal-types">Literal Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/types.html#validation-classes">Validation Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/types.html#custom-exceptions">Custom Exceptions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development/contributing.html">Contributing to openseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/changelog.html">Changelog</a></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_guide/installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Captor Fund Management AB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -70,7 +70,7 @@ def market_holidays(
         String or list of market codes supported by pandas_market_calendars.
 
     Returns:
-    -------
+    --------
     list[str]
         list of holiday dates.
     """
@@ -122,7 +122,7 @@ def holiday_calendar(
         Argument where missing holidays can be added
 
     Returns:
-    -------
+    --------
     numpy.busdaycalendar
         Generate a business calendar
 
@@ -183,7 +183,7 @@ def date_fix(
         The data item to parse
 
     Returns:
-    -------
+    --------
     datetime.date
         Parsed date
 
@@ -232,7 +232,7 @@ def date_offset_foll(
         Determines if days should be offset forward (following) or backward
 
     Returns:
-    -------
+    --------
     datetime.date
         Off-set date
 
@@ -280,7 +280,7 @@ def get_previous_business_day_before_today(
         Argument where missing holidays can be added
 
     Returns:
-    -------
+    --------
     datetime.date
         The previous business day
 
@@ -326,7 +326,7 @@ def offset_business_days(
         Argument where missing holidays can be added
 
     Returns:
-    -------
+    --------
     datetime.date
         The new offset business day
 
@@ -410,7 +410,7 @@ def generate_calendar_date_range(
         Argument where missing holidays can be added
 
     Returns:
-    -------
+    --------
     list[dt.date]
         List of business day calendar dates
 
@@ -491,7 +491,7 @@ def _do_resample_to_business_period_ends(
         Argument where missing holidays can be added
 
     Returns:
-    -------
+    --------
     Pandas.DatetimeIndex
         A date range aligned to business period ends
 

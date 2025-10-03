@@ -215,7 +215,7 @@ class OpenTimeSeries(_CommonModel[float]):
             Boolean flag indicating if timeseries is in local currency
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -265,7 +265,7 @@ class OpenTimeSeries(_CommonModel[float]):
             Boolean flag indicating if timeseries is in local currency
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -364,7 +364,7 @@ class OpenTimeSeries(_CommonModel[float]):
             Boolean flag indicating if timeseries is in local currency
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -403,7 +403,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Create copy of OpenTimeSeries object.
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -414,7 +414,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Populate .tsdf Pandas DataFrame from the .dates and .values lists.
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -441,7 +441,7 @@ class OpenTimeSeries(_CommonModel[float]):
             The properties to calculate. Defaults to calculating all available.
 
         Returns:
-        -------
+        --------
         pandas.DataFrame
             Properties of the OpenTimeSeries
 
@@ -461,7 +461,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Convert series of values into series of returns.
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             The returns of the values in the series
 
@@ -486,7 +486,7 @@ class OpenTimeSeries(_CommonModel[float]):
             is calculated
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -506,7 +506,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Convert series of returns into cumulative series of values.
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -541,7 +541,7 @@ class OpenTimeSeries(_CommonModel[float]):
             Convenience divider for when the 1-day rate is not scaled correctly
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -582,7 +582,7 @@ class OpenTimeSeries(_CommonModel[float]):
             The date offset string that sets the resampled frequency
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -612,7 +612,7 @@ class OpenTimeSeries(_CommonModel[float]):
             Controls the method used to align values across columns
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -667,7 +667,7 @@ class OpenTimeSeries(_CommonModel[float]):
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns:
-        -------
+        --------
         Pandas.Series[float]
             Series EWMA volatility
 
@@ -732,7 +732,7 @@ class OpenTimeSeries(_CommonModel[float]):
             assumed number of days in a calendar year
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -793,7 +793,7 @@ class OpenTimeSeries(_CommonModel[float]):
             If True the level one label is deleted
 
         Returns:
-        -------
+        --------
         OpenTimeSeries
             An OpenTimeSeries object
 
@@ -835,7 +835,7 @@ def timeseries_chain(
         Fee to apply to earlier series
 
     Returns:
-    -------
+    --------
     TypeOpenTimeSeries
         An OpenTimeSeries object or a subclass thereof
 
@@ -896,7 +896,7 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
         variable to be checked
 
     Returns:
-    -------
+    --------
     bool
         Answer to whether the variable is None or equivalent
 

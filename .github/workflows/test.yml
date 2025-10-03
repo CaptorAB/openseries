@@ -31,7 +31,6 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
-        id: setup_python
         with:
           python-version-file: '.python-version'
 
@@ -45,13 +44,10 @@ jobs:
           key: poetry-cache-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
           restore-keys: poetry-cache-${{ runner.os }}-
 
-      - name: Create virtual environment
-        run: python -m venv venv
-
-      - name: Activate venv and install Poetry
+      - name: Create virtual environment and install Poetry
         run: |
+          python -m venv venv
           . venv/bin/activate
-          python --version
           pip install --upgrade pip
           pip install poetry==2.2.1
 

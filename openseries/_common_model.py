@@ -110,7 +110,7 @@ def _get_date_range_and_factor(
         comparisons
 
     Returns:
-    -------
+    --------
     tuple[dt.date, dt.date, float, DataFrame]
         earlier, later, time_factor, data
     """
@@ -153,7 +153,7 @@ def _get_base_column_data(
         End date
 
     Returns:
-    -------
+    --------
     tuple[Series[float], tuple[str, ValueType], str]
         data, item, label
     """
@@ -196,7 +196,7 @@ def _calculate_time_factor(
         Fixed periods in year
 
     Returns:
-    -------
+    --------
     float
         Time factor
     """
@@ -239,7 +239,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Number of observations.
 
         Returns:
-        -------
+        --------
         int
             Number of observations
 
@@ -251,7 +251,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """The first date in the timeseries.
 
         Returns:
-        -------
+        --------
         datetime.date
             The first date in the timeseries
 
@@ -263,7 +263,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """The last date in the timeseries.
 
         Returns:
-        -------
+        --------
         datetime.date
             The last date in the timeseries
 
@@ -275,7 +275,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Number of days from the first date to the last.
 
         Returns:
-        -------
+        --------
         int
             Number of days from the first date to the last
 
@@ -287,7 +287,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Length of series expressed in years assuming all years have 365.25 days.
 
         Returns:
-        -------
+        --------
         float
             Length of the timeseries expressed in years assuming all years
             have 365.25 days
@@ -300,7 +300,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """The average number of observations per year.
 
         Returns:
-        -------
+        --------
         float
             The average number of observations per year
 
@@ -312,7 +312,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Maximum drawdown in a single calendar year.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -334,7 +334,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/c/cagr.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Compounded Annual Growth Rate (CAGR).
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -348,7 +348,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Annualized arithmetic mean of returns.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -362,7 +362,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Simple return.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Simple return.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -379,7 +379,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         https://www.investopedia.com/terms/v/volatility.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Annualized volatility.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -397,7 +397,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         https://www.investopedia.com/terms/d/downside-deviation.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Downside deviation.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -416,10 +416,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Ratio of annualized arithmetic mean of returns and annualized volatility.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Ratio of the annualized arithmetic mean of returns and annualized.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+            Ratio of the annualized arithmetic mean of returns and annualized
             volatility.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
@@ -432,10 +431,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Sortino ratio calculated as the annualized arithmetic mean of returns.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame
+            Sortino ratio calculated as the annualized arithmetic mean of returns
             / downside deviation. The ratio implies that the riskfree asset has zero
             volatility, and a minimum acceptable return of zero.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -459,10 +457,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         the Sortino ratio (which uses order 2).
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Kappa-3 ratio calculation with the riskfree rate and.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame
             Minimum Acceptable Return (MAR) both set to zero.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
@@ -481,7 +478,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://en.wikipedia.org/wiki/Omega_ratio.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Omega ratio calculation.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -496,7 +493,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/z/zscore.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Z-score as (last return - mean return) / standard deviation of returns.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -510,7 +507,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Maximum drawdown without any limit on date range.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -526,7 +523,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
-        -------
+        --------
         datetime.date | pandas.Series[dt.date]
             Date when the maximum drawdown occurred
 
@@ -549,7 +546,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Most negative percentage change.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Most negative percentage change.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -564,7 +561,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Most negative month.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Most negative month.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -610,7 +607,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """The share of percentage changes that are greater than zero.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             The share of percentage changes that are greater than zero.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -624,7 +621,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/s/skewness.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Skew of the return distribution.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -638,7 +635,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Kurtosis of the return distribution.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -652,7 +649,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Downside 95% Conditional Value At Risk "CVaR".
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -670,7 +667,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         https://www.investopedia.com/terms/v/var.asp.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Downside 95% Value At Risk (VaR).
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -688,10 +685,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         Assumes that returns are normally distributed.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Implied annualized volatility from the Downside 95% VaR using the.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+            Implied annualized volatility from the Downside 95% VaR using the
             assumption that returns are normally distributed.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
@@ -719,7 +715,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific from date
 
         Returns:
-        -------
+        --------
         tuple[datetime.date, datetime.date]
             Start and end date of the chosen date range
 
@@ -776,8 +772,10 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Argument where missing holidays can be added
         method: LiteralPandasReindexMethod, default: "nearest"
 
+
+
         Returns:
-        -------
+        --------
         OpenFrame
             An OpenFrame object
 
@@ -837,7 +835,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         Equivalent to LN(value[t] / value[t=0]) in Excel.
 
         Returns:
-        -------
+        --------
         self
             An object of the same class
 
@@ -858,7 +856,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Method used to handle NaN. Either fill with last known or drop
 
         Returns:
-        -------
+        --------
         self
             An object of the same class
 
@@ -878,7 +876,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Method used to handle NaN. Either fill with zero or drop
 
         Returns:
-        -------
+        --------
         self
             An object of the same class
 
@@ -893,7 +891,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Convert timeseries into a drawdown series.
 
         Returns:
-        -------
+        --------
         self
             An object of the same class
 
@@ -923,7 +921,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             File folder location
 
         Returns:
-        -------
+        --------
         list[dict[str, str | bool | ValueType | list[str] | list[float]]]
             A list of dictionaries with the data of the series
 
@@ -990,7 +988,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Flag whether to overwrite an existing file
 
         Returns:
-        -------
+        --------
         str
             The Excel file path
 
@@ -1161,7 +1159,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             If True a Captor logo is added to the plot
 
         Returns:
-        -------
+        --------
         tuple[plotly.go.Figure, str]
             Plotly Figure and a div section or a html filename with location
 
@@ -1258,7 +1256,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             If True the last self.tsdf point is highlighted as red dot with a label
 
         Returns:
-        -------
+        --------
         tuple[plotly.go.Figure, str]
             Plotly Figure and a div section or a html filename with location
 
@@ -1395,7 +1393,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             If True a Captor logo is added to the plot
 
         Returns:
-        -------
+        --------
         tuple[plotly.go.Figure, str]
             Plotly Figure and a div section or a html filename with location
 
@@ -1493,7 +1491,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             comparisons
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Annualized arithmetic mean of returns.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -1537,7 +1535,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Annualized volatility.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -1591,11 +1589,11 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             An adjustment to remove the bias implied by the average return
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Implied annualized volatility from the Downside VaR using the.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+            Implied annualized volatility from the Downside VaR using the
             assumption that returns are normally distributed.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         return self._var_implied_vol_and_target_func(
@@ -1653,11 +1651,11 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             An adjustment to remove the bias implied by the average return
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            A position weight multiplier from the ratio between a VaR implied.
+            A position weight multiplier from the ratio between a VaR implied
+            volatility and a given target volatility. Multiplier = 1.0 -> target met.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-            volatility and a given target volatility. Multiplier = 1.0 -> target met
 
         """
         return self._var_implied_vol_and_target_func(
@@ -1720,11 +1718,11 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             An adjustment to remove the bias implied by the average return
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Target volatility if target_vol is provided otherwise the VaR.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+            Target volatility if target_vol is provided otherwise the VaR
             implied volatility.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
 
         """
         earlier, later = self.calc_range(
@@ -1808,7 +1806,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Downside Conditional Value At Risk "CVaR".
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -1868,7 +1866,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             comparisons
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Downside deviation if order set to 2.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -1942,7 +1940,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Compounded Annual Growth Rate (CAGR).
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -1992,7 +1990,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Skew of the return distribution.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2036,7 +2034,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Kurtosis of the return distribution.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2087,7 +2085,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Smallest number of observations to use to find the maximum drawdown
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Maximum drawdown without any limit on date range.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2126,7 +2124,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Calculate share of percentage changes that are greater than zero.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2191,11 +2189,11 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             comparisons
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Ratio of the annualized arithmetic mean of returns and annualized.
+            Ratio of the annualized arithmetic mean of returns and annualized
+            volatility or, if risk-free return provided, Sharpe ratio.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-            volatility or, if risk-free return provided, Sharpe ratio
 
         """
         result = Series(
@@ -2256,11 +2254,11 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             comparisons
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Sortino ratio calculated as ( return - riskfree return ) /.
+            Sortino ratio calculated as ( return - riskfree return ) /
+            downside deviation (std dev of returns below MAR).
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-            downside deviation (std dev of returns below MAR)
 
         """
         result = Series(
@@ -2312,7 +2310,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Omega ratio calculation.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2353,7 +2351,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Calculate simple return.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2394,7 +2392,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Calendar month of the period to calculate.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Calculate simple return for a specific calendar period.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2440,7 +2438,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Downside Value At Risk.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2482,11 +2480,11 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
-            Most negative percentage change over a rolling number of observations.
+            Most negative percentage change over a rolling number of observations
+            within a chosen date range.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-            within a chosen date range
 
         """
         earlier, later = self.calc_range(
@@ -2526,7 +2524,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Specific to date
 
         Returns:
-        -------
+        --------
         SeriesOrFloat_co
             Z-score as (last return - mean return) / standard deviation of returns.
             Returns float for OpenTimeSeries, Series[float] for OpenFrame.
@@ -2564,7 +2562,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Number of observations in the overlapping window.
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Calculate rolling annualized downside CVaR
 
@@ -2595,7 +2593,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Number of observations in the overlapping window.
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Calculate rolling returns
 
@@ -2634,7 +2632,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Type of interpolation in Pandas.DataFrame.quantile() function.
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
            Calculate rolling annualized downside Value At Risk "VaR"
 
@@ -2674,7 +2672,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Variance bias factor taking the value 0 or 1.
 
         Returns:
-        -------
+        --------
         Pandas.DataFrame
             Calculate rolling annualised volatilities
 

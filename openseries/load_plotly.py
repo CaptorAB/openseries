@@ -34,7 +34,7 @@ def _check_remote_file_existence(url: str) -> bool:
         Path to remote file
 
     Returns:
-    -------
+    --------
     bool
         True if url is valid and False otherwise
 
@@ -62,7 +62,7 @@ def load_plotly_dict(
         Flag whether to load as responsive
 
     Returns:
-    -------
+    --------
     tuple[PlotlyLayoutType, CaptorLogoType]
         A dictionary with the Plotly config and layout template
 

@@ -64,7 +64,7 @@ def _random_generator(seed: int | None) -> Generator:
         Random seed
 
     Returns:
-    -------
+    --------
     numpy.random.Generator
         Numpy random process generator
 
@@ -109,7 +109,7 @@ def _create_base_simulation(
         Additional keyword arguments for jump parameters
 
     Returns:
-    -------
+    --------
     ReturnSimulation
         A ReturnSimulation instance
 
@@ -176,7 +176,7 @@ class ReturnSimulation(BaseModel):
         """Simulation data.
 
         Returns:
-        -------
+        --------
         pandas.DataFrame
             Simulation data
 
@@ -188,7 +188,7 @@ class ReturnSimulation(BaseModel):
         """Annualized arithmetic mean of returns.
 
         Returns:
-        -------
+        --------
         float
             Annualized arithmetic mean of returns
 
@@ -205,7 +205,7 @@ class ReturnSimulation(BaseModel):
         """Annualized volatility.
 
         Returns:
-        -------
+        --------
         float
             Annualized volatility
 
@@ -249,7 +249,7 @@ class ReturnSimulation(BaseModel):
             Random process generator
 
         Returns:
-        -------
+        --------
         ReturnSimulation
             Normal distribution simulation
 
@@ -305,7 +305,7 @@ class ReturnSimulation(BaseModel):
             Random process generator
 
         Returns:
-        -------
+        --------
         ReturnSimulation
             Lognormal distribution simulation
 
@@ -364,7 +364,7 @@ class ReturnSimulation(BaseModel):
             Random process generator
 
         Returns:
-        -------
+        --------
         ReturnSimulation
             Geometric Brownian Motion simulation
 
@@ -436,7 +436,7 @@ class ReturnSimulation(BaseModel):
             Random process generator
 
         Returns:
-        -------
+        --------
         ReturnSimulation
             Merton Jump-Diffusion model simulation
 
@@ -511,7 +511,7 @@ class ReturnSimulation(BaseModel):
             (List of) markets code(s) according to pandas-market-calendars
 
         Returns:
-        -------
+        --------
         pandas.DataFrame
             The simulation(s) data
 
