@@ -1,25 +1,20 @@
-name: Documentation
+name: docs.yml
 
 permissions:
   contents: read
 
 on:
-  # Trigger on push to main branch or when documentation paths change
   push:
     branches:
-      - main
       - master
     paths:
       - 'docs/**'
       - 'openseries/**'
       - 'pyproject.toml'
       - '.readthedocs.yaml'
-  # Allow manual trigger
-  workflow_dispatch:
-  # Trigger on pull requests to main/master
+  workflow_dispatch: {}
   pull_request:
     branches:
-      - main
       - master
     paths:
       - 'docs/**'
@@ -35,10 +30,11 @@ jobs:
         shell: bash
 
     steps:
-      - name: Check out repository
+      - name: Check out GitHub repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Set up Python
@@ -47,14 +43,14 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Cache Poetry dependencies
+      - name: Manage Poetry cache
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         with:
           path: |
             ~/.cache/pypoetry/cache
             ~/.cache/pypoetry/artifacts
-          key: poetry-docs-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: poetry-docs-
+          key: poetry-cache-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-cache-${{ runner.os }}-
 
       - name: Create virtual environment and install Poetry
         run: |
@@ -88,7 +84,7 @@ jobs:
   docs_site:
     runs-on: ubuntu-latest
     needs: docs
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     permissions:
       contents: read
       pages: write
@@ -103,10 +99,11 @@ jobs:
         shell: bash
 
     steps:
-      - name: Check out repository
+      - name: Check out GitHub repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Set up Python
@@ -115,14 +112,14 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Cache Poetry dependencies
+      - name: Manage Poetry cache
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         with:
           path: |
             ~/.cache/pypoetry/cache
             ~/.cache/pypoetry/artifacts
-          key: poetry-docs-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: poetry-docs-
+          key: poetry-cache-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-cache-${{ runner.os }}-
 
       - name: Create virtual environment and install Poetry
         run: |

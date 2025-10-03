@@ -47,7 +47,7 @@ class TestPackage:
             "^(Tools for analyzing financial timeseries.)$",
             "^(Martin Karrin)$",
             "^(>=3.10,<3.14)$",
-            "^(Homepage, https://github.com/CaptorAB/openseries)$",
+            "^(Documentation, https://openseries.readthedocs.io/)$",
         ]
 
         for name, value in zip(attribute_names, expected_values, strict=True):
