@@ -8,6 +8,7 @@ OpenFrame
    :undoc-members:
    :show-inheritance:
    :special-members: __init__
+   :no-index:
 
 The OpenFrame class manages collections of OpenTimeSeries objects and provides functionality for:
 

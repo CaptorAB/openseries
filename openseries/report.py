@@ -61,7 +61,7 @@ def calendar_period_returns(
         Whether to set new appropriate labels
 
     Returns:
-    -------
+    --------
     pandas.DataFrame
         The resulting data
 
@@ -122,7 +122,7 @@ def report_html(
         Determines whether to vertically align the legend's labels
 
     Returns:
-    -------
+    --------
     tuple[plotly.go.Figure, str]
         Plotly Figure and a div section or a html filename with location
 

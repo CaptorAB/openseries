@@ -7,6 +7,7 @@ Report Generation
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 HTML Report Function
 --------------------

@@ -84,7 +84,7 @@ def simulate_portfolios(
         The seed for the random process
 
     Returns:
-    -------
+    --------
     pandas.DataFrame
         The resulting data
 
@@ -155,7 +155,7 @@ def efficient_frontier(
         cutting the frontier to exclude multiple points with almost the same risk
 
     Returns:
-    -------
+    --------
     tuple[DataFrame, DataFrame, NDArray[float]]
         The efficient frontier data, simulation data and optimal portfolio
 
@@ -342,7 +342,7 @@ def constrain_optimized_portfolios(
         The method passed into the scipy.minimize function
 
     Returns:
-    -------
+    --------
     tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]
         The constrained optimal portfolio data
 
@@ -404,7 +404,7 @@ def prepare_plot_data(
         Data optimized with the efficient_frontier method
 
     Returns:
-    -------
+    --------
     DataFrame
         The data prepared with mean returns, volatility and weights
 
@@ -488,7 +488,7 @@ def sharpeplot(
         Determines whether to open a browser window with the plot
 
     Returns:
-    -------
+    --------
     Figure
         The scatter plot with simulated and optimized results
 

@@ -67,24 +67,6 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../openseries.html">openseries package</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.OpenFrame"><code class="docutils literal notranslate"><span class="pre">OpenFrame</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.OpenTimeSeries"><code class="docutils literal notranslate"><span class="pre">OpenTimeSeries</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation"><code class="docutils literal notranslate"><span class="pre">ReturnSimulation</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.ValueType"><code class="docutils literal notranslate"><span class="pre">ValueType</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.constrain_optimized_portfolios"><code class="docutils literal notranslate"><span class="pre">constrain_optimized_portfolios()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.date_fix"><code class="docutils literal notranslate"><span class="pre">date_fix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.date_offset_foll"><code class="docutils literal notranslate"><span class="pre">date_offset_foll()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.efficient_frontier"><code class="docutils literal notranslate"><span class="pre">efficient_frontier()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.generate_calendar_date_range"><code class="docutils literal notranslate"><span class="pre">generate_calendar_date_range()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.get_previous_business_day_before_today"><code class="docutils literal notranslate"><span class="pre">get_previous_business_day_before_today()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.holiday_calendar"><code class="docutils literal notranslate"><span class="pre">holiday_calendar()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.load_plotly_dict"><code class="docutils literal notranslate"><span class="pre">load_plotly_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.offset_business_days"><code class="docutils literal notranslate"><span class="pre">offset_business_days()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.prepare_plot_data"><code class="docutils literal notranslate"><span class="pre">prepare_plot_data()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.report_html"><code class="docutils literal notranslate"><span class="pre">report_html()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.sharpeplot"><code class="docutils literal notranslate"><span class="pre">sharpeplot()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.simulate_portfolios"><code class="docutils literal notranslate"><span class="pre">simulate_portfolios()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../openseries.html#openseries.timeseries_chain"><code class="docutils literal notranslate"><span class="pre">timeseries_chain()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../openseries.html#main-classes">Main Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../openseries.html#utility-functions">Utility Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../openseries.html#portfolio-tools">Portfolio Tools</a></li>
@@ -193,16 +175,16 @@ validated to form a valid model.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>(*[, include, exclude, by_alias, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.from_gbm" title="openseries.ReturnSimulation.from_gbm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_gbm</span></code></a>(number_of_sims, mean_annual_return, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.from_gbm" title="openseries.ReturnSimulation.from_gbm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_gbm</span></code></a>(number_of_sims, mean_annual_return, ...)</p></td>
 <td><p>Create a Geometric Brownian Motion simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.from_lognormal" title="openseries.ReturnSimulation.from_lognormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lognormal</span></code></a>(number_of_sims, ...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.from_lognormal" title="openseries.ReturnSimulation.from_lognormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lognormal</span></code></a>(number_of_sims, ...[, ...])</p></td>
 <td><p>Create a Lognormal distribution simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.from_merton_jump_gbm" title="openseries.ReturnSimulation.from_merton_jump_gbm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_merton_jump_gbm</span></code></a>(number_of_sims, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.from_merton_jump_gbm" title="openseries.ReturnSimulation.from_merton_jump_gbm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_merton_jump_gbm</span></code></a>(number_of_sims, ...[, ...])</p></td>
 <td><p>Create a Merton Jump-Diffusion model simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.from_normal" title="openseries.ReturnSimulation.from_normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_normal</span></code></a>(number_of_sims, ...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.from_normal" title="openseries.ReturnSimulation.from_normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_normal</span></code></a>(number_of_sims, ...[, ...])</p></td>
 <td><p>Create a Normal distribution simulation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_orm</span></code>(obj)</p></td>
@@ -259,7 +241,7 @@ validated to form a valid model.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema_json</span></code>(*[, by_alias, ref_template])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.to_dataframe" title="openseries.ReturnSimulation.to_dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code></a>(name[, start, end, countries, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.to_dataframe" title="openseries.ReturnSimulation.to_dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code></a>(name[, start, end, countries, ...])</p></td>
 <td><p>Create a pandas.DataFrame from simulation(s).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_forward_refs</span></code>(**localns)</p></td>
@@ -276,7 +258,7 @@ validated to form a valid model.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_computed_fields</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.model_config" title="openseries.ReturnSimulation.model_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_config</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.model_config" title="openseries.ReturnSimulation.model_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_config</span></code></a></p></td>
 <td><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_extra</span></code></p></td>
@@ -288,43 +270,43 @@ validated to form a valid model.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_fields_set</span></code></p></td>
 <td><p>Returns the set of fields that have been explicitly set on this model instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.realized_mean_return" title="openseries.ReturnSimulation.realized_mean_return"><code class="xref py py-obj docutils literal notranslate"><span class="pre">realized_mean_return</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.realized_mean_return" title="openseries.ReturnSimulation.realized_mean_return"><code class="xref py py-obj docutils literal notranslate"><span class="pre">realized_mean_return</span></code></a></p></td>
 <td><p>Annualized arithmetic mean of returns.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.realized_vol" title="openseries.ReturnSimulation.realized_vol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">realized_vol</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.realized_vol" title="openseries.ReturnSimulation.realized_vol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">realized_vol</span></code></a></p></td>
 <td><p>Annualized volatility.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.results" title="openseries.ReturnSimulation.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">results</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.results" title="openseries.ReturnSimulation.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">results</span></code></a></p></td>
 <td><p>Simulation data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.number_of_sims" title="openseries.ReturnSimulation.number_of_sims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">number_of_sims</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.number_of_sims" title="openseries.ReturnSimulation.number_of_sims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">number_of_sims</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.trading_days" title="openseries.ReturnSimulation.trading_days"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trading_days</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.trading_days" title="openseries.ReturnSimulation.trading_days"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trading_days</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.trading_days_in_year" title="openseries.ReturnSimulation.trading_days_in_year"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trading_days_in_year</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.trading_days_in_year" title="openseries.ReturnSimulation.trading_days_in_year"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trading_days_in_year</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.mean_annual_return" title="openseries.ReturnSimulation.mean_annual_return"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_annual_return</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.mean_annual_return" title="openseries.ReturnSimulation.mean_annual_return"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_annual_return</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.mean_annual_vol" title="openseries.ReturnSimulation.mean_annual_vol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_annual_vol</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.mean_annual_vol" title="openseries.ReturnSimulation.mean_annual_vol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_annual_vol</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.dframe" title="openseries.ReturnSimulation.dframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dframe</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.dframe" title="openseries.ReturnSimulation.dframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dframe</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.jumps_lamda" title="openseries.ReturnSimulation.jumps_lamda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jumps_lamda</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.jumps_lamda" title="openseries.ReturnSimulation.jumps_lamda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jumps_lamda</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.jumps_sigma" title="openseries.ReturnSimulation.jumps_sigma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jumps_sigma</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.jumps_sigma" title="openseries.ReturnSimulation.jumps_sigma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jumps_sigma</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.jumps_mu" title="openseries.ReturnSimulation.jumps_mu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jumps_mu</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.jumps_mu" title="openseries.ReturnSimulation.jumps_mu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jumps_mu</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../openseries.html#openseries.ReturnSimulation.seed" title="openseries.ReturnSimulation.seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ReturnSimulation.seed" title="openseries.ReturnSimulation.seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>

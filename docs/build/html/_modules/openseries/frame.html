@@ -8,9 +8,9 @@
   <title>openseries.frame &mdash; openseries 1.9.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b3da7c01" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
 
-
+  
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=0f42b3e6"></script>
@@ -18,17 +18,17 @@
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #2980B9" >
 
-
-
+          
+          
           <a href="../../index.html" class="icon icon-home">
             openseries
           </a>
@@ -101,7 +101,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <h1>Source code for openseries.frame</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Defining the OpenFrame class.</span>
 
@@ -200,7 +200,7 @@
 <span class="sd">        List of weights in float format.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    -------</span>
+<span class="sd">    --------</span>
 <span class="sd">    OpenFrame</span>
 <span class="sd">        Object of the class OpenFrame</span>
 
@@ -241,7 +241,7 @@
 <span class="sd">            List of weights in float format.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            Object of the class OpenFrame</span>
 
@@ -276,7 +276,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create copy of the OpenFrame object.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -298,7 +298,7 @@
 <span class="sd">            The Pandas merge method.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -345,7 +345,7 @@
 <span class="sd">            The properties to calculate. Defaults to calculating all available.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        pandas.DataFrame</span>
 <span class="sd">            Properties of the contituent OpenTimeSeries</span>
 
@@ -365,7 +365,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of observations of all constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[int]</span>
 <span class="sd">            Number of observations of all constituents</span>
 
@@ -381,7 +381,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        int</span>
 <span class="sd">            Number of constituents</span>
 
@@ -393,7 +393,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Level 0 values of the MultiIndex columns in the .tsdf DataFrame.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        list[str]</span>
 <span class="sd">            Level 0 values of the MultiIndex columns in the .tsdf DataFrame</span>
 
@@ -405,7 +405,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Level 1 values of the MultiIndex columns in the .tsdf DataFrame.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        list[ValueType]</span>
 <span class="sd">            Level 1 values of the MultiIndex columns in the .tsdf DataFrame</span>
 
@@ -417,7 +417,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The first dates in the timeseries of all constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[dt.date]</span>
 <span class="sd">            The first dates in the timeseries of all constituents</span>
 
@@ -434,7 +434,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The last dates in the timeseries of all constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[dt.date]</span>
 <span class="sd">            The last dates in the timeseries of all constituents</span>
 
@@ -451,7 +451,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of days from the first date to the last for all items in the frame.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[int]</span>
 <span class="sd">            Number of days from the first date to the last for all</span>
 <span class="sd">            items in the frame.</span>
@@ -469,7 +469,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values into series of returns.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            The returns of the values in the series</span>
 
@@ -498,7 +498,7 @@
 <span class="sd">            is calculated</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -520,7 +520,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of returns into cumulative series of values.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -562,7 +562,7 @@
 <span class="sd">            The date offset string that sets the resampled frequency</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -614,7 +614,7 @@
 <span class="sd">            Controls the method used to align values across columns</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -698,7 +698,7 @@
 <span class="sd">            comparisons</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.DataFrame</span>
 <span class="sd">            Series volatilities and correlation</span>
 
@@ -796,7 +796,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Correlation matrix.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.DataFrame</span>
 <span class="sd">            Correlation matrix</span>
 
@@ -828,7 +828,7 @@
 <span class="sd">            The timeseries to add</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -849,7 +849,7 @@
 <span class="sd">            The .tsdf column level 0 value of the timeseries to delete</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -891,7 +891,7 @@
 <span class="sd">            or end_cut is None.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenFrame</span>
 <span class="sd">            An OpenFrame object</span>
 
@@ -998,7 +998,7 @@
 <span class="sd">            comparisons</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[float]</span>
 <span class="sd">            Tracking Errors</span>
 
@@ -1076,7 +1076,7 @@
 <span class="sd">            comparisons</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[float]</span>
 <span class="sd">            Information Ratios</span>
 
@@ -1162,7 +1162,7 @@
 <span class="sd">            comparisons</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[float]</span>
 <span class="sd">            Capture Ratios</span>
 
@@ -1351,7 +1351,7 @@
 <span class="sd">            Variance bias factor taking the value 0 or 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        float</span>
 <span class="sd">            Beta as Co-variance of x &amp; y divided by Variance of x</span>
 
@@ -1423,7 +1423,7 @@
 <span class="sd">            If True the fit is added as a new column in the .tsdf Pandas.DataFrame</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        dict[str, float]</span>
 <span class="sd">            A dictionary with the coefficient, intercept and rsquared outputs.</span>
 
@@ -1495,7 +1495,7 @@
 <span class="sd">            Variance bias factor taking the value 0 or 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        float</span>
 <span class="sd">            Jensen&#39;s alpha</span>
 
@@ -1570,7 +1570,7 @@
 <span class="sd">            weight calculation strategies</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.DataFrame</span>
 <span class="sd">            A basket timeseries</span>
 
@@ -1638,7 +1638,7 @@
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and comparisons</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.DataFrame</span>
 <span class="sd">            Rolling Information Ratios</span>
 
@@ -1707,7 +1707,7 @@
 <span class="sd">            Variance bias factor taking the value 0 or 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.DataFrame</span>
 <span class="sd">            Rolling Betas</span>
 
@@ -1770,7 +1770,7 @@
 <span class="sd">            The length of the rolling window to use is set as number of observations</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.DataFrame</span>
 <span class="sd">            Rolling Correlations</span>
 
@@ -1818,7 +1818,7 @@
 <span class="sd">            to use as the dependent variable</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        tuple[pandas.DataFrame, OpenTimeSeries]</span>
 <span class="sd">            - A DataFrame with the R-squared, the intercept</span>
 <span class="sd">              and the regression coefficients</span>
@@ -1875,7 +1875,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -1886,7 +1886,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>

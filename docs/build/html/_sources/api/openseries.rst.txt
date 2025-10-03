@@ -5,6 +5,7 @@ openseries package
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 Main Classes
 ------------
@@ -15,8 +16,8 @@ The openseries package provides two main classes for financial time series analy
    :toctree: generated/
    :nosignatures:
 
-   openseries.OpenTimeSeries
-   openseries.OpenFrame
+   OpenTimeSeries
+   OpenFrame
 
 Utility Functions
 -----------------
@@ -25,8 +26,8 @@ Utility Functions
    :toctree: generated/
    :nosignatures:
 
-   openseries.timeseries_chain
-   openseries.report_html
+   timeseries_chain
+   report_html
 
 Portfolio Tools
 ---------------
@@ -35,11 +36,11 @@ Portfolio Tools
    :toctree: generated/
    :nosignatures:
 
-   openseries.efficient_frontier
-   openseries.simulate_portfolios
-   openseries.constrain_optimized_portfolios
-   openseries.prepare_plot_data
-   openseries.sharpeplot
+   efficient_frontier
+   simulate_portfolios
+   constrain_optimized_portfolios
+   prepare_plot_data
+   sharpeplot
 
 Date Utilities
 --------------
@@ -48,12 +49,12 @@ Date Utilities
    :toctree: generated/
    :nosignatures:
 
-   openseries.date_fix
-   openseries.date_offset_foll
-   openseries.generate_calendar_date_range
-   openseries.get_previous_business_day_before_today
-   openseries.holiday_calendar
-   openseries.offset_business_days
+   date_fix
+   date_offset_foll
+   generate_calendar_date_range
+   get_previous_business_day_before_today
+   holiday_calendar
+   offset_business_days
 
 Simulation
 ----------
@@ -62,7 +63,7 @@ Simulation
    :toctree: generated/
    :nosignatures:
 
-   openseries.ReturnSimulation
+   ReturnSimulation
 
 Types and Enums
 ---------------
@@ -71,8 +72,8 @@ Types and Enums
    :toctree: generated/
    :nosignatures:
 
-   openseries.ValueType
-   openseries.Self
+   ValueType
+   Self
 
 Other Utilities
 ---------------
@@ -81,4 +82,4 @@ Other Utilities
    :toctree: generated/
    :nosignatures:
 
-   openseries.load_plotly_dict
+   load_plotly_dict

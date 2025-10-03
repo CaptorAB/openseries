@@ -9,6 +9,7 @@ The portfoliotools module provides functions for portfolio optimization, simulat
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 Portfolio Optimization
 -----------------------

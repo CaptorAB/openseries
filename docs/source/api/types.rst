@@ -7,6 +7,7 @@ Types and Enums
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 Value Types
 -----------
@@ -15,6 +16,7 @@ Value Types
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 The ValueType enum identifies the type of values in a time series (prices, returns, etc.).
 

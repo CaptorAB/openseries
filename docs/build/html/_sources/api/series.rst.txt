@@ -8,6 +8,7 @@ OpenTimeSeries
    :undoc-members:
    :show-inheritance:
    :special-members: __init__
+   :no-index:
 
 The OpenTimeSeries class is the core component for analyzing individual financial time series. It provides comprehensive functionality for:
 

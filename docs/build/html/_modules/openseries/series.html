@@ -8,9 +8,9 @@
   <title>openseries.series &mdash; openseries 1.9.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b3da7c01" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
 
-
+  
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=0f42b3e6"></script>
@@ -18,17 +18,17 @@
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #2980B9" >
 
-
-
+          
+          
           <a href="../../index.html" class="icon icon-home">
             openseries
           </a>
@@ -101,7 +101,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
+             
   <h1>Source code for openseries.series</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Defining the OpenTimeSeries class.</span>
 
@@ -324,7 +324,7 @@
 <span class="sd">            Boolean flag indicating if timeseries is in local currency</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -377,7 +377,7 @@
 <span class="sd">            Boolean flag indicating if timeseries is in local currency</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -479,7 +479,7 @@
 <span class="sd">            Boolean flag indicating if timeseries is in local currency</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -521,7 +521,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create copy of OpenTimeSeries object.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -535,7 +535,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate .tsdf Pandas DataFrame from the .dates and .values lists.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -565,7 +565,7 @@
 <span class="sd">            The properties to calculate. Defaults to calculating all available.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        pandas.DataFrame</span>
 <span class="sd">            Properties of the OpenTimeSeries</span>
 
@@ -588,7 +588,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values into series of returns.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            The returns of the values in the series</span>
 
@@ -616,7 +616,7 @@
 <span class="sd">            is calculated</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -639,7 +639,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of returns into cumulative series of values.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -677,7 +677,7 @@
 <span class="sd">            Convenience divider for when the 1-day rate is not scaled correctly</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -721,7 +721,7 @@
 <span class="sd">            The date offset string that sets the resampled frequency</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -754,7 +754,7 @@
 <span class="sd">            Controls the method used to align values across columns</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -812,7 +812,7 @@
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and comparisons</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        Pandas.Series[float]</span>
 <span class="sd">            Series EWMA volatility</span>
 
@@ -880,7 +880,7 @@
 <span class="sd">            assumed number of days in a calendar year</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -944,7 +944,7 @@
 <span class="sd">            If True the level one label is deleted</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 <span class="sd">        OpenTimeSeries</span>
 <span class="sd">            An OpenTimeSeries object</span>
 
@@ -990,7 +990,7 @@
 <span class="sd">        Fee to apply to earlier series</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    -------</span>
+<span class="sd">    --------</span>
 <span class="sd">    TypeOpenTimeSeries</span>
 <span class="sd">        An OpenTimeSeries object or a subclass thereof</span>
 
@@ -1052,7 +1052,7 @@
 <span class="sd">        variable to be checked</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    -------</span>
+<span class="sd">    --------</span>
 <span class="sd">    bool</span>
 <span class="sd">        Answer to whether the variable is None or equivalent</span>
 
@@ -1078,7 +1078,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -1089,7 +1089,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>
