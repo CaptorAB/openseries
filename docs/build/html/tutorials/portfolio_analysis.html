@@ -85,7 +85,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Custom Reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -229,12 +229,8 @@
 <p>Let’s start with basic portfolio construction methods:</p>
 <section id="equal-weight-portfolio">
 <h3>Equal Weight Portfolio<a class="headerlink" href="#equal-weight-portfolio" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create equal-weighted portfolio</span>
-<span class="n">n_assets</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">item_count</span>
-<span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
-
-<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
-<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight Portfolio&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create equal-weighted portfolio using native weight_strat</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight Portfolio&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">)</span>
 <span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Return: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -261,16 +257,8 @@
 </section>
 <section id="risk-parity-portfolio">
 <h3>Risk Parity Portfolio<a class="headerlink" href="#risk-parity-portfolio" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inverse volatility weighting (simple risk parity)</span>
-<span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-<span class="n">volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">vol</span> <span class="k">for</span> <span class="n">vol</span> <span class="ow">in</span> <span class="n">volatilities</span><span class="p">]</span>
-<span class="c1"># Normalize to sum to 1</span>
-<span class="n">total_inv_vol</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inv_vol_weights</span><span class="p">)</span>
-<span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">/</span><span class="n">total_inv_vol</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">inv_vol_weights</span><span class="p">]</span>
-
-<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">inv_vol_weights</span>
-<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Parity&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use native inverse volatility weighting (risk parity)</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Parity&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;inv_vol&quot;</span><span class="p">)</span>
 <span class="n">risk_parity_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk Parity Portfolio Return: </span><span class="si">{</span><span class="n">risk_parity_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

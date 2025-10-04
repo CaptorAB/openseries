@@ -152,13 +152,10 @@ Equal Weight Portfolio
 
 .. code-block:: python
 
-   # Equal weight portfolio
-   n_assets = investment_universe.item_count
-   equal_weights = [1/n_assets] * n_assets
-
+   # Equal weight portfolio using native weight_strat
    equal_weight_portfolio = investment_universe.make_portfolio(
-       weights=equal_weights,
-       name="Equal Weight"
+       name="Equal Weight",
+       weight_strat="eq_weights"
    )
 
    print(f"\n=== EQUAL WEIGHT PORTFOLIO ===")
@@ -171,16 +168,10 @@ Inverse Volatility Portfolio
 
 .. code-block:: python
 
-   # Inverse volatility weighting using OpenFrame
-   asset_metrics = investment_universe.all_properties()
-   asset_volatilities = asset_metrics.loc['vol'].values
-   inv_vol_weights = [1/vol for vol in asset_volatilities]
-   total_inv_vol = sum(inv_vol_weights)
-   inv_vol_weights = [w/total_inv_vol for w in inv_vol_weights]
-
+   # Inverse volatility weighting using native weight_strat
    inv_vol_portfolio = investment_universe.make_portfolio(
-       weights=inv_vol_weights,
-       name="Inverse Volatility"
+       name="Inverse Volatility",
+       weight_strat="inv_vol"
    )
 
    print(f"\n=== INVERSE VOLATILITY PORTFOLIO ===")
@@ -188,44 +179,16 @@ Inverse Volatility Portfolio
    print(f"Volatility: {inv_vol_portfolio.vol:.2%}")
    print(f"Sharpe: {inv_vol_portfolio.ret_vol_ratio:.2f}")
 
-   print("\nInverse Volatility Weights:")
-   for i, weight in enumerate(inv_vol_weights):
-       asset_name = investment_universe.constituents[i].name
-       print(f"  {asset_name}: {weight:.1%}")
 
 Maximum Diversification Portfolio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
-   def max_diversification_weights(returns_df):
-       """Calculate maximum diversification portfolio weights"""
-       # Calculate correlation matrix and volatilities
-       corr_matrix = returns_df.corr()
-       volatilities = returns_df.std() * np.sqrt(252)  # Annualized
-
-       # Maximum diversification ratio = weighted average vol / portfolio vol
-       # This is a simplified approximation
-       inv_corr_sum = np.sum(np.linalg.inv(corr_matrix.values), axis=1)
-       weights = inv_corr_sum / np.sum(inv_corr_sum)
-
-       return weights
-
-   # Get returns data for calculation
-   returns_data = []
-   for asset in investment_universe.constituents:
-       returns = asset.value_to_ret()
-       returns_data.append(returns.tsdf.iloc[:, 0])
-
-   returns_df = pd.concat(returns_data, axis=1)
-   returns_df.columns = [asset.name for asset in investment_universe.constituents]
-
-   # Calculate max diversification weights
-   max_div_weights = max_diversification_weights(returns_df)
-
+   # Maximum diversification portfolio using native weight_strat
    max_div_portfolio = investment_universe.make_portfolio(
-       weights=max_div_weights.tolist(),
-       name="Maximum Diversification"
+       name="Maximum Diversification",
+       weight_strat="max_div"
    )
 
    print(f"\n=== MAXIMUM DIVERSIFICATION PORTFOLIO ===")
@@ -238,34 +201,13 @@ Target Risk Portfolio
 
 .. code-block:: python
 
-   def target_risk_portfolio(frame, target_volatility=0.10):
-       """Create portfolio targeting specific volatility level"""
-
-       # Start with minimum volatility portfolio weights using OpenFrame
-       asset_metrics = frame.all_properties()
-       asset_vols = asset_metrics.loc['vol'].values
-       min_vol_asset_idx = np.argmin(asset_vols)
-
-       # Create weights that target the desired volatility
-       # Simple approach: blend minimum vol asset with equal weight
-       min_vol_weight = 0.6  # 60% in minimum volatility asset
-       remaining_weight = 0.4
-       n_other_assets = frame.item_count - 1
-
-       weights = [remaining_weight / n_other_assets] * frame.item_count
-       weights[min_vol_asset_idx] = min_vol_weight
-
-       return weights
-
-   # Create 10% volatility target portfolio
-   target_vol_weights = target_risk_portfolio(investment_universe, target_volatility=0.10)
-
+   # Target risk portfolio using native weight_strat
    target_vol_portfolio = investment_universe.make_portfolio(
-       weights=target_vol_weights,
-       name="10% Target Volatility"
+       name="Target Risk",
+       weight_strat="target_risk"
    )
 
-   print(f"\n=== TARGET VOLATILITY PORTFOLIO (10%) ===")
+   print(f"\n=== TARGET RISK PORTFOLIO ===")
    print(f"Return: {target_vol_portfolio.geo_ret:.2%}")
    print(f"Volatility: {target_vol_portfolio.vol:.2%}")
    print(f"Sharpe: {target_vol_portfolio.ret_vol_ratio:.2f}")
@@ -314,36 +256,30 @@ Backtesting Framework
 
 .. code-block:: python
 
-   def backtest_portfolio_strategies(frame, strategies, rebalance_freq='BME'):
-       """Simple backtesting framework for portfolio strategies"""
-
-       results = {}
-
-       for strategy_name, weights in strategies.items():
-           # Create portfolio
-           portfolio = frame.make_portfolio(weights=weights, name=strategy_name)
-
-           # Calculate metrics
-           results[strategy_name] = {
-               'return': portfolio.geo_ret,
-               'volatility': portfolio.vol,
-               'sharpe': portfolio.ret_vol_ratio,
-               'max_drawdown': portfolio.max_drawdown,
-               'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else np.nan
-           }
-
-       return pd.DataFrame(results).T
-
-   # Define strategies to backtest
+   # Define strategies to backtest using native weight_strat
    strategies = {
-       'Equal Weight': equal_weights,
-       'Inverse Volatility': inv_vol_weights,
-       'Max Diversification': max_div_weights.tolist(),
-       'Target Volatility': target_vol_weights
+       'Equal Weight': 'eq_weights',
+       'Inverse Volatility': 'inv_vol',
+       'Max Diversification': 'max_div',
+       'Target Risk': 'target_risk'
    }
 
-   # Run backtest
-   backtest_results = backtest_portfolio_strategies(investment_universe, strategies)
+   # Run backtest using native strategies
+   backtest_results = {}
+   for strategy_name, weight_strat in strategies.items():
+       portfolio = investment_universe.make_portfolio(
+           name=strategy_name,
+           weight_strat=weight_strat
+       )
+       backtest_results[strategy_name] = {
+           'return': portfolio.geo_ret,
+           'volatility': portfolio.vol,
+           'sharpe': portfolio.ret_vol_ratio,
+           'max_drawdown': portfolio.max_drawdown,
+           'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else np.nan
+       }
+
+   backtest_results = pd.DataFrame(backtest_results).T
 
    print(f"\n=== BACKTEST RESULTS ===")
    print(backtest_results.round(4))
@@ -354,50 +290,6 @@ Backtesting Framework
 
    print(f"\nBest performing strategy: {best_strategy}")
    print(f"Sharpe ratio: {backtest_results.loc[best_strategy, 'sharpe']:.3f}")
-
-Risk Budgeting
---------------
-
-.. code-block:: python
-
-   def risk_budget_portfolio(returns_df, risk_budgets):
-       """Create portfolio based on risk budgets"""
-
-       # Calculate covariance matrix
-       cov_matrix = returns_df.cov() * 252  # Annualized
-
-       # This is a simplified risk budgeting approach
-       # In practice, you would use iterative optimization
-
-       # Start with risk budget proportions as initial weights
-       weights = np.array(risk_budgets) / np.sum(risk_budgets)
-
-       # Simple adjustment based on volatilities
-       volatilities = np.sqrt(np.diag(cov_matrix))
-       adjusted_weights = weights / volatilities
-       adjusted_weights = adjusted_weights / np.sum(adjusted_weights)
-
-       return adjusted_weights
-
-   # Define risk budgets (must sum to 1)
-   risk_budgets = [0.20, 0.15, 0.10, 0.25, 0.10, 0.05, 0.10, 0.05]  # Equal to number of assets
-
-   risk_budget_weights = risk_budget_portfolio(returns_df, risk_budgets)
-
-   risk_budget_portfolio_obj = investment_universe.make_portfolio(
-       weights=risk_budget_weights.tolist(),
-       name="Risk Budget"
-   )
-
-   print(f"\n=== RISK BUDGET PORTFOLIO ===")
-   print(f"Return: {risk_budget_portfolio_obj.geo_ret:.2%}")
-   print(f"Volatility: {risk_budget_portfolio_obj.vol:.2%}")
-   print(f"Sharpe: {risk_budget_portfolio_obj.ret_vol_ratio:.2f}")
-
-   print("\nRisk Budget Weights:")
-   for i, (weight, budget) in enumerate(zip(risk_budget_weights, risk_budgets)):
-       asset_name = investment_universe.constituents[i].name
-       print(f"  {asset_name}: {weight:.1%} (budget: {budget:.1%})")
 
 Export Optimization Results
 ---------------------------
@@ -440,6 +332,8 @@ This section demonstrates portfolio optimization using actual fund data from pro
 Using Real Fund Data for Optimization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Here's how to work with real fund data using openseries methods directly:
+
 .. code-block:: python
 
    from requests import get as requests_get
@@ -448,29 +342,6 @@ Using Real Fund Data for Optimization
        efficient_frontier, prepare_plot_data, sharpeplot,
        load_plotly_dict, get_previous_business_day_before_today
    )
-
-   def create_fund_universe(fund_isins: list[str]) -> OpenFrame:
-       """Create optimization universe from real fund data"""
-
-       response = requests_get(url="https://api.captor.se/public/api/nav", timeout=10)
-       response.raise_for_status()
-
-       series_list = []
-       result = response.json()
-
-       for data in result:
-           if data["isin"] in fund_isins:
-               series = OpenTimeSeries.from_arrays(
-                   name=data["longName"],
-                   isin=data["isin"],
-                   baseccy=data["currency"],
-                   dates=data["dates"],
-                   values=data["navPerUnit"],
-                   valuetype=ValueType.PRICE,
-               )
-               series_list.append(series)
-
-       return OpenFrame(constituents=series_list)
 
    # Define fund universe for optimization
    fund_universe_isins = [
@@ -481,8 +352,29 @@ Using Real Fund Data for Optimization
        "SE0017832330",  # Multi-Asset Strategy
    ]
 
-   # Create fund universe
-   fund_universe = create_fund_universe(fund_universe_isins)
+   # Load fund data using openseries methods
+   response = requests_get(url="https://api.captor.se/public/api/nav", timeout=10)
+   response.raise_for_status()
+
+   series_list = []
+   result = response.json()
+
+   for data in result:
+       if data["isin"] in fund_universe_isins:
+           series = OpenTimeSeries.from_arrays(
+               name=data["longName"],
+               isin=data["isin"],
+               baseccy=data["currency"],
+               dates=data["dates"],
+               values=data["navPerUnit"],
+               valuetype=ValueType.PRICE,
+           )
+           series_list.append(series)
+
+   # Create fund universe using openseries OpenFrame
+   fund_universe = OpenFrame(constituents=series_list)
+
+   # Process data using openseries methods
    fund_universe = fund_universe.value_nan_handle().trunc_frame().to_cumret()
 
    print(f"Fund universe created with {fund_universe.item_count} funds")
@@ -583,49 +475,43 @@ Performance Comparison Analysis
    for metric, value in improvement.items():
        print(f"{metric}: {value:+.2f}")
 
-Complete Optimization Function
+Complete Optimization Workflow
 ------------------------------
+
+Here's how to perform portfolio optimization using openseries methods directly:
 
 .. code-block:: python
 
-   def comprehensive_portfolio_optimization(tickers, period="5y"):
-       """Complete portfolio optimization workflow"""
+   # Example: Optimize ETF portfolio using openseries methods
+   etf_tickers = ["VTI", "VEA", "VWO", "BND", "VNQ"]
 
-       # Load data
-       assets = []
-       for ticker in tickers:
-           try:
-               data = yf.Ticker(ticker).history(period=period)
-               series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
-               assets.append(series)
-           except:
-               print(f"Failed to load {ticker}")
+   # Load data using openseries methods
+   assets = []
+   for ticker in etf_tickers:
+       try:
+           data = yf.Ticker(ticker).history(period="5y")
+           series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
+           assets.append(series)
+       except:
+           print(f"Failed to load {ticker}")
 
-       if len(assets) < 2:
-           print("Need at least 2 assets for optimization")
-           return None
-
+   if len(assets) < 2:
+       print("Need at least 2 assets for optimization")
+   else:
        frame = OpenFrame(constituents=assets)
 
-       # Basic strategies
-       n = frame.item_count
-       equal_weights = [1/n] * n
-
-       # Asset volatilities for inverse vol weighting using OpenFrame
-       asset_metrics = frame.all_properties()
-       vols = asset_metrics.loc['vol'].values
-       inv_vol_weights = [1/vol for vol in vols]
-       inv_vol_weights = [w/sum(inv_vol_weights) for w in inv_vol_weights]
-
+       # Use openseries native weight strategies
        strategies = {
-           'Equal Weight': equal_weights,
-           'Inverse Volatility': inv_vol_weights
+           'Equal Weight': 'eq_weights',
+           'Inverse Volatility': 'inv_vol',
+           'Max Diversification': 'max_div',
+           'Target Risk': 'target_risk'
        }
 
-       # Create portfolios
+       # Create portfolios using openseries make_portfolio method
        results = {}
-       for name, weights in strategies.items():
-           portfolio = frame.make_portfolio(weights=weights, name=name)
+       for name, weight_strat in strategies.items():
+           portfolio = frame.make_portfolio(name=name, weight_strat=weight_strat)
            results[name] = {
                'Return': portfolio.geo_ret,
                'Volatility': portfolio.vol,
@@ -637,9 +523,3 @@ Complete Optimization Function
 
        print("=== PORTFOLIO OPTIMIZATION RESULTS ===")
        print((results_df * 100).round(2))
-
-       return frame, results_df
-
-   # Example usage
-   etf_tickers = ["VTI", "VEA", "VWO", "BND", "VNQ"]
-   optimization_results = comprehensive_portfolio_optimization(etf_tickers)

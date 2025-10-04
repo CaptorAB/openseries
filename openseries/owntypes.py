@@ -1,11 +1,4 @@
-"""Declaring types used throughout the project.
-
-Copyright (c) Captor Fund Management AB. This file is part of the openseries project.
-
-Licensed under the BSD 3-Clause License. You may obtain a copy of the License at:
-https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
-SPDX-License-Identifier: BSD-3-Clause
-"""
+"""Declaring types used throughout the project."""
 
 from __future__ import annotations
 
@@ -142,7 +135,7 @@ LiteralPlotlyHistogramHistNorm = Literal[
     "density",
     "probability density",
 ]
-LiteralPortfolioWeightings = Literal["eq_weights", "inv_vol"]
+LiteralPortfolioWeightings = Literal["eq_weights", "inv_vol", "max_div", "target_risk"]
 LiteralMinimizeMethods = Literal[
     "SLSQP",
     "Nelder-Mead",

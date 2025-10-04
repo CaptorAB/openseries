@@ -138,57 +138,62 @@ Export Results
    # Export to JSON
    apple.to_json("apple_data.json")
 
-Complete Example
-----------------
+Complete Analysis Workflow
+----------------------------
 
-Here's a complete analysis script:
+Here's how to perform comprehensive single asset analysis using openseries methods directly:
 
 .. code-block:: python
 
    import yfinance as yf
    from openseries import OpenTimeSeries
 
-   def analyze_single_asset(ticker_symbol, period="5y"):
-       """Complete single asset analysis"""
+   # Example: Analyze Apple stock using openseries methods
+   ticker_symbol = "AAPL"
 
-       # Download data
+   # Download data using openseries methods
+   ticker = yf.Ticker(ticker_symbol)
+   data = ticker.history(period="5y")
+
+   # Create series using openseries from_df method
+   series = OpenTimeSeries.from_df(
+       dframe=data['Close'],
+       name=ticker_symbol
+   )
+
+   # Analysis using openseries properties and methods
+   print(f"=== {ticker_symbol} ANALYSIS ===")
+   print(f"Period: {series.first_idx} to {series.last_idx}")
+   print(f"Observations: {series.length}")
+
+   # Key metrics using openseries properties
+   metrics = {
+       'Total Return': f"{series.value_ret:.2%}",
+       'Annual Return': f"{series.geo_ret:.2%}",
+       'Volatility': f"{series.vol:.2%}",
+       'Sharpe Ratio': f"{series.ret_vol_ratio:.2f}",
+       'Max Drawdown': f"{series.max_drawdown:.2%}",
+       '95% VaR': f"{series.var_down:.2%}",
+       'Skewness': f"{series.skew:.2f}",
+       'Kurtosis': f"{series.kurtosis:.2f}"
+   }
+
+   for metric, value in metrics.items():
+       print(f"{metric}: {value}")
+
+   # Export results using openseries to_xlsx method
+   filename = f"{ticker_symbol.lower()}_analysis.xlsx"
+   series.to_xlsx(filename)
+   print(f"\nResults exported to {filename}")
+
+   # Example: Analyze multiple assets
+   tickers = ["AAPL", "TSLA", "MSFT"]
+   for ticker_symbol in tickers:
        ticker = yf.Ticker(ticker_symbol)
-       data = ticker.history(period=period)
+       data = ticker.history(period="2y")
+       series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker_symbol)
 
-       # Create series
-       series = OpenTimeSeries.from_df(
-           dframe=data['Close'],
-           name=ticker_symbol
-       )
-
-       # Analysis
-       print(f"=== {ticker_symbol} ANALYSIS ===")
-       print(f"Period: {series.first_idx} to {series.last_idx}")
-       print(f"Observations: {series.length}")
-
-       # Key metrics
-       metrics = {
-           'Total Return': f"{series.value_ret:.2%}",
-           'Annual Return': f"{series.geo_ret:.2%}",
-           'Volatility': f"{series.vol:.2%}",
-           'Sharpe Ratio': f"{series.ret_vol_ratio:.2f}",
-           'Max Drawdown': f"{series.max_drawdown:.2%}",
-           '95% VaR': f"{series.var_down:.2%}",
-           'Skewness': f"{series.skew:.2f}",
-           'Kurtosis': f"{series.kurtosis:.2f}"
-       }
-
-       for metric, value in metrics.items():
-           print(f"{metric}: {value}")
-
-       # Export results
-       filename = f"{ticker_symbol.lower()}_analysis.xlsx"
-       series.to_xlsx(filename)
-       print(f"\nResults exported to {filename}")
-
-       return series
-
-   # Run analysis
-   apple = analyze_single_asset("AAPL")
-   tesla = analyze_single_asset("TSLA")
-   microsoft = analyze_single_asset("MSFT")
+       print(f"\n{ticker_symbol}:")
+       print(f"  Return: {series.geo_ret:.2%}")
+       print(f"  Volatility: {series.vol:.2%}")
+       print(f"  Sharpe: {series.ret_vol_ratio:.2f}")
