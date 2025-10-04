@@ -658,10 +658,13 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     def correl_matrix(self: Self) -> DataFrame:
         """Correlation matrix.
 
+        This property returns the correlation matrix of the time series
+        in the frame.
+
         Returns:
         --------
-        Pandas.DataFrame
-            Correlation matrix
+        pandas.DataFrame
+            Correlation matrix of the time series in the frame.
 
         """
         corr_matrix = (

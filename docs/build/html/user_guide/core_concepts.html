@@ -57,7 +57,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#the-openframe-class">The OpenFrame Class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#managing-multiple-series">Managing Multiple Series</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#automatic-alignment">Automatic Alignment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-alignment">Data Alignment</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#financial-calculations">Financial Calculations</a><ul>
@@ -259,19 +259,31 @@
 </pre></div>
 </div>
 </section>
-<section id="automatic-alignment">
-<h3>Automatic Alignment<a class="headerlink" href="#automatic-alignment" title="Link to this heading"></a></h3>
-<p>OpenFrame automatically aligns series to common dates:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Series with different date ranges are aligned</span>
+<section id="data-alignment">
+<h3>Data Alignment<a class="headerlink" href="#data-alignment" title="Link to this heading"></a></h3>
+<p>OpenFrame concatenates series data but does <strong>not</strong> automatically align them.
+The library provides explicit methods for alignment that require user choice:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Series with different date ranges are concatenated (not aligned)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Individual series lengths:&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frame length (aligned): </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frame length (concatenated): </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Access aligned data</span>
-<span class="n">aligned_data</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">tsdf</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Aligned DataFrame shape: </span><span class="si">{</span><span class="n">aligned_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Explicit alignment methods require user choice:</span>
+
+<span class="c1"># 1. Truncate to common date range</span>
+<span class="n">aligned_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span>
+
+<span class="c1"># 2. Align to business day calendar</span>
+<span class="n">business_aligned</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
+
+<span class="c1"># 3. Handle missing values</span>
+<span class="n">filled_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;fill&quot;</span><span class="p">)</span>
+
+<span class="c1"># 4. Merge with explicit join strategy</span>
+<span class="n">inner_merged</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">merge_series</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">)</span>
+<span class="n">outer_merged</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">merge_series</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -431,7 +443,7 @@
 <h3>Analysis Methods<a class="headerlink" href="#analysis-methods" title="Link to this heading"></a></h3>
 <p>Methods that return calculated values:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rolling calculations</span>
-<span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="n">rolling_corr</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">rolling_corr</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 
 <span class="c1"># Statistical analysis</span>
@@ -475,11 +487,11 @@
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset&quot;</span><span class="p">)</span>
 
 <span class="c1"># 2. Basic analysis</span>
-<span class="n">metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 
 <span class="c1"># 3. Specific calculations</span>
 <span class="n">drawdowns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
-<span class="n">rolling_metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+<span class="n">rolling_metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
 
 <span class="c1"># 4. Visualization</span>
 <span class="n">series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>

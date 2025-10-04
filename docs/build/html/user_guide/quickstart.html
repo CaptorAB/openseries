@@ -202,7 +202,7 @@
 <h3>Get All Metrics at Once<a class="headerlink" href="#get-all-metrics-at-once" title="Link to this heading"></a></h3>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">all_properties</span></code> attribute to get a comprehensive overview:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get all metrics in a DataFrame</span>
-<span class="n">metrics</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -245,11 +245,11 @@
 <span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
 
 <span class="c1"># Get metrics for all series</span>
-<span class="n">all_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">all_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">all_metrics</span><span class="p">)</span>
 
 <span class="c1"># Calculate correlations</span>
-<span class="n">correlations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">correl_matrix</span><span class="p">()</span>
+<span class="n">correlations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">correl_matrix</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Correlation Matrix:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">correlations</span><span class="p">)</span>
 </pre></div>
@@ -259,10 +259,9 @@
 <h2>Portfolio Analysis<a class="headerlink" href="#portfolio-analysis" title="Link to this heading"></a></h2>
 <p>Create and analyze portfolios:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create equal-weighted portfolio</span>
-<span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">],</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight Portfolio&quot;</span>
-<span class="p">)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight Portfolio&quot;</span><span class="p">)</span>
+<span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Return: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Volatility: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -270,7 +269,7 @@
 
 <span class="c1"># Compare with individual assets</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">portfolio</span><span class="p">)</span>
-<span class="n">comparison</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">comparison</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">comparison</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -286,7 +285,7 @@
 <span class="n">log_returns</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
 
 <span class="c1"># Calculate rolling statistics</span>
-<span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># 30-day rolling volatility</span>
+<span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># 30-day rolling volatility</span>
 <span class="n">rolling_ret</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_return</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># 30-day rolling returns</span>
 
 <span class="c1"># Resample to monthly data</span>
@@ -348,22 +347,24 @@
 <p>Here are some common usage patterns:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pattern 1: Load, analyze, visualize</span>
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset&quot;</span><span class="p">)</span>
-<span class="n">metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="n">series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
 
 <span class="c1"># Pattern 2: Multi-asset comparison</span>
 <span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">series1</span><span class="p">,</span> <span class="n">series2</span><span class="p">,</span> <span class="n">series3</span><span class="p">])</span>
-<span class="n">comparison</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span>
-<span class="n">correlations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">correl_matrix</span><span class="p">()</span>
+<span class="n">comparison</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+<span class="n">correlations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">correl_matrix</span>
 
 <span class="c1"># Pattern 3: Portfolio construction</span>
-<span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Portfolio&quot;</span><span class="p">)</span>
+<span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">portfolio</span><span class="p">)</span>
 
 <span class="c1"># Pattern 4: Risk analysis</span>
 <span class="n">drawdowns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
 <span class="n">var_95</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">var_down</span>
-<span class="n">rolling_risk</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+<span class="n">rolling_risk</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This should give you a solid foundation to start using openseries for your financial analysis needs!</p>

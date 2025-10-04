@@ -32,6 +32,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "myst_parser",
     "sphinx_rtd_theme",
+    "nbsphinx",
 ]
 
 # Napoleon settings for Google-style docstrings
@@ -57,7 +58,13 @@ autodoc_default_options = {
     "special-members": "__init__",
     "undoc-members": True,
     "exclude-members": "__weakref__",
+    "show-inheritance": True,
 }
+
+# Handle properties correctly
+autodoc_preserve_defaults = True
+autodoc_typehints = "description"
+autodoc_typehints_format = "short"
 
 # Autosummary settings
 autosummary_generate = True
@@ -87,6 +94,14 @@ html_theme_options = {
     "includehidden": True,
     "titles_only": False,
 }
+
+# Suppress specific warnings
+suppress_warnings = [
+    "autodoc.failed_to_get_signature",
+    "autodoc.attribute",
+    "autodoc.property",
+    "autodoc.method",
+]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -128,3 +143,9 @@ myst_enable_extensions = [
     "substitution",
     "tasklist",
 ]
+
+# nbsphinx configuration
+nbsphinx_execute = "never"  # Don't execute notebooks during build
+nbsphinx_allow_errors = True
+nbsphinx_timeout = 60
+nbsphinx_requirejs_path = ""

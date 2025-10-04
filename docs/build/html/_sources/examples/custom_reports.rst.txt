@@ -48,7 +48,7 @@ Custom Performance Report
        """Create a custom performance analysis report"""
 
        # Calculate comprehensive metrics
-       metrics = series.all_properties
+       metrics = series.all_properties()
 
        # Additional custom calculations
        returns = series.value_to_ret()
@@ -192,7 +192,7 @@ Portfolio Comparison Report
        """Create a comprehensive portfolio comparison report"""
 
        # Get metrics for all assets
-       all_metrics = frame.all_properties
+       all_metrics = frame.all_properties()
 
        # Calculate correlations
        correlations = frame.correl_matrix()
@@ -431,7 +431,7 @@ Risk Assessment Report
        returns_data = returns.tsdf.iloc[:, 0].dropna()
 
        # Rolling metrics
-       rolling_vol = series.rolling_vol(window=252)
+       rolling_vol = series.rolling_vol(observations=252)
        rolling_var = series.rolling_var_down(window=252)
 
        # Stress test scenarios
@@ -611,7 +611,7 @@ Executive Summary Report
        portfolio = frame.make_portfolio(weights=equal_weights, name="Portfolio")
 
        # Get individual asset metrics
-       asset_metrics = frame.all_properties
+       asset_metrics = frame.all_properties()
 
        html_content = f"""
        <!DOCTYPE html>

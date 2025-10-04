@@ -51,7 +51,7 @@ Comparative Analysis
 .. code-block:: python
 
    # Get metrics for all assets
-   all_metrics = tech_stocks.all_properties
+   all_metrics = tech_stocks.all_properties()
    print("=== COMPARATIVE METRICS ===")
    print(all_metrics)
 
@@ -170,7 +170,7 @@ Sector/Style Analysis
 
        if group_series:
            group_frame = OpenFrame(constituents=group_series)
-           group_metrics = group_frame.all_properties
+           group_metrics = group_frame.all_properties()
 
            avg_return = group_metrics.loc['geo_ret'].mean()
            avg_vol = group_metrics.loc['vol'].mean()
@@ -213,9 +213,10 @@ Performance Attribution
    print(f"Portfolio Volatility: {portfolio.vol:.2%}")
    print(f"Portfolio Sharpe: {portfolio.ret_vol_ratio:.2f}")
 
-   # Compare with individual assets
-   individual_returns = [s.geo_ret for s in tech_stocks.constituents]
-   individual_vols = [s.vol for s in tech_stocks.constituents]
+   # Compare with individual assets using OpenFrame
+   asset_metrics = tech_stocks.all_properties()
+   individual_returns = asset_metrics.loc['geo_ret'].values
+   individual_vols = asset_metrics.loc['vol'].values
 
    print(f"\nDiversification benefit:")
    print(f"  Weighted avg return: {np.average(individual_returns, weights=equal_weights):.2%}")
@@ -309,7 +310,7 @@ Complete Multi-Asset Analysis Function
        print(f"Period: {frame.first_idx} to {frame.last_idx}")
 
        # Key metrics
-       metrics = frame.all_properties
+       metrics = frame.all_properties()
        key_metrics = metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
 
        print("\nKey Metrics:")

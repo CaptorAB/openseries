@@ -1,7 +1,7 @@
 Portfolio Optimization
 ======================
 
-This example demonstrates various portfolio optimization techniques using openseries.
+This example demonstrates various portfolio optimization techniques using openseries, including both theoretical approaches and real-world applications with actual fund data.
 
 Basic Portfolio Optimization Setup
 -----------------------------------
@@ -171,8 +171,9 @@ Inverse Volatility Portfolio
 
 .. code-block:: python
 
-   # Inverse volatility weighting
-   asset_volatilities = [asset.vol for asset in investment_universe.constituents]
+   # Inverse volatility weighting using OpenFrame
+   asset_metrics = investment_universe.all_properties()
+   asset_volatilities = asset_metrics.loc['vol'].values
    inv_vol_weights = [1/vol for vol in asset_volatilities]
    total_inv_vol = sum(inv_vol_weights)
    inv_vol_weights = [w/total_inv_vol for w in inv_vol_weights]
@@ -240,9 +241,9 @@ Target Risk Portfolio
    def target_risk_portfolio(frame, target_volatility=0.10):
        """Create portfolio targeting specific volatility level"""
 
-       # Start with minimum volatility portfolio weights
-       # This is a simplified approach - in practice, use optimization
-       asset_vols = [asset.vol for asset in frame.constituents]
+       # Start with minimum volatility portfolio weights using OpenFrame
+       asset_metrics = frame.all_properties()
+       asset_vols = asset_metrics.loc['vol'].values
        min_vol_asset_idx = np.argmin(asset_vols)
 
        # Create weights that target the desired volatility
@@ -299,7 +300,7 @@ Portfolio Comparison
 
    # Create comparison frame
    comparison_frame = OpenFrame(constituents=portfolios)
-   comparison_metrics = comparison_frame.all_properties
+   comparison_metrics = comparison_frame.all_properties()
 
    # Display key metrics
    key_metrics = comparison_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
@@ -410,7 +411,7 @@ Export Optimization Results
        comparison_metrics.to_excel(writer, sheet_name='Portfolio Comparison')
 
        # Individual asset metrics
-       asset_metrics = investment_universe.all_properties
+       asset_metrics = investment_universe.all_properties()
        asset_metrics.to_excel(writer, sheet_name='Asset Metrics')
 
        # Correlation matrix
@@ -430,6 +431,157 @@ Export Optimization Results
            frontier_df.to_excel(writer, sheet_name='Efficient Frontier', index=False)
 
    print("\nOptimization results exported to 'portfolio_optimization_results.xlsx'")
+
+Real-World Fund Portfolio Optimization
+---------------------------------------
+
+This section demonstrates portfolio optimization using actual fund data from professional fund managers, showing how optimization techniques apply in practice.
+
+Using Real Fund Data for Optimization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   from requests import get as requests_get
+   from openseries import (
+       OpenTimeSeries, OpenFrame, ValueType,
+       efficient_frontier, prepare_plot_data, sharpeplot,
+       load_plotly_dict, get_previous_business_day_before_today
+   )
+
+   def create_fund_universe(fund_isins: list[str]) -> OpenFrame:
+       """Create optimization universe from real fund data"""
+
+       response = requests_get(url="https://api.captor.se/public/api/nav", timeout=10)
+       response.raise_for_status()
+
+       series_list = []
+       result = response.json()
+
+       for data in result:
+           if data["isin"] in fund_isins:
+               series = OpenTimeSeries.from_arrays(
+                   name=data["longName"],
+                   isin=data["isin"],
+                   baseccy=data["currency"],
+                   dates=data["dates"],
+                   values=data["navPerUnit"],
+                   valuetype=ValueType.PRICE,
+               )
+               series_list.append(series)
+
+       return OpenFrame(constituents=series_list)
+
+   # Define fund universe for optimization
+   fund_universe_isins = [
+       "SE0015243886",  # Global High Yield
+       "SE0011337195",  # Global Equity
+       "SE0011670843",  # Global Bond
+       "SE0017832280",  # Alternative Strategy
+       "SE0017832330",  # Multi-Asset Strategy
+   ]
+
+   # Create fund universe
+   fund_universe = create_fund_universe(fund_universe_isins)
+   fund_universe = fund_universe.value_nan_handle().trunc_frame().to_cumret()
+
+   print(f"Fund universe created with {fund_universe.item_count} funds")
+   print(f"Analysis period: {fund_universe.first_idx} to {fund_universe.last_idx}")
+
+Advanced Optimization with Real Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   # Set optimization parameters
+   simulations = 10000
+   frontier_points = 50
+   seed = 55
+
+   # Create current portfolio (equal weights)
+   current_portfolio = OpenTimeSeries.from_df(
+       dframe=fund_universe.make_portfolio(
+           name="Current Portfolio",
+           weight_strat="eq_weights",
+       ),
+   )
+
+   # Calculate efficient frontier
+   frontier, simulated_portfolios, optimal_portfolio = efficient_frontier(
+       eframe=fund_universe,
+       num_ports=simulations,
+       seed=seed,
+       frontier_points=frontier_points,
+   )
+
+   # Prepare visualization data
+   plot_data = prepare_plot_data(
+       assets=fund_universe,
+       current=current_portfolio,
+       optimized=optimal_portfolio,
+   )
+
+   # Load plotly configuration
+   figdict, _ = load_plotly_dict()
+
+   # Create efficient frontier plot
+   optimization_plot, _ = sharpeplot(
+       sim_frame=simulated_portfolios,
+       line_frame=frontier,
+       point_frame=plot_data,
+       point_frame_mode="markers+text",
+       title="Real Fund Portfolio Optimization",
+       add_logo=False,
+       auto_open=False,
+       output_type="div",
+   )
+   optimization_plot = optimization_plot.update_layout(width=1200, height=700)
+
+   # Display the optimization results
+   optimization_plot.show(config=figdict["config"])
+
+Performance Comparison Analysis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   # Compare different portfolio strategies
+   strategies = {}
+
+   # Equal weight portfolio
+   equal_weights = [1/fund_universe.item_count] * fund_universe.item_count
+   equal_weight_portfolio = fund_universe.make_portfolio(
+       weights=equal_weights, name="Equal Weight"
+   )
+   strategies['Equal Weight'] = equal_weight_portfolio
+
+   # Optimal portfolio from efficient frontier
+   optimal_portfolio_series = fund_universe.make_portfolio(
+       weights=optimal_portfolio.weights, name="Optimal Portfolio"
+   )
+   strategies['Optimal Portfolio'] = optimal_portfolio_series
+
+   # Create comparison frame
+   comparison_frame = OpenFrame(constituents=list(strategies.values()))
+   comparison_metrics = comparison_frame.all_properties()
+
+   # Display key metrics
+   key_metrics = comparison_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
+   key_metrics.index = ['Annual Return', 'Volatility', 'Sharpe Ratio', 'Max Drawdown']
+
+   print("=== PORTFOLIO STRATEGY COMPARISON ===")
+   print((key_metrics * 100).round(2))
+
+   # Calculate improvement metrics
+   improvement = {
+       'Return Improvement': (optimal_portfolio_series.geo_ret - equal_weight_portfolio.geo_ret) * 100,
+       'Volatility Change': (optimal_portfolio_series.vol - equal_weight_portfolio.vol) * 100,
+       'Sharpe Improvement': optimal_portfolio_series.ret_vol_ratio - equal_weight_portfolio.ret_vol_ratio,
+   }
+
+   print("\n=== OPTIMIZATION IMPROVEMENTS ===")
+   for metric, value in improvement.items():
+       print(f"{metric}: {value:+.2f}")
 
 Complete Optimization Function
 ------------------------------
@@ -459,8 +611,9 @@ Complete Optimization Function
        n = frame.item_count
        equal_weights = [1/n] * n
 
-       # Asset volatilities for inverse vol weighting
-       vols = [asset.vol for asset in frame.constituents]
+       # Asset volatilities for inverse vol weighting using OpenFrame
+       asset_metrics = frame.all_properties()
+       vols = asset_metrics.loc['vol'].values
        inv_vol_weights = [1/vol for vol in vols]
        inv_vol_weights = [w/sum(inv_vol_weights) for w in inv_vol_weights]
 

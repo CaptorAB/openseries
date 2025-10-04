@@ -120,23 +120,35 @@ OpenFrame manages collections of OpenTimeSeries:
    print(f"Column names: {frame.columns_lvl_zero}")
    print(f"Common length: {frame.length}")
 
-Automatic Alignment
-~~~~~~~~~~~~~~~~~~~
+Data Alignment
+~~~~~~~~~~~~~~~
 
-OpenFrame automatically aligns series to common dates:
+OpenFrame concatenates series data but does **not** automatically align them.
+The library provides explicit methods for alignment that require user choice:
 
 .. code-block:: python
 
-   # Series with different date ranges are aligned
+   # Series with different date ranges are concatenated (not aligned)
    print("Individual series lengths:")
    for series in frame.constituents:
        print(f"  {series.name}: {series.length}")
 
-   print(f"Frame length (aligned): {frame.length}")
+   print(f"Frame length (concatenated): {frame.length}")
 
-   # Access aligned data
-   aligned_data = frame.tsdf
-   print(f"Aligned DataFrame shape: {aligned_data.shape}")
+   # Explicit alignment methods require user choice:
+
+   # 1. Truncate to common date range
+   aligned_frame = frame.trunc_frame()
+
+   # 2. Align to business day calendar
+   business_aligned = frame.align_index_to_local_cdays(countries="US")
+
+   # 3. Handle missing values
+   filled_frame = frame.value_nan_handle(method="fill")
+
+   # 4. Merge with explicit join strategy
+   inner_merged = frame.merge_series(how="inner")
+   outer_merged = frame.merge_series(how="outer")
 
 Financial Calculations
 ----------------------
@@ -315,7 +327,7 @@ Methods that return calculated values:
 .. code-block:: python
 
    # Rolling calculations
-   rolling_vol = series.rolling_vol(window=30)
+   rolling_vol = series.rolling_vol(observations=30)
    rolling_corr = frame.rolling_corr(window=60)
 
    # Statistical analysis
@@ -363,11 +375,11 @@ Analysis Workflow
    series = OpenTimeSeries.from_df(data['Close'], name="Asset")
 
    # 2. Basic analysis
-   metrics = series.all_properties
+   metrics = series.all_properties()
 
    # 3. Specific calculations
    drawdowns = series.to_drawdown_series()
-   rolling_metrics = series.rolling_vol(window=252)
+   rolling_metrics = series.rolling_vol(observations=252)
 
    # 4. Visualization
    series.plot_series()

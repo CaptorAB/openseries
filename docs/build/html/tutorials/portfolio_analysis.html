@@ -177,7 +177,7 @@
 <h2>Asset Analysis<a class="headerlink" href="#asset-analysis" title="Link to this heading"></a></h2>
 <p>First, let’s analyze the individual assets:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get metrics for all assets</span>
-<span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== INDIVIDUAL ASSET METRICS ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">asset_metrics</span><span class="p">)</span>
 
@@ -202,7 +202,7 @@
 <h2>Correlation Analysis<a class="headerlink" href="#correlation-analysis" title="Link to this heading"></a></h2>
 <p>Understanding correlations is crucial for portfolio construction:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate correlation matrix</span>
-<span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">correl_matrix</span><span class="p">()</span>
+<span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">correl_matrix</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== CORRELATION MATRIX ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">correlation_matrix</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 
@@ -233,10 +233,9 @@
 <span class="n">n_assets</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">item_count</span>
 <span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
 
-<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight Portfolio&quot;</span>
-<span class="p">)</span>
+<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight Portfolio&quot;</span><span class="p">)</span>
+<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Return: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Volatility: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -250,10 +249,9 @@
 <span class="c1"># Larger weights for larger markets</span>
 <span class="n">market_cap_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]</span>  <span class="c1"># Must sum to 1</span>
 
-<span class="n">market_cap_portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">market_cap_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Market Cap Weighted&quot;</span>
-<span class="p">)</span>
+<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">market_cap_weights</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Market Cap Weighted&quot;</span><span class="p">)</span>
+<span class="n">market_cap_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market Cap Portfolio Return: </span><span class="si">{</span><span class="n">market_cap_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market Cap Portfolio Volatility: </span><span class="si">{</span><span class="n">market_cap_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -264,16 +262,16 @@
 <section id="risk-parity-portfolio">
 <h3>Risk Parity Portfolio<a class="headerlink" href="#risk-parity-portfolio" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inverse volatility weighting (simple risk parity)</span>
-<span class="n">volatilities</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+<span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+<span class="n">volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">vol</span> <span class="k">for</span> <span class="n">vol</span> <span class="ow">in</span> <span class="n">volatilities</span><span class="p">]</span>
 <span class="c1"># Normalize to sum to 1</span>
 <span class="n">total_inv_vol</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inv_vol_weights</span><span class="p">)</span>
 <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">/</span><span class="n">total_inv_vol</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">inv_vol_weights</span><span class="p">]</span>
 
-<span class="n">risk_parity_portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">inv_vol_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Parity&quot;</span>
-<span class="p">)</span>
+<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">inv_vol_weights</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Parity&quot;</span><span class="p">)</span>
+<span class="n">risk_parity_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk Parity Portfolio Return: </span><span class="si">{</span><span class="n">risk_parity_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk Parity Portfolio Volatility: </span><span class="si">{</span><span class="n">risk_parity_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -363,7 +361,7 @@
 <span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">all_series</span><span class="p">)</span>
 
 <span class="c1"># Get comprehensive metrics</span>
-<span class="n">portfolio_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">portfolio_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 
 <span class="c1"># Focus on key metrics</span>
 <span class="n">key_metrics</span> <span class="o">=</span> <span class="n">portfolio_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;max_drawdown&#39;</span><span class="p">]]</span>
@@ -461,7 +459,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correlation range: </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Rolling portfolio volatility</span>
-<span class="n">portfolio_rolling_vol</span> <span class="o">=</span> <span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+<span class="n">portfolio_rolling_vol</span> <span class="o">=</span> <span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Rolling volatility statistics:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average volatility: </span><span class="si">{</span><span class="n">portfolio_rolling_vol</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -477,17 +475,15 @@
 
 <span class="c1"># Monthly rebalancing</span>
 <span class="n">monthly_data</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="n">monthly_portfolio</span> <span class="o">=</span> <span class="n">monthly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Monthly Rebalanced&quot;</span>
-<span class="p">)</span>
+<span class="n">monthly_data</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
+<span class="n">monthly_portfolio_df</span> <span class="o">=</span> <span class="n">monthly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Monthly Rebalanced&quot;</span><span class="p">)</span>
+<span class="n">monthly_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">monthly_portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="c1"># Quarterly rebalancing</span>
 <span class="n">quarterly_data</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
-<span class="n">quarterly_portfolio</span> <span class="o">=</span> <span class="n">quarterly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Quarterly Rebalanced&quot;</span>
-<span class="p">)</span>
+<span class="n">quarterly_data</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
+<span class="n">quarterly_portfolio_df</span> <span class="o">=</span> <span class="n">quarterly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Quarterly Rebalanced&quot;</span><span class="p">)</span>
+<span class="n">quarterly_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">quarterly_portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
 <span class="c1"># Compare rebalancing frequencies</span>
 <span class="n">rebalancing_comparison</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span>
@@ -496,7 +492,7 @@
     <span class="n">quarterly_portfolio</span>
 <span class="p">])</span>
 
-<span class="n">rebal_metrics</span> <span class="o">=</span> <span class="n">rebalancing_comparison</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">rebal_metrics</span> <span class="o">=</span> <span class="n">rebalancing_comparison</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== REBALANCING FREQUENCY COMPARISON ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">rebal_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
@@ -552,7 +548,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- PORTFOLIO CHARACTERISTICS ---&quot;</span><span class="p">)</span>
 <span class="n">avg_correlation</span> <span class="o">=</span> <span class="n">correlation_matrix</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average Asset Correlation: </span><span class="si">{</span><span class="n">avg_correlation</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Diversification Benefit: </span><span class="si">{</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">vol</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Diversification Benefit: </span><span class="si">{</span><span class="p">(</span><span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Export results</span>
 <span class="n">portfolio_metrics</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s2">&quot;portfolio_analysis.xlsx&quot;</span><span class="p">)</span>

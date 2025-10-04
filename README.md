@@ -19,7 +19,7 @@ Tools for analyzing financial timeseries of a single asset or a group of assets.
 
 ## Documentation
 
-📚 **Complete documentation is available at:** https://openseries.readthedocs.io/
+Complete documentation is available at: [https://openseries.readthedocs.io](https://openseries.readthedocs.io/)
 
 The documentation includes:
 
@@ -56,16 +56,3 @@ _,_=series.plot_series()
 ### Sample output using the report_html() function
 
 <img src="https://raw.githubusercontent.com/CaptorAB/openseries/master/openseries_plot.png" alt="Two Assets Compared" width="1000" />
-
-## Development
-
-```bash
-git clone https://github.com/CaptorAB/openseries.git
-cd openseries
-make install
-source source_me
-```
-
-## License
-
-This project is licensed under the BSD License - see the [LICENSE.md](LICENSE.md) file for details.

@@ -140,7 +140,7 @@ Monitor how risk changes over time:
    print(f"\n=== ROLLING RISK ANALYSIS ({window}-day window) ===")
 
    # Rolling volatility
-   rolling_vol = portfolio.rolling_vol(window=window)
+   rolling_vol = portfolio.rolling_vol(observations=window)
    print(f"Rolling Volatility - Current: {rolling_vol.iloc[-1, 0]:.2%}")
    print(f"Rolling Volatility - Average: {rolling_vol.mean().iloc[0]:.2%}")
    print(f"Rolling Volatility - Range: {rolling_vol.min().iloc[0]:.2%} to {rolling_vol.max().iloc[0]:.2%}")
@@ -276,8 +276,9 @@ Analyze risk contribution by asset:
 
    print("\n=== RISK DECOMPOSITION ===")
 
-   # Calculate individual asset volatilities
-   asset_vols = [series.vol for series in portfolio_assets.constituents]
+   # Calculate individual asset volatilities using OpenFrame
+   asset_metrics = portfolio_assets.all_properties()
+   asset_vols = asset_metrics.loc['vol'].values
 
    # Portfolio volatility
    portfolio_vol = portfolio.vol
@@ -345,7 +346,7 @@ Evaluate risk-adjusted returns:
    all_assets = portfolio_assets.constituents + [portfolio]
    comparison_frame = OpenFrame(constituents=all_assets)
 
-   risk_adj_metrics = comparison_frame.all_properties.loc[
+   risk_adj_metrics = comparison_frame.all_properties().loc[
        ['ret_vol_ratio', 'sortino_ratio', 'kappa3_ratio', 'omega_ratio']
    ]
 

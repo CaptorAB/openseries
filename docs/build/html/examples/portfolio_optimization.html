@@ -76,6 +76,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#backtesting-framework">Backtesting Framework</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#risk-budgeting">Risk Budgeting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#export-optimization-results">Export Optimization Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#real-world-fund-portfolio-optimization">Real-World Fund Portfolio Optimization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-real-fund-data-for-optimization">Using Real Fund Data for Optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-optimization-with-real-data">Advanced Optimization with Real Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance-comparison-analysis">Performance Comparison Analysis</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#complete-optimization-function">Complete Optimization Function</a></li>
 </ul>
 </li>
@@ -124,7 +130,7 @@
              
   <section id="portfolio-optimization">
 <h1>Portfolio Optimization<a class="headerlink" href="#portfolio-optimization" title="Link to this heading"></a></h1>
-<p>This example demonstrates various portfolio optimization techniques using openseries.</p>
+<p>This example demonstrates various portfolio optimization techniques using openseries, including both theoretical approaches and real-world applications with actual fund data.</p>
 <section id="basic-portfolio-optimization-setup">
 <h2>Basic Portfolio Optimization Setup<a class="headerlink" href="#basic-portfolio-optimization-setup" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
@@ -285,8 +291,9 @@
 </section>
 <section id="inverse-volatility-portfolio">
 <h3>Inverse Volatility Portfolio<a class="headerlink" href="#inverse-volatility-portfolio" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inverse volatility weighting</span>
-<span class="n">asset_volatilities</span> <span class="o">=</span> <span class="p">[</span><span class="n">asset</span><span class="o">.</span><span class="n">vol</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inverse volatility weighting using OpenFrame</span>
+<span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+<span class="n">asset_volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">vol</span> <span class="k">for</span> <span class="n">vol</span> <span class="ow">in</span> <span class="n">asset_volatilities</span><span class="p">]</span>
 <span class="n">total_inv_vol</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inv_vol_weights</span><span class="p">)</span>
 <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">/</span><span class="n">total_inv_vol</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">inv_vol_weights</span><span class="p">]</span>
@@ -353,9 +360,9 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">target_risk_portfolio</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">target_volatility</span><span class="o">=</span><span class="mf">0.10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create portfolio targeting specific volatility level&quot;&quot;&quot;</span>
 
-    <span class="c1"># Start with minimum volatility portfolio weights</span>
-    <span class="c1"># This is a simplified approach - in practice, use optimization</span>
-    <span class="n">asset_vols</span> <span class="o">=</span> <span class="p">[</span><span class="n">asset</span><span class="o">.</span><span class="n">vol</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+    <span class="c1"># Start with minimum volatility portfolio weights using OpenFrame</span>
+    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+    <span class="n">asset_vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">min_vol_asset_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">asset_vols</span><span class="p">)</span>
 
     <span class="c1"># Create weights that target the desired volatility</span>
@@ -411,7 +418,7 @@
 
 <span class="c1"># Create comparison frame</span>
 <span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">portfolios</span><span class="p">)</span>
-<span class="n">comparison_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">comparison_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 
 <span class="c1"># Display key metrics</span>
 <span class="n">key_metrics</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;max_drawdown&#39;</span><span class="p">]]</span>
@@ -519,7 +526,7 @@
     <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Portfolio Comparison&#39;</span><span class="p">)</span>
 
     <span class="c1"># Individual asset metrics</span>
-    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">all_properties</span>
+    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
     <span class="n">asset_metrics</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Asset Metrics&#39;</span><span class="p">)</span>
 
     <span class="c1"># Correlation matrix</span>
@@ -541,6 +548,153 @@
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Optimization results exported to &#39;portfolio_optimization_results.xlsx&#39;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="real-world-fund-portfolio-optimization">
+<h2>Real-World Fund Portfolio Optimization<a class="headerlink" href="#real-world-fund-portfolio-optimization" title="Link to this heading"></a></h2>
+<p>This section demonstrates portfolio optimization using actual fund data from professional fund managers, showing how optimization techniques apply in practice.</p>
+<section id="using-real-fund-data-for-optimization">
+<h3>Using Real Fund Data for Optimization<a class="headerlink" href="#using-real-fund-data-for-optimization" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">get</span> <span class="k">as</span> <span class="n">requests_get</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OpenTimeSeries</span><span class="p">,</span> <span class="n">OpenFrame</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">,</span>
+    <span class="n">efficient_frontier</span><span class="p">,</span> <span class="n">prepare_plot_data</span><span class="p">,</span> <span class="n">sharpeplot</span><span class="p">,</span>
+    <span class="n">load_plotly_dict</span><span class="p">,</span> <span class="n">get_previous_business_day_before_today</span>
+<span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_fund_universe</span><span class="p">(</span><span class="n">fund_isins</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">OpenFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create optimization universe from real fund data&quot;&quot;&quot;</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://api.captor.se/public/api/nav&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+    <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;isin&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fund_isins</span><span class="p">:</span>
+            <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;longName&quot;</span><span class="p">],</span>
+                <span class="n">isin</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;isin&quot;</span><span class="p">],</span>
+                <span class="n">baseccy</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;currency&quot;</span><span class="p">],</span>
+                <span class="n">dates</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;dates&quot;</span><span class="p">],</span>
+                <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;navPerUnit&quot;</span><span class="p">],</span>
+                <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
+
+<span class="c1"># Define fund universe for optimization</span>
+<span class="n">fund_universe_isins</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;SE0015243886&quot;</span><span class="p">,</span>  <span class="c1"># Global High Yield</span>
+    <span class="s2">&quot;SE0011337195&quot;</span><span class="p">,</span>  <span class="c1"># Global Equity</span>
+    <span class="s2">&quot;SE0011670843&quot;</span><span class="p">,</span>  <span class="c1"># Global Bond</span>
+    <span class="s2">&quot;SE0017832280&quot;</span><span class="p">,</span>  <span class="c1"># Alternative Strategy</span>
+    <span class="s2">&quot;SE0017832330&quot;</span><span class="p">,</span>  <span class="c1"># Multi-Asset Strategy</span>
+<span class="p">]</span>
+
+<span class="c1"># Create fund universe</span>
+<span class="n">fund_universe</span> <span class="o">=</span> <span class="n">create_fund_universe</span><span class="p">(</span><span class="n">fund_universe_isins</span><span class="p">)</span>
+<span class="n">fund_universe</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fund universe created with </span><span class="si">{</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">item_count</span><span class="si">}</span><span class="s2"> funds&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analysis period: </span><span class="si">{</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="advanced-optimization-with-real-data">
+<h3>Advanced Optimization with Real Data<a class="headerlink" href="#advanced-optimization-with-real-data" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set optimization parameters</span>
+<span class="n">simulations</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">frontier_points</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">55</span>
+
+<span class="c1"># Create current portfolio (equal weights)</span>
+<span class="n">current_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+    <span class="n">dframe</span><span class="o">=</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Current Portfolio&quot;</span><span class="p">,</span>
+        <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="c1"># Calculate efficient frontier</span>
+<span class="n">frontier</span><span class="p">,</span> <span class="n">simulated_portfolios</span><span class="p">,</span> <span class="n">optimal_portfolio</span> <span class="o">=</span> <span class="n">efficient_frontier</span><span class="p">(</span>
+    <span class="n">eframe</span><span class="o">=</span><span class="n">fund_universe</span><span class="p">,</span>
+    <span class="n">num_ports</span><span class="o">=</span><span class="n">simulations</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+    <span class="n">frontier_points</span><span class="o">=</span><span class="n">frontier_points</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Prepare visualization data</span>
+<span class="n">plot_data</span> <span class="o">=</span> <span class="n">prepare_plot_data</span><span class="p">(</span>
+    <span class="n">assets</span><span class="o">=</span><span class="n">fund_universe</span><span class="p">,</span>
+    <span class="n">current</span><span class="o">=</span><span class="n">current_portfolio</span><span class="p">,</span>
+    <span class="n">optimized</span><span class="o">=</span><span class="n">optimal_portfolio</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Load plotly configuration</span>
+<span class="n">figdict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
+
+<span class="c1"># Create efficient frontier plot</span>
+<span class="n">optimization_plot</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sharpeplot</span><span class="p">(</span>
+    <span class="n">sim_frame</span><span class="o">=</span><span class="n">simulated_portfolios</span><span class="p">,</span>
+    <span class="n">line_frame</span><span class="o">=</span><span class="n">frontier</span><span class="p">,</span>
+    <span class="n">point_frame</span><span class="o">=</span><span class="n">plot_data</span><span class="p">,</span>
+    <span class="n">point_frame_mode</span><span class="o">=</span><span class="s2">&quot;markers+text&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Real Fund Portfolio Optimization&quot;</span><span class="p">,</span>
+    <span class="n">add_logo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">auto_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">optimization_plot</span> <span class="o">=</span> <span class="n">optimization_plot</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">700</span><span class="p">)</span>
+
+<span class="c1"># Display the optimization results</span>
+<span class="n">optimization_plot</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">figdict</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="performance-comparison-analysis">
+<h3>Performance Comparison Analysis<a class="headerlink" href="#performance-comparison-analysis" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare different portfolio strategies</span>
+<span class="n">strategies</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Equal weight portfolio</span>
+<span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">item_count</span><span class="p">]</span> <span class="o">*</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">item_count</span>
+<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span>
+<span class="p">)</span>
+<span class="n">strategies</span><span class="p">[</span><span class="s1">&#39;Equal Weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">equal_weight_portfolio</span>
+
+<span class="c1"># Optimal portfolio from efficient frontier</span>
+<span class="n">optimal_portfolio_series</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="n">optimal_portfolio</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Optimal Portfolio&quot;</span>
+<span class="p">)</span>
+<span class="n">strategies</span><span class="p">[</span><span class="s1">&#39;Optimal Portfolio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimal_portfolio_series</span>
+
+<span class="c1"># Create comparison frame</span>
+<span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">strategies</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="n">comparison_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+
+<span class="c1"># Display key metrics</span>
+<span class="n">key_metrics</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;max_drawdown&#39;</span><span class="p">]]</span>
+<span class="n">key_metrics</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Annual Return&#39;</span><span class="p">,</span> <span class="s1">&#39;Volatility&#39;</span><span class="p">,</span> <span class="s1">&#39;Sharpe Ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;Max Drawdown&#39;</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== PORTFOLIO STRATEGY COMPARISON ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">((</span><span class="n">key_metrics</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Calculate improvement metrics</span>
+<span class="n">improvement</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Return Improvement&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">optimal_portfolio_series</span><span class="o">.</span><span class="n">geo_ret</span> <span class="o">-</span> <span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="s1">&#39;Volatility Change&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">optimal_portfolio_series</span><span class="o">.</span><span class="n">vol</span> <span class="o">-</span> <span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="s1">&#39;Sharpe Improvement&#39;</span><span class="p">:</span> <span class="n">optimal_portfolio_series</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">-</span> <span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== OPTIMIZATION IMPROVEMENTS ===&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">improvement</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">+.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="complete-optimization-function">
 <h2>Complete Optimization Function<a class="headerlink" href="#complete-optimization-function" title="Link to this heading"></a></h2>
@@ -567,8 +721,9 @@
     <span class="n">n</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">item_count</span>
     <span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
 
-    <span class="c1"># Asset volatilities for inverse vol weighting</span>
-    <span class="n">vols</span> <span class="o">=</span> <span class="p">[</span><span class="n">asset</span><span class="o">.</span><span class="n">vol</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+    <span class="c1"># Asset volatilities for inverse vol weighting using OpenFrame</span>
+    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+    <span class="n">vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">vol</span> <span class="k">for</span> <span class="n">vol</span> <span class="ow">in</span> <span class="n">vols</span><span class="p">]</span>
     <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">inv_vol_weights</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">inv_vol_weights</span><span class="p">]</span>
 
