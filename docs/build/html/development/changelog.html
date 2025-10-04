@@ -78,36 +78,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to openseries</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-9-7-current">Version 1.9.7 (Current)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#previous-versions">Previous Versions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-9-x-series">Version 1.9.x Series</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-8-x-series">Version 1.8.x Series</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-7-x-series">Version 1.7.x Series</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-6-x-series">Version 1.6.x Series</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-5-x-series">Version 1.5.x Series</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#early-versions-1-0-x-1-4-x">Early Versions (1.0.x - 1.4.x)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#breaking-changes">Breaking Changes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-9-0">Version 1.9.0</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-8-0">Version 1.8.0</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-7-0">Version 1.7.0</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#migration-guide">Migration Guide</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#from-1-8-x-to-1-9-x">From 1.8.x to 1.9.x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#from-1-7-x-to-1-8-x">From 1.7.x to 1.8.x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#from-1-6-x-to-1-7-x">From 1.6.x to 1.7.x</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#deprecation-notices">Deprecation Notices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#future-plans">Future Plans</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#version-2-0-0-planned">Version 2.0.0 (Planned)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#version-1-10-x-series">Version 1.10.x Series</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#contributing-to-releases">Contributing to Releases</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#stay-updated">Stay Updated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#github-releases">GitHub Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#current-release-information">Current Release Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#release-notifications">Release Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#changelog-format">Changelog Format</a></li>
 </ul>
 </li>
 </ul>
@@ -138,267 +112,45 @@
              
   <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
-<p>This page documents the changes and improvements made to openseries over time.</p>
-<section id="version-1-9-7-current">
-<h2>Version 1.9.7 (Current)<a class="headerlink" href="#version-1-9-7-current" title="Link to this heading"></a></h2>
-<p><strong>Release Date</strong>: 2024</p>
-<p><strong>New Features</strong></p>
+<p>This page provides access to the complete changelog and release history for openseries.</p>
+<section id="github-releases">
+<h2>GitHub Releases<a class="headerlink" href="#github-releases" title="Link to this heading"></a></h2>
+<p>The complete changelog with detailed release information is maintained on GitHub. This includes:</p>
 <ul class="simple">
-<li><p>Enhanced portfolio optimization tools</p></li>
-<li><p>Improved business day calendar handling</p></li>
-<li><p>Extended statistical analysis capabilities</p></li>
-<li><p>Better integration with external data sources</p></li>
+<li><p><strong>Latest releases</strong> with detailed change logs</p></li>
+<li><p><strong>Breaking changes</strong> and migration guides</p></li>
+<li><p><strong>Bug fixes</strong> and performance improvements</p></li>
+<li><p><strong>New features</strong> and enhancements</p></li>
+<li><p><strong>Dependency updates</strong> and compatibility notes</p></li>
 </ul>
-<p><strong>Improvements</strong></p>
+<p><strong>View the complete changelog</strong>: <a class="reference external" href="https://github.com/CaptorAB/openseries/releases">GitHub Releases</a></p>
+</section>
+<section id="current-release-information">
+<h2>Current Release Information<a class="headerlink" href="#current-release-information" title="Link to this heading"></a></h2>
+<p><strong>Latest Version</strong>: <a class="reference external" href="https://github.com/CaptorAB/openseries/releases/tag/2.0.0">2.0.0</a></p>
+<p>Key highlights from recent releases:</p>
 <ul class="simple">
-<li><p>Performance optimizations for large datasets</p></li>
-<li><p>Enhanced type safety with Pydantic v2</p></li>
-<li><p>Improved error handling and validation</p></li>
-<li><p>Better documentation and examples</p></li>
+<li><p><strong>Version 2.0.0</strong>: Adjustments to ensure alignments with new readthedocs.io documentation and new weight strategies in OpenFrame.make_portfolio()</p></li>
+<li><p><strong>Version 1.9.7</strong>: Improved use of common logic helper functions, portfolio simulation optimization, and enhanced type annotations</p></li>
+<li><p><strong>Version 1.9.6</strong>: Updates to adhere to ruff 0.13.0, mypy standards, and added plot title options</p></li>
 </ul>
-<p><strong>Bug Fixes</strong></p>
-<ul class="simple">
-<li><p>Fixed edge cases in drawdown calculations</p></li>
-<li><p>Resolved issues with date alignment</p></li>
-<li><p>Corrected correlation matrix calculations</p></li>
-<li><p>Fixed memory leaks in rolling calculations</p></li>
-</ul>
-<p><strong>Dependencies</strong></p>
-<ul class="simple">
-<li><p>Updated to Pydantic v2.5.2+</p></li>
-<li><p>Pandas 2.1.2+ support</p></li>
-<li><p>Python 3.10-3.13 compatibility</p></li>
-<li><p>Enhanced exchange-calendars integration</p></li>
-</ul>
+<p>For complete details on all changes, please visit the <a class="reference external" href="https://github.com/CaptorAB/openseries/releases">GitHub Releases page</a>.</p>
 </section>
-<section id="previous-versions">
-<h2>Previous Versions<a class="headerlink" href="#previous-versions" title="Link to this heading"></a></h2>
-<section id="version-1-9-x-series">
-<h3>Version 1.9.x Series<a class="headerlink" href="#version-1-9-x-series" title="Link to this heading"></a></h3>
-<p>The 1.9.x series focused on:</p>
-<ul class="simple">
-<li><p>Stability improvements</p></li>
-<li><p>Enhanced financial calculations</p></li>
-<li><p>Better data validation</p></li>
-<li><p>Expanded visualization capabilities</p></li>
-</ul>
+<section id="release-notifications">
+<h2>Release Notifications<a class="headerlink" href="#release-notifications" title="Link to this heading"></a></h2>
+<p>Stay updated on new releases:</p>
+<dl class="simple">
+<dt><strong>GitHub</strong></dt><dd><p>Watch the <a class="reference external" href="https://github.com/CaptorAB/openseries">openseries repository</a> for release notifications</p>
+</dd>
+<dt><strong>PyPI</strong></dt><dd><p>Monitor <a class="reference external" href="https://pypi.org/project/openseries/">openseries on PyPI</a> for new versions</p>
+</dd>
+<dt><strong>Conda-forge</strong></dt><dd><p>Track updates on <a class="reference external" href="https://anaconda.org/conda-forge/openseries">conda-forge</a></p>
+</dd>
+</dl>
 </section>
-<section id="version-1-8-x-series">
-<h3>Version 1.8.x Series<a class="headerlink" href="#version-1-8-x-series" title="Link to this heading"></a></h3>
-<p>Key features introduced:</p>
-<ul class="simple">
-<li><p>Rolling analysis functions</p></li>
-<li><p>Enhanced portfolio tools</p></li>
-<li><p>Improved risk metrics</p></li>
-<li><p>Better correlation analysis</p></li>
-</ul>
-</section>
-<section id="version-1-7-x-series">
-<h3>Version 1.7.x Series<a class="headerlink" href="#version-1-7-x-series" title="Link to this heading"></a></h3>
-<p>Major additions:</p>
-<ul class="simple">
-<li><p>OpenFrame class enhancements</p></li>
-<li><p>Multi-factor regression analysis</p></li>
-<li><p>Advanced portfolio optimization</p></li>
-<li><p>Enhanced reporting capabilities</p></li>
-</ul>
-</section>
-<section id="version-1-6-x-series">
-<h3>Version 1.6.x Series<a class="headerlink" href="#version-1-6-x-series" title="Link to this heading"></a></h3>
-<p>Notable improvements:</p>
-<ul class="simple">
-<li><p>Performance optimizations</p></li>
-<li><p>Enhanced date handling</p></li>
-<li><p>Better error messages</p></li>
-<li><p>Expanded test coverage</p></li>
-</ul>
-</section>
-<section id="version-1-5-x-series">
-<h3>Version 1.5.x Series<a class="headerlink" href="#version-1-5-x-series" title="Link to this heading"></a></h3>
-<p>Foundation improvements:</p>
-<ul class="simple">
-<li><p>Core architecture refinements</p></li>
-<li><p>Enhanced data validation</p></li>
-<li><p>Better type hints</p></li>
-<li><p>Improved documentation</p></li>
-</ul>
-</section>
-<section id="early-versions-1-0-x-1-4-x">
-<h3>Early Versions (1.0.x - 1.4.x)<a class="headerlink" href="#early-versions-1-0-x-1-4-x" title="Link to this heading"></a></h3>
-<p>The early versions established:</p>
-<ul class="simple">
-<li><p>Core OpenTimeSeries functionality</p></li>
-<li><p>Basic financial calculations</p></li>
-<li><p>Initial OpenFrame implementation</p></li>
-<li><p>Fundamental plotting capabilities</p></li>
-</ul>
-</section>
-</section>
-<section id="breaking-changes">
-<h2>Breaking Changes<a class="headerlink" href="#breaking-changes" title="Link to this heading"></a></h2>
-<section id="version-1-9-0">
-<h3>Version 1.9.0<a class="headerlink" href="#version-1-9-0" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><strong>Pydantic v2 Migration</strong>: Updated to Pydantic v2, which may affect custom validation code</p></li>
-<li><p><strong>Python Version</strong>: Dropped support for Python &lt; 3.10</p></li>
-<li><p><strong>API Changes</strong>: Some internal APIs were refactored for better performance</p></li>
-</ul>
-</section>
-<section id="version-1-8-0">
-<h3>Version 1.8.0<a class="headerlink" href="#version-1-8-0" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><strong>Method Signatures</strong>: Some method signatures were updated for consistency</p></li>
-<li><p><strong>Return Types</strong>: Enhanced return type annotations may affect type checking</p></li>
-</ul>
-</section>
-<section id="version-1-7-0">
-<h3>Version 1.7.0<a class="headerlink" href="#version-1-7-0" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><strong>Configuration</strong>: Some configuration options were moved or renamed</p></li>
-<li><p><strong>Dependencies</strong>: Updated minimum versions for several dependencies</p></li>
-</ul>
-</section>
-</section>
-<section id="migration-guide">
-<h2>Migration Guide<a class="headerlink" href="#migration-guide" title="Link to this heading"></a></h2>
-<section id="from-1-8-x-to-1-9-x">
-<h3>From 1.8.x to 1.9.x<a class="headerlink" href="#from-1-8-x-to-1-9-x" title="Link to this heading"></a></h3>
-<p><strong>Pydantic v2 Migration</strong></p>
-<p>If you have custom validation code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old (Pydantic v1)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">validator</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomSeries</span><span class="p">(</span><span class="n">OpenTimeSeries</span><span class="p">):</span>
-    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">validate_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">v</span>
-
-<span class="c1"># New (Pydantic v2)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">field_validator</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomSeries</span><span class="p">(</span><span class="n">OpenTimeSeries</span><span class="p">):</span>
-    <span class="nd">@field_validator</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">validate_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">v</span>
-</pre></div>
-</div>
-<p><strong>Python Version</strong></p>
-<p>Ensure you’re using Python 3.10 or higher:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>--version<span class="w">  </span><span class="c1"># Should be 3.10+</span>
-</pre></div>
-</div>
-</section>
-<section id="from-1-7-x-to-1-8-x">
-<h3>From 1.7.x to 1.8.x<a class="headerlink" href="#from-1-7-x-to-1-8-x" title="Link to this heading"></a></h3>
-<p><strong>Method Updates</strong></p>
-<p>Some method signatures were standardized:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old</span>
-<span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;std&#39;</span><span class="p">)</span>
-
-<span class="c1"># New</span>
-<span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># method parameter removed</span>
-</pre></div>
-</div>
-</section>
-<section id="from-1-6-x-to-1-7-x">
-<h3>From 1.6.x to 1.7.x<a class="headerlink" href="#from-1-6-x-to-1-7-x" title="Link to this heading"></a></h3>
-<p><strong>Import Changes</strong></p>
-<p>Some imports were reorganized:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openseries.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">some_function</span>
-
-<span class="c1"># New</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">some_function</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="deprecation-notices">
-<h2>Deprecation Notices<a class="headerlink" href="#deprecation-notices" title="Link to this heading"></a></h2>
-<p><strong>Deprecated in 1.9.x</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">old_method_name()</span></code>: Use <code class="docutils literal notranslate"><span class="pre">new_method_name()</span></code> instead</p></li>
-<li><p>Legacy configuration options: Will be removed in 2.0.0</p></li>
-</ul>
-<p><strong>Removed in 1.9.x</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">deprecated_function()</span></code>: Removed, use <code class="docutils literal notranslate"><span class="pre">replacement_function()</span></code></p></li>
-<li><p>Old-style configuration: No longer supported</p></li>
-</ul>
-</section>
-<section id="future-plans">
-<h2>Future Plans<a class="headerlink" href="#future-plans" title="Link to this heading"></a></h2>
-<section id="version-2-0-0-planned">
-<h3>Version 2.0.0 (Planned)<a class="headerlink" href="#version-2-0-0-planned" title="Link to this heading"></a></h3>
-<p><strong>Major Changes Planned</strong></p>
-<ul class="simple">
-<li><p>Enhanced performance with optional Rust backend</p></li>
-<li><p>Improved memory efficiency for large datasets</p></li>
-<li><p>Streamlined API with breaking changes</p></li>
-<li><p>Enhanced visualization with modern plotting libraries</p></li>
-</ul>
-<p><strong>New Features Planned</strong></p>
-<ul class="simple">
-<li><p>Advanced risk models</p></li>
-<li><p>Machine learning integration</p></li>
-<li><p>Real-time data streaming</p></li>
-<li><p>Enhanced portfolio optimization algorithms</p></li>
-</ul>
-<p><strong>Timeline</strong></p>
-<p>Version 2.0.0 is planned for release in 2025, with beta versions available in late 2024.</p>
-</section>
-<section id="version-1-10-x-series">
-<h3>Version 1.10.x Series<a class="headerlink" href="#version-1-10-x-series" title="Link to this heading"></a></h3>
-<p><strong>Planned Features</strong></p>
-<ul class="simple">
-<li><p>Enhanced statistical analysis</p></li>
-<li><p>Better integration with cloud data sources</p></li>
-<li><p>Improved performance monitoring</p></li>
-<li><p>Extended visualization options</p></li>
-</ul>
-</section>
-</section>
-<section id="contributing-to-releases">
-<h2>Contributing to Releases<a class="headerlink" href="#contributing-to-releases" title="Link to this heading"></a></h2>
-<p><strong>Feature Requests</strong></p>
-<p>Submit feature requests through GitHub Issues with:</p>
-<ul class="simple">
-<li><p>Clear description of the proposed feature</p></li>
-<li><p>Use cases and examples</p></li>
-<li><p>Potential implementation approach</p></li>
-</ul>
-<p><strong>Bug Reports</strong></p>
-<p>Report bugs with:</p>
-<ul class="simple">
-<li><p>Steps to reproduce</p></li>
-<li><p>Expected vs. actual behavior</p></li>
-<li><p>Environment details</p></li>
-<li><p>Minimal code example</p></li>
-</ul>
-<p><strong>Testing Beta Versions</strong></p>
-<p>Help test pre-release versions:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>openseries
-</pre></div>
-</div>
-<p><strong>Release Notes</strong></p>
-<p>Each release includes detailed notes covering:</p>
-<ul class="simple">
-<li><p>New features and improvements</p></li>
-<li><p>Bug fixes and performance enhancements</p></li>
-<li><p>Breaking changes and migration guidance</p></li>
-<li><p>Updated dependencies and requirements</p></li>
-</ul>
-</section>
-<section id="stay-updated">
-<h2>Stay Updated<a class="headerlink" href="#stay-updated" title="Link to this heading"></a></h2>
-<p><strong>GitHub Releases</strong></p>
-<p>Watch the <a class="reference external" href="https://github.com/CaptorAB/openseries">openseries repository</a> for release notifications.</p>
-<p><strong>PyPI</strong></p>
-<p>Monitor <a class="reference external" href="https://pypi.org/project/openseries/">openseries on PyPI</a> for new versions.</p>
-<p><strong>Conda-forge</strong></p>
-<p>Track updates on <a class="reference external" href="https://anaconda.org/conda-forge/openseries">conda-forge</a>.</p>
-<p><strong>Changelog Format</strong></p>
-<p>This changelog follows the <a class="reference external" href="https://keepachangelog.com/">Keep a Changelog</a> format and openseries adheres to <a class="reference external" href="https://semver.org/">Semantic Versioning</a>.</p>
+<section id="changelog-format">
+<h2>Changelog Format<a class="headerlink" href="#changelog-format" title="Link to this heading"></a></h2>
+<p>The changelog follows the <a class="reference external" href="https://keepachangelog.com/">Keep a Changelog</a> format and openseries adheres to <a class="reference external" href="https://semver.org/">Semantic Versioning</a>.</p>
 <p><strong>Categories</strong></p>
 <ul class="simple">
 <li><p><strong>Added</strong>: New features</p></li>
