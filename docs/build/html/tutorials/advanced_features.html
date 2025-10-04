@@ -61,11 +61,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#rolling-factor-analysis">Rolling Factor Analysis</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#advanced-portfolio-techniques">Advanced Portfolio Techniques</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#black-litterman-model-implementation">Black-Litterman Model Implementation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#risk-parity-implementation">Risk Parity Implementation</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -197,109 +192,6 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Correlation: </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average Correlation: </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correlation Range: </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="advanced-portfolio-techniques">
-<h2>Advanced Portfolio Techniques<a class="headerlink" href="#advanced-portfolio-techniques" title="Link to this heading"></a></h2>
-<section id="black-litterman-model-implementation">
-<h3>Black-Litterman Model Implementation<a class="headerlink" href="#black-litterman-model-implementation" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">black_litterman_weights</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">market_caps</span><span class="p">,</span> <span class="n">risk_aversion</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.025</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simplified Black-Litterman model implementation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Calculate market-implied returns</span>
-    <span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span> <span class="o">*</span> <span class="mi">252</span>  <span class="c1"># Annualized</span>
-    <span class="n">market_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">market_caps</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">market_caps</span><span class="p">)</span>
-
-    <span class="c1"># Market-implied equilibrium returns</span>
-    <span class="n">pi</span> <span class="o">=</span> <span class="n">risk_aversion</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">,</span> <span class="n">market_weights</span><span class="p">)</span>
-
-    <span class="c1"># Without views, BL reduces to market weights</span>
-    <span class="c1"># In practice, you would incorporate investor views here</span>
-
-    <span class="c1"># Calculate BL weights (simplified - no views)</span>
-    <span class="n">bl_weights</span> <span class="o">=</span> <span class="n">market_weights</span>  <span class="c1"># Without views, equals market weights</span>
-
-    <span class="k">return</span> <span class="n">bl_weights</span><span class="p">,</span> <span class="n">pi</span>
-
-<span class="c1"># Example with our portfolio assets</span>
-<span class="k">if</span> <span class="s1">&#39;portfolio_assets&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-    <span class="c1"># Get returns data</span>
-    <span class="n">returns_data</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-        <span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-        <span class="n">returns_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
-
-    <span class="n">returns_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">returns_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
-
-    <span class="c1"># Simulate market caps (in practice, use real market cap data)</span>
-    <span class="n">market_caps</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>  <span class="c1"># Billions</span>
-
-    <span class="n">bl_weights</span><span class="p">,</span> <span class="n">implied_returns</span> <span class="o">=</span> <span class="n">black_litterman_weights</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">market_caps</span><span class="p">)</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== BLACK-LITTERMAN MODEL ===&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Market-implied returns:&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">implied_returns</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">asset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Black-Litterman weights:&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">bl_weights</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">asset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="risk-parity-implementation">
-<h3>Risk Parity Implementation<a class="headerlink" href="#risk-parity-implementation" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">risk_parity_weights</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate risk parity weights using iterative algorithm</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">)</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>  <span class="c1"># Start with equal weights</span>
-
-    <span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
-        <span class="c1"># Calculate risk contributions</span>
-        <span class="n">portfolio_vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">,</span> <span class="n">weights</span><span class="p">)))</span>
-        <span class="n">marginal_contrib</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="n">portfolio_vol</span>
-        <span class="n">risk_contrib</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">*</span> <span class="n">marginal_contrib</span>
-
-        <span class="c1"># Target risk contribution (equal for all assets)</span>
-        <span class="n">target_risk</span> <span class="o">=</span> <span class="n">portfolio_vol</span> <span class="o">/</span> <span class="n">n</span>
-
-        <span class="c1"># Update weights</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">*</span> <span class="p">(</span><span class="n">target_risk</span> <span class="o">/</span> <span class="n">risk_contrib</span><span class="p">)</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># Normalize</span>
-
-        <span class="c1"># Check convergence</span>
-        <span class="n">risk_contrib_new</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="n">portfolio_vol</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">risk_contrib_new</span> <span class="o">-</span> <span class="n">target_risk</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
-            <span class="k">break</span>
-
-    <span class="k">return</span> <span class="n">weights</span>
-
-<span class="c1"># Calculate risk parity weights</span>
-<span class="k">if</span> <span class="s1">&#39;returns_df&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-    <span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="mi">252</span>  <span class="c1"># Annualized</span>
-    <span class="n">rp_weights</span> <span class="o">=</span> <span class="n">risk_parity_weights</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">)</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== RISK PARITY WEIGHTS ===&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">rp_weights</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">asset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Create risk parity portfolio</span>
-    <span class="k">if</span> <span class="s1">&#39;portfolio_assets&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-        <span class="n">rp_portfolio</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-            <span class="n">weights</span><span class="o">=</span><span class="n">rp_weights</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Parity Portfolio&quot;</span>
-        <span class="p">)</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Risk Parity Portfolio Metrics:&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Return: </span><span class="si">{</span><span class="n">rp_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">rp_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe: </span><span class="si">{</span><span class="n">rp_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This tutorial demonstrates how to extend openseries with advanced functionality for sophisticated financial analysis workflows.</p>

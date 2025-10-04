@@ -256,7 +256,6 @@ Backtesting Framework
 
 .. code-block:: python
 
-
    # Define strategies to backtest using native weight_strat
    strategies = {
        'Equal Weight': 'eq_weights',
@@ -333,6 +332,8 @@ This section demonstrates portfolio optimization using actual fund data from pro
 Using Real Fund Data for Optimization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Here's how to work with real fund data using openseries methods directly:
+
 .. code-block:: python
 
    from requests import get as requests_get
@@ -341,29 +342,6 @@ Using Real Fund Data for Optimization
        efficient_frontier, prepare_plot_data, sharpeplot,
        load_plotly_dict, get_previous_business_day_before_today
    )
-
-   def create_fund_universe(fund_isins: list[str]) -> OpenFrame:
-       """Create optimization universe from real fund data"""
-
-       response = requests_get(url="https://api.captor.se/public/api/nav", timeout=10)
-       response.raise_for_status()
-
-       series_list = []
-       result = response.json()
-
-       for data in result:
-           if data["isin"] in fund_isins:
-               series = OpenTimeSeries.from_arrays(
-                   name=data["longName"],
-                   isin=data["isin"],
-                   baseccy=data["currency"],
-                   dates=data["dates"],
-                   values=data["navPerUnit"],
-                   valuetype=ValueType.PRICE,
-               )
-               series_list.append(series)
-
-       return OpenFrame(constituents=series_list)
 
    # Define fund universe for optimization
    fund_universe_isins = [
@@ -374,8 +352,29 @@ Using Real Fund Data for Optimization
        "SE0017832330",  # Multi-Asset Strategy
    ]
 
-   # Create fund universe
-   fund_universe = create_fund_universe(fund_universe_isins)
+   # Load fund data using openseries methods
+   response = requests_get(url="https://api.captor.se/public/api/nav", timeout=10)
+   response.raise_for_status()
+
+   series_list = []
+   result = response.json()
+
+   for data in result:
+       if data["isin"] in fund_universe_isins:
+           series = OpenTimeSeries.from_arrays(
+               name=data["longName"],
+               isin=data["isin"],
+               baseccy=data["currency"],
+               dates=data["dates"],
+               values=data["navPerUnit"],
+               valuetype=ValueType.PRICE,
+           )
+           series_list.append(series)
+
+   # Create fund universe using openseries OpenFrame
+   fund_universe = OpenFrame(constituents=series_list)
+
+   # Process data using openseries methods
    fund_universe = fund_universe.value_nan_handle().trunc_frame().to_cumret()
 
    print(f"Fund universe created with {fund_universe.item_count} funds")
@@ -476,31 +475,32 @@ Performance Comparison Analysis
    for metric, value in improvement.items():
        print(f"{metric}: {value:+.2f}")
 
-Complete Optimization Function
+Complete Optimization Workflow
 ------------------------------
+
+Here's how to perform portfolio optimization using openseries methods directly:
 
 .. code-block:: python
 
-   def comprehensive_portfolio_optimization(tickers, period="5y"):
-       """Complete portfolio optimization workflow"""
+   # Example: Optimize ETF portfolio using openseries methods
+   etf_tickers = ["VTI", "VEA", "VWO", "BND", "VNQ"]
 
-       # Load data
-       assets = []
-       for ticker in tickers:
-           try:
-               data = yf.Ticker(ticker).history(period=period)
-               series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
-               assets.append(series)
-           except:
-               print(f"Failed to load {ticker}")
+   # Load data using openseries methods
+   assets = []
+   for ticker in etf_tickers:
+       try:
+           data = yf.Ticker(ticker).history(period="5y")
+           series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
+           assets.append(series)
+       except:
+           print(f"Failed to load {ticker}")
 
-       if len(assets) < 2:
-           print("Need at least 2 assets for optimization")
-           return None
-
+   if len(assets) < 2:
+       print("Need at least 2 assets for optimization")
+   else:
        frame = OpenFrame(constituents=assets)
 
-       # Use native weight strategies
+       # Use openseries native weight strategies
        strategies = {
            'Equal Weight': 'eq_weights',
            'Inverse Volatility': 'inv_vol',
@@ -508,7 +508,7 @@ Complete Optimization Function
            'Target Risk': 'target_risk'
        }
 
-       # Create portfolios
+       # Create portfolios using openseries make_portfolio method
        results = {}
        for name, weight_strat in strategies.items():
            portfolio = frame.make_portfolio(name=name, weight_strat=weight_strat)
@@ -523,9 +523,3 @@ Complete Optimization Function
 
        print("=== PORTFOLIO OPTIMIZATION RESULTS ===")
        print((results_df * 100).round(2))
-
-       return frame, results_df
-
-   # Example usage
-   etf_tickers = ["VTI", "VEA", "VWO", "BND", "VNQ"]
-   optimization_results = comprehensive_portfolio_optimization(etf_tickers)

@@ -347,88 +347,80 @@ Evaluate risk-adjusted returns:
 Risk Monitoring Dashboard
 -------------------------
 
-Create a comprehensive risk monitoring summary:
+Create a comprehensive risk monitoring summary using openseries properties and methods:
 
 .. code-block:: python
 
-   def risk_dashboard(portfolio_obj, lookback_days=252):
-       """Create a risk monitoring dashboard"""
+   print("\n" + "="*60)
+   print("RISK MONITORING DASHBOARD")
+   print("="*60)
 
-       print("\n" + "="*60)
-       print("RISK MONITORING DASHBOARD")
-       print("="*60)
+   # Current date and lookback period
+   current_date = portfolio.last_idx
+   lookback_date = portfolio.first_idx
 
-       # Current date and lookback period
-       current_date = portfolio_obj.last_idx
-       lookback_date = portfolio_obj.first_idx
+   print(f"Portfolio: {portfolio.name}")
+   print(f"Current Date: {current_date}")
+   print(f"Analysis Period: {lookback_date} to {current_date}")
+   print(f"Observations: {portfolio.length}")
 
-       print(f"Portfolio: {portfolio_obj.name}")
-       print(f"Current Date: {current_date}")
-       print(f"Analysis Period: {lookback_date} to {current_date}")
-       print(f"Observations: {portfolio_obj.length}")
+   # Risk metrics using openseries properties
+   print(f"\n--- CURRENT RISK METRICS ---")
+   print(f"Volatility (annualized): {portfolio.vol:.2%}")
+   print(f"Downside Deviation: {portfolio.downside_deviation:.2%}")
+   print(f"95% VaR (daily): {portfolio.var_down:.2%}")
+   print(f"95% CVaR (daily): {portfolio.cvar_down:.2%}")
+   print(f"Maximum Drawdown: {portfolio.max_drawdown:.2%}")
 
-       # Risk metrics
-       print(f"\n--- CURRENT RISK METRICS ---")
-       print(f"Volatility (annualized): {portfolio_obj.vol:.2%}")
-       print(f"Downside Deviation: {portfolio_obj.downside_deviation:.2%}")
-       print(f"95% VaR (daily): {portfolio_obj.var_down:.2%}")
-       print(f"95% CVaR (daily): {portfolio_obj.cvar_down:.2%}")
-       print(f"Maximum Drawdown: {portfolio_obj.max_drawdown:.2%}")
+   # Performance metrics using openseries properties
+   print(f"\n--- PERFORMANCE METRICS ---")
+   print(f"Total Return: {portfolio.value_ret:.2%}")
+   print(f"Annualized Return: {portfolio.geo_ret:.2%}")
+   print(f"Sharpe Ratio: {portfolio.ret_vol_ratio:.3f}")
+   print(f"Sortino Ratio: {portfolio.sortino_ratio:.3f}")
 
-       # Performance metrics
-       print(f"\n--- PERFORMANCE METRICS ---")
-       print(f"Total Return: {portfolio_obj.value_ret:.2%}")
-       print(f"Annualized Return: {portfolio_obj.geo_ret:.2%}")
-       print(f"Sharpe Ratio: {portfolio_obj.ret_vol_ratio:.3f}")
-       print(f"Sortino Ratio: {portfolio_obj.sortino_ratio:.3f}")
+   # Distribution characteristics using openseries properties
+   print(f"\n--- RETURN DISTRIBUTION ---")
+   print(f"Skewness: {portfolio.skew:.3f}")
+   print(f"Kurtosis: {portfolio.kurtosis:.3f}")
+   print(f"Positive Days: {portfolio.positive_share:.1%}")
 
-       # Distribution characteristics
-       print(f"\n--- RETURN DISTRIBUTION ---")
-       print(f"Skewness: {portfolio_obj.skew:.3f}")
-       print(f"Kurtosis: {portfolio_obj.kurtosis:.3f}")
-       print(f"Positive Days: {portfolio_obj.positive_share:.1%}")
+   # Recent performance using openseries properties
+   recent_return = portfolio.z_score
+   print(f"\n--- RECENT ACTIVITY ---")
+   print(f"Last Return Z-Score: {recent_return:.2f}")
 
-       # Recent performance
-       recent_return = portfolio_obj.z_score
-       print(f"\n--- RECENT ACTIVITY ---")
-       print(f"Last Return Z-Score: {recent_return:.2f}")
+   if abs(recent_return) > 2:
+       print("  ⚠️  ALERT: Recent return is unusual (|z| > 2)")
+   elif abs(recent_return) > 3:
+       print("  🚨 WARNING: Recent return is extreme (|z| > 3)")
+   else:
+       print("  ✅ Recent return is within normal range")
 
-       if abs(recent_return) > 2:
-           print("  ⚠️  ALERT: Recent return is unusual (|z| > 2)")
-       elif abs(recent_return) > 3:
-           print("  🚨 WARNING: Recent return is extreme (|z| > 3)")
-       else:
-           print("  ✅ Recent return is within normal range")
+   # Risk alerts based on openseries metrics
+   print(f"\n--- RISK ALERTS ---")
+   alerts = []
 
-       # Risk alerts
-       print(f"\n--- RISK ALERTS ---")
-       alerts = []
+   if portfolio.vol > 0.25:
+       alerts.append("High volatility (>25%)")
 
-       if portfolio_obj.vol > 0.25:
-           alerts.append("High volatility (>25%)")
+   if abs(portfolio.max_drawdown) > 0.20:
+       alerts.append("Large maximum drawdown (>20%)")
 
-       if abs(portfolio_obj.max_drawdown) > 0.20:
-           alerts.append("Large maximum drawdown (>20%)")
+   if portfolio.ret_vol_ratio < 0.5:
+       alerts.append("Low Sharpe ratio (<0.5)")
 
-       if portfolio_obj.ret_vol_ratio < 0.5:
-           alerts.append("Low Sharpe ratio (<0.5)")
+   if portfolio.skew < -1:
+       alerts.append("Highly negative skew (<-1)")
 
-       if portfolio_obj.skew < -1:
-           alerts.append("Highly negative skew (<-1)")
+   if portfolio.kurtosis > 5:
+       alerts.append("High kurtosis (>5) - fat tails")
 
-       if portfolio_obj.kurtosis > 5:
-           alerts.append("High kurtosis (>5) - fat tails")
-
-       if alerts:
-           for alert in alerts:
-               print(f"  ⚠️  {alert}")
-       else:
-           print("  ✅ No risk alerts")
-
-       return True
-
-   # Generate dashboard
-   risk_dashboard(portfolio)
+   if alerts:
+       for alert in alerts:
+           print(f"  ⚠️  {alert}")
+   else:
+       print("  ✅ No risk alerts")
 
 Risk Limits and Controls
 ------------------------

@@ -279,49 +279,50 @@ Export Multi-Asset Results
 
    print("\nMulti-asset analysis exported to 'multi_asset_analysis.xlsx'")
 
-Complete Multi-Asset Analysis Function
---------------------------------------
+Complete Multi-Asset Analysis Workflow
+---------------------------------------
+
+Here's how to perform a complete multi-asset analysis using openseries methods directly:
 
 .. code-block:: python
 
-   def comprehensive_multi_asset_analysis(tickers, period="3y"):
-       """Complete multi-asset analysis function"""
+   # Example: Analyze tech stocks using openseries methods
+   tech_tickers = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
 
-       # Load data
-       series_list = []
-       for ticker in tickers:
-           try:
-               data = yf.Ticker(ticker).history(period=period)
-               series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
-               series_list.append(series)
-           except:
-               print(f"Failed to load {ticker}")
+   # Load data using openseries methods
+   series_list = []
+   for ticker in tech_tickers:
+       try:
+           data = yf.Ticker(ticker).history(period="3y")
+           series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
+           series_list.append(series)
+       except:
+           print(f"Failed to load {ticker}")
 
-       if not series_list:
-           print("No data loaded")
-           return None
-
-       # Create frame
+   if not series_list:
+       print("No data loaded")
+   else:
+       # Create frame using openseries
        frame = OpenFrame(constituents=series_list)
 
-       # Analysis
+       # Analysis using openseries properties and methods
        print(f"=== MULTI-ASSET ANALYSIS ===")
        print(f"Assets: {frame.item_count}")
        print(f"Period: {frame.first_idx} to {frame.last_idx}")
 
-       # Key metrics
+       # Key metrics using openseries all_properties method
        metrics = frame.all_properties()
        key_metrics = metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
 
        print("\nKey Metrics:")
        print((key_metrics * 100).round(2))  # Convert to percentages
 
-       # Correlations
+       # Correlations using openseries correl_matrix method
        correlations = frame.correl_matrix()
        avg_correlation = correlations.mean().mean()
        print(f"\nAverage correlation: {avg_correlation:.3f}")
 
-       # Create portfolio
+       # Create portfolio using openseries make_portfolio method
        equal_weights = [1/frame.item_count] * frame.item_count
        portfolio = frame.make_portfolio(weights=equal_weights, name="Equal Weight")
 
@@ -329,9 +330,3 @@ Complete Multi-Asset Analysis Function
        print(f"  Return: {portfolio.geo_ret:.2%}")
        print(f"  Volatility: {portfolio.vol:.2%}")
        print(f"  Sharpe: {portfolio.ret_vol_ratio:.2f}")
-
-       return frame
-
-   # Example usage
-   tech_tickers = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
-   tech_analysis = comprehensive_multi_asset_analysis(tech_tickers)

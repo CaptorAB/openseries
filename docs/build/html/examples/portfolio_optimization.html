@@ -81,7 +81,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#performance-comparison-analysis">Performance Comparison Analysis</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#complete-optimization-function">Complete Optimization Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#complete-optimization-workflow">Complete Optimization Workflow</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="custom_reports.html">Reporting</a></li>
@@ -445,35 +445,13 @@
 <p>This section demonstrates portfolio optimization using actual fund data from professional fund managers, showing how optimization techniques apply in practice.</p>
 <section id="using-real-fund-data-for-optimization">
 <h3>Using Real Fund Data for Optimization<a class="headerlink" href="#using-real-fund-data-for-optimization" title="Link to this heading"></a></h3>
+<p>Here’s how to work with real fund data using openseries methods directly:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">get</span> <span class="k">as</span> <span class="n">requests_get</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OpenTimeSeries</span><span class="p">,</span> <span class="n">OpenFrame</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">,</span>
     <span class="n">efficient_frontier</span><span class="p">,</span> <span class="n">prepare_plot_data</span><span class="p">,</span> <span class="n">sharpeplot</span><span class="p">,</span>
     <span class="n">load_plotly_dict</span><span class="p">,</span> <span class="n">get_previous_business_day_before_today</span>
 <span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">create_fund_universe</span><span class="p">(</span><span class="n">fund_isins</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">OpenFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create optimization universe from real fund data&quot;&quot;&quot;</span>
-
-    <span class="n">response</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://api.captor.se/public/api/nav&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-
-    <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;isin&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fund_isins</span><span class="p">:</span>
-            <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;longName&quot;</span><span class="p">],</span>
-                <span class="n">isin</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;isin&quot;</span><span class="p">],</span>
-                <span class="n">baseccy</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;currency&quot;</span><span class="p">],</span>
-                <span class="n">dates</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;dates&quot;</span><span class="p">],</span>
-                <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;navPerUnit&quot;</span><span class="p">],</span>
-                <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
 
 <span class="c1"># Define fund universe for optimization</span>
 <span class="n">fund_universe_isins</span> <span class="o">=</span> <span class="p">[</span>
@@ -484,8 +462,29 @@
     <span class="s2">&quot;SE0017832330&quot;</span><span class="p">,</span>  <span class="c1"># Multi-Asset Strategy</span>
 <span class="p">]</span>
 
-<span class="c1"># Create fund universe</span>
-<span class="n">fund_universe</span> <span class="o">=</span> <span class="n">create_fund_universe</span><span class="p">(</span><span class="n">fund_universe_isins</span><span class="p">)</span>
+<span class="c1"># Load fund data using openseries methods</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://api.captor.se/public/api/nav&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+<span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;isin&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">fund_universe_isins</span><span class="p">:</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;longName&quot;</span><span class="p">],</span>
+            <span class="n">isin</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;isin&quot;</span><span class="p">],</span>
+            <span class="n">baseccy</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;currency&quot;</span><span class="p">],</span>
+            <span class="n">dates</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;dates&quot;</span><span class="p">],</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;navPerUnit&quot;</span><span class="p">],</span>
+            <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+
+<span class="c1"># Create fund universe using openseries OpenFrame</span>
+<span class="n">fund_universe</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
+
+<span class="c1"># Process data using openseries methods</span>
 <span class="n">fund_universe</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fund universe created with </span><span class="si">{</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">item_count</span><span class="si">}</span><span class="s2"> funds&quot;</span><span class="p">)</span>
@@ -587,28 +586,28 @@
 </div>
 </section>
 </section>
-<section id="complete-optimization-function">
-<h2>Complete Optimization Function<a class="headerlink" href="#complete-optimization-function" title="Link to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">comprehensive_portfolio_optimization</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;5y&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete portfolio optimization workflow&quot;&quot;&quot;</span>
+<section id="complete-optimization-workflow">
+<h2>Complete Optimization Workflow<a class="headerlink" href="#complete-optimization-workflow" title="Link to this heading"></a></h2>
+<p>Here’s how to perform portfolio optimization using openseries methods directly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Optimize ETF portfolio using openseries methods</span>
+<span class="n">etf_tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;VTI&quot;</span><span class="p">,</span> <span class="s2">&quot;VEA&quot;</span><span class="p">,</span> <span class="s2">&quot;VWO&quot;</span><span class="p">,</span> <span class="s2">&quot;BND&quot;</span><span class="p">,</span> <span class="s2">&quot;VNQ&quot;</span><span class="p">]</span>
 
-    <span class="c1"># Load data</span>
-    <span class="n">assets</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
-            <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">ticker</span><span class="p">)</span>
-            <span class="n">assets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load </span><span class="si">{</span><span class="n">ticker</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Load data using openseries methods</span>
+<span class="n">assets</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">etf_tickers</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;5y&quot;</span><span class="p">)</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">ticker</span><span class="p">)</span>
+        <span class="n">assets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load </span><span class="si">{</span><span class="n">ticker</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">assets</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Need at least 2 assets for optimization&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span>
-
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">assets</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Need at least 2 assets for optimization&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
     <span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">assets</span><span class="p">)</span>
 
-    <span class="c1"># Use native weight strategies</span>
+    <span class="c1"># Use openseries native weight strategies</span>
     <span class="n">strategies</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="s1">&#39;eq_weights&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Inverse Volatility&#39;</span><span class="p">:</span> <span class="s1">&#39;inv_vol&#39;</span><span class="p">,</span>
@@ -616,7 +615,7 @@
         <span class="s1">&#39;Target Risk&#39;</span><span class="p">:</span> <span class="s1">&#39;target_risk&#39;</span>
     <span class="p">}</span>
 
-    <span class="c1"># Create portfolios</span>
+    <span class="c1"># Create portfolios using openseries make_portfolio method</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="n">weight_strat</span><span class="p">)</span>
@@ -631,12 +630,6 @@
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== PORTFOLIO OPTIMIZATION RESULTS ===&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">((</span><span class="n">results_df</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">frame</span><span class="p">,</span> <span class="n">results_df</span>
-
-<span class="c1"># Example usage</span>
-<span class="n">etf_tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;VTI&quot;</span><span class="p">,</span> <span class="s2">&quot;VEA&quot;</span><span class="p">,</span> <span class="s2">&quot;VWO&quot;</span><span class="p">,</span> <span class="s2">&quot;BND&quot;</span><span class="p">,</span> <span class="s2">&quot;VNQ&quot;</span><span class="p">]</span>
-<span class="n">optimization_results</span> <span class="o">=</span> <span class="n">comprehensive_portfolio_optimization</span><span class="p">(</span><span class="n">etf_tickers</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
