@@ -14,10 +14,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path("../../").resolve()))
 
 project = "openseries"
-copyright = "2024, Captor Fund Management AB"  # noqa: A001
+copyright = "2025, Captor Fund Management AB"  # noqa: A001
 author = "Martin Karrin"
-release = "1.9.7"
-version = "1.9.7"
+release = "2.0.0"
+version = "2.0.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -32,7 +32,6 @@ extensions = [
     "sphinx.ext.githubpages",
     "myst_parser",
     "sphinx_rtd_theme",
-    "nbsphinx",
 ]
 
 # Napoleon settings for Google-style docstrings
@@ -143,9 +142,3 @@ myst_enable_extensions = [
     "substitution",
     "tasklist",
 ]
-
-# nbsphinx configuration
-nbsphinx_execute = "never"  # Don't execute notebooks during build
-nbsphinx_allow_errors = True
-nbsphinx_timeout = 60
-nbsphinx_requirejs_path = ""
