@@ -18,11 +18,14 @@ from numpy import (
     array,
     asarray,
     concatenate,
+    corrcoef,
     cov,
     diff,
     divide,
     float64,
     isinf,
+    isnan,
+    linalg,
     log,
     nan,
     sqrt,
@@ -1434,6 +1437,23 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 vol = divide(1.0, std(returns, axis=0, ddof=1))
                 vol[isinf(vol)] = nan
                 self.weights = list(divide(vol, vol.sum()))
+            elif weight_strat == "max_div":
+                corr_matrix = corrcoef(returns.T)
+                corr_matrix[isinf(corr_matrix)] = nan
+                corr_matrix[isnan(corr_matrix)] = nan
+                try:
+                    inv_corr_sum = linalg.inv(corr_matrix).sum(axis=1)
+                    self.weights = list(divide(inv_corr_sum, inv_corr_sum.sum()))
+                except linalg.LinAlgError:
+                    self.weights = [1.0 / self.item_count] * self.item_count
+            elif weight_strat == "target_risk":
+                vols = std(returns, axis=0, ddof=1)
+                min_vol_idx = vols.argmin()
+                min_vol_weight = 0.6
+                remaining_weight = 0.4
+                weights = [remaining_weight / (self.item_count - 1)] * self.item_count
+                weights[min_vol_idx] = min_vol_weight
+                self.weights = weights
             else:
                 raise NotImplementedError(msg)
 

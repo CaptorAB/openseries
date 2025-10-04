@@ -221,51 +221,43 @@ Use Monte Carlo methods for risk assessment:
 
    print("\n=== MONTE CARLO RISK SIMULATION ===")
 
-   # Get historical returns for simulation
-   asset_returns = []
-   for series in portfolio_assets.constituents:
-       returns = series.value_to_ret()
-       asset_returns.append(returns.tsdf.iloc[:, 0])
+   # Import the simulate_portfolios function
+   from openseries.portfoliotools import simulate_portfolios
 
-   returns_matrix = pd.concat(asset_returns, axis=1)
-   returns_matrix.columns = [series.name for series in portfolio_assets.constituents]
-
-   # Calculate statistics for simulation
-   mean_returns = returns_matrix.mean()
-   cov_matrix = returns_matrix.cov()
-
-   # Monte Carlo simulation
+   # Monte Carlo simulation using native function
    num_simulations = 10000
-   time_horizon = 22  # 1 month
+   seed = 42  # For reproducible results
 
-   np.random.seed(42)  # For reproducible results
-
-   # Generate random returns
-   simulated_returns = np.random.multivariate_normal(
-       mean_returns, cov_matrix, (num_simulations, time_horizon)
+   # Generate simulated portfolios using the native function
+   simulated_portfolios = simulate_portfolios(
+       simframe=portfolio_assets,
+       num_ports=num_simulations,
+       seed=seed
    )
 
-   # Calculate portfolio returns for each simulation
-   portfolio_simulations = []
-   for sim in simulated_returns:
-       # Calculate cumulative portfolio return over time horizon
-       portfolio_path = np.dot(sim, equal_weights)
-       cumulative_return = np.prod(1 + portfolio_path) - 1
-       portfolio_simulations.append(cumulative_return)
-
-   portfolio_simulations = np.array(portfolio_simulations)
+   # Extract portfolio metrics from simulation
+   portfolio_returns = simulated_portfolios['ret']
+   portfolio_volatilities = simulated_portfolios['stdev']
+   portfolio_sharpes = simulated_portfolios['sharpe']
 
    # Calculate risk metrics from simulation
-   sim_var_95 = np.percentile(portfolio_simulations, 5)
-   sim_cvar_95 = portfolio_simulations[portfolio_simulations <= sim_var_95].mean()
+   sim_var_95 = np.percentile(portfolio_returns, 5)
+   sim_cvar_95 = portfolio_returns[portfolio_returns <= sim_var_95].mean()
 
-   print(f"Monte Carlo Results ({time_horizon}-day horizon, {num_simulations:,} simulations):")
-   print(f"Expected Return: {portfolio_simulations.mean():.2%}")
-   print(f"Volatility: {portfolio_simulations.std():.2%}")
+   print(f"Monte Carlo Results ({num_simulations:,} simulations):")
+   print(f"Expected Return: {portfolio_returns.mean():.2%}")
+   print(f"Average Volatility: {portfolio_volatilities.mean():.2%}")
    print(f"95% VaR: {sim_var_95:.2%}")
    print(f"95% CVaR: {sim_cvar_95:.2%}")
-   print(f"Worst Case (0.1%): {np.percentile(portfolio_simulations, 0.1):.2%}")
-   print(f"Best Case (99.9%): {np.percentile(portfolio_simulations, 99.9):.2%}")
+   print(f"Worst Case (0.1%): {np.percentile(portfolio_returns, 0.1):.2%}")
+   print(f"Best Case (99.9%): {np.percentile(portfolio_returns, 99.9):.2%}")
+   print(f"Average Sharpe Ratio: {portfolio_sharpes.mean():.3f}")
+
+   # Show distribution of portfolio characteristics
+   print(f"\nPortfolio Distribution:")
+   print(f"Return Range: {portfolio_returns.min():.2%} to {portfolio_returns.max():.2%}")
+   print(f"Volatility Range: {portfolio_volatilities.min():.2%} to {portfolio_volatilities.max():.2%}")
+   print(f"Sharpe Range: {portfolio_sharpes.min():.3f} to {portfolio_sharpes.max():.3f}")
 
 Risk Decomposition
 ------------------

@@ -729,6 +729,75 @@ class TestOpenFrame(CommonTestCase):
                 weight_strat=cast("LiteralPortfolioWeightings", "bogus"),
             )
 
+    def test_make_portfolio_new_weight_strategies(self: TestOpenFrame) -> None:
+        """Test make_portfolio method with new weight strategies."""
+        mpframe = self.randomframe.from_deepcopy()
+        mpframe.to_cumret()
+        name = "portfolio"
+        tolerance = 1e-10
+
+        # Test max_div strategy
+        _ = mpframe.make_portfolio(name=name, weight_strat="max_div")
+
+        # Weights should sum to 1
+        weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
+        if abs(weight_sum - 1.0) > tolerance:
+            msg = f"make_portfolio() max_div weights do not sum to 1.0: {weight_sum}"
+            raise OpenFrameTestError(msg)
+
+        # Test target_risk strategy
+        _ = mpframe.make_portfolio(name=name, weight_strat="target_risk")
+
+        # Weights should sum to 1
+        weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
+        if abs(weight_sum - 1.0) > tolerance:
+            msg = (
+                f"make_portfolio() target_risk weights do not sum to 1.0: {weight_sum}"
+            )
+            raise OpenFrameTestError(msg)
+
+    def test_make_portfolio_max_div_singular_matrix(self: TestOpenFrame) -> None:
+        """Test make_portfolio max_div strategy with singular correlation matrix."""
+        # Create perfectly correlated assets to make correlation matrix singular
+        dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"]
+        base_values = [100.0, 101.0, 99.0, 102.0, 101.0]
+
+        # Create three assets with identical returns (perfect correlation)
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Asset1", dates=dates, values=base_values
+        )
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Asset2", dates=dates, values=base_values
+        )
+        ts3 = OpenTimeSeries.from_arrays(
+            name="Asset3", dates=dates, values=base_values
+        )
+
+        # Create frame with perfectly correlated assets
+        singular_frame = OpenFrame(constituents=[ts1, ts2, ts3])
+        singular_frame.to_cumret()
+
+        # Test max_div strategy with singular correlation matrix
+        _ = singular_frame.make_portfolio(name="Singular Test", weight_strat="max_div")
+
+        # Should fall back to equal weights when matrix is singular
+        expected_weight = 1.0 / 3.0
+        tolerance = 1e-10
+
+        for weight in singular_frame.weights:  # type: ignore[union-attr]
+            if abs(weight - expected_weight) > tolerance:
+                msg = (
+                    f"max_div with singular matrix should use equal weights: "
+                    f"{singular_frame.weights}"
+                )
+                raise OpenFrameTestError(msg)
+
+        # Verify weights sum to 1
+        weight_sum = sum(singular_frame.weights)  # type: ignore[arg-type]
+        if abs(weight_sum - 1.0) > tolerance:
+            msg = f"max_div singular matrix weights do not sum to 1.0: {weight_sum}"
+            raise OpenFrameTestError(msg)
+
     def test_add_timeseries(self: TestOpenFrame) -> None:
         """Test add_timeseries method."""
         frameas = self.randomframe.from_deepcopy()

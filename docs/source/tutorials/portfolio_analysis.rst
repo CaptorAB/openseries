@@ -112,12 +112,8 @@ Equal Weight Portfolio
 
 .. code-block:: python
 
-   # Create equal-weighted portfolio
-   n_assets = assets.item_count
-   equal_weights = [1/n_assets] * n_assets
-
-   assets.weights = equal_weights
-   portfolio_df = assets.make_portfolio(name="Equal Weight Portfolio")
+   # Create equal-weighted portfolio using native weight_strat
+   portfolio_df = assets.make_portfolio(name="Equal Weight Portfolio", weight_strat="eq_weights")
    equal_weight_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
 
    print(f"Equal Weight Portfolio Return: {equal_weight_portfolio.geo_ret:.2%}")
@@ -146,16 +142,8 @@ Risk Parity Portfolio
 
 .. code-block:: python
 
-   # Inverse volatility weighting (simple risk parity)
-   asset_metrics = assets.all_properties()
-   volatilities = asset_metrics.loc['vol'].values
-   inv_vol_weights = [1/vol for vol in volatilities]
-   # Normalize to sum to 1
-   total_inv_vol = sum(inv_vol_weights)
-   inv_vol_weights = [w/total_inv_vol for w in inv_vol_weights]
-
-   assets.weights = inv_vol_weights
-   portfolio_df = assets.make_portfolio(name="Risk Parity")
+   # Use native inverse volatility weighting (risk parity)
+   portfolio_df = assets.make_portfolio(name="Risk Parity", weight_strat="inv_vol")
    risk_parity_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
 
    print(f"Risk Parity Portfolio Return: {risk_parity_portfolio.geo_ret:.2%}")

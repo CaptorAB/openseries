@@ -142,7 +142,7 @@ LiteralPlotlyHistogramHistNorm = Literal[
     "density",
     "probability density",
 ]
-LiteralPortfolioWeightings = Literal["eq_weights", "inv_vol"]
+LiteralPortfolioWeightings = Literal["eq_weights", "inv_vol", "max_div", "target_risk"]
 LiteralMinimizeMethods = Literal[
     "SLSQP",
     "Nelder-Mead",

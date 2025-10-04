@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Custom Reports" href="custom_reports.html" />
+    <link rel="next" title="Reporting" href="custom_reports.html" />
     <link rel="prev" title="Multi-Asset Analysis" href="multi_asset.html" /> 
 </head>
 
@@ -74,7 +74,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#target-risk-portfolio">Target Risk Portfolio</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#portfolio-comparison">Portfolio Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#backtesting-framework">Backtesting Framework</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#risk-budgeting">Risk Budgeting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#export-optimization-results">Export Optimization Results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#real-world-fund-portfolio-optimization">Real-World Fund Portfolio Optimization</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#using-real-fund-data-for-optimization">Using Real Fund Data for Optimization</a></li>
@@ -85,7 +84,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#complete-optimization-function">Complete Optimization Function</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="custom_reports.html">Custom Reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -273,13 +272,10 @@
 <h2>Risk-Based Portfolio Strategies<a class="headerlink" href="#risk-based-portfolio-strategies" title="Link to this heading"></a></h2>
 <section id="equal-weight-portfolio">
 <h3>Equal Weight Portfolio<a class="headerlink" href="#equal-weight-portfolio" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Equal weight portfolio</span>
-<span class="n">n_assets</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">item_count</span>
-<span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
-
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Equal weight portfolio using native weight_strat</span>
 <span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== EQUAL WEIGHT PORTFOLIO ===&quot;</span><span class="p">)</span>
@@ -291,60 +287,25 @@
 </section>
 <section id="inverse-volatility-portfolio">
 <h3>Inverse Volatility Portfolio<a class="headerlink" href="#inverse-volatility-portfolio" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inverse volatility weighting using OpenFrame</span>
-<span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-<span class="n">asset_volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">vol</span> <span class="k">for</span> <span class="n">vol</span> <span class="ow">in</span> <span class="n">asset_volatilities</span><span class="p">]</span>
-<span class="n">total_inv_vol</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inv_vol_weights</span><span class="p">)</span>
-<span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">/</span><span class="n">total_inv_vol</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">inv_vol_weights</span><span class="p">]</span>
-
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inverse volatility weighting using native weight_strat</span>
 <span class="n">inv_vol_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">inv_vol_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Inverse Volatility&quot;</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Inverse Volatility&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;inv_vol&quot;</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== INVERSE VOLATILITY PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">inv_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">inv_vol_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe: </span><span class="si">{</span><span class="n">inv_vol_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Inverse Volatility Weights:&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inv_vol_weights</span><span class="p">):</span>
-    <span class="n">asset_name</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">constituents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="maximum-diversification-portfolio">
 <h3>Maximum Diversification Portfolio<a class="headerlink" href="#maximum-diversification-portfolio" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">max_diversification_weights</span><span class="p">(</span><span class="n">returns_df</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate maximum diversification portfolio weights&quot;&quot;&quot;</span>
-    <span class="c1"># Calculate correlation matrix and volatilities</span>
-    <span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
-    <span class="n">volatilities</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">252</span><span class="p">)</span>  <span class="c1"># Annualized</span>
-
-    <span class="c1"># Maximum diversification ratio = weighted average vol / portfolio vol</span>
-    <span class="c1"># This is a simplified approximation</span>
-    <span class="n">inv_corr_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">corr_matrix</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="n">inv_corr_sum</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">inv_corr_sum</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">weights</span>
-
-<span class="c1"># Get returns data for calculation</span>
-<span class="n">returns_data</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-    <span class="n">returns</span> <span class="o">=</span> <span class="n">asset</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-    <span class="n">returns_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
-
-<span class="n">returns_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">returns_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">asset</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
-
-<span class="c1"># Calculate max diversification weights</span>
-<span class="n">max_div_weights</span> <span class="o">=</span> <span class="n">max_diversification_weights</span><span class="p">(</span><span class="n">returns_df</span><span class="p">)</span>
-
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Maximum diversification portfolio using native weight_strat</span>
 <span class="n">max_div_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">max_div_weights</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Maximum Diversification&quot;</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Maximum Diversification&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;max_div&quot;</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MAXIMUM DIVERSIFICATION PORTFOLIO ===&quot;</span><span class="p">)</span>
@@ -357,34 +318,13 @@
 </section>
 <section id="target-risk-portfolio">
 <h2>Target Risk Portfolio<a class="headerlink" href="#target-risk-portfolio" title="Link to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">target_risk_portfolio</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">target_volatility</span><span class="o">=</span><span class="mf">0.10</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create portfolio targeting specific volatility level&quot;&quot;&quot;</span>
-
-    <span class="c1"># Start with minimum volatility portfolio weights using OpenFrame</span>
-    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-    <span class="n">asset_vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">min_vol_asset_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">asset_vols</span><span class="p">)</span>
-
-    <span class="c1"># Create weights that target the desired volatility</span>
-    <span class="c1"># Simple approach: blend minimum vol asset with equal weight</span>
-    <span class="n">min_vol_weight</span> <span class="o">=</span> <span class="mf">0.6</span>  <span class="c1"># 60% in minimum volatility asset</span>
-    <span class="n">remaining_weight</span> <span class="o">=</span> <span class="mf">0.4</span>
-    <span class="n">n_other_assets</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">item_count</span> <span class="o">-</span> <span class="mi">1</span>
-
-    <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">remaining_weight</span> <span class="o">/</span> <span class="n">n_other_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">frame</span><span class="o">.</span><span class="n">item_count</span>
-    <span class="n">weights</span><span class="p">[</span><span class="n">min_vol_asset_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_vol_weight</span>
-
-    <span class="k">return</span> <span class="n">weights</span>
-
-<span class="c1"># Create 10% volatility target portfolio</span>
-<span class="n">target_vol_weights</span> <span class="o">=</span> <span class="n">target_risk_portfolio</span><span class="p">(</span><span class="n">investment_universe</span><span class="p">,</span> <span class="n">target_volatility</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
-
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Target risk portfolio using native weight_strat</span>
 <span class="n">target_vol_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">target_vol_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;10% Target Volatility&quot;</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Target Risk&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;target_risk&quot;</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TARGET VOLATILITY PORTFOLIO (10%) ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TARGET RISK PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">target_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">target_vol_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe: </span><span class="si">{</span><span class="n">target_vol_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -431,36 +371,30 @@
 </section>
 <section id="backtesting-framework">
 <h2>Backtesting Framework<a class="headerlink" href="#backtesting-framework" title="Link to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">backtest_portfolio_strategies</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">strategies</span><span class="p">,</span> <span class="n">rebalance_freq</span><span class="o">=</span><span class="s1">&#39;BME&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple backtesting framework for portfolio strategies&quot;&quot;&quot;</span>
-
-    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">for</span> <span class="n">strategy_name</span><span class="p">,</span> <span class="n">weights</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="c1"># Create portfolio</span>
-        <span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">strategy_name</span><span class="p">)</span>
-
-        <span class="c1"># Calculate metrics</span>
-        <span class="n">results</span><span class="p">[</span><span class="n">strategy_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;return&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="p">,</span>
-            <span class="s1">&#39;volatility&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">,</span>
-            <span class="s1">&#39;sharpe&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="p">,</span>
-            <span class="s1">&#39;max_drawdown&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">,</span>
-            <span class="s1">&#39;calmar&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="p">}</span>
-
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-
-<span class="c1"># Define strategies to backtest</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define strategies to backtest using native weight_strat</span>
 <span class="n">strategies</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="n">equal_weights</span><span class="p">,</span>
-    <span class="s1">&#39;Inverse Volatility&#39;</span><span class="p">:</span> <span class="n">inv_vol_weights</span><span class="p">,</span>
-    <span class="s1">&#39;Max Diversification&#39;</span><span class="p">:</span> <span class="n">max_div_weights</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-    <span class="s1">&#39;Target Volatility&#39;</span><span class="p">:</span> <span class="n">target_vol_weights</span>
+    <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="s1">&#39;eq_weights&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Inverse Volatility&#39;</span><span class="p">:</span> <span class="s1">&#39;inv_vol&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Max Diversification&#39;</span><span class="p">:</span> <span class="s1">&#39;max_div&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Target Risk&#39;</span><span class="p">:</span> <span class="s1">&#39;target_risk&#39;</span>
 <span class="p">}</span>
 
-<span class="c1"># Run backtest</span>
-<span class="n">backtest_results</span> <span class="o">=</span> <span class="n">backtest_portfolio_strategies</span><span class="p">(</span><span class="n">investment_universe</span><span class="p">,</span> <span class="n">strategies</span><span class="p">)</span>
+<span class="c1"># Run backtest using native strategies</span>
+<span class="n">backtest_results</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">strategy_name</span><span class="p">,</span> <span class="n">weight_strat</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">strategy_name</span><span class="p">,</span>
+        <span class="n">weight_strat</span><span class="o">=</span><span class="n">weight_strat</span>
+    <span class="p">)</span>
+    <span class="n">backtest_results</span><span class="p">[</span><span class="n">strategy_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;return&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="p">,</span>
+        <span class="s1">&#39;volatility&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">,</span>
+        <span class="s1">&#39;sharpe&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="p">,</span>
+        <span class="s1">&#39;max_drawdown&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">,</span>
+        <span class="s1">&#39;calmar&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="p">}</span>
+
+<span class="n">backtest_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">backtest_results</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== BACKTEST RESULTS ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">backtest_results</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
@@ -471,49 +405,6 @@
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Best performing strategy: </span><span class="si">{</span><span class="n">best_strategy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe ratio: </span><span class="si">{</span><span class="n">backtest_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">best_strategy</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;sharpe&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="risk-budgeting">
-<h2>Risk Budgeting<a class="headerlink" href="#risk-budgeting" title="Link to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">risk_budget_portfolio</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">risk_budgets</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create portfolio based on risk budgets&quot;&quot;&quot;</span>
-
-    <span class="c1"># Calculate covariance matrix</span>
-    <span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span> <span class="o">*</span> <span class="mi">252</span>  <span class="c1"># Annualized</span>
-
-    <span class="c1"># This is a simplified risk budgeting approach</span>
-    <span class="c1"># In practice, you would use iterative optimization</span>
-
-    <span class="c1"># Start with risk budget proportions as initial weights</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">risk_budgets</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">risk_budgets</span><span class="p">)</span>
-
-    <span class="c1"># Simple adjustment based on volatilities</span>
-    <span class="n">volatilities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">))</span>
-    <span class="n">adjusted_weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">volatilities</span>
-    <span class="n">adjusted_weights</span> <span class="o">=</span> <span class="n">adjusted_weights</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adjusted_weights</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">adjusted_weights</span>
-
-<span class="c1"># Define risk budgets (must sum to 1)</span>
-<span class="n">risk_budgets</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span>  <span class="c1"># Equal to number of assets</span>
-
-<span class="n">risk_budget_weights</span> <span class="o">=</span> <span class="n">risk_budget_portfolio</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">risk_budgets</span><span class="p">)</span>
-
-<span class="n">risk_budget_portfolio_obj</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">risk_budget_weights</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Budget&quot;</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== RISK BUDGET PORTFOLIO ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">risk_budget_portfolio_obj</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">risk_budget_portfolio_obj</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe: </span><span class="si">{</span><span class="n">risk_budget_portfolio_obj</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Risk Budget Weights:&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">budget</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">risk_budget_weights</span><span class="p">,</span> <span class="n">risk_budgets</span><span class="p">)):</span>
-    <span class="n">asset_name</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">constituents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> (budget: </span><span class="si">{</span><span class="n">budget</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -717,25 +608,18 @@
 
     <span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">assets</span><span class="p">)</span>
 
-    <span class="c1"># Basic strategies</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">item_count</span>
-    <span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
-
-    <span class="c1"># Asset volatilities for inverse vol weighting using OpenFrame</span>
-    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-    <span class="n">vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">vol</span> <span class="k">for</span> <span class="n">vol</span> <span class="ow">in</span> <span class="n">vols</span><span class="p">]</span>
-    <span class="n">inv_vol_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">inv_vol_weights</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">inv_vol_weights</span><span class="p">]</span>
-
+    <span class="c1"># Use native weight strategies</span>
     <span class="n">strategies</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="n">equal_weights</span><span class="p">,</span>
-        <span class="s1">&#39;Inverse Volatility&#39;</span><span class="p">:</span> <span class="n">inv_vol_weights</span>
+        <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="s1">&#39;eq_weights&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Inverse Volatility&#39;</span><span class="p">:</span> <span class="s1">&#39;inv_vol&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Max Diversification&#39;</span><span class="p">:</span> <span class="s1">&#39;max_div&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Target Risk&#39;</span><span class="p">:</span> <span class="s1">&#39;target_risk&#39;</span>
     <span class="p">}</span>
 
     <span class="c1"># Create portfolios</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">weights</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="n">weight_strat</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;Return&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="p">,</span>
             <span class="s1">&#39;Volatility&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">,</span>
@@ -763,7 +647,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="multi_asset.html" class="btn btn-neutral float-left" title="Multi-Asset Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="custom_reports.html" class="btn btn-neutral float-right" title="Custom Reports" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="custom_reports.html" class="btn btn-neutral float-right" title="Reporting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
