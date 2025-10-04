@@ -1,10 +1,6 @@
-"""Defining the _CommonModel class.
+"""The _CommonModel class.
 
-Copyright (c) Captor Fund Management AB. This file is part of the openseries project.
-
-Licensed under the BSD 3-Clause License. You may obtain a copy of the License at:
-https://github.com/CaptorAB/openseries/blob/master/LICENSE.md
-SPDX-License-Identifier: BSD-3-Clause
+_CommonModel class which is the base class for OpenFrame and OpenTimeSeries.
 """
 
 from __future__ import annotations

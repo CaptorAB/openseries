@@ -80,7 +80,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Custom Reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -327,51 +327,43 @@
 <p>Use Monte Carlo methods for risk assessment:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MONTE CARLO RISK SIMULATION ===&quot;</span><span class="p">)</span>
 
-<span class="c1"># Get historical returns for simulation</span>
-<span class="n">asset_returns</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-    <span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-    <span class="n">asset_returns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="c1"># Import the simulate_portfolios function</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries.portfoliotools</span><span class="w"> </span><span class="kn">import</span> <span class="n">simulate_portfolios</span>
 
-<span class="n">returns_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">asset_returns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">returns_matrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
-
-<span class="c1"># Calculate statistics for simulation</span>
-<span class="n">mean_returns</span> <span class="o">=</span> <span class="n">returns_matrix</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">returns_matrix</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span>
-
-<span class="c1"># Monte Carlo simulation</span>
+<span class="c1"># Monte Carlo simulation using native function</span>
 <span class="n">num_simulations</span> <span class="o">=</span> <span class="mi">10000</span>
-<span class="n">time_horizon</span> <span class="o">=</span> <span class="mi">22</span>  <span class="c1"># 1 month</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>  <span class="c1"># For reproducible results</span>
 
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>  <span class="c1"># For reproducible results</span>
-
-<span class="c1"># Generate random returns</span>
-<span class="n">simulated_returns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
-    <span class="n">mean_returns</span><span class="p">,</span> <span class="n">cov_matrix</span><span class="p">,</span> <span class="p">(</span><span class="n">num_simulations</span><span class="p">,</span> <span class="n">time_horizon</span><span class="p">)</span>
+<span class="c1"># Generate simulated portfolios using the native function</span>
+<span class="n">simulated_portfolios</span> <span class="o">=</span> <span class="n">simulate_portfolios</span><span class="p">(</span>
+    <span class="n">simframe</span><span class="o">=</span><span class="n">portfolio_assets</span><span class="p">,</span>
+    <span class="n">num_ports</span><span class="o">=</span><span class="n">num_simulations</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="n">seed</span>
 <span class="p">)</span>
 
-<span class="c1"># Calculate portfolio returns for each simulation</span>
-<span class="n">portfolio_simulations</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="n">simulated_returns</span><span class="p">:</span>
-    <span class="c1"># Calculate cumulative portfolio return over time horizon</span>
-    <span class="n">portfolio_path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sim</span><span class="p">,</span> <span class="n">equal_weights</span><span class="p">)</span>
-    <span class="n">cumulative_return</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">portfolio_path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="n">portfolio_simulations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cumulative_return</span><span class="p">)</span>
-
-<span class="n">portfolio_simulations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">portfolio_simulations</span><span class="p">)</span>
+<span class="c1"># Extract portfolio metrics from simulation</span>
+<span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">simulated_portfolios</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span>
+<span class="n">portfolio_volatilities</span> <span class="o">=</span> <span class="n">simulated_portfolios</span><span class="p">[</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span>
+<span class="n">portfolio_sharpes</span> <span class="o">=</span> <span class="n">simulated_portfolios</span><span class="p">[</span><span class="s1">&#39;sharpe&#39;</span><span class="p">]</span>
 
 <span class="c1"># Calculate risk metrics from simulation</span>
-<span class="n">sim_var_95</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">portfolio_simulations</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">sim_cvar_95</span> <span class="o">=</span> <span class="n">portfolio_simulations</span><span class="p">[</span><span class="n">portfolio_simulations</span> <span class="o">&lt;=</span> <span class="n">sim_var_95</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">sim_var_95</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">portfolio_returns</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">sim_cvar_95</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="p">[</span><span class="n">portfolio_returns</span> <span class="o">&lt;=</span> <span class="n">sim_var_95</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monte Carlo Results (</span><span class="si">{</span><span class="n">time_horizon</span><span class="si">}</span><span class="s2">-day horizon, </span><span class="si">{</span><span class="n">num_simulations</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> simulations):&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Return: </span><span class="si">{</span><span class="n">portfolio_simulations</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">portfolio_simulations</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monte Carlo Results (</span><span class="si">{</span><span class="n">num_simulations</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> simulations):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Return: </span><span class="si">{</span><span class="n">portfolio_returns</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average Volatility: </span><span class="si">{</span><span class="n">portfolio_volatilities</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% VaR: </span><span class="si">{</span><span class="n">sim_var_95</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% CVaR: </span><span class="si">{</span><span class="n">sim_cvar_95</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst Case (0.1%): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">portfolio_simulations</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best Case (99.9%): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">portfolio_simulations</span><span class="p">,</span><span class="w"> </span><span class="mf">99.9</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst Case (0.1%): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">portfolio_returns</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best Case (99.9%): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">portfolio_returns</span><span class="p">,</span><span class="w"> </span><span class="mf">99.9</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average Sharpe Ratio: </span><span class="si">{</span><span class="n">portfolio_sharpes</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Show distribution of portfolio characteristics</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Portfolio Distribution:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return Range: </span><span class="si">{</span><span class="n">portfolio_returns</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">portfolio_returns</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility Range: </span><span class="si">{</span><span class="n">portfolio_volatilities</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">portfolio_volatilities</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Range: </span><span class="si">{</span><span class="n">portfolio_sharpes</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">portfolio_sharpes</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -458,85 +450,77 @@
 </section>
 <section id="risk-monitoring-dashboard">
 <h2>Risk Monitoring Dashboard<a class="headerlink" href="#risk-monitoring-dashboard" title="Link to this heading"></a></h2>
-<p>Create a comprehensive risk monitoring summary:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">risk_dashboard</span><span class="p">(</span><span class="n">portfolio_obj</span><span class="p">,</span> <span class="n">lookback_days</span><span class="o">=</span><span class="mi">252</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a risk monitoring dashboard&quot;&quot;&quot;</span>
+<p>Create a comprehensive risk monitoring summary using openseries properties and methods:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RISK MONITORING DASHBOARD&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RISK MONITORING DASHBOARD&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="c1"># Current date and lookback period</span>
+<span class="n">current_date</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">last_idx</span>
+<span class="n">lookback_date</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">first_idx</span>
 
-    <span class="c1"># Current date and lookback period</span>
-    <span class="n">current_date</span> <span class="o">=</span> <span class="n">portfolio_obj</span><span class="o">.</span><span class="n">last_idx</span>
-    <span class="n">lookback_date</span> <span class="o">=</span> <span class="n">portfolio_obj</span><span class="o">.</span><span class="n">first_idx</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Date: </span><span class="si">{</span><span class="n">current_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analysis Period: </span><span class="si">{</span><span class="n">lookback_date</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">current_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observations: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Date: </span><span class="si">{</span><span class="n">current_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analysis Period: </span><span class="si">{</span><span class="n">lookback_date</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">current_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observations: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Risk metrics using openseries properties</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- CURRENT RISK METRICS ---&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility (annualized): </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downside Deviation: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">downside_deviation</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% VaR (daily): </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% CVaR (daily): </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum Drawdown: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Risk metrics</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- CURRENT RISK METRICS ---&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility (annualized): </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downside Deviation: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">downside_deviation</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% VaR (daily): </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% CVaR (daily): </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum Drawdown: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Performance metrics using openseries properties</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- PERFORMANCE METRICS ---&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Return: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Return: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Ratio: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sortino Ratio: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Performance metrics</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- PERFORMANCE METRICS ---&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Return: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Return: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Ratio: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sortino Ratio: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Distribution characteristics using openseries properties</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- RETURN DISTRIBUTION ---&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skewness: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">skew</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Kurtosis: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Positive Days: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">positive_share</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Distribution characteristics</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- RETURN DISTRIBUTION ---&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skewness: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">skew</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Kurtosis: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Positive Days: </span><span class="si">{</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">positive_share</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Recent performance using openseries properties</span>
+<span class="n">recent_return</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">z_score</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- RECENT ACTIVITY ---&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Last Return Z-Score: </span><span class="si">{</span><span class="n">recent_return</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Recent performance</span>
-    <span class="n">recent_return</span> <span class="o">=</span> <span class="n">portfolio_obj</span><span class="o">.</span><span class="n">z_score</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- RECENT ACTIVITY ---&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Last Return Z-Score: </span><span class="si">{</span><span class="n">recent_return</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">recent_return</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ⚠️  ALERT: Recent return is unusual (|z| &gt; 2)&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">recent_return</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🚨 WARNING: Recent return is extreme (|z| &gt; 3)&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ✅ Recent return is within normal range&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">recent_return</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ⚠️  ALERT: Recent return is unusual (|z| &gt; 2)&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">recent_return</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🚨 WARNING: Recent return is extreme (|z| &gt; 3)&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ✅ Recent return is within normal range&quot;</span><span class="p">)</span>
+<span class="c1"># Risk alerts based on openseries metrics</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- RISK ALERTS ---&quot;</span><span class="p">)</span>
+<span class="n">alerts</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># Risk alerts</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- RISK ALERTS ---&quot;</span><span class="p">)</span>
-    <span class="n">alerts</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span> <span class="o">&gt;</span> <span class="mf">0.25</span><span class="p">:</span>
+    <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;High volatility (&gt;25%)&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">portfolio_obj</span><span class="o">.</span><span class="n">vol</span> <span class="o">&gt;</span> <span class="mf">0.25</span><span class="p">:</span>
-        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;High volatility (&gt;25%)&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">portfolio</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.20</span><span class="p">:</span>
+    <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Large maximum drawdown (&gt;20%)&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">portfolio_obj</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.20</span><span class="p">:</span>
-        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Large maximum drawdown (&gt;20%)&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+    <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Low Sharpe ratio (&lt;0.5)&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">portfolio_obj</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
-        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Low Sharpe ratio (&lt;0.5)&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">skew</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Highly negative skew (&lt;-1)&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">portfolio_obj</span><span class="o">.</span><span class="n">skew</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Highly negative skew (&lt;-1)&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">kurtosis</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+    <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;High kurtosis (&gt;5) - fat tails&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">portfolio_obj</span><span class="o">.</span><span class="n">kurtosis</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
-        <span class="n">alerts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;High kurtosis (&gt;5) - fat tails&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">alerts</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="n">alerts</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ⚠️  </span><span class="si">{</span><span class="n">alert</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ✅ No risk alerts&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="kc">True</span>
-
-<span class="c1"># Generate dashboard</span>
-<span class="n">risk_dashboard</span><span class="p">(</span><span class="n">portfolio</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">alerts</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="n">alerts</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ⚠️  </span><span class="si">{</span><span class="n">alert</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ✅ No risk alerts&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
