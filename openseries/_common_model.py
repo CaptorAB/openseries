@@ -760,6 +760,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
+
         countries: CountriesType, optional
             (List of) country code(s) according to ISO 3166-1 alpha-2
         markets: list[str] | str, optional
@@ -767,7 +768,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         custom_holidays: list[str] | str, optional
             Argument where missing holidays can be added
         method: LiteralPandasReindexMethod, default: "nearest"
-
+            Method for reindexing when aligning to business days
 
         Returns:
         --------

@@ -62,12 +62,15 @@ from .owntypes import (
     LiteralTrunc,
     MergingResultedInEmptyError,
     MixedValuetypesError,
+    MultipleCurrenciesError,
     NoWeightsError,
     OpenFramePropertiesList,
+    PortfolioItemsNotWithinFrameError,
     RatioInputError,
     ResampleDataLossError,
     Self,
     ValueType,
+    WeightsNotProvidedError,
 )
 from .series import OpenTimeSeries
 
@@ -1693,3 +1696,271 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         result = DataFrame(data=output, index=indx, columns=[dependent_column[0]])
 
         return result, predictions.to_cumret()
+
+    def rebalanced_portfolio(
+        self: Self,
+        name: str,
+        items: list[str] | None = None,
+        bal_weights: list[float] | None = None,
+        frequency: int = 1,
+        cash_index: OpenTimeSeries | None = None,
+        *,
+        equal_weights: bool = False,
+        drop_extras: bool = True,
+    ) -> OpenFrame:
+        """Create a rebalanced portfolio from the OpenFrame constituents.
+
+        Parameters
+        ----------
+        name: str
+            Name of the portfolio
+        items: list[str], optional
+            List of items to include in the portfolio. If None, uses all items.
+        bal_weights: list[float], optional
+            List of weights for rebalancing. If None, uses frame weights.
+        frequency: int, default: 1
+            Rebalancing frequency
+        cash_index: OpenTimeSeries, optional
+            Cash index series for cash component
+        equal_weights: bool, default: False
+            If True, use equal weights for all items
+        drop_extras: bool, default: True
+            If True, only return TWR series; if False, return all details
+
+        Returns:
+        --------
+        OpenFrame
+            OpenFrame containing the rebalanced portfolio
+
+        """
+        if bal_weights is None and not equal_weights:
+            if self.weights is None:
+                msg = "Weights must be provided."
+                raise WeightsNotProvidedError(msg)
+            bal_weights = list(self.weights)
+
+        if items is None:
+            items = list(self.columns_lvl_zero)
+        else:
+            msg = "Items must be passed as list."
+            if not isinstance(items, list):
+                raise TypeError(msg)
+            if not items:
+                msg = "Items for portfolio must be within SeriesFrame items."
+                raise PortfolioItemsNotWithinFrameError(msg)
+            if not set(items) <= set(self.columns_lvl_zero):
+                msg = "Items for portfolio must be within SeriesFrame items."
+                raise PortfolioItemsNotWithinFrameError(msg)
+
+        if equal_weights:
+            bal_weights = [1 / len(items)] * len(items)
+
+        if cash_index:
+            cash_index.tsdf = cash_index.tsdf.reindex(self.tsdf.index)
+            cash_values: list[float] = cast(
+                "list[float]", cash_index.tsdf.iloc[:, 0].to_numpy().tolist()
+            )
+        else:
+            cash_values = [1.0] * self.length
+
+        if self.tsdf.isna().to_numpy().any():
+            self.value_nan_handle()
+
+        ccies = list({serie.currency for serie in self.constituents})
+
+        if len(ccies) != 1:
+            msg = "Items for portfolio must be denominated in same currency."
+            raise MultipleCurrenciesError(msg)
+
+        currency = ccies[0]
+
+        instruments = [*items, "cash", name]
+        subheaders = [
+            ValueType.PRICE,
+            "buysell_qty",
+            "position",
+            "value",
+            "twr",
+            "settle",
+        ]
+
+        output = {
+            item: {
+                ValueType.PRICE: [],
+                "buysell_qty": [0.0] * self.length,
+                "position": [0.0] * self.length,
+                "value": [0.0] * self.length,
+                "twr": [0.0] * self.length,
+                "settle": [0.0] * self.length,
+            }
+            for item in items
+        }
+        output.update(
+            {
+                "cash": {
+                    ValueType.PRICE: cash_values,
+                    "buysell_qty": [0.0] * self.length,
+                    "position": [0.0] * self.length,
+                    "value": [0.0] * self.length,
+                    "twr": [0.0] * self.length,
+                    "settle": [0.0] * self.length,
+                },
+                name: {
+                    ValueType.PRICE: [1.0] + [0.0] * (self.length - 1),
+                    "buysell_qty": [-1.0] + [0.0] * (self.length - 1),
+                    "position": [-1.0] + [0.0] * (self.length - 1),
+                    "value": [-1.0] + [0.0] * (self.length - 1),
+                    "twr": [1.0] + [0.0] * (self.length - 1),
+                    "settle": [1.0] + [0.0] * (self.length - 1),
+                },
+            },
+        )
+
+        for item, weight in zip(items, cast("list[float]", bal_weights), strict=False):
+            output[item][ValueType.PRICE] = cast(
+                "list[float]", self.tsdf[(item, ValueType.PRICE)].to_numpy().tolist()
+            )
+            output[item]["buysell_qty"][0] = (
+                weight / self.tsdf[(item, ValueType.PRICE)].iloc[0]
+            )
+            output[item]["position"][0] = output[item]["buysell_qty"][0]
+            output[item]["value"][0] = (
+                output[item]["position"][0] * output[item][ValueType.PRICE][0]
+            )
+            output[item]["settle"][0] = (
+                -output[item]["buysell_qty"][0] * output[item][ValueType.PRICE][0]
+            )
+            output["cash"]["buysell_qty"][0] += output[item]["settle"][0]
+            output[item]["twr"][0] = (
+                output[item]["value"][0] / -output[item]["settle"][0]
+            )
+
+        output["cash"]["position"][0] = (
+            output["cash"]["buysell_qty"][0] + output[name]["settle"][0]
+        )
+        output["cash"]["settle"][0] = -output["cash"]["position"][0]
+
+        counter = 1
+        for day in range(1, self.length):
+            portfolio_value = 0.0
+            settle_value = 0.0
+            if day == frequency * counter:
+                for item, weight in zip(
+                    items, cast("list[float]", bal_weights), strict=False
+                ):
+                    output[item]["buysell_qty"][day] = (
+                        weight
+                        - output[item]["value"][day - 1]
+                        / -output[name]["value"][day - 1]
+                    ) / output[item][ValueType.PRICE][day]
+                    output[item]["position"][day] = (
+                        output[item]["position"][day - 1]
+                        + output[item]["buysell_qty"][day]
+                    )
+                    output[item]["value"][day] = (
+                        output[item]["position"][day]
+                        * output[item][ValueType.PRICE][day]
+                    )
+                    portfolio_value += output[item]["value"][day]
+                    output[item]["twr"][day] = (
+                        output[item]["value"][day]
+                        / (
+                            output[item]["value"][day - 1]
+                            - output[item]["settle"][day]
+                        )
+                        * output[item]["twr"][day - 1]
+                    )
+                    output[item]["settle"][day] = (
+                        -output[item]["buysell_qty"][day]
+                        * output[item][ValueType.PRICE][day]
+                    )
+                    settle_value += output[item]["settle"][day]
+                counter += 1
+            else:
+                for item in items:
+                    output[item]["position"][day] = output[item]["position"][day - 1]
+                    output[item]["value"][day] = (
+                        output[item]["position"][day]
+                        * output[item][ValueType.PRICE][day]
+                    )
+                    portfolio_value += output[item]["value"][day]
+                    output[item]["twr"][day] = (
+                        output[item]["value"][day]
+                        / (
+                            output[item]["value"][day - 1]
+                            - output[item]["settle"][day]
+                        )
+                        * output[item]["twr"][day - 1]
+                    )
+            output["cash"]["buysell_qty"][day] = settle_value
+            output["cash"]["position"][day] = (
+                output["cash"]["position"][day - 1]
+                * output["cash"][ValueType.PRICE][day]
+                / output["cash"][ValueType.PRICE][day - 1]
+                + output["cash"]["buysell_qty"][day]
+            )
+            output["cash"]["value"][day] = output["cash"]["position"][day]
+            portfolio_value += output["cash"]["value"][day]
+            output[name]["position"][day] = output[name]["position"][day - 1]
+            output[name]["value"][day] = -portfolio_value
+            output[name]["twr"][day] = (
+                output[name]["value"][day] / output[name]["position"][day]
+            )
+            output[name][ValueType.PRICE][day] = output[name]["twr"][day]
+
+        result = DataFrame()
+        for outvalue in output.values():
+            result = concat(
+                [
+                    result,
+                    DataFrame(
+                        data=outvalue,
+                        index=self.tsdf.index,
+                    ),
+                ],
+                axis="columns",
+            )
+        lvlone, lvltwo = [], []
+        for instr in instruments:
+            lvlone.extend([instr] * 6)
+            lvltwo.extend(subheaders)
+        result.columns = MultiIndex.from_arrays([lvlone, lvltwo])
+
+        series = []
+        if drop_extras:
+            used_constituents = [
+                item for item in self.constituents if item.label in items
+            ]
+            series.extend(
+                [
+                    OpenTimeSeries.from_df(
+                        dframe=result[(item.label, "twr")],
+                        valuetype=ValueType.PRICE,
+                        baseccy=item.currency,
+                        local_ccy=item.local_ccy,
+                    )
+                    for item in used_constituents
+                ]
+            )
+            series.append(
+                OpenTimeSeries.from_df(
+                    dframe=result[(name, "twr")],
+                    valuetype=ValueType.PRICE,
+                    baseccy=currency,
+                    local_ccy=True,
+                ),
+            )
+        else:
+            series.extend(
+                [
+                    OpenTimeSeries.from_df(
+                        dframe=result.loc[:, col],
+                        valuetype=ValueType.PRICE,
+                        baseccy=currency,
+                        local_ccy=True,
+                    ).set_new_label(f"{col[0]}, {col[1]!s}")
+                    for col in result.columns
+                ]
+            )
+
+        return OpenFrame(series)

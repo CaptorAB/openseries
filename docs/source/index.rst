@@ -112,6 +112,7 @@ Documentation Contents
    examples/single_asset
    examples/multi_asset
    examples/portfolio_optimization
+   examples/rebalanced_portfolio
    examples/custom_reports
 
 .. toctree::

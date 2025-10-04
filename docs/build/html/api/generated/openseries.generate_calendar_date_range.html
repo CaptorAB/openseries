@@ -62,6 +62,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -73,10 +74,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../openseries.html#date-utilities">Date Utilities</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="openseries.date_fix.html">openseries.date_fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.date_offset_foll.html">openseries.date_offset_foll</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.generate_calendar_date_range</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.generate_calendar_date_range"><code class="docutils literal notranslate"><span class="pre">generate_calendar_date_range()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.generate_calendar_date_range</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.get_previous_business_day_before_today.html">openseries.get_previous_business_day_before_today</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.holiday_calendar.html">openseries.holiday_calendar</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.offset_business_days.html">openseries.offset_business_days</a></li>
@@ -129,8 +127,8 @@
   <section id="openseries-generate-calendar-date-range">
 <h1>openseries.generate_calendar_date_range<a class="headerlink" href="#openseries-generate-calendar-date-range" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="openseries.generate_calendar_date_range">
-<span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">generate_calendar_date_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">countries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_holidays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/datefixer.html#generate_calendar_date_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.generate_calendar_date_range" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">generate_calendar_date_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">countries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_holidays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/datefixer.html#generate_calendar_date_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Generate a list of business day calendar dates.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>

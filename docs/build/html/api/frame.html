@@ -62,6 +62,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -181,7 +182,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>constituents</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.series.OpenTimeSeries"><em>OpenTimeSeries</em></a><em>]</em>)</p></li>
+<li><p><strong>constituents</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><em>OpenTimeSeries</em><em>]</em>)</p></li>
 <li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
@@ -193,7 +194,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">constituents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries"><span class="pre">OpenTimeSeries</span></a><span class="p"><span class="pre">]</span></span></em></dt>
+<span class="sig-name descname"><span class="pre">constituents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">OpenTimeSeries</span><span class="p"><span class="pre">]</span></span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -325,7 +326,7 @@
 
 <dl class="py property">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">columns_lvl_one</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><span class="pre">ValueType</span></a><span class="p"><span class="pre">]</span></span></em></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">columns_lvl_one</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ValueType</span><span class="p"><span class="pre">]</span></span></em></dt>
 <dd><p>Level 1 values of the MultiIndex columns in the .tsdf DataFrame.</p>
 <section id="id11">
 <h3>Returns:<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
@@ -615,7 +616,7 @@ in the frame.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>new_series</strong> (<a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.series.OpenTimeSeries"><em>OpenTimeSeries</em></a>)</p></li>
+<li><p><strong>new_series</strong> (<em>OpenTimeSeries</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -759,7 +760,7 @@ comparisons</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
-<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
@@ -808,7 +809,7 @@ comparisons</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
-<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
@@ -864,7 +865,7 @@ comparisons</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
 <li><p><strong>ratio</strong> (<em>LiteralCaptureRatio</em>)</p></li>
-<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
@@ -905,8 +906,8 @@ of the market. <a class="reference external" href="https://www.investopedia.com/
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>dlta_degr_freedms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 </ul>
 </dd>
@@ -944,8 +945,8 @@ using Ordinary Least Squares fit</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>y_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>x_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>y_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>x_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>fitted_series</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
@@ -989,8 +990,8 @@ This metric is also commonly referred to as simply alpha.
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>riskfree_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>)</p></li>
 <li><p><strong>dlta_degr_freedms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 </ul>
@@ -1078,12 +1079,6 @@ difference between the fund and its index returns.</p>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True,</span> <span class="pre">'revalidate_instances':</span> <span class="pre">'always',</span> <span class="pre">'validate_assignment':</span> <span class="pre">True}</span></em></dt>
-<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">rolling_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">market_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">21</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.rolling_beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
@@ -1124,6 +1119,12 @@ of the market. <a class="reference external" href="https://www.investopedia.com/
 <dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True,</span> <span class="pre">'revalidate_instances':</span> <span class="pre">'always',</span> <span class="pre">'validate_assignment':</span> <span class="pre">True}</span></em></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1204,11 +1205,60 @@ and the regression coefficients</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>dependent_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>]</em>)</p></li>
+<li><p><strong>dependent_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>]</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>, <a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.series.OpenTimeSeries"><em>OpenTimeSeries</em></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>, <em>OpenTimeSeries</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">rebalanced_portfolio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bal_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cash_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_extras</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.rebalanced_portfolio"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Create a rebalanced portfolio from the OpenFrame constituents.</p>
+<section id="id55">
+<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>name: str</dt><dd><p>Name of the portfolio</p>
+</dd>
+<dt>items: list[str], optional</dt><dd><p>List of items to include in the portfolio. If None, uses all items.</p>
+</dd>
+<dt>bal_weights: list[float], optional</dt><dd><p>List of weights for rebalancing. If None, uses frame weights.</p>
+</dd>
+<dt>frequency: int, default: 1</dt><dd><p>Rebalancing frequency</p>
+</dd>
+<dt>cash_index: OpenTimeSeries, optional</dt><dd><p>Cash index series for cash component</p>
+</dd>
+<dt>equal_weights: bool, default: False</dt><dd><p>If True, use equal weights for all items</p>
+</dd>
+<dt>drop_extras: bool, default: True</dt><dd><p>If True, only return TWR series; if False, return all details</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h3>Returns:<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>OpenFrame</dt><dd><p>OpenFrame containing the rebalanced portfolio</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>bal_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>cash_index</strong> (<em>OpenTimeSeries</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>equal_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+<li><p><strong>drop_extras</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>OpenFrame</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1217,7 +1267,7 @@ and the regression coefficients</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>constituents</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.series.OpenTimeSeries"><em>OpenTimeSeries</em></a><em>]</em>)</p></li>
+<li><p><strong>constituents</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><em>OpenTimeSeries</em><em>]</em>)</p></li>
 <li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
@@ -1238,8 +1288,8 @@ and the regression coefficients</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">from_deepcopy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.from_deepcopy"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create copy of the OpenFrame object.</p>
-<section id="id55">
-<h3>Returns:<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
+<section id="id57">
+<h3>Returns:<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -1262,15 +1312,15 @@ and the regression coefficients</p></li>
 <h3>Frame-specific Properties<a class="headerlink" href="#frame-specific-properties" title="Link to this heading"></a></h3>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">constituents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries"><span class="pre">OpenTimeSeries</span></a><span class="p"><span class="pre">]</span></span></em></dt>
+<span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">constituents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">OpenTimeSeries</span><span class="p"><span class="pre">]</span></span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">columns_lvl_zero</span></span></dt>
 <dd><p>Level 0 values of the MultiIndex columns in the .tsdf DataFrame.</p>
-<section id="id56">
-<h4>Returns:<a class="headerlink" href="#id56" title="Link to this heading"></a></h4>
+<section id="id58">
+<h4>Returns:<a class="headerlink" href="#id58" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>list[str]</dt><dd><p>Level 0 values of the MultiIndex columns in the .tsdf DataFrame</p>
 </dd>
@@ -1282,8 +1332,8 @@ and the regression coefficients</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">columns_lvl_one</span></span></dt>
 <dd><p>Level 1 values of the MultiIndex columns in the .tsdf DataFrame.</p>
-<section id="id57">
-<h4>Returns:<a class="headerlink" href="#id57" title="Link to this heading"></a></h4>
+<section id="id59">
+<h4>Returns:<a class="headerlink" href="#id59" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>list[ValueType]</dt><dd><p>Level 1 values of the MultiIndex columns in the .tsdf DataFrame</p>
 </dd>
@@ -1295,8 +1345,8 @@ and the regression coefficients</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">item_count</span></span></dt>
 <dd><p>Number of constituents.</p>
-<section id="id58">
-<h4>Returns:<a class="headerlink" href="#id58" title="Link to this heading"></a></h4>
+<section id="id60">
+<h4>Returns:<a class="headerlink" href="#id60" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>int</dt><dd><p>Number of constituents</p>
 </dd>
@@ -1313,8 +1363,8 @@ and the regression coefficients</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">first_indices</span></span></dt>
 <dd><p>The first dates in the timeseries of all constituents.</p>
-<section id="id59">
-<h4>Returns:<a class="headerlink" href="#id59" title="Link to this heading"></a></h4>
+<section id="id61">
+<h4>Returns:<a class="headerlink" href="#id61" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.Series[dt.date]</dt><dd><p>The first dates in the timeseries of all constituents</p>
 </dd>
@@ -1326,8 +1376,8 @@ and the regression coefficients</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">last_indices</span></span></dt>
 <dd><p>The last dates in the timeseries of all constituents.</p>
-<section id="id60">
-<h4>Returns:<a class="headerlink" href="#id60" title="Link to this heading"></a></h4>
+<section id="id62">
+<h4>Returns:<a class="headerlink" href="#id62" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.Series[dt.date]</dt><dd><p>The last dates in the timeseries of all constituents</p>
 </dd>
@@ -1339,8 +1389,8 @@ and the regression coefficients</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">lengths_of_items</span></span></dt>
 <dd><p>Number of observations of all constituents.</p>
-<section id="id61">
-<h4>Returns:<a class="headerlink" href="#id61" title="Link to this heading"></a></h4>
+<section id="id63">
+<h4>Returns:<a class="headerlink" href="#id63" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.Series[int]</dt><dd><p>Number of observations of all constituents</p>
 </dd>
@@ -1352,8 +1402,8 @@ and the regression coefficients</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">span_of_days_all</span></span></dt>
 <dd><p>Number of days from the first date to the last for all items in the frame.</p>
-<section id="id62">
-<h4>Returns:<a class="headerlink" href="#id62" title="Link to this heading"></a></h4>
+<section id="id64">
+<h4>Returns:<a class="headerlink" href="#id64" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.Series[int]</dt><dd><p>Number of days from the first date to the last for all
 items in the frame.</p>
@@ -1369,8 +1419,8 @@ items in the frame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">first_idx</span></span></dt>
 <dd><p>The first date in the timeseries.</p>
-<section id="id63">
-<h4>Returns:<a class="headerlink" href="#id63" title="Link to this heading"></a></h4>
+<section id="id65">
+<h4>Returns:<a class="headerlink" href="#id65" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>datetime.date</dt><dd><p>The first date in the timeseries</p>
 </dd>
@@ -1382,8 +1432,8 @@ items in the frame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">last_idx</span></span></dt>
 <dd><p>The last date in the timeseries.</p>
-<section id="id64">
-<h4>Returns:<a class="headerlink" href="#id64" title="Link to this heading"></a></h4>
+<section id="id66">
+<h4>Returns:<a class="headerlink" href="#id66" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>datetime.date</dt><dd><p>The last date in the timeseries</p>
 </dd>
@@ -1395,8 +1445,8 @@ items in the frame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">length</span></span></dt>
 <dd><p>Number of observations.</p>
-<section id="id65">
-<h4>Returns:<a class="headerlink" href="#id65" title="Link to this heading"></a></h4>
+<section id="id67">
+<h4>Returns:<a class="headerlink" href="#id67" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>int</dt><dd><p>Number of observations</p>
 </dd>
@@ -1408,8 +1458,8 @@ items in the frame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">span_of_days</span></span></dt>
 <dd><p>Number of days from the first date to the last.</p>
-<section id="id66">
-<h4>Returns:<a class="headerlink" href="#id66" title="Link to this heading"></a></h4>
+<section id="id68">
+<h4>Returns:<a class="headerlink" href="#id68" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>int</dt><dd><p>Number of days from the first date to the last</p>
 </dd>
@@ -1427,8 +1477,8 @@ items in the frame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">max_drawdown_date</span></span></dt>
 <dd><p>Date when the maximum drawdown occurred.</p>
 <p><a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
-<section id="id67">
-<h4>Returns:<a class="headerlink" href="#id67" title="Link to this heading"></a></h4>
+<section id="id69">
+<h4>Returns:<a class="headerlink" href="#id69" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>datetime.date | pandas.Series[dt.date]</dt><dd><p>Date when the maximum drawdown occurred</p>
 </dd>
@@ -1440,8 +1490,8 @@ items in the frame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">periods_in_a_year</span></span></dt>
 <dd><p>The average number of observations per year.</p>
-<section id="id68">
-<h4>Returns:<a class="headerlink" href="#id68" title="Link to this heading"></a></h4>
+<section id="id70">
+<h4>Returns:<a class="headerlink" href="#id70" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>The average number of observations per year</p>
 </dd>
@@ -1453,8 +1503,8 @@ items in the frame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">yearfrac</span></span></dt>
 <dd><p>Length of series expressed in years assuming all years have 365.25 days.</p>
-<section id="id69">
-<h4>Returns:<a class="headerlink" href="#id69" title="Link to this heading"></a></h4>
+<section id="id71">
+<h4>Returns:<a class="headerlink" href="#id71" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>Length of the timeseries expressed in years assuming all years
 have 365.25 days</p>
@@ -1486,8 +1536,8 @@ have 365.25 days</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">arithmetic_ret</span></span></dt>
 <dd><p>//www.investopedia.com/terms/a/arithmeticmean.asp.</p>
-<section id="id70">
-<h4>Returns:<a class="headerlink" href="#id70" title="Link to this heading"></a></h4>
+<section id="id72">
+<h4>Returns:<a class="headerlink" href="#id72" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Annualized arithmetic mean of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1505,8 +1555,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">geo_ret</span></span></dt>
 <dd><p>//www.investopedia.com/terms/c/cagr.asp.</p>
-<section id="id71">
-<h4>Returns:<a class="headerlink" href="#id71" title="Link to this heading"></a></h4>
+<section id="id73">
+<h4>Returns:<a class="headerlink" href="#id73" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Compounded Annual Growth Rate (CAGR).
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1524,8 +1574,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">value_ret</span></span></dt>
 <dd><p>Simple return.</p>
-<section id="id72">
-<h4>Returns:<a class="headerlink" href="#id72" title="Link to this heading"></a></h4>
+<section id="id74">
+<h4>Returns:<a class="headerlink" href="#id74" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Simple return.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1540,8 +1590,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dd><p>Annualized volatility.</p>
 <p>Based on Pandas .std() which is the equivalent of stdev.s([…]) in MS Excel.
 <a class="reference external" href="https://www.investopedia.com/terms/v/volatility.asp">https://www.investopedia.com/terms/v/volatility.asp</a>.</p>
-<section id="id73">
-<h4>Returns:<a class="headerlink" href="#id73" title="Link to this heading"></a></h4>
+<section id="id75">
+<h4>Returns:<a class="headerlink" href="#id75" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Annualized volatility.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1557,8 +1607,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <p>Standard deviation of returns that are below a Minimum Accepted Return
 of zero. It is used to calculate the Sortino Ratio.
 <a class="reference external" href="https://www.investopedia.com/terms/d/downside-deviation.asp">https://www.investopedia.com/terms/d/downside-deviation.asp</a>.</p>
-<section id="id74">
-<h4>Returns:<a class="headerlink" href="#id74" title="Link to this heading"></a></h4>
+<section id="id76">
+<h4>Returns:<a class="headerlink" href="#id76" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside deviation.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1571,8 +1621,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">ret_vol_ratio</span></span></dt>
 <dd><p>Ratio of annualized arithmetic mean of returns and annualized volatility.</p>
-<section id="id75">
-<h4>Returns:<a class="headerlink" href="#id75" title="Link to this heading"></a></h4>
+<section id="id77">
+<h4>Returns:<a class="headerlink" href="#id77" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Ratio of the annualized arithmetic mean of returns and annualized
 volatility.
@@ -1586,8 +1636,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">sortino_ratio</span></span></dt>
 <dd><p>//www.investopedia.com/terms/s/sortinoratio.asp.</p>
-<section id="id76">
-<h4>Returns:<a class="headerlink" href="#id76" title="Link to this heading"></a></h4>
+<section id="id78">
+<h4>Returns:<a class="headerlink" href="#id78" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Sortino ratio calculated as the annualized arithmetic mean of returns
 / downside deviation. The ratio implies that the riskfree asset has zero
@@ -1612,8 +1662,8 @@ annualized arithmetic return divided by the cubic-root of the
 lower partial moment of order 3 (with respect to a minimum acceptable
 return, MAR). It penalizes larger downside outcomes more heavily than
 the Sortino ratio (which uses order 2).</p>
-<section id="id77">
-<h4>Returns:<a class="headerlink" href="#id77" title="Link to this heading"></a></h4>
+<section id="id79">
+<h4>Returns:<a class="headerlink" href="#id79" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Kappa-3 ratio calculation with the riskfree rate and.
 Minimum Acceptable Return (MAR) both set to zero.
@@ -1627,8 +1677,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">omega_ratio</span></span></dt>
 <dd><p>//en.wikipedia.org/wiki/Omega_ratio.</p>
-<section id="id78">
-<h4>Returns:<a class="headerlink" href="#id78" title="Link to this heading"></a></h4>
+<section id="id80">
+<h4>Returns:<a class="headerlink" href="#id80" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Omega ratio calculation.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1648,8 +1698,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dd><p>Downside 95% Value At Risk (VaR).</p>
 <p>The equivalent of percentile.inc([…], 1-level) over returns in MS Excel.
 <a class="reference external" href="https://www.investopedia.com/terms/v/var.asp">https://www.investopedia.com/terms/v/var.asp</a>.</p>
-<section id="id79">
-<h4>Returns:<a class="headerlink" href="#id79" title="Link to this heading"></a></h4>
+<section id="id81">
+<h4>Returns:<a class="headerlink" href="#id81" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside 95% Value At Risk (VaR).
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1662,8 +1712,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">cvar_down</span></span></dt>
 <dd><p>//www.investopedia.com/terms/c/conditional_value_at_risk.asp.</p>
-<section id="id80">
-<h4>Returns:<a class="headerlink" href="#id80" title="Link to this heading"></a></h4>
+<section id="id82">
+<h4>Returns:<a class="headerlink" href="#id82" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside 95% Conditional Value At Risk “CVaR”.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1681,8 +1731,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">worst</span></span></dt>
 <dd><p>Most negative percentage change.</p>
-<section id="id81">
-<h4>Returns:<a class="headerlink" href="#id81" title="Link to this heading"></a></h4>
+<section id="id83">
+<h4>Returns:<a class="headerlink" href="#id83" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Most negative percentage change.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1695,8 +1745,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">worst_month</span></span></dt>
 <dd><p>Most negative month.</p>
-<section id="id82">
-<h4>Returns:<a class="headerlink" href="#id82" title="Link to this heading"></a></h4>
+<section id="id84">
+<h4>Returns:<a class="headerlink" href="#id84" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Most negative month.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1709,8 +1759,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">max_drawdown</span></span></dt>
 <dd><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p>
-<section id="id83">
-<h4>Returns:<a class="headerlink" href="#id83" title="Link to this heading"></a></h4>
+<section id="id85">
+<h4>Returns:<a class="headerlink" href="#id85" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Maximum drawdown without any limit on date range.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1728,8 +1778,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">max_drawdown_cal_year</span></span></dt>
 <dd><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p>
-<section id="id84">
-<h4>Returns:<a class="headerlink" href="#id84" title="Link to this heading"></a></h4>
+<section id="id86">
+<h4>Returns:<a class="headerlink" href="#id86" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Maximum drawdown in a single calendar year.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1747,8 +1797,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">positive_share</span></span></dt>
 <dd><p>The share of percentage changes that are greater than zero.</p>
-<section id="id85">
-<h4>Returns:<a class="headerlink" href="#id85" title="Link to this heading"></a></h4>
+<section id="id87">
+<h4>Returns:<a class="headerlink" href="#id87" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>The share of percentage changes that are greater than zero.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1762,8 +1812,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">vol_from_var</span></span></dt>
 <dd><p>Implied annualized volatility from Downside 95% Value at Risk.</p>
 <p>Assumes that returns are normally distributed.</p>
-<section id="id86">
-<h4>Returns:<a class="headerlink" href="#id86" title="Link to this heading"></a></h4>
+<section id="id88">
+<h4>Returns:<a class="headerlink" href="#id88" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Implied annualized volatility from the Downside 95% VaR using the
 assumption that returns are normally distributed.
@@ -1777,8 +1827,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">skew</span></span></dt>
 <dd><p>//www.investopedia.com/terms/s/skewness.asp.</p>
-<section id="id87">
-<h4>Returns:<a class="headerlink" href="#id87" title="Link to this heading"></a></h4>
+<section id="id89">
+<h4>Returns:<a class="headerlink" href="#id89" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Skew of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1796,8 +1846,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">kurtosis</span></span></dt>
 <dd><p>//www.investopedia.com/terms/k/kurtosis.asp.</p>
-<section id="id88">
-<h4>Returns:<a class="headerlink" href="#id88" title="Link to this heading"></a></h4>
+<section id="id90">
+<h4>Returns:<a class="headerlink" href="#id90" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Kurtosis of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1815,8 +1865,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">z_score</span></span></dt>
 <dd><p>//www.investopedia.com/terms/z/zscore.asp.</p>
-<section id="id89">
-<h4>Returns:<a class="headerlink" href="#id89" title="Link to this heading"></a></h4>
+<section id="id91">
+<h4>Returns:<a class="headerlink" href="#id91" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Z-score as (last return - mean return) / standard deviation of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1840,15 +1890,15 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">merge_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">how</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'outer'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.merge_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Merge index of Pandas Dataframes of the constituent OpenTimeSeries.</p>
-<section id="id90">
-<h4>Parameters<a class="headerlink" href="#id90" title="Link to this heading"></a></h4>
+<section id="id92">
+<h4>Parameters<a class="headerlink" href="#id92" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>how: LiteralHowMerge, default: “outer”</dt><dd><p>The Pandas merge method.</p>
 </dd>
 </dl>
 </section>
-<section id="id91">
-<h4>Returns:<a class="headerlink" href="#id91" title="Link to this heading"></a></h4>
+<section id="id93">
+<h4>Returns:<a class="headerlink" href="#id93" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -1871,8 +1921,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">trunc_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.trunc_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Truncate DataFrame such that all timeseries have the same time span.</p>
-<section id="id92">
-<h4>Parameters<a class="headerlink" href="#id92" title="Link to this heading"></a></h4>
+<section id="id94">
+<h4>Parameters<a class="headerlink" href="#id94" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>start_cut: datetime.date, optional</dt><dd><p>New first date</p>
 </dd>
@@ -1883,8 +1933,8 @@ or end_cut is None.</p>
 </dd>
 </dl>
 </section>
-<section id="id93">
-<h4>Returns:<a class="headerlink" href="#id93" title="Link to this heading"></a></h4>
+<section id="id95">
+<h4>Returns:<a class="headerlink" href="#id95" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -1909,15 +1959,15 @@ or end_cut is None.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">add_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_series</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.add_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>To add an OpenTimeSeries object.</p>
-<section id="id94">
-<h4>Parameters<a class="headerlink" href="#id94" title="Link to this heading"></a></h4>
+<section id="id96">
+<h4>Parameters<a class="headerlink" href="#id96" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>new_series: OpenTimeSeries</dt><dd><p>The timeseries to add</p>
 </dd>
 </dl>
 </section>
-<section id="id95">
-<h4>Returns:<a class="headerlink" href="#id95" title="Link to this heading"></a></h4>
+<section id="id97">
+<h4>Returns:<a class="headerlink" href="#id97" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -1927,7 +1977,7 @@ or end_cut is None.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>new_series</strong> (<a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.series.OpenTimeSeries"><em>OpenTimeSeries</em></a>)</p></li>
+<li><p><strong>new_series</strong> (<em>OpenTimeSeries</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1940,15 +1990,15 @@ or end_cut is None.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">delete_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lvl_zero_item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.delete_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>To delete an OpenTimeSeries object.</p>
-<section id="id96">
-<h4>Parameters<a class="headerlink" href="#id96" title="Link to this heading"></a></h4>
+<section id="id98">
+<h4>Parameters<a class="headerlink" href="#id98" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>lvl_zero_item: str</dt><dd><p>The .tsdf column level 0 value of the timeseries to delete</p>
 </dd>
 </dl>
 </section>
-<section id="id97">
-<h4>Returns:<a class="headerlink" href="#id97" title="Link to this heading"></a></h4>
+<section id="id99">
+<h4>Returns:<a class="headerlink" href="#id99" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -1974,8 +2024,8 @@ or end_cut is None.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">relative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">long_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">short_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_zero</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.relative"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate cumulative relative return between two series.</p>
-<section id="id98">
-<h4>Parameters<a class="headerlink" href="#id98" title="Link to this heading"></a></h4>
+<section id="id100">
+<h4>Parameters<a class="headerlink" href="#id100" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>long_column: int, default: 0</dt><dd><p>Column number of timeseries bought</p>
 </dd>
@@ -2005,8 +2055,8 @@ to allow a volatility calculation</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">make_portfolio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_strat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.make_portfolio"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate a basket timeseries based on the supplied weights.</p>
-<section id="id99">
-<h4>Parameters<a class="headerlink" href="#id99" title="Link to this heading"></a></h4>
+<section id="id101">
+<h4>Parameters<a class="headerlink" href="#id101" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>name: str</dt><dd><p>Name of the basket timeseries</p>
 </dd>
@@ -2014,8 +2064,8 @@ to allow a volatility calculation</p>
 </dd>
 </dl>
 </section>
-<section id="id100">
-<h4>Returns:<a class="headerlink" href="#id100" title="Link to this heading"></a></h4>
+<section id="id102">
+<h4>Returns:<a class="headerlink" href="#id102" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>A basket timeseries</p>
 </dd>
@@ -2035,6 +2085,55 @@ to allow a volatility calculation</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">rebalanced_portfolio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bal_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cash_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_extras</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.rebalanced_portfolio"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Create a rebalanced portfolio from the OpenFrame constituents.</p>
+<section id="id103">
+<h4>Parameters<a class="headerlink" href="#id103" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>name: str</dt><dd><p>Name of the portfolio</p>
+</dd>
+<dt>items: list[str], optional</dt><dd><p>List of items to include in the portfolio. If None, uses all items.</p>
+</dd>
+<dt>bal_weights: list[float], optional</dt><dd><p>List of weights for rebalancing. If None, uses frame weights.</p>
+</dd>
+<dt>frequency: int, default: 1</dt><dd><p>Rebalancing frequency</p>
+</dd>
+<dt>cash_index: OpenTimeSeries, optional</dt><dd><p>Cash index series for cash component</p>
+</dd>
+<dt>equal_weights: bool, default: False</dt><dd><p>If True, use equal weights for all items</p>
+</dd>
+<dt>drop_extras: bool, default: True</dt><dd><p>If True, only return TWR series; if False, return all details</p>
+</dd>
+</dl>
+</section>
+<section id="id104">
+<h4>Returns:<a class="headerlink" href="#id104" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>OpenFrame</dt><dd><p>OpenFrame containing the rebalanced portfolio</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>bal_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>cash_index</strong> (<em>OpenTimeSeries</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>equal_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+<li><p><strong>drop_extras</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>OpenFrame</em></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="statistical-analysis">
 <h3>Statistical Analysis<a class="headerlink" href="#statistical-analysis" title="Link to this heading"></a></h3>
@@ -2044,8 +2143,8 @@ to allow a volatility calculation</p>
 <dd><p>Ordinary Least Squares fit.</p>
 <p>Performs a linear regression and adds a new column with a fitted line
 using Ordinary Least Squares fit</p>
-<section id="id101">
-<h4>Parameters<a class="headerlink" href="#id101" title="Link to this heading"></a></h4>
+<section id="id105">
+<h4>Parameters<a class="headerlink" href="#id105" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>y_column: tuple[str, ValueType] | int</dt><dd><p>The column level values of the dependent variable y</p>
 </dd>
@@ -2055,8 +2154,8 @@ using Ordinary Least Squares fit</p>
 </dd>
 </dl>
 </section>
-<section id="id102">
-<h4>Returns:<a class="headerlink" href="#id102" title="Link to this heading"></a></h4>
+<section id="id106">
+<h4>Returns:<a class="headerlink" href="#id106" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>dict[str, float]</dt><dd><p>A dictionary with the coefficient, intercept and rsquared outputs.</p>
 </dd>
@@ -2066,8 +2165,8 @@ using Ordinary Least Squares fit</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>y_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>x_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>y_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>x_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>fitted_series</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
@@ -2083,8 +2182,8 @@ using Ordinary Least Squares fit</p>
 <dd><p>Market Beta.</p>
 <p>Calculates Beta as Co-variance of asset &amp; market divided by Variance
 of the market. <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
-<section id="id103">
-<h4>Parameters<a class="headerlink" href="#id103" title="Link to this heading"></a></h4>
+<section id="id107">
+<h4>Parameters<a class="headerlink" href="#id107" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>asset: tuple[str, ValueType] | int</dt><dd><p>The column of the asset</p>
 </dd>
@@ -2094,8 +2193,8 @@ of the market. <a class="reference external" href="https://www.investopedia.com/
 </dd>
 </dl>
 </section>
-<section id="id104">
-<h4>Returns:<a class="headerlink" href="#id104" title="Link to this heading"></a></h4>
+<section id="id108">
+<h4>Returns:<a class="headerlink" href="#id108" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>Beta as Co-variance of x &amp; y divided by Variance of x</p>
 </dd>
@@ -2105,8 +2204,8 @@ of the market. <a class="reference external" href="https://www.investopedia.com/
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>dlta_degr_freedms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 </ul>
 </dd>
@@ -2126,8 +2225,8 @@ above or below that predicted by the capital asset pricing model (CAPM),
 given the portfolio’s or investment’s beta and the average market return.
 This metric is also commonly referred to as simply alpha.
 <a class="reference external" href="https://www.investopedia.com/terms/j/jensensmeasure.asp">https://www.investopedia.com/terms/j/jensensmeasure.asp</a>.</p>
-<section id="id105">
-<h4>Parameters<a class="headerlink" href="#id105" title="Link to this heading"></a></h4>
+<section id="id109">
+<h4>Parameters<a class="headerlink" href="#id109" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>asset: tuple[str, ValueType] | int</dt><dd><p>The column of the asset</p>
 </dd>
@@ -2139,8 +2238,8 @@ This metric is also commonly referred to as simply alpha.
 </dd>
 </dl>
 </section>
-<section id="id106">
-<h4>Returns:<a class="headerlink" href="#id106" title="Link to this heading"></a></h4>
+<section id="id110">
+<h4>Returns:<a class="headerlink" href="#id110" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>Jensen’s alpha</p>
 </dd>
@@ -2150,8 +2249,8 @@ This metric is also commonly referred to as simply alpha.
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>asset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>market</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>riskfree_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>)</p></li>
 <li><p><strong>dlta_degr_freedms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 </ul>
@@ -2169,8 +2268,8 @@ This metric is also commonly referred to as simply alpha.
 <p>Calculates Tracking Error which is the standard deviation of the
 difference between the fund and its index returns.
 <a class="reference external" href="https://www.investopedia.com/terms/t/trackingerror.asp">https://www.investopedia.com/terms/t/trackingerror.asp</a>.</p>
-<section id="id107">
-<h4>Parameters<a class="headerlink" href="#id107" title="Link to this heading"></a></h4>
+<section id="id111">
+<h4>Parameters<a class="headerlink" href="#id111" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>base_column: tuple[str, ValueType] | int, default: -1</dt><dd><p>Column of timeseries that is the denominator in the ratio.</p>
 </dd>
@@ -2186,8 +2285,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id108">
-<h4>Returns:<a class="headerlink" href="#id108" title="Link to this heading"></a></h4>
+<section id="id112">
+<h4>Returns:<a class="headerlink" href="#id112" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.Series[float]</dt><dd><p>Tracking Errors</p>
 </dd>
@@ -2197,7 +2296,7 @@ comparisons</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
-<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
@@ -2218,8 +2317,8 @@ comparisons</p>
 by the Tracking Error. And the Tracking Error is the standard deviation of
 the difference between the fund and its index returns.
 The ratio is calculated using the annualized arithmetic mean of returns.</p>
-<section id="id109">
-<h4>Parameters<a class="headerlink" href="#id109" title="Link to this heading"></a></h4>
+<section id="id113">
+<h4>Parameters<a class="headerlink" href="#id113" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>base_column: tuple[str, ValueType] | int, default: -1</dt><dd><p>Column of timeseries that is the denominator in the ratio.</p>
 </dd>
@@ -2235,8 +2334,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id110">
-<h4>Returns:<a class="headerlink" href="#id110" title="Link to this heading"></a></h4>
+<section id="id114">
+<h4>Returns:<a class="headerlink" href="#id114" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.Series[float]</dt><dd><p>Information Ratios</p>
 </dd>
@@ -2246,7 +2345,7 @@ comparisons</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
-<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
@@ -2271,8 +2370,8 @@ Source: ‘Capture Ratios: A Popular Method of Measuring Portfolio Performance
 in Practice’, Don R. Cox and Delbert C. Goff, Journal of Economics and
 Finance Education (Vol 2 Winter 2013).
 <a class="reference external" href="https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf">https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf</a>.</p>
-<section id="id111">
-<h4>Parameters<a class="headerlink" href="#id111" title="Link to this heading"></a></h4>
+<section id="id115">
+<h4>Parameters<a class="headerlink" href="#id115" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>ratio: LiteralCaptureRatio</dt><dd><p>The ratio to calculate</p>
 </dd>
@@ -2290,8 +2389,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id112">
-<h4>Returns:<a class="headerlink" href="#id112" title="Link to this heading"></a></h4>
+<section id="id116">
+<h4>Returns:<a class="headerlink" href="#id116" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.Series[float]</dt><dd><p>Capture Ratios</p>
 </dd>
@@ -2302,7 +2401,7 @@ comparisons</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
 <li><p><strong>ratio</strong> (<em>LiteralCaptureRatio</em>)</p></li>
-<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
+<li><p><strong>base_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
@@ -2323,16 +2422,16 @@ comparisons</p>
 variable (y) and uses all remaining columns as independent variables (X).
 It utilizes a scikit-learn LinearRegression model and returns a DataFrame
 with summary output and an OpenTimeSeries of predicted values.</p>
-<section id="id113">
-<h4>Parameters<a class="headerlink" href="#id113" title="Link to this heading"></a></h4>
+<section id="id117">
+<h4>Parameters<a class="headerlink" href="#id117" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>dependent_column: tuple[str, ValueType]</dt><dd><p>A tuple key to select the column in the OpenFrame.tsdf.columns
 to use as the dependent variable</p>
 </dd>
 </dl>
 </section>
-<section id="id114">
-<h4>Returns:<a class="headerlink" href="#id114" title="Link to this heading"></a></h4>
+<section id="id118">
+<h4>Returns:<a class="headerlink" href="#id118" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>tuple[pandas.DataFrame, OpenTimeSeries]</dt><dd><ul class="simple">
 <li><p>A DataFrame with the R-squared, the intercept
@@ -2354,11 +2453,11 @@ and the regression coefficients</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>dependent_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em>]</em>)</p></li>
+<li><p><strong>dependent_column</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>ValueType</em><em>]</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>, <a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.series.OpenTimeSeries"><em>OpenTimeSeries</em></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>, <em>OpenTimeSeries</em>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2373,8 +2472,8 @@ and the regression coefficients</p></li>
 <p>The Information Ratio equals ( fund return less index return ) divided by
 the Tracking Error. And the Tracking Error is the standard deviation of the
 difference between the fund and its index returns.</p>
-<section id="id115">
-<h4>Parameters<a class="headerlink" href="#id115" title="Link to this heading"></a></h4>
+<section id="id119">
+<h4>Parameters<a class="headerlink" href="#id119" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>long_column: int, default: 0</dt><dd><p>Column of timeseries that is the numerator in the ratio.</p>
 </dd>
@@ -2386,8 +2485,8 @@ difference between the fund and its index returns.</p>
 </dd>
 </dl>
 </section>
-<section id="id116">
-<h4>Returns:<a class="headerlink" href="#id116" title="Link to this heading"></a></h4>
+<section id="id120">
+<h4>Returns:<a class="headerlink" href="#id120" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Rolling Information Ratios</p>
 </dd>
@@ -2415,8 +2514,8 @@ difference between the fund and its index returns.</p>
 <dd><p>Calculate rolling Market Beta.</p>
 <p>Calculates Beta as Co-variance of asset &amp; market divided by Variance
 of the market. <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
-<section id="id117">
-<h4>Parameters<a class="headerlink" href="#id117" title="Link to this heading"></a></h4>
+<section id="id121">
+<h4>Parameters<a class="headerlink" href="#id121" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>asset_column: int, default: 0</dt><dd><p>Column of timeseries that is the asset.</p>
 </dd>
@@ -2428,8 +2527,8 @@ of the market. <a class="reference external" href="https://www.investopedia.com/
 </dd>
 </dl>
 </section>
-<section id="id118">
-<h4>Returns:<a class="headerlink" href="#id118" title="Link to this heading"></a></h4>
+<section id="id122">
+<h4>Returns:<a class="headerlink" href="#id122" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Rolling Betas</p>
 </dd>
@@ -2457,8 +2556,8 @@ of the market. <a class="reference external" href="https://www.investopedia.com/
 <dd><p>Calculate rolling Correlation.</p>
 <p>Calculates correlation between two series. The period with
 at least the given number of observations is the first period calculated.</p>
-<section id="id119">
-<h4>Parameters<a class="headerlink" href="#id119" title="Link to this heading"></a></h4>
+<section id="id123">
+<h4>Parameters<a class="headerlink" href="#id123" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>first_column: int, default: 0</dt><dd><p>The position as integer of the first timeseries to compare</p>
 </dd>
@@ -2468,8 +2567,8 @@ at least the given number of observations is the first period calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id120">
-<h4>Returns:<a class="headerlink" href="#id120" title="Link to this heading"></a></h4>
+<section id="id124">
+<h4>Returns:<a class="headerlink" href="#id124" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Rolling Correlations</p>
 </dd>
@@ -2494,8 +2593,8 @@ at least the given number of observations is the first period calculated.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">rolling_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">21</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Calculate rolling returns.</p>
-<section id="id121">
-<h4>Parameters<a class="headerlink" href="#id121" title="Link to this heading"></a></h4>
+<section id="id125">
+<h4>Parameters<a class="headerlink" href="#id125" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>column: int, default: 0</dt><dd><p>Position as integer of column to calculate</p>
 </dd>
@@ -2503,8 +2602,8 @@ at least the given number of observations is the first period calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id122">
-<h4>Returns:<a class="headerlink" href="#id122" title="Link to this heading"></a></h4>
+<section id="id126">
+<h4>Returns:<a class="headerlink" href="#id126" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Calculate rolling returns</p>
 </dd>
@@ -2528,8 +2627,8 @@ at least the given number of observations is the first period calculated.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">rolling_vol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">21</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Calculate rolling annualised volatilities.</p>
-<section id="id123">
-<h4>Parameters<a class="headerlink" href="#id123" title="Link to this heading"></a></h4>
+<section id="id127">
+<h4>Parameters<a class="headerlink" href="#id127" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>column: int, default: 0</dt><dd><p>Position as integer of column to calculate</p>
 </dd>
@@ -2542,8 +2641,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id124">
-<h4>Returns:<a class="headerlink" href="#id124" title="Link to this heading"></a></h4>
+<section id="id128">
+<h4>Returns:<a class="headerlink" href="#id128" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Calculate rolling annualised volatilities</p>
 </dd>
@@ -2569,8 +2668,8 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">rolling_var_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Calculate rolling annualized downside Value At Risk “VaR”.</p>
-<section id="id125">
-<h4>Parameters<a class="headerlink" href="#id125" title="Link to this heading"></a></h4>
+<section id="id129">
+<h4>Parameters<a class="headerlink" href="#id129" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>column: int, default: 0</dt><dd><p>Position as integer of column to calculate</p>
 </dd>
@@ -2582,8 +2681,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id126">
-<h4>Returns:<a class="headerlink" href="#id126" title="Link to this heading"></a></h4>
+<section id="id130">
+<h4>Returns:<a class="headerlink" href="#id130" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Calculate rolling annualized downside Value At Risk “VaR”</p>
 </dd>
@@ -2609,8 +2708,8 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">rolling_cvar_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">252</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Calculate rolling annualized downside CVaR.</p>
-<section id="id127">
-<h4>Parameters<a class="headerlink" href="#id127" title="Link to this heading"></a></h4>
+<section id="id131">
+<h4>Parameters<a class="headerlink" href="#id131" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>column: int, default: 0</dt><dd><p>Position as integer of column to calculate</p>
 </dd>
@@ -2620,8 +2719,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id128">
-<h4>Returns:<a class="headerlink" href="#id128" title="Link to this heading"></a></h4>
+<section id="id132">
+<h4>Returns:<a class="headerlink" href="#id132" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Calculate rolling annualized downside CVaR</p>
 </dd>
@@ -2645,14 +2744,14 @@ comparisons</p>
 </section>
 <section id="correlation-and-risk">
 <h3>Correlation and Risk<a class="headerlink" href="#correlation-and-risk" title="Link to this heading"></a></h3>
-<dl class="py method">
+<dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">correl_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">correl_matrix</span></span></dt>
 <dd><p>Correlation matrix.</p>
 <p>This property returns the correlation matrix of the time series
 in the frame.</p>
-<section id="id129">
-<h4>Returns:<a class="headerlink" href="#id129" title="Link to this heading"></a></h4>
+<section id="id133">
+<h4>Returns:<a class="headerlink" href="#id133" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>pandas.DataFrame</dt><dd><p>Correlation matrix of the time series in the frame.</p>
 </dd>
@@ -2666,8 +2765,8 @@ in the frame.</p>
 <dd><p>Exponentially Weighted Moving Average Volatilities and Correlation.</p>
 <p>Exponentially Weighted Moving Average (EWMA) for Volatilities and
 Correlation. <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
-<section id="id130">
-<h4>Parameters<a class="headerlink" href="#id130" title="Link to this heading"></a></h4>
+<section id="id134">
+<h4>Parameters<a class="headerlink" href="#id134" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>lmbda: float, default: 0.94</dt><dd><p>Scaling factor to determine weighting.</p>
 </dd>
@@ -2693,8 +2792,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id131">
-<h4>Returns:<a class="headerlink" href="#id131" title="Link to this heading"></a></h4>
+<section id="id135">
+<h4>Returns:<a class="headerlink" href="#id135" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Pandas.DataFrame</dt><dd><p>Series volatilities and correlation</p>
 </dd>
@@ -2729,8 +2828,8 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">align_index_to_local_cdays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">countries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_holidays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Align the index of .tsdf with local calendar business days.</p>
-<section id="id132">
-<h4>Parameters<a class="headerlink" href="#id132" title="Link to this heading"></a></h4>
+<section id="id136">
+<h4>Parameters<a class="headerlink" href="#id136" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>countries: CountriesType, optional</dt><dd><p>(List of) country code(s) according to ISO 3166-1 alpha-2</p>
 </dd>
@@ -2738,11 +2837,12 @@ comparisons</p>
 </dd>
 <dt>custom_holidays: list[str] | str, optional</dt><dd><p>Argument where missing holidays can be added</p>
 </dd>
+<dt>method: LiteralPandasReindexMethod, default: “nearest”</dt><dd><p>Method for reindexing when aligning to business days</p>
+</dd>
 </dl>
-<p>method: LiteralPandasReindexMethod, default: “nearest”</p>
 </section>
-<section id="id133">
-<h4>Returns:<a class="headerlink" href="#id133" title="Link to this heading"></a></h4>
+<section id="id137">
+<h4>Returns:<a class="headerlink" href="#id137" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -2768,15 +2868,15 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BME'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Resample the timeseries frequency.</p>
-<section id="id134">
-<h4>Parameters<a class="headerlink" href="#id134" title="Link to this heading"></a></h4>
+<section id="id138">
+<h4>Parameters<a class="headerlink" href="#id138" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>freq: LiteralBizDayFreq | str, default “BME”</dt><dd><p>The date offset string that sets the resampled frequency</p>
 </dd>
 </dl>
 </section>
-<section id="id135">
-<h4>Returns:<a class="headerlink" href="#id135" title="Link to this heading"></a></h4>
+<section id="id139">
+<h4>Returns:<a class="headerlink" href="#id139" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -2800,8 +2900,8 @@ comparisons</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">resample_to_business_period_ends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BME'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.resample_to_business_period_ends"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Resamples timeseries frequency to the business calendar month end dates.</p>
 <p>Stubs left in place. Stubs will be aligned to the shortest stub.</p>
-<section id="id136">
-<h4>Parameters<a class="headerlink" href="#id136" title="Link to this heading"></a></h4>
+<section id="id140">
+<h4>Parameters<a class="headerlink" href="#id140" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>freq: LiteralBizDayFreq, default “BME”</dt><dd><p>The date offset string that sets the resampled frequency</p>
 </dd>
@@ -2809,8 +2909,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id137">
-<h4>Returns:<a class="headerlink" href="#id137" title="Link to this heading"></a></h4>
+<section id="id141">
+<h4>Returns:<a class="headerlink" href="#id141" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -2834,15 +2934,15 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">value_nan_handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fill'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Handle missing values in a valueseries.</p>
-<section id="id138">
-<h4>Parameters<a class="headerlink" href="#id138" title="Link to this heading"></a></h4>
+<section id="id142">
+<h4>Parameters<a class="headerlink" href="#id142" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>method: LiteralNanMethod, default: “fill”</dt><dd><p>Method used to handle NaN. Either fill with last known or drop</p>
 </dd>
 </dl>
 </section>
-<section id="id139">
-<h4>Returns:<a class="headerlink" href="#id139" title="Link to this heading"></a></h4>
+<section id="id143">
+<h4>Returns:<a class="headerlink" href="#id143" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>self</dt><dd><p>An object of the same class</p>
 </dd>
@@ -2865,15 +2965,15 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">return_nan_handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fill'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Handle missing values in a returnseries.</p>
-<section id="id140">
-<h4>Parameters<a class="headerlink" href="#id140" title="Link to this heading"></a></h4>
+<section id="id144">
+<h4>Parameters<a class="headerlink" href="#id144" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>method: LiteralNanMethod, default: “fill”</dt><dd><p>Method used to handle NaN. Either fill with zero or drop</p>
 </dd>
 </dl>
 </section>
-<section id="id141">
-<h4>Returns:<a class="headerlink" href="#id141" title="Link to this heading"></a></h4>
+<section id="id145">
+<h4>Returns:<a class="headerlink" href="#id145" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>self</dt><dd><p>An object of the same class</p>
 </dd>
@@ -2899,8 +2999,8 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">to_cumret</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.to_cumret"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Convert series of returns into cumulative series of values.</p>
-<section id="id142">
-<h4>Returns:<a class="headerlink" href="#id142" title="Link to this heading"></a></h4>
+<section id="id146">
+<h4>Returns:<a class="headerlink" href="#id146" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -2920,8 +3020,8 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">value_to_ret</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.value_to_ret"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Convert series of values into series of returns.</p>
-<section id="id143">
-<h4>Returns:<a class="headerlink" href="#id143" title="Link to this heading"></a></h4>
+<section id="id147">
+<h4>Returns:<a class="headerlink" href="#id147" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>The returns of the values in the series</p>
 </dd>
@@ -2941,16 +3041,16 @@ comparisons</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">value_to_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.value_to_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Convert series of values to series of their period differences.</p>
-<section id="id144">
-<h4>Parameters<a class="headerlink" href="#id144" title="Link to this heading"></a></h4>
+<section id="id148">
+<h4>Parameters<a class="headerlink" href="#id148" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>periods: int, default: 1</dt><dd><p>The number of periods between observations over which difference
 is calculated</p>
 </dd>
 </dl>
 </section>
-<section id="id145">
-<h4>Returns:<a class="headerlink" href="#id145" title="Link to this heading"></a></h4>
+<section id="id149">
+<h4>Returns:<a class="headerlink" href="#id149" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>OpenFrame</dt><dd><p>An OpenFrame object</p>
 </dd>
@@ -2974,8 +3074,8 @@ is calculated</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">value_to_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Series of values converted into logarithmic weighted series.</p>
 <p>Equivalent to LN(value[t] / value[t=0]) in Excel.</p>
-<section id="id146">
-<h4>Returns:<a class="headerlink" href="#id146" title="Link to this heading"></a></h4>
+<section id="id150">
+<h4>Returns:<a class="headerlink" href="#id150" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>self</dt><dd><p>An object of the same class</p>
 </dd>
@@ -2995,8 +3095,8 @@ is calculated</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">to_drawdown_series</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Convert timeseries into a drawdown series.</p>
-<section id="id147">
-<h4>Returns:<a class="headerlink" href="#id147" title="Link to this heading"></a></h4>
+<section id="id151">
+<h4>Returns:<a class="headerlink" href="#id151" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>self</dt><dd><p>An object of the same class</p>
 </dd>
@@ -3016,8 +3116,8 @@ is calculated</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">value_ret_calendar_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Calculate simple return for a specific calendar period.</p>
-<section id="id148">
-<h4>Parameters<a class="headerlink" href="#id148" title="Link to this heading"></a></h4>
+<section id="id152">
+<h4>Parameters<a class="headerlink" href="#id152" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>year<span class="classifier">int</span></dt><dd><p>Calendar year of the period to calculate.</p>
 </dd>
@@ -3025,8 +3125,8 @@ is calculated</p>
 </dd>
 </dl>
 </section>
-<section id="id149">
-<h4>Returns:<a class="headerlink" href="#id149" title="Link to this heading"></a></h4>
+<section id="id153">
+<h4>Returns:<a class="headerlink" href="#id153" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Calculate simple return for a specific calendar period.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3054,8 +3154,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">calc_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create user defined date range.</p>
-<section id="id150">
-<h4>Parameters<a class="headerlink" href="#id150" title="Link to this heading"></a></h4>
+<section id="id154">
+<h4>Parameters<a class="headerlink" href="#id154" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_offset: int, optional</dt><dd><p>Number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3066,8 +3166,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id151">
-<h4>Returns:<a class="headerlink" href="#id151" title="Link to this heading"></a></h4>
+<section id="id155">
+<h4>Returns:<a class="headerlink" href="#id155" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>tuple[datetime.date, datetime.date]</dt><dd><p>Start and end date of the chosen date range</p>
 </dd>
@@ -3095,8 +3195,8 @@ and to_date</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">arithmetic_ret_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p><a class="reference external" href="https://www.investopedia.com/terms/a/arithmeticmean.asp">https://www.investopedia.com/terms/a/arithmeticmean.asp</a>.</p>
-<section id="id152">
-<h4>Parameters<a class="headerlink" href="#id152" title="Link to this heading"></a></h4>
+<section id="id156">
+<h4>Parameters<a class="headerlink" href="#id156" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3110,8 +3210,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id153">
-<h4>Returns:<a class="headerlink" href="#id153" title="Link to this heading"></a></h4>
+<section id="id157">
+<h4>Returns:<a class="headerlink" href="#id157" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Annualized arithmetic mean of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3139,8 +3239,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">geo_ret_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Compounded Annual Growth Rate (CAGR).</p>
 <p><a class="reference external" href="https://www.investopedia.com/terms/c/cagr.asp">https://www.investopedia.com/terms/c/cagr.asp</a>.</p>
-<section id="id154">
-<h4>Parameters<a class="headerlink" href="#id154" title="Link to this heading"></a></h4>
+<section id="id158">
+<h4>Parameters<a class="headerlink" href="#id158" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3151,8 +3251,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id155">
-<h4>Returns:<a class="headerlink" href="#id155" title="Link to this heading"></a></h4>
+<section id="id159">
+<h4>Returns:<a class="headerlink" href="#id159" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Compounded Annual Growth Rate (CAGR).
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3178,8 +3278,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">value_ret_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Calculate simple return.</p>
-<section id="id156">
-<h4>Parameters<a class="headerlink" href="#id156" title="Link to this heading"></a></h4>
+<section id="id160">
+<h4>Parameters<a class="headerlink" href="#id160" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3190,8 +3290,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id157">
-<h4>Returns:<a class="headerlink" href="#id157" title="Link to this heading"></a></h4>
+<section id="id161">
+<h4>Returns:<a class="headerlink" href="#id161" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Calculate simple return.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3219,8 +3319,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dd><p>Annualized volatility.</p>
 <p>Based on Pandas .std() which is the equivalent of stdev.s([…]) in MS Excel.
 <a class="reference external" href="https://www.investopedia.com/terms/v/volatility.asp">https://www.investopedia.com/terms/v/volatility.asp</a>.</p>
-<section id="id158">
-<h4>Parameters<a class="headerlink" href="#id158" title="Link to this heading"></a></h4>
+<section id="id162">
+<h4>Parameters<a class="headerlink" href="#id162" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3233,8 +3333,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id159">
-<h4>Returns:<a class="headerlink" href="#id159" title="Link to this heading"></a></h4>
+<section id="id163">
+<h4>Returns:<a class="headerlink" href="#id163" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Annualized volatility.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3265,8 +3365,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 deviation of returns that are below a Minimum Accepted
 Return of zero. For general order p, it returns LPM_p^(1/p),
 i.e., the rooted lower partial moment of order p.</p>
-<section id="id160">
-<h4>Parameters<a class="headerlink" href="#id160" title="Link to this heading"></a></h4>
+<section id="id164">
+<h4>Parameters<a class="headerlink" href="#id164" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>min_accepted_return<span class="classifier">float, optional</span></dt><dd><p>The annualized Minimum Accepted Return (MAR)</p>
 </dd>
@@ -3284,8 +3384,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id161">
-<h4>Returns:<a class="headerlink" href="#id161" title="Link to this heading"></a></h4>
+<section id="id165">
+<h4>Returns:<a class="headerlink" href="#id165" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside deviation if order set to 2.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3319,8 +3419,8 @@ volatility or, if riskfree return provided, Sharpe ratio calculated
 as ( geometric return - risk-free return ) / volatility. The latter ratio
 implies that the riskfree asset has zero volatility.
 <a class="reference external" href="https://www.investopedia.com/terms/s/sharperatio.asp">https://www.investopedia.com/terms/s/sharperatio.asp</a>.</p>
-<section id="id162">
-<h4>Parameters<a class="headerlink" href="#id162" title="Link to this heading"></a></h4>
+<section id="id166">
+<h4>Parameters<a class="headerlink" href="#id166" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>riskfree_rate<span class="classifier">float</span></dt><dd><p>The return of the zero volatility asset used to calculate Sharpe ratio</p>
 </dd>
@@ -3336,8 +3436,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id163">
-<h4>Returns:<a class="headerlink" href="#id163" title="Link to this heading"></a></h4>
+<section id="id167">
+<h4>Returns:<a class="headerlink" href="#id167" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Ratio of the annualized arithmetic mean of returns and annualized
 volatility or, if risk-free return provided, Sharpe ratio.
@@ -3374,8 +3474,8 @@ calculated using the annualized arithmetic mean of returns.
 If order is set to 3 the ratio calculated becomes Kappa3 which
 penalizes larger downside outcomes more heavily than the Sortino
 ratio (which uses order 2).</p>
-<section id="id164">
-<h4>Parameters<a class="headerlink" href="#id164" title="Link to this heading"></a></h4>
+<section id="id168">
+<h4>Parameters<a class="headerlink" href="#id168" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>riskfree_rate<span class="classifier">float</span></dt><dd><p>The return of the zero volatility asset</p>
 </dd>
@@ -3395,8 +3495,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id165">
-<h4>Returns:<a class="headerlink" href="#id165" title="Link to this heading"></a></h4>
+<section id="id169">
+<h4>Returns:<a class="headerlink" href="#id169" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Sortino ratio calculated as ( return - riskfree return ) /
 downside deviation (std dev of returns below MAR).
@@ -3431,8 +3531,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 (often referred to as the “minimum acceptable return” or “MAR”)
 to the total downside risk below that same threshold.
 <a class="reference external" href="https://en.wikipedia.org/wiki/Omega_ratio">https://en.wikipedia.org/wiki/Omega_ratio</a>.</p>
-<section id="id166">
-<h4>Parameters<a class="headerlink" href="#id166" title="Link to this heading"></a></h4>
+<section id="id170">
+<h4>Parameters<a class="headerlink" href="#id170" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>min_accepted_return<span class="classifier">float, optional</span></dt><dd><p>The annualized Minimum Accepted Return (MAR)</p>
 </dd>
@@ -3445,8 +3545,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id167">
-<h4>Returns:<a class="headerlink" href="#id167" title="Link to this heading"></a></h4>
+<section id="id171">
+<h4>Returns:<a class="headerlink" href="#id171" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Omega ratio calculation.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3475,8 +3575,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dd><p>Downside Value At Risk, “VaR”.</p>
 <p>The equivalent of percentile.inc([…], 1-level) over returns in MS Excel.
 <a class="reference external" href="https://www.investopedia.com/terms/v/var.asp">https://www.investopedia.com/terms/v/var.asp</a>.</p>
-<section id="id168">
-<h4>Parameters<a class="headerlink" href="#id168" title="Link to this heading"></a></h4>
+<section id="id172">
+<h4>Parameters<a class="headerlink" href="#id172" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>level: float, default: 0.95</dt><dd><p>The sought VaR level</p>
 </dd>
@@ -3491,8 +3591,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id169">
-<h4>Returns:<a class="headerlink" href="#id169" title="Link to this heading"></a></h4>
+<section id="id173">
+<h4>Returns:<a class="headerlink" href="#id173" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside Value At Risk.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3521,8 +3621,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">cvar_down_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Downside Conditional Value At Risk “CVaR”.</p>
 <p><a class="reference external" href="https://www.investopedia.com/terms/c/conditional_value_at_risk.asp">https://www.investopedia.com/terms/c/conditional_value_at_risk.asp</a>.</p>
-<section id="id170">
-<h4>Parameters<a class="headerlink" href="#id170" title="Link to this heading"></a></h4>
+<section id="id174">
+<h4>Parameters<a class="headerlink" href="#id174" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>level: float, default: 0.95</dt><dd><p>The sought CVaR level</p>
 </dd>
@@ -3535,8 +3635,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id171">
-<h4>Returns:<a class="headerlink" href="#id171" title="Link to this heading"></a></h4>
+<section id="id175">
+<h4>Returns:<a class="headerlink" href="#id175" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside Conditional Value At Risk “CVaR”.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3563,8 +3663,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">worst_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Most negative percentage change over a rolling number of observations.</p>
-<section id="id172">
-<h4>Parameters<a class="headerlink" href="#id172" title="Link to this heading"></a></h4>
+<section id="id176">
+<h4>Parameters<a class="headerlink" href="#id176" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>observations: int, default: 1</dt><dd><p>Number of observations over which to measure the worst outcome</p>
 </dd>
@@ -3577,8 +3677,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id173">
-<h4>Returns:<a class="headerlink" href="#id173" title="Link to this heading"></a></h4>
+<section id="id177">
+<h4>Returns:<a class="headerlink" href="#id177" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Most negative percentage change over a rolling number of observations
 within a chosen date range.
@@ -3607,8 +3707,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">max_drawdown_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_periods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Maximum drawdown without any limit on date range.</p>
 <p><a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
-<section id="id174">
-<h4>Parameters<a class="headerlink" href="#id174" title="Link to this heading"></a></h4>
+<section id="id178">
+<h4>Parameters<a class="headerlink" href="#id178" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3621,8 +3721,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id175">
-<h4>Returns:<a class="headerlink" href="#id175" title="Link to this heading"></a></h4>
+<section id="id179">
+<h4>Returns:<a class="headerlink" href="#id179" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Maximum drawdown without any limit on date range.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3649,8 +3749,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">positive_share_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Calculate share of percentage changes that are greater than zero.</p>
-<section id="id176">
-<h4>Parameters<a class="headerlink" href="#id176" title="Link to this heading"></a></h4>
+<section id="id180">
+<h4>Parameters<a class="headerlink" href="#id180" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3661,8 +3761,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id177">
-<h4>Returns:<a class="headerlink" href="#id177" title="Link to this heading"></a></h4>
+<section id="id181">
+<h4>Returns:<a class="headerlink" href="#id181" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Calculate share of percentage changes that are greater than zero.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3690,8 +3790,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dd><p>Implied annualized volatility.</p>
 <p>Implied annualized volatility from the Downside VaR using the assumption
 that returns are normally distributed.</p>
-<section id="id178">
-<h4>Parameters<a class="headerlink" href="#id178" title="Link to this heading"></a></h4>
+<section id="id182">
+<h4>Parameters<a class="headerlink" href="#id182" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>level: float, default: 0.95</dt><dd><p>The sought VaR level</p>
 </dd>
@@ -3711,8 +3811,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id179">
-<h4>Returns:<a class="headerlink" href="#id179" title="Link to this heading"></a></h4>
+<section id="id183">
+<h4>Returns:<a class="headerlink" href="#id183" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Implied annualized volatility from the Downside VaR using the
 assumption that returns are normally distributed.
@@ -3744,8 +3844,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">skew_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Skew of the return distribution.</p>
 <p><a class="reference external" href="https://www.investopedia.com/terms/s/skewness.asp">https://www.investopedia.com/terms/s/skewness.asp</a>.</p>
-<section id="id180">
-<h4>Parameters<a class="headerlink" href="#id180" title="Link to this heading"></a></h4>
+<section id="id184">
+<h4>Parameters<a class="headerlink" href="#id184" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3756,8 +3856,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id181">
-<h4>Returns:<a class="headerlink" href="#id181" title="Link to this heading"></a></h4>
+<section id="id185">
+<h4>Returns:<a class="headerlink" href="#id185" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Skew of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3784,8 +3884,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">kurtosis_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Kurtosis of the return distribution.</p>
 <p><a class="reference external" href="https://www.investopedia.com/terms/k/kurtosis.asp">https://www.investopedia.com/terms/k/kurtosis.asp</a>.</p>
-<section id="id182">
-<h4>Parameters<a class="headerlink" href="#id182" title="Link to this heading"></a></h4>
+<section id="id186">
+<h4>Parameters<a class="headerlink" href="#id186" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3796,8 +3896,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id183">
-<h4>Returns:<a class="headerlink" href="#id183" title="Link to this heading"></a></h4>
+<section id="id187">
+<h4>Returns:<a class="headerlink" href="#id187" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Kurtosis of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3824,8 +3924,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">z_score_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Z-score as (last return - mean return) / standard deviation of returns.</p>
 <p><a class="reference external" href="https://www.investopedia.com/terms/z/zscore.asp">https://www.investopedia.com/terms/z/zscore.asp</a>.</p>
-<section id="id184">
-<h4>Parameters<a class="headerlink" href="#id184" title="Link to this heading"></a></h4>
+<section id="id188">
+<h4>Parameters<a class="headerlink" href="#id188" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
@@ -3836,8 +3936,8 @@ and to_date</p>
 </dd>
 </dl>
 </section>
-<section id="id185">
-<h4>Returns:<a class="headerlink" href="#id185" title="Link to this heading"></a></h4>
+<section id="id189">
+<h4>Returns:<a class="headerlink" href="#id189" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Z-score as (last return - mean return) / standard deviation of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -3865,8 +3965,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dd><p>Target weight from VaR.</p>
 <p>A position weight multiplier from the ratio between a VaR implied
 volatility and a given target volatility. Multiplier = 1.0 -&gt; target met.</p>
-<section id="id186">
-<h4>Parameters<a class="headerlink" href="#id186" title="Link to this heading"></a></h4>
+<section id="id190">
+<h4>Parameters<a class="headerlink" href="#id190" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>target_vol: float, default: 0.175</dt><dd><p>Target Volatility</p>
 </dd>
@@ -3892,8 +3992,8 @@ comparisons</p>
 </dd>
 </dl>
 </section>
-<section id="id187">
-<h4>Returns:<a class="headerlink" href="#id187" title="Link to this heading"></a></h4>
+<section id="id191">
+<h4>Returns:<a class="headerlink" href="#id191" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>A position weight multiplier from the ratio between a VaR implied
 volatility and a given target volatility. Multiplier = 1.0 -&gt; target met.
@@ -3930,8 +4030,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">plot_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lines'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tick_fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_plotlyjs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cdn'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_logo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a Plotly Scatter Figure.</p>
-<section id="id188">
-<h4>Parameters<a class="headerlink" href="#id188" title="Link to this heading"></a></h4>
+<section id="id192">
+<h4>Parameters<a class="headerlink" href="#id192" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>self.tsdf: pandas.DataFrame</dt><dd><p>The timeseries self.tsdf</p>
 </dd>
@@ -3960,8 +4060,8 @@ the input self.tsdf</p>
 </dd>
 </dl>
 </section>
-<section id="id189">
-<h4>Returns:<a class="headerlink" href="#id189" title="Link to this heading"></a></h4>
+<section id="id193">
+<h4>Returns:<a class="headerlink" href="#id193" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>tuple[plotly.go.Figure, str]</dt><dd><p>Plotly Figure and a div section or a html filename with location</p>
 </dd>
@@ -3994,8 +4094,8 @@ the input self.tsdf</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">plot_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'group'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tick_fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_plotlyjs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cdn'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_logo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a Plotly Bar Figure.</p>
-<section id="id190">
-<h4>Parameters<a class="headerlink" href="#id190" title="Link to this heading"></a></h4>
+<section id="id194">
+<h4>Parameters<a class="headerlink" href="#id194" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>self.tsdf: pandas.DataFrame</dt><dd><p>The timeseries self.tsdf</p>
 </dd>
@@ -4022,8 +4122,8 @@ the input self.tsdf</p>
 </dd>
 </dl>
 </section>
-<section id="id191">
-<h4>Returns:<a class="headerlink" href="#id191" title="Link to this heading"></a></h4>
+<section id="id195">
+<h4>Returns:<a class="headerlink" href="#id195" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>tuple[plotly.go.Figure, str]</dt><dd><p>Plotly Figure and a div section or a html filename with location</p>
 </dd>
@@ -4055,8 +4155,8 @@ the input self.tsdf</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">plot_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bars'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">histnorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'probability'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barmode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'overlay'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xbins_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bargap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bargroupgap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kde'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_plotlyjs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cdn'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cumulative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_rug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_logo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a Plotly Histogram Figure.</p>
-<section id="id192">
-<h4>Parameters<a class="headerlink" href="#id192" title="Link to this heading"></a></h4>
+<section id="id196">
+<h4>Parameters<a class="headerlink" href="#id196" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>plot_type: LiteralPlotlyHistogramPlotType, default: bars</dt><dd><p>Type of plot</p>
 </dd>
@@ -4101,8 +4201,8 @@ the input self.tsdf</p>
 </dd>
 </dl>
 </section>
-<section id="id193">
-<h4>Returns:<a class="headerlink" href="#id193" title="Link to this heading"></a></h4>
+<section id="id197">
+<h4>Returns:<a class="headerlink" href="#id197" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>tuple[plotly.go.Figure, str]</dt><dd><p>Plotly Figure and a div section or a html filename with location</p>
 </dd>
@@ -4147,8 +4247,8 @@ the input self.tsdf</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Dump timeseries data into a json file.</p>
-<section id="id194">
-<h4>Parameters<a class="headerlink" href="#id194" title="Link to this heading"></a></h4>
+<section id="id198">
+<h4>Parameters<a class="headerlink" href="#id198" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>what_output: LiteralJsonOutput</dt><dd><p>Choice on whether the raw values or the tsdf Dataframe values are
 returned as json and exported as json file.</p>
@@ -4159,8 +4259,8 @@ returned as json and exported as json file.</p>
 </dd>
 </dl>
 </section>
-<section id="id195">
-<h4>Returns:<a class="headerlink" href="#id195" title="Link to this heading"></a></h4>
+<section id="id199">
+<h4>Returns:<a class="headerlink" href="#id199" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>list[dict[str, str | bool | ValueType | list[str] | list[float]]]</dt><dd><p>A list of dictionaries with the data of the series</p>
 </dd>
@@ -4176,7 +4276,7 @@ returned as json and exported as json file.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a> | <a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType">ValueType</a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>] | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]]]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a> | ValueType | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>] | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4185,8 +4285,8 @@ returned as json and exported as json file.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">to_xlsx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Save .tsdf DataFrame to an Excel spreadsheet file.</p>
-<section id="id196">
-<h4>Parameters<a class="headerlink" href="#id196" title="Link to this heading"></a></h4>
+<section id="id200">
+<h4>Parameters<a class="headerlink" href="#id200" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>filename: str</dt><dd><p>Filename that should include .xlsx</p>
 </dd>
@@ -4198,8 +4298,8 @@ returned as json and exported as json file.</p>
 </dd>
 </dl>
 </section>
-<section id="id197">
-<h4>Returns:<a class="headerlink" href="#id197" title="Link to this heading"></a></h4>
+<section id="id201">
+<h4>Returns:<a class="headerlink" href="#id201" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>str</dt><dd><p>The Excel file path</p>
 </dd>

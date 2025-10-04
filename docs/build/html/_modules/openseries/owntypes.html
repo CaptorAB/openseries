@@ -59,6 +59,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -551,6 +552,18 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">ResampleDataLossError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when user attempts to run resample_to_business_period_ends on returns.&quot;&quot;&quot;</span></div>
 
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WeightsNotProvidedError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when weights are not provided.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MultipleCurrenciesError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when multiple currencies are provided.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PortfolioItemsNotWithinFrameError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when portfolio items are not within frame.&quot;&quot;&quot;</span>
 </pre></div>
 
            </div>

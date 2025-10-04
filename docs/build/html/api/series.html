@@ -62,6 +62,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -184,7 +185,7 @@ These values will not be altered by methods</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">valuetype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><span class="pre">ValueType</span></a></em></dt>
+<span class="sig-name descname"><span class="pre">valuetype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ValueType</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -277,7 +278,7 @@ These values will not be altered by methods</p>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>dates</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=None</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=10</em><em>, </em><em>max_length=10</em><em>, </em><em>pattern=^\d{4}-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>1</em><em>[</em><em>0-2</em><em>]</em><em>)</em><em>-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>[</em><em>12</em><em>]</em><em>\d</em><em>|</em><em>3</em><em>[</em><em>01</em><em>]</em><em>)</em><em>$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>valuetype</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a>)</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
 <li><p><strong>timeseries_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>isin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
@@ -322,7 +323,7 @@ These values will not be altered by methods</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dframe</strong> (<em>Series</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>] </em><em>| </em><em>DataFrame</em>)</p></li>
 <li><p><strong>column_nmbr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a>)</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
 <li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>)</p></li>
 <li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
@@ -377,7 +378,7 @@ combined with days</p>
 <li><p><strong>days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>end_dt</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a>)</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
 <li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>)</p></li>
 <li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
@@ -748,7 +749,7 @@ assumed number of days in a calendar year</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
 <li><p><strong>lvl_zero</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>lvl_one</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>lvl_one</strong> (<em>ValueType</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>delete_lvl_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
@@ -772,7 +773,7 @@ assumed number of days in a calendar year</p>
 <li><p><strong>timeseries_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a>)</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
 <li><p><strong>dates</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=None</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=10</em><em>, </em><em>max_length=10</em><em>, </em><em>pattern=^\d{4}-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>1</em><em>[</em><em>0-2</em><em>]</em><em>)</em><em>-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>[</em><em>12</em><em>]</em><em>\d</em><em>|</em><em>3</em><em>[</em><em>01</em><em>]</em><em>)</em><em>$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
 <li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
@@ -837,7 +838,7 @@ assumed number of days in a calendar year</p>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>dates</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=None</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=10</em><em>, </em><em>max_length=10</em><em>, </em><em>pattern=^\d{4}-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>1</em><em>[</em><em>0-2</em><em>]</em><em>)</em><em>-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>[</em><em>12</em><em>]</em><em>\d</em><em>|</em><em>3</em><em>[</em><em>01</em><em>]</em><em>)</em><em>$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>valuetype</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a>)</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
 <li><p><strong>timeseries_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>isin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
@@ -882,7 +883,7 @@ assumed number of days in a calendar year</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dframe</strong> (<em>Series</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>] </em><em>| </em><em>DataFrame</em>)</p></li>
 <li><p><strong>column_nmbr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a>)</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
 <li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>)</p></li>
 <li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
@@ -937,7 +938,7 @@ combined with days</p>
 <li><p><strong>days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>end_dt</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><em>ValueType</em></a>)</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
 <li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>)</p></li>
 <li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
@@ -1036,7 +1037,7 @@ combined with days</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">valuetype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType"><span class="pre">ValueType</span></a></em></dt>
+<span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">valuetype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ValueType</span></em></dt>
 <dd></dd></dl>
 
 </section>
@@ -1561,7 +1562,7 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
 <li><p><strong>lvl_zero</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>lvl_one</strong> (<a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.owntypes.ValueType"><em>ValueType</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>lvl_one</strong> (<em>ValueType</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>delete_lvl_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
@@ -1653,8 +1654,9 @@ assumed number of days in a calendar year</p>
 </dd>
 <dt>custom_holidays: list[str] | str, optional</dt><dd><p>Argument where missing holidays can be added</p>
 </dd>
+<dt>method: LiteralPandasReindexMethod, default: “nearest”</dt><dd><p>Method for reindexing when aligning to business days</p>
+</dd>
 </dl>
-<p>method: LiteralPandasReindexMethod, default: “nearest”</p>
 </section>
 <section id="id68">
 <h4>Returns:<a class="headerlink" href="#id68" title="Link to this heading"></a></h4>
@@ -3294,7 +3296,7 @@ returned as json and exported as json file.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a> | <a class="reference internal" href="generated/openseries.ValueType.html#openseries.ValueType" title="openseries.ValueType">ValueType</a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>] | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]]]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a> | ValueType | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>] | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]]]</p>
 </dd>
 </dl>
 </dd></dl>

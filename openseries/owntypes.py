@@ -374,3 +374,15 @@ class PropertiesInputValidationError(Exception):
 
 class ResampleDataLossError(Exception):
     """Raised when user attempts to run resample_to_business_period_ends on returns."""
+
+
+class WeightsNotProvidedError(Exception):
+    """Raised when weights are not provided."""
+
+
+class MultipleCurrenciesError(Exception):
+    """Raised when multiple currencies are provided."""
+
+
+class PortfolioItemsNotWithinFrameError(Exception):
+    """Raised when portfolio items are not within frame."""

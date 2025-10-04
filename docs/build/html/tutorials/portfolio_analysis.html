@@ -85,6 +85,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -457,32 +458,63 @@
 </section>
 <section id="rebalancing-analysis">
 <h2>Rebalancing Analysis<a class="headerlink" href="#rebalancing-analysis" title="Link to this heading"></a></h2>
-<p>Analyze the impact of rebalancing frequency:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simulate different rebalancing frequencies</span>
-<span class="c1"># This is a simplified example - in practice you&#39;d implement full rebalancing logic</span>
+<p>Analyze the impact of rebalancing frequency using the realistic <cite>rebalanced_portfolio</cite> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare different rebalancing frequencies using realistic simulation</span>
+<span class="n">frequencies</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>  <span class="c1"># Daily, monthly, quarterly</span>
+<span class="n">frequency_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Daily&quot;</span><span class="p">,</span> <span class="s2">&quot;Monthly&quot;</span><span class="p">,</span> <span class="s2">&quot;Quarterly&quot;</span><span class="p">]</span>
 
-<span class="c1"># Monthly rebalancing</span>
-<span class="n">monthly_data</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="n">monthly_data</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
-<span class="n">monthly_portfolio_df</span> <span class="o">=</span> <span class="n">monthly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Monthly Rebalanced&quot;</span><span class="p">)</span>
-<span class="n">monthly_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">monthly_portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">rebalanced_portfolios</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="c1"># Quarterly rebalancing</span>
-<span class="n">quarterly_data</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
-<span class="n">quarterly_data</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
-<span class="n">quarterly_portfolio_df</span> <span class="o">=</span> <span class="n">quarterly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Quarterly Rebalanced&quot;</span><span class="p">)</span>
-<span class="n">quarterly_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">quarterly_portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">freq</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">frequency_names</span><span class="p">):</span>
+    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">rebalanced_portfolio</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> Rebalanced&quot;</span><span class="p">,</span>
+        <span class="n">frequency</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+        <span class="n">bal_weights</span><span class="o">=</span><span class="n">equal_weights</span>
+    <span class="p">)</span>
+    <span class="n">rebalanced_portfolios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">portfolio</span><span class="o">.</span><span class="n">constituents</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-<span class="c1"># Compare rebalancing frequencies</span>
-<span class="n">rebalancing_comparison</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span>
-    <span class="n">equal_weight_portfolio</span><span class="p">,</span>  <span class="c1"># Daily rebalanced (theoretical)</span>
-    <span class="n">monthly_portfolio</span><span class="p">,</span>
-    <span class="n">quarterly_portfolio</span>
-<span class="p">])</span>
+<span class="c1"># Compare with theoretical portfolio</span>
+<span class="n">theoretical_portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Theoretical&quot;</span><span class="p">,</span>
+    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span>
+<span class="p">)</span>
 
-<span class="n">rebal_metrics</span> <span class="o">=</span> <span class="n">rebalancing_comparison</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== REBALANCING FREQUENCY COMPARISON ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">rebal_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="c1"># Create comprehensive comparison</span>
+<span class="n">all_portfolios</span> <span class="o">=</span> <span class="p">[</span><span class="n">theoretical_portfolio</span><span class="p">]</span> <span class="o">+</span> <span class="n">rebalanced_portfolios</span>
+<span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">all_portfolios</span><span class="p">)</span>
+<span class="n">comparison_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== REALISTIC REBALANCING COMPARISON ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strategy | Return | Volatility | Sharpe | Max DD&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">all_portfolios</span><span class="p">:</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">vol</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">sharpe</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">max_dd</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;max_drawdown&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">ret</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2">% | </span><span class="si">{</span><span class="n">vol</span><span class="si">:</span><span class="s2">10.2f</span><span class="si">}</span><span class="s2">% | </span><span class="si">{</span><span class="n">sharpe</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">max_dd</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+
+<span class="c1"># Analyze transaction costs</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TRANSACTION COST ANALYSIS ===&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">freq</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">frequency_names</span><span class="p">):</span>
+    <span class="n">detailed_portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">rebalanced_portfolio</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> Detailed&quot;</span><span class="p">,</span>
+        <span class="n">frequency</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+        <span class="n">bal_weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
+        <span class="n">drop_extras</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># Get detailed trading data</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Count rebalancing events</span>
+    <span class="n">rebalancing_days</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">detailed_portfolio</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;buysell_qty&quot;</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="c1"># Count days with non-zero trading</span>
+            <span class="n">trading_days</span> <span class="o">=</span> <span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">rebalancing_days</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rebalancing_days</span><span class="p">,</span> <span class="n">trading_days</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">rebalancing_days</span><span class="si">}</span><span class="s2"> rebalancing events&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

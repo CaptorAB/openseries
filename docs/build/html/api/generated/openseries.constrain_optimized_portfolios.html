@@ -62,6 +62,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -72,10 +73,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../openseries.html#portfolio-tools">Portfolio Tools</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="openseries.efficient_frontier.html">openseries.efficient_frontier</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.simulate_portfolios.html">openseries.simulate_portfolios</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.constrain_optimized_portfolios</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.constrain_optimized_portfolios"><code class="docutils literal notranslate"><span class="pre">constrain_optimized_portfolios()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.constrain_optimized_portfolios</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.prepare_plot_data.html">openseries.prepare_plot_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.sharpeplot.html">openseries.sharpeplot</a></li>
 </ul>
@@ -128,8 +126,8 @@
   <section id="openseries-constrain-optimized-portfolios">
 <h1>openseries.constrain_optimized_portfolios<a class="headerlink" href="#openseries-constrain-optimized-portfolios" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="openseries.constrain_optimized_portfolios">
-<span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">constrain_optimized_portfolios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">portfolioname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Current</span> <span class="pre">Portfolio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SLSQP'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/portfoliotools.html#constrain_optimized_portfolios"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.constrain_optimized_portfolios" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">constrain_optimized_portfolios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">portfolioname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Current</span> <span class="pre">Portfolio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SLSQP'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/portfoliotools.html#constrain_optimized_portfolios"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Constrain optimized portfolios to those that improve on the current one.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
@@ -160,8 +158,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
-<li><p><strong>serie</strong> (<a class="reference internal" href="openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries"><em>OpenTimeSeries</em></a>)</p></li>
+<li><p><strong>data</strong> (<em>OpenFrame</em>)</p></li>
+<li><p><strong>serie</strong> (<em>OpenTimeSeries</em>)</p></li>
 <li><p><strong>portfolioname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>simulations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>curve_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
@@ -170,7 +168,7 @@
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference internal" href="openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame">OpenFrame</a>, <a class="reference internal" href="openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries">OpenTimeSeries</a>, <a class="reference internal" href="openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame">OpenFrame</a>, <a class="reference internal" href="openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries">OpenTimeSeries</a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</p>
 </dd>
 </dl>
 </dd></dl>

@@ -62,6 +62,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -148,8 +149,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
-<li><p><strong>serie</strong> (<a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries"><em>OpenTimeSeries</em></a>)</p></li>
+<li><p><strong>data</strong> (<em>OpenFrame</em>)</p></li>
+<li><p><strong>serie</strong> (<em>OpenTimeSeries</em>)</p></li>
 <li><p><strong>portfolioname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>simulations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>curve_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
@@ -158,7 +159,7 @@
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame">OpenFrame</a>, <a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries">OpenTimeSeries</a>, <a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame">OpenFrame</a>, <a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries">OpenTimeSeries</a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -196,7 +197,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>eframe</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
+<li><p><strong>eframe</strong> (<em>OpenFrame</em>)</p></li>
 <li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
@@ -236,8 +237,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>assets</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
-<li><p><strong>current</strong> (<a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries"><em>OpenTimeSeries</em></a>)</p></li>
+<li><p><strong>assets</strong> (<em>OpenFrame</em>)</p></li>
+<li><p><strong>current</strong> (<em>OpenTimeSeries</em>)</p></li>
 <li><p><strong>optimized</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
 </ul>
 </dd>
@@ -335,7 +336,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>simframe</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
+<li><p><strong>simframe</strong> (<em>OpenFrame</em>)</p></li>
 <li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 </ul>
@@ -381,7 +382,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>eframe</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
+<li><p><strong>eframe</strong> (<em>OpenFrame</em>)</p></li>
 <li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
@@ -424,7 +425,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>simframe</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
+<li><p><strong>simframe</strong> (<em>OpenFrame</em>)</p></li>
 <li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 </ul>
@@ -471,8 +472,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
-<li><p><strong>serie</strong> (<a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries"><em>OpenTimeSeries</em></a>)</p></li>
+<li><p><strong>data</strong> (<em>OpenFrame</em>)</p></li>
+<li><p><strong>serie</strong> (<em>OpenTimeSeries</em>)</p></li>
 <li><p><strong>portfolioname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
 <li><p><strong>simulations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
 <li><p><strong>curve_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
@@ -481,7 +482,7 @@
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame">OpenFrame</a>, <a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries">OpenTimeSeries</a>, <a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame">OpenFrame</a>, <a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries">OpenTimeSeries</a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -514,8 +515,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>assets</strong> (<a class="reference internal" href="generated/openseries.OpenFrame.html#openseries.OpenFrame" title="openseries.OpenFrame"><em>OpenFrame</em></a>)</p></li>
-<li><p><strong>current</strong> (<a class="reference internal" href="generated/openseries.OpenTimeSeries.html#openseries.OpenTimeSeries" title="openseries.OpenTimeSeries"><em>OpenTimeSeries</em></a>)</p></li>
+<li><p><strong>assets</strong> (<em>OpenFrame</em>)</p></li>
+<li><p><strong>current</strong> (<em>OpenTimeSeries</em>)</p></li>
 <li><p><strong>optimized</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
 </ul>
 </dd>

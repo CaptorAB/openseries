@@ -59,6 +59,7 @@
       ~OpenFrame.plot_histogram
       ~OpenFrame.plot_series
       ~OpenFrame.positive_share_func
+      ~OpenFrame.rebalanced_portfolio
       ~OpenFrame.relative
       ~OpenFrame.resample
       ~OpenFrame.resample_to_business_period_ends

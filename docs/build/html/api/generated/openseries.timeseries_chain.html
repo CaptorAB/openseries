@@ -62,6 +62,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/custom_reports.html">Reporting</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -69,10 +70,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../openseries.html">openseries package</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../openseries.html#main-classes">Main Classes</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../openseries.html#utility-functions">Utility Functions</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.timeseries_chain</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.timeseries_chain"><code class="docutils literal notranslate"><span class="pre">timeseries_chain()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.timeseries_chain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.report_html.html">openseries.report_html</a></li>
 </ul>
 </li>
@@ -125,8 +123,8 @@
   <section id="openseries-timeseries-chain">
 <h1>openseries.timeseries_chain<a class="headerlink" href="#openseries-timeseries-chain" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="openseries.timeseries_chain">
-<span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">timeseries_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">front</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_fee</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#timeseries_chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.timeseries_chain" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">timeseries_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">front</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_fee</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#timeseries_chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Chain two timeseries together.</p>
 <p>The function assumes that the two series have at least one date in common.</p>
 <section id="parameters">

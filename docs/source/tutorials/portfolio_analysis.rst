@@ -351,35 +351,66 @@ Analyze how portfolio characteristics change over time:
 Rebalancing Analysis
 --------------------
 
-Analyze the impact of rebalancing frequency:
+Analyze the impact of rebalancing frequency using the realistic `rebalanced_portfolio` method:
 
 .. code-block:: python
 
-   # Simulate different rebalancing frequencies
-   # This is a simplified example - in practice you'd implement full rebalancing logic
+   # Compare different rebalancing frequencies using realistic simulation
+   frequencies = [1, 21, 63]  # Daily, monthly, quarterly
+   frequency_names = ["Daily", "Monthly", "Quarterly"]
 
-   # Monthly rebalancing
-   monthly_data = assets.resample_to_business_period_ends(freq="BME")
-   monthly_data.weights = equal_weights
-   monthly_portfolio_df = monthly_data.make_portfolio(name="Monthly Rebalanced")
-   monthly_portfolio = OpenTimeSeries.from_df(dframe=monthly_portfolio_df.iloc[:, 0])
+   rebalanced_portfolios = []
 
-   # Quarterly rebalancing
-   quarterly_data = assets.resample_to_business_period_ends(freq="BQE")
-   quarterly_data.weights = equal_weights
-   quarterly_portfolio_df = quarterly_data.make_portfolio(name="Quarterly Rebalanced")
-   quarterly_portfolio = OpenTimeSeries.from_df(dframe=quarterly_portfolio_df.iloc[:, 0])
+   for freq, name in zip(frequencies, frequency_names):
+       portfolio = assets.rebalanced_portfolio(
+           name=f"{name} Rebalanced",
+           frequency=freq,
+           bal_weights=equal_weights
+       )
+       rebalanced_portfolios.append(portfolio.constituents[-1])
 
-   # Compare rebalancing frequencies
-   rebalancing_comparison = OpenFrame(constituents=[
-       equal_weight_portfolio,  # Daily rebalanced (theoretical)
-       monthly_portfolio,
-       quarterly_portfolio
-   ])
+   # Compare with theoretical portfolio
+   theoretical_portfolio = assets.make_portfolio(
+       name="Theoretical",
+       weights=equal_weights
+   )
 
-   rebal_metrics = rebalancing_comparison.all_properties()
-   print("\n=== REBALANCING FREQUENCY COMPARISON ===")
-   print(rebal_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio']].round(4))
+   # Create comprehensive comparison
+   all_portfolios = [theoretical_portfolio] + rebalanced_portfolios
+   comparison_frame = OpenFrame(constituents=all_portfolios)
+   comparison_metrics = comparison_frame.all_properties()
+
+   print("\n=== REALISTIC REBALANCING COMPARISON ===")
+   print("Strategy | Return | Volatility | Sharpe | Max DD")
+   print("-" * 50)
+
+   for series in all_portfolios:
+       ret = comparison_metrics.loc['geo_ret', series.name] * 100
+       vol = comparison_metrics.loc['vol', series.name] * 100
+       sharpe = comparison_metrics.loc['ret_vol_ratio', series.name]
+       max_dd = comparison_metrics.loc['max_drawdown', series.name] * 100
+
+       print(f"{series.name:>15} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
+
+   # Analyze transaction costs
+   print(f"\n=== TRANSACTION COST ANALYSIS ===")
+   for freq, name in zip(frequencies, frequency_names):
+       detailed_portfolio = assets.rebalanced_portfolio(
+           name=f"{name} Detailed",
+           frequency=freq,
+           bal_weights=equal_weights,
+           drop_extras=False  # Get detailed trading data
+       )
+
+       # Count rebalancing events
+       rebalancing_days = 0
+       for series in detailed_portfolio.constituents:
+           if "buysell_qty" in series.name:
+               # Count days with non-zero trading
+               trading_days = (series.tsdf != 0).any(axis=1).sum()
+               rebalancing_days = max(rebalancing_days, trading_days)
+
+       print(f"{name:>15}: {rebalancing_days} rebalancing events")
 
 Stress Testing
 --------------

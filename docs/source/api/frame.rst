@@ -6,7 +6,6 @@ OpenFrame
 .. autoclass:: OpenFrame
    :undoc-members:
    :show-inheritance:
-   :special-members: __init__
    :no-index:
 
 The OpenFrame class manages collections of OpenTimeSeries objects and provides functionality for:
@@ -136,6 +135,8 @@ Portfolio Analysis
    :no-index:
 .. automethod:: OpenFrame.make_portfolio
    :no-index:
+.. automethod:: OpenFrame.rebalanced_portfolio
+   :no-index:
 
 Statistical Analysis
 ~~~~~~~~~~~~~~~~~~~~
@@ -176,7 +177,7 @@ Rolling Analysis
 Correlation and Risk
 ~~~~~~~~~~~~~~~~~~~~
 
-.. automethod:: OpenFrame.correl_matrix
+.. autoattribute:: OpenFrame.correl_matrix
    :no-index:
 .. automethod:: OpenFrame.ewma_risk
    :no-index:
