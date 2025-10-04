@@ -91,7 +91,7 @@ Use the ``all_properties`` attribute to get a comprehensive overview:
 .. code-block:: python
 
    # Get all metrics in a DataFrame
-   metrics = sp500.all_properties
+   metrics = sp500.all_properties()
    print(metrics)
 
 Creating Visualizations
@@ -137,11 +137,11 @@ For multi-asset analysis, use the OpenFrame class:
    frame = OpenFrame(constituents=series_list)
 
    # Get metrics for all series
-   all_metrics = frame.all_properties
+   all_metrics = frame.all_properties()
    print(all_metrics)
 
    # Calculate correlations
-   correlations = frame.correl_matrix()
+   correlations = frame.correl_matrix
    print("\nCorrelation Matrix:")
    print(correlations)
 
@@ -153,10 +153,9 @@ Create and analyze portfolios:
 .. code-block:: python
 
    # Create equal-weighted portfolio
-   portfolio = frame.make_portfolio(
-       weights=[1/3, 1/3, 1/3],
-       name="Equal Weight Portfolio"
-   )
+   frame.weights = [1/3, 1/3, 1/3]
+   portfolio_df = frame.make_portfolio(name="Equal Weight Portfolio")
+   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
 
    print(f"Portfolio Return: {portfolio.geo_ret:.2%}")
    print(f"Portfolio Volatility: {portfolio.vol:.2%}")
@@ -164,7 +163,7 @@ Create and analyze portfolios:
 
    # Compare with individual assets
    frame.add_timeseries(portfolio)
-   comparison = frame.all_properties
+   comparison = frame.all_properties()
    print(comparison)
 
 Data Transformations
@@ -182,7 +181,7 @@ openseries provides various data transformation methods:
    log_returns = sp500.value_to_log()
 
    # Calculate rolling statistics
-   rolling_vol = sp500.rolling_vol(window=30)  # 30-day rolling volatility
+   rolling_vol = sp500.rolling_vol(observations=30)  # 30-day rolling volatility
    rolling_ret = sp500.rolling_return(window=30)  # 30-day rolling returns
 
    # Resample to monthly data
@@ -249,21 +248,23 @@ Here are some common usage patterns:
 
    # Pattern 1: Load, analyze, visualize
    series = OpenTimeSeries.from_df(data['Close'], name="Asset")
-   metrics = series.all_properties
+   metrics = series.all_properties()
    series.plot_series()
 
    # Pattern 2: Multi-asset comparison
    frame = OpenFrame(constituents=[series1, series2, series3])
-   comparison = frame.all_properties
-   correlations = frame.correl_matrix()
+   comparison = frame.all_properties()
+   correlations = frame.correl_matrix
 
    # Pattern 3: Portfolio construction
-   portfolio = frame.make_portfolio(weights=[0.4, 0.3, 0.3])
+   frame.weights = [0.4, 0.3, 0.3]
+   portfolio_df = frame.make_portfolio(name="Custom Portfolio")
+   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
    frame.add_timeseries(portfolio)
 
    # Pattern 4: Risk analysis
    drawdowns = series.to_drawdown_series()
    var_95 = series.var_down
-   rolling_risk = series.rolling_vol(window=252)
+   rolling_risk = series.rolling_vol(observations=252)
 
 This should give you a solid foundation to start using openseries for your financial analysis needs!

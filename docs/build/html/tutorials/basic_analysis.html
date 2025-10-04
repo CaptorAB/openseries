@@ -314,7 +314,7 @@
 <h2>Rolling Analysis<a class="headerlink" href="#rolling-analysis" title="Link to this heading"></a></h2>
 <p>Analyze how metrics change over time:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 252-day (1-year) rolling volatility</span>
-<span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+<span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling volatility calculated for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rolling_vol</span><span class="p">)</span><span class="si">}</span><span class="s2"> periods&quot;</span><span class="p">)</span>
 
 <span class="c1"># 30-day rolling returns</span>
@@ -339,7 +339,7 @@
 <h2>Comprehensive Report<a class="headerlink" href="#comprehensive-report" title="Link to this heading"></a></h2>
 <p>Get all metrics at once:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate comprehensive metrics report</span>
-<span class="n">all_metrics</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">all_metrics</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== COMPREHENSIVE ANALYSIS REPORT ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">all_metrics</span><span class="p">)</span>
 
@@ -382,12 +382,12 @@
 <span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">sp500</span><span class="p">,</span> <span class="n">bonds</span><span class="p">])</span>
 
 <span class="c1"># Compare metrics</span>
-<span class="n">comparison_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">comparison_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== ASSET COMPARISON ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">comparison_metrics</span><span class="p">)</span>
 
 <span class="c1"># Calculate correlation</span>
-<span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">correl_matrix</span><span class="p">()</span>
+<span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">correl_matrix</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== CORRELATION MATRIX ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">correlation_matrix</span><span class="p">)</span>
 </pre></div>

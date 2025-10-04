@@ -471,7 +471,7 @@
     <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.express</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
 
     <span class="c1"># Get metrics for all assets</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
     <span class="n">returns</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
     <span class="n">volatilities</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
     <span class="n">sharpe_ratios</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">]</span>
@@ -517,8 +517,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create performance attribution waterfall chart&quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 
-    <span class="c1"># Calculate individual contributions</span>
-    <span class="n">asset_returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+    <span class="c1"># Calculate individual contributions using OpenFrame</span>
+    <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+    <span class="n">asset_returns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">contributions</span> <span class="o">=</span> <span class="p">[</span><span class="n">weight</span> <span class="o">*</span> <span class="n">ret</span> <span class="k">for</span> <span class="n">weight</span><span class="p">,</span> <span class="n">ret</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">asset_returns</span><span class="p">)]</span>
 
     <span class="c1"># Create waterfall chart</span>
@@ -751,7 +752,7 @@
 
         <span class="c1"># Process chunk</span>
         <span class="n">chunk_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">chunk</span><span class="p">)</span>
-        <span class="n">chunk_metrics</span> <span class="o">=</span> <span class="n">chunk_frame</span><span class="o">.</span><span class="n">all_properties</span>
+        <span class="n">chunk_metrics</span> <span class="o">=</span> <span class="n">chunk_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 
         <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk_metrics</span><span class="p">)</span>
 
@@ -790,7 +791,7 @@
     <span class="c1"># Sequential processing</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">sequential_results</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">all_properties</span>
+    <span class="n">sequential_results</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
     <span class="n">sequential_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sequential processing time: </span><span class="si">{</span><span class="n">sequential_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>

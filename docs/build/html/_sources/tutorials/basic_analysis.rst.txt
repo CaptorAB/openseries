@@ -210,7 +210,7 @@ Analyze how metrics change over time:
 .. code-block:: python
 
    # 252-day (1-year) rolling volatility
-   rolling_vol = sp500.rolling_vol(window=252)
+   rolling_vol = sp500.rolling_vol(observations=252)
    print(f"Rolling volatility calculated for {len(rolling_vol)} periods")
 
    # 30-day rolling returns
@@ -237,7 +237,7 @@ Get all metrics at once:
 .. code-block:: python
 
    # Generate comprehensive metrics report
-   all_metrics = sp500.all_properties
+   all_metrics = sp500.all_properties()
    print("\n=== COMPREHENSIVE ANALYSIS REPORT ===")
    print(all_metrics)
 
@@ -284,12 +284,12 @@ Let's compare with a bond index:
    comparison_frame = OpenFrame(constituents=[sp500, bonds])
 
    # Compare metrics
-   comparison_metrics = comparison_frame.all_properties
+   comparison_metrics = comparison_frame.all_properties()
    print("\n=== ASSET COMPARISON ===")
    print(comparison_metrics)
 
    # Calculate correlation
-   correlation_matrix = comparison_frame.correl_matrix()
+   correlation_matrix = comparison_frame.correl_matrix
    print("\n=== CORRELATION MATRIX ===")
    print(correlation_matrix)
 

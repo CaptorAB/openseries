@@ -10,7 +10,6 @@ Basic Setup
 
    import yfinance as yf
    from openseries import OpenTimeSeries
-   import pandas as pd
    import numpy as np
 
    # Download Apple stock data
@@ -42,7 +41,7 @@ Performance Analysis
    print(f"Sharpe Ratio: {apple.ret_vol_ratio:.2f}")
 
    # Get all metrics at once
-   all_metrics = apple.all_properties
+   all_metrics = apple.all_properties()
    print("\n=== ALL METRICS ===")
    print(all_metrics)
 
@@ -85,7 +84,7 @@ Rolling Analysis
 .. code-block:: python
 
    # Rolling volatility (1-year window)
-   rolling_vol = apple.rolling_vol(window=252)
+   rolling_vol = apple.rolling_vol(observations=252)
    print(f"Current 1Y volatility: {rolling_vol.iloc[-1, 0]:.2%}")
    print(f"Average 1Y volatility: {rolling_vol.mean().iloc[0]:.2%}")
 
@@ -148,7 +147,6 @@ Here's a complete analysis script:
 
    import yfinance as yf
    from openseries import OpenTimeSeries
-   import pandas as pd
 
    def analyze_single_asset(ticker_symbol, period="5y"):
        """Complete single asset analysis"""

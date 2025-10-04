@@ -338,7 +338,7 @@ Custom Plotting Functions
        import plotly.express as px
 
        # Get metrics for all assets
-       metrics = frame.all_properties
+       metrics = frame.all_properties()
        returns = metrics.loc['geo_ret'] * 100
        volatilities = metrics.loc['vol'] * 100
        sharpe_ratios = metrics.loc['ret_vol_ratio']
@@ -385,8 +385,9 @@ Performance Attribution
        """Create performance attribution waterfall chart"""
        import plotly.graph_objects as go
 
-       # Calculate individual contributions
-       asset_returns = [series.geo_ret for series in frame.constituents]
+       # Calculate individual contributions using OpenFrame
+       asset_metrics = frame.all_properties()
+       asset_returns = asset_metrics.loc['geo_ret'].values
        contributions = [weight * ret for weight, ret in zip(weights, asset_returns)]
 
        # Create waterfall chart
@@ -623,7 +624,7 @@ Efficient Data Processing
 
            # Process chunk
            chunk_frame = OpenFrame(constituents=chunk)
-           chunk_metrics = chunk_frame.all_properties
+           chunk_metrics = chunk_frame.all_properties()
 
            results.append(chunk_metrics)
 
@@ -662,7 +663,7 @@ Efficient Data Processing
        # Sequential processing
        import time
        start_time = time.time()
-       sequential_results = portfolio_assets.all_properties
+       sequential_results = portfolio_assets.all_properties()
        sequential_time = time.time() - start_time
 
        print(f"Sequential processing time: {sequential_time:.4f} seconds")

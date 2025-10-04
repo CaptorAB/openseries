@@ -773,7 +773,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         method: LiteralPandasReindexMethod, default: "nearest"
 
 
-
         Returns:
         --------
         OpenFrame

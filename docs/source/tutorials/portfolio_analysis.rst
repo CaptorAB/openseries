@@ -55,7 +55,7 @@ First, let's analyze the individual assets:
 .. code-block:: python
 
    # Get metrics for all assets
-   asset_metrics = assets.all_properties
+   asset_metrics = assets.all_properties()
    print("=== INDIVIDUAL ASSET METRICS ===")
    print(asset_metrics)
 
@@ -82,7 +82,7 @@ Understanding correlations is crucial for portfolio construction:
 .. code-block:: python
 
    # Calculate correlation matrix
-   correlation_matrix = assets.correl_matrix()
+   correlation_matrix = assets.correl_matrix
    print("\n=== CORRELATION MATRIX ===")
    print(correlation_matrix.round(3))
 
@@ -116,10 +116,9 @@ Equal Weight Portfolio
    n_assets = assets.item_count
    equal_weights = [1/n_assets] * n_assets
 
-   equal_weight_portfolio = assets.make_portfolio(
-       weights=equal_weights,
-       name="Equal Weight Portfolio"
-   )
+   assets.weights = equal_weights
+   portfolio_df = assets.make_portfolio(name="Equal Weight Portfolio")
+   equal_weight_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
 
    print(f"Equal Weight Portfolio Return: {equal_weight_portfolio.geo_ret:.2%}")
    print(f"Equal Weight Portfolio Volatility: {equal_weight_portfolio.vol:.2%}")
@@ -134,10 +133,9 @@ Market Cap Weighted Portfolio
    # Larger weights for larger markets
    market_cap_weights = [0.50, 0.15, 0.10, 0.15, 0.05, 0.03, 0.02]  # Must sum to 1
 
-   market_cap_portfolio = assets.make_portfolio(
-       weights=market_cap_weights,
-       name="Market Cap Weighted"
-   )
+   assets.weights = market_cap_weights
+   portfolio_df = assets.make_portfolio(name="Market Cap Weighted")
+   market_cap_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
 
    print(f"Market Cap Portfolio Return: {market_cap_portfolio.geo_ret:.2%}")
    print(f"Market Cap Portfolio Volatility: {market_cap_portfolio.vol:.2%}")
@@ -149,16 +147,16 @@ Risk Parity Portfolio
 .. code-block:: python
 
    # Inverse volatility weighting (simple risk parity)
-   volatilities = [series.vol for series in assets.constituents]
+   asset_metrics = assets.all_properties()
+   volatilities = asset_metrics.loc['vol'].values
    inv_vol_weights = [1/vol for vol in volatilities]
    # Normalize to sum to 1
    total_inv_vol = sum(inv_vol_weights)
    inv_vol_weights = [w/total_inv_vol for w in inv_vol_weights]
 
-   risk_parity_portfolio = assets.make_portfolio(
-       weights=inv_vol_weights,
-       name="Risk Parity"
-   )
+   assets.weights = inv_vol_weights
+   portfolio_df = assets.make_portfolio(name="Risk Parity")
+   risk_parity_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
 
    print(f"Risk Parity Portfolio Return: {risk_parity_portfolio.geo_ret:.2%}")
    print(f"Risk Parity Portfolio Volatility: {risk_parity_portfolio.vol:.2%}")
@@ -252,7 +250,7 @@ Let's compare all our portfolios:
    comparison_frame = OpenFrame(constituents=all_series)
 
    # Get comprehensive metrics
-   portfolio_metrics = comparison_frame.all_properties
+   portfolio_metrics = comparison_frame.all_properties()
 
    # Focus on key metrics
    key_metrics = portfolio_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
@@ -356,7 +354,7 @@ Analyze how portfolio characteristics change over time:
    print(f"Correlation range: {rolling_corr.min().iloc[0]:.3f} to {rolling_corr.max().iloc[0]:.3f}")
 
    # Rolling portfolio volatility
-   portfolio_rolling_vol = equal_weight_portfolio.rolling_vol(window=252)
+   portfolio_rolling_vol = equal_weight_portfolio.rolling_vol(observations=252)
 
    print(f"\nRolling volatility statistics:")
    print(f"Average volatility: {portfolio_rolling_vol.mean().iloc[0]:.2%}")
@@ -374,17 +372,15 @@ Analyze the impact of rebalancing frequency:
 
    # Monthly rebalancing
    monthly_data = assets.resample_to_business_period_ends(freq="BME")
-   monthly_portfolio = monthly_data.make_portfolio(
-       weights=equal_weights,
-       name="Monthly Rebalanced"
-   )
+   monthly_data.weights = equal_weights
+   monthly_portfolio_df = monthly_data.make_portfolio(name="Monthly Rebalanced")
+   monthly_portfolio = OpenTimeSeries.from_df(dframe=monthly_portfolio_df.iloc[:, 0])
 
    # Quarterly rebalancing
    quarterly_data = assets.resample_to_business_period_ends(freq="BQE")
-   quarterly_portfolio = quarterly_data.make_portfolio(
-       weights=equal_weights,
-       name="Quarterly Rebalanced"
-   )
+   quarterly_data.weights = equal_weights
+   quarterly_portfolio_df = quarterly_data.make_portfolio(name="Quarterly Rebalanced")
+   quarterly_portfolio = OpenTimeSeries.from_df(dframe=quarterly_portfolio_df.iloc[:, 0])
 
    # Compare rebalancing frequencies
    rebalancing_comparison = OpenFrame(constituents=[
@@ -393,7 +389,7 @@ Analyze the impact of rebalancing frequency:
        quarterly_portfolio
    ])
 
-   rebal_metrics = rebalancing_comparison.all_properties
+   rebal_metrics = rebalancing_comparison.all_properties()
    print("\n=== REBALANCING FREQUENCY COMPARISON ===")
    print(rebal_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio']].round(4))
 
@@ -453,7 +449,7 @@ Generate a comprehensive portfolio analysis report:
    print(f"\n--- PORTFOLIO CHARACTERISTICS ---")
    avg_correlation = correlation_matrix.mean().mean()
    print(f"Average Asset Correlation: {avg_correlation:.3f}")
-   print(f"Portfolio Diversification Benefit: {(sum([s.vol for s in assets.constituents])/len(assets.constituents) - equal_weight_portfolio.vol):.2%}")
+   print(f"Portfolio Diversification Benefit: {(asset_metrics.loc['vol'].mean() - equal_weight_portfolio.vol):.2%}")
 
    # Export results
    portfolio_metrics.to_excel("portfolio_analysis.xlsx")

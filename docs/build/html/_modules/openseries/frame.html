@@ -795,10 +795,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">correl_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Correlation matrix.</span>
 
+<span class="sd">        This property returns the correlation matrix of the time series</span>
+<span class="sd">        in the frame.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">        --------</span>
-<span class="sd">        Pandas.DataFrame</span>
-<span class="sd">            Correlation matrix</span>
+<span class="sd">        pandas.DataFrame</span>
+<span class="sd">            Correlation matrix of the time series in the frame.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">corr_matrix</span> <span class="o">=</span> <span class="p">(</span>

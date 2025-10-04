@@ -165,7 +165,7 @@
 <section id="comparative-analysis">
 <h2>Comparative Analysis<a class="headerlink" href="#comparative-analysis" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get metrics for all assets</span>
-<span class="n">all_metrics</span> <span class="o">=</span> <span class="n">tech_stocks</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">all_metrics</span> <span class="o">=</span> <span class="n">tech_stocks</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== COMPARATIVE METRICS ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">all_metrics</span><span class="p">)</span>
 
@@ -280,7 +280,7 @@
 
     <span class="k">if</span> <span class="n">group_series</span><span class="p">:</span>
         <span class="n">group_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">group_series</span><span class="p">)</span>
-        <span class="n">group_metrics</span> <span class="o">=</span> <span class="n">group_frame</span><span class="o">.</span><span class="n">all_properties</span>
+        <span class="n">group_metrics</span> <span class="o">=</span> <span class="n">group_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 
         <span class="n">avg_return</span> <span class="o">=</span> <span class="n">group_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="n">avg_vol</span> <span class="o">=</span> <span class="n">group_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -321,9 +321,10 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Volatility: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Sharpe: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Compare with individual assets</span>
-<span class="n">individual_returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">geo_ret</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tech_stocks</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
-<span class="n">individual_vols</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">vol</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tech_stocks</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+<span class="c1"># Compare with individual assets using OpenFrame</span>
+<span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">tech_stocks</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+<span class="n">individual_returns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">individual_vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Diversification benefit:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Weighted avg return: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">individual_returns</span><span class="p">,</span><span class="w"> </span><span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -414,7 +415,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Period: </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Key metrics</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
     <span class="n">key_metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;max_drawdown&#39;</span><span class="p">]]</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Key Metrics:&quot;</span><span class="p">)</span>

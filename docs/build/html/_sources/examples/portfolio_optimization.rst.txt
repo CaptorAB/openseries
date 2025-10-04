@@ -171,8 +171,9 @@ Inverse Volatility Portfolio
 
 .. code-block:: python
 
-   # Inverse volatility weighting
-   asset_volatilities = [asset.vol for asset in investment_universe.constituents]
+   # Inverse volatility weighting using OpenFrame
+   asset_metrics = investment_universe.all_properties()
+   asset_volatilities = asset_metrics.loc['vol'].values
    inv_vol_weights = [1/vol for vol in asset_volatilities]
    total_inv_vol = sum(inv_vol_weights)
    inv_vol_weights = [w/total_inv_vol for w in inv_vol_weights]
@@ -240,9 +241,9 @@ Target Risk Portfolio
    def target_risk_portfolio(frame, target_volatility=0.10):
        """Create portfolio targeting specific volatility level"""
 
-       # Start with minimum volatility portfolio weights
-       # This is a simplified approach - in practice, use optimization
-       asset_vols = [asset.vol for asset in frame.constituents]
+       # Start with minimum volatility portfolio weights using OpenFrame
+       asset_metrics = frame.all_properties()
+       asset_vols = asset_metrics.loc['vol'].values
        min_vol_asset_idx = np.argmin(asset_vols)
 
        # Create weights that target the desired volatility
@@ -299,7 +300,7 @@ Portfolio Comparison
 
    # Create comparison frame
    comparison_frame = OpenFrame(constituents=portfolios)
-   comparison_metrics = comparison_frame.all_properties
+   comparison_metrics = comparison_frame.all_properties()
 
    # Display key metrics
    key_metrics = comparison_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
@@ -410,7 +411,7 @@ Export Optimization Results
        comparison_metrics.to_excel(writer, sheet_name='Portfolio Comparison')
 
        # Individual asset metrics
-       asset_metrics = investment_universe.all_properties
+       asset_metrics = investment_universe.all_properties()
        asset_metrics.to_excel(writer, sheet_name='Asset Metrics')
 
        # Correlation matrix
@@ -459,8 +460,9 @@ Complete Optimization Function
        n = frame.item_count
        equal_weights = [1/n] * n
 
-       # Asset volatilities for inverse vol weighting
-       vols = [asset.vol for asset in frame.constituents]
+       # Asset volatilities for inverse vol weighting using OpenFrame
+       asset_metrics = frame.all_properties()
+       vols = asset_metrics.loc['vol'].values
        inv_vol_weights = [1/vol for vol in vols]
        inv_vol_weights = [w/sum(inv_vol_weights) for w in inv_vol_weights]
 
