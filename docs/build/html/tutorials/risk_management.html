@@ -83,6 +83,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Important Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_consistency.html">API Consistency Notes</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/openseries.html">openseries package</a></li>
@@ -156,8 +160,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
         <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-            <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span>
+            <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
@@ -172,8 +175,10 @@
 <span class="n">n_assets</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">item_count</span>
 <span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
 
+<span class="c1"># Set weights on the frame first</span>
+<span class="n">portfolio_assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
+
 <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Diversified Portfolio&quot;</span>
 <span class="p">)</span>
 <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
@@ -259,12 +264,12 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling Volatility - Range: </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Rolling VaR</span>
-<span class="n">rolling_var</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_var_down</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+<span class="n">rolling_var</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_var_down</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling VaR (95%) - Current: </span><span class="si">{</span><span class="n">rolling_var</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling VaR (95%) - Average: </span><span class="si">{</span><span class="n">rolling_var</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Rolling CVaR</span>
-<span class="n">rolling_cvar</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_cvar_down</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+<span class="n">rolling_cvar</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_cvar_down</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling CVaR (95%) - Current: </span><span class="si">{</span><span class="n">rolling_cvar</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling CVaR (95%) - Average: </span><span class="si">{</span><span class="n">rolling_cvar</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
@@ -280,24 +285,30 @@
 <span class="c1"># Convert to returns for analysis</span>
 <span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
 <span class="n">returns_data</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="o">.</span><span class="n">tsdf</span>
+
+<span class="c1"># Note: value_to_ret() modifies the original series in place</span>
+<span class="c1"># Restore the original portfolio for further analysis</span>
+<span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
+
 <span class="c1"># Identify worst periods</span>
-<span class="n">worst_1_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-<span class="n">worst_5_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">worst_1_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">worst_5_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst 1% threshold: </span><span class="si">{</span><span class="n">worst_1_percent</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst 5% threshold: </span><span class="si">{</span><span class="n">worst_5_percent</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Count extreme events</span>
-<span class="n">extreme_events_1pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_1_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-<span class="n">extreme_events_5pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_5_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">extreme_events_1pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_1_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">extreme_events_5pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_5_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Days with returns &lt;= 1% threshold: </span><span class="si">{</span><span class="n">extreme_events_1pct</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Days with returns &lt;= 5% threshold: </span><span class="si">{</span><span class="n">extreme_events_5pct</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Worst consecutive days</span>
-<span class="n">worst_days</span> <span class="o">=</span> <span class="n">returns_data</span><span class="p">[</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_5_percent</span><span class="p">]</span>
+<span class="c1"># Worst consecutive days - simplified approach</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Worst 5 single days:&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">return_val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">worst_days</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+<span class="n">returns_series</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Get the first (and only) column</span>
+<span class="n">worst_5_days</span> <span class="o">=</span> <span class="n">returns_series</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">return_val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">worst_5_days</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">return_val</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>

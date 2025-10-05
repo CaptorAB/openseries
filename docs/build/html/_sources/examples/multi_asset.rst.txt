@@ -31,8 +31,7 @@ Setting Up Multi-Asset Analysis
        try:
            data = yf.Ticker(ticker).history(period="3y")
            series = OpenTimeSeries.from_df(
-               dframe=data['Close'],
-               name=name
+               dframe=data['Close']
            )
            series.set_new_label(lvl_zero=name)
            series_list.append(series)
@@ -56,7 +55,7 @@ Comparative Analysis
    print(all_metrics)
 
    # Focus on key metrics
-   key_metrics = all_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
+   key_metrics = all_metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
    key_metrics.index = ['Annual Return', 'Volatility', 'Sharpe Ratio', 'Max Drawdown']
 
    # Convert to percentages for better readability
@@ -293,7 +292,8 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
    for ticker in tech_tickers:
        try:
            data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
+           series = OpenTimeSeries.from_df(dframe=data['Close'])
+           series.set_new_label(lvl_zero=ticker)
            series_list.append(series)
        except:
            print(f"Failed to load {ticker}")
@@ -311,7 +311,7 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
 
        # Key metrics using openseries all_properties method
        metrics = frame.all_properties()
-       key_metrics = metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
+       key_metrics = metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
 
        print("\nKey Metrics:")
        print((key_metrics * 100).round(2))  # Convert to percentages

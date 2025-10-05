@@ -72,6 +72,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Important Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_consistency.html">API Consistency Notes</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/openseries.html">openseries package</a></li>
@@ -120,7 +124,10 @@
 <h2>Factor Analysis and Regression<a class="headerlink" href="#factor-analysis-and-regression" title="Link to this heading"></a></h2>
 <section id="multi-factor-model-analysis">
 <h3>Multi-Factor Model Analysis<a class="headerlink" href="#multi-factor-model-analysis" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load factor data (Fama-French factors would be ideal, using proxies here)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span><span class="p">,</span> <span class="n">OpenFrame</span>
+
+<span class="c1"># Load factor data (Fama-French factors would be ideal, using proxies here)</span>
 <span class="n">factor_tickers</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;^GSPC&quot;</span><span class="p">:</span> <span class="s2">&quot;Market&quot;</span><span class="p">,</span>
     <span class="s2">&quot;^RUT&quot;</span><span class="p">:</span> <span class="s2">&quot;Small Cap&quot;</span><span class="p">,</span>  <span class="c1"># Size factor proxy</span>
@@ -133,7 +140,8 @@
 <span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">factor_tickers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
-        <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="n">factor_series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -143,7 +151,8 @@
 
 <span class="c1"># Load individual stock for analysis</span>
 <span class="n">stock_data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s2">&quot;AAPL&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
-<span class="n">apple</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">stock_data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Apple&quot;</span><span class="p">)</span>
+<span class="n">apple</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">stock_data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;Apple&quot;</span><span class="p">)</span>
 
 <span class="c1"># Add stock to factor frame for regression</span>
 <span class="n">analysis_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">factor_series</span> <span class="o">+</span> <span class="p">[</span><span class="n">apple</span><span class="p">])</span>
@@ -178,7 +187,7 @@
 <span class="n">stock_vs_market</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">apple</span><span class="p">,</span> <span class="n">market_series</span><span class="p">])</span>
 
 <span class="c1"># Calculate rolling beta</span>
-<span class="n">rolling_beta</span> <span class="o">=</span> <span class="n">stock_vs_market</span><span class="o">.</span><span class="n">rolling_beta</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>  <span class="c1"># 1-year rolling</span>
+<span class="n">rolling_beta</span> <span class="o">=</span> <span class="n">stock_vs_market</span><span class="o">.</span><span class="n">rolling_beta</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>  <span class="c1"># 1-year rolling</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== ROLLING BETA ANALYSIS ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Beta: </span><span class="si">{</span><span class="n">rolling_beta</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -187,7 +196,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Beta Volatility: </span><span class="si">{</span><span class="n">rolling_beta</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Rolling correlation</span>
-<span class="n">rolling_corr</span> <span class="o">=</span> <span class="n">stock_vs_market</span><span class="o">.</span><span class="n">rolling_corr</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+<span class="n">rolling_corr</span> <span class="o">=</span> <span class="n">stock_vs_market</span><span class="o">.</span><span class="n">rolling_corr</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== ROLLING CORRELATION ANALYSIS ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Correlation: </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

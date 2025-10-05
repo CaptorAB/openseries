@@ -11,6 +11,9 @@ Multi-Factor Model Analysis
 
 .. code-block:: python
 
+   import yfinance as yf
+   from openseries import OpenTimeSeries, OpenFrame
+
    # Load factor data (Fama-French factors would be ideal, using proxies here)
    factor_tickers = {
        "^GSPC": "Market",
@@ -24,7 +27,8 @@ Multi-Factor Model Analysis
    for ticker, name in factor_tickers.items():
        try:
            data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'], name=name)
+           series = OpenTimeSeries.from_df(dframe=data['Close'])
+           series.set_new_label(lvl_zero=name)
            factor_series.append(series)
        except:
            print(f"Failed to load {name}")
@@ -34,7 +38,8 @@ Multi-Factor Model Analysis
 
    # Load individual stock for analysis
    stock_data = yf.Ticker("AAPL").history(period="3y")
-   apple = OpenTimeSeries.from_df(dframe=stock_data['Close'], name="Apple")
+   apple = OpenTimeSeries.from_df(dframe=stock_data['Close'])
+   apple.set_new_label(lvl_zero="Apple")
 
    # Add stock to factor frame for regression
    analysis_frame = OpenFrame(constituents=factor_series + [apple])
@@ -70,7 +75,7 @@ Rolling Factor Analysis
    stock_vs_market = OpenFrame(constituents=[apple, market_series])
 
    # Calculate rolling beta
-   rolling_beta = stock_vs_market.rolling_beta(window=252)  # 1-year rolling
+   rolling_beta = stock_vs_market.rolling_beta(observations=252)  # 1-year rolling
 
    print(f"\n=== ROLLING BETA ANALYSIS ===")
    print(f"Current Beta: {rolling_beta.iloc[-1, 0]:.3f}")
@@ -79,7 +84,7 @@ Rolling Factor Analysis
    print(f"Beta Volatility: {rolling_beta.std().iloc[0]:.3f}")
 
    # Rolling correlation
-   rolling_corr = stock_vs_market.rolling_corr(window=252)
+   rolling_corr = stock_vs_market.rolling_corr(observations=252)
 
    print(f"\n=== ROLLING CORRELATION ANALYSIS ===")
    print(f"Current Correlation: {rolling_corr.iloc[-1, 0]:.3f}")

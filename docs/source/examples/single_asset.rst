@@ -18,8 +18,7 @@ Basic Setup
 
    # Create OpenTimeSeries
    apple = OpenTimeSeries.from_df(
-       dframe=data['Close'],
-       name="Apple Inc."
+       dframe=data['Close']
    )
 
    # Set descriptive label
@@ -89,10 +88,10 @@ Rolling Analysis
    print(f"Average 1Y volatility: {rolling_vol.mean().iloc[0]:.2%}")
 
    # Rolling returns (30-day)
-   rolling_returns = apple.rolling_return(window=30)
+   rolling_returns = apple.rolling_return(observations=30)
 
    # Rolling VaR
-   rolling_var = apple.rolling_var_down(window=252)
+   rolling_var = apple.rolling_var_down(observations=252)
 
 Visualization
 -------------
@@ -191,7 +190,8 @@ Here's how to perform comprehensive single asset analysis using openseries metho
    for ticker_symbol in tickers:
        ticker = yf.Ticker(ticker_symbol)
        data = ticker.history(period="2y")
-       series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker_symbol)
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=ticker_symbol)
 
        print(f"\n{ticker_symbol}:")
        print(f"  Return: {series.geo_ret:.2%}")

@@ -83,6 +83,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Important Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_consistency.html">API Consistency Notes</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/openseries.html">openseries package</a></li>
@@ -142,8 +146,7 @@
 
 <span class="c1"># Create OpenTimeSeries</span>
 <span class="n">sp500</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500&quot;</span>
+    <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="c1"># Set a descriptive label</span>
@@ -250,6 +253,11 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns for distribution analysis</span>
 <span class="n">returns</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
 
+<span class="c1"># Note: value_to_ret() modifies the original series in place</span>
+<span class="c1"># Restore the original series for further analysis</span>
+<span class="n">sp500</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500 Index&quot;</span><span class="p">)</span>
+
 <span class="c1"># Skewness (asymmetry of the distribution)</span>
 <span class="n">skewness</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">skew</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skewness: </span><span class="si">{</span><span class="n">skewness</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -319,7 +327,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling volatility calculated for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rolling_vol</span><span class="p">)</span><span class="si">}</span><span class="s2"> periods&quot;</span><span class="p">)</span>
 
 <span class="c1"># 30-day rolling returns</span>
-<span class="n">rolling_returns</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_return</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">rolling_returns</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_return</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
 <span class="c1"># Plot rolling volatility</span>
 <span class="c1"># Convert to OpenTimeSeries for plotting</span>
@@ -375,9 +383,9 @@
 
 <span class="c1"># Create bond series (using yield data)</span>
 <span class="n">bonds</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">bond_data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;10Y Treasury Yield&quot;</span>
+    <span class="n">dframe</span><span class="o">=</span><span class="n">bond_data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
 <span class="p">)</span>
+<span class="n">bonds</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;10Y Treasury Yield&quot;</span><span class="p">)</span>
 
 <span class="c1"># Create frame for comparison</span>
 <span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">sp500</span><span class="p">,</span> <span class="n">bonds</span><span class="p">])</span>

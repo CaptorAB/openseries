@@ -49,8 +49,7 @@ More commonly, you'll load data from a pandas DataFrame:
 
    # Create OpenTimeSeries from the Close prices
    sp500 = OpenTimeSeries.from_df(
-       dframe=data['Close'],
-       name="S&P 500"
+       dframe=data['Close']
    )
 
    # Set a more descriptive label
@@ -130,7 +129,8 @@ For multi-asset analysis, use the OpenFrame class:
    series_list = []
    for ticker, name in zip(tickers, names):
        data = yf.Ticker(ticker).history(period="2y")
-       series = OpenTimeSeries.from_df(dframe=data['Close'], name=name)
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=name)
        series_list.append(series)
 
    # Create OpenFrame
@@ -199,7 +199,7 @@ Save your analysis results:
    sp500.to_xlsx("sp500_analysis.xlsx")
 
    # Export to JSON
-   sp500.to_json("sp500_data.json")
+   sp500.to_json(filename="sp500_data.json", what_output="tsdf")
 
    # Export metrics to CSV
    metrics.to_csv("sp500_metrics.csv")
@@ -247,7 +247,8 @@ Here are some common usage patterns:
 .. code-block:: python
 
    # Pattern 1: Load, analyze, visualize
-   series = OpenTimeSeries.from_df(data['Close'], name="Asset")
+   series = OpenTimeSeries.from_df(dframe=data['Close'])
+   series.set_new_label(lvl_zero="Asset")
    metrics = series.all_properties()
    series.plot_series()
 

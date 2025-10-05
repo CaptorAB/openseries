@@ -22,8 +22,7 @@ First, let's import the necessary libraries and download some data:
 
    # Create OpenTimeSeries
    sp500 = OpenTimeSeries.from_df(
-       dframe=data['Close'],
-       name="S&P 500"
+       dframe=data['Close']
    )
 
    # Set a descriptive label
@@ -140,6 +139,11 @@ Examine the return distribution characteristics:
    # Convert to returns for distribution analysis
    returns = sp500.value_to_ret()
 
+   # Note: value_to_ret() modifies the original series in place
+   # Restore the original series for further analysis
+   sp500 = OpenTimeSeries.from_df(dframe=data['Close'])
+   sp500.set_new_label(lvl_zero="S&P 500 Index")
+
    # Skewness (asymmetry of the distribution)
    skewness = sp500.skew
    print(f"Skewness: {skewness:.2f}")
@@ -214,7 +218,7 @@ Analyze how metrics change over time:
    print(f"Rolling volatility calculated for {len(rolling_vol)} periods")
 
    # 30-day rolling returns
-   rolling_returns = sp500.rolling_return(window=30)
+   rolling_returns = sp500.rolling_return(observations=30)
 
    # Plot rolling volatility
    # Convert to OpenTimeSeries for plotting
@@ -276,9 +280,9 @@ Let's compare with a bond index:
 
    # Create bond series (using yield data)
    bonds = OpenTimeSeries.from_df(
-       dframe=bond_data['Close'],
-       name="10Y Treasury Yield"
+       dframe=bond_data['Close']
    )
+   bonds.set_new_label(lvl_zero="10Y Treasury Yield")
 
    # Create frame for comparison
    comparison_frame = OpenFrame(constituents=[sp500, bonds])

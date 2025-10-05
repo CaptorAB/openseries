@@ -358,7 +358,8 @@ Data Loading
 .. code-block:: python
 
    # Prefer from_df for pandas data
-   series = OpenTimeSeries.from_df(dataframe['Close'], name="Asset")
+   series = OpenTimeSeries.from_df(dframe=dataframe['Close'])
+   series.set_new_label(lvl_zero="Asset")
 
    # Use from_arrays for custom data
    series = OpenTimeSeries.from_arrays(dates=date_list, values=value_list)
@@ -372,7 +373,8 @@ Analysis Workflow
 .. code-block:: python
 
    # 1. Load and validate data
-   series = OpenTimeSeries.from_df(data['Close'], name="Asset")
+   series = OpenTimeSeries.from_df(dframe=data['Close'])
+   series.set_new_label(lvl_zero="Asset")
 
    # 2. Basic analysis
    metrics = series.all_properties()

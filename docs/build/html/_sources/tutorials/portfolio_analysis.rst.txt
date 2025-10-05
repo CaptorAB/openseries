@@ -33,8 +33,7 @@ Let's start by downloading data for a diversified set of assets:
        try:
            data = yf.Ticker(ticker).history(period="5y")
            series = OpenTimeSeries.from_df(
-               dframe=data['Close'],
-               name=name
+               dframe=data['Close']
            )
            series.set_new_label(lvl_zero=name)
            series_list.append(series)
@@ -162,27 +161,27 @@ Efficient Frontier
 
    # Calculate efficient frontier
    try:
-       frontier_results = efficient_frontier(
-           frame=assets,
-           num_portfolios=50,
-           max_weight=0.4,  # Maximum 40% in any single asset
-           min_weight=0.0   # No short selling
+       frontier_df, simulated_df, optimal_portfolio = efficient_frontier(
+           eframe=assets,
+           num_ports=50,
+           seed=42
        )
 
        print("Efficient frontier calculated successfully")
-       print(f"Number of portfolios: {len(frontier_results['returns'])}")
+       print(f"Number of frontier points: {len(frontier_df)}")
+       print(f"Number of simulated portfolios: {len(simulated_df)}")
 
        # Find maximum Sharpe ratio portfolio
-       sharpe_ratios = np.array(frontier_results['returns']) / np.array(frontier_results['volatilities'])
+       sharpe_ratios = frontier_df['ret'] / frontier_df['stdev']
        max_sharpe_idx = np.argmax(sharpe_ratios)
 
        print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
-       print(f"Expected Return: {frontier_results['returns'][max_sharpe_idx]:.2%}")
-       print(f"Volatility: {frontier_results['volatilities'][max_sharpe_idx]:.2%}")
-       print(f"Sharpe Ratio: {sharpe_ratios[max_sharpe_idx]:.2f}")
+       print(f"Expected Return: {frontier_df.iloc[max_sharpe_idx]['ret']:.2%}")
+       print(f"Volatility: {frontier_df.iloc[max_sharpe_idx]['stdev']:.2%}")
+       print(f"Sharpe Ratio: {sharpe_ratios.iloc[max_sharpe_idx]:.2f}")
 
        # Get optimal weights
-       optimal_weights = frontier_results['weights'][max_sharpe_idx]
+       optimal_weights = optimal_portfolio[-len(assets.constituents):]
        print("\nOptimal Weights:")
        for i, weight in enumerate(optimal_weights):
            asset_name = assets.constituents[i].name
@@ -199,16 +198,15 @@ Monte Carlo Portfolio Simulation
    # Simulate random portfolios
    try:
        simulation_results = simulate_portfolios(
-           frame=assets,
-           num_portfolios=10000,
-           max_weight=0.5,
-           min_weight=0.0
+           simframe=assets,
+           num_ports=10000,
+           seed=42
        )
 
-       print(f"\nSimulated {len(simulation_results['returns'])} random portfolios")
+       print(f"\nSimulated {len(simulation_results)} random portfolios")
 
        # Find best performing portfolios
-       sim_sharpe_ratios = np.array(simulation_results['returns']) / np.array(simulation_results['volatilities'])
+       sim_sharpe_ratios = simulation_results['ret'] / simulation_results['stdev']
 
        # Top 5 Sharpe ratios
        top_indices = np.argsort(sim_sharpe_ratios)[-5:]
@@ -216,9 +214,9 @@ Monte Carlo Portfolio Simulation
        print("\n=== TOP 5 SIMULATED PORTFOLIOS ===")
        for i, idx in enumerate(reversed(top_indices)):
            print(f"\nRank {i+1}:")
-           print(f"  Return: {simulation_results['returns'][idx]:.2%}")
-           print(f"  Volatility: {simulation_results['volatilities'][idx]:.2%}")
-           print(f"  Sharpe: {sim_sharpe_ratios[idx]:.2f}")
+           print(f"  Return: {simulation_results.iloc[idx]['ret']:.2%}")
+           print(f"  Volatility: {simulation_results.iloc[idx]['stdev']:.2%}")
+           print(f"  Sharpe: {sim_sharpe_ratios.iloc[idx]:.2f}")
 
    except Exception as e:
        print(f"Simulation failed: {e}")
@@ -241,7 +239,7 @@ Let's compare all our portfolios:
    portfolio_metrics = comparison_frame.all_properties()
 
    # Focus on key metrics
-   key_metrics = portfolio_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
+   key_metrics = portfolio_metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
    key_metrics.index = ['Annual Return', 'Volatility', 'Sharpe Ratio', 'Max Drawdown']
 
    print("\n=== PORTFOLIO COMPARISON ===")
@@ -335,7 +333,7 @@ Analyze how portfolio characteristics change over time:
    portfolio_vs_market = OpenFrame(constituents=[equal_weight_portfolio, market_proxy])
 
    # Calculate rolling correlation
-   rolling_corr = portfolio_vs_market.rolling_corr(window=252)  # 1-year rolling
+   rolling_corr = portfolio_vs_market.rolling_corr(observations=252)  # 1-year rolling
 
    print(f"\nRolling correlation calculated for {len(rolling_corr)} periods")
    print(f"Average correlation: {rolling_corr.mean().iloc[0]:.3f}")

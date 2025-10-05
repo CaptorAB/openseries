@@ -116,6 +116,12 @@ Documentation Contents
    examples/custom_reports
 
 .. toctree::
+   :maxdepth: 1
+   :caption: Important Notes
+
+   api_consistency
+
+.. toctree::
    :maxdepth: 2
    :caption: API Reference
 

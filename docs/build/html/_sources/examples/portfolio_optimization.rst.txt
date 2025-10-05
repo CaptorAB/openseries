@@ -31,7 +31,8 @@ Basic Portfolio Optimization Setup
    for ticker, name in universe.items():
        try:
            data = yf.Ticker(ticker).history(period="5y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'], name=name)
+           series = OpenTimeSeries.from_df(dframe=data['Close'])
+           series.set_new_label(lvl_zero=name)
            assets.append(series)
            print(f"Loaded {name}")
        except Exception as e:
@@ -49,24 +50,24 @@ Mean-Variance Optimization
 
    # Calculate efficient frontier
    try:
-       frontier_results = efficient_frontier(
-           frame=investment_universe,
-           num_portfolios=100,
-           max_weight=0.40,  # Maximum 40% in any asset
-           min_weight=0.05   # Minimum 5% in each asset
+       frontier_df, simulated_df, optimal_portfolio = efficient_frontier(
+           eframe=investment_universe,
+           num_ports=100,
+           seed=42
        )
 
        print("=== EFFICIENT FRONTIER RESULTS ===")
-       print(f"Generated {len(frontier_results['returns'])} efficient portfolios")
+       print(f"Generated {len(frontier_df)} efficient portfolios")
+       print(f"Simulated {len(simulated_df)} random portfolios")
 
        # Find key portfolios
-       returns = np.array(frontier_results['returns'])
-       volatilities = np.array(frontier_results['volatilities'])
+       returns = frontier_df['ret'].values
+       volatilities = frontier_df['stdev'].values
        sharpe_ratios = returns / volatilities
 
        # Maximum Sharpe ratio portfolio
        max_sharpe_idx = np.argmax(sharpe_ratios)
-       max_sharpe_weights = frontier_results['weights'][max_sharpe_idx]
+       max_sharpe_weights = optimal_portfolio[-len(investment_universe.constituents):]
 
        print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
        print(f"Expected Return: {returns[max_sharpe_idx]:.2%}")
@@ -105,17 +106,16 @@ Monte Carlo Portfolio Simulation
    # Generate random portfolios
    try:
        simulation_results = simulate_portfolios(
-           frame=investment_universe,
-           num_portfolios=50000,
-           max_weight=0.50,
-           min_weight=0.0
+           simframe=investment_universe,
+           num_ports=50000,
+           seed=42
        )
 
        print(f"\n=== MONTE CARLO SIMULATION ===")
-       print(f"Simulated {len(simulation_results['returns'])} random portfolios")
+       print(f"Simulated {len(simulation_results)} random portfolios")
 
-       sim_returns = np.array(simulation_results['returns'])
-       sim_volatilities = np.array(simulation_results['volatilities'])
+       sim_returns = simulation_results['ret'].values
+       sim_volatilities = simulation_results['stdev'].values
        sim_sharpe_ratios = sim_returns / sim_volatilities
 
        # Statistics of simulated portfolios
@@ -498,7 +498,8 @@ Here's how to perform portfolio optimization using openseries methods directly:
    for ticker in etf_tickers:
        try:
            data = yf.Ticker(ticker).history(period="5y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
+           series = OpenTimeSeries.from_df(dframe=data['Close'])
+           series.set_new_label(lvl_zero=ticker)
            assets.append(series)
        except:
            print(f"Failed to load {ticker}")

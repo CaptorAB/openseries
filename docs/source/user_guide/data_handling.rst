@@ -19,7 +19,8 @@ The most common way to load data is from pandas objects:
    # From pandas Series with DatetimeIndex
    data = pd.Series([100, 101, 99, 102],
                    index=pd.date_range('2023-01-01', periods=4))
-   series = OpenTimeSeries.from_df(dframe=data, name="Sample")
+   series = OpenTimeSeries.from_df(dframe=data)
+   series.set_new_label(lvl_zero="Sample")
 
    # From pandas DataFrame column
    df = pd.DataFrame({
@@ -28,7 +29,8 @@ The most common way to load data is from pandas objects:
        'Volume': [1000, 1100, 900, 1200]
    })
    df.set_index('Date', inplace=True)
-   series = OpenTimeSeries.from_df(dframe=df['Close'], name="Stock")
+   series = OpenTimeSeries.from_df(dframe=df['Close'])
+   series.set_new_label(lvl_zero="Stock")
 
 From Arrays
 ~~~~~~~~~~~

@@ -36,8 +36,7 @@ Let's start with a portfolio of assets for risk analysis:
        try:
            data = yf.Ticker(ticker).history(period="3y")
            series = OpenTimeSeries.from_df(
-               dframe=data['Close'],
-               name=name
+               dframe=data['Close']
            )
            series.set_new_label(lvl_zero=name)
            series_list.append(series)
@@ -52,8 +51,10 @@ Let's start with a portfolio of assets for risk analysis:
    n_assets = portfolio_assets.item_count
    equal_weights = [1/n_assets] * n_assets
 
+   # Set weights on the frame first
+   portfolio_assets.weights = equal_weights
+
    portfolio_df = portfolio_assets.make_portfolio(
-       weights=equal_weights,
        name="Diversified Portfolio"
    )
    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
@@ -147,12 +148,12 @@ Monitor how risk changes over time:
    print(f"Rolling Volatility - Range: {rolling_vol.min().iloc[0]:.2%} to {rolling_vol.max().iloc[0]:.2%}")
 
    # Rolling VaR
-   rolling_var = portfolio.rolling_var_down(window=window)
+   rolling_var = portfolio.rolling_var_down(observations=window)
    print(f"Rolling VaR (95%) - Current: {rolling_var.iloc[-1, 0]:.2%}")
    print(f"Rolling VaR (95%) - Average: {rolling_var.mean().iloc[0]:.2%}")
 
    # Rolling CVaR
-   rolling_cvar = portfolio.rolling_cvar_down(window=window)
+   rolling_cvar = portfolio.rolling_cvar_down(observations=window)
    print(f"Rolling CVaR (95%) - Current: {rolling_cvar.iloc[-1, 0]:.2%}")
    print(f"Rolling CVaR (95%) - Average: {rolling_cvar.mean().iloc[0]:.2%}")
 
@@ -171,24 +172,30 @@ Historical Stress Testing
    # Convert to returns for analysis
    portfolio_returns = portfolio.value_to_ret()
    returns_data = portfolio_returns.tsdf
+
+   # Note: value_to_ret() modifies the original series in place
+   # Restore the original portfolio for further analysis
+   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+
    # Identify worst periods
-   worst_1_percent = returns_data.quantile(0.01)
-   worst_5_percent = returns_data.quantile(0.05)
+   worst_1_percent = returns_data.quantile(0.01).iloc[0]
+   worst_5_percent = returns_data.quantile(0.05).iloc[0]
 
    print(f"Worst 1% threshold: {worst_1_percent:.2%}")
    print(f"Worst 5% threshold: {worst_5_percent:.2%}")
 
    # Count extreme events
-   extreme_events_1pct = (returns_data <= worst_1_percent).sum()
-   extreme_events_5pct = (returns_data <= worst_5_percent).sum()
+   extreme_events_1pct = (returns_data <= worst_1_percent).sum().iloc[0]
+   extreme_events_5pct = (returns_data <= worst_5_percent).sum().iloc[0]
 
    print(f"Days with returns <= 1% threshold: {extreme_events_1pct}")
    print(f"Days with returns <= 5% threshold: {extreme_events_5pct}")
 
-   # Worst consecutive days
-   worst_days = returns_data[returns_data <= worst_5_percent]
+   # Worst consecutive days - simplified approach
    print(f"\nWorst 5 single days:")
-   for i, (date, return_val) in enumerate(worst_days.nsmallest(5).items()):
+   returns_series = returns_data.iloc[:, 0]  # Get the first (and only) column
+   worst_5_days = returns_series.nsmallest(5)
+   for i, (date, return_val) in enumerate(worst_5_days.items()):
        print(f"  {i+1}. {date.strftime('%Y-%m-%d')}: {return_val:.2%}")
 
 Scenario Analysis

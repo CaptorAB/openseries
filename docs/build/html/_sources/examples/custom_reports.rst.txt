@@ -19,7 +19,7 @@ Using the Built-in HTML Report
    series_list = []
    for ticker, name in zip(tickers, names):
        data = yf.Ticker(ticker).history(period="3y")
-       series = OpenTimeSeries.from_df(dframe=data['Close'], name=name)
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
        series.set_new_label(lvl_zero=name)
        series_list.append(series)
 
