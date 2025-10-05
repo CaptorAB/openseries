@@ -60,10 +60,10 @@ First, let's analyze the individual assets:
    print(asset_metrics)
 
    # Key metrics comparison
-   returns = asset_metrics.loc['geo_ret'] * 100
-   volatilities = asset_metrics.loc['vol'] * 100
-   sharpe_ratios = asset_metrics.loc['ret_vol_ratio']
-   max_drawdowns = asset_metrics.loc['max_drawdown'] * 100
+   returns = asset_metrics.loc['Geometric return'] * 100
+   volatilities = asset_metrics.loc['Volatility'] * 100
+   sharpe_ratios = asset_metrics.loc['Return vol ratio']
+   max_drawdowns = asset_metrics.loc['Max drawdown'] * 100
 
    print("\n=== ASSET COMPARISON ===")
    comparison_df = pd.DataFrame({
@@ -114,7 +114,7 @@ Equal Weight Portfolio
 
    # Create equal-weighted portfolio using native weight_strat
    portfolio_df = assets.make_portfolio(name="Equal Weight Portfolio", weight_strat="eq_weights")
-   equal_weight_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
+   equal_weight_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
    print(f"Equal Weight Portfolio Return: {equal_weight_portfolio.geo_ret:.2%}")
    print(f"Equal Weight Portfolio Volatility: {equal_weight_portfolio.vol:.2%}")
@@ -131,7 +131,7 @@ Market Cap Weighted Portfolio
 
    assets.weights = market_cap_weights
    portfolio_df = assets.make_portfolio(name="Market Cap Weighted")
-   market_cap_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
+   market_cap_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
    print(f"Market Cap Portfolio Return: {market_cap_portfolio.geo_ret:.2%}")
    print(f"Market Cap Portfolio Volatility: {market_cap_portfolio.vol:.2%}")
@@ -144,7 +144,7 @@ Risk Parity Portfolio
 
    # Use native inverse volatility weighting (risk parity)
    portfolio_df = assets.make_portfolio(name="Risk Parity", weight_strat="inv_vol")
-   risk_parity_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
+   risk_parity_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
    print(f"Risk Parity Portfolio Return: {risk_parity_portfolio.geo_ret:.2%}")
    print(f"Risk Parity Portfolio Volatility: {risk_parity_portfolio.vol:.2%}")
@@ -258,7 +258,7 @@ Analyze the risk contribution of each asset:
    returns_data = []
    for series in assets.constituents:
        returns = series.value_to_ret()
-       returns_data.append(returns.tsdf.iloc[:, 0])
+       returns_data.append(returns.tsdf)
 
    # Create returns matrix
    returns_matrix = pd.concat(returns_data, axis=1)
@@ -304,7 +304,7 @@ Analyze performance contribution over time:
    asset_returns = []
    for series in assets.constituents:
        returns = series.value_to_ret()
-       asset_returns.append(returns.tsdf.iloc[:, 0])
+       asset_returns.append(returns.tsdf)
 
    returns_df = pd.concat(asset_returns, axis=1)
    returns_df.columns = [series.name for series in assets.constituents]
@@ -370,10 +370,11 @@ Analyze the impact of rebalancing frequency using the realistic `rebalanced_port
        rebalanced_portfolios.append(portfolio.constituents[-1])
 
    # Compare with theoretical portfolio
-   theoretical_portfolio = assets.make_portfolio(
+   theoretical_portfolio_df = assets.make_portfolio(
        name="Theoretical",
        weights=equal_weights
    )
+   theoretical_portfolio = OpenTimeSeries.from_df(dframe=theoretical_portfolio_df)
 
    # Create comprehensive comparison
    all_portfolios = [theoretical_portfolio] + rebalanced_portfolios
@@ -385,10 +386,10 @@ Analyze the impact of rebalancing frequency using the realistic `rebalanced_port
    print("-" * 50)
 
    for series in all_portfolios:
-       ret = comparison_metrics.loc['geo_ret', series.name] * 100
-       vol = comparison_metrics.loc['vol', series.name] * 100
-       sharpe = comparison_metrics.loc['ret_vol_ratio', series.name]
-       max_dd = comparison_metrics.loc['max_drawdown', series.name] * 100
+       ret = comparison_metrics.loc['Geometric return', series.name].iloc[0] * 100
+       vol = comparison_metrics.loc['Volatility', series.name].iloc[0] * 100
+       sharpe = comparison_metrics.loc['Return vol ratio', series.name].iloc[0]
+       max_dd = comparison_metrics.loc['Max drawdown', series.name].iloc[0] * 100
 
        print(f"{series.name:>15} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
@@ -425,7 +426,7 @@ Test portfolio performance during market stress:
 
    # Find worst 5% of days
    worst_days_threshold = market_returns_df.quantile(0.05).iloc[0]
-   worst_days = market_returns_df[market_returns_df.iloc[:, 0] <= worst_days_threshold]
+   worst_days = market_returns_df[market_returns_df <= worst_days_threshold]
 
    print(f"\n=== STRESS TEST RESULTS ===")
    print(f"Market stress threshold: {worst_days_threshold:.2%}")
@@ -468,7 +469,7 @@ Generate a comprehensive portfolio analysis report:
    print(f"\n--- PORTFOLIO CHARACTERISTICS ---")
    avg_correlation = correlation_matrix.mean().mean()
    print(f"Average Asset Correlation: {avg_correlation:.3f}")
-   print(f"Portfolio Diversification Benefit: {(asset_metrics.loc['vol'].mean() - equal_weight_portfolio.vol):.2%}")
+   print(f"Portfolio Diversification Benefit: {(asset_metrics.loc['Volatility'].mean() - equal_weight_portfolio.vol):.2%}")
 
    # Export results
    portfolio_metrics.to_excel("portfolio_analysis.xlsx")

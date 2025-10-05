@@ -153,10 +153,11 @@ Equal Weight Portfolio
 .. code-block:: python
 
    # Equal weight portfolio using native weight_strat
-   equal_weight_portfolio = investment_universe.make_portfolio(
+   equal_weight_portfolio_df = investment_universe.make_portfolio(
        name="Equal Weight",
        weight_strat="eq_weights"
    )
+   equal_weight_portfolio = OpenTimeSeries.from_df(dframe=equal_weight_portfolio_df)
 
    print(f"\n=== EQUAL WEIGHT PORTFOLIO ===")
    print(f"Return: {equal_weight_portfolio.geo_ret:.2%}")
@@ -169,10 +170,11 @@ Inverse Volatility Portfolio
 .. code-block:: python
 
    # Inverse volatility weighting using native weight_strat
-   inv_vol_portfolio = investment_universe.make_portfolio(
+   inv_vol_portfolio_df = investment_universe.make_portfolio(
        name="Inverse Volatility",
        weight_strat="inv_vol"
    )
+   inv_vol_portfolio = OpenTimeSeries.from_df(dframe=inv_vol_portfolio_df)
 
    print(f"\n=== INVERSE VOLATILITY PORTFOLIO ===")
    print(f"Return: {inv_vol_portfolio.geo_ret:.2%}")
@@ -186,10 +188,11 @@ Maximum Diversification Portfolio
 .. code-block:: python
 
    # Maximum diversification portfolio using native weight_strat
-   max_div_portfolio = investment_universe.make_portfolio(
+   max_div_portfolio_df = investment_universe.make_portfolio(
        name="Maximum Diversification",
        weight_strat="max_div"
    )
+   max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
 
    print(f"\n=== MAXIMUM DIVERSIFICATION PORTFOLIO ===")
    print(f"Return: {max_div_portfolio.geo_ret:.2%}")
@@ -202,10 +205,11 @@ Target Risk Portfolio
 .. code-block:: python
 
    # Target risk portfolio using native weight_strat
-   target_vol_portfolio = investment_universe.make_portfolio(
+   target_vol_portfolio_df = investment_universe.make_portfolio(
        name="Target Risk",
        weight_strat="target_risk"
    )
+   target_vol_portfolio = OpenTimeSeries.from_df(dframe=target_vol_portfolio_df)
 
    print(f"\n=== TARGET RISK PORTFOLIO ===")
    print(f"Return: {target_vol_portfolio.geo_ret:.2%}")
@@ -227,17 +231,19 @@ Portfolio Comparison
 
    # Add optimized portfolios if available
    if 'max_sharpe_weights' in locals():
-       max_sharpe_portfolio = investment_universe.make_portfolio(
+       max_sharpe_portfolio_df = investment_universe.make_portfolio(
            weights=max_sharpe_weights.tolist(),
            name="Max Sharpe (Optimized)"
        )
+       max_sharpe_portfolio = OpenTimeSeries.from_df(dframe=max_sharpe_portfolio_df)
        portfolios.append(max_sharpe_portfolio)
 
    if 'min_vol_weights' in locals():
-       min_vol_portfolio = investment_universe.make_portfolio(
+       min_vol_portfolio_df = investment_universe.make_portfolio(
            weights=min_vol_weights.tolist(),
            name="Min Vol (Optimized)"
        )
+       min_vol_portfolio = OpenTimeSeries.from_df(dframe=min_vol_portfolio_df)
        portfolios.append(min_vol_portfolio)
 
    # Create comparison frame
@@ -267,10 +273,11 @@ Backtesting Framework
    # Run backtest using native strategies
    backtest_results = {}
    for strategy_name, weight_strat in strategies.items():
-       portfolio = investment_universe.make_portfolio(
+       portfolio_df = investment_universe.make_portfolio(
            name=strategy_name,
            weight_strat=weight_strat
        )
+       portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
        backtest_results[strategy_name] = {
            'return': portfolio.geo_ret,
            'volatility': portfolio.vol,
@@ -391,12 +398,11 @@ Advanced Optimization with Real Data
    seed = 55
 
    # Create current portfolio (equal weights)
-   current_portfolio = OpenTimeSeries.from_df(
-       dframe=fund_universe.make_portfolio(
-           name="Current Portfolio",
-           weight_strat="eq_weights",
-       ),
+   current_portfolio_df = fund_universe.make_portfolio(
+       name="Current Portfolio",
+       weight_strat="eq_weights",
    )
+   current_portfolio = OpenTimeSeries.from_df(dframe=current_portfolio_df)
 
    # Calculate efficient frontier
    frontier, simulated_portfolios, optimal_portfolio = efficient_frontier(
@@ -442,15 +448,17 @@ Performance Comparison Analysis
 
    # Equal weight portfolio
    equal_weights = [1/fund_universe.item_count] * fund_universe.item_count
-   equal_weight_portfolio = fund_universe.make_portfolio(
+   equal_weight_portfolio_df = fund_universe.make_portfolio(
        weights=equal_weights, name="Equal Weight"
    )
+   equal_weight_portfolio = OpenTimeSeries.from_df(dframe=equal_weight_portfolio_df)
    strategies['Equal Weight'] = equal_weight_portfolio
 
    # Optimal portfolio from efficient frontier
-   optimal_portfolio_series = fund_universe.make_portfolio(
+   optimal_portfolio_df = fund_universe.make_portfolio(
        weights=optimal_portfolio.weights, name="Optimal Portfolio"
    )
+   optimal_portfolio_series = OpenTimeSeries.from_df(dframe=optimal_portfolio_df)
    strategies['Optimal Portfolio'] = optimal_portfolio_series
 
    # Create comparison frame
@@ -511,7 +519,8 @@ Here's how to perform portfolio optimization using openseries methods directly:
        # Create portfolios using openseries make_portfolio method
        results = {}
        for name, weight_strat in strategies.items():
-           portfolio = frame.make_portfolio(name=name, weight_strat=weight_strat)
+           portfolio_df = frame.make_portfolio(name=name, weight_strat=weight_strat)
+           portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
            results[name] = {
                'Return': portfolio.geo_ret,
                'Volatility': portfolio.vol,

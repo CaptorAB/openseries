@@ -155,7 +155,7 @@ Create and analyze portfolios:
    # Create equal-weighted portfolio
    frame.weights = [1/3, 1/3, 1/3]
    portfolio_df = frame.make_portfolio(name="Equal Weight Portfolio")
-   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
+   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
    print(f"Portfolio Return: {portfolio.geo_ret:.2%}")
    print(f"Portfolio Volatility: {portfolio.vol:.2%}")
@@ -259,7 +259,7 @@ Here are some common usage patterns:
    # Pattern 3: Portfolio construction
    frame.weights = [0.4, 0.3, 0.3]
    portfolio_df = frame.make_portfolio(name="Custom Portfolio")
-   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df.iloc[:, 0])
+   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
    frame.add_timeseries(portfolio)
 
    # Pattern 4: Risk analysis

@@ -274,10 +274,11 @@
 <section id="equal-weight-portfolio">
 <h3>Equal Weight Portfolio<a class="headerlink" href="#equal-weight-portfolio" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Equal weight portfolio using native weight_strat</span>
-<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+<span class="n">equal_weight_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span><span class="p">,</span>
     <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span>
 <span class="p">)</span>
+<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">equal_weight_portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== EQUAL WEIGHT PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -289,10 +290,11 @@
 <section id="inverse-volatility-portfolio">
 <h3>Inverse Volatility Portfolio<a class="headerlink" href="#inverse-volatility-portfolio" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inverse volatility weighting using native weight_strat</span>
-<span class="n">inv_vol_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+<span class="n">inv_vol_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Inverse Volatility&quot;</span><span class="p">,</span>
     <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;inv_vol&quot;</span>
 <span class="p">)</span>
+<span class="n">inv_vol_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">inv_vol_portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== INVERSE VOLATILITY PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">inv_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -304,10 +306,11 @@
 <section id="maximum-diversification-portfolio">
 <h3>Maximum Diversification Portfolio<a class="headerlink" href="#maximum-diversification-portfolio" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Maximum diversification portfolio using native weight_strat</span>
-<span class="n">max_div_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+<span class="n">max_div_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Maximum Diversification&quot;</span><span class="p">,</span>
     <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;max_div&quot;</span>
 <span class="p">)</span>
+<span class="n">max_div_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">max_div_portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MAXIMUM DIVERSIFICATION PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">max_div_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -320,10 +323,11 @@
 <section id="target-risk-portfolio">
 <h2>Target Risk Portfolio<a class="headerlink" href="#target-risk-portfolio" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Target risk portfolio using native weight_strat</span>
-<span class="n">target_vol_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+<span class="n">target_vol_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Target Risk&quot;</span><span class="p">,</span>
     <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;target_risk&quot;</span>
 <span class="p">)</span>
+<span class="n">target_vol_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">target_vol_portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TARGET RISK PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">target_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -344,17 +348,19 @@
 
 <span class="c1"># Add optimized portfolios if available</span>
 <span class="k">if</span> <span class="s1">&#39;max_sharpe_weights&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-    <span class="n">max_sharpe_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">max_sharpe_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
         <span class="n">weights</span><span class="o">=</span><span class="n">max_sharpe_weights</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Max Sharpe (Optimized)&quot;</span>
     <span class="p">)</span>
+    <span class="n">max_sharpe_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">max_sharpe_portfolio_df</span><span class="p">)</span>
     <span class="n">portfolios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_sharpe_portfolio</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="s1">&#39;min_vol_weights&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-    <span class="n">min_vol_portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">min_vol_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
         <span class="n">weights</span><span class="o">=</span><span class="n">min_vol_weights</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Min Vol (Optimized)&quot;</span>
     <span class="p">)</span>
+    <span class="n">min_vol_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">min_vol_portfolio_df</span><span class="p">)</span>
     <span class="n">portfolios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_vol_portfolio</span><span class="p">)</span>
 
 <span class="c1"># Create comparison frame</span>
@@ -383,10 +389,11 @@
 <span class="c1"># Run backtest using native strategies</span>
 <span class="n">backtest_results</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">strategy_name</span><span class="p">,</span> <span class="n">weight_strat</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
         <span class="n">name</span><span class="o">=</span><span class="n">strategy_name</span><span class="p">,</span>
         <span class="n">weight_strat</span><span class="o">=</span><span class="n">weight_strat</span>
     <span class="p">)</span>
+    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
     <span class="n">backtest_results</span><span class="p">[</span><span class="n">strategy_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;return&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="p">,</span>
         <span class="s1">&#39;volatility&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">,</span>
@@ -501,12 +508,11 @@
 <span class="n">seed</span> <span class="o">=</span> <span class="mi">55</span>
 
 <span class="c1"># Create current portfolio (equal weights)</span>
-<span class="n">current_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Current Portfolio&quot;</span><span class="p">,</span>
-        <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">,</span>
-    <span class="p">),</span>
+<span class="n">current_portfolio_df</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Current Portfolio&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="n">current_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">current_portfolio_df</span><span class="p">)</span>
 
 <span class="c1"># Calculate efficient frontier</span>
 <span class="n">frontier</span><span class="p">,</span> <span class="n">simulated_portfolios</span><span class="p">,</span> <span class="n">optimal_portfolio</span> <span class="o">=</span> <span class="n">efficient_frontier</span><span class="p">(</span>
@@ -551,15 +557,17 @@
 
 <span class="c1"># Equal weight portfolio</span>
 <span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">item_count</span><span class="p">]</span> <span class="o">*</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">item_count</span>
-<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+<span class="n">equal_weight_portfolio_df</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
     <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span>
 <span class="p">)</span>
+<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">equal_weight_portfolio_df</span><span class="p">)</span>
 <span class="n">strategies</span><span class="p">[</span><span class="s1">&#39;Equal Weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">equal_weight_portfolio</span>
 
 <span class="c1"># Optimal portfolio from efficient frontier</span>
-<span class="n">optimal_portfolio_series</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+<span class="n">optimal_portfolio_df</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
     <span class="n">weights</span><span class="o">=</span><span class="n">optimal_portfolio</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Optimal Portfolio&quot;</span>
 <span class="p">)</span>
+<span class="n">optimal_portfolio_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">optimal_portfolio_df</span><span class="p">)</span>
 <span class="n">strategies</span><span class="p">[</span><span class="s1">&#39;Optimal Portfolio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimal_portfolio_series</span>
 
 <span class="c1"># Create comparison frame</span>
@@ -619,7 +627,8 @@
     <span class="c1"># Create portfolios using openseries make_portfolio method</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">portfolio</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="n">weight_strat</span><span class="p">)</span>
+        <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="n">weight_strat</span><span class="p">)</span>
+        <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;Return&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="p">,</span>
             <span class="s1">&#39;Volatility&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">,</span>

@@ -52,10 +52,11 @@ Let's start with a portfolio of assets for risk analysis:
    n_assets = portfolio_assets.item_count
    equal_weights = [1/n_assets] * n_assets
 
-   portfolio = portfolio_assets.make_portfolio(
+   portfolio_df = portfolio_assets.make_portfolio(
        weights=equal_weights,
        name="Diversified Portfolio"
    )
+   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
    print(f"\nPortfolio created with {n_assets} assets")
    print(f"Date range: {portfolio.first_idx} to {portfolio.last_idx}")
@@ -169,8 +170,7 @@ Historical Stress Testing
 
    # Convert to returns for analysis
    portfolio_returns = portfolio.value_to_ret()
-   returns_data = portfolio_returns.tsdf.iloc[:, 0]
-
+   returns_data = portfolio_returns.tsdf
    # Identify worst periods
    worst_1_percent = returns_data.quantile(0.01)
    worst_5_percent = returns_data.quantile(0.05)
@@ -270,7 +270,7 @@ Analyze risk contribution by asset:
 
    # Calculate individual asset volatilities using OpenFrame
    asset_metrics = portfolio_assets.all_properties()
-   asset_vols = asset_metrics.loc['vol'].values
+   asset_vols = asset_metrics.loc['Volatility'].values
 
    # Portfolio volatility
    portfolio_vol = portfolio.vol

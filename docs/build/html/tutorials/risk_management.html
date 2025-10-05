@@ -172,10 +172,11 @@
 <span class="n">n_assets</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">item_count</span>
 <span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
 
-<span class="n">portfolio</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
     <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Diversified Portfolio&quot;</span>
 <span class="p">)</span>
+<span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Portfolio created with </span><span class="si">{</span><span class="n">n_assets</span><span class="si">}</span><span class="s2"> assets&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date range: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -278,8 +279,7 @@
 
 <span class="c1"># Convert to returns for analysis</span>
 <span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="n">returns_data</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-
+<span class="n">returns_data</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="o">.</span><span class="n">tsdf</span>
 <span class="c1"># Identify worst periods</span>
 <span class="n">worst_1_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 <span class="n">worst_5_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
@@ -375,7 +375,7 @@
 
 <span class="c1"># Calculate individual asset volatilities using OpenFrame</span>
 <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-<span class="n">asset_vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">asset_vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Volatility&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="c1"># Portfolio volatility</span>
 <span class="n">portfolio_vol</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span>

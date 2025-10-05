@@ -71,9 +71,10 @@ Let's compare daily rebalancing with the theoretical portfolio calculation:
 .. code-block:: python
 
    # Create theoretical portfolio (no rebalancing friction)
-   theoretical_portfolio = investment_universe.make_portfolio(
+   theoretical_portfolio_df = investment_universe.make_portfolio(
        name="Theoretical Portfolio"
    )
+   theoretical_portfolio = OpenTimeSeries.from_df(dframe=theoretical_portfolio_df)
 
    # Create daily rebalanced portfolio (simulates actual trading)
    daily_rebalanced = investment_universe.rebalanced_portfolio(
@@ -82,7 +83,7 @@ Let's compare daily rebalancing with the theoretical portfolio calculation:
    )
 
    # Extract portfolio series for comparison
-   theoretical_series = theoretical_portfolio.constituents[-1]
+   theoretical_series = theoretical_portfolio
    daily_rebalanced_series = daily_rebalanced.constituents[-1]
 
    print("=== PORTFOLIO COMPARISON ===")
@@ -135,10 +136,10 @@ Now let's compare different rebalancing frequencies:
    print("-" * 50)
 
    for i, name in enumerate(frequency_names):
-       ret = metrics.loc['geo_ret', portfolios[i].name] * 100
-       vol = metrics.loc['vol', portfolios[i].name] * 100
-       sharpe = metrics.loc['ret_vol_ratio', portfolios[i].name]
-       max_dd = metrics.loc['max_drawdown', portfolios[i].name] * 100
+       ret = metrics.loc['Geometric return', portfolios[i].name].iloc[0] * 100
+       vol = metrics.loc['Volatility', portfolios[i].name].iloc[0] * 100
+       sharpe = metrics.loc['Return vol ratio', portfolios[i].name].iloc[0]
+       max_dd = metrics.loc['Max drawdown', portfolios[i].name].iloc[0] * 100
 
        print(f"{name:>9} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
@@ -216,10 +217,10 @@ Compare equal weight strategy with custom weights:
    print("-" * 50)
 
    for strategy in strategies:
-       ret = strategy_metrics.loc['geo_ret', strategy.name] * 100
-       vol = strategy_metrics.loc['vol', strategy.name] * 100
-       sharpe = strategy_metrics.loc['ret_vol_ratio', strategy.name]
-       max_dd = strategy_metrics.loc['max_drawdown', strategy.name] * 100
+       ret = strategy_metrics.loc['Geometric return', strategy.name].iloc[0] * 100
+       vol = strategy_metrics.loc['Volatility', strategy.name].iloc[0] * 100
+       sharpe = strategy_metrics.loc['Return vol ratio', strategy.name].iloc[0]
+       max_dd = strategy_metrics.loc['Max drawdown', strategy.name].iloc[0] * 100
 
        print(f"{strategy.name:>15} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
@@ -293,10 +294,10 @@ Analyze performance with a subset of assets:
    print("-" * 50)
 
    for series in comparison_series:
-       ret = comparison_metrics.loc['geo_ret', series.name] * 100
-       vol = comparison_metrics.loc['vol', series.name] * 100
-       sharpe = comparison_metrics.loc['ret_vol_ratio', series.name]
-       max_dd = comparison_metrics.loc['max_drawdown', series.name] * 100
+       ret = comparison_metrics.loc['Geometric return', series.name].iloc[0] * 100
+       vol = comparison_metrics.loc['Volatility', series.name].iloc[0] * 100
+       sharpe = comparison_metrics.loc['Return vol ratio', series.name].iloc[0]
+       max_dd = comparison_metrics.loc['Max drawdown', series.name].iloc[0] * 100
 
        print(f"{series.name:>20} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
