@@ -807,14 +807,14 @@ testing-docutils = ["pygments", "pytest (>=8,<9)", "pytest-param-files (>=0.6.0,
 
 [[package]]
 name = "narwhals"
-version = "2.6.0"
+version = "2.7.0"
 description = "Extremely lightweight compatibility layer between dataframe libraries"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "narwhals-2.6.0-py3-none-any.whl", hash = "sha256:3215ea42afb452c6c8527e79cefbe542b674aa08d7e2e99d46b2c9708870e0d4"},
-    {file = "narwhals-2.6.0.tar.gz", hash = "sha256:5c9e2ba923e6a0051017e146184e49fb793548936f978ce130c9f55a9a81240e"},
+    {file = "narwhals-2.7.0-py3-none-any.whl", hash = "sha256:010791aa0cee86d90bf2b658264aaec3eeea34fb4ddf2e83746ea4940bcffae3"},
+    {file = "narwhals-2.7.0.tar.gz", hash = "sha256:e3fff7f1610fd3318ede78c969bc5954ce710d585eefdb689586fb69da3da43c"},
 ]
 
 [package.extras]
