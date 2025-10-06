@@ -173,13 +173,11 @@
 
 <span class="c1"># Create equal-weighted portfolio</span>
 <span class="n">n_assets</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">item_count</span>
-<span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
 
 <span class="c1"># Set weights on the frame first</span>
-<span class="n">portfolio_assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
-
 <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Diversified Portfolio&quot;</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Diversified Portfolio&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span>
 <span class="p">)</span>
 <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 

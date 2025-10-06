@@ -185,19 +185,28 @@ Inverse Volatility Portfolio
 Maximum Diversification Portfolio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The maximum diversification strategy aims to maximize portfolio diversification by optimizing the correlation structure. This strategy can encounter numerical issues in certain scenarios:
+
 .. code-block:: python
 
    # Maximum diversification portfolio using native weight_strat
-   max_div_portfolio_df = investment_universe.make_portfolio(
-       name="Maximum Diversification",
-       weight_strat="max_div"
-   )
-   max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
+   try:
+       max_div_portfolio_df = investment_universe.make_portfolio(
+           name="Maximum Diversification",
+           weight_strat="max_div"
+       )
+       max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
 
-   print(f"\n=== MAXIMUM DIVERSIFICATION PORTFOLIO ===")
-   print(f"Return: {max_div_portfolio.geo_ret:.2%}")
-   print(f"Volatility: {max_div_portfolio.vol:.2%}")
-   print(f"Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
+       print(f"\n=== MAXIMUM DIVERSIFICATION PORTFOLIO ===")
+       print(f"Return: {max_div_portfolio.geo_ret:.2%}")
+       print(f"Volatility: {max_div_portfolio.vol:.2%}")
+       print(f"Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
+   except MaxDiversificationNaNError as e:
+       print(f"Maximum diversification failed due to numerical issues: {e}")
+       print("Consider using a different weight strategy or checking your data quality")
+   except MaxDiversificationNegativeWeightsError as e:
+       print(f"Maximum diversification produced negative weights: {e}")
+       print("This strategy may not be suitable for your data - consider using 'eq_weights' or 'inv_vol'")
 
 Target Risk Portfolio
 ---------------------
@@ -257,6 +266,48 @@ Portfolio Comparison
    print(f"\n=== PORTFOLIO STRATEGY COMPARISON ===")
    print((key_metrics * 100).round(2))  # Convert to percentages
 
+Weight Strategy Details
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The openseries library provides several built-in weight strategies for portfolio construction:
+
+**Equal Weights (``eq_weights``)**
+   - Assigns equal weight to all assets
+   - Most robust strategy, always works
+   - Good baseline for comparison
+
+**Inverse Volatility (``inv_vol``)**
+   - Weights assets inversely to their volatility
+   - Lower volatility assets get higher weights
+   - Generally stable and reliable
+
+**Maximum Diversification (``max_div``)**
+   - Optimizes correlation structure for maximum diversification
+   - Can encounter numerical issues with certain data patterns
+   - May produce negative weights in some scenarios
+   - Raises ``MaxDiversificationNaNError`` for numerical issues
+   - Raises ``MaxDiversificationNegativeWeightsError`` for negative weights
+
+**Target Risk (``target_risk``)**
+   - Targets a specific portfolio volatility level
+   - Requires additional parameters for target volatility
+
+**Exception Handling**
+   When using the maximum diversification strategy, it's recommended to handle potential exceptions:
+
+   .. code-block:: python
+
+      from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
+
+      try:
+          portfolio_df = frame.make_portfolio(name="Max Div", weight_strat="max_div")
+      except MaxDiversificationNaNError:
+          print("Numerical issues detected - using equal weights instead")
+          portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
+      except MaxDiversificationNegativeWeightsError:
+          print("Negative weights detected - using inverse volatility instead")
+          portfolio_df = frame.make_portfolio(name="Inv Vol", weight_strat="inv_vol")
+
 Backtesting Framework
 ---------------------
 
@@ -273,18 +324,22 @@ Backtesting Framework
    # Run backtest using native strategies
    backtest_results = {}
    for strategy_name, weight_strat in strategies.items():
-       portfolio_df = investment_universe.make_portfolio(
-           name=strategy_name,
-           weight_strat=weight_strat
-       )
-       portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
-       backtest_results[strategy_name] = {
-           'return': portfolio.geo_ret,
-           'volatility': portfolio.vol,
-           'sharpe': portfolio.ret_vol_ratio,
-           'max_drawdown': portfolio.max_drawdown,
-           'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else np.nan
-       }
+       try:
+           portfolio_df = investment_universe.make_portfolio(
+               name=strategy_name,
+               weight_strat=weight_strat
+           )
+           portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+           backtest_results[strategy_name] = {
+               'return': portfolio.geo_ret,
+               'volatility': portfolio.vol,
+               'sharpe': portfolio.ret_vol_ratio,
+               'max_drawdown': portfolio.max_drawdown,
+               'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else np.nan
+           }
+       except (MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError) as e:
+           print(f"Skipping {strategy_name}: {e}")
+           continue
 
    backtest_results = pd.DataFrame(backtest_results).T
 
@@ -447,9 +502,8 @@ Performance Comparison Analysis
    strategies = {}
 
    # Equal weight portfolio
-   equal_weights = [1/fund_universe.item_count] * fund_universe.item_count
    equal_weight_portfolio_df = fund_universe.make_portfolio(
-       weights=equal_weights, name="Equal Weight"
+       name="Equal Weight", weight_strat="eq_weights"
    )
    equal_weight_portfolio = OpenTimeSeries.from_df(dframe=equal_weight_portfolio_df)
    strategies['Equal Weight'] = equal_weight_portfolio
@@ -520,14 +574,18 @@ Here's how to perform portfolio optimization using openseries methods directly:
        # Create portfolios using openseries make_portfolio method
        results = {}
        for name, weight_strat in strategies.items():
-           portfolio_df = frame.make_portfolio(name=name, weight_strat=weight_strat)
-           portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
-           results[name] = {
-               'Return': portfolio.geo_ret,
-               'Volatility': portfolio.vol,
-               'Sharpe': portfolio.ret_vol_ratio,
-               'Max Drawdown': portfolio.max_drawdown
-           }
+           try:
+               portfolio_df = frame.make_portfolio(name=name, weight_strat=weight_strat)
+               portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+               results[name] = {
+                   'Return': portfolio.geo_ret,
+                   'Volatility': portfolio.vol,
+                   'Sharpe': portfolio.ret_vol_ratio,
+                   'Max Drawdown': portfolio.max_drawdown
+               }
+           except (MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError) as e:
+               print(f"Skipping {name}: {e}")
+               continue
 
        results_df = pd.DataFrame(results).T
 

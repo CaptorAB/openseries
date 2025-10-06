@@ -60,6 +60,8 @@ from .owntypes import (
     LiteralPandasReindexMethod,
     LiteralPortfolioWeightings,
     LiteralTrunc,
+    MaxDiversificationNaNError,
+    MaxDiversificationNegativeWeightsError,
     MergingResultedInEmptyError,
     MixedValuetypesError,
     MultipleCurrenciesError,
@@ -1437,11 +1439,48 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 corr_matrix = corrcoef(returns.T)
                 corr_matrix[isinf(corr_matrix)] = nan
                 corr_matrix[isnan(corr_matrix)] = nan
+
+                msga = (
+                    "max_div weight strategy failed: "
+                    "correlation matrix contains NaN values"
+                )
+                if isnan(corr_matrix).any():
+                    raise MaxDiversificationNaNError(msga)
+
                 try:
                     inv_corr_sum = linalg.inv(corr_matrix).sum(axis=1)
+
+                    msgb = (
+                        "max_div weight strategy failed: "
+                        "inverse correlation matrix sum contains NaN values"
+                    )
+                    if isnan(inv_corr_sum).any():
+                        raise MaxDiversificationNaNError(msgb)
+
                     self.weights = list(divide(inv_corr_sum, inv_corr_sum.sum()))
-                except linalg.LinAlgError:
-                    self.weights = [1.0 / self.item_count] * self.item_count
+
+                    msgc = (
+                        "max_div weight strategy failed: "
+                        "final weights contain NaN values"
+                    )
+                    if any(  # pragma: no cover
+                        isnan(weight) for weight in self.weights
+                    ):
+                        raise MaxDiversificationNaNError(msgc)
+
+                    msgd = (
+                        "max_div weight strategy failed: negative weights detected"
+                        f" - weights: {[round(w, 6) for w in self.weights]}"
+                    )
+                    if any(weight < 0 for weight in self.weights):
+                        raise MaxDiversificationNegativeWeightsError(msgd)
+
+                except linalg.LinAlgError as e:
+                    msge = (
+                        "max_div weight strategy failed: "
+                        f"correlation matrix is singular - {e!s}"
+                    )
+                    raise MaxDiversificationNaNError(msge) from e
             elif weight_strat == "target_risk":
                 vols = std(returns, axis=0, ddof=1)
                 min_vol_idx = vols.argmin()

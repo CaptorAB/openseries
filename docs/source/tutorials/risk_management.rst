@@ -49,13 +49,11 @@ Let's start with a portfolio of assets for risk analysis:
 
    # Create equal-weighted portfolio
    n_assets = portfolio_assets.item_count
-   equal_weights = [1/n_assets] * n_assets
 
    # Set weights on the frame first
-   portfolio_assets.weights = equal_weights
-
    portfolio_df = portfolio_assets.make_portfolio(
-       name="Diversified Portfolio"
+       name="Diversified Portfolio",
+       weight_strat="eq_weights"
    )
    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 

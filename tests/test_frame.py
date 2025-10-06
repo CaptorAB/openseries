@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import warnings
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from inspect import getmembers, isfunction
 from itertools import product as iter_product
@@ -13,7 +14,7 @@ from re import escape
 from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, patch
 
-from numpy import array
+from numpy import array, nan
 from pydantic import BaseModel
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -35,6 +36,8 @@ from openseries.owntypes import (
     InitialValueZeroError,
     LabelsNotUniqueError,
     LiteralPortfolioWeightings,
+    MaxDiversificationNaNError,
+    MaxDiversificationNegativeWeightsError,
     MixedValuetypesError,
     MultipleCurrenciesError,
     NoWeightsError,
@@ -732,19 +735,15 @@ class TestOpenFrame(CommonTestCase):
         name = "portfolio"
         tolerance = 1e-10
 
-        # Test max_div strategy
         _ = mpframe.make_portfolio(name=name, weight_strat="max_div")
 
-        # Weights should sum to 1
         weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
         if abs(weight_sum - 1.0) > tolerance:
             msg = f"make_portfolio() max_div weights do not sum to 1.0: {weight_sum}"
             raise OpenFrameTestError(msg)
 
-        # Test target_risk strategy
         _ = mpframe.make_portfolio(name=name, weight_strat="target_risk")
 
-        # Weights should sum to 1
         weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
         if abs(weight_sum - 1.0) > tolerance:
             msg = (
@@ -754,11 +753,9 @@ class TestOpenFrame(CommonTestCase):
 
     def test_make_portfolio_max_div_singular_matrix(self: TestOpenFrame) -> None:
         """Test make_portfolio max_div strategy with singular correlation matrix."""
-        # Create perfectly correlated assets to make correlation matrix singular
         dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"]
         base_values = [100.0, 101.0, 99.0, 102.0, 101.0]
 
-        # Create three assets with identical returns (perfect correlation)
         ts1 = OpenTimeSeries.from_arrays(
             name="Asset1", dates=dates, values=base_values
         )
@@ -769,30 +766,123 @@ class TestOpenFrame(CommonTestCase):
             name="Asset3", dates=dates, values=base_values
         )
 
-        # Create frame with perfectly correlated assets
         singular_frame = OpenFrame(constituents=[ts1, ts2, ts3])
         singular_frame.to_cumret()
 
-        # Test max_div strategy with singular correlation matrix
-        _ = singular_frame.make_portfolio(name="Singular Test", weight_strat="max_div")
+        with pytest.raises(MaxDiversificationNaNError):
+            _ = singular_frame.make_portfolio(
+                name="Singular Test", weight_strat="max_div"
+            )
 
-        # Should fall back to equal weights when matrix is singular
-        expected_weight = 1.0 / 3.0
-        tolerance = 1e-10
+    def test_make_portfolio_max_div_nan_values(self: TestOpenFrame) -> None:
+        """Test make_portfolio max_div strategy with NaN in correlation matrix."""
+        dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"]
 
-        for weight in singular_frame.weights:  # type: ignore[union-attr]
-            if abs(weight - expected_weight) > tolerance:
-                msg = (
-                    f"max_div with singular matrix should use equal weights: "
-                    f"{singular_frame.weights}"
+        constant_values = [100.0, 100.0, 100.0, 100.0, 100.0]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Constant Asset", dates=dates, values=constant_values
+        )
+
+        normal_values = [100.0, 101.0, 99.0, 102.0, 101.0]
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Normal Asset", dates=dates, values=normal_values
+        )
+
+        nan_frame = OpenFrame(constituents=[ts1, ts2])
+        nan_frame.to_cumret()
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "invalid value encountered in divide")
+            with pytest.raises(MaxDiversificationNaNError):
+                _ = nan_frame.make_portfolio(name="NaN Test", weight_strat="max_div")
+
+    def test_make_portfolio_max_div_negative_weights(self: TestOpenFrame) -> None:
+        """Test make_portfolio max_div strategy with negative weights."""
+        dates = [
+            "2023-01-01",
+            "2023-01-02",
+            "2023-01-03",
+            "2023-01-04",
+            "2023-01-05",
+            "2023-01-06",
+        ]
+
+        asset1_values = [100.0, 102.0, 104.0, 106.0, 108.0, 110.0]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Upward Asset", dates=dates, values=asset1_values
+        )
+
+        asset2_values = [100.0, 98.0, 96.0, 94.0, 92.0, 90.0]
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Downward Asset", dates=dates, values=asset2_values
+        )
+
+        asset3_values = [100.0, 101.0, 99.0, 100.0, 101.0, 100.0]
+        ts3 = OpenTimeSeries.from_arrays(
+            name="Sideways Asset", dates=dates, values=asset3_values
+        )
+
+        negative_weights_frame = OpenFrame(constituents=[ts1, ts2, ts3])
+        negative_weights_frame.to_cumret()
+
+        with pytest.raises(MaxDiversificationNegativeWeightsError):
+            _ = negative_weights_frame.make_portfolio(
+                name="Negative Weights Test", weight_strat="max_div"
+            )
+
+    def test_make_portfolio_max_div_inverse_nan_and_final_nan(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test max_div with NaN in inverse correlation sum and final weights."""
+        dates = ["2023-01-01", "2023-01-02", "2023-01-03"]
+
+        asset1_values = [100.0, 100.0, 100.0]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Constant Asset", dates=dates, values=asset1_values
+        )
+
+        asset2_values = [100.0, 101.0, 99.0]
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Normal Asset", dates=dates, values=asset2_values
+        )
+
+        asset3_values = [200.0, 200.0, 200.0]
+        ts3 = OpenTimeSeries.from_arrays(
+            name="Another Constant", dates=dates, values=asset3_values
+        )
+
+        frame = OpenFrame(constituents=[ts1, ts2, ts3])
+        frame.to_cumret()
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "invalid value encountered in divide")
+            with pytest.raises(MaxDiversificationNaNError):
+                _ = frame.make_portfolio(
+                    name="Inverse NaN Test", weight_strat="max_div"
                 )
-                raise OpenFrameTestError(msg)
 
-        # Verify weights sum to 1
-        weight_sum = sum(singular_frame.weights)  # type: ignore[arg-type]
-        if abs(weight_sum - 1.0) > tolerance:
-            msg = f"max_div singular matrix weights do not sum to 1.0: {weight_sum}"
-            raise OpenFrameTestError(msg)
+    def test_make_portfolio_max_div_force_inverse_nan(self: TestOpenFrame) -> None:
+        """Test max_div strategy by forcing NaN in inverse correlation sum."""
+        dates = ["2023-01-01", "2023-01-02", "2023-01-03"]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Asset1", dates=dates, values=[100.0, 101.0, 99.0]
+        )
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Asset2", dates=dates, values=[100.0, 98.0, 102.0]
+        )
+
+        frame = OpenFrame(constituents=[ts1, ts2])
+        frame.to_cumret()
+
+        with patch("numpy.linalg.inv") as mock_inv:
+            mock_inv.return_value.sum.return_value = array([nan, nan])
+            with pytest.raises(
+                MaxDiversificationNaNError,
+                match="inverse correlation matrix sum contains NaN",
+            ):
+                _ = frame.make_portfolio(
+                    name="Force Inverse NaN", weight_strat="max_div"
+                )
 
     def test_add_timeseries(self: TestOpenFrame) -> None:
         """Test add_timeseries method."""

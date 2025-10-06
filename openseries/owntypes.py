@@ -386,3 +386,11 @@ class MultipleCurrenciesError(Exception):
 
 class PortfolioItemsNotWithinFrameError(Exception):
     """Raised when portfolio items are not within frame."""
+
+
+class MaxDiversificationNaNError(Exception):
+    """Raised when max_div weight strategy produces NaN values."""
+
+
+class MaxDiversificationNegativeWeightsError(Exception):
+    """Raised when max_div weight strategy produces negative weights."""

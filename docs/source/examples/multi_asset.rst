@@ -204,8 +204,7 @@ Performance Attribution
 .. code-block:: python
 
    # Create equal-weighted portfolio for attribution
-   equal_weights = [1/tech_stocks.item_count] * tech_stocks.item_count
-   portfolio_df = tech_stocks.make_portfolio(weights=equal_weights, name="Tech Portfolio")
+   portfolio_df = tech_stocks.make_portfolio(name="Tech Portfolio", weight_strat="eq_weights")
    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
    print(f"\n=== PORTFOLIO vs INDIVIDUAL ASSETS ===")
@@ -219,6 +218,7 @@ Performance Attribution
    individual_vols = asset_metrics.loc['Volatility'].values
 
    print(f"\nDiversification benefit:")
+   equal_weights = [1/tech_stocks.item_count] * tech_stocks.item_count
    print(f"  Weighted avg return: {np.average(individual_returns, weights=equal_weights):.2%}")
    print(f"  Portfolio return: {portfolio.geo_ret:.2%}")
    print(f"  Weighted avg volatility: {np.average(individual_vols, weights=equal_weights):.2%}")
@@ -322,8 +322,7 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
        print(f"\nAverage correlation: {avg_correlation:.3f}")
 
        # Create portfolio using openseries make_portfolio method
-       equal_weights = [1/frame.item_count] * frame.item_count
-       portfolio_df = frame.make_portfolio(weights=equal_weights, name="Equal Weight")
+       portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
        portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
        print(f"\nEqual-weight portfolio:")

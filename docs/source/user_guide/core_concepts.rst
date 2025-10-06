@@ -403,4 +403,31 @@ Memory Management
    # Clean up intermediate results
    del intermediate_series
 
+Portfolio Construction
+~~~~~~~~~~~~~~~~~~~~~~
+
+OpenFrame provides several built-in weight strategies for portfolio construction:
+
+.. code-block:: python
+
+   from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
+
+   # Available weight strategies
+   strategies = {
+       'eq_weights': 'Equal weights for all assets',
+       'inv_vol': 'Inverse volatility weighting (risk parity)',
+       'max_div': 'Maximum diversification optimization',
+       'target_risk': 'Target risk/volatility strategy'
+   }
+
+   # Example with error handling
+   try:
+       portfolio_df = frame.make_portfolio(name="Max Div", weight_strat="max_div")
+   except MaxDiversificationNaNError:
+       print("Numerical issues - using equal weights")
+       portfolio_df = frame.make_portfolio(name="Equal", weight_strat="eq_weights")
+   except MaxDiversificationNegativeWeightsError:
+       print("Negative weights - using risk parity")
+       portfolio_df = frame.make_portfolio(name="Risk Parity", weight_strat="inv_vol")
+
 Understanding these core concepts will help you use openseries effectively and build more sophisticated financial analysis workflows.

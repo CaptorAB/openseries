@@ -64,16 +64,16 @@ Some items are properties, not methods:
 Portfolio Creation
 ~~~~~~~~~~~~~~~~~~
 
-When creating portfolios, set weights on the frame first:
+When creating portfolios, use weight_strat parameter for built-in strategies:
 
 .. code-block:: python
 
-   # Correct way
-   frame.weights = [0.5, 0.3, 0.2]
-   portfolio_df = frame.make_portfolio(name="My Portfolio")
+   # Correct way - use weight_strat parameter
+   portfolio_df = frame.make_portfolio(name="My Portfolio", weight_strat="eq_weights")
 
-   # Avoid this
-   portfolio_df = frame.make_portfolio(weights=[0.5, 0.3, 0.2], name="My Portfolio")
+   # For custom weights, set weights first then call make_portfolio
+   frame.weights = [0.5, 0.3, 0.2]
+   portfolio_df = frame.make_portfolio(name="Custom Portfolio")
 
 Metric Names in DataFrames
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

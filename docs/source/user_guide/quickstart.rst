@@ -152,14 +152,31 @@ Create and analyze portfolios:
 
 .. code-block:: python
 
-   # Create equal-weighted portfolio
-   frame.weights = [1/3, 1/3, 1/3]
-   portfolio_df = frame.make_portfolio(name="Equal Weight Portfolio")
+   # Create portfolios using different weight strategies
+   from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
+
+   # Equal-weighted portfolio (most reliable)
+   portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
-   print(f"Portfolio Return: {portfolio.geo_ret:.2%}")
-   print(f"Portfolio Volatility: {portfolio.vol:.2%}")
-   print(f"Portfolio Sharpe: {portfolio.ret_vol_ratio:.2f}")
+   print(f"Equal Weight Portfolio Return: {portfolio.geo_ret:.2%}")
+   print(f"Equal Weight Portfolio Volatility: {portfolio.vol:.2%}")
+   print(f"Equal Weight Portfolio Sharpe: {portfolio.ret_vol_ratio:.2f}")
+
+   # Try maximum diversification (may fail)
+   try:
+       max_div_df = frame.make_portfolio(name="Max Diversification", weight_strat="max_div")
+       max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_df)
+       print(f"Max Div Portfolio Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
+   except (MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError) as e:
+       print(f"Max diversification failed: {e}")
+       print("Using equal weights instead")
+
+   # Create custom weighted portfolio
+   frame.weights = [0.5, 0.3, 0.2]  # Custom allocation
+   custom_df = frame.make_portfolio(name="Custom Portfolio")
+   custom_portfolio = OpenTimeSeries.from_df(dframe=custom_df)
+   print(f"Custom Portfolio Sharpe: {custom_portfolio.ret_vol_ratio:.2f}")
 
    # Compare with individual assets
    frame.add_timeseries(portfolio)
@@ -257,11 +274,15 @@ Here are some common usage patterns:
    comparison = frame.all_properties()
    correlations = frame.correl_matrix
 
-   # Pattern 3: Portfolio construction
-   frame.weights = [0.4, 0.3, 0.3]
-   portfolio_df = frame.make_portfolio(name="Custom Portfolio")
+   # Pattern 3: Portfolio construction (built-in strategies)
+   portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
    frame.add_timeseries(portfolio)
+
+   # Pattern 3b: Custom portfolio construction
+   frame.weights = [0.4, 0.3, 0.3]
+   custom_df = frame.make_portfolio(name="Custom Portfolio")
+   custom_portfolio = OpenTimeSeries.from_df(dframe=custom_df)
 
    # Pattern 4: Risk analysis
    drawdowns = series.to_drawdown_series()

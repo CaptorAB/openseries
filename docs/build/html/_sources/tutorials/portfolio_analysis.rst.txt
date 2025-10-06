@@ -119,22 +119,23 @@ Equal Weight Portfolio
    print(f"Equal Weight Portfolio Volatility: {equal_weight_portfolio.vol:.2%}")
    print(f"Equal Weight Portfolio Sharpe: {equal_weight_portfolio.ret_vol_ratio:.2f}")
 
-Market Cap Weighted Portfolio
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Custom Weight Portfolio
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You can also specify custom weights for portfolio construction:
 
 .. code-block:: python
 
-   # Simulate market cap weights (in practice, you'd use actual market caps)
-   # Larger weights for larger markets
-   market_cap_weights = [0.50, 0.15, 0.10, 0.15, 0.05, 0.03, 0.02]  # Must sum to 1
+   # Define custom weights (must sum to 1)
+   custom_weights = [0.50, 0.15, 0.10, 0.15, 0.05, 0.03, 0.02]
 
-   assets.weights = market_cap_weights
-   portfolio_df = assets.make_portfolio(name="Market Cap Weighted")
-   market_cap_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+   assets.weights = custom_weights
+   portfolio_df = assets.make_portfolio(name="Custom Weighted")
+   custom_portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
-   print(f"Market Cap Portfolio Return: {market_cap_portfolio.geo_ret:.2%}")
-   print(f"Market Cap Portfolio Volatility: {market_cap_portfolio.vol:.2%}")
-   print(f"Market Cap Portfolio Sharpe: {market_cap_portfolio.ret_vol_ratio:.2f}")
+   print(f"Custom Portfolio Return: {custom_portfolio.geo_ret:.2%}")
+   print(f"Custom Portfolio Volatility: {custom_portfolio.vol:.2%}")
+   print(f"Custom Portfolio Sharpe: {custom_portfolio.ret_vol_ratio:.2f}")
 
 Risk Parity Portfolio
 ~~~~~~~~~~~~~~~~~~~~~
@@ -148,6 +149,98 @@ Risk Parity Portfolio
    print(f"Risk Parity Portfolio Return: {risk_parity_portfolio.geo_ret:.2%}")
    print(f"Risk Parity Portfolio Volatility: {risk_parity_portfolio.vol:.2%}")
    print(f"Risk Parity Portfolio Sharpe: {risk_parity_portfolio.ret_vol_ratio:.2f}")
+
+Advanced Weight Strategies
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+OpenSeries provides additional weight strategies beyond basic equal weighting and risk parity:
+
+Maximum Diversification Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The maximum diversification strategy optimizes the correlation structure to maximize portfolio diversification:
+
+.. code-block:: python
+
+   from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
+
+   try:
+       max_div_portfolio_df = assets.make_portfolio(
+           name="Maximum Diversification",
+           weight_strat="max_div"
+       )
+       max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
+
+       print(f"Max Diversification Return: {max_div_portfolio.geo_ret:.2%}")
+       print(f"Max Diversification Volatility: {max_div_portfolio.vol:.2%}")
+       print(f"Max Diversification Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
+
+   except MaxDiversificationNaNError as e:
+       print(f"Maximum diversification failed due to numerical issues: {e}")
+       print("This can occur with highly correlated assets or insufficient data")
+       print("Consider using equal weights or inverse volatility instead")
+
+   except MaxDiversificationNegativeWeightsError as e:
+       print(f"Maximum diversification produced negative weights: {e}")
+       print("Negative weights indicate the strategy may not be suitable for your data")
+       print("Consider using equal weights or inverse volatility instead")
+
+Target Risk Strategy
+^^^^^^^^^^^^^^^^^^^^
+
+The target risk strategy aims for a specific portfolio volatility level:
+
+.. code-block:: python
+
+   try:
+       target_risk_portfolio_df = assets.make_portfolio(
+           name="Target Risk",
+           weight_strat="target_risk"
+       )
+       target_risk_portfolio = OpenTimeSeries.from_df(dframe=target_risk_portfolio_df)
+
+       print(f"Target Risk Return: {target_risk_portfolio.geo_ret:.2%}")
+       print(f"Target Risk Volatility: {target_risk_portfolio.vol:.2%}")
+       print(f"Target Risk Sharpe: {target_risk_portfolio.ret_vol_ratio:.2f}")
+
+   except Exception as e:
+       print(f"Target risk strategy failed: {e}")
+
+Strategy Comparison with Error Handling
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When comparing multiple strategies, it's important to handle potential failures gracefully:
+
+.. code-block:: python
+
+   strategies = {
+       'Equal Weight': 'eq_weights',
+       'Risk Parity': 'inv_vol',
+       'Max Diversification': 'max_div',
+       'Target Risk': 'target_risk'
+   }
+
+   results = {}
+   for name, strategy in strategies.items():
+       try:
+           portfolio_df = assets.make_portfolio(name=name, weight_strat=strategy)
+           portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+           results[name] = {
+               'Return': portfolio.geo_ret,
+               'Volatility': portfolio.vol,
+               'Sharpe': portfolio.ret_vol_ratio
+           }
+       except (MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError) as e:
+           print(f"Skipping {name}: {e}")
+           continue
+       except Exception as e:
+           print(f"Unexpected error with {name}: {e}")
+           continue
+
+   if results:
+       results_df = pd.DataFrame(results).T
+       print("\n=== STRATEGY COMPARISON ===")
+       print((results_df * 100).round(2))
 
 Portfolio Optimization
 ----------------------

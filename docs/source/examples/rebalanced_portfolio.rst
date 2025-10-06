@@ -72,7 +72,8 @@ Let's compare daily rebalancing with the theoretical portfolio calculation:
 
    # Create theoretical portfolio (no rebalancing friction)
    theoretical_portfolio_df = investment_universe.make_portfolio(
-       name="Theoretical Portfolio"
+       name="Theoretical Portfolio",
+       weight_strat="eq_weights"
    )
    theoretical_portfolio = OpenTimeSeries.from_df(dframe=theoretical_portfolio_df)
 
