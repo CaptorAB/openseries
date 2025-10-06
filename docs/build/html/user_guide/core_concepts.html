@@ -181,18 +181,26 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="c1"># Create a sample series</span>
-<span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;B&#39;</span><span class="p">)</span>
-<span class="n">values</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cumprod</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="c1"># Create a sample series using openseries simulation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReturnSimulation</span><span class="p">,</span> <span class="n">ValueType</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 
-<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Asset&quot;</span>
+<span class="n">simulation</span> <span class="o">=</span> <span class="n">ReturnSimulation</span><span class="o">.</span><span class="n">from_lognormal</span><span class="p">(</span>
+    <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">trading_days</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>  <span class="c1"># ~0.001 daily</span>
+    <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span>     <span class="c1"># ~0.02 daily</span>
+    <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>
 
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+    <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Asset&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
+    <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
+
 <span class="c1"># Core properties</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First date: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Last date: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -210,10 +218,9 @@
 <span class="c1"># Working data is in the tsdf DataFrame</span>
 <span class="n">working_data</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">tsdf</span>         <span class="c1"># pandas DataFrame</span>
 
-<span class="c1"># Transformations create new objects</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>    <span class="c1"># New OpenTimeSeries</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original length: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns length: </span><span class="si">{</span><span class="n">returns</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Usually length - 1</span>
+<span class="c1"># Transformations modify the original object (method chaining)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>    <span class="c1"># Modifies original series</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Series length: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Usually length - 1</span>
 </pre></div>
 </div>
 </section>
@@ -231,8 +238,8 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Series type: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">valuetype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Type changes with transformations</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns type: </span><span class="si">{</span><span class="n">returns</span><span class="o">.</span><span class="n">valuetype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns type: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">valuetype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -244,15 +251,22 @@
 <p>OpenFrame manages collections of OpenTimeSeries:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenFrame</span>
 
-<span class="c1"># Create multiple series (example with synthetic data)</span>
+<span class="c1"># Create multiple series using openseries simulation</span>
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;Asset A&quot;</span><span class="p">,</span> <span class="s2">&quot;Asset B&quot;</span><span class="p">,</span> <span class="s2">&quot;Asset C&quot;</span><span class="p">]):</span>
-    <span class="n">values</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cumprod</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-        <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
-        <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">name</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">ReturnSimulation</span><span class="o">.</span><span class="n">from_lognormal</span><span class="p">(</span>
+        <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">trading_days</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>  <span class="c1"># ~0.001 daily</span>
+        <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span>     <span class="c1"># ~0.02 daily</span>
+        <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="mi">42</span> <span class="o">+</span> <span class="n">i</span>  <span class="c1"># Different seed for each asset</span>
     <span class="p">)</span>
+
+    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+        <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
+        <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
     <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
 <span class="c1"># Create OpenFrame</span>
@@ -271,25 +285,24 @@
 The library provides explicit methods for alignment that require user choice:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Series with different date ranges are concatenated (not aligned)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Individual series lengths:&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">lengths_of_items</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frame length (concatenated): </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Explicit alignment methods require user choice:</span>
 
 <span class="c1"># 1. Truncate to common date range</span>
-<span class="n">aligned_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span>
 
-<span class="c1"># 2. Align to business day calendar</span>
-<span class="n">business_aligned</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
+<span class="c1"># 2. Align to business day calendar (modifies original)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
 
-<span class="c1"># 3. Handle missing values</span>
-<span class="n">filled_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;fill&quot;</span><span class="p">)</span>
+<span class="c1"># 3. Handle missing values (modifies original)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;fill&quot;</span><span class="p">)</span>
 
 <span class="c1"># 4. Merge with explicit join strategy</span>
-<span class="n">inner_merged</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">merge_series</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">)</span>
-<span class="n">outer_merged</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">merge_series</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">merge_series</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">merge_series</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -300,13 +313,13 @@ The library provides explicit methods for alignment that require user choice:</p
 <h3>Return Calculations<a class="headerlink" href="#return-calculations" title="Link to this heading"></a></h3>
 <p>openseries uses standard financial formulas:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simple returns: (P_t / P_{t-1}) - 1</span>
-<span class="n">simple_returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
 
 <span class="c1"># Log returns: ln(P_t / P_{t-1})</span>
-<span class="n">log_returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
+<span class="n">series</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
 
-<span class="c1"># Cumulative returns: rebasing to start at 1.0</span>
-<span class="n">cumulative</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
+<span class="c1"># Cumulative returns: rebasing to start at 1.0 (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -353,28 +366,28 @@ The library provides explicit methods for alignment that require user choice:</p
 <section id="business-day-calendars">
 <h3>Business Day Calendars<a class="headerlink" href="#business-day-calendars" title="Link to this heading"></a></h3>
 <p>openseries integrates with business day calendars:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Align to specific country&#39;s business days</span>
-<span class="n">us_aligned</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Align to specific country&#39;s business days (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
 
-<span class="c1"># Multiple countries (intersection of business days)</span>
-<span class="n">multi_country</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
+<span class="c1"># Multiple countries (intersection of business days) (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
 
-<span class="c1"># Custom markets using pandas-market-calendars</span>
-<span class="n">nyse_aligned</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">markets</span><span class="o">=</span><span class="s2">&quot;NYSE&quot;</span><span class="p">)</span>
+<span class="c1"># Custom markets using pandas-market-calendars (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">markets</span><span class="o">=</span><span class="s2">&quot;NYSE&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="resampling">
 <h3>Resampling<a class="headerlink" href="#resampling" title="Link to this heading"></a></h3>
 <p>Convert between different frequencies:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Resample to month-end</span>
-<span class="n">monthly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Resample to month-end (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
 
-<span class="c1"># Resample to quarter-end</span>
-<span class="n">quarterly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
+<span class="c1"># Resample to quarter-end (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
 
-<span class="c1"># Custom resampling</span>
-<span class="n">weekly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
+<span class="c1"># Custom resampling (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -385,22 +398,18 @@ The library provides explicit methods for alignment that require user choice:</p
 <h3>Type Safety<a class="headerlink" href="#type-safety" title="Link to this heading"></a></h3>
 <p>Pydantic ensures data integrity:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dates must be valid ISO format strings</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-        <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;invalid-date&quot;</span><span class="p">],</span>
-        <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">]</span>
-    <span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># This will fail with a validation error</span>
+<span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;invalid-date&quot;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">]</span>
+<span class="p">)</span>
 
 <span class="c1"># Values must be numeric</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-        <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">],</span>
-        <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;not a number&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># This will fail with a validation error</span>
+<span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;not a number&quot;</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -433,15 +442,21 @@ The library provides explicit methods for alignment that require user choice:</p
 </section>
 <section id="transformation-methods">
 <h3>Transformation Methods<a class="headerlink" href="#transformation-methods" title="Link to this heading"></a></h3>
-<p>Methods that return new objects:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Data transformations</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>        <span class="c1"># Prices to returns</span>
-<span class="n">drawdowns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span> <span class="c1"># Drawdown series</span>
-<span class="n">cumulative</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>        <span class="c1"># Cumulative returns</span>
+<p>Methods that modify the original object (return self for chaining):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Data transformations (modify original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>        <span class="c1"># Prices to returns</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>  <span class="c1"># Drawdown series</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>           <span class="c1"># Cumulative returns</span>
 
-<span class="c1"># Time transformations</span>
-<span class="n">monthly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="n">aligned</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
+<span class="c1"># Time transformations (modify original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Methods that return new objects:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Analysis methods (return new objects)</span>
+<span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">rolling_ret</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_return</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -466,8 +481,8 @@ The library provides explicit methods for alignment that require user choice:</p
 <span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;data.json&quot;</span><span class="p">)</span>
 
 <span class="c1"># Visualization</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">plot_histogram</span><span class="p">()</span>
+<span class="n">series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
+<span class="n">series</span><span class="o">.</span><span class="n">plot_histogram</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -498,14 +513,14 @@ The library provides explicit methods for alignment that require user choice:</p
 <span class="n">metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 
 <span class="c1"># 3. Specific calculations</span>
-<span class="n">drawdowns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
-<span class="n">rolling_metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>  <span class="c1"># Convert to drawdown (modifies original)</span>
+<span class="n">rolling_metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>  <span class="c1"># Returns DataFrame</span>
 
 <span class="c1"># 4. Visualization</span>
 <span class="n">series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
 
 <span class="c1"># 5. Export results</span>
-<span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">&quot;analysis.xlsx&quot;</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="n">fiilename</span><span class="o">=</span><span class="s2">&quot;analysis.xlsx&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -514,8 +529,8 @@ The library provides explicit methods for alignment that require user choice:</p
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Original data is preserved - use deepcopy if needed</span>
 <span class="n">series_copy</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
-<span class="c1"># Large datasets - consider resampling</span>
-<span class="n">monthly_data</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+<span class="c1"># Large datasets - consider resampling (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
 
 <span class="c1"># Clean up intermediate results</span>
 <span class="k">del</span> <span class="n">intermediate_series</span>
@@ -536,14 +551,8 @@ The library provides explicit methods for alignment that require user choice:</p
 <span class="p">}</span>
 
 <span class="c1"># Example with error handling</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Max Div&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;max_div&quot;</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">MaxDiversificationNaNError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Numerical issues - using equal weights&quot;</span><span class="p">)</span>
-    <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">MaxDiversificationNegativeWeightsError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Negative weights - using risk parity&quot;</span><span class="p">)</span>
-    <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Parity&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;inv_vol&quot;</span><span class="p">)</span>
+<span class="c1"># This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Max Div&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;max_div&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Understanding these core concepts will help you use openseries effectively and build more sophisticated financial analysis workflows.</p>

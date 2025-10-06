@@ -80,13 +80,11 @@ openseries enforces strict date formats:
    valid_dates = ['2023-01-01', '2023-12-31', '2024-02-29']  # ISO format
 
    # Invalid formats will raise ValidationError
-   try:
-       invalid_series = OpenTimeSeries.from_arrays(
-           dates=['01/01/2023', '2023-1-1'],  # Wrong format
-           values=[100, 101]
-       )
-   except ValueError as e:
-       print(f"Date validation error: {e}")
+   # This will fail with a validation error
+   invalid_series = OpenTimeSeries.from_arrays(
+       dates=['01/01/2023', '2023-1-1'],  # Wrong format
+       values=[100, 101]
+   )
 
 Value Validation
 ~~~~~~~~~~~~~~~~
@@ -108,8 +106,8 @@ Values must be numeric and finite:
        name="Data with NaN"
    )
 
-   # Clean NaN values
-   clean_series = series.value_nan_handle()  # Forward fill
+   # Clean NaN values (modifies original)
+   series.value_nan_handle()  # Forward fill
 
 Length Consistency
 ~~~~~~~~~~~~~~~~~~
@@ -119,13 +117,11 @@ Dates and values must have the same length:
 .. code-block:: python
 
    # This will raise an error
-   try:
-       invalid_series = OpenTimeSeries.from_arrays(
-           dates=['2023-01-01', '2023-01-02'],
-           values=[100.0, 101.0, 102.0]  # Different length
-       )
-   except ValueError as e:
-       print(f"Length mismatch error: {e}")
+   # This will fail with a length mismatch error
+   invalid_series = OpenTimeSeries.from_arrays(
+       dates=['2023-01-01', '2023-01-02'],
+       values=[100.0, 101.0, 102.0]  # Different length
+   )
 
 Data Transformations
 --------------------
@@ -142,18 +138,18 @@ Price and Return Conversions
        name="Stock Price"
    )
 
-   # Convert to simple returns
-   returns = prices.value_to_ret()
-   print(f"Returns: {returns.values}")  # [0.02, -0.0294...]
+   # Convert to simple returns (modifies original)
+   prices.value_to_ret()
+   print(f"Returns: {prices.values}")  # [0.02, -0.0294...]
 
-   # Convert to log returns
-   log_returns = prices.value_to_log()
+   # Convert to log returns (modifies original)
+   prices.value_to_log()
 
-   # Convert returns back to cumulative values
-   cumulative = returns.to_cumret()
+   # Convert returns back to cumulative values (modifies original)
+   prices.to_cumret()
 
-   # Convert to differences (absolute changes)
-   differences = prices.value_to_diff()
+   # Convert to differences (absolute changes) (modifies original)
+   prices.value_to_diff()
 
 Resampling
 ~~~~~~~~~~
@@ -162,20 +158,20 @@ Change the frequency of your data:
 
 .. code-block:: python
 
-   # Daily to monthly (business month end)
-   monthly = series.resample_to_business_period_ends(freq="BME")
+   # Daily to monthly (business month end) (modifies original)
+   series.resample_to_business_period_ends(freq="BME")
 
-   # Daily to quarterly
-   quarterly = series.resample_to_business_period_ends(freq="BQE")
+   # Daily to quarterly (modifies original)
+   series.resample_to_business_period_ends(freq="BQE")
 
-   # Daily to annual
-   annual = series.resample_to_business_period_ends(freq="BYE")
+   # Daily to annual (modifies original)
+   series.resample_to_business_period_ends(freq="BYE")
 
-   # Custom resampling with pandas frequency strings
-   weekly = series.resample(freq="W")
+   # Custom resampling with pandas frequency strings (modifies original)
+   series.resample(freq="W")
 
-   # Resample with specific method
-   weekly_mean = series.resample(freq="W", method="mean")
+   # Resample with specific method (modifies original)
+   series.resample(freq="W", method="mean")
 
 Business Day Alignment
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -184,14 +180,14 @@ Align data to business day calendars:
 
 .. code-block:: python
 
-   # Align to US business days
-   us_series = series.align_index_to_local_cdays(countries="US")
+   # Align to US business days (modifies original)
+   series.align_index_to_local_cdays(countries="US")
 
-   # Align to multiple countries (intersection)
-   global_series = series.align_index_to_local_cdays(countries=["US", "GB", "JP"])
+   # Align to multiple countries (intersection) (modifies original)
+   series.align_index_to_local_cdays(countries=["US", "GB", "JP"])
 
-   # Align to specific market calendar
-   nyse_series = series.align_index_to_local_cdays(markets="NYSE")
+   # Align to specific market calendar (modifies original)
+   series.align_index_to_local_cdays(markets="NYSE")
 
 Handling Missing Data
 ---------------------
@@ -211,20 +207,20 @@ NaN Handling Strategies
        dates=dates, values=values, name="With NaN"
    )
 
-   # Forward fill missing values (for price series)
-   filled_series = series_with_nan.value_nan_handle()
+   # Forward fill missing values (for price series) (modifies original)
+   series_with_nan.value_nan_handle()
 
-   # For return series, replace NaN with 0.0
-   return_series = series_with_nan.value_to_ret()
-   clean_returns = return_series.return_nan_handle()
+   # For return series, replace NaN with 0.0 (modifies original)
+   series_with_nan.value_to_ret()
+   series_with_nan.return_nan_handle()
 
 Dropping Missing Data
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
-   # Remove NaN values entirely
-   clean_series = series_with_nan.value_nan_handle(method="drop")
+   # Remove NaN values entirely (modifies original)
+   series_with_nan.value_nan_handle(method="drop")
 
 Working with Multiple Assets
 -----------------------------
@@ -416,11 +412,11 @@ Outlier Detection
 
 .. code-block:: python
 
-   # Convert to returns for outlier analysis
-   returns = series.value_to_ret()
+   # Convert to returns for outlier analysis (modifies original)
+   series.value_to_ret()
 
    # Calculate z-scores
-   returns_df = returns.tsdf
+   returns_df = series.tsdf
    mean_return = returns_df.mean().iloc[0]
    std_return = returns_df.std().iloc[0]
 
@@ -440,11 +436,11 @@ Memory Usage
    # For large datasets, consider resampling
    large_series = series  # Assume this is large daily data
 
-   # Reduce to monthly for analysis
-   monthly_series = large_series.resample_to_business_period_ends(freq="BME")
+   # Reduce to monthly for analysis (modifies original)
+   large_series.resample_to_business_period_ends(freq="BME")
 
    # Use monthly for computationally intensive operations
-   monthly_metrics = monthly_series.all_properties
+   monthly_metrics = large_series.all_properties
 
 Efficient Data Loading
 ~~~~~~~~~~~~~~~~~~~~~~

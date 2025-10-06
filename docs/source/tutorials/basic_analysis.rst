@@ -118,11 +118,11 @@ Analyze drawdowns to understand downside risk:
    print(f"Maximum Drawdown: {max_drawdown:.2%}")
    print(f"Max Drawdown Date: {max_dd_date}")
 
-   # Create drawdown series for visualization
-   drawdown_series = sp500.to_drawdown_series()
+   # Create drawdown series for visualization (modifies original)
+   sp500.to_drawdown_series()
 
    # Plot drawdowns
-   fig, _ = drawdown_series.plot_series()
+   fig, _ = sp500.plot_series()
    # This will open an interactive plot in your browser
 
    # Worst calendar year drawdown
@@ -136,8 +136,8 @@ Examine the return distribution characteristics:
 
 .. code-block:: python
 
-   # Convert to returns for distribution analysis
-   returns = sp500.value_to_ret()
+   # Convert to returns for distribution analysis (modifies original)
+   sp500.value_to_ret()
 
    # Note: value_to_ret() modifies the original series in place
    # Restore the original series for further analysis
@@ -173,13 +173,13 @@ Break down performance by different time periods:
 
 .. code-block:: python
 
-   # Resample to monthly data
-   monthly_series = sp500.resample_to_business_period_ends(freq="BME")
-   print(f"Monthly observations: {monthly_series.length}")
+   # Resample to monthly data (modifies original)
+   sp500.resample_to_business_period_ends(freq="BME")
+   print(f"Monthly observations: {sp500.length}")
 
    # Monthly metrics
-   monthly_return = monthly_series.geo_ret
-   monthly_vol = monthly_series.vol
+   monthly_return = sp500.geo_ret
+   monthly_vol = sp500.vol
    print(f"Monthly Return (annualized): {monthly_return:.2%}")
    print(f"Monthly Volatility (annualized): {monthly_vol:.2%}")
 
@@ -187,9 +187,9 @@ Break down performance by different time periods:
    worst_month = sp500.worst_month
    print(f"Worst Month: {worst_month:.2%}")
 
-   # Annual data
-   annual_series = sp500.resample_to_business_period_ends(freq="BYE")
-   print(f"Annual observations: {annual_series.length}")
+   # Annual data (modifies original)
+   sp500.resample_to_business_period_ends(freq="BYE")
+   print(f"Annual observations: {sp500.length}")
 
 Calendar Year Returns
 ~~~~~~~~~~~~~~~~~~~~~
@@ -200,11 +200,9 @@ Calendar Year Returns
    years = range(2019, 2025)  # Adjust based on your data range
 
    for year in years:
-       try:
-           year_return = sp500.value_ret_calendar_period(year=year)
-           print(f"{year}: {year_return:.2%}")
-       except:
-           print(f"{year}: No data")
+       # This may fail if no data exists for the year
+       year_return = sp500.value_ret_calendar_period(year=year)
+       print(f"{year}: {year_return:.2%}")
 
 Rolling Analysis
 ----------------
@@ -259,13 +257,13 @@ Create various visualizations:
    # Price chart
    fig, _ = sp500.plot_series()
 
-   # Returns histogram
-   returns = sp500.value_to_ret()
-   fig, _ = returns.plot_histogram()
+   # Returns histogram (modifies original)
+   sp500.value_to_ret()
+   fig, _ = sp500.plot_histogram()
 
-   # Drawdown chart
-   drawdowns = sp500.to_drawdown_series()
-   fig, _ = drawdowns.plot_series()
+   # Drawdown chart (modifies original)
+   sp500.to_drawdown_series()
+   fig, _ = sp500.plot_series()
 
 Comparison with Benchmark
 -------------------------
@@ -333,7 +331,7 @@ Summary and Interpretation
 .. code-block:: python
 
    print("\n=== INVESTMENT SUMMARY ===")
-   print(f"Asset: {sp500.name}")
+   print(f"Asset: {sp500.label}")
    print(f"Period: {sp500.first_idx} to {sp500.last_idx}")
    print(f"Total Return: {sp500.value_ret:.2%}")
    print(f"Annualized Return: {sp500.geo_ret:.2%}")

@@ -30,16 +30,14 @@ Let's start by downloading data for a diversified set of assets:
    # Download 5 years of data
    series_list = []
    for ticker, name in tickers.items():
-       try:
-           data = yf.Ticker(ticker).history(period="5y")
-           series = OpenTimeSeries.from_df(
-               dframe=data['Close']
-           )
-           series.set_new_label(lvl_zero=name)
-           series_list.append(series)
-           print(f"Loaded {name}: {series.length} observations")
-       except Exception as e:
-           print(f"Failed to load {name}: {e}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="5y")
+       series = OpenTimeSeries.from_df(
+           dframe=data['Close']
+       )
+       series.set_new_label(lvl_zero=name)
+       series_list.append(series)
+       print(f"Loaded {name}: {series.length} observations")
 
    # Create OpenFrame
    assets = OpenFrame(constituents=series_list)
@@ -164,26 +162,16 @@ The maximum diversification strategy optimizes the correlation structure to maxi
 
    from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
 
-   try:
-       max_div_portfolio_df = assets.make_portfolio(
-           name="Maximum Diversification",
-           weight_strat="max_div"
-       )
-       max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
+   # This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError
+   max_div_portfolio_df = assets.make_portfolio(
+       name="Maximum Diversification",
+       weight_strat="max_div"
+   )
+   max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
 
-       print(f"Max Diversification Return: {max_div_portfolio.geo_ret:.2%}")
-       print(f"Max Diversification Volatility: {max_div_portfolio.vol:.2%}")
-       print(f"Max Diversification Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
-
-   except MaxDiversificationNaNError as e:
-       print(f"Maximum diversification failed due to numerical issues: {e}")
-       print("This can occur with highly correlated assets or insufficient data")
-       print("Consider using equal weights or inverse volatility instead")
-
-   except MaxDiversificationNegativeWeightsError as e:
-       print(f"Maximum diversification produced negative weights: {e}")
-       print("Negative weights indicate the strategy may not be suitable for your data")
-       print("Consider using equal weights or inverse volatility instead")
+   print(f"Max Diversification Return: {max_div_portfolio.geo_ret:.2%}")
+   print(f"Max Diversification Volatility: {max_div_portfolio.vol:.2%}")
+   print(f"Max Diversification Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
 
 Target Risk Strategy
 ^^^^^^^^^^^^^^^^^^^^
@@ -192,19 +180,16 @@ The target risk strategy aims for a specific portfolio volatility level:
 
 .. code-block:: python
 
-   try:
-       target_risk_portfolio_df = assets.make_portfolio(
-           name="Target Risk",
-           weight_strat="target_risk"
-       )
-       target_risk_portfolio = OpenTimeSeries.from_df(dframe=target_risk_portfolio_df)
+   # This may fail with various exceptions
+   target_risk_portfolio_df = assets.make_portfolio(
+       name="Target Risk",
+       weight_strat="target_risk"
+   )
+   target_risk_portfolio = OpenTimeSeries.from_df(dframe=target_risk_portfolio_df)
 
-       print(f"Target Risk Return: {target_risk_portfolio.geo_ret:.2%}")
-       print(f"Target Risk Volatility: {target_risk_portfolio.vol:.2%}")
-       print(f"Target Risk Sharpe: {target_risk_portfolio.ret_vol_ratio:.2f}")
-
-   except Exception as e:
-       print(f"Target risk strategy failed: {e}")
+   print(f"Target Risk Return: {target_risk_portfolio.geo_ret:.2%}")
+   print(f"Target Risk Volatility: {target_risk_portfolio.vol:.2%}")
+   print(f"Target Risk Sharpe: {target_risk_portfolio.ret_vol_ratio:.2f}")
 
 Strategy Comparison with Error Handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -222,20 +207,14 @@ When comparing multiple strategies, it's important to handle potential failures 
 
    results = {}
    for name, strategy in strategies.items():
-       try:
-           portfolio_df = assets.make_portfolio(name=name, weight_strat=strategy)
-           portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
-           results[name] = {
-               'Return': portfolio.geo_ret,
-               'Volatility': portfolio.vol,
-               'Sharpe': portfolio.ret_vol_ratio
-           }
-       except (MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError) as e:
-           print(f"Skipping {name}: {e}")
-           continue
-       except Exception as e:
-           print(f"Unexpected error with {name}: {e}")
-           continue
+       # This may fail with MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError, or other exceptions
+       portfolio_df = assets.make_portfolio(name=name, weight_strat=strategy)
+       portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+       results[name] = {
+           'Return': portfolio.geo_ret,
+           'Volatility': portfolio.vol,
+           'Sharpe': portfolio.ret_vol_ratio
+       }
 
    if results:
        results_df = pd.DataFrame(results).T
@@ -253,35 +232,32 @@ Efficient Frontier
 .. code-block:: python
 
    # Calculate efficient frontier
-   try:
-       frontier_df, simulated_df, optimal_portfolio = efficient_frontier(
-           eframe=assets,
-           num_ports=50,
-           seed=42
-       )
+   # This may fail with various exceptions
+   frontier_df, simulated_df, optimal_portfolio = efficient_frontier(
+       eframe=assets,
+       num_ports=50,
+       seed=42
+   )
 
-       print("Efficient frontier calculated successfully")
-       print(f"Number of frontier points: {len(frontier_df)}")
-       print(f"Number of simulated portfolios: {len(simulated_df)}")
+   print("Efficient frontier calculated successfully")
+   print(f"Number of frontier points: {len(frontier_df)}")
+   print(f"Number of simulated portfolios: {len(simulated_df)}")
 
-       # Find maximum Sharpe ratio portfolio
-       sharpe_ratios = frontier_df['ret'] / frontier_df['stdev']
-       max_sharpe_idx = np.argmax(sharpe_ratios)
+   # Find maximum Sharpe ratio portfolio
+   sharpe_ratios = frontier_df['ret'] / frontier_df['stdev']
+   max_sharpe_idx = np.argmax(sharpe_ratios)
 
-       print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
-       print(f"Expected Return: {frontier_df.iloc[max_sharpe_idx]['ret']:.2%}")
-       print(f"Volatility: {frontier_df.iloc[max_sharpe_idx]['stdev']:.2%}")
-       print(f"Sharpe Ratio: {sharpe_ratios.iloc[max_sharpe_idx]:.2f}")
+   print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
+   print(f"Expected Return: {frontier_df.iloc[max_sharpe_idx]['ret']:.2%}")
+   print(f"Volatility: {frontier_df.iloc[max_sharpe_idx]['stdev']:.2%}")
+   print(f"Sharpe Ratio: {sharpe_ratios.iloc[max_sharpe_idx]:.2f}")
 
-       # Get optimal weights
-       optimal_weights = optimal_portfolio[-len(assets.constituents):]
-       print("\nOptimal Weights:")
-       for i, weight in enumerate(optimal_weights):
-           asset_name = assets.constituents[i].name
-           print(f"  {asset_name}: {weight:.1%}")
-
-   except Exception as e:
-       print(f"Optimization failed: {e}")
+   # Get optimal weights
+   optimal_weights = optimal_portfolio[-len(assets.constituents):]
+   print("\nOptimal Weights:")
+   for i, weight in enumerate(optimal_weights):
+       asset_name = assets.constituents[i].label
+       print(f"  {asset_name}: {weight:.1%}")
 
 Monte Carlo Portfolio Simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -289,30 +265,27 @@ Monte Carlo Portfolio Simulation
 .. code-block:: python
 
    # Simulate random portfolios
-   try:
-       simulation_results = simulate_portfolios(
-           simframe=assets,
-           num_ports=10000,
-           seed=42
-       )
+   # This may fail with various exceptions
+   simulation_results = simulate_portfolios(
+       simframe=assets,
+       num_ports=10000,
+       seed=42
+   )
 
-       print(f"\nSimulated {len(simulation_results)} random portfolios")
+   print(f"\nSimulated {len(simulation_results)} random portfolios")
 
-       # Find best performing portfolios
-       sim_sharpe_ratios = simulation_results['ret'] / simulation_results['stdev']
+   # Find best performing portfolios
+   sim_sharpe_ratios = simulation_results['ret'] / simulation_results['stdev']
 
-       # Top 5 Sharpe ratios
-       top_indices = np.argsort(sim_sharpe_ratios)[-5:]
+   # Top 5 Sharpe ratios
+   top_indices = np.argsort(sim_sharpe_ratios)[-5:]
 
-       print("\n=== TOP 5 SIMULATED PORTFOLIOS ===")
-       for i, idx in enumerate(reversed(top_indices)):
-           print(f"\nRank {i+1}:")
-           print(f"  Return: {simulation_results.iloc[idx]['ret']:.2%}")
-           print(f"  Volatility: {simulation_results.iloc[idx]['stdev']:.2%}")
-           print(f"  Sharpe: {sim_sharpe_ratios.iloc[idx]:.2f}")
-
-   except Exception as e:
-       print(f"Simulation failed: {e}")
+   print("\n=== TOP 5 SIMULATED PORTFOLIOS ===")
+   for i, idx in enumerate(reversed(top_indices)):
+       print(f"\nRank {i+1}:")
+       print(f"  Return: {simulation_results.iloc[idx]['ret']:.2%}")
+       print(f"  Volatility: {simulation_results.iloc[idx]['stdev']:.2%}")
+       print(f"  Sharpe: {sim_sharpe_ratios.iloc[idx]:.2f}")
 
 Portfolio Comparison
 --------------------
@@ -348,12 +321,12 @@ Analyze the risk contribution of each asset:
    # Calculate portfolio statistics for equal weight portfolio
    returns_data = []
    for series in assets.constituents:
-       returns = series.value_to_ret()
-       returns_data.append(returns.tsdf)
+       series.value_to_ret()  # Modifies original
+       returns_data.append(series.tsdf)
 
    # Create returns matrix
    returns_matrix = pd.concat(returns_data, axis=1)
-   returns_matrix.columns = [series.name for series in assets.constituents]
+   returns_matrix.columns = [series.label for series in assets.constituents]
 
    # Calculate covariance matrix (annualized)
    cov_matrix = returns_matrix.cov() * 252  # Assuming daily data
@@ -380,7 +353,7 @@ Analyze the risk contribution of each asset:
        'Marginal Contrib': marginal_contrib,
        'Component Contrib': component_contrib,
        'Percent Contrib': percent_contrib
-   }, index=[series.name for series in assets.constituents])
+   }, index=[series.label for series in assets.constituents])
 
    print(risk_attribution.round(4))
 
@@ -394,11 +367,11 @@ Analyze performance contribution over time:
    # Calculate individual asset returns
    asset_returns = []
    for series in assets.constituents:
-       returns = series.value_to_ret()
-       asset_returns.append(returns.tsdf)
+       series.value_to_ret()  # Modifies original
+       asset_returns.append(series.tsdf)
 
    returns_df = pd.concat(asset_returns, axis=1)
-   returns_df.columns = [series.name for series in assets.constituents]
+   returns_df.columns = [series.label for series in assets.constituents]
 
    # Calculate weighted returns (equal weight portfolio)
    weighted_returns = returns_df * equal_weights
@@ -477,12 +450,12 @@ Analyze the impact of rebalancing frequency using the realistic `rebalanced_port
    print("-" * 50)
 
    for series in all_portfolios:
-       ret = comparison_metrics.loc['Geometric return', series.name].iloc[0] * 100
-       vol = comparison_metrics.loc['Volatility', series.name].iloc[0] * 100
-       sharpe = comparison_metrics.loc['Return vol ratio', series.name].iloc[0]
-       max_dd = comparison_metrics.loc['Max drawdown', series.name].iloc[0] * 100
+       ret = comparison_metrics.loc['Geometric return', series.label].iloc[0] * 100
+       vol = comparison_metrics.loc['Volatility', series.label].iloc[0] * 100
+       sharpe = comparison_metrics.loc['Return vol ratio', series.label].iloc[0]
+       max_dd = comparison_metrics.loc['Max drawdown', series.label].iloc[0] * 100
 
-       print(f"{series.name:>15} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
+       print(f"{series.label:>15} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
    # Analyze transaction costs
    print(f"\n=== TRANSACTION COST ANALYSIS ===")
@@ -497,7 +470,7 @@ Analyze the impact of rebalancing frequency using the realistic `rebalanced_port
        # Count rebalancing events
        rebalancing_days = 0
        for series in detailed_portfolio.constituents:
-           if "buysell_qty" in series.name:
+           if "buysell_qty" in series.label:
                # Count days with non-zero trading
                trading_days = (series.tsdf != 0).any(axis=1).sum()
                rebalancing_days = max(rebalancing_days, trading_days)
@@ -511,9 +484,9 @@ Test portfolio performance during market stress:
 
 .. code-block:: python
 
-   # Identify worst periods for the market
-   market_returns = market_proxy.value_to_ret()
-   market_returns_df = market_returns.tsdf
+   # Identify worst periods for the market (modifies original)
+   market_proxy.value_to_ret()
+   market_returns_df = market_proxy.tsdf
 
    # Find worst 5% of days
    worst_days_threshold = market_returns_df.quantile(0.05).iloc[0]
@@ -523,9 +496,9 @@ Test portfolio performance during market stress:
    print(f"Market stress threshold: {worst_days_threshold:.2%}")
    print(f"Number of stress days: {len(worst_days)}")
 
-   # Portfolio performance during stress
-   portfolio_returns = equal_weight_portfolio.value_to_ret()
-   portfolio_returns_df = portfolio_returns.tsdf
+   # Portfolio performance during stress (modifies original)
+   equal_weight_portfolio.value_to_ret()
+   portfolio_returns_df = equal_weight_portfolio.tsdf
 
    # Align dates and calculate portfolio performance during market stress
    stress_dates = worst_days.index
@@ -547,7 +520,7 @@ Generate a comprehensive portfolio analysis report:
 
    print(f"\nAnalysis Period: {assets.first_idx} to {assets.last_idx}")
    print(f"Number of Assets: {assets.item_count}")
-   print(f"Asset Universe: {', '.join([s.name for s in assets.constituents])}")
+   print(f"Asset Universe: {', '.join([s.label for s in assets.constituents])}")
 
    print(f"\n--- EQUAL WEIGHT PORTFOLIO PERFORMANCE ---")
    print(f"Total Return: {equal_weight_portfolio.value_ret:.2%}")

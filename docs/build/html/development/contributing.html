@@ -327,8 +327,8 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 
         <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Test&quot;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected name &#39;Test&#39;, got &#39;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;Test&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected name &#39;Test&#39;, got &#39;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected length 3, got </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -355,10 +355,10 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
         <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">]</span>
 
         <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">)</span>
-        <span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
 
         <span class="n">expected_returns</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0294117647</span><span class="p">]</span>  <span class="c1"># Approximate</span>
-        <span class="n">actual_returns</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">actual_returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">actual_returns</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected 2 returns, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">actual_returns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>

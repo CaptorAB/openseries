@@ -63,19 +63,19 @@ Time Series Transformations
 
 .. code-block:: python
 
-   # Convert to returns
-   apple_returns = apple.value_to_ret()
-   print(f"Returns series length: {apple_returns.length}")
+   # Convert to returns (modifies original)
+   apple.value_to_ret()
+   print(f"Returns series length: {apple.length}")
 
-   # Create drawdown series
-   apple_drawdowns = apple.to_drawdown_series()
+   # Create drawdown series (modifies original)
+   apple.to_drawdown_series()
 
-   # Convert to log returns
-   apple_log_returns = apple.value_to_log()
+   # Convert to log returns (modifies original)
+   apple.value_to_log()
 
-   # Resample to monthly
-   apple_monthly = apple.resample_to_business_period_ends(freq="BME")
-   print(f"Monthly data points: {apple_monthly.length}")
+   # Resample to monthly (modifies original)
+   apple.resample_to_business_period_ends(freq="BME")
+   print(f"Monthly data points: {apple.length}")
 
 Rolling Analysis
 ----------------
@@ -117,11 +117,9 @@ Calendar Analysis
 
    print("=== CALENDAR YEAR RETURNS ===")
    for year in years:
-       try:
-           year_return = apple.value_ret_calendar_period(year=year)
-           print(f"{year}: {year_return:.2%}")
-       except:
-           print(f"{year}: No data")
+       # This may fail if no data exists for the year
+       year_return = apple.value_ret_calendar_period(year=year)
+       print(f"{year}: {year_return:.2%}")
 
 Export Results
 --------------

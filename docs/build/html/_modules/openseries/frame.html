@@ -192,7 +192,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OpenFrame</span><span class="p">(</span><span class="n">_CommonModel</span><span class="p">[</span><span class="n">SeriesFloat</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;OpenFrame objects hold OpenTimeSeries in the list constituents.</span>
 
@@ -229,7 +229,7 @@
         <span class="k">return</span> <span class="n">tseries</span>
 
 <div class="viewcode-block" id="OpenFrame.__init__">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.__init__">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">constituents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">OpenTimeSeries</span><span class="p">],</span>
@@ -277,7 +277,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;OpenFrame() was passed an empty list.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="OpenFrame.from_deepcopy">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.from_deepcopy">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.from_deepcopy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create copy of the OpenFrame object.</span>
 
@@ -291,7 +291,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.merge_series">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.merge_series">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.merge_series">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">merge_series</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">how</span><span class="p">:</span> <span class="n">LiteralHowMerge</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
@@ -338,7 +338,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.all_properties">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.all_properties">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.all_properties">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">all_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">properties</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">LiteralFrameProps</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -470,7 +470,7 @@
         <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
 <div class="viewcode-block" id="OpenFrame.value_to_ret">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.value_to_ret">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.value_to_ret">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">value_to_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values into series of returns.</span>
 
@@ -493,7 +493,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.value_to_diff">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.value_to_diff">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.value_to_diff">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">value_to_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">periods</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values to series of their period differences.</span>
 
@@ -521,7 +521,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.to_cumret">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.to_cumret">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.to_cumret">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_cumret</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of returns into cumulative series of values.</span>
 
@@ -555,7 +555,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.resample">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.resample">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.resample">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;BME&quot;</span><span class="p">,</span>
@@ -602,7 +602,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.resample_to_business_period_ends">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.resample_to_business_period_ends">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.resample_to_business_period_ends">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resample_to_business_period_ends</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">&quot;BME&quot;</span><span class="p">,</span>
@@ -659,7 +659,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.ewma_risk">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.ewma_risk">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.ewma_risk">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ewma_risk</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">lmbda</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.94</span><span class="p">,</span>
@@ -824,7 +824,7 @@
         <span class="k">return</span> <span class="n">corr_matrix</span>
 
 <div class="viewcode-block" id="OpenFrame.add_timeseries">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.add_timeseries">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.add_timeseries">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_timeseries</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">new_series</span><span class="p">:</span> <span class="n">OpenTimeSeries</span><span class="p">,</span>
@@ -848,7 +848,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.delete_timeseries">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.delete_timeseries">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.delete_timeseries">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">delete_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">lvl_zero_item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;To delete an OpenTimeSeries object.</span>
 
@@ -880,7 +880,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.trunc_frame">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.trunc_frame">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.trunc_frame">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">trunc_frame</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">start_cut</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -936,7 +936,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.relative">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.relative">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.relative">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">relative</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">long_column</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -976,7 +976,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.tracking_error_func">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.tracking_error_func">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.tracking_error_func">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tracking_error_func</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">base_column</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -1053,7 +1053,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.info_ratio_func">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.info_ratio_func">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.info_ratio_func">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">info_ratio_func</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">base_column</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -1132,7 +1132,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.capture_ratio_func">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.capture_ratio_func">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.capture_ratio_func">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">capture_ratio_func</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">ratio</span><span class="p">:</span> <span class="n">LiteralCaptureRatio</span><span class="p">,</span>
@@ -1338,7 +1338,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.beta">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.beta">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.beta">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">beta</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">asset</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
@@ -1409,7 +1409,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.ord_least_squares_fit">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.ord_least_squares_fit">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.ord_least_squares_fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ord_least_squares_fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">y_column</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
@@ -1475,7 +1475,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.jensen_alpha">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.jensen_alpha">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.jensen_alpha">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">jensen_alpha</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">asset</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
@@ -1563,7 +1563,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.make_portfolio">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.make_portfolio">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.make_portfolio">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">make_portfolio</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1675,7 +1675,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.rolling_info_ratio">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.rolling_info_ratio">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.rolling_info_ratio">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">rolling_info_ratio</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">long_column</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -1745,7 +1745,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.rolling_beta">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.rolling_beta">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.rolling_beta">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">rolling_beta</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">asset_column</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -1811,7 +1811,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.rolling_corr">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.rolling_corr">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.rolling_corr">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">rolling_corr</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">first_column</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -1862,7 +1862,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.multi_factor_linear_regression">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.multi_factor_linear_regression">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.multi_factor_linear_regression">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">multi_factor_linear_regression</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">dependent_column</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">],</span>
@@ -1924,7 +1924,7 @@
 
 
 <div class="viewcode-block" id="OpenFrame.rebalanced_portfolio">
-<a class="viewcode-back" href="../../api/openseries.html#openseries.OpenFrame.rebalanced_portfolio">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/openseries.OpenFrame.html#openseries.OpenFrame.rebalanced_portfolio">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">rebalanced_portfolio</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>

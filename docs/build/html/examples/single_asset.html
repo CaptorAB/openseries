@@ -178,19 +178,19 @@
 </section>
 <section id="time-series-transformations">
 <h2>Time Series Transformations<a class="headerlink" href="#time-series-transformations" title="Link to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns</span>
-<span class="n">apple_returns</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns series length: </span><span class="si">{</span><span class="n">apple_returns</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns (modifies original)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns series length: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Create drawdown series</span>
-<span class="n">apple_drawdowns</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
+<span class="c1"># Create drawdown series (modifies original)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
 
-<span class="c1"># Convert to log returns</span>
-<span class="n">apple_log_returns</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
+<span class="c1"># Convert to log returns (modifies original)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
 
-<span class="c1"># Resample to monthly</span>
-<span class="n">apple_monthly</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly data points: </span><span class="si">{</span><span class="n">apple_monthly</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Resample to monthly (modifies original)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly data points: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -229,11 +229,9 @@
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== CALENDAR YEAR RETURNS ===&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">year_return</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: No data&quot;</span><span class="p">)</span>
+    <span class="c1"># This may fail if no data exists for the year</span>
+    <span class="n">year_return</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

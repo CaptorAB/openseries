@@ -25,13 +25,11 @@ Multi-Factor Model Analysis
    # Load factor data
    factor_series = []
    for ticker, name in factor_tickers.items():
-       try:
-           data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'])
-           series.set_new_label(lvl_zero=name)
-           factor_series.append(series)
-       except:
-           print(f"Failed to load {name}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="3y")
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=name)
+       factor_series.append(series)
 
    # Create factor frame
    factors = OpenFrame(constituents=factor_series)
@@ -45,25 +43,22 @@ Multi-Factor Model Analysis
    analysis_frame = OpenFrame(constituents=factor_series + [apple])
 
    # Perform multi-factor regression
-   try:
-       regression_results = analysis_frame.multi_factor_linear_regression(
-           dependent_variable_idx=-1  # Apple is the last series (dependent variable)
-       )
+   # This may fail with various exceptions
+   regression_results = analysis_frame.multi_factor_linear_regression(
+       dependent_variable_idx=-1  # Apple is the last series (dependent variable)
+   )
 
-       print("\n=== MULTI-FACTOR REGRESSION RESULTS ===")
-       print("Regression Summary:")
-       print(regression_results['summary'])
+   print("\n=== MULTI-FACTOR REGRESSION RESULTS ===")
+   print("Regression Summary:")
+   print(regression_results['summary'])
 
-       print("\nFactor Loadings (Betas):")
-       for i, factor_name in enumerate([s.name for s in factor_series]):
-           beta = regression_results['coefficients'][i+1]  # Skip intercept
-           print(f"  {factor_name}: {beta:.4f}")
+   print("\nFactor Loadings (Betas):")
+   for i, factor_name in enumerate([s.label for s in factor_series]):
+       beta = regression_results['coefficients'][i+1]  # Skip intercept
+       print(f"  {factor_name}: {beta:.4f}")
 
-       print(f"\nR-squared: {regression_results['r_squared']:.4f}")
-       print(f"Adjusted R-squared: {regression_results['adj_r_squared']:.4f}")
-
-   except Exception as e:
-       print(f"Regression analysis failed: {e}")
+   print(f"\nR-squared: {regression_results['r_squared']:.4f}")
+   print(f"Adjusted R-squared: {regression_results['adj_r_squared']:.4f}")
 
 Rolling Factor Analysis
 ~~~~~~~~~~~~~~~~~~~~~~~

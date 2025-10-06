@@ -28,16 +28,14 @@ Setting Up Multi-Asset Analysis
    # Download data for all assets
    series_list = []
    for ticker, name in assets.items():
-       try:
-           data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(
-               dframe=data['Close']
-           )
-           series.set_new_label(lvl_zero=name)
-           series_list.append(series)
-           print(f"Loaded {name}: {series.length} observations")
-       except Exception as e:
-           print(f"Failed to load {name}: {e}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="3y")
+       series = OpenTimeSeries.from_df(
+           dframe=data['Close']
+       )
+       series.set_new_label(lvl_zero=name)
+       series_list.append(series)
+       print(f"Loaded {name}: {series.length} observations")
 
    # Create OpenFrame
    tech_stocks = OpenFrame(constituents=series_list)
@@ -165,7 +163,7 @@ Sector/Style Analysis
    print("\n=== GROUP ANALYSIS ===")
    for group_name, group_assets in asset_groups.items():
        # Filter assets that exist in our data
-       group_series = [s for s in tech_stocks.constituents if s.name in group_assets]
+       group_series = [s for s in tech_stocks.constituents if s.label in group_assets]
 
        if group_series:
            group_frame = OpenFrame(constituents=group_series)
@@ -187,13 +185,13 @@ Time Series Analysis
 
    # Rolling correlation analysis
    # Pick two assets for detailed analysis
-   apple = next(s for s in tech_stocks.constituents if "Apple" in s.name)
-   microsoft = next(s for s in tech_stocks.constituents if "Microsoft" in s.name)
+   apple = next(s for s in tech_stocks.constituents if "Apple" in s.label)
+   microsoft = next(s for s in tech_stocks.constituents if "Microsoft" in s.label)
 
    pair_frame = OpenFrame(constituents=[apple, microsoft])
    rolling_corr = pair_frame.rolling_corr(window=252)  # 1-year rolling
 
-   print(f"\n=== ROLLING CORRELATION: {apple.name} vs {microsoft.name} ===")
+   print(f"\n=== ROLLING CORRELATION: {apple.label} vs {microsoft.label} ===")
    print(f"Current correlation: {rolling_corr.iloc[-1, 0]:.3f}")
    print(f"Average correlation: {rolling_corr.mean().iloc[0]:.3f}")
    print(f"Correlation range: {rolling_corr.min().iloc[0]:.3f} to {rolling_corr.max().iloc[0]:.3f}")
@@ -230,10 +228,10 @@ Stress Testing
 
 .. code-block:: python
 
-   # Identify worst market days
+   # Identify worst market days (modifies original)
    market_proxy = tech_stocks.constituents[0]  # Use first asset as market proxy
-   market_returns = market_proxy.value_to_ret()
-   market_data = market_returns.tsdf
+   market_proxy.value_to_ret()
+   market_data = market_proxy.tsdf
    # Find worst 5% of days
    worst_threshold = market_data.quantile(0.05)
    worst_days = market_data[market_data <= worst_threshold]
@@ -245,13 +243,13 @@ Stress Testing
    # Analyze each asset's performance during stress
    print("\nAsset performance during market stress:")
    for series in tech_stocks.constituents:
-       asset_returns = series.value_to_ret()
-       asset_data = asset_returns.tsdf
+       series.value_to_ret()  # Modifies original
+       asset_data = series.tsdf
        # Get returns on stress days
        stress_returns = asset_data.loc[worst_days.index]
        avg_stress_return = stress_returns.mean()
 
-       print(f"  {series.name}: {avg_stress_return:.2%}")
+       print(f"  {series.label}: {avg_stress_return:.2%}")
 
 Export Multi-Asset Results
 --------------------------
@@ -290,13 +288,11 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
    # Load data using openseries methods
    series_list = []
    for ticker in tech_tickers:
-       try:
-           data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'])
-           series.set_new_label(lvl_zero=ticker)
-           series_list.append(series)
-       except:
-           print(f"Failed to load {ticker}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="3y")
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=ticker)
+       series_list.append(series)
 
    if not series_list:
        print("No data loaded")

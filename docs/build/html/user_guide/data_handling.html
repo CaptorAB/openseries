@@ -231,13 +231,11 @@
 <span class="n">valid_dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-12-31&#39;</span><span class="p">,</span> <span class="s1">&#39;2024-02-29&#39;</span><span class="p">]</span>  <span class="c1"># ISO format</span>
 
 <span class="c1"># Invalid formats will raise ValidationError</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-        <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;01/01/2023&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-1-1&#39;</span><span class="p">],</span>  <span class="c1"># Wrong format</span>
-        <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">]</span>
-    <span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date validation error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># This will fail with a validation error</span>
+<span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;01/01/2023&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-1-1&#39;</span><span class="p">],</span>  <span class="c1"># Wrong format</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -257,8 +255,8 @@
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Data with NaN&quot;</span>
 <span class="p">)</span>
 
-<span class="c1"># Clean NaN values</span>
-<span class="n">clean_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span>  <span class="c1"># Forward fill</span>
+<span class="c1"># Clean NaN values (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span>  <span class="c1"># Forward fill</span>
 </pre></div>
 </div>
 </section>
@@ -266,13 +264,11 @@
 <h3>Length Consistency<a class="headerlink" href="#length-consistency" title="Link to this heading"></a></h3>
 <p>Dates and values must have the same length:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This will raise an error</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-        <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
-        <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>  <span class="c1"># Different length</span>
-    <span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length mismatch error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># This will fail with a length mismatch error</span>
+<span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>  <span class="c1"># Different length</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -288,52 +284,52 @@
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock Price&quot;</span>
 <span class="p">)</span>
 
-<span class="c1"># Convert to simple returns</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns: </span><span class="si">{</span><span class="n">returns</span><span class="o">.</span><span class="n">values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># [0.02, -0.0294...]</span>
+<span class="c1"># Convert to simple returns (modifies original)</span>
+<span class="n">prices</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns: </span><span class="si">{</span><span class="n">prices</span><span class="o">.</span><span class="n">values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># [0.02, -0.0294...]</span>
 
-<span class="c1"># Convert to log returns</span>
-<span class="n">log_returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
+<span class="c1"># Convert to log returns (modifies original)</span>
+<span class="n">prices</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
 
-<span class="c1"># Convert returns back to cumulative values</span>
-<span class="n">cumulative</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
+<span class="c1"># Convert returns back to cumulative values (modifies original)</span>
+<span class="n">prices</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
 
-<span class="c1"># Convert to differences (absolute changes)</span>
-<span class="n">differences</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">value_to_diff</span><span class="p">()</span>
+<span class="c1"># Convert to differences (absolute changes) (modifies original)</span>
+<span class="n">prices</span><span class="o">.</span><span class="n">value_to_diff</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
 <section id="resampling">
 <h3>Resampling<a class="headerlink" href="#resampling" title="Link to this heading"></a></h3>
 <p>Change the frequency of your data:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Daily to monthly (business month end)</span>
-<span class="n">monthly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Daily to monthly (business month end) (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
 
-<span class="c1"># Daily to quarterly</span>
-<span class="n">quarterly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
+<span class="c1"># Daily to quarterly (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
 
-<span class="c1"># Daily to annual</span>
-<span class="n">annual</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BYE&quot;</span><span class="p">)</span>
+<span class="c1"># Daily to annual (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BYE&quot;</span><span class="p">)</span>
 
-<span class="c1"># Custom resampling with pandas frequency strings</span>
-<span class="n">weekly</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
+<span class="c1"># Custom resampling with pandas frequency strings (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
 
-<span class="c1"># Resample with specific method</span>
-<span class="n">weekly_mean</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+<span class="c1"># Resample with specific method (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="business-day-alignment">
 <h3>Business Day Alignment<a class="headerlink" href="#business-day-alignment" title="Link to this heading"></a></h3>
 <p>Align data to business day calendars:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Align to US business days</span>
-<span class="n">us_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Align to US business days (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;US&quot;</span><span class="p">)</span>
 
-<span class="c1"># Align to multiple countries (intersection)</span>
-<span class="n">global_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;JP&quot;</span><span class="p">])</span>
+<span class="c1"># Align to multiple countries (intersection) (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;JP&quot;</span><span class="p">])</span>
 
-<span class="c1"># Align to specific market calendar</span>
-<span class="n">nyse_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">markets</span><span class="o">=</span><span class="s2">&quot;NYSE&quot;</span><span class="p">)</span>
+<span class="c1"># Align to specific market calendar (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">markets</span><span class="o">=</span><span class="s2">&quot;NYSE&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -352,19 +348,19 @@
     <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;With NaN&quot;</span>
 <span class="p">)</span>
 
-<span class="c1"># Forward fill missing values (for price series)</span>
-<span class="n">filled_series</span> <span class="o">=</span> <span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span>
+<span class="c1"># Forward fill missing values (for price series) (modifies original)</span>
+<span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span>
 
-<span class="c1"># For return series, replace NaN with 0.0</span>
-<span class="n">return_series</span> <span class="o">=</span> <span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="n">clean_returns</span> <span class="o">=</span> <span class="n">return_series</span><span class="o">.</span><span class="n">return_nan_handle</span><span class="p">()</span>
+<span class="c1"># For return series, replace NaN with 0.0 (modifies original)</span>
+<span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="n">series_with_nan</span><span class="o">.</span><span class="n">return_nan_handle</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
 <section id="dropping-missing-data">
 <h3>Dropping Missing Data<a class="headerlink" href="#dropping-missing-data" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remove NaN values entirely</span>
-<span class="n">clean_series</span> <span class="o">=</span> <span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remove NaN values entirely (modifies original)</span>
+<span class="n">series_with_nan</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -545,11 +541,11 @@
 </section>
 <section id="outlier-detection">
 <h3>Outlier Detection<a class="headerlink" href="#outlier-detection" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns for outlier analysis</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns for outlier analysis (modifies original)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
 
 <span class="c1"># Calculate z-scores</span>
-<span class="n">returns_df</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span>
+<span class="n">returns_df</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">tsdf</span>
 <span class="n">mean_return</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">std_return</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -568,11 +564,11 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># For large datasets, consider resampling</span>
 <span class="n">large_series</span> <span class="o">=</span> <span class="n">series</span>  <span class="c1"># Assume this is large daily data</span>
 
-<span class="c1"># Reduce to monthly for analysis</span>
-<span class="n">monthly_series</span> <span class="o">=</span> <span class="n">large_series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+<span class="c1"># Reduce to monthly for analysis (modifies original)</span>
+<span class="n">large_series</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
 
 <span class="c1"># Use monthly for computationally intensive operations</span>
-<span class="n">monthly_metrics</span> <span class="o">=</span> <span class="n">monthly_series</span><span class="o">.</span><span class="n">all_properties</span>
+<span class="n">monthly_metrics</span> <span class="o">=</span> <span class="n">large_series</span><span class="o">.</span><span class="n">all_properties</span>
 </pre></div>
 </div>
 </section>

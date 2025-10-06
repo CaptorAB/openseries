@@ -33,16 +33,14 @@ Let's start with a portfolio of assets for risk analysis:
    # Download 3 years of data
    series_list = []
    for ticker, name in tickers.items():
-       try:
-           data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(
-               dframe=data['Close']
-           )
-           series.set_new_label(lvl_zero=name)
-           series_list.append(series)
-           print(f"Loaded {name}: {series.length} observations")
-       except Exception as e:
-           print(f"Failed to load {name}: {e}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="3y")
+       series = OpenTimeSeries.from_df(
+           dframe=data['Close']
+       )
+       series.set_new_label(lvl_zero=name)
+       series_list.append(series)
+       print(f"Loaded {name}: {series.length} observations")
 
    # Create portfolio frame
    portfolio_assets = OpenFrame(constituents=series_list)
@@ -167,9 +165,9 @@ Historical Stress Testing
 
    print("\n=== HISTORICAL STRESS TESTING ===")
 
-   # Convert to returns for analysis
-   portfolio_returns = portfolio.value_to_ret()
-   returns_data = portfolio_returns.tsdf
+   # Convert to returns for analysis (modifies original)
+   portfolio.value_to_ret()
+   returns_data = portfolio.tsdf
 
    # Note: value_to_ret() modifies the original series in place
    # Restore the original portfolio for further analysis
@@ -302,7 +300,7 @@ Analyze risk contribution by asset:
 
    print("Risk Contribution Analysis:")
    risk_decomp = pd.DataFrame({
-       'Asset': [series.name for series in portfolio_assets.constituents],
+       'Asset': [series.label for series in portfolio_assets.constituents],
        'Weight': weights,
        'Individual Vol': vols,
        'Marginal Contrib': marginal_contrib,
@@ -364,7 +362,7 @@ Create a comprehensive risk monitoring summary using openseries properties and m
    current_date = portfolio.last_idx
    lookback_date = portfolio.first_idx
 
-   print(f"Portfolio: {portfolio.name}")
+   print(f"Portfolio: {portfolio.label}")
    print(f"Current Date: {current_date}")
    print(f"Analysis Period: {lookback_date} to {current_date}")
    print(f"Observations: {portfolio.length}")

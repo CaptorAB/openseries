@@ -234,11 +234,11 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum Drawdown: </span><span class="si">{</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Drawdown Date: </span><span class="si">{</span><span class="n">max_dd_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Create drawdown series for visualization</span>
-<span class="n">drawdown_series</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
+<span class="c1"># Create drawdown series for visualization (modifies original)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
 
 <span class="c1"># Plot drawdowns</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">drawdown_series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
 <span class="c1"># This will open an interactive plot in your browser</span>
 
 <span class="c1"># Worst calendar year drawdown</span>
@@ -250,8 +250,8 @@
 <section id="distribution-analysis">
 <h2>Distribution Analysis<a class="headerlink" href="#distribution-analysis" title="Link to this heading"></a></h2>
 <p>Examine the return distribution characteristics:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns for distribution analysis</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns for distribution analysis (modifies original)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
 
 <span class="c1"># Note: value_to_ret() modifies the original series in place</span>
 <span class="c1"># Restore the original series for further analysis</span>
@@ -285,13 +285,13 @@
 <section id="monthly-and-annual-analysis">
 <h2>Monthly and Annual Analysis<a class="headerlink" href="#monthly-and-annual-analysis" title="Link to this heading"></a></h2>
 <p>Break down performance by different time periods:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Resample to monthly data</span>
-<span class="n">monthly_series</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly observations: </span><span class="si">{</span><span class="n">monthly_series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Resample to monthly data (modifies original)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly observations: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Monthly metrics</span>
-<span class="n">monthly_return</span> <span class="o">=</span> <span class="n">monthly_series</span><span class="o">.</span><span class="n">geo_ret</span>
-<span class="n">monthly_vol</span> <span class="o">=</span> <span class="n">monthly_series</span><span class="o">.</span><span class="n">vol</span>
+<span class="n">monthly_return</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">geo_ret</span>
+<span class="n">monthly_vol</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">vol</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly Return (annualized): </span><span class="si">{</span><span class="n">monthly_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly Volatility (annualized): </span><span class="si">{</span><span class="n">monthly_vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -299,9 +299,9 @@
 <span class="n">worst_month</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">worst_month</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst Month: </span><span class="si">{</span><span class="n">worst_month</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Annual data</span>
-<span class="n">annual_series</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BYE&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annual observations: </span><span class="si">{</span><span class="n">annual_series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Annual data (modifies original)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BYE&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annual observations: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="calendar-year-returns">
@@ -310,11 +310,9 @@
 <span class="n">years</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">2025</span><span class="p">)</span>  <span class="c1"># Adjust based on your data range</span>
 
 <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">year_return</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: No data&quot;</span><span class="p">)</span>
+    <span class="c1"># This may fail if no data exists for the year</span>
+    <span class="n">year_return</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -364,13 +362,13 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Price chart</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
 
-<span class="c1"># Returns histogram</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">plot_histogram</span><span class="p">()</span>
+<span class="c1"># Returns histogram (modifies original)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">plot_histogram</span><span class="p">()</span>
 
-<span class="c1"># Drawdown chart</span>
-<span class="n">drawdowns</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">drawdowns</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
+<span class="c1"># Drawdown chart (modifies original)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -433,7 +431,7 @@
 <section id="summary-and-interpretation">
 <h2>Summary and Interpretation<a class="headerlink" href="#summary-and-interpretation" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== INVESTMENT SUMMARY ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Asset: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Asset: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Period: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Return: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Return: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

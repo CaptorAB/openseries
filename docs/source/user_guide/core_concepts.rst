@@ -32,18 +32,26 @@ Every OpenTimeSeries has these fundamental properties:
    import pandas as pd
    import numpy as np
 
-   # Create a sample series
-   dates = pd.date_range('2023-01-01', periods=100, freq='B')
-   values = 100 * np.cumprod(1 + np.random.normal(0.001, 0.02, 100))
+   # Create a sample series using openseries simulation
+   from openseries import ReturnSimulation, ValueType
+   import datetime as dt
 
-   series = OpenTimeSeries.from_arrays(
-       dates=[d.strftime('%Y-%m-%d') for d in dates],
-       values=values.tolist(),
-       name="Sample Asset"
+   simulation = ReturnSimulation.from_lognormal(
+       number_of_sims=1,
+       trading_days=100,
+       mean_annual_return=0.25,  # ~0.001 daily
+       mean_annual_vol=0.32,     # ~0.02 daily
+       trading_days_in_year=252,
+       seed=42
    )
 
+   series = OpenTimeSeries.from_df(
+       dframe=simulation.to_dataframe(name="Sample Asset", end=dt.date(2023, 12, 31)),
+       valuetype=ValueType.RTRN
+   ).to_cumret()  # Convert returns to cumulative prices
+
    # Core properties
-   print(f"Name: {series.name}")
+   print(f"Name: {series.label}")
    print(f"Length: {series.length}")
    print(f"First date: {series.first_idx}")
    print(f"Last date: {series.last_idx}")
@@ -63,10 +71,9 @@ The original data is never modified:
    # Working data is in the tsdf DataFrame
    working_data = series.tsdf         # pandas DataFrame
 
-   # Transformations create new objects
-   returns = series.value_to_ret()    # New OpenTimeSeries
-   print(f"Original length: {series.length}")
-   print(f"Returns length: {returns.length}")  # Usually length - 1
+   # Transformations modify the original object (method chaining)
+   series.value_to_ret()    # Modifies original series
+   print(f"Series length: {series.length}")  # Usually length - 1
 
 Value Types
 ~~~~~~~~~~~
@@ -86,8 +93,8 @@ The ValueType enum identifies what the series represents:
    print(f"Series type: {series.valuetype}")
 
    # Type changes with transformations
-   returns = series.value_to_ret()
-   print(f"Returns type: {returns.valuetype}")
+   series.value_to_ret()  # Modifies original
+   print(f"Returns type: {series.valuetype}")
 
 The OpenFrame Class
 --------------------
@@ -101,15 +108,22 @@ OpenFrame manages collections of OpenTimeSeries:
 
    from openseries import OpenFrame
 
-   # Create multiple series (example with synthetic data)
+   # Create multiple series using openseries simulation
    series_list = []
    for i, name in enumerate(["Asset A", "Asset B", "Asset C"]):
-       values = 100 * np.cumprod(1 + np.random.normal(0.001, 0.02, 100))
-       series = OpenTimeSeries.from_arrays(
-           dates=[d.strftime('%Y-%m-%d') for d in dates],
-           values=values.tolist(),
-           name=name
+       simulation = ReturnSimulation.from_lognormal(
+           number_of_sims=1,
+           trading_days=100,
+           mean_annual_return=0.25,  # ~0.001 daily
+           mean_annual_vol=0.32,     # ~0.02 daily
+           trading_days_in_year=252,
+           seed=42 + i  # Different seed for each asset
        )
+
+       series = OpenTimeSeries.from_df(
+           dframe=simulation.to_dataframe(name=name, end=dt.date(2023, 12, 31)),
+           valuetype=ValueType.RTRN
+       ).to_cumret()  # Convert returns to cumulative prices
        series_list.append(series)
 
    # Create OpenFrame
@@ -130,25 +144,24 @@ The library provides explicit methods for alignment that require user choice:
 
    # Series with different date ranges are concatenated (not aligned)
    print("Individual series lengths:")
-   for series in frame.constituents:
-       print(f"  {series.name}: {series.length}")
+   print(frame.lengths_of_items)
 
    print(f"Frame length (concatenated): {frame.length}")
 
    # Explicit alignment methods require user choice:
 
    # 1. Truncate to common date range
-   aligned_frame = frame.trunc_frame()
+   frame.trunc_frame()
 
-   # 2. Align to business day calendar
-   business_aligned = frame.align_index_to_local_cdays(countries="US")
+   # 2. Align to business day calendar (modifies original)
+   frame.align_index_to_local_cdays(countries="US")
 
-   # 3. Handle missing values
-   filled_frame = frame.value_nan_handle(method="fill")
+   # 3. Handle missing values (modifies original)
+   frame.value_nan_handle(method="fill")
 
    # 4. Merge with explicit join strategy
-   inner_merged = frame.merge_series(how="inner")
-   outer_merged = frame.merge_series(how="outer")
+   frame.merge_series(how="inner")
+   frame.merge_series(how="outer")
 
 Financial Calculations
 ----------------------
@@ -161,13 +174,13 @@ openseries uses standard financial formulas:
 .. code-block:: python
 
    # Simple returns: (P_t / P_{t-1}) - 1
-   simple_returns = series.value_to_ret()
+   series.value_to_ret()  # Modifies original
 
    # Log returns: ln(P_t / P_{t-1})
-   log_returns = series.value_to_log()
+   series.value_to_log()  # Modifies original
 
-   # Cumulative returns: rebasing to start at 1.0
-   cumulative = series.to_cumret()
+   # Cumulative returns: rebasing to start at 1.0 (modifies original)
+   series.to_cumret()
 
 Annualization
 ~~~~~~~~~~~~~
@@ -220,14 +233,14 @@ openseries integrates with business day calendars:
 
 .. code-block:: python
 
-   # Align to specific country's business days
-   us_aligned = series.align_index_to_local_cdays(countries="US")
+   # Align to specific country's business days (modifies original)
+   series.align_index_to_local_cdays(countries="US")
 
-   # Multiple countries (intersection of business days)
-   multi_country = series.align_index_to_local_cdays(countries=["US", "GB"])
+   # Multiple countries (intersection of business days) (modifies original)
+   series.align_index_to_local_cdays(countries=["US", "GB"])
 
-   # Custom markets using pandas-market-calendars
-   nyse_aligned = series.align_index_to_local_cdays(markets="NYSE")
+   # Custom markets using pandas-market-calendars (modifies original)
+   series.align_index_to_local_cdays(markets="NYSE")
 
 Resampling
 ~~~~~~~~~~
@@ -236,14 +249,14 @@ Convert between different frequencies:
 
 .. code-block:: python
 
-   # Resample to month-end
-   monthly = series.resample_to_business_period_ends(freq="BME")
+   # Resample to month-end (modifies original)
+   series.resample_to_business_period_ends(freq="BME")
 
-   # Resample to quarter-end
-   quarterly = series.resample_to_business_period_ends(freq="BQE")
+   # Resample to quarter-end (modifies original)
+   series.resample_to_business_period_ends(freq="BQE")
 
-   # Custom resampling
-   weekly = series.resample(freq="W")
+   # Custom resampling (modifies original)
+   series.resample(freq="W")
 
 Data Validation
 ---------------
@@ -256,22 +269,18 @@ Pydantic ensures data integrity:
 .. code-block:: python
 
    # Dates must be valid ISO format strings
-   try:
-       invalid_series = OpenTimeSeries.from_arrays(
-           dates=["invalid-date"],
-           values=[100.0]
-       )
-   except ValueError as e:
-       print(f"Validation error: {e}")
+   # This will fail with a validation error
+   invalid_series = OpenTimeSeries.from_arrays(
+       dates=["invalid-date"],
+       values=[100.0]
+   )
 
    # Values must be numeric
-   try:
-       invalid_series = OpenTimeSeries.from_arrays(
-           dates=["2023-01-01"],
-           values=["not a number"]
-       )
-   except ValueError as e:
-       print(f"Validation error: {e}")
+   # This will fail with a validation error
+   invalid_series = OpenTimeSeries.from_arrays(
+       dates=["2023-01-01"],
+       values=["not a number"]
+   )
 
 Consistency Checks
 ~~~~~~~~~~~~~~~~~~
@@ -306,18 +315,26 @@ Properties vs Methods
 Transformation Methods
 ~~~~~~~~~~~~~~~~~~~~~~
 
+Methods that modify the original object (return self for chaining):
+
+.. code-block:: python
+
+   # Data transformations (modify original)
+   series.value_to_ret()        # Prices to returns
+   series.to_drawdown_series()  # Drawdown series
+   series.to_cumret()           # Cumulative returns
+
+   # Time transformations (modify original)
+   series.resample_to_business_period_ends(freq="BME")
+   series.align_index_to_local_cdays(countries="US")
+
 Methods that return new objects:
 
 .. code-block:: python
 
-   # Data transformations
-   returns = series.value_to_ret()        # Prices to returns
-   drawdowns = series.to_drawdown_series() # Drawdown series
-   cumulative = series.to_cumret()        # Cumulative returns
-
-   # Time transformations
-   monthly = series.resample_to_business_period_ends(freq="BME")
-   aligned = series.align_index_to_local_cdays(countries="US")
+   # Analysis methods (return new objects)
+   rolling_vol = series.rolling_vol(observations=30)
+   rolling_ret = series.rolling_return(observations=30)
 
 Analysis Methods
 ~~~~~~~~~~~~~~~~
@@ -346,8 +363,8 @@ Methods for saving results:
    series.to_json("data.json")
 
    # Visualization
-   fig, _ = series.plot_series()
-   fig, _ = series.plot_histogram()
+   series.plot_series()
+   series.plot_histogram()
 
 Best Practices
 --------------
@@ -380,14 +397,14 @@ Analysis Workflow
    metrics = series.all_properties()
 
    # 3. Specific calculations
-   drawdowns = series.to_drawdown_series()
-   rolling_metrics = series.rolling_vol(observations=252)
+   series.to_drawdown_series()  # Convert to drawdown (modifies original)
+   rolling_metrics = series.rolling_vol(observations=252)  # Returns DataFrame
 
    # 4. Visualization
    series.plot_series()
 
    # 5. Export results
-   series.to_xlsx("analysis.xlsx")
+   series.to_xlsx(fiilename="analysis.xlsx")
 
 Memory Management
 ~~~~~~~~~~~~~~~~~
@@ -397,8 +414,8 @@ Memory Management
    # Original data is preserved - use deepcopy if needed
    series_copy = OpenTimeSeries.from_deepcopy(series)
 
-   # Large datasets - consider resampling
-   monthly_data = series.resample_to_business_period_ends(freq="BME")
+   # Large datasets - consider resampling (modifies original)
+   series.resample_to_business_period_ends(freq="BME")
 
    # Clean up intermediate results
    del intermediate_series
@@ -421,13 +438,7 @@ OpenFrame provides several built-in weight strategies for portfolio construction
    }
 
    # Example with error handling
-   try:
-       portfolio_df = frame.make_portfolio(name="Max Div", weight_strat="max_div")
-   except MaxDiversificationNaNError:
-       print("Numerical issues - using equal weights")
-       portfolio_df = frame.make_portfolio(name="Equal", weight_strat="eq_weights")
-   except MaxDiversificationNegativeWeightsError:
-       print("Negative weights - using risk parity")
-       portfolio_df = frame.make_portfolio(name="Risk Parity", weight_strat="inv_vol")
+   # This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError
+   portfolio_df = frame.make_portfolio(name="Max Div", weight_strat="max_div")
 
 Understanding these core concepts will help you use openseries effectively and build more sophisticated financial analysis workflows.

@@ -29,14 +29,12 @@ Basic Portfolio Optimization Setup
    # Load data
    assets = []
    for ticker, name in universe.items():
-       try:
-           data = yf.Ticker(ticker).history(period="5y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'])
-           series.set_new_label(lvl_zero=name)
-           assets.append(series)
-           print(f"Loaded {name}")
-       except Exception as e:
-           print(f"Failed to load {name}: {e}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="5y")
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=name)
+       assets.append(series)
+       print(f"Loaded {name}")
 
    # Create investment universe frame
    investment_universe = OpenFrame(constituents=assets)
@@ -49,54 +47,51 @@ Mean-Variance Optimization
 .. code-block:: python
 
    # Calculate efficient frontier
-   try:
-       frontier_df, simulated_df, optimal_portfolio = efficient_frontier(
-           eframe=investment_universe,
-           num_ports=100,
-           seed=42
-       )
+   # This may fail with various exceptions
+   frontier_df, simulated_df, optimal_portfolio = efficient_frontier(
+       eframe=investment_universe,
+       num_ports=100,
+       seed=42
+   )
 
-       print("=== EFFICIENT FRONTIER RESULTS ===")
-       print(f"Generated {len(frontier_df)} efficient portfolios")
-       print(f"Simulated {len(simulated_df)} random portfolios")
+   print("=== EFFICIENT FRONTIER RESULTS ===")
+   print(f"Generated {len(frontier_df)} efficient portfolios")
+   print(f"Simulated {len(simulated_df)} random portfolios")
 
-       # Find key portfolios
-       returns = frontier_df['ret'].values
-       volatilities = frontier_df['stdev'].values
-       sharpe_ratios = returns / volatilities
+   # Find key portfolios
+   returns = frontier_df['ret'].values
+   volatilities = frontier_df['stdev'].values
+   sharpe_ratios = returns / volatilities
 
-       # Maximum Sharpe ratio portfolio
-       max_sharpe_idx = np.argmax(sharpe_ratios)
-       max_sharpe_weights = optimal_portfolio[-len(investment_universe.constituents):]
+   # Maximum Sharpe ratio portfolio
+   max_sharpe_idx = np.argmax(sharpe_ratios)
+   max_sharpe_weights = optimal_portfolio[-len(investment_universe.constituents):]
 
-       print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
-       print(f"Expected Return: {returns[max_sharpe_idx]:.2%}")
-       print(f"Volatility: {volatilities[max_sharpe_idx]:.2%}")
-       print(f"Sharpe Ratio: {sharpe_ratios[max_sharpe_idx]:.2f}")
+   print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
+   print(f"Expected Return: {returns[max_sharpe_idx]:.2%}")
+   print(f"Volatility: {volatilities[max_sharpe_idx]:.2%}")
+   print(f"Sharpe Ratio: {sharpe_ratios[max_sharpe_idx]:.2f}")
 
-       print("\nOptimal Weights:")
-       for i, weight in enumerate(max_sharpe_weights):
-           asset_name = investment_universe.constituents[i].name
-           if weight > 0.01:  # Only show weights > 1%
-               print(f"  {asset_name}: {weight:.1%}")
+   print("\nOptimal Weights:")
+   for i, weight in enumerate(max_sharpe_weights):
+       asset_name = investment_universe.constituents[i].label
+       if weight > 0.01:  # Only show weights > 1%
+           print(f"  {asset_name}: {weight:.1%}")
 
-       # Minimum volatility portfolio
-       min_vol_idx = np.argmin(volatilities)
-       min_vol_weights = frontier_results['weights'][min_vol_idx]
+   # Minimum volatility portfolio
+   min_vol_idx = np.argmin(volatilities)
+   min_vol_weights = frontier_results['weights'][min_vol_idx]
 
-       print(f"\n=== MINIMUM VOLATILITY PORTFOLIO ===")
-       print(f"Expected Return: {returns[min_vol_idx]:.2%}")
-       print(f"Volatility: {volatilities[min_vol_idx]:.2%}")
-       print(f"Sharpe Ratio: {sharpe_ratios[min_vol_idx]:.2f}")
+   print(f"\n=== MINIMUM VOLATILITY PORTFOLIO ===")
+   print(f"Expected Return: {returns[min_vol_idx]:.2%}")
+   print(f"Volatility: {volatilities[min_vol_idx]:.2%}")
+   print(f"Sharpe Ratio: {sharpe_ratios[min_vol_idx]:.2f}")
 
-       print("\nMinimum Volatility Weights:")
-       for i, weight in enumerate(min_vol_weights):
-           asset_name = investment_universe.constituents[i].name
-           if weight > 0.01:
-               print(f"  {asset_name}: {weight:.1%}")
-
-   except Exception as e:
-       print(f"Efficient frontier calculation failed: {e}")
+   print("\nMinimum Volatility Weights:")
+   for i, weight in enumerate(min_vol_weights):
+       asset_name = investment_universe.constituents[i].label
+       if weight > 0.01:
+           print(f"  {asset_name}: {weight:.1%}")
 
 Monte Carlo Portfolio Simulation
 --------------------------------
@@ -104,45 +99,42 @@ Monte Carlo Portfolio Simulation
 .. code-block:: python
 
    # Generate random portfolios
-   try:
-       simulation_results = simulate_portfolios(
-           simframe=investment_universe,
-           num_ports=50000,
-           seed=42
-       )
+   # This may fail with various exceptions
+   simulation_results = simulate_portfolios(
+       simframe=investment_universe,
+       num_ports=50000,
+       seed=42
+   )
 
-       print(f"\n=== MONTE CARLO SIMULATION ===")
-       print(f"Simulated {len(simulation_results)} random portfolios")
+   print(f"\n=== MONTE CARLO SIMULATION ===")
+   print(f"Simulated {len(simulation_results)} random portfolios")
 
-       sim_returns = simulation_results['ret'].values
-       sim_volatilities = simulation_results['stdev'].values
-       sim_sharpe_ratios = sim_returns / sim_volatilities
+   sim_returns = simulation_results['ret'].values
+   sim_volatilities = simulation_results['stdev'].values
+   sim_sharpe_ratios = sim_returns / sim_volatilities
 
-       # Statistics of simulated portfolios
-       print(f"\nSimulation Statistics:")
-       print(f"Return range: {sim_returns.min():.2%} to {sim_returns.max():.2%}")
-       print(f"Volatility range: {sim_volatilities.min():.2%} to {sim_volatilities.max():.2%}")
-       print(f"Sharpe range: {sim_sharpe_ratios.min():.2f} to {sim_sharpe_ratios.max():.2f}")
+   # Statistics of simulated portfolios
+   print(f"\nSimulation Statistics:")
+   print(f"Return range: {sim_returns.min():.2%} to {sim_returns.max():.2%}")
+   print(f"Volatility range: {sim_volatilities.min():.2%} to {sim_volatilities.max():.2%}")
+   print(f"Sharpe range: {sim_sharpe_ratios.min():.2f} to {sim_sharpe_ratios.max():.2f}")
 
-       # Best portfolios from simulation
-       top_sharpe_indices = np.argsort(sim_sharpe_ratios)[-5:]
+   # Best portfolios from simulation
+   top_sharpe_indices = np.argsort(sim_sharpe_ratios)[-5:]
 
-       print(f"\n=== TOP 5 SIMULATED PORTFOLIOS ===")
-       for i, idx in enumerate(reversed(top_sharpe_indices)):
-           print(f"\nRank {i+1}:")
-           print(f"  Return: {sim_returns[idx]:.2%}")
-           print(f"  Volatility: {sim_volatilities[idx]:.2%}")
-           print(f"  Sharpe: {sim_sharpe_ratios[idx]:.2f}")
+   print(f"\n=== TOP 5 SIMULATED PORTFOLIOS ===")
+   for i, idx in enumerate(reversed(top_sharpe_indices)):
+       print(f"\nRank {i+1}:")
+       print(f"  Return: {sim_returns[idx]:.2%}")
+       print(f"  Volatility: {sim_volatilities[idx]:.2%}")
+       print(f"  Sharpe: {sim_sharpe_ratios[idx]:.2f}")
 
-           weights = simulation_results['weights'][idx]
-           print("  Weights:")
-           for j, weight in enumerate(weights):
-               if weight > 0.05:  # Only show weights > 5%
-                   asset_name = investment_universe.constituents[j].name
-                   print(f"    {asset_name}: {weight:.1%}")
-
-   except Exception as e:
-       print(f"Portfolio simulation failed: {e}")
+       weights = simulation_results['weights'][idx]
+       print("  Weights:")
+       for j, weight in enumerate(weights):
+           if weight > 0.05:  # Only show weights > 5%
+               asset_name = investment_universe.constituents[j].label
+               print(f"    {asset_name}: {weight:.1%}")
 
 Risk-Based Portfolio Strategies
 -------------------------------
@@ -190,23 +182,17 @@ The maximum diversification strategy aims to maximize portfolio diversification 
 .. code-block:: python
 
    # Maximum diversification portfolio using native weight_strat
-   try:
-       max_div_portfolio_df = investment_universe.make_portfolio(
-           name="Maximum Diversification",
-           weight_strat="max_div"
-       )
-       max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
+   # This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError
+   max_div_portfolio_df = investment_universe.make_portfolio(
+       name="Maximum Diversification",
+       weight_strat="max_div"
+   )
+   max_div_portfolio = OpenTimeSeries.from_df(dframe=max_div_portfolio_df)
 
-       print(f"\n=== MAXIMUM DIVERSIFICATION PORTFOLIO ===")
-       print(f"Return: {max_div_portfolio.geo_ret:.2%}")
-       print(f"Volatility: {max_div_portfolio.vol:.2%}")
-       print(f"Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
-   except MaxDiversificationNaNError as e:
-       print(f"Maximum diversification failed due to numerical issues: {e}")
-       print("Consider using a different weight strategy or checking your data quality")
-   except MaxDiversificationNegativeWeightsError as e:
-       print(f"Maximum diversification produced negative weights: {e}")
-       print("This strategy may not be suitable for your data - consider using 'eq_weights' or 'inv_vol'")
+   print(f"\n=== MAXIMUM DIVERSIFICATION PORTFOLIO ===")
+   print(f"Return: {max_div_portfolio.geo_ret:.2%}")
+   print(f"Volatility: {max_div_portfolio.vol:.2%}")
+   print(f"Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
 
 Target Risk Portfolio
 ---------------------
@@ -299,14 +285,8 @@ The openseries library provides several built-in weight strategies for portfolio
 
       from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
 
-      try:
-          portfolio_df = frame.make_portfolio(name="Max Div", weight_strat="max_div")
-      except MaxDiversificationNaNError:
-          print("Numerical issues detected - using equal weights instead")
-          portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
-      except MaxDiversificationNegativeWeightsError:
-          print("Negative weights detected - using inverse volatility instead")
-          portfolio_df = frame.make_portfolio(name="Inv Vol", weight_strat="inv_vol")
+      # This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError
+      portfolio_df = frame.make_portfolio(name="Max Div", weight_strat="max_div")
 
 Backtesting Framework
 ---------------------
@@ -324,22 +304,19 @@ Backtesting Framework
    # Run backtest using native strategies
    backtest_results = {}
    for strategy_name, weight_strat in strategies.items():
-       try:
-           portfolio_df = investment_universe.make_portfolio(
-               name=strategy_name,
-               weight_strat=weight_strat
-           )
-           portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
-           backtest_results[strategy_name] = {
-               'return': portfolio.geo_ret,
-               'volatility': portfolio.vol,
-               'sharpe': portfolio.ret_vol_ratio,
-               'max_drawdown': portfolio.max_drawdown,
-               'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else np.nan
-           }
-       except (MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError) as e:
-           print(f"Skipping {strategy_name}: {e}")
-           continue
+       # This may fail with MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError, or other exceptions
+       portfolio_df = investment_universe.make_portfolio(
+           name=strategy_name,
+           weight_strat=weight_strat
+       )
+       portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+       backtest_results[strategy_name] = {
+           'return': portfolio.geo_ret,
+           'volatility': portfolio.vol,
+           'sharpe': portfolio.ret_vol_ratio,
+           'max_drawdown': portfolio.max_drawdown,
+           'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else np.nan
+       }
 
    backtest_results = pd.DataFrame(backtest_results).T
 
@@ -550,13 +527,11 @@ Here's how to perform portfolio optimization using openseries methods directly:
    # Load data using openseries methods
    assets = []
    for ticker in etf_tickers:
-       try:
-           data = yf.Ticker(ticker).history(period="5y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'])
-           series.set_new_label(lvl_zero=ticker)
-           assets.append(series)
-       except:
-           print(f"Failed to load {ticker}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="5y")
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=ticker)
+       assets.append(series)
 
    if len(assets) < 2:
        print("Need at least 2 assets for optimization")
@@ -574,18 +549,15 @@ Here's how to perform portfolio optimization using openseries methods directly:
        # Create portfolios using openseries make_portfolio method
        results = {}
        for name, weight_strat in strategies.items():
-           try:
-               portfolio_df = frame.make_portfolio(name=name, weight_strat=weight_strat)
-               portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
-               results[name] = {
-                   'Return': portfolio.geo_ret,
-                   'Volatility': portfolio.vol,
-                   'Sharpe': portfolio.ret_vol_ratio,
-                   'Max Drawdown': portfolio.max_drawdown
-               }
-           except (MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError) as e:
-               print(f"Skipping {name}: {e}")
-               continue
+           # This may fail with MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError, or other exceptions
+           portfolio_df = frame.make_portfolio(name=name, weight_strat=weight_strat)
+           portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+           results[name] = {
+               'Return': portfolio.geo_ret,
+               'Volatility': portfolio.vol,
+               'Sharpe': portfolio.ret_vol_ratio,
+               'Max Drawdown': portfolio.max_drawdown
+           }
 
        results_df = pd.DataFrame(results).T
 

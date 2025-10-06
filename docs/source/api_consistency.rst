@@ -21,19 +21,26 @@ When creating `OpenTimeSeries` objects from price data, `ValueType.PRICE` is the
    series = OpenTimeSeries.from_df(dframe=data['Close'], valuetype=ValueType.PRICE)
    series.set_new_label(lvl_zero="Asset Name")
 
-Destructive Methods
-~~~~~~~~~~~~~~~~~~~
+Method Chaining vs Object Creation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some methods modify the original series in place. Always restore the original series after calling these methods:
+Methods that return `self` are designed for method chaining and modify the original object in place. They do NOT create new objects:
 
 .. code-block:: python
 
-   # This modifies the original series
-   returns = series.value_to_ret()
+   # CORRECT: Method chaining (modifies original)
+   series.value_to_ret().plot_histogram()
 
-   # Restore original series for further analysis
-   series = OpenTimeSeries.from_df(dframe=data['Close'])
-   series.set_new_label(lvl_zero="Asset Name")
+   # CORRECT: Sequential operations (modifies original)
+   series.value_to_ret()  # Convert to returns
+   series.plot_histogram()  # Plot the returns
+
+   # INCORRECT: This doesn't create a new object
+   # returns_series = series.value_to_ret()  # Wrong pattern!
+
+   # To create a new object, use from_deepcopy()
+   returns_series = series.from_deepcopy()
+   returns_series.value_to_ret()  # Now you have both original and returns
 
 Method Parameter Names
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +143,7 @@ Best Practices
 --------------
 
 1. **ValueType is optional**: `ValueType.PRICE` is the default for `from_df()`
-2. **Handle destructive methods**: Restore original series after calling `value_to_ret()`
+2. **Understand method chaining**: Methods returning `self` modify the original object, use `from_deepcopy()` to create new objects
 3. **Check parameter names**: Use `observations` not `window` for rolling methods
 4. **Use correct function parameters**: `eframe` and `simframe` for optimization functions
 5. **Set weights before portfolio creation**: Use `frame.weights = [...]` before `make_portfolio()`

@@ -137,10 +137,10 @@ Now let's compare different rebalancing frequencies:
    print("-" * 50)
 
    for i, name in enumerate(frequency_names):
-       ret = metrics.loc['Geometric return', portfolios[i].name].iloc[0] * 100
-       vol = metrics.loc['Volatility', portfolios[i].name].iloc[0] * 100
-       sharpe = metrics.loc['Return vol ratio', portfolios[i].name].iloc[0]
-       max_dd = metrics.loc['Max drawdown', portfolios[i].name].iloc[0] * 100
+       ret = metrics.loc['Geometric return', portfolios[i].label].iloc[0] * 100
+       vol = metrics.loc['Volatility', portfolios[i].label].iloc[0] * 100
+       sharpe = metrics.loc['Return vol ratio', portfolios[i].label].iloc[0]
+       max_dd = metrics.loc['Max drawdown', portfolios[i].label].iloc[0] * 100
 
        print(f"{name:>9} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
@@ -161,16 +161,16 @@ Let's examine the detailed trading data by setting `drop_extras=False`:
    print(f"\nDetailed portfolio contains {detailed_portfolio.item_count} series")
    print("Available data series:")
    for series in detailed_portfolio.constituents:
-       print(f"  - {series.name}")
+       print(f"  - {series.label}")
 
    # Extract key trading metrics
    portfolio_twr = None
    cash_position = None
 
    for series in detailed_portfolio.constituents:
-       if "Detailed Analysis, twr" in series.name:
+       if "Detailed Analysis, twr" in series.label:
            portfolio_twr = series
-       elif "cash, twr" in series.name:
+       elif "cash, twr" in series.label:
            cash_position = series
 
    if portfolio_twr and cash_position:
@@ -218,12 +218,12 @@ Compare equal weight strategy with custom weights:
    print("-" * 50)
 
    for strategy in strategies:
-       ret = strategy_metrics.loc['Geometric return', strategy.name].iloc[0] * 100
-       vol = strategy_metrics.loc['Volatility', strategy.name].iloc[0] * 100
-       sharpe = strategy_metrics.loc['Return vol ratio', strategy.name].iloc[0]
-       max_dd = strategy_metrics.loc['Max drawdown', strategy.name].iloc[0] * 100
+       ret = strategy_metrics.loc['Geometric return', strategy.label].iloc[0] * 100
+       vol = strategy_metrics.loc['Volatility', strategy.label].iloc[0] * 100
+       sharpe = strategy_metrics.loc['Return vol ratio', strategy.label].iloc[0]
+       max_dd = strategy_metrics.loc['Max drawdown', strategy.label].iloc[0] * 100
 
-       print(f"{strategy.name:>15} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
+       print(f"{strategy.label:>15} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
 Cash Management Analysis
 ------------------------
@@ -242,8 +242,8 @@ Let's examine how cash is managed in the rebalanced portfolio:
    # Extract cash-related series
    cash_series = {}
    for series in cash_analysis.constituents:
-       if "cash" in series.name.lower():
-           series_type = series.name.split(", ")[1] if ", " in series.name else series.name
+       if "cash" in series.label.lower():
+           series_type = series.label.split(", ")[1] if ", " in series.label else series.label
            cash_series[series_type] = series
 
    print("\n=== CASH MANAGEMENT ANALYSIS ===")
@@ -295,12 +295,12 @@ Analyze performance with a subset of assets:
    print("-" * 50)
 
    for series in comparison_series:
-       ret = comparison_metrics.loc['Geometric return', series.name].iloc[0] * 100
-       vol = comparison_metrics.loc['Volatility', series.name].iloc[0] * 100
-       sharpe = comparison_metrics.loc['Return vol ratio', series.name].iloc[0]
-       max_dd = comparison_metrics.loc['Max drawdown', series.name].iloc[0] * 100
+       ret = comparison_metrics.loc['Geometric return', series.label].iloc[0] * 100
+       vol = comparison_metrics.loc['Volatility', series.label].iloc[0] * 100
+       sharpe = comparison_metrics.loc['Return vol ratio', series.label].iloc[0]
+       max_dd = comparison_metrics.loc['Max drawdown', series.label].iloc[0] * 100
 
-       print(f"{series.name:>20} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
+       print(f"{series.label:>20} | {ret:6.2f}% | {vol:10.2f}% | {sharpe:6.2f} | {max_dd:6.2f}%")
 
 Transaction Cost Analysis
 -------------------------
@@ -319,8 +319,8 @@ Analyze the implicit transaction costs from rebalancing:
    # Extract transaction-related series
    transaction_series = {}
    for series in transaction_data.constituents:
-       if "buysell_qty" in series.name or "settle" in series.name:
-           transaction_series[series.name] = series
+       if "buysell_qty" in series.label or "settle" in series.label:
+           transaction_series[series.label] = series
 
    print("\n=== TRANSACTION ANALYSIS ===")
    print("Transaction data available:")
@@ -362,7 +362,7 @@ Analyze the contribution of each asset to portfolio performance:
        weight = target_weights[i]
        contribution = final_twr * weight
 
-       print(f"{series.name:>15} | {final_twr:8.4f} | {contribution:8.4f}")
+       print(f"{series.label:>15} | {final_twr:8.4f} | {contribution:8.4f}")
 
    # Portfolio total
    portfolio_series = asset_performance.constituents[-1]
@@ -384,16 +384,14 @@ Here's a practical example using real market data:
 
    real_assets = []
    for ticker, name in zip(tickers, names):
-       try:
-           data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(
-               dframe=data['Close'],
-               name=name
-           )
-           real_assets.append(series)
-           print(f"Loaded {name}: {series.length} observations")
-       except Exception as e:
-           print(f"Failed to load {name}: {e}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="3y")
+       series = OpenTimeSeries.from_df(
+           dframe=data['Close'],
+           name=name
+       )
+       real_assets.append(series)
+       print(f"Loaded {name}: {series.length} observations")
 
    if len(real_assets) >= 2:
        # Create real-world portfolio
