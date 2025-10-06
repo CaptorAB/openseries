@@ -122,7 +122,7 @@ Analyze drawdowns to understand downside risk:
    sp500.to_drawdown_series()
 
    # Plot drawdowns
-   fig, _ = sp500.plot_series()
+   sp500.plot_series()
    # This will open an interactive plot in your browser
 
    # Worst calendar year drawdown
@@ -229,7 +229,7 @@ Analyze how metrics change over time:
        name="Rolling Volatility"
    )
 
-   fig, _ = vol_series.plot_series()
+   vol_series.plot_series()
 
 Comprehensive Report
 --------------------
@@ -255,15 +255,17 @@ Create various visualizations:
 .. code-block:: python
 
    # Price chart
-   fig, _ = sp500.plot_series()
+   sp500.plot_series()
 
-   # Returns histogram (modifies original)
-   sp500.value_to_ret()
-   fig, _ = sp500.plot_histogram()
+   # Returns bar plot and histogram
+   returns = sp500.from_deepcopy()
+   returns.value_to_ret()
+   returns.plot_bars()
+   returns.plot_histogram()
 
-   # Drawdown chart (modifies original)
+   # Drawdown chart
    sp500.to_drawdown_series()
-   fig, _ = sp500.plot_series()
+   sp500.plot_series()
 
 Comparison with Benchmark
 -------------------------
