@@ -392,15 +392,19 @@ Outlier Detection
    # Convert to returns for outlier analysis (modifies original)
    series.value_to_ret()
 
-   # Calculate z-scores
-   returns_df = series.tsdf
-   mean_return = returns_df.mean().iloc[0]
-   std_return = returns_df.std().iloc[0]
-
-   z_scores = (returns_df - mean_return) / std_return
-   outliers = z_scores[abs(z_scores) > 3].dropna()
-
+   # Detect outliers using the built-in method
+   outliers = series.outliers(threshold=3.0)
    print(f"Found {len(outliers)} outliers (|z| > 3)")
+
+   # For OpenFrame, outliers returns a DataFrame
+   frame_outliers = frame.outliers(threshold=3.0)
+   print(f"Found outliers in frame: {len(frame_outliers)} rows")
+
+   # Customize threshold and date range
+   recent_outliers = series.outliers(
+       threshold=2.5,
+       months_from_last=6
+   )
 
 Performance Considerations
 --------------------------
@@ -417,7 +421,7 @@ Memory Usage
    large_series.resample_to_business_period_ends(freq="BME")
 
    # Use monthly for computationally intensive operations
-   monthly_metrics = large_series.all_properties
+   monthly_metrics = large_series.all_properties()
 
 Efficient Data Loading
 ~~~~~~~~~~~~~~~~~~~~~~

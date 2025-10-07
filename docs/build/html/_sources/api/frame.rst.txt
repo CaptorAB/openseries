@@ -217,6 +217,8 @@ Analysis Methods
 
 .. automethod:: OpenFrame.calc_range
    :no-index:
+.. automethod:: OpenFrame.outliers
+   :no-index:
 
 Financial Metrics Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~

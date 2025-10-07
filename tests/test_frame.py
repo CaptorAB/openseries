@@ -1331,6 +1331,7 @@ class TestOpenFrame(CommonTestCase):
             "all_properties",
             "calc_range",
             "from_deepcopy",
+            "outliers",
             "plot_bars",
             "plot_series",
             "plot_histogram",

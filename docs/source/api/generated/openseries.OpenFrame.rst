@@ -52,6 +52,7 @@
       ~OpenFrame.multi_factor_linear_regression
       ~OpenFrame.omega_ratio_func
       ~OpenFrame.ord_least_squares_fit
+      ~OpenFrame.outliers
       ~OpenFrame.parse_file
       ~OpenFrame.parse_obj
       ~OpenFrame.parse_raw

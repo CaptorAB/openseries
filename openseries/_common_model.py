@@ -2695,3 +2695,70 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         )
 
         return DataFrame(voldf)
+
+    def outliers(
+        self: Self,
+        threshold: float = 3.0,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+    ) -> Series | DataFrame:
+        """Detect outliers using z-score analysis.
+
+        Identifies data points where the absolute z-score exceeds the threshold.
+        For OpenTimeSeries, returns a pandas Series with dates and outlier values.
+        For OpenFrame, returns a pandas DataFrame with dates and outlier values
+        for each column.
+
+        Parameters
+        ----------
+        threshold: float, default: 3.0
+            Z-score threshold for outlier detection. Values with absolute
+            z-score > threshold are considered outliers.
+        months_from_last : int, optional
+            Number of months offset as positive integer. Overrides use of from_date
+            and to_date
+        from_date : datetime.date, optional
+            Specific from date
+        to_date : datetime.date, optional
+            Specific to date
+
+        Returns:
+        --------
+        pandas.Series | pandas.DataFrame
+            For OpenTimeSeries: Series with dates as index and outlier values.
+            For OpenFrame: DataFrame with dates as index and outlier values for
+            each column.
+            Returns empty Series/DataFrame if no outliers found.
+
+        """
+        earlier, later = self.calc_range(
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
+        )
+
+        # Get the data for the specified date range
+        data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)]
+
+        # Calculate z-scores for each column
+        z_scores = (data - data.mean()) / data.std()
+
+        # Find outliers where |z-score| > threshold
+        outliers_mask = z_scores.abs() > threshold
+
+        if self.tsdf.shape[1] == 1:
+            # OpenTimeSeries case - return Series
+            outlier_values = data[outliers_mask].iloc[:, 0].dropna()
+            return Series(
+                data=outlier_values.values,
+                index=outlier_values.index,
+                name="Outliers",
+                dtype="float64",
+            )
+        # OpenFrame case - return DataFrame
+        outlier_df = data[outliers_mask].dropna(how="all")
+        return DataFrame(
+            data=outlier_df,
+            dtype="float64",
+        )

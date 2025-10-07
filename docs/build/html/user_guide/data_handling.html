@@ -86,7 +86,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#working-with-real-data-sources">Working with Real Data Sources</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#yahoo-finance-integration">Yahoo Finance Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#csv-data">CSV Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#database-integration">Database Integration</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#data-quality-checks">Data Quality Checks</a><ul>
@@ -427,29 +426,29 @@
 <section id="excel-export">
 <h3>Excel Export<a class="headerlink" href="#excel-export" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export single series</span>
-<span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">&quot;single_series.xlsx&quot;</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;single_series.xlsx&quot;</span><span class="p">)</span>
 
 <span class="c1"># Export frame (multiple series)</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">&quot;multiple_series.xlsx&quot;</span><span class="p">)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;multiple_series.xlsx&quot;</span><span class="p">)</span>
 
-<span class="c1"># Custom Excel export with formatting</span>
+<span class="c1"># Export with custom sheet title</span>
 <span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span>
-    <span class="s2">&quot;formatted_export.xlsx&quot;</span><span class="p">,</span>
-    <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Analysis&quot;</span><span class="p">,</span>
-    <span class="n">startrow</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">startcol</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;formatted_export.xlsx&quot;</span><span class="p">,</span>
+    <span class="n">sheet_title</span><span class="o">=</span><span class="s2">&quot;Analysis&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="json-export">
 <h3>JSON Export<a class="headerlink" href="#json-export" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export series data</span>
-<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;series_data.json&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export series values only</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">what_output</span><span class="o">=</span><span class="s2">&quot;values&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;series_values.json&quot;</span><span class="p">)</span>
 
-<span class="c1"># Export with specific output format</span>
-<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;values_only.json&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;values&quot;</span><span class="p">)</span>
-<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;full_dataframe.json&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;tsdf&quot;</span><span class="p">)</span>
+<span class="c1"># Export full dataframe structure</span>
+<span class="n">series</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">what_output</span><span class="o">=</span><span class="s2">&quot;tsdf&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;series_dataframe.json&quot;</span><span class="p">)</span>
+
+<span class="c1"># Export frame data</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">what_output</span><span class="o">=</span><span class="s2">&quot;values&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;frame_values.json&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -498,28 +497,6 @@
 </pre></div>
 </div>
 </section>
-<section id="database-integration">
-<h3>Database Integration<a class="headerlink" href="#database-integration" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
-
-<span class="c1"># Example with SQLite</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;financial_data.db&quot;</span><span class="p">)</span>
-<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">SELECT date, close_price</span>
-<span class="s2">FROM stock_prices</span>
-<span class="s2">WHERE symbol = &#39;AAPL&#39;</span>
-<span class="s2">ORDER BY date</span>
-<span class="s2">&quot;&quot;&quot;</span>
-
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span>
-
-<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;close_price&#39;</span><span class="p">],</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Apple from DB&quot;</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</section>
 </section>
 <section id="data-quality-checks">
 <h2>Data Quality Checks<a class="headerlink" href="#data-quality-checks" title="Link to this heading"></a></h2>
@@ -544,15 +521,19 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns for outlier analysis (modifies original)</span>
 <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
 
-<span class="c1"># Calculate z-scores</span>
-<span class="n">returns_df</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">tsdf</span>
-<span class="n">mean_return</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">std_return</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="n">z_scores</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_df</span> <span class="o">-</span> <span class="n">mean_return</span><span class="p">)</span> <span class="o">/</span> <span class="n">std_return</span>
-<span class="n">outliers</span> <span class="o">=</span> <span class="n">z_scores</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">z_scores</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-
+<span class="c1"># Detect outliers using the built-in method</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">outliers</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span><span class="si">}</span><span class="s2"> outliers (|z| &gt; 3)&quot;</span><span class="p">)</span>
+
+<span class="c1"># For OpenFrame, outliers returns a DataFrame</span>
+<span class="n">frame_outliers</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">outliers</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found outliers in frame: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frame_outliers</span><span class="p">)</span><span class="si">}</span><span class="s2"> rows&quot;</span><span class="p">)</span>
+
+<span class="c1"># Customize threshold and date range</span>
+<span class="n">recent_outliers</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">outliers</span><span class="p">(</span>
+    <span class="n">threshold</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
+    <span class="n">months_from_last</span><span class="o">=</span><span class="mi">6</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>

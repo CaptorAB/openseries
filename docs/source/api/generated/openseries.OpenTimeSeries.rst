@@ -46,6 +46,7 @@
       ~OpenTimeSeries.model_validate_json
       ~OpenTimeSeries.model_validate_strings
       ~OpenTimeSeries.omega_ratio_func
+      ~OpenTimeSeries.outliers
       ~OpenTimeSeries.pandas_df
       ~OpenTimeSeries.parse_file
       ~OpenTimeSeries.parse_obj

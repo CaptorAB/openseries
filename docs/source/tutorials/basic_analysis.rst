@@ -244,8 +244,8 @@ Get all metrics at once:
    print(all_metrics)
 
    # Save to Excel for further analysis
-   sp500.to_xlsx("sp500_analysis.xlsx")
-   all_metrics.to_excel("sp500_metrics.xlsx")
+   sp500.to_xlsx(filename="sp500_analysis.xlsx")
+   all_metrics.to_excel(excel_writer="sp500_metrics.xlsx", engine="openpyxl")
 
 Visualization
 -------------
