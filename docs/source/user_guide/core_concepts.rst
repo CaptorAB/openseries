@@ -28,10 +28,6 @@ Every OpenTimeSeries has these fundamental properties:
 
 .. code-block:: python
 
-   from openseries import OpenTimeSeries
-   import pandas as pd
-   import numpy as np
-
    # Create a sample series using openseries simulation
    from openseries import ReturnSimulation, ValueType
    import datetime as dt
@@ -109,25 +105,26 @@ OpenFrame manages collections of OpenTimeSeries:
    from openseries import OpenFrame
 
    # Create multiple series using openseries simulation
-   series_list = []
-   for i, name in enumerate(["Asset A", "Asset B", "Asset C"]):
-       simulation = ReturnSimulation.from_lognormal(
-           number_of_sims=1,
-           trading_days=100,
-           mean_annual_return=0.25,  # ~0.001 daily
-           mean_annual_vol=0.32,     # ~0.02 daily
-           trading_days_in_year=252,
-           seed=42 + i  # Different seed for each asset
-       )
+   simulation = ReturnSimulation.from_lognormal(
+       number_of_sims=3,
+       trading_days=100,
+       mean_annual_return=0.25,  # ~0.001 daily
+       mean_annual_vol=0.32,     # ~0.02 daily
+       trading_days_in_year=252,
+       seed=42
+   )
 
-       series = OpenTimeSeries.from_df(
-           dframe=simulation.to_dataframe(name=name, end=dt.date(2023, 12, 31)),
-           valuetype=ValueType.RTRN
-       ).to_cumret()  # Convert returns to cumulative prices
-       series_list.append(series)
-
-   # Create OpenFrame
-   frame = OpenFrame(constituents=series_list)
+   # Create OpenFrame with multiple series from simulation
+   frame = OpenFrame(
+       constituents=[
+           OpenTimeSeries.from_df(
+               dframe=simulation.to_dataframe(name="Asset", end=dt.date(2023, 12, 31)),
+               column_nmbr=serie,
+               valuetype=ValueType.RTRN,
+           ).to_cumret()  # Convert returns to cumulative prices
+           for serie in range(simulation.number_of_sims)
+       ]
+   )
 
    # Frame properties
    print(f"Number of series: {frame.item_count}")
@@ -434,7 +431,7 @@ OpenFrame provides several built-in weight strategies for portfolio construction
        'eq_weights': 'Equal weights for all assets',
        'inv_vol': 'Inverse volatility weighting (risk parity)',
        'max_div': 'Maximum diversification optimization',
-       'target_risk': 'Target risk/volatility strategy'
+       'min_vol_overweight': 'Minimum volatility overweight strategy'
    }
 
    # Example with error handling

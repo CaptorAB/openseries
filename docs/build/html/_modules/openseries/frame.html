@@ -1655,7 +1655,7 @@
                         <span class="sa">f</span><span class="s2">&quot;correlation matrix is singular - </span><span class="si">{</span><span class="n">e</span><span class="si">!s}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
                     <span class="k">raise</span> <span class="n">MaxDiversificationNaNError</span><span class="p">(</span><span class="n">msge</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
-            <span class="k">elif</span> <span class="n">weight_strat</span> <span class="o">==</span> <span class="s2">&quot;target_risk&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">weight_strat</span> <span class="o">==</span> <span class="s2">&quot;min_vol_overweight&quot;</span><span class="p">:</span>
                 <span class="n">vols</span> <span class="o">=</span> <span class="n">std</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
                 <span class="n">min_vol_idx</span> <span class="o">=</span> <span class="n">vols</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
                 <span class="n">min_vol_weight</span> <span class="o">=</span> <span class="mf">0.6</span>

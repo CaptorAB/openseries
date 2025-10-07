@@ -71,29 +71,35 @@ Some items are properties, not methods:
 Portfolio Creation
 ~~~~~~~~~~~~~~~~~~
 
-When creating portfolios, use weight_strat parameter for built-in strategies:
+When creating portfolios, the weight_strat parameter can be used for built-in strategies:
 
 .. code-block:: python
 
-   # Correct way - use weight_strat parameter
+   # Using the weight_strat parameter
    portfolio_df = frame.make_portfolio(name="My Portfolio", weight_strat="eq_weights")
 
-   # For custom weights, set weights first then call make_portfolio
-   frame.weights = [0.5, 0.3, 0.2]
-   portfolio_df = frame.make_portfolio(name="Custom Portfolio")
+   # Or set custom weights
+   weights = [0.5, 0.3, 0.2]
+   portfolio_df = frame.make_portfolio(name="Custom Portfolio", weights=weights)
 
 Metric Names in DataFrames
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When accessing metrics from `all_properties()`, use the actual column names:
+The `all_properties()` method has two modes:
+
+1. **Without arguments**: Returns all properties with "tidied" display names
+2. **With `properties` argument**: Returns only specified properties using their internal names
 
 .. code-block:: python
 
-   # Correct metric names
-   metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
+   # Get all properties with display names
+   all_metrics = frame.all_properties()
+   # Access using display names
+   key_metrics = all_metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
 
-   # Not these (they don't exist)
-   metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
+   # Get only specific properties using internal names
+   specific_metrics = frame.all_properties(properties=['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown'])
+   # No need to filter - only requested properties are returned
 
 Function Return Values
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -134,11 +140,6 @@ Issue: "TypeError: unsupported format string passed to Series.__format__"
    # Incorrect
    print(f"VaR: {var_series:.2%}")
 
-Issue: "KeyError" when accessing metrics
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Solution**: Use the actual metric names from `all_properties()`. Check the output to see the exact names.
-
 Best Practices
 --------------
 
@@ -147,7 +148,7 @@ Best Practices
 3. **Check parameter names**: Use `observations` not `window` for rolling methods
 4. **Use correct function parameters**: `eframe` and `simframe` for optimization functions
 5. **Set weights before portfolio creation**: Use `frame.weights = [...]` before `make_portfolio()`
-6. **Verify metric names**: Check `all_properties()` output for exact column names
+6. **Use properties parameter**: Pass specific properties to `all_properties(properties=[...])` instead of filtering post-call
 7. **Unpack return values**: Handle tuples returned by `efficient_frontier()`
 
 These notes will help you avoid common pitfalls and use openseries more effectively.

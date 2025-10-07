@@ -63,7 +63,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#risk-parity-portfolio">Risk Parity Portfolio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#advanced-weight-strategies">Advanced Weight Strategies</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#maximum-diversification-strategy">Maximum Diversification Strategy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#target-risk-strategy">Target Risk Strategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#minimum-volatility-overweight-strategy">Minimum Volatility Overweight Strategy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#strategy-comparison-with-error-handling">Strategy Comparison with Error Handling</a></li>
 </ul>
 </li>
@@ -296,19 +296,19 @@
 </pre></div>
 </div>
 </section>
-<section id="target-risk-strategy">
-<h4>Target Risk Strategy<a class="headerlink" href="#target-risk-strategy" title="Link to this heading"></a></h4>
-<p>The target risk strategy aims for a specific portfolio volatility level:</p>
+<section id="minimum-volatility-overweight-strategy">
+<h4>Minimum Volatility Overweight Strategy<a class="headerlink" href="#minimum-volatility-overweight-strategy" title="Link to this heading"></a></h4>
+<p>The minimum volatility overweight strategy overweights the least volatile asset:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This may fail with various exceptions</span>
-<span class="n">target_risk_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Target Risk&quot;</span><span class="p">,</span>
-    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;target_risk&quot;</span>
+<span class="n">min_vol_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Min Vol Overweight&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;min_vol_overweight&quot;</span>
 <span class="p">)</span>
-<span class="n">target_risk_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">target_risk_portfolio_df</span><span class="p">)</span>
+<span class="n">min_vol_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">min_vol_portfolio_df</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target Risk Return: </span><span class="si">{</span><span class="n">target_risk_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target Risk Volatility: </span><span class="si">{</span><span class="n">target_risk_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target Risk Sharpe: </span><span class="si">{</span><span class="n">target_risk_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min Vol Overweight Return: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min Vol Overweight Volatility: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min Vol Overweight Sharpe: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -319,7 +319,7 @@
     <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="s1">&#39;eq_weights&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Risk Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;inv_vol&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Max Diversification&#39;</span><span class="p">:</span> <span class="s1">&#39;max_div&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Target Risk&#39;</span><span class="p">:</span> <span class="s1">&#39;target_risk&#39;</span>
+    <span class="s1">&#39;Min Vol Overweight&#39;</span><span class="p">:</span> <span class="s1">&#39;min_vol_overweight&#39;</span>
 <span class="p">}</span>
 
 <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>

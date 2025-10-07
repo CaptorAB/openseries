@@ -71,7 +71,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#maximum-diversification-portfolio">Maximum Diversification Portfolio</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#target-risk-portfolio">Target Risk Portfolio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#minimum-volatility-overweight-portfolio">Minimum Volatility Overweight Portfolio</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#portfolio-comparison">Portfolio Comparison</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#weight-strategy-details">Weight Strategy Details</a></li>
 </ul>
@@ -321,19 +321,19 @@
 </div>
 </section>
 </section>
-<section id="target-risk-portfolio">
-<h2>Target Risk Portfolio<a class="headerlink" href="#target-risk-portfolio" title="Link to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Target risk portfolio using native weight_strat</span>
-<span class="n">target_vol_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Target Risk&quot;</span><span class="p">,</span>
-    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;target_risk&quot;</span>
+<section id="minimum-volatility-overweight-portfolio">
+<h2>Minimum Volatility Overweight Portfolio<a class="headerlink" href="#minimum-volatility-overweight-portfolio" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Minimum volatility overweight portfolio using native weight_strat</span>
+<span class="n">min_vol_portfolio_df</span> <span class="o">=</span> <span class="n">investment_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Min Vol Overweight&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;min_vol_overweight&quot;</span>
 <span class="p">)</span>
-<span class="n">target_vol_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">target_vol_portfolio_df</span><span class="p">)</span>
+<span class="n">min_vol_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">min_vol_portfolio_df</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TARGET RISK PORTFOLIO ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">target_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">target_vol_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe: </span><span class="si">{</span><span class="n">target_vol_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MINIMUM VOLATILITY OVERWEIGHT PORTFOLIO ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -400,9 +400,10 @@
 <li><p>Raises <code class="docutils literal notranslate"><span class="pre">MaxDiversificationNegativeWeightsError</span></code> for negative weights</p></li>
 </ul>
 </dd>
-<dt><strong>Target Risk (``target_risk``)</strong></dt><dd><ul class="simple">
-<li><p>Targets a specific portfolio volatility level</p></li>
-<li><p>Requires additional parameters for target volatility</p></li>
+<dt><strong>Minimum Volatility Overweight (``min_vol_overweight``)</strong></dt><dd><ul class="simple">
+<li><p>Overweights the least volatile asset (60% weight)</p></li>
+<li><p>Distributes remaining 40% equally among other assets</p></li>
+<li><p>Based on the low volatility anomaly</p></li>
 </ul>
 </dd>
 <dt><strong>Exception Handling</strong></dt><dd><p>When using the maximum diversification strategy, it’s recommended to handle potential exceptions:</p>
@@ -423,7 +424,7 @@
     <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="s1">&#39;eq_weights&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Inverse Volatility&#39;</span><span class="p">:</span> <span class="s1">&#39;inv_vol&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Max Diversification&#39;</span><span class="p">:</span> <span class="s1">&#39;max_div&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Target Risk&#39;</span><span class="p">:</span> <span class="s1">&#39;target_risk&#39;</span>
+    <span class="s1">&#39;Min Vol Overweight&#39;</span><span class="p">:</span> <span class="s1">&#39;min_vol_overweight&#39;</span>
 <span class="p">}</span>
 
 <span class="c1"># Run backtest using native strategies</span>
@@ -660,7 +661,7 @@
         <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="s1">&#39;eq_weights&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Inverse Volatility&#39;</span><span class="p">:</span> <span class="s1">&#39;inv_vol&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Max Diversification&#39;</span><span class="p">:</span> <span class="s1">&#39;max_div&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Target Risk&#39;</span><span class="p">:</span> <span class="s1">&#39;target_risk&#39;</span>
+        <span class="s1">&#39;Min Vol Overweight&#39;</span><span class="p">:</span> <span class="s1">&#39;min_vol_overweight&#39;</span>
     <span class="p">}</span>
 
     <span class="c1"># Create portfolios using openseries make_portfolio method</span>

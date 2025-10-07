@@ -1481,7 +1481,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                         f"correlation matrix is singular - {e!s}"
                     )
                     raise MaxDiversificationNaNError(msge) from e
-            elif weight_strat == "target_risk":
+            elif weight_strat == "min_vol_overweight":
                 vols = std(returns, axis=0, ddof=1)
                 min_vol_idx = vols.argmin()
                 min_vol_weight = 0.6

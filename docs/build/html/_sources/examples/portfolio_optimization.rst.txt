@@ -194,22 +194,22 @@ The maximum diversification strategy aims to maximize portfolio diversification 
    print(f"Volatility: {max_div_portfolio.vol:.2%}")
    print(f"Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
 
-Target Risk Portfolio
----------------------
+Minimum Volatility Overweight Portfolio
+----------------------------------------
 
 .. code-block:: python
 
-   # Target risk portfolio using native weight_strat
-   target_vol_portfolio_df = investment_universe.make_portfolio(
-       name="Target Risk",
-       weight_strat="target_risk"
+   # Minimum volatility overweight portfolio using native weight_strat
+   min_vol_portfolio_df = investment_universe.make_portfolio(
+       name="Min Vol Overweight",
+       weight_strat="min_vol_overweight"
    )
-   target_vol_portfolio = OpenTimeSeries.from_df(dframe=target_vol_portfolio_df)
+   min_vol_portfolio = OpenTimeSeries.from_df(dframe=min_vol_portfolio_df)
 
-   print(f"\n=== TARGET RISK PORTFOLIO ===")
-   print(f"Return: {target_vol_portfolio.geo_ret:.2%}")
-   print(f"Volatility: {target_vol_portfolio.vol:.2%}")
-   print(f"Sharpe: {target_vol_portfolio.ret_vol_ratio:.2f}")
+   print(f"\n=== MINIMUM VOLATILITY OVERWEIGHT PORTFOLIO ===")
+   print(f"Return: {min_vol_portfolio.geo_ret:.2%}")
+   print(f"Volatility: {min_vol_portfolio.vol:.2%}")
+   print(f"Sharpe: {min_vol_portfolio.ret_vol_ratio:.2f}")
 
 Portfolio Comparison
 --------------------
@@ -274,9 +274,10 @@ The openseries library provides several built-in weight strategies for portfolio
    - Raises ``MaxDiversificationNaNError`` for numerical issues
    - Raises ``MaxDiversificationNegativeWeightsError`` for negative weights
 
-**Target Risk (``target_risk``)**
-   - Targets a specific portfolio volatility level
-   - Requires additional parameters for target volatility
+**Minimum Volatility Overweight (``min_vol_overweight``)**
+   - Overweights the least volatile asset (60% weight)
+   - Distributes remaining 40% equally among other assets
+   - Based on the low volatility anomaly
 
 **Exception Handling**
    When using the maximum diversification strategy, it's recommended to handle potential exceptions:
@@ -298,7 +299,7 @@ Backtesting Framework
        'Equal Weight': 'eq_weights',
        'Inverse Volatility': 'inv_vol',
        'Max Diversification': 'max_div',
-       'Target Risk': 'target_risk'
+       'Min Vol Overweight': 'min_vol_overweight'
    }
 
    # Run backtest using native strategies
@@ -543,7 +544,7 @@ Here's how to perform portfolio optimization using openseries methods directly:
            'Equal Weight': 'eq_weights',
            'Inverse Volatility': 'inv_vol',
            'Max Diversification': 'max_div',
-           'Target Risk': 'target_risk'
+           'Min Vol Overweight': 'min_vol_overweight'
        }
 
        # Create portfolios using openseries make_portfolio method

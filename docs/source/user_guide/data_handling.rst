@@ -292,17 +292,15 @@ Excel Export
 .. code-block:: python
 
    # Export single series
-   series.to_xlsx("single_series.xlsx")
+   series.to_xlsx(filename="single_series.xlsx")
 
    # Export frame (multiple series)
-   frame.to_xlsx("multiple_series.xlsx")
+   frame.to_xlsx(filename="multiple_series.xlsx")
 
-   # Custom Excel export with formatting
+   # Export with custom sheet title
    series.to_xlsx(
-       "formatted_export.xlsx",
-       sheet_name="Analysis",
-       startrow=2,
-       startcol=1
+       filename="formatted_export.xlsx",
+       sheet_title="Analysis"
    )
 
 JSON Export
@@ -310,12 +308,14 @@ JSON Export
 
 .. code-block:: python
 
-   # Export series data
-   series.to_json("series_data.json")
+   # Export series values only
+   series.to_json(what_output="values", filename="series_values.json")
 
-   # Export with specific output format
-   series.to_json("values_only.json", output="values")
-   series.to_json("full_dataframe.json", output="tsdf")
+   # Export full dataframe structure
+   series.to_json(what_output="tsdf", filename="series_dataframe.json")
+
+   # Export frame data
+   frame.to_json(what_output="values", filename="frame_values.json")
 
 Working with Real Data Sources
 -------------------------------
@@ -362,29 +362,6 @@ CSV Data
    series = OpenTimeSeries.from_df(
        dframe=df['Close'],
        name="Stock from CSV"
-   )
-
-Database Integration
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   import sqlite3
-
-   # Example with SQLite
-   conn = sqlite3.connect("financial_data.db")
-   query = """
-   SELECT date, close_price
-   FROM stock_prices
-   WHERE symbol = 'AAPL'
-   ORDER BY date
-   """
-
-   df = pd.read_sql_query(query, conn, index_col='date', parse_dates=['date'])
-
-   series = OpenTimeSeries.from_df(
-       dframe=df['close_price'],
-       name="Apple from DB"
    )
 
 Data Quality Checks

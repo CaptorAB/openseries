@@ -306,8 +306,9 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
        print(f"Period: {frame.first_idx} to {frame.last_idx}")
 
        # Key metrics using openseries all_properties method
-       metrics = frame.all_properties()
-       key_metrics = metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
+       key_metrics = frame.all_properties(
+           properties=['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']
+       )
 
        print("\nKey Metrics:")
        print((key_metrics * 100).round(2))  # Convert to percentages

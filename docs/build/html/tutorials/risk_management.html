@@ -448,9 +448,9 @@
 <span class="n">all_assets</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span> <span class="o">+</span> <span class="p">[</span><span class="n">portfolio</span><span class="p">]</span>
 <span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">all_assets</span><span class="p">)</span>
 
-<span class="n">risk_adj_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-    <span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;sortino_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa3_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;omega_ratio&#39;</span><span class="p">]</span>
-<span class="p">]</span>
+<span class="n">risk_adj_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">(</span>
+    <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;sortino_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa3_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;omega_ratio&#39;</span><span class="p">]</span>
+<span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">risk_adj_metrics</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 </pre></div>

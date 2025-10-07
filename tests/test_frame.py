@@ -742,12 +742,13 @@ class TestOpenFrame(CommonTestCase):
             msg = f"make_portfolio() max_div weights do not sum to 1.0: {weight_sum}"
             raise OpenFrameTestError(msg)
 
-        _ = mpframe.make_portfolio(name=name, weight_strat="target_risk")
+        _ = mpframe.make_portfolio(name=name, weight_strat="min_vol_overweight")
 
         weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
         if abs(weight_sum - 1.0) > tolerance:
             msg = (
-                f"make_portfolio() target_risk weights do not sum to 1.0: {weight_sum}"
+                "make_portfolio() min_vol_overweight "
+                f"weights do not sum to 1.0: {weight_sum}"
             )
             raise OpenFrameTestError(msg)
 

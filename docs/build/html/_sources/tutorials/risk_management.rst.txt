@@ -341,9 +341,9 @@ Evaluate risk-adjusted returns:
    all_assets = portfolio_assets.constituents + [portfolio]
    comparison_frame = OpenFrame(constituents=all_assets)
 
-   risk_adj_metrics = comparison_frame.all_properties().loc[
-       ['ret_vol_ratio', 'sortino_ratio', 'kappa3_ratio', 'omega_ratio']
-   ]
+   risk_adj_metrics = comparison_frame.all_properties(
+       properties=['ret_vol_ratio', 'sortino_ratio', 'kappa3_ratio', 'omega_ratio']
+   )
 
    print(risk_adj_metrics.round(3))
 

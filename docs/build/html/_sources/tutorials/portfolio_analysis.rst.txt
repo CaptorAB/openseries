@@ -173,23 +173,23 @@ The maximum diversification strategy optimizes the correlation structure to maxi
    print(f"Max Diversification Volatility: {max_div_portfolio.vol:.2%}")
    print(f"Max Diversification Sharpe: {max_div_portfolio.ret_vol_ratio:.2f}")
 
-Target Risk Strategy
-^^^^^^^^^^^^^^^^^^^^
+Minimum Volatility Overweight Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The target risk strategy aims for a specific portfolio volatility level:
+The minimum volatility overweight strategy overweights the least volatile asset:
 
 .. code-block:: python
 
    # This may fail with various exceptions
-   target_risk_portfolio_df = assets.make_portfolio(
-       name="Target Risk",
-       weight_strat="target_risk"
+   min_vol_portfolio_df = assets.make_portfolio(
+       name="Min Vol Overweight",
+       weight_strat="min_vol_overweight"
    )
-   target_risk_portfolio = OpenTimeSeries.from_df(dframe=target_risk_portfolio_df)
+   min_vol_portfolio = OpenTimeSeries.from_df(dframe=min_vol_portfolio_df)
 
-   print(f"Target Risk Return: {target_risk_portfolio.geo_ret:.2%}")
-   print(f"Target Risk Volatility: {target_risk_portfolio.vol:.2%}")
-   print(f"Target Risk Sharpe: {target_risk_portfolio.ret_vol_ratio:.2f}")
+   print(f"Min Vol Overweight Return: {min_vol_portfolio.geo_ret:.2%}")
+   print(f"Min Vol Overweight Volatility: {min_vol_portfolio.vol:.2%}")
+   print(f"Min Vol Overweight Sharpe: {min_vol_portfolio.ret_vol_ratio:.2f}")
 
 Strategy Comparison with Error Handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -202,7 +202,7 @@ When comparing multiple strategies, it's important to handle potential failures 
        'Equal Weight': 'eq_weights',
        'Risk Parity': 'inv_vol',
        'Max Diversification': 'max_div',
-       'Target Risk': 'target_risk'
+       'Min Vol Overweight': 'min_vol_overweight'
    }
 
    results = {}

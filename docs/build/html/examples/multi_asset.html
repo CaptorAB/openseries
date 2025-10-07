@@ -415,8 +415,9 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Period: </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Key metrics using openseries all_properties method</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-    <span class="n">key_metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;Geometric return&#39;</span><span class="p">,</span> <span class="s1">&#39;Volatility&#39;</span><span class="p">,</span> <span class="s1">&#39;Return vol ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;Max drawdown&#39;</span><span class="p">]]</span>
+    <span class="n">key_metrics</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">(</span>
+        <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;max_drawdown&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Key Metrics:&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">((</span><span class="n">key_metrics</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>  <span class="c1"># Convert to percentages</span>
