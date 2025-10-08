@@ -33,5 +33,3 @@ Using the Built-in HTML Report
        output_type="file",
        file_name="stock_comparison_report.html"
    )
-
-   print("HTML report generated: stock_comparison_report.html")

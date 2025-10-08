@@ -421,7 +421,7 @@ Memory Usage
    large_series.resample_to_business_period_ends(freq="BME")
 
    # Use monthly for computationally intensive operations
-   monthly_metrics = large_series.all_properties
+   monthly_metrics = large_series.all_properties()
 
 Efficient Data Loading
 ~~~~~~~~~~~~~~~~~~~~~~

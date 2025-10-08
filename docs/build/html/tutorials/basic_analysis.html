@@ -351,8 +351,8 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">all_metrics</span><span class="p">)</span>
 
 <span class="c1"># Save to Excel for further analysis</span>
-<span class="n">sp500</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">&quot;sp500_analysis.xlsx&quot;</span><span class="p">)</span>
-<span class="n">all_metrics</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s2">&quot;sp500_metrics.xlsx&quot;</span><span class="p">)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;sp500_analysis.xlsx&quot;</span><span class="p">)</span>
+<span class="n">all_metrics</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">excel_writer</span><span class="o">=</span><span class="s2">&quot;sp500_metrics.xlsx&quot;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;openpyxl&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

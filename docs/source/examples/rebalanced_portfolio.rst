@@ -20,48 +20,63 @@ Let's start with a simple example using simulated data:
 
 .. code-block:: python
 
-   import numpy as np
-   import pandas as pd
    from openseries import OpenTimeSeries, OpenFrame, ValueType
    from openseries.simulation import ReturnSimulation
    import datetime as dt
 
    # Create simulated asset data
-   seed = 42
-   end_date = dt.date(2023, 12, 31)
+    seed = 55
+    end_date = dt.date(2023, 12, 31)
 
-   # Generate correlated returns for 3 assets
-   seriesim = ReturnSimulation.from_merton_jump_gbm(
-       number_of_sims=3,
-       trading_days=1000,
-       mean_annual_return=0.08,
-       mean_annual_vol=0.15,
-       jumps_lamda=0.05,
-       jumps_sigma=0.2,
-       jumps_mu=-0.1,
-       trading_days_in_year=252,
-       seed=seed,
-   )
+    # Generate DIFFERENT returns for each asset to create realistic drift
+    assets = []
+    asset_names = ["Equity Fund", "Bond Fund", "Commodity Fund"]
 
-   # Create individual asset series
-   assets = []
-   asset_names = ["Equity Fund", "Bond Fund", "Commodity Fund"]
+    # Create different simulations for each asset with different parameters
+    asset_params = [
+        {
+            "mean_annual_return": 0.12,
+            "mean_annual_vol": 0.20,
+            "seed": seed,
+        },  # Equity: higher return, higher vol
+        {
+            "mean_annual_return": 0.05,
+            "mean_annual_vol": 0.08,
+            "seed": seed + 1,
+        },  # Bond: lower return, lower vol
+        {
+            "mean_annual_return": 0.08,
+            "mean_annual_vol": 0.25,
+            "seed": seed + 2,
+        },  # Commodity: medium return, high vol
+    ]
 
-   for i, name in enumerate(asset_names):
-       series = OpenTimeSeries.from_df(
-           dframe=seriesim.to_dataframe(name=name, end=end_date),
-           valuetype=ValueType.RTRN,
-       ).to_cumret()
-       series.set_new_label(lvl_zero=name)
-       assets.append(series)
+    for name, params in zip(asset_names, asset_params, strict=False):
+        seriesim = ReturnSimulation.from_lognormal(
+            number_of_sims=1,  # Only one simulation per asset
+            trading_days=2520,
+            mean_annual_return=params["mean_annual_return"],
+            mean_annual_vol=params["mean_annual_vol"],
+            seed=params["seed"],
+        )
 
-   # Create investment universe
-   investment_universe = OpenFrame(constituents=assets)
-   investment_universe.weights = [0.6, 0.3, 0.1]  # 60% equity, 30% bonds, 10% commodities
+        series = OpenTimeSeries.from_df(
+            dframe=seriesim.to_dataframe(name=name, end=end_date),
+            valuetype=ValueType.RTRN,
+        ).to_cumret()
+        series.set_new_label(lvl_zero=name)
+        assets.append(series)
 
-   print(f"Created investment universe with {investment_universe.item_count} assets")
-   print(f"Analysis period: {investment_universe.first_idx} to {investment_universe.last_idx}")
-   print(f"Target weights: {investment_universe.weights}")
+    # Create investment universe
+    weights = [0.6, 0.3, 0.1]
+    investment_universe = OpenFrame(constituents=assets, weights=weights)
+    investment_universe.align_index_to_local_cdays(countries="SE")
+
+    print(f"Created investment universe with {investment_universe.item_count} assets")
+    print(
+        f"Analysis period: {investment_universe.first_idx} to {investment_universe.last_idx}"
+    )
+    print(f"Target weights: {investment_universe.weights}")
 
 Daily Rebalancing vs Theoretical Portfolio
 ------------------------------------------
@@ -70,43 +85,42 @@ Let's compare daily rebalancing with the theoretical portfolio calculation:
 
 .. code-block:: python
 
-   # Create theoretical portfolio (no rebalancing friction)
-   theoretical_portfolio_df = investment_universe.make_portfolio(
-       name="Theoretical Portfolio",
-       weight_strat="eq_weights"
-   )
-   theoretical_portfolio = OpenTimeSeries.from_df(dframe=theoretical_portfolio_df)
+    # Create theoretical portfolio (no rebalancing friction)
+    theoretical_portfolio_df = investment_universe.make_portfolio(
+        name="Theoretical Portfolio", weight_strat="eq_weights"
+    )
+    theoretical_portfolio = OpenTimeSeries.from_df(dframe=theoretical_portfolio_df)
 
-   # Create daily rebalanced portfolio (simulates actual trading)
-   daily_rebalanced = investment_universe.rebalanced_portfolio(
-       name="Daily Rebalanced",
-       frequency=1  # Rebalance every day
-   )
+    # Create monthly rebalanced portfolio (simulates actual trading)
+    monthly_rebalanced = investment_universe.rebalanced_portfolio(
+        name="Monthly Rebalanced",
+        frequency=21,  # Roughly monthly
+    )
 
-   # Extract portfolio series for comparison
-   theoretical_series = theoretical_portfolio
-   daily_rebalanced_series = daily_rebalanced.constituents[-1]
+    # Extract portfolio series for comparison
+    theoretical_series = theoretical_portfolio
+    monthly_rebalanced_series = monthly_rebalanced.constituents[-1]
 
-   print("=== PORTFOLIO COMPARISON ===")
-   print(f"Theoretical Portfolio:")
-   print(f"  Total Return: {theoretical_series.value_ret:.2%}")
-   print(f"  Annualized Return: {theoretical_series.geo_ret:.2%}")
-   print(f"  Volatility: {theoretical_series.vol:.2%}")
-   print(f"  Sharpe Ratio: {theoretical_series.ret_vol_ratio:.2f}")
+    print("=== PORTFOLIO COMPARISON ===")
+    print("Theoretical Portfolio:")
+    print(f"  Total Return: {theoretical_series.value_ret:.2%}")
+    print(f"  Annualized Return: {theoretical_series.geo_ret:.2%}")
+    print(f"  Volatility: {theoretical_series.vol:.2%}")
+    print(f"  Sharpe Ratio: {theoretical_series.ret_vol_ratio:.2f}")
 
-   print(f"\nDaily Rebalanced Portfolio:")
-   print(f"  Total Return: {daily_rebalanced_series.value_ret:.2%}")
-   print(f"  Annualized Return: {daily_rebalanced_series.geo_ret:.2%}")
-   print(f"  Volatility: {daily_rebalanced_series.vol:.2%}")
-   print(f"  Sharpe Ratio: {daily_rebalanced_series.ret_vol_ratio:.2f}")
+    print("\nmonthly Rebalanced Portfolio:")
+    print(f"  Total Return: {monthly_rebalanced_series.value_ret:.2%}")
+    print(f"  Annualized Return: {monthly_rebalanced_series.geo_ret:.2%}")
+    print(f"  Volatility: {monthly_rebalanced_series.vol:.2%}")
+    print(f"  Sharpe Ratio: {monthly_rebalanced_series.ret_vol_ratio:.2f}")
 
-   # Calculate difference
-   return_diff = daily_rebalanced_series.geo_ret - theoretical_series.geo_ret
-   vol_diff = daily_rebalanced_series.vol - theoretical_series.vol
+    # Calculate difference
+    return_diff = monthly_rebalanced_series.geo_ret - theoretical_series.geo_ret
+    vol_diff = monthly_rebalanced_series.vol - theoretical_series.vol
 
-   print(f"\nDifference (Rebalanced - Theoretical):")
-   print(f"  Return Difference: {return_diff:+.2%}")
-   print(f"  Volatility Difference: {vol_diff:+.2%}")
+    print("\nDifference (Rebalanced - Theoretical):")
+    print(f"  Return Difference: {return_diff:+.2%}")
+    print(f"  Volatility Difference: {vol_diff:+.2%}")
 
 Different Rebalancing Frequencies
 ---------------------------------
