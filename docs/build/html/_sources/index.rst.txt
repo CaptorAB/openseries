@@ -112,7 +112,14 @@ Documentation Contents
    examples/single_asset
    examples/multi_asset
    examples/portfolio_optimization
+   examples/rebalanced_portfolio
    examples/custom_reports
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Important Notes
+
+   api_consistency
 
 .. toctree::
    :maxdepth: 2

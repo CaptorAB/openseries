@@ -182,8 +182,8 @@ Write comprehensive tests for new functionality:
 
            series = OpenTimeSeries.from_arrays(dates=dates, values=values, name="Test")
 
-           if series.name != "Test":
-               msg = f"Expected name 'Test', got '{series.name}'"
+           if series.label != "Test":
+               msg = f"Expected name 'Test', got '{series.label}'"
                raise ValueError(msg)
            if series.length != 3:
                msg = f"Expected length 3, got {series.length}"
@@ -210,10 +210,10 @@ Write comprehensive tests for new functionality:
            values = [100.0, 102.0, 99.0]
 
            series = OpenTimeSeries.from_arrays(dates=dates, values=values, name="Test")
-           returns = series.value_to_ret()
+           series.value_to_ret()  # Modifies original
 
            expected_returns = [0.02, -0.0294117647]  # Approximate
-           actual_returns = returns.values
+           actual_returns = series.values
 
            if len(actual_returns) != 2:
                msg = f"Expected 2 returns, got {len(actual_returns)}"

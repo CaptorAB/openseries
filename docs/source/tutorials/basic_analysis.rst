@@ -22,8 +22,7 @@ First, let's import the necessary libraries and download some data:
 
    # Create OpenTimeSeries
    sp500 = OpenTimeSeries.from_df(
-       dframe=data['Close'],
-       name="S&P 500"
+       dframe=data['Close']
    )
 
    # Set a descriptive label
@@ -119,11 +118,11 @@ Analyze drawdowns to understand downside risk:
    print(f"Maximum Drawdown: {max_drawdown:.2%}")
    print(f"Max Drawdown Date: {max_dd_date}")
 
-   # Create drawdown series for visualization
-   drawdown_series = sp500.to_drawdown_series()
+   # Create drawdown series for visualization (modifies original)
+   sp500.to_drawdown_series()
 
    # Plot drawdowns
-   fig, _ = drawdown_series.plot_series()
+   sp500.plot_series()
    # This will open an interactive plot in your browser
 
    # Worst calendar year drawdown
@@ -137,8 +136,13 @@ Examine the return distribution characteristics:
 
 .. code-block:: python
 
-   # Convert to returns for distribution analysis
-   returns = sp500.value_to_ret()
+   # Convert to returns for distribution analysis (modifies original)
+   sp500.value_to_ret()
+
+   # Note: value_to_ret() modifies the original series in place
+   # Restore the original series for further analysis
+   sp500 = OpenTimeSeries.from_df(dframe=data['Close'])
+   sp500.set_new_label(lvl_zero="S&P 500 Index")
 
    # Skewness (asymmetry of the distribution)
    skewness = sp500.skew
@@ -169,13 +173,13 @@ Break down performance by different time periods:
 
 .. code-block:: python
 
-   # Resample to monthly data
-   monthly_series = sp500.resample_to_business_period_ends(freq="BME")
-   print(f"Monthly observations: {monthly_series.length}")
+   # Resample to monthly data (modifies original)
+   sp500.resample_to_business_period_ends(freq="BME")
+   print(f"Monthly observations: {sp500.length}")
 
    # Monthly metrics
-   monthly_return = monthly_series.geo_ret
-   monthly_vol = monthly_series.vol
+   monthly_return = sp500.geo_ret
+   monthly_vol = sp500.vol
    print(f"Monthly Return (annualized): {monthly_return:.2%}")
    print(f"Monthly Volatility (annualized): {monthly_vol:.2%}")
 
@@ -183,9 +187,9 @@ Break down performance by different time periods:
    worst_month = sp500.worst_month
    print(f"Worst Month: {worst_month:.2%}")
 
-   # Annual data
-   annual_series = sp500.resample_to_business_period_ends(freq="BYE")
-   print(f"Annual observations: {annual_series.length}")
+   # Annual data (modifies original)
+   sp500.resample_to_business_period_ends(freq="BYE")
+   print(f"Annual observations: {sp500.length}")
 
 Calendar Year Returns
 ~~~~~~~~~~~~~~~~~~~~~
@@ -196,11 +200,9 @@ Calendar Year Returns
    years = range(2019, 2025)  # Adjust based on your data range
 
    for year in years:
-       try:
-           year_return = sp500.value_ret_calendar_period(year=year)
-           print(f"{year}: {year_return:.2%}")
-       except:
-           print(f"{year}: No data")
+       # This may fail if no data exists for the year
+       year_return = sp500.value_ret_calendar_period(year=year)
+       print(f"{year}: {year_return:.2%}")
 
 Rolling Analysis
 ----------------
@@ -214,7 +216,7 @@ Analyze how metrics change over time:
    print(f"Rolling volatility calculated for {len(rolling_vol)} periods")
 
    # 30-day rolling returns
-   rolling_returns = sp500.rolling_return(window=30)
+   rolling_returns = sp500.rolling_return(observations=30)
 
    # Plot rolling volatility
    # Convert to OpenTimeSeries for plotting
@@ -227,7 +229,7 @@ Analyze how metrics change over time:
        name="Rolling Volatility"
    )
 
-   fig, _ = vol_series.plot_series()
+   vol_series.plot_series()
 
 Comprehensive Report
 --------------------
@@ -242,8 +244,8 @@ Get all metrics at once:
    print(all_metrics)
 
    # Save to Excel for further analysis
-   sp500.to_xlsx("sp500_analysis.xlsx")
-   all_metrics.to_excel("sp500_metrics.xlsx")
+   sp500.to_xlsx(filename="sp500_analysis.xlsx")
+   all_metrics.to_excel(excel_writer="sp500_metrics.xlsx", engine="openpyxl")
 
 Visualization
 -------------
@@ -253,15 +255,17 @@ Create various visualizations:
 .. code-block:: python
 
    # Price chart
-   fig, _ = sp500.plot_series()
+   sp500.plot_series()
 
-   # Returns histogram
-   returns = sp500.value_to_ret()
-   fig, _ = returns.plot_histogram()
+   # Returns bar plot and histogram
+   returns = sp500.from_deepcopy()
+   returns.value_to_ret()
+   returns.plot_bars()
+   returns.plot_histogram()
 
    # Drawdown chart
-   drawdowns = sp500.to_drawdown_series()
-   fig, _ = drawdowns.plot_series()
+   sp500.to_drawdown_series()
+   sp500.plot_series()
 
 Comparison with Benchmark
 -------------------------
@@ -276,9 +280,9 @@ Let's compare with a bond index:
 
    # Create bond series (using yield data)
    bonds = OpenTimeSeries.from_df(
-       dframe=bond_data['Close'],
-       name="10Y Treasury Yield"
+       dframe=bond_data['Close']
    )
+   bonds.set_new_label(lvl_zero="10Y Treasury Yield")
 
    # Create frame for comparison
    comparison_frame = OpenFrame(constituents=[sp500, bonds])
@@ -329,7 +333,7 @@ Summary and Interpretation
 .. code-block:: python
 
    print("\n=== INVESTMENT SUMMARY ===")
-   print(f"Asset: {sp500.name}")
+   print(f"Asset: {sp500.label}")
    print(f"Period: {sp500.first_idx} to {sp500.last_idx}")
    print(f"Total Return: {sp500.value_ret:.2%}")
    print(f"Annualized Return: {sp500.geo_ret:.2%}")

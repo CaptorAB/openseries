@@ -7,7 +7,7 @@ System Requirements
 openseries requires Python 3.10 or higher and is compatible with:
 
 - **Operating Systems**: Windows, macOS, Linux
-- **Python versions**: 3.10, 3.11, 3.12, 3.13
+- **Python versions**: 3.10, 3.11, 3.12, 3.13, 3.14
 
 Installing openseries
 ---------------------
@@ -92,20 +92,24 @@ You can also run a quick test:
 
 .. code-block:: python
 
-   from openseries import OpenTimeSeries
-   import pandas as pd
-   import numpy as np
+   from openseries import OpenTimeSeries, ReturnSimulation, ValueType
+   import datetime as dt
 
-   # Create sample data
-   dates = pd.date_range('2020-01-01', periods=100, freq='D')
-   values = np.cumprod(1 + np.random.normal(0.001, 0.02, 100))
+   # Create sample data using openseries simulation
+   simulation = ReturnSimulation.from_lognormal(
+       number_of_sims=1,
+       trading_days=100,
+       mean_annual_return=0.25,  # ~0.001 daily
+       mean_annual_vol=0.32,     # ~0.02 daily
+       trading_days_in_year=252,
+       seed=42
+   )
 
    # Create OpenTimeSeries
-   series = OpenTimeSeries.from_arrays(
-       dates=[d.strftime('%Y-%m-%d') for d in dates],
-       values=values.tolist(),
-       name="Test Series"
-   )
+   series = OpenTimeSeries.from_df(
+       dframe=simulation.to_dataframe(name="Test Series", end=dt.date(2023, 12, 31)),
+       valuetype=ValueType.RTRN
+   ).to_cumret()  # Convert returns to cumulative prices
 
    print(f"Series length: {series.length}")
    print(f"Annual return: {series.geo_ret:.2%}")

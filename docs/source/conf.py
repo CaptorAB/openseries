@@ -58,6 +58,7 @@ autodoc_default_options = {
     "undoc-members": True,
     "exclude-members": "__weakref__",
     "show-inheritance": True,
+    "no-index": True,
 }
 
 # Handle properties correctly

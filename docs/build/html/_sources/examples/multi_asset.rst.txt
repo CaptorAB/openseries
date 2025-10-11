@@ -28,17 +28,14 @@ Setting Up Multi-Asset Analysis
    # Download data for all assets
    series_list = []
    for ticker, name in assets.items():
-       try:
-           data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(
-               dframe=data['Close'],
-               name=name
-           )
-           series.set_new_label(lvl_zero=name)
-           series_list.append(series)
-           print(f"Loaded {name}: {series.length} observations")
-       except Exception as e:
-           print(f"Failed to load {name}: {e}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="3y")
+       series = OpenTimeSeries.from_df(
+           dframe=data['Close']
+       )
+       series.set_new_label(lvl_zero=name)
+       series_list.append(series)
+       print(f"Loaded {name}: {series.length} observations")
 
    # Create OpenFrame
    tech_stocks = OpenFrame(constituents=series_list)
@@ -56,7 +53,7 @@ Comparative Analysis
    print(all_metrics)
 
    # Focus on key metrics
-   key_metrics = all_metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
+   key_metrics = all_metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
    key_metrics.index = ['Annual Return', 'Volatility', 'Sharpe Ratio', 'Max Drawdown']
 
    # Convert to percentages for better readability
@@ -75,16 +72,16 @@ Ranking Analysis
    rankings = pd.DataFrame(index=all_metrics.columns)
 
    # Rank by return (higher is better)
-   rankings['Return Rank'] = all_metrics.loc['geo_ret'].rank(ascending=False)
+   rankings['Return Rank'] = all_metrics.loc['Geometric return'].rank(ascending=False)
 
    # Rank by volatility (lower is better)
-   rankings['Vol Rank'] = all_metrics.loc['vol'].rank(ascending=True)
+   rankings['Volatility Rank'] = all_metrics.loc['Volatility'].rank(ascending=True)
 
    # Rank by Sharpe ratio (higher is better)
-   rankings['Sharpe Rank'] = all_metrics.loc['ret_vol_ratio'].rank(ascending=False)
+   rankings['Sharpe Rank'] = all_metrics.loc['Return vol ratio'].rank(ascending=False)
 
    # Rank by max drawdown (higher/less negative is better)
-   rankings['Drawdown Rank'] = all_metrics.loc['max_drawdown'].rank(ascending=False)
+   rankings['Drawdown Rank'] = all_metrics.loc['Max drawdown'].rank(ascending=False)
 
    # Overall rank (average of all ranks)
    rankings['Overall Rank'] = rankings.mean(axis=1)
@@ -129,9 +126,9 @@ Risk-Return Analysis
 .. code-block:: python
 
    # Create risk-return scatter data
-   returns = all_metrics.loc['geo_ret'] * 100
-   volatilities = all_metrics.loc['vol'] * 100
-   sharpe_ratios = all_metrics.loc['ret_vol_ratio']
+   returns = all_metrics.loc['Geometric return'] * 100
+   volatilities = all_metrics.loc['Volatility'] * 100
+   sharpe_ratios = all_metrics.loc['Return vol ratio']
 
    risk_return_df = pd.DataFrame({
        'Asset': returns.index,
@@ -166,15 +163,15 @@ Sector/Style Analysis
    print("\n=== GROUP ANALYSIS ===")
    for group_name, group_assets in asset_groups.items():
        # Filter assets that exist in our data
-       group_series = [s for s in tech_stocks.constituents if s.name in group_assets]
+       group_series = [s for s in tech_stocks.constituents if s.label in group_assets]
 
        if group_series:
            group_frame = OpenFrame(constituents=group_series)
            group_metrics = group_frame.all_properties()
 
-           avg_return = group_metrics.loc['geo_ret'].mean()
-           avg_vol = group_metrics.loc['vol'].mean()
-           avg_sharpe = group_metrics.loc['ret_vol_ratio'].mean()
+           avg_return = group_metrics.loc['Geometric return'].mean()
+           avg_vol = group_metrics.loc['Volatility'].mean()
+           avg_sharpe = group_metrics.loc['Return vol ratio'].mean()
 
            print(f"\n{group_name} ({len(group_series)} assets):")
            print(f"  Average Return: {avg_return:.2%}")
@@ -188,13 +185,13 @@ Time Series Analysis
 
    # Rolling correlation analysis
    # Pick two assets for detailed analysis
-   apple = next(s for s in tech_stocks.constituents if "Apple" in s.name)
-   microsoft = next(s for s in tech_stocks.constituents if "Microsoft" in s.name)
+   apple = next(s for s in tech_stocks.constituents if "Apple" in s.label)
+   microsoft = next(s for s in tech_stocks.constituents if "Microsoft" in s.label)
 
    pair_frame = OpenFrame(constituents=[apple, microsoft])
    rolling_corr = pair_frame.rolling_corr(window=252)  # 1-year rolling
 
-   print(f"\n=== ROLLING CORRELATION: {apple.name} vs {microsoft.name} ===")
+   print(f"\n=== ROLLING CORRELATION: {apple.label} vs {microsoft.label} ===")
    print(f"Current correlation: {rolling_corr.iloc[-1, 0]:.3f}")
    print(f"Average correlation: {rolling_corr.mean().iloc[0]:.3f}")
    print(f"Correlation range: {rolling_corr.min().iloc[0]:.3f} to {rolling_corr.max().iloc[0]:.3f}")
@@ -205,8 +202,8 @@ Performance Attribution
 .. code-block:: python
 
    # Create equal-weighted portfolio for attribution
-   equal_weights = [1/tech_stocks.item_count] * tech_stocks.item_count
-   portfolio = tech_stocks.make_portfolio(weights=equal_weights, name="Tech Portfolio")
+   portfolio_df = tech_stocks.make_portfolio(name="Tech Portfolio", weight_strat="eq_weights")
+   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
    print(f"\n=== PORTFOLIO vs INDIVIDUAL ASSETS ===")
    print(f"Portfolio Return: {portfolio.geo_ret:.2%}")
@@ -215,10 +212,11 @@ Performance Attribution
 
    # Compare with individual assets using OpenFrame
    asset_metrics = tech_stocks.all_properties()
-   individual_returns = asset_metrics.loc['geo_ret'].values
-   individual_vols = asset_metrics.loc['vol'].values
+   individual_returns = asset_metrics.loc['Geometric return'].values
+   individual_vols = asset_metrics.loc['Volatility'].values
 
    print(f"\nDiversification benefit:")
+   equal_weights = [1/tech_stocks.item_count] * tech_stocks.item_count
    print(f"  Weighted avg return: {np.average(individual_returns, weights=equal_weights):.2%}")
    print(f"  Portfolio return: {portfolio.geo_ret:.2%}")
    print(f"  Weighted avg volatility: {np.average(individual_vols, weights=equal_weights):.2%}")
@@ -230,11 +228,10 @@ Stress Testing
 
 .. code-block:: python
 
-   # Identify worst market days
+   # Identify worst market days (modifies original)
    market_proxy = tech_stocks.constituents[0]  # Use first asset as market proxy
-   market_returns = market_proxy.value_to_ret()
-   market_data = market_returns.tsdf.iloc[:, 0]
-
+   market_proxy.value_to_ret()
+   market_data = market_proxy.tsdf
    # Find worst 5% of days
    worst_threshold = market_data.quantile(0.05)
    worst_days = market_data[market_data <= worst_threshold]
@@ -246,14 +243,13 @@ Stress Testing
    # Analyze each asset's performance during stress
    print("\nAsset performance during market stress:")
    for series in tech_stocks.constituents:
-       asset_returns = series.value_to_ret()
-       asset_data = asset_returns.tsdf.iloc[:, 0]
-
+       series.value_to_ret()  # Modifies original
+       asset_data = series.tsdf
        # Get returns on stress days
        stress_returns = asset_data.loc[worst_days.index]
        avg_stress_return = stress_returns.mean()
 
-       print(f"  {series.name}: {avg_stress_return:.2%}")
+       print(f"  {series.label}: {avg_stress_return:.2%}")
 
 Export Multi-Asset Results
 --------------------------
@@ -292,12 +288,11 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
    # Load data using openseries methods
    series_list = []
    for ticker in tech_tickers:
-       try:
-           data = yf.Ticker(ticker).history(period="3y")
-           series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker)
-           series_list.append(series)
-       except:
-           print(f"Failed to load {ticker}")
+       # This may fail if the ticker is invalid or data unavailable
+       data = yf.Ticker(ticker).history(period="3y")
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=ticker)
+       series_list.append(series)
 
    if not series_list:
        print("No data loaded")
@@ -311,8 +306,9 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
        print(f"Period: {frame.first_idx} to {frame.last_idx}")
 
        # Key metrics using openseries all_properties method
-       metrics = frame.all_properties()
-       key_metrics = metrics.loc[['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']]
+       key_metrics = frame.all_properties(
+           properties=['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown']
+       )
 
        print("\nKey Metrics:")
        print((key_metrics * 100).round(2))  # Convert to percentages
@@ -323,8 +319,8 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
        print(f"\nAverage correlation: {avg_correlation:.3f}")
 
        # Create portfolio using openseries make_portfolio method
-       equal_weights = [1/frame.item_count] * frame.item_count
-       portfolio = frame.make_portfolio(weights=equal_weights, name="Equal Weight")
+       portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
+       portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
        print(f"\nEqual-weight portfolio:")
        print(f"  Return: {portfolio.geo_ret:.2%}")

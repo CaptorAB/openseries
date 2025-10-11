@@ -331,6 +331,6 @@ class TestReport(CommonTestCase):
 
         with pytest.raises(
             expected_exception=ZeroDivisionError,
-            match=r"float division by zero",
+            match=r"division by zero",
         ):
             _, _ = report_html(data=frame, auto_open=False, output_type="div")

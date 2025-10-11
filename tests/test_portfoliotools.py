@@ -15,7 +15,10 @@ import pytest
 
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
-from openseries.owntypes import AtLeastOneFrameError, MixedValuetypesError
+from openseries.owntypes import (
+    AtLeastOneFrameError,
+    MixedValuetypesError,
+)
 from openseries.portfoliotools import (
     constrain_optimized_portfolios,
     efficient_frontier,
