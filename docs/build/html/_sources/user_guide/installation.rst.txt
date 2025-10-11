@@ -7,7 +7,7 @@ System Requirements
 openseries requires Python 3.10 or higher and is compatible with:
 
 - **Operating Systems**: Windows, macOS, Linux
-- **Python versions**: 3.10, 3.11, 3.12, 3.13
+- **Python versions**: 3.10, 3.11, 3.12, 3.13, 3.14
 
 Installing openseries
 ---------------------
