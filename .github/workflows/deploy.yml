@@ -231,6 +231,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - name: Trigger documentation update
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
