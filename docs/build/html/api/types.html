@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Types and Enums &mdash; openseries 2.0.0 documentation</title>
+  <title>Types and Enums &mdash; openseries 2.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=f5cff4aa"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -62,7 +62,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Important Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_consistency.html">API Consistency Notes</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
@@ -75,88 +80,10 @@
 <li class="toctree-l1"><a class="reference internal" href="datefixer.html">Date Utilities</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Types and Enums</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#value-types">Value Types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#type-aliases">Type Aliases</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.SeriesOrFloat_co"><code class="docutils literal notranslate"><span class="pre">SeriesOrFloat_co</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.CountryStringType"><code class="docutils literal notranslate"><span class="pre">CountryStringType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.CountrySetType"><code class="docutils literal notranslate"><span class="pre">CountrySetType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.CountriesType"><code class="docutils literal notranslate"><span class="pre">CountriesType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.CurrencyStringType"><code class="docutils literal notranslate"><span class="pre">CurrencyStringType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.DateStringType"><code class="docutils literal notranslate"><span class="pre">DateStringType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.DateListType"><code class="docutils literal notranslate"><span class="pre">DateListType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.ValueListType"><code class="docutils literal notranslate"><span class="pre">ValueListType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.DaysInYearType"><code class="docutils literal notranslate"><span class="pre">DaysInYearType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.DateType"><code class="docutils literal notranslate"><span class="pre">DateType</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#literal-types">Literal Types</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralJsonOutput"><code class="docutils literal notranslate"><span class="pre">LiteralJsonOutput</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralTrunc"><code class="docutils literal notranslate"><span class="pre">LiteralTrunc</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralLinePlotMode"><code class="docutils literal notranslate"><span class="pre">LiteralLinePlotMode</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralHowMerge"><code class="docutils literal notranslate"><span class="pre">LiteralHowMerge</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralQuantileInterp"><code class="docutils literal notranslate"><span class="pre">LiteralQuantileInterp</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralBizDayFreq"><code class="docutils literal notranslate"><span class="pre">LiteralBizDayFreq</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPandasReindexMethod"><code class="docutils literal notranslate"><span class="pre">LiteralPandasReindexMethod</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralNanMethod"><code class="docutils literal notranslate"><span class="pre">LiteralNanMethod</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralCaptureRatio"><code class="docutils literal notranslate"><span class="pre">LiteralCaptureRatio</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralBarPlotMode"><code class="docutils literal notranslate"><span class="pre">LiteralBarPlotMode</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPlotlyOutput"><code class="docutils literal notranslate"><span class="pre">LiteralPlotlyOutput</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPlotlyJSlib"><code class="docutils literal notranslate"><span class="pre">LiteralPlotlyJSlib</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPlotlyHistogramPlotType"><code class="docutils literal notranslate"><span class="pre">LiteralPlotlyHistogramPlotType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPlotlyHistogramBarMode"><code class="docutils literal notranslate"><span class="pre">LiteralPlotlyHistogramBarMode</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPlotlyHistogramCurveType"><code class="docutils literal notranslate"><span class="pre">LiteralPlotlyHistogramCurveType</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPlotlyHistogramHistNorm"><code class="docutils literal notranslate"><span class="pre">LiteralPlotlyHistogramHistNorm</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralPortfolioWeightings"><code class="docutils literal notranslate"><span class="pre">LiteralPortfolioWeightings</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralMinimizeMethods"><code class="docutils literal notranslate"><span class="pre">LiteralMinimizeMethods</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralSeriesProps"><code class="docutils literal notranslate"><span class="pre">LiteralSeriesProps</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LiteralFrameProps"><code class="docutils literal notranslate"><span class="pre">LiteralFrameProps</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#validation-classes">Validation Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.Countries"><code class="docutils literal notranslate"><span class="pre">Countries</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.Countries.countryinput"><code class="docutils literal notranslate"><span class="pre">Countries.countryinput</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.Countries.model_config"><code class="docutils literal notranslate"><span class="pre">Countries.model_config</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.Currency"><code class="docutils literal notranslate"><span class="pre">Currency</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.Currency.ccy"><code class="docutils literal notranslate"><span class="pre">Currency.ccy</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.Currency.model_config"><code class="docutils literal notranslate"><span class="pre">Currency.model_config</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.PropertiesList"><code class="docutils literal notranslate"><span class="pre">PropertiesList</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.PropertiesList.allowed_strings"><code class="docutils literal notranslate"><span class="pre">PropertiesList.allowed_strings</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.OpenTimeSeriesPropertiesList"><code class="docutils literal notranslate"><span class="pre">OpenTimeSeriesPropertiesList</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.OpenTimeSeriesPropertiesList.allowed_strings"><code class="docutils literal notranslate"><span class="pre">OpenTimeSeriesPropertiesList.allowed_strings</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.OpenTimeSeriesPropertiesList.__init__"><code class="docutils literal notranslate"><span class="pre">OpenTimeSeriesPropertiesList.__init__()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.OpenFramePropertiesList"><code class="docutils literal notranslate"><span class="pre">OpenFramePropertiesList</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.OpenFramePropertiesList.allowed_strings"><code class="docutils literal notranslate"><span class="pre">OpenFramePropertiesList.allowed_strings</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.owntypes.OpenFramePropertiesList.__init__"><code class="docutils literal notranslate"><span class="pre">OpenFramePropertiesList.__init__()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#custom-exceptions">Custom Exceptions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.MixedValuetypesError"><code class="docutils literal notranslate"><span class="pre">MixedValuetypesError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.AtLeastOneFrameError"><code class="docutils literal notranslate"><span class="pre">AtLeastOneFrameError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.DateAlignmentError"><code class="docutils literal notranslate"><span class="pre">DateAlignmentError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.NumberOfItemsAndLabelsNotSameError"><code class="docutils literal notranslate"><span class="pre">NumberOfItemsAndLabelsNotSameError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.InitialValueZeroError"><code class="docutils literal notranslate"><span class="pre">InitialValueZeroError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.CountriesNotStringNorListStrError"><code class="docutils literal notranslate"><span class="pre">CountriesNotStringNorListStrError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.MarketsNotStringNorListStrError"><code class="docutils literal notranslate"><span class="pre">MarketsNotStringNorListStrError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.TradingDaysNotAboveZeroError"><code class="docutils literal notranslate"><span class="pre">TradingDaysNotAboveZeroError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.BothStartAndEndError"><code class="docutils literal notranslate"><span class="pre">BothStartAndEndError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.NoWeightsError"><code class="docutils literal notranslate"><span class="pre">NoWeightsError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.LabelsNotUniqueError"><code class="docutils literal notranslate"><span class="pre">LabelsNotUniqueError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.RatioInputError"><code class="docutils literal notranslate"><span class="pre">RatioInputError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.MergingResultedInEmptyError"><code class="docutils literal notranslate"><span class="pre">MergingResultedInEmptyError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.IncorrectArgumentComboError"><code class="docutils literal notranslate"><span class="pre">IncorrectArgumentComboError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.PropertiesInputValidationError"><code class="docutils literal notranslate"><span class="pre">PropertiesInputValidationError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openseries.owntypes.ResampleDataLossError"><code class="docutils literal notranslate"><span class="pre">ResampleDataLossError</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#type-aliases">Type Aliases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#literal-types">Literal Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#validation-classes">Validation Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-exceptions">Custom Exceptions</a></li>
 </ul>
 </li>
 </ul>
@@ -196,7 +123,7 @@
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Enum types of OpenTimeSeries to identify the output.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
@@ -260,7 +187,7 @@
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Enum types of OpenTimeSeries to identify the output.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
@@ -324,8 +251,8 @@
 <section id="type-aliases">
 <h2>Type Aliases<a class="headerlink" href="#type-aliases" title="Link to this heading"></a></h2>
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.SeriesOrFloat_co">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">SeriesOrFloat_co</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">+SeriesOrFloat_co</span></em><a class="headerlink" href="#openseries.owntypes.SeriesOrFloat_co" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">SeriesOrFloat_co</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">+SeriesOrFloat_co</span></em></dt>
 <dd><p>Type variable.</p>
 <p>The preferred way to construct a type variable is via the dedicated
 syntax for generic functions, classes, and type aliases:</p>
@@ -372,98 +299,98 @@ details.</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.CountryStringType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountryStringType</span></span><a class="headerlink" href="#openseries.owntypes.CountryStringType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountryStringType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
 with extra annotations. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.CountrySetType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountrySetType</span></span><a class="headerlink" href="#openseries.owntypes.CountrySetType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountrySetType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
 with extra annotations. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.CountriesType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesType</span></span><a class="headerlink" href="#openseries.owntypes.CountriesType" title="Link to this definition"></a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)] | <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesType</span></span></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)] | <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.CurrencyStringType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CurrencyStringType</span></span><a class="headerlink" href="#openseries.owntypes.CurrencyStringType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CurrencyStringType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
 with extra annotations. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=3, max_length=3, pattern=^[A-Z]{3}$)]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=3, max_length=3, pattern=^[A-Z]{3}$)]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.DateStringType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateStringType</span></span><a class="headerlink" href="#openseries.owntypes.DateStringType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateStringType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
 with extra annotations. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=10, max_length=10, pattern=^d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]d|3[01])$)]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=10, max_length=10, pattern=^d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]d|3[01])$)]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.DateListType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateListType</span></span><a class="headerlink" href="#openseries.owntypes.DateListType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateListType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
 with extra annotations. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=10, max_length=10, pattern=^d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]d|3[01])$)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=10, max_length=10, pattern=^d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]d|3[01])$)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.ValueListType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueListType</span></span><a class="headerlink" href="#openseries.owntypes.ValueListType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueListType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
 with extra annotations. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.DaysInYearType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DaysInYearType</span></span><a class="headerlink" href="#openseries.owntypes.DaysInYearType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DaysInYearType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
 with extra annotations. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), Ge(ge=1), Le(le=366)])]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), Ge(ge=1), Le(le=366)])]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.DateType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateType</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">datetime.date</span> <span class="pre">|</span> <span class="pre">datetime.datetime</span> <span class="pre">|</span> <span class="pre">numpy.datetime64</span> <span class="pre">|</span> <span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></em><a class="headerlink" href="#openseries.owntypes.DateType" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateType</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">datetime.date</span> <span class="pre">|</span> <span class="pre">datetime.datetime</span> <span class="pre">|</span> <span class="pre">numpy.datetime64</span> <span class="pre">|</span> <span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></em></dt>
 <dd><p>Represent a PEP 604 union type</p>
 <p>E.g. for int | str</p>
 </dd></dl>
@@ -472,190 +399,190 @@ it to types is also the same.</p>
 <section id="literal-types">
 <h2>Literal Types<a class="headerlink" href="#literal-types" title="Link to this heading"></a></h2>
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralJsonOutput">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralJsonOutput</span></span><a class="headerlink" href="#openseries.owntypes.LiteralJsonOutput" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘values’, ‘tsdf’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralJsonOutput</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘values’, ‘tsdf’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralTrunc">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralTrunc</span></span><a class="headerlink" href="#openseries.owntypes.LiteralTrunc" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘before’, ‘after’, ‘both’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralTrunc</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘before’, ‘after’, ‘both’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralLinePlotMode">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralLinePlotMode</span></span><a class="headerlink" href="#openseries.owntypes.LiteralLinePlotMode" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘lines’, ‘markers’, ‘lines+markers’, ‘lines+text’, ‘markers+text’, ‘lines+markers+text’] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralLinePlotMode</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘lines’, ‘markers’, ‘lines+markers’, ‘lines+text’, ‘markers+text’, ‘lines+markers+text’] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralHowMerge">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralHowMerge</span></span><a class="headerlink" href="#openseries.owntypes.LiteralHowMerge" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘outer’, ‘inner’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralHowMerge</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘outer’, ‘inner’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralQuantileInterp">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralQuantileInterp</span></span><a class="headerlink" href="#openseries.owntypes.LiteralQuantileInterp" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘linear’, ‘lower’, ‘higher’, ‘midpoint’, ‘nearest’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralQuantileInterp</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘linear’, ‘lower’, ‘higher’, ‘midpoint’, ‘nearest’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralBizDayFreq">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralBizDayFreq</span></span><a class="headerlink" href="#openseries.owntypes.LiteralBizDayFreq" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘B’, ‘BME’, ‘BQE’, ‘BYE’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralBizDayFreq</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘B’, ‘BME’, ‘BQE’, ‘BYE’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPandasReindexMethod">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPandasReindexMethod</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPandasReindexMethod" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘pad’, ‘ffill’, ‘backfill’, ‘bfill’, ‘nearest’] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPandasReindexMethod</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘pad’, ‘ffill’, ‘backfill’, ‘bfill’, ‘nearest’] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralNanMethod">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralNanMethod</span></span><a class="headerlink" href="#openseries.owntypes.LiteralNanMethod" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘fill’, ‘drop’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralNanMethod</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘fill’, ‘drop’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralCaptureRatio">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralCaptureRatio</span></span><a class="headerlink" href="#openseries.owntypes.LiteralCaptureRatio" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘up’, ‘down’, ‘both’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralCaptureRatio</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘up’, ‘down’, ‘both’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralBarPlotMode">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralBarPlotMode</span></span><a class="headerlink" href="#openseries.owntypes.LiteralBarPlotMode" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘stack’, ‘group’, ‘overlay’, ‘relative’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralBarPlotMode</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘stack’, ‘group’, ‘overlay’, ‘relative’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPlotlyOutput">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyOutput</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPlotlyOutput" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘file’, ‘div’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyOutput</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘file’, ‘div’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPlotlyJSlib">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyJSlib</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPlotlyJSlib" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[True, False, ‘cdn’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyJSlib</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[True, False, ‘cdn’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPlotlyHistogramPlotType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramPlotType</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPlotlyHistogramPlotType" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘bars’, ‘lines’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramPlotType</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘bars’, ‘lines’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPlotlyHistogramBarMode">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramBarMode</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPlotlyHistogramBarMode" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘stack’, ‘group’, ‘overlay’, ‘relative’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramBarMode</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘stack’, ‘group’, ‘overlay’, ‘relative’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPlotlyHistogramCurveType">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramCurveType</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPlotlyHistogramCurveType" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘normal’, ‘kde’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramCurveType</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘normal’, ‘kde’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPlotlyHistogramHistNorm">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramHistNorm</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPlotlyHistogramHistNorm" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘percent’, ‘probability’, ‘density’, ‘probability density’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPlotlyHistogramHistNorm</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘percent’, ‘probability’, ‘density’, ‘probability density’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralPortfolioWeightings">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPortfolioWeightings</span></span><a class="headerlink" href="#openseries.owntypes.LiteralPortfolioWeightings" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘eq_weights’, ‘inv_vol’, ‘max_div’, ‘target_risk’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPortfolioWeightings</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘eq_weights’, ‘inv_vol’, ‘max_div’, ‘min_vol_overweight’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralMinimizeMethods">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralMinimizeMethods</span></span><a class="headerlink" href="#openseries.owntypes.LiteralMinimizeMethods" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘SLSQP’, ‘Nelder-Mead’, ‘Powell’, ‘CG’, ‘BFGS’, ‘Newton-CG’, ‘L-BFGS-B’, ‘TNC’, ‘COBYLA’, ‘trust-constr’, ‘dogleg’, ‘trust-ncg’, ‘trust-exact’, ‘trust-krylov’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralMinimizeMethods</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘SLSQP’, ‘Nelder-Mead’, ‘Powell’, ‘CG’, ‘BFGS’, ‘Newton-CG’, ‘L-BFGS-B’, ‘TNC’, ‘COBYLA’, ‘trust-constr’, ‘dogleg’, ‘trust-ncg’, ‘trust-exact’, ‘trust-krylov’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralSeriesProps">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralSeriesProps</span></span><a class="headerlink" href="#openseries.owntypes.LiteralSeriesProps" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘value_ret’, ‘geo_ret’, ‘arithmetic_ret’, ‘vol’, ‘downside_deviation’, ‘ret_vol_ratio’, ‘sortino_ratio’, ‘kappa3_ratio’, ‘z_score’, ‘skew’, ‘kurtosis’, ‘positive_share’, ‘var_down’, ‘cvar_down’, ‘vol_from_var’, ‘worst’, ‘worst_month’, ‘max_drawdown_cal_year’, ‘max_drawdown’, ‘max_drawdown_date’, ‘first_idx’, ‘last_idx’, ‘length’, ‘span_of_days’, ‘yearfrac’, ‘periods_in_a_year’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralSeriesProps</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘value_ret’, ‘geo_ret’, ‘arithmetic_ret’, ‘vol’, ‘downside_deviation’, ‘ret_vol_ratio’, ‘sortino_ratio’, ‘kappa3_ratio’, ‘z_score’, ‘skew’, ‘kurtosis’, ‘positive_share’, ‘var_down’, ‘cvar_down’, ‘vol_from_var’, ‘worst’, ‘worst_month’, ‘max_drawdown_cal_year’, ‘max_drawdown’, ‘max_drawdown_date’, ‘first_idx’, ‘last_idx’, ‘length’, ‘span_of_days’, ‘yearfrac’, ‘periods_in_a_year’]</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="openseries.owntypes.LiteralFrameProps">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralFrameProps</span></span><a class="headerlink" href="#openseries.owntypes.LiteralFrameProps" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘value_ret’, ‘geo_ret’, ‘arithmetic_ret’, ‘vol’, ‘downside_deviation’, ‘ret_vol_ratio’, ‘sortino_ratio’, ‘kappa3_ratio’, ‘z_score’, ‘skew’, ‘kurtosis’, ‘positive_share’, ‘var_down’, ‘cvar_down’, ‘vol_from_var’, ‘worst’, ‘worst_month’, ‘max_drawdown’, ‘max_drawdown_date’, ‘max_drawdown_cal_year’, ‘first_indices’, ‘last_indices’, ‘lengths_of_items’, ‘span_of_days_all’]</p>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralFrameProps</span></span></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘value_ret’, ‘geo_ret’, ‘arithmetic_ret’, ‘vol’, ‘downside_deviation’, ‘ret_vol_ratio’, ‘sortino_ratio’, ‘kappa3_ratio’, ‘z_score’, ‘skew’, ‘kurtosis’, ‘positive_share’, ‘var_down’, ‘cvar_down’, ‘vol_from_var’, ‘worst’, ‘worst_month’, ‘max_drawdown’, ‘max_drawdown_date’, ‘max_drawdown_cal_year’, ‘first_indices’, ‘last_indices’, ‘lengths_of_items’, ‘span_of_days_all’]</p>
 </dd></dl>
 
 </section>
 <section id="validation-classes">
 <h2>Validation Classes<a class="headerlink" href="#validation-classes" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="openseries.owntypes.Countries">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Countries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">countryinput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Countries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.Countries" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Countries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">countryinput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Countries"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Declare Countries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>countryinput</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em>)</p>
+<dd class="field-odd"><p><strong>countryinput</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em>)</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.owntypes.Countries.countryinput">
-<span class="sig-name descname"><span class="pre">countryinput</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CountriesType</span></em><a class="headerlink" href="#openseries.owntypes.Countries.countryinput" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">countryinput</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CountriesType</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.owntypes.Countries.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#openseries.owntypes.Countries.model_config" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em></dt>
 <dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="openseries.owntypes.Currency">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Currency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Currency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.Currency" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Currency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Currency"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Declare Currency.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>)</p>
+<dd class="field-odd"><p><strong>ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>)</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.owntypes.Currency.ccy">
-<span class="sig-name descname"><span class="pre">ccy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CurrencyStringType</span></em><a class="headerlink" href="#openseries.owntypes.Currency.ccy" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ccy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CurrencyStringType</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.owntypes.Currency.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#openseries.owntypes.Currency.model_config" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em></dt>
 <dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="openseries.owntypes.PropertiesList">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.PropertiesList" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
 <p>Base class for allowed property arguments definition.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.owntypes.PropertiesList.allowed_strings">
-<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.13)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></em><a class="headerlink" href="#openseries.owntypes.PropertiesList.allowed_strings" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></em></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="openseries.owntypes.OpenTimeSeriesPropertiesList">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenTimeSeriesPropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenTimeSeriesPropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.OpenTimeSeriesPropertiesList" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#openseries.owntypes.PropertiesList" title="openseries.owntypes.PropertiesList"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertiesList</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenTimeSeriesPropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenTimeSeriesPropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PropertiesList</span></code></p>
 <p>Allowed property arguments for the OpenTimeSeries class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -663,19 +590,19 @@ it to types is also the same.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.owntypes.OpenTimeSeriesPropertiesList.allowed_strings">
-<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.13)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_idx',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_idx',</span> <span class="pre">'length',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'periods_in_a_year',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'yearfrac',</span> <span class="pre">'z_score'}</span></em><a class="headerlink" href="#openseries.owntypes.OpenTimeSeriesPropertiesList.allowed_strings" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_idx',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_idx',</span> <span class="pre">'length',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'periods_in_a_year',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'yearfrac',</span> <span class="pre">'z_score'}</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="openseries.owntypes.OpenTimeSeriesPropertiesList.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenTimeSeriesPropertiesList.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.OpenTimeSeriesPropertiesList.__init__" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenTimeSeriesPropertiesList.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Property arguments for the OpenTimeSeries class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>]</em>)</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>]</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -687,9 +614,9 @@ it to types is also the same.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="openseries.owntypes.OpenFramePropertiesList">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenFramePropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenFramePropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.OpenFramePropertiesList" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#openseries.owntypes.PropertiesList" title="openseries.owntypes.PropertiesList"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertiesList</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenFramePropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenFramePropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PropertiesList</span></code></p>
 <p>Allowed property arguments for the OpenFrame class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -697,19 +624,19 @@ it to types is also the same.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.owntypes.OpenFramePropertiesList.allowed_strings">
-<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.13)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_indices',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_indices',</span> <span class="pre">'lengths_of_items',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days_all',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></em><a class="headerlink" href="#openseries.owntypes.OpenFramePropertiesList.allowed_strings" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_indices',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_indices',</span> <span class="pre">'lengths_of_items',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days_all',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="openseries.owntypes.OpenFramePropertiesList.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenFramePropertiesList.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.OpenFramePropertiesList.__init__" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenFramePropertiesList.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Property arguments for the OpenFrame class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.13)"><em>Self</em></a>)</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'first_indices'</em><em>, </em><em>'last_indices'</em><em>, </em><em>'lengths_of_items'</em><em>, </em><em>'span_of_days_all'</em><em>]</em>)</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'first_indices'</em><em>, </em><em>'last_indices'</em><em>, </em><em>'lengths_of_items'</em><em>, </em><em>'span_of_days_all'</em><em>]</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -724,114 +651,114 @@ it to types is also the same.</p>
 <section id="custom-exceptions">
 <h2>Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Link to this heading"></a></h2>
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.MixedValuetypesError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MixedValuetypesError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MixedValuetypesError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.MixedValuetypesError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MixedValuetypesError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MixedValuetypesError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when provided timeseries valuetypes are not the same.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.AtLeastOneFrameError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">AtLeastOneFrameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#AtLeastOneFrameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.AtLeastOneFrameError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">AtLeastOneFrameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#AtLeastOneFrameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when none of the possible frame inputs is provided.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.DateAlignmentError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateAlignmentError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#DateAlignmentError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.DateAlignmentError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateAlignmentError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#DateAlignmentError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when date input is not aligned with existing range.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.NumberOfItemsAndLabelsNotSameError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NumberOfItemsAndLabelsNotSameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NumberOfItemsAndLabelsNotSameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.NumberOfItemsAndLabelsNotSameError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NumberOfItemsAndLabelsNotSameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NumberOfItemsAndLabelsNotSameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when number of labels is not matching the number of timeseries.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.InitialValueZeroError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">InitialValueZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#InitialValueZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.InitialValueZeroError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">InitialValueZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#InitialValueZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when a calculation cannot be performed due to initial value(s) zero.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.CountriesNotStringNorListStrError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#CountriesNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.CountriesNotStringNorListStrError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#CountriesNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when countries argument is not provided in correct format.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.MarketsNotStringNorListStrError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MarketsNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MarketsNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.MarketsNotStringNorListStrError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MarketsNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MarketsNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when markets argument is not provided in correct format.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.TradingDaysNotAboveZeroError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">TradingDaysNotAboveZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#TradingDaysNotAboveZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.TradingDaysNotAboveZeroError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">TradingDaysNotAboveZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#TradingDaysNotAboveZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when trading days argument is not above zero.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.BothStartAndEndError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">BothStartAndEndError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#BothStartAndEndError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.BothStartAndEndError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">BothStartAndEndError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#BothStartAndEndError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when both start and end dates are provided.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.NoWeightsError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NoWeightsError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NoWeightsError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.NoWeightsError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NoWeightsError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NoWeightsError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when no weights are provided to function where necessary.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.LabelsNotUniqueError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LabelsNotUniqueError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#LabelsNotUniqueError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.LabelsNotUniqueError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LabelsNotUniqueError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#LabelsNotUniqueError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when provided label names are not unique.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.RatioInputError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">RatioInputError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#RatioInputError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.RatioInputError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">RatioInputError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#RatioInputError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when ratio keyword not provided correctly.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.MergingResultedInEmptyError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MergingResultedInEmptyError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MergingResultedInEmptyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.MergingResultedInEmptyError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MergingResultedInEmptyError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MergingResultedInEmptyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when a merge resulted in an empty DataFrame.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.IncorrectArgumentComboError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">IncorrectArgumentComboError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#IncorrectArgumentComboError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.IncorrectArgumentComboError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">IncorrectArgumentComboError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#IncorrectArgumentComboError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when correct combination of arguments is not provided.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.PropertiesInputValidationError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesInputValidationError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesInputValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.PropertiesInputValidationError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesInputValidationError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesInputValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when duplicate strings are provided.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="openseries.owntypes.ResampleDataLossError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ResampleDataLossError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#ResampleDataLossError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.owntypes.ResampleDataLossError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ResampleDataLossError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#ResampleDataLossError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when user attempts to run resample_to_business_period_ends on returns.</p>
 </dd></dl>
 
@@ -849,7 +776,7 @@ it to types is also the same.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Captor Fund Management AB.</p>
+    <p>&#169; Copyright Captor Fund Management AB.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

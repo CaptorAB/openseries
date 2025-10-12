@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Risk Management &mdash; openseries 2.0.0 documentation</title>
+  <title>Risk Management &mdash; openseries 2.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=f5cff4aa"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -80,7 +80,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Important Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_consistency.html">API Consistency Notes</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -152,29 +157,27 @@
 <span class="c1"># Download 3 years of data</span>
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tickers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
-        <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-            <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span>
-        <span class="p">)</span>
-        <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations&quot;</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># This may fail if the ticker is invalid or data unavailable</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+        <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations&quot;</span><span class="p">)</span>
 
 <span class="c1"># Create portfolio frame</span>
 <span class="n">portfolio_assets</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
 
 <span class="c1"># Create equal-weighted portfolio</span>
 <span class="n">n_assets</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">item_count</span>
-<span class="n">equal_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_assets</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_assets</span>
 
-<span class="n">portfolio</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Diversified Portfolio&quot;</span>
+<span class="c1"># Set weights on the frame first</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Diversified Portfolio&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span>
 <span class="p">)</span>
+<span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Portfolio created with </span><span class="si">{</span><span class="n">n_assets</span><span class="si">}</span><span class="s2"> assets&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date range: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -257,12 +260,12 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling Volatility - Range: </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Rolling VaR</span>
-<span class="n">rolling_var</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_var_down</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+<span class="n">rolling_var</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_var_down</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling VaR (95%) - Current: </span><span class="si">{</span><span class="n">rolling_var</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling VaR (95%) - Average: </span><span class="si">{</span><span class="n">rolling_var</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Rolling CVaR</span>
-<span class="n">rolling_cvar</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_cvar_down</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+<span class="n">rolling_cvar</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">rolling_cvar_down</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling CVaR (95%) - Current: </span><span class="si">{</span><span class="n">rolling_cvar</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rolling CVaR (95%) - Average: </span><span class="si">{</span><span class="n">rolling_cvar</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
@@ -275,28 +278,33 @@
 <h3>Historical Stress Testing<a class="headerlink" href="#historical-stress-testing" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== HISTORICAL STRESS TESTING ===&quot;</span><span class="p">)</span>
 
-<span class="c1"># Convert to returns for analysis</span>
-<span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="n">returns_data</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Convert to returns for analysis (modifies original)</span>
+<span class="n">portfolio</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="n">returns_data</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">tsdf</span>
+
+<span class="c1"># Note: value_to_ret() modifies the original series in place</span>
+<span class="c1"># Restore the original portfolio for further analysis</span>
+<span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
 <span class="c1"># Identify worst periods</span>
-<span class="n">worst_1_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-<span class="n">worst_5_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">worst_1_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">worst_5_percent</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst 1% threshold: </span><span class="si">{</span><span class="n">worst_1_percent</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst 5% threshold: </span><span class="si">{</span><span class="n">worst_5_percent</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Count extreme events</span>
-<span class="n">extreme_events_1pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_1_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-<span class="n">extreme_events_5pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_5_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">extreme_events_1pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_1_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">extreme_events_5pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_5_percent</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Days with returns &lt;= 1% threshold: </span><span class="si">{</span><span class="n">extreme_events_1pct</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Days with returns &lt;= 5% threshold: </span><span class="si">{</span><span class="n">extreme_events_5pct</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Worst consecutive days</span>
-<span class="n">worst_days</span> <span class="o">=</span> <span class="n">returns_data</span><span class="p">[</span><span class="n">returns_data</span> <span class="o">&lt;=</span> <span class="n">worst_5_percent</span><span class="p">]</span>
+<span class="c1"># Worst consecutive days - simplified approach</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Worst 5 single days:&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">return_val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">worst_days</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+<span class="n">returns_series</span> <span class="o">=</span> <span class="n">returns_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Get the first (and only) column</span>
+<span class="n">worst_5_days</span> <span class="o">=</span> <span class="n">returns_series</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">return_val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">worst_5_days</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">return_val</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -374,7 +382,7 @@
 
 <span class="c1"># Calculate individual asset volatilities using OpenFrame</span>
 <span class="n">asset_metrics</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-<span class="n">asset_vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">asset_vols</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Volatility&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="c1"># Portfolio volatility</span>
 <span class="n">portfolio_vol</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span>
@@ -401,7 +409,7 @@
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Risk Contribution Analysis:&quot;</span><span class="p">)</span>
 <span class="n">risk_decomp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-    <span class="s1">&#39;Asset&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">],</span>
+    <span class="s1">&#39;Asset&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">],</span>
     <span class="s1">&#39;Weight&#39;</span><span class="p">:</span> <span class="n">weights</span><span class="p">,</span>
     <span class="s1">&#39;Individual Vol&#39;</span><span class="p">:</span> <span class="n">vols</span><span class="p">,</span>
     <span class="s1">&#39;Marginal Contrib&#39;</span><span class="p">:</span> <span class="n">marginal_contrib</span><span class="p">,</span>
@@ -440,9 +448,9 @@
 <span class="n">all_assets</span> <span class="o">=</span> <span class="n">portfolio_assets</span><span class="o">.</span><span class="n">constituents</span> <span class="o">+</span> <span class="p">[</span><span class="n">portfolio</span><span class="p">]</span>
 <span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">all_assets</span><span class="p">)</span>
 
-<span class="n">risk_adj_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-    <span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;sortino_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa3_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;omega_ratio&#39;</span><span class="p">]</span>
-<span class="p">]</span>
+<span class="n">risk_adj_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">(</span>
+    <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;sortino_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa3_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;omega_ratio&#39;</span><span class="p">]</span>
+<span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">risk_adj_metrics</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 </pre></div>
@@ -459,7 +467,7 @@
 <span class="n">current_date</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">last_idx</span>
 <span class="n">lookback_date</span> <span class="o">=</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">first_idx</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Date: </span><span class="si">{</span><span class="n">current_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analysis Period: </span><span class="si">{</span><span class="n">lookback_date</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">current_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observations: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -637,7 +645,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Captor Fund Management AB.</p>
+    <p>&#169; Copyright Captor Fund Management AB.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

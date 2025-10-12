@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>openseries.ValueType &mdash; openseries 2.0.0 documentation</title>
+  <title>openseries.ValueType &mdash; openseries 2.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../../_static/documentation_options.js?v=f5cff4aa"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -62,7 +62,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/custom_reports.html">Reporting</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Important Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api_consistency.html">API Consistency Notes</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
@@ -73,10 +78,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../openseries.html#date-utilities">Date Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../openseries.html#simulation">Simulation</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../openseries.html#types-and-enums">Types and Enums</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.ValueType</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#openseries.ValueType"><code class="docutils literal notranslate"><span class="pre">ValueType</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">openseries.ValueType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="openseries.Self.html">openseries.Self</a></li>
 </ul>
 </li>
@@ -125,13 +127,13 @@
   <section id="openseries-valuetype">
 <h1>openseries.ValueType<a class="headerlink" href="#openseries-valuetype" title="Link to this heading"></a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="openseries.ValueType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openseries.ValueType" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<dt class="sig sig-object py">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Enum types of OpenTimeSeries to identify the output.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="openseries.ValueType.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openseries.ValueType.__init__" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -278,7 +280,7 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">maketrans</span></code></p></td>
 <td><p>Return a translation table usable for str.translate().</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ValueType.__init__" title="openseries.ValueType.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwds)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(*args, **kwds)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -286,94 +288,94 @@
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ValueType.EWMA" title="openseries.ValueType.EWMA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EWMA</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">EWMA</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ValueType.PRICE" title="openseries.ValueType.PRICE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRICE</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRICE</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ValueType.RTRN" title="openseries.ValueType.RTRN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RTRN</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RTRN</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ValueType.RELRTRN" title="openseries.ValueType.RELRTRN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RELRTRN</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RELRTRN</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ValueType.ROLLBETA" title="openseries.ValueType.ROLLBETA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLBETA</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLBETA</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ValueType.ROLLCORR" title="openseries.ValueType.ROLLCORR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLCORR</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLCORR</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ValueType.ROLLCVAR" title="openseries.ValueType.ROLLCVAR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLCVAR</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLCVAR</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ValueType.ROLLINFORATIO" title="openseries.ValueType.ROLLINFORATIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLINFORATIO</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLINFORATIO</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ValueType.ROLLRTRN" title="openseries.ValueType.ROLLRTRN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLRTRN</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLRTRN</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#openseries.ValueType.ROLLVAR" title="openseries.ValueType.ROLLVAR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLVAR</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLVAR</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#openseries.ValueType.ROLLVOL" title="openseries.ValueType.ROLLVOL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLVOL</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROLLVOL</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.EWMA">
-<span class="sig-name descname"><span class="pre">EWMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'EWMA'</span></em><a class="headerlink" href="#openseries.ValueType.EWMA" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">EWMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'EWMA'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.PRICE">
-<span class="sig-name descname"><span class="pre">PRICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Price(Close)'</span></em><a class="headerlink" href="#openseries.ValueType.PRICE" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">PRICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Price(Close)'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.RTRN">
-<span class="sig-name descname"><span class="pre">RTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Return(Total)'</span></em><a class="headerlink" href="#openseries.ValueType.RTRN" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">RTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Return(Total)'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.RELRTRN">
-<span class="sig-name descname"><span class="pre">RELRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Relative</span> <span class="pre">return'</span></em><a class="headerlink" href="#openseries.ValueType.RELRTRN" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">RELRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Relative</span> <span class="pre">return'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.ROLLBETA">
-<span class="sig-name descname"><span class="pre">ROLLBETA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Beta'</span></em><a class="headerlink" href="#openseries.ValueType.ROLLBETA" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ROLLBETA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Beta'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.ROLLCORR">
-<span class="sig-name descname"><span class="pre">ROLLCORR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">correlation'</span></em><a class="headerlink" href="#openseries.ValueType.ROLLCORR" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ROLLCORR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">correlation'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.ROLLCVAR">
-<span class="sig-name descname"><span class="pre">ROLLCVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">CVaR'</span></em><a class="headerlink" href="#openseries.ValueType.ROLLCVAR" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ROLLCVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">CVaR'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.ROLLINFORATIO">
-<span class="sig-name descname"><span class="pre">ROLLINFORATIO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Information</span> <span class="pre">Ratio'</span></em><a class="headerlink" href="#openseries.ValueType.ROLLINFORATIO" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ROLLINFORATIO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Information</span> <span class="pre">Ratio'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.ROLLRTRN">
-<span class="sig-name descname"><span class="pre">ROLLRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">returns'</span></em><a class="headerlink" href="#openseries.ValueType.ROLLRTRN" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ROLLRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">returns'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.ROLLVAR">
-<span class="sig-name descname"><span class="pre">ROLLVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">VaR'</span></em><a class="headerlink" href="#openseries.ValueType.ROLLVAR" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ROLLVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">VaR'</span></em></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="openseries.ValueType.ROLLVOL">
-<span class="sig-name descname"><span class="pre">ROLLVOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">volatility'</span></em><a class="headerlink" href="#openseries.ValueType.ROLLVOL" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ROLLVOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">volatility'</span></em></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -391,7 +393,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Captor Fund Management AB.</p>
+    <p>&#169; Copyright Captor Fund Management AB.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

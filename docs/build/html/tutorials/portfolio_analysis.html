@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio Analysis &mdash; openseries 2.0.0 documentation</title>
+  <title>Portfolio Analysis &mdash; openseries 2.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=f5cff4aa"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -59,8 +59,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#correlation-analysis">Correlation Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#simple-portfolio-construction">Simple Portfolio Construction</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#equal-weight-portfolio">Equal Weight Portfolio</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#market-cap-weighted-portfolio">Market Cap Weighted Portfolio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-weight-portfolio">Custom Weight Portfolio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#risk-parity-portfolio">Risk Parity Portfolio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-weight-strategies">Advanced Weight Strategies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#maximum-diversification-strategy">Maximum Diversification Strategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#minimum-volatility-overweight-strategy">Minimum Volatility Overweight Strategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#strategy-comparison-with-error-handling">Strategy Comparison with Error Handling</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#portfolio-optimization">Portfolio Optimization</a><ul>
@@ -85,7 +91,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/single_asset.html">Single Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/multi_asset.html">Multi-Asset Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/portfolio_optimization.html">Portfolio Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/rebalanced_portfolio.html">Rebalanced Portfolio Simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/custom_reports.html">Reporting</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Important Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_consistency.html">API Consistency Notes</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -154,17 +165,14 @@
 <span class="c1"># Download 5 years of data</span>
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tickers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;5y&quot;</span><span class="p">)</span>
-        <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-            <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span>
-        <span class="p">)</span>
-        <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations&quot;</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># This may fail if the ticker is invalid or data unavailable</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;5y&quot;</span><span class="p">)</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+        <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations&quot;</span><span class="p">)</span>
 
 <span class="c1"># Create OpenFrame</span>
 <span class="n">assets</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
@@ -182,10 +190,10 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">asset_metrics</span><span class="p">)</span>
 
 <span class="c1"># Key metrics comparison</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-<span class="n">volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-<span class="n">sharpe_ratios</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">]</span>
-<span class="n">max_drawdowns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;max_drawdown&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">returns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Geometric return&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Volatility&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">sharpe_ratios</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Return vol ratio&#39;</span><span class="p">]</span>
+<span class="n">max_drawdowns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Max drawdown&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== ASSET COMPARISON ===&quot;</span><span class="p">)</span>
 <span class="n">comparison_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -231,7 +239,7 @@
 <h3>Equal Weight Portfolio<a class="headerlink" href="#equal-weight-portfolio" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create equal-weighted portfolio using native weight_strat</span>
 <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight Portfolio&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">)</span>
-<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Return: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Volatility: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -239,19 +247,19 @@
 </pre></div>
 </div>
 </section>
-<section id="market-cap-weighted-portfolio">
-<h3>Market Cap Weighted Portfolio<a class="headerlink" href="#market-cap-weighted-portfolio" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simulate market cap weights (in practice, you&#39;d use actual market caps)</span>
-<span class="c1"># Larger weights for larger markets</span>
-<span class="n">market_cap_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]</span>  <span class="c1"># Must sum to 1</span>
+<section id="custom-weight-portfolio">
+<h3>Custom Weight Portfolio<a class="headerlink" href="#custom-weight-portfolio" title="Link to this heading"></a></h3>
+<p>You can also specify custom weights for portfolio construction:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define custom weights (must sum to 1)</span>
+<span class="n">custom_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]</span>
 
-<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">market_cap_weights</span>
-<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Market Cap Weighted&quot;</span><span class="p">)</span>
-<span class="n">market_cap_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">custom_weights</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Weighted&quot;</span><span class="p">)</span>
+<span class="n">custom_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market Cap Portfolio Return: </span><span class="si">{</span><span class="n">market_cap_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market Cap Portfolio Volatility: </span><span class="si">{</span><span class="n">market_cap_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market Cap Portfolio Sharpe: </span><span class="si">{</span><span class="n">market_cap_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Custom Portfolio Return: </span><span class="si">{</span><span class="n">custom_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Custom Portfolio Volatility: </span><span class="si">{</span><span class="n">custom_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Custom Portfolio Sharpe: </span><span class="si">{</span><span class="n">custom_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -259,13 +267,79 @@
 <h3>Risk Parity Portfolio<a class="headerlink" href="#risk-parity-portfolio" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use native inverse volatility weighting (risk parity)</span>
 <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Risk Parity&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;inv_vol&quot;</span><span class="p">)</span>
-<span class="n">risk_parity_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">risk_parity_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk Parity Portfolio Return: </span><span class="si">{</span><span class="n">risk_parity_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk Parity Portfolio Volatility: </span><span class="si">{</span><span class="n">risk_parity_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk Parity Portfolio Sharpe: </span><span class="si">{</span><span class="n">risk_parity_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="advanced-weight-strategies">
+<h3>Advanced Weight Strategies<a class="headerlink" href="#advanced-weight-strategies" title="Link to this heading"></a></h3>
+<p>OpenSeries provides additional weight strategies beyond basic equal weighting and risk parity:</p>
+<section id="maximum-diversification-strategy">
+<h4>Maximum Diversification Strategy<a class="headerlink" href="#maximum-diversification-strategy" title="Link to this heading"></a></h4>
+<p>The maximum diversification strategy optimizes the correlation structure to maximize portfolio diversification:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openseries.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaxDiversificationNaNError</span><span class="p">,</span> <span class="n">MaxDiversificationNegativeWeightsError</span>
+
+<span class="c1"># This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError</span>
+<span class="n">max_div_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Maximum Diversification&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;max_div&quot;</span>
+<span class="p">)</span>
+<span class="n">max_div_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">max_div_portfolio_df</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Diversification Return: </span><span class="si">{</span><span class="n">max_div_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Diversification Volatility: </span><span class="si">{</span><span class="n">max_div_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Diversification Sharpe: </span><span class="si">{</span><span class="n">max_div_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="minimum-volatility-overweight-strategy">
+<h4>Minimum Volatility Overweight Strategy<a class="headerlink" href="#minimum-volatility-overweight-strategy" title="Link to this heading"></a></h4>
+<p>The minimum volatility overweight strategy overweights the least volatile asset:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This may fail with various exceptions</span>
+<span class="n">min_vol_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Min Vol Overweight&quot;</span><span class="p">,</span>
+    <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;min_vol_overweight&quot;</span>
+<span class="p">)</span>
+<span class="n">min_vol_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">min_vol_portfolio_df</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min Vol Overweight Return: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min Vol Overweight Volatility: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min Vol Overweight Sharpe: </span><span class="si">{</span><span class="n">min_vol_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="strategy-comparison-with-error-handling">
+<h4>Strategy Comparison with Error Handling<a class="headerlink" href="#strategy-comparison-with-error-handling" title="Link to this heading"></a></h4>
+<p>When comparing multiple strategies, it’s important to handle potential failures gracefully:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">strategies</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Equal Weight&#39;</span><span class="p">:</span> <span class="s1">&#39;eq_weights&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Risk Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;inv_vol&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Max Diversification&#39;</span><span class="p">:</span> <span class="s1">&#39;max_div&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Min Vol Overweight&#39;</span><span class="p">:</span> <span class="s1">&#39;min_vol_overweight&#39;</span>
+<span class="p">}</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">strategies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="c1"># This may fail with MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError, or other exceptions</span>
+    <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="n">strategy</span><span class="p">)</span>
+    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Return&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="p">,</span>
+        <span class="s1">&#39;Volatility&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">,</span>
+        <span class="s1">&#39;Sharpe&#39;</span><span class="p">:</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span>
+    <span class="p">}</span>
+
+<span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== STRATEGY COMPARISON ===&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">((</span><span class="n">results_df</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 <section id="portfolio-optimization">
@@ -274,66 +348,59 @@
 <section id="efficient-frontier">
 <h3>Efficient Frontier<a class="headerlink" href="#efficient-frontier" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate efficient frontier</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">frontier_results</span> <span class="o">=</span> <span class="n">efficient_frontier</span><span class="p">(</span>
-        <span class="n">frame</span><span class="o">=</span><span class="n">assets</span><span class="p">,</span>
-        <span class="n">num_portfolios</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-        <span class="n">max_weight</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>  <span class="c1"># Maximum 40% in any single asset</span>
-        <span class="n">min_weight</span><span class="o">=</span><span class="mf">0.0</span>   <span class="c1"># No short selling</span>
-    <span class="p">)</span>
+<span class="c1"># This may fail with various exceptions</span>
+<span class="n">frontier_df</span><span class="p">,</span> <span class="n">simulated_df</span><span class="p">,</span> <span class="n">optimal_portfolio</span> <span class="o">=</span> <span class="n">efficient_frontier</span><span class="p">(</span>
+    <span class="n">eframe</span><span class="o">=</span><span class="n">assets</span><span class="p">,</span>
+    <span class="n">num_ports</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Efficient frontier calculated successfully&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of portfolios: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Efficient frontier calculated successfully&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of frontier points: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frontier_df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of simulated portfolios: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">simulated_df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Find maximum Sharpe ratio portfolio</span>
-    <span class="n">sharpe_ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;volatilities&#39;</span><span class="p">])</span>
-    <span class="n">max_sharpe_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sharpe_ratios</span><span class="p">)</span>
+<span class="c1"># Find maximum Sharpe ratio portfolio</span>
+<span class="n">sharpe_ratios</span> <span class="o">=</span> <span class="n">frontier_df</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">frontier_df</span><span class="p">[</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span>
+<span class="n">max_sharpe_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sharpe_ratios</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MAXIMUM SHARPE RATIO PORTFOLIO ===&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Return: </span><span class="si">{</span><span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">][</span><span class="n">max_sharpe_idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;volatilities&#39;</span><span class="p">][</span><span class="n">max_sharpe_idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Ratio: </span><span class="si">{</span><span class="n">sharpe_ratios</span><span class="p">[</span><span class="n">max_sharpe_idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MAXIMUM SHARPE RATIO PORTFOLIO ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Return: </span><span class="si">{</span><span class="n">frontier_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">max_sharpe_idx</span><span class="p">][</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Volatility: </span><span class="si">{</span><span class="n">frontier_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">max_sharpe_idx</span><span class="p">][</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Ratio: </span><span class="si">{</span><span class="n">sharpe_ratios</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">max_sharpe_idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Get optimal weights</span>
-    <span class="n">optimal_weights</span> <span class="o">=</span> <span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">][</span><span class="n">max_sharpe_idx</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Optimal Weights:&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">optimal_weights</span><span class="p">):</span>
-        <span class="n">asset_name</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimization failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Get optimal weights</span>
+<span class="n">optimal_weights</span> <span class="o">=</span> <span class="n">optimal_portfolio</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">):]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Optimal Weights:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">optimal_weights</span><span class="p">):</span>
+    <span class="n">asset_name</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">label</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">asset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="monte-carlo-portfolio-simulation">
 <h3>Monte Carlo Portfolio Simulation<a class="headerlink" href="#monte-carlo-portfolio-simulation" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simulate random portfolios</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">simulation_results</span> <span class="o">=</span> <span class="n">simulate_portfolios</span><span class="p">(</span>
-        <span class="n">frame</span><span class="o">=</span><span class="n">assets</span><span class="p">,</span>
-        <span class="n">num_portfolios</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
-        <span class="n">max_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">min_weight</span><span class="o">=</span><span class="mf">0.0</span>
-    <span class="p">)</span>
+<span class="c1"># This may fail with various exceptions</span>
+<span class="n">simulation_results</span> <span class="o">=</span> <span class="n">simulate_portfolios</span><span class="p">(</span>
+    <span class="n">simframe</span><span class="o">=</span><span class="n">assets</span><span class="p">,</span>
+    <span class="n">num_ports</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> random portfolios&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">simulation_results</span><span class="p">)</span><span class="si">}</span><span class="s2"> random portfolios&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Find best performing portfolios</span>
-    <span class="n">sim_sharpe_ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;volatilities&#39;</span><span class="p">])</span>
+<span class="c1"># Find best performing portfolios</span>
+<span class="n">sim_sharpe_ratios</span> <span class="o">=</span> <span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span>
 
-    <span class="c1"># Top 5 Sharpe ratios</span>
-    <span class="n">top_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sim_sharpe_ratios</span><span class="p">)[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span>
+<span class="c1"># Top 5 Sharpe ratios</span>
+<span class="n">top_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sim_sharpe_ratios</span><span class="p">)[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TOP 5 SIMULATED PORTFOLIOS ===&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">top_indices</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Rank </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Return: </span><span class="si">{</span><span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;volatilities&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe: </span><span class="si">{</span><span class="n">sim_sharpe_ratios</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TOP 5 SIMULATED PORTFOLIOS ===&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">top_indices</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Rank </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Return: </span><span class="si">{</span><span class="n">simulation_results</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">simulation_results</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe: </span><span class="si">{</span><span class="n">sim_sharpe_ratios</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -352,7 +419,7 @@
 <span class="n">portfolio_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 
 <span class="c1"># Focus on key metrics</span>
-<span class="n">key_metrics</span> <span class="o">=</span> <span class="n">portfolio_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;max_drawdown&#39;</span><span class="p">]]</span>
+<span class="n">key_metrics</span> <span class="o">=</span> <span class="n">portfolio_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;Geometric return&#39;</span><span class="p">,</span> <span class="s1">&#39;Volatility&#39;</span><span class="p">,</span> <span class="s1">&#39;Return vol ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;Max drawdown&#39;</span><span class="p">]]</span>
 <span class="n">key_metrics</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Annual Return&#39;</span><span class="p">,</span> <span class="s1">&#39;Volatility&#39;</span><span class="p">,</span> <span class="s1">&#39;Sharpe Ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;Max Drawdown&#39;</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== PORTFOLIO COMPARISON ===&quot;</span><span class="p">)</span>
@@ -366,12 +433,12 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate portfolio statistics for equal weight portfolio</span>
 <span class="n">returns_data</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-    <span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-    <span class="n">returns_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
+    <span class="n">returns_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">tsdf</span><span class="p">)</span>
 
 <span class="c1"># Create returns matrix</span>
 <span class="n">returns_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">returns_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">returns_matrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+<span class="n">returns_matrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
 
 <span class="c1"># Calculate covariance matrix (annualized)</span>
 <span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">returns_matrix</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span> <span class="o">*</span> <span class="mi">252</span>  <span class="c1"># Assuming daily data</span>
@@ -398,7 +465,7 @@
     <span class="s1">&#39;Marginal Contrib&#39;</span><span class="p">:</span> <span class="n">marginal_contrib</span><span class="p">,</span>
     <span class="s1">&#39;Component Contrib&#39;</span><span class="p">:</span> <span class="n">component_contrib</span><span class="p">,</span>
     <span class="s1">&#39;Percent Contrib&#39;</span><span class="p">:</span> <span class="n">percent_contrib</span>
-<span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">])</span>
+<span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">risk_attribution</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
@@ -410,11 +477,11 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate individual asset returns</span>
 <span class="n">asset_returns</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-    <span class="n">returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-    <span class="n">asset_returns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">returns</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
+    <span class="n">asset_returns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">tsdf</span><span class="p">)</span>
 
 <span class="n">returns_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">asset_returns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
+<span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
 
 <span class="c1"># Calculate weighted returns (equal weight portfolio)</span>
 <span class="n">weighted_returns</span> <span class="o">=</span> <span class="n">returns_df</span> <span class="o">*</span> <span class="n">equal_weights</span>
@@ -440,7 +507,7 @@
 <span class="n">portfolio_vs_market</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">equal_weight_portfolio</span><span class="p">,</span> <span class="n">market_proxy</span><span class="p">])</span>
 
 <span class="c1"># Calculate rolling correlation</span>
-<span class="n">rolling_corr</span> <span class="o">=</span> <span class="n">portfolio_vs_market</span><span class="o">.</span><span class="n">rolling_corr</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>  <span class="c1"># 1-year rolling</span>
+<span class="n">rolling_corr</span> <span class="o">=</span> <span class="n">portfolio_vs_market</span><span class="o">.</span><span class="n">rolling_corr</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>  <span class="c1"># 1-year rolling</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Rolling correlation calculated for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rolling_corr</span><span class="p">)</span><span class="si">}</span><span class="s2"> periods&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average correlation: </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -457,53 +524,85 @@
 </section>
 <section id="rebalancing-analysis">
 <h2>Rebalancing Analysis<a class="headerlink" href="#rebalancing-analysis" title="Link to this heading"></a></h2>
-<p>Analyze the impact of rebalancing frequency:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simulate different rebalancing frequencies</span>
-<span class="c1"># This is a simplified example - in practice you&#39;d implement full rebalancing logic</span>
+<p>Analyze the impact of rebalancing frequency using the realistic <cite>rebalanced_portfolio</cite> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare different rebalancing frequencies using realistic simulation</span>
+<span class="n">frequencies</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>  <span class="c1"># Daily, monthly, quarterly</span>
+<span class="n">frequency_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Daily&quot;</span><span class="p">,</span> <span class="s2">&quot;Monthly&quot;</span><span class="p">,</span> <span class="s2">&quot;Quarterly&quot;</span><span class="p">]</span>
 
-<span class="c1"># Monthly rebalancing</span>
-<span class="n">monthly_data</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="n">monthly_data</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
-<span class="n">monthly_portfolio_df</span> <span class="o">=</span> <span class="n">monthly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Monthly Rebalanced&quot;</span><span class="p">)</span>
-<span class="n">monthly_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">monthly_portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">rebalanced_portfolios</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="c1"># Quarterly rebalancing</span>
-<span class="n">quarterly_data</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BQE&quot;</span><span class="p">)</span>
-<span class="n">quarterly_data</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
-<span class="n">quarterly_portfolio_df</span> <span class="o">=</span> <span class="n">quarterly_data</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Quarterly Rebalanced&quot;</span><span class="p">)</span>
-<span class="n">quarterly_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">quarterly_portfolio_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">freq</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">frequency_names</span><span class="p">):</span>
+    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">rebalanced_portfolio</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> Rebalanced&quot;</span><span class="p">,</span>
+        <span class="n">frequency</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+        <span class="n">bal_weights</span><span class="o">=</span><span class="n">equal_weights</span>
+    <span class="p">)</span>
+    <span class="n">rebalanced_portfolios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">portfolio</span><span class="o">.</span><span class="n">constituents</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-<span class="c1"># Compare rebalancing frequencies</span>
-<span class="n">rebalancing_comparison</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span>
-    <span class="n">equal_weight_portfolio</span><span class="p">,</span>  <span class="c1"># Daily rebalanced (theoretical)</span>
-    <span class="n">monthly_portfolio</span><span class="p">,</span>
-    <span class="n">quarterly_portfolio</span>
-<span class="p">])</span>
+<span class="c1"># Compare with theoretical portfolio</span>
+<span class="n">theoretical_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Theoretical&quot;</span><span class="p">,</span>
+    <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span>
+<span class="p">)</span>
+<span class="n">theoretical_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">theoretical_portfolio_df</span><span class="p">)</span>
 
-<span class="n">rebal_metrics</span> <span class="o">=</span> <span class="n">rebalancing_comparison</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== REBALANCING FREQUENCY COMPARISON ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">rebal_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;geo_ret&#39;</span><span class="p">,</span> <span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="s1">&#39;ret_vol_ratio&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="c1"># Create comprehensive comparison</span>
+<span class="n">all_portfolios</span> <span class="o">=</span> <span class="p">[</span><span class="n">theoretical_portfolio</span><span class="p">]</span> <span class="o">+</span> <span class="n">rebalanced_portfolios</span>
+<span class="n">comparison_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">all_portfolios</span><span class="p">)</span>
+<span class="n">comparison_metrics</span> <span class="o">=</span> <span class="n">comparison_frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== REALISTIC REBALANCING COMPARISON ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strategy | Return | Volatility | Sharpe | Max DD&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">all_portfolios</span><span class="p">:</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Geometric return&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">vol</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Volatility&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">sharpe</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Return vol ratio&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">max_dd</span> <span class="o">=</span> <span class="n">comparison_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Max drawdown&#39;</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">ret</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2">% | </span><span class="si">{</span><span class="n">vol</span><span class="si">:</span><span class="s2">10.2f</span><span class="si">}</span><span class="s2">% | </span><span class="si">{</span><span class="n">sharpe</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">max_dd</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+
+<span class="c1"># Analyze transaction costs</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TRANSACTION COST ANALYSIS ===&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">freq</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">frequency_names</span><span class="p">):</span>
+    <span class="n">detailed_portfolio</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">rebalanced_portfolio</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> Detailed&quot;</span><span class="p">,</span>
+        <span class="n">frequency</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+        <span class="n">bal_weights</span><span class="o">=</span><span class="n">equal_weights</span><span class="p">,</span>
+        <span class="n">drop_extras</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># Get detailed trading data</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Count rebalancing events</span>
+    <span class="n">rebalancing_days</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">detailed_portfolio</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;buysell_qty&quot;</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
+            <span class="c1"># Count days with non-zero trading</span>
+            <span class="n">trading_days</span> <span class="o">=</span> <span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">rebalancing_days</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rebalancing_days</span><span class="p">,</span> <span class="n">trading_days</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">rebalancing_days</span><span class="si">}</span><span class="s2"> rebalancing events&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="stress-testing">
 <h2>Stress Testing<a class="headerlink" href="#stress-testing" title="Link to this heading"></a></h2>
 <p>Test portfolio performance during market stress:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Identify worst periods for the market</span>
-<span class="n">market_returns</span> <span class="o">=</span> <span class="n">market_proxy</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="n">market_returns_df</span> <span class="o">=</span> <span class="n">market_returns</span><span class="o">.</span><span class="n">tsdf</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Identify worst periods for the market (modifies original)</span>
+<span class="n">market_proxy</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="n">market_returns_df</span> <span class="o">=</span> <span class="n">market_proxy</span><span class="o">.</span><span class="n">tsdf</span>
 
 <span class="c1"># Find worst 5% of days</span>
 <span class="n">worst_days_threshold</span> <span class="o">=</span> <span class="n">market_returns_df</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">worst_days</span> <span class="o">=</span> <span class="n">market_returns_df</span><span class="p">[</span><span class="n">market_returns_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">worst_days_threshold</span><span class="p">]</span>
+<span class="n">worst_days</span> <span class="o">=</span> <span class="n">market_returns_df</span><span class="p">[</span><span class="n">market_returns_df</span> <span class="o">&lt;=</span> <span class="n">worst_days_threshold</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== STRESS TEST RESULTS ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market stress threshold: </span><span class="si">{</span><span class="n">worst_days_threshold</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of stress days: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">worst_days</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Portfolio performance during stress</span>
-<span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="n">portfolio_returns_df</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="o">.</span><span class="n">tsdf</span>
+<span class="c1"># Portfolio performance during stress (modifies original)</span>
+<span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
+<span class="n">portfolio_returns_df</span> <span class="o">=</span> <span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">tsdf</span>
 
 <span class="c1"># Align dates and calculate portfolio performance during market stress</span>
 <span class="n">stress_dates</span> <span class="o">=</span> <span class="n">worst_days</span><span class="o">.</span><span class="n">index</span>
@@ -523,7 +622,7 @@
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Analysis Period: </span><span class="si">{</span><span class="n">assets</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">assets</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of Assets: </span><span class="si">{</span><span class="n">assets</span><span class="o">.</span><span class="n">item_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Asset Universe: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Asset Universe: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">label</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- EQUAL WEIGHT PORTFOLIO PERFORMANCE ---&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Return: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -536,7 +635,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- PORTFOLIO CHARACTERISTICS ---&quot;</span><span class="p">)</span>
 <span class="n">avg_correlation</span> <span class="o">=</span> <span class="n">correlation_matrix</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average Asset Correlation: </span><span class="si">{</span><span class="n">avg_correlation</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Diversification Benefit: </span><span class="si">{</span><span class="p">(</span><span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Diversification Benefit: </span><span class="si">{</span><span class="p">(</span><span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Volatility&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Export results</span>
 <span class="n">portfolio_metrics</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s2">&quot;portfolio_analysis.xlsx&quot;</span><span class="p">)</span>
@@ -561,7 +660,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Captor Fund Management AB.</p>
+    <p>&#169; Copyright Captor Fund Management AB.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

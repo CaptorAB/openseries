@@ -18,8 +18,7 @@ Basic Setup
 
    # Create OpenTimeSeries
    apple = OpenTimeSeries.from_df(
-       dframe=data['Close'],
-       name="Apple Inc."
+       dframe=data['Close']
    )
 
    # Set descriptive label
@@ -64,19 +63,19 @@ Time Series Transformations
 
 .. code-block:: python
 
-   # Convert to returns
-   apple_returns = apple.value_to_ret()
-   print(f"Returns series length: {apple_returns.length}")
+   # Convert to returns (modifies original)
+   apple.value_to_ret()
+   print(f"Returns series length: {apple.length}")
 
-   # Create drawdown series
-   apple_drawdowns = apple.to_drawdown_series()
+   # Create drawdown series (modifies original)
+   apple.to_drawdown_series()
 
-   # Convert to log returns
-   apple_log_returns = apple.value_to_log()
+   # Convert to log returns (modifies original)
+   apple.value_to_log()
 
-   # Resample to monthly
-   apple_monthly = apple.resample_to_business_period_ends(freq="BME")
-   print(f"Monthly data points: {apple_monthly.length}")
+   # Resample to monthly (modifies original)
+   apple.resample_to_business_period_ends(freq="BME")
+   print(f"Monthly data points: {apple.length}")
 
 Rolling Analysis
 ----------------
@@ -89,10 +88,10 @@ Rolling Analysis
    print(f"Average 1Y volatility: {rolling_vol.mean().iloc[0]:.2%}")
 
    # Rolling returns (30-day)
-   rolling_returns = apple.rolling_return(window=30)
+   rolling_returns = apple.rolling_return(observations=30)
 
    # Rolling VaR
-   rolling_var = apple.rolling_var_down(window=252)
+   rolling_var = apple.rolling_var_down(observations=252)
 
 Visualization
 -------------
@@ -118,11 +117,9 @@ Calendar Analysis
 
    print("=== CALENDAR YEAR RETURNS ===")
    for year in years:
-       try:
-           year_return = apple.value_ret_calendar_period(year=year)
-           print(f"{year}: {year_return:.2%}")
-       except:
-           print(f"{year}: No data")
+       # This may fail if no data exists for the year
+       year_return = apple.value_ret_calendar_period(year=year)
+       print(f"{year}: {year_return:.2%}")
 
 Export Results
 --------------
@@ -191,7 +188,8 @@ Here's how to perform comprehensive single asset analysis using openseries metho
    for ticker_symbol in tickers:
        ticker = yf.Ticker(ticker_symbol)
        data = ticker.history(period="2y")
-       series = OpenTimeSeries.from_df(dframe=data['Close'], name=ticker_symbol)
+       series = OpenTimeSeries.from_df(dframe=data['Close'])
+       series.set_new_label(lvl_zero=ticker_symbol)
 
        print(f"\n{ticker_symbol}:")
        print(f"  Return: {series.geo_ret:.2%}")

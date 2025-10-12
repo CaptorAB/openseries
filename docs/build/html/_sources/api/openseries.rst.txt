@@ -1,23 +1,28 @@
 openseries package
 ==================
 
-.. automodule:: openseries
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
+The openseries package provides two main classes for financial time series analysis:
+
+- **OpenTimeSeries**: For single financial time series analysis
+- **OpenFrame**: For multi-asset portfolio analysis and comparison
+
+Both classes inherit from the private ``_CommonModel`` class, which in turn inherits from Pydantic's ``BaseModel``. This inheritance structure provides:
+
+- **Data validation** through Pydantic's validation system
+- **Common functionality** shared between both classes (risk metrics, plotting, data handling)
+- **Type safety** and consistent API design
+
+The ``_CommonModel`` class contains all the shared methods and properties that both ``OpenTimeSeries`` and ``OpenFrame`` use, including risk calculations, plotting capabilities, and data manipulation functions.
 
 Main Classes
 ------------
-
-The openseries package provides two main classes for financial time series analysis:
 
 .. autosummary::
    :toctree: generated/
    :nosignatures:
 
-   OpenTimeSeries
-   OpenFrame
+   openseries.OpenTimeSeries
+   openseries.OpenFrame
 
 Utility Functions
 -----------------
@@ -26,8 +31,8 @@ Utility Functions
    :toctree: generated/
    :nosignatures:
 
-   timeseries_chain
-   report_html
+   openseries.timeseries_chain
+   openseries.report_html
 
 Portfolio Tools
 ---------------
@@ -36,11 +41,11 @@ Portfolio Tools
    :toctree: generated/
    :nosignatures:
 
-   efficient_frontier
-   simulate_portfolios
-   constrain_optimized_portfolios
-   prepare_plot_data
-   sharpeplot
+   openseries.efficient_frontier
+   openseries.simulate_portfolios
+   openseries.constrain_optimized_portfolios
+   openseries.prepare_plot_data
+   openseries.sharpeplot
 
 Date Utilities
 --------------
@@ -49,12 +54,12 @@ Date Utilities
    :toctree: generated/
    :nosignatures:
 
-   date_fix
-   date_offset_foll
-   generate_calendar_date_range
-   get_previous_business_day_before_today
-   holiday_calendar
-   offset_business_days
+   openseries.date_fix
+   openseries.date_offset_foll
+   openseries.generate_calendar_date_range
+   openseries.get_previous_business_day_before_today
+   openseries.holiday_calendar
+   openseries.offset_business_days
 
 Simulation
 ----------
@@ -63,7 +68,7 @@ Simulation
    :toctree: generated/
    :nosignatures:
 
-   ReturnSimulation
+   openseries.ReturnSimulation
 
 Types and Enums
 ---------------
@@ -72,8 +77,8 @@ Types and Enums
    :toctree: generated/
    :nosignatures:
 
-   ValueType
-   Self
+   openseries.ValueType
+   openseries.Self
 
 Other Utilities
 ---------------
@@ -82,4 +87,4 @@ Other Utilities
    :toctree: generated/
    :nosignatures:
 
-   load_plotly_dict
+   openseries.load_plotly_dict

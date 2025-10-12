@@ -184,6 +184,8 @@ Analysis Methods
    :no-index:
 .. automethod:: OpenTimeSeries.calc_range
    :no-index:
+.. automethod:: OpenTimeSeries.outliers
+   :no-index:
 
 Financial Metrics Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~

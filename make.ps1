@@ -59,7 +59,6 @@ switch ($task) {
         # if pyenv exists, pin it; otherwise verify system Python
         if (Test-Path "$env:USERPROFILE\.pyenv") {
             pyenv global  $pythonVersion
-            pyenv local   $pythonVersion
             Write-Output "Set pyenv global & local to Python $pythonVersion."
         } else {
             $sysVer = (& python --version 2>&1) -replace 'Python ', ''
@@ -90,7 +89,7 @@ switch ($task) {
         if (Test-Path 'poetry.lock') {
             Remove-Item 'poetry.lock' -Force -ErrorAction SilentlyContinue
         }
-        poetry install --with dev
+        poetry install --with dev,docs
         poetry run pre-commit install
     }
 

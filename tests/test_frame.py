@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import warnings
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from inspect import getmembers, isfunction
 from itertools import product as iter_product
@@ -13,7 +14,7 @@ from re import escape
 from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, patch
 
-from numpy import array
+from numpy import array, nan
 from pydantic import BaseModel
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -35,12 +36,17 @@ from openseries.owntypes import (
     InitialValueZeroError,
     LabelsNotUniqueError,
     LiteralPortfolioWeightings,
+    MaxDiversificationNaNError,
+    MaxDiversificationNegativeWeightsError,
     MixedValuetypesError,
+    MultipleCurrenciesError,
     NoWeightsError,
     NumberOfItemsAndLabelsNotSameError,
+    PortfolioItemsNotWithinFrameError,
     RatioInputError,
     ResampleDataLossError,
     ValueType,
+    WeightsNotProvidedError,
 )
 from openseries.series import OpenTimeSeries
 
@@ -729,33 +735,28 @@ class TestOpenFrame(CommonTestCase):
         name = "portfolio"
         tolerance = 1e-10
 
-        # Test max_div strategy
         _ = mpframe.make_portfolio(name=name, weight_strat="max_div")
 
-        # Weights should sum to 1
         weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
         if abs(weight_sum - 1.0) > tolerance:
             msg = f"make_portfolio() max_div weights do not sum to 1.0: {weight_sum}"
             raise OpenFrameTestError(msg)
 
-        # Test target_risk strategy
-        _ = mpframe.make_portfolio(name=name, weight_strat="target_risk")
+        _ = mpframe.make_portfolio(name=name, weight_strat="min_vol_overweight")
 
-        # Weights should sum to 1
         weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
         if abs(weight_sum - 1.0) > tolerance:
             msg = (
-                f"make_portfolio() target_risk weights do not sum to 1.0: {weight_sum}"
+                "make_portfolio() min_vol_overweight "
+                f"weights do not sum to 1.0: {weight_sum}"
             )
             raise OpenFrameTestError(msg)
 
     def test_make_portfolio_max_div_singular_matrix(self: TestOpenFrame) -> None:
         """Test make_portfolio max_div strategy with singular correlation matrix."""
-        # Create perfectly correlated assets to make correlation matrix singular
         dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"]
         base_values = [100.0, 101.0, 99.0, 102.0, 101.0]
 
-        # Create three assets with identical returns (perfect correlation)
         ts1 = OpenTimeSeries.from_arrays(
             name="Asset1", dates=dates, values=base_values
         )
@@ -766,30 +767,123 @@ class TestOpenFrame(CommonTestCase):
             name="Asset3", dates=dates, values=base_values
         )
 
-        # Create frame with perfectly correlated assets
         singular_frame = OpenFrame(constituents=[ts1, ts2, ts3])
         singular_frame.to_cumret()
 
-        # Test max_div strategy with singular correlation matrix
-        _ = singular_frame.make_portfolio(name="Singular Test", weight_strat="max_div")
+        with pytest.raises(MaxDiversificationNaNError):
+            _ = singular_frame.make_portfolio(
+                name="Singular Test", weight_strat="max_div"
+            )
 
-        # Should fall back to equal weights when matrix is singular
-        expected_weight = 1.0 / 3.0
-        tolerance = 1e-10
+    def test_make_portfolio_max_div_nan_values(self: TestOpenFrame) -> None:
+        """Test make_portfolio max_div strategy with NaN in correlation matrix."""
+        dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"]
 
-        for weight in singular_frame.weights:  # type: ignore[union-attr]
-            if abs(weight - expected_weight) > tolerance:
-                msg = (
-                    f"max_div with singular matrix should use equal weights: "
-                    f"{singular_frame.weights}"
+        constant_values = [100.0, 100.0, 100.0, 100.0, 100.0]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Constant Asset", dates=dates, values=constant_values
+        )
+
+        normal_values = [100.0, 101.0, 99.0, 102.0, 101.0]
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Normal Asset", dates=dates, values=normal_values
+        )
+
+        nan_frame = OpenFrame(constituents=[ts1, ts2])
+        nan_frame.to_cumret()
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "invalid value encountered in divide")
+            with pytest.raises(MaxDiversificationNaNError):
+                _ = nan_frame.make_portfolio(name="NaN Test", weight_strat="max_div")
+
+    def test_make_portfolio_max_div_negative_weights(self: TestOpenFrame) -> None:
+        """Test make_portfolio max_div strategy with negative weights."""
+        dates = [
+            "2023-01-01",
+            "2023-01-02",
+            "2023-01-03",
+            "2023-01-04",
+            "2023-01-05",
+            "2023-01-06",
+        ]
+
+        asset1_values = [100.0, 102.0, 104.0, 106.0, 108.0, 110.0]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Upward Asset", dates=dates, values=asset1_values
+        )
+
+        asset2_values = [100.0, 98.0, 96.0, 94.0, 92.0, 90.0]
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Downward Asset", dates=dates, values=asset2_values
+        )
+
+        asset3_values = [100.0, 101.0, 99.0, 100.0, 101.0, 100.0]
+        ts3 = OpenTimeSeries.from_arrays(
+            name="Sideways Asset", dates=dates, values=asset3_values
+        )
+
+        negative_weights_frame = OpenFrame(constituents=[ts1, ts2, ts3])
+        negative_weights_frame.to_cumret()
+
+        with pytest.raises(MaxDiversificationNegativeWeightsError):
+            _ = negative_weights_frame.make_portfolio(
+                name="Negative Weights Test", weight_strat="max_div"
+            )
+
+    def test_make_portfolio_max_div_inverse_nan_and_final_nan(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test max_div with NaN in inverse correlation sum and final weights."""
+        dates = ["2023-01-01", "2023-01-02", "2023-01-03"]
+
+        asset1_values = [100.0, 100.0, 100.0]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Constant Asset", dates=dates, values=asset1_values
+        )
+
+        asset2_values = [100.0, 101.0, 99.0]
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Normal Asset", dates=dates, values=asset2_values
+        )
+
+        asset3_values = [200.0, 200.0, 200.0]
+        ts3 = OpenTimeSeries.from_arrays(
+            name="Another Constant", dates=dates, values=asset3_values
+        )
+
+        frame = OpenFrame(constituents=[ts1, ts2, ts3])
+        frame.to_cumret()
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "invalid value encountered in divide")
+            with pytest.raises(MaxDiversificationNaNError):
+                _ = frame.make_portfolio(
+                    name="Inverse NaN Test", weight_strat="max_div"
                 )
-                raise OpenFrameTestError(msg)
 
-        # Verify weights sum to 1
-        weight_sum = sum(singular_frame.weights)  # type: ignore[arg-type]
-        if abs(weight_sum - 1.0) > tolerance:
-            msg = f"max_div singular matrix weights do not sum to 1.0: {weight_sum}"
-            raise OpenFrameTestError(msg)
+    def test_make_portfolio_max_div_force_inverse_nan(self: TestOpenFrame) -> None:
+        """Test max_div strategy by forcing NaN in inverse correlation sum."""
+        dates = ["2023-01-01", "2023-01-02", "2023-01-03"]
+        ts1 = OpenTimeSeries.from_arrays(
+            name="Asset1", dates=dates, values=[100.0, 101.0, 99.0]
+        )
+        ts2 = OpenTimeSeries.from_arrays(
+            name="Asset2", dates=dates, values=[100.0, 98.0, 102.0]
+        )
+
+        frame = OpenFrame(constituents=[ts1, ts2])
+        frame.to_cumret()
+
+        with patch("numpy.linalg.inv") as mock_inv:
+            mock_inv.return_value.sum.return_value = array([nan, nan])
+            with pytest.raises(
+                MaxDiversificationNaNError,
+                match="inverse correlation matrix sum contains NaN",
+            ):
+                _ = frame.make_portfolio(
+                    name="Force Inverse NaN", weight_strat="max_div"
+                )
 
     def test_add_timeseries(self: TestOpenFrame) -> None:
         """Test add_timeseries method."""
@@ -1237,6 +1331,7 @@ class TestOpenFrame(CommonTestCase):
             "all_properties",
             "calc_range",
             "from_deepcopy",
+            "outliers",
             "plot_bars",
             "plot_series",
             "plot_histogram",
@@ -1280,6 +1375,7 @@ class TestOpenFrame(CommonTestCase):
             "multi_factor_linear_regression",
             "make_portfolio",
             "merge_series",
+            "rebalanced_portfolio",
             "relative",
             "rolling_corr",
             "rolling_beta",
@@ -4001,3 +4097,340 @@ class TestOpenFrame(CommonTestCase):
             match=r"Do not run worst_month on return series.",
         ):
             _ = mixframe.worst_month
+
+    def test_rebalanced_portfolio_basic(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio with basic functionality."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+        portfolio_name = "Test Portfolio"
+
+        result = test_frame.rebalanced_portfolio(
+            name=portfolio_name,
+            frequency=1,
+        )
+
+        msg = "rebalanced_portfolio should return OpenFrame"
+        if not isinstance(result, OpenFrame):
+            raise OpenFrameTestError(msg)
+
+        if len(result.constituents) != test_frame.item_count + 1:
+            msg = "rebalanced_portfolio should return all assets plus portfolio"
+            raise OpenFrameTestError(msg)
+
+        portfolio_series = result.constituents[-1]
+        if portfolio_series.label != portfolio_name:
+            msg = f"Portfolio name should be {portfolio_name}"
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_no_weights_error(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio raises error when no weights provided."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = None
+
+        with pytest.raises(
+            expected_exception=WeightsNotProvidedError,
+            match=r"Weights must be provided.",
+        ):
+            _ = test_frame.rebalanced_portfolio(
+                name="Test Portfolio",
+            )
+
+    def test_rebalanced_portfolio_equal_weights(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio with equal weights."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = None
+
+        result = test_frame.rebalanced_portfolio(
+            name="Equal Weight Portfolio",
+            equal_weights=True,
+        )
+
+        if len(result.constituents) != test_frame.item_count + 1:
+            msg = (
+                "rebalanced_portfolio with equal weights should return "
+                "all assets plus portfolio"
+            )
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_items_not_list_error(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test method rebalanced_portfolio raises error when items not list."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        with pytest.raises(
+            expected_exception=TypeError,
+            match=r"Items must be passed as list.",
+        ):
+            _ = test_frame.rebalanced_portfolio(
+                name="Test Portfolio",
+                items=cast("list[str]", "not_a_list"),
+            )
+
+    def test_rebalanced_portfolio_items_not_in_frame_error(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test method rebalanced_portfolio raises error when items not in frame."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        with pytest.raises(
+            expected_exception=PortfolioItemsNotWithinFrameError,
+            match=r"Items for portfolio must be within SeriesFrame items.",
+        ):
+            _ = test_frame.rebalanced_portfolio(
+                name="Test Portfolio",
+                items=["NonExistentAsset"],
+            )
+
+    def test_rebalanced_portfolio_subset_items(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio with subset of items."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+        subset_items = test_frame.columns_lvl_zero[:3]
+
+        result = test_frame.rebalanced_portfolio(
+            name="Subset Portfolio",
+            items=subset_items,
+            bal_weights=[0.33, 0.33, 0.34],
+        )
+
+        if len(result.constituents) != len(subset_items) + 1:
+            msg = (
+                "rebalanced_portfolio with subset should return "
+                "subset assets plus portfolio"
+            )
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_with_cash_index(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio with cash index."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        cash_series = OpenTimeSeries.from_df(
+            dframe=test_frame.tsdf.iloc[:, 0:1],
+            valuetype=ValueType.PRICE,
+            baseccy="USD",
+            local_ccy=True,
+        )
+        cash_series.set_new_label("Cash Index")
+
+        result = test_frame.rebalanced_portfolio(
+            name="Cash Portfolio",
+            cash_index=cash_series,
+        )
+
+        if len(result.constituents) != test_frame.item_count + 1:
+            msg = (
+                "rebalanced_portfolio with cash index should return "
+                "all assets plus portfolio"
+            )
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_multiple_currencies_error(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test method rebalanced_portfolio raises error with multiple currencies."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        # Create series with different currency
+        eur_series = OpenTimeSeries.from_df(
+            dframe=test_frame.tsdf.iloc[:, 0:1],
+            valuetype=ValueType.PRICE,
+            baseccy="EUR",
+            local_ccy=True,
+        )
+        eur_series.set_new_label("EUR Asset")
+
+        mixed_frame = OpenFrame(constituents=[test_frame.constituents[0], eur_series])
+        mixed_frame.weights = [0.5, 0.5]
+
+        with pytest.raises(
+            expected_exception=MultipleCurrenciesError,
+            match=r"Items for portfolio must be denominated in same currency.",
+        ):
+            _ = mixed_frame.rebalanced_portfolio(
+                name="Mixed Currency Portfolio",
+            )
+
+    def test_rebalanced_portfolio_frequency_rebalancing(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test method rebalanced_portfolio with different rebalancing frequency."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        result_freq_1 = test_frame.rebalanced_portfolio(
+            name="Freq 1 Portfolio",
+            frequency=1,
+        )
+
+        result_freq_5 = test_frame.rebalanced_portfolio(
+            name="Freq 5 Portfolio",
+            frequency=5,
+        )
+
+        if len(result_freq_1.constituents) != len(result_freq_5.constituents):
+            msg = "Different frequencies should return same number of constituents"
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_drop_extras_false(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio with drop_extras=False."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        result = test_frame.rebalanced_portfolio(
+            name="Full Details Portfolio",
+            drop_extras=False,
+        )
+
+        expected_columns = (test_frame.item_count + 2) * 6
+        if len(result.tsdf.columns) != expected_columns:
+            msg = (
+                f"drop_extras=False should return {expected_columns} columns, "
+                f"got {len(result.tsdf.columns)}"
+            )
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_with_nan_values(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio handles NaN values."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        test_frame.tsdf.iloc[5, 0] = float("nan")
+
+        result = test_frame.rebalanced_portfolio(
+            name="NaN Portfolio",
+        )
+
+        if len(result.constituents) != test_frame.item_count + 1:
+            msg = "rebalanced_portfolio should handle NaN values"
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_custom_weights(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio with custom bal_weights."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.1, 0.1, 0.1, 0.1, 0.6]
+
+        custom_weights = [0.3, 0.3, 0.2, 0.1, 0.1]
+
+        result = test_frame.rebalanced_portfolio(
+            name="Custom Weight Portfolio",
+            bal_weights=custom_weights,
+        )
+
+        if len(result.constituents) != test_frame.item_count + 1:
+            msg = (
+                "rebalanced_portfolio with custom weights should return "
+                "all assets plus portfolio"
+            )
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_empty_items_list(self: TestOpenFrame) -> None:
+        """Test method rebalanced_portfolio with empty items list."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        with pytest.raises(
+            expected_exception=PortfolioItemsNotWithinFrameError,
+            match=r"Items for portfolio must be within SeriesFrame items.",
+        ):
+            _ = test_frame.rebalanced_portfolio(
+                name="Empty Portfolio",
+                items=[],
+            )
+
+    def test_rebalanced_portfolio_weights_sum_not_one(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test method rebalanced_portfolio with weights that don't sum to 1."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+        invalid_weights = [0.1, 0.1, 0.1, 0.1, 0.1]
+
+        result = test_frame.rebalanced_portfolio(
+            name="Invalid Weight Portfolio",
+            bal_weights=invalid_weights,
+        )
+
+        if len(result.constituents) != test_frame.item_count + 1:
+            msg = "rebalanced_portfolio should handle non-normalized weights"
+            raise OpenFrameTestError(msg)
+
+    def test_rebalanced_portfolio_frequency_one_equals_make_portfolio(
+        self: TestOpenFrame,
+    ) -> None:
+        """Test that rebalanced_portfolio with frequency=1 equals make_portfolio."""
+        test_frame = self.randomframe.from_deepcopy()
+        test_frame.to_cumret()
+        test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+        portfolio_name = "Test Portfolio"
+
+        # Create portfolio using rebalanced_portfolio with frequency=1
+        rebalanced_result = test_frame.rebalanced_portfolio(
+            name=portfolio_name,
+            frequency=1,
+        )
+        rebalanced_series = OpenTimeSeries.from_df(
+            dframe=rebalanced_result.tsdf.iloc[:, -1:],  # Get the portfolio series
+            valuetype=ValueType.PRICE,
+            baseccy="USD",
+            local_ccy=True,
+        )
+
+        # Create portfolio using make_portfolio
+        make_portfolio_df = test_frame.make_portfolio(name=portfolio_name)
+        make_portfolio_series = OpenTimeSeries.from_df(
+            dframe=make_portfolio_df,
+            valuetype=ValueType.PRICE,
+            baseccy="USD",
+            local_ccy=True,
+        )
+
+        # Check that the data matches (allowing for reasonable differences)
+        # rebalanced_portfolio simulates actual trading while make_portfolio is
+        # theoretical. They should be close but not identical due to rebalancing
+        # mechanics
+        tolerance = 1e-2  # 1% tolerance
+        if not rebalanced_series.tsdf.equals(make_portfolio_series.tsdf):
+            # Check if they're close enough (within tolerance)
+            diff = abs(rebalanced_series.tsdf - make_portfolio_series.tsdf)
+            max_diff = diff.max().max()
+            if max_diff > tolerance:
+                msg = (
+                    f"rebalanced_portfolio with frequency=1 should be close to "
+                    f"make_portfolio. Max difference: {max_diff:.2e} "
+                    f"(tolerance: {tolerance})"
+                )
+                raise OpenFrameTestError(msg)
+
+        # Check that the series have the same length
+        if len(rebalanced_series.tsdf) != len(make_portfolio_series.tsdf):
+            msg = (
+                "rebalanced_portfolio and make_portfolio should have same length. "
+                f"Rebalanced: {len(rebalanced_series.tsdf)}, "
+                f"Make portfolio: {len(make_portfolio_series.tsdf)}"
+            )
+            raise OpenFrameTestError(msg)
+
+        # Check that the series have the same index
+        if not rebalanced_series.tsdf.index.equals(make_portfolio_series.tsdf.index):
+            msg = "rebalanced_portfolio and make_portfolio should have same index"
+            raise OpenFrameTestError(msg)

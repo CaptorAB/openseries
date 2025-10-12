@@ -1,6 +1,6 @@
 .ONESHELL:
 
-.PHONY: all install test lint builddocs servedocs clean cleandocs
+.PHONY: all install test lint clean builddocs servedocs cleandocs
 
 all: install
 
@@ -10,7 +10,7 @@ install:
 	venv/bin/python -m pip install --upgrade pip
 	venv/bin/pip install poetry==2.2.1
 	@. venv/bin/activate && \
-	poetry install --with dev && \
+	poetry install --with dev,docs && \
 	poetry run pre-commit install
 
 test:
@@ -20,6 +20,12 @@ lint:
 	poetry run ruff check . --fix --exit-non-zero-on-fix
 	poetry run ruff format
 	poetry run mypy .
+
+clean:
+	@. venv/bin/activate && \
+	pre-commit uninstall && \
+	rm -rf venv && \
+	rm -f poetry.lock
 
 builddocs:
 	@echo "📚 Building documentation..."
@@ -35,9 +41,3 @@ cleandocs:
 	@echo "🧹 Cleaning documentation artifacts..."
 	rm -rf docs/build/ docs/source/api/generated/
 	@echo "✅ Documentation artifacts cleaned"
-
-clean:
-	@. venv/bin/activate && \
-	pre-commit uninstall && \
-	rm -rf venv && \
-	rm -f poetry.lock

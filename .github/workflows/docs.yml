@@ -4,15 +4,17 @@ permissions:
   contents: read
 
 on:
+  # Only run on pushes to master for documentation-related changes
+  # This prevents running on every commit, only when docs actually change
   push:
     branches:
       - master
     paths:
       - 'docs/**'
-      - 'openseries/**'
-      - 'pyproject.toml'
       - '.readthedocs.yaml'
+  # Manual trigger for immediate updates (e.g., after releases)
   workflow_dispatch: {}
+  # Always run on PRs to check documentation changes
   pull_request:
     branches:
       - master
@@ -68,6 +70,8 @@ jobs:
         run: |
           . venv/bin/activate
           cd docs
+          # This will automatically update the changelog with the latest GitHub release
+          # The update_changelog_github.py script fetches the latest release info
           make builddocs
 
       - name: Check for documentation warnings
@@ -137,6 +141,8 @@ jobs:
         run: |
           . venv/bin/activate
           cd docs
+          # This will automatically update the changelog with the latest GitHub release
+          # The update_changelog_github.py script fetches the latest release info
           make builddocs
           echo "Documentation built successfully"
 
