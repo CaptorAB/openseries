@@ -53,7 +53,7 @@ Let's start with a simple example using simulated data:
 
     for name, params in zip(asset_names, asset_params, strict=False):
         seriesim = ReturnSimulation.from_lognormal(
-            number_of_sims=1,  # Only one simulation per asset
+            number_of_sims=1,
             trading_days=2520,
             mean_annual_return=params["mean_annual_return"],
             mean_annual_vol=params["mean_annual_vol"],
