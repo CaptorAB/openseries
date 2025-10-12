@@ -222,39 +222,34 @@ class TestOpenFrame(CommonTestCase):
 
     def test_outliers_opentimeseries(self: TestOpenFrame) -> None:
         """Test outliers method with OpenTimeSeries."""
-        # Create test data with known outliers
         dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"]
-        values = [100.0, 101.0, 150.0, 99.0, 50.0]  # 150.0 and 50.0 are outliers
+        values = [100.0, 101.0, 150.0, 99.0, 50.0]
 
         series = OpenTimeSeries.from_arrays(
             dates=dates, values=values, name="Test Series"
         )
 
-        # Test with default threshold (3.0)
         outliers = series.outliers()
         msg = "outliers() should return a Series for OpenTimeSeries"
         if not isinstance(outliers, Series):
             raise OpenFrameTestError(msg)
 
-        # Test with lower threshold to catch more outliers
         outliers_low_threshold = series.outliers(threshold=1.0)
         msg = "Lower threshold should catch more outliers"
         if len(outliers_low_threshold) <= len(outliers):
             raise OpenFrameTestError(msg)
 
-        # Test with date range
         outliers_subset = series.outliers(
             threshold=1.0, from_date=dt.date(2023, 1, 1), to_date=dt.date(2023, 1, 3)
         )
         msg = "Date range should limit outliers to specified period"
-        max_expected_outliers = 3  # Should not exceed the date range
+        max_expected_outliers = 3
         if len(outliers_subset) > max_expected_outliers:
             raise OpenFrameTestError(msg)
 
-        # Test with months_from_last (use a smaller offset for short test data)
         outliers_recent = series.outliers(
             threshold=1.0,
-            months_from_last=0,  # Use 0 to avoid going before first date
+            months_from_last=0,
         )
         msg = "months_from_last should limit outliers to recent period"
         if not isinstance(outliers_recent, Series):
@@ -262,22 +257,18 @@ class TestOpenFrame(CommonTestCase):
 
     def test_outliers_openframe(self: TestOpenFrame) -> None:
         """Test outliers method with OpenFrame."""
-        # Test with the random frame
         frame = self.randomframe.from_deepcopy()
 
-        # Test with default threshold
         outliers = frame.outliers()
         msg = "outliers() should return a DataFrame for OpenFrame"
         if not isinstance(outliers, DataFrame):
             raise OpenFrameTestError(msg)
 
-        # Test with lower threshold
         outliers_low_threshold = frame.outliers(threshold=1.0)
         msg = "Lower threshold should potentially catch more outliers"
         if not isinstance(outliers_low_threshold, DataFrame):
             raise OpenFrameTestError(msg)
 
-        # Test with date range
         outliers_subset = frame.outliers(
             threshold=1.0, from_date=dt.date(2015, 1, 1), to_date=dt.date(2015, 12, 31)
         )
@@ -285,7 +276,6 @@ class TestOpenFrame(CommonTestCase):
         if not isinstance(outliers_subset, DataFrame):
             raise OpenFrameTestError(msg)
 
-        # Test with months_from_last
         outliers_recent = frame.outliers(threshold=1.0, months_from_last=12)
         msg = "months_from_last should limit outliers to recent period"
         if not isinstance(outliers_recent, DataFrame):
@@ -293,20 +283,18 @@ class TestOpenFrame(CommonTestCase):
 
     def test_outliers_edge_cases(self: TestOpenFrame) -> None:
         """Test outliers method edge cases."""
-        # Test with no outliers (use data with very small variance)
         dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04"]
-        values = [100.0, 100.1, 99.9, 100.05]  # Very small variance, no outliers
+        values = [100.0, 100.1, 99.9, 100.05]
 
         series_no_outliers = OpenTimeSeries.from_arrays(
             dates=dates, values=values, name="No Outliers"
         )
 
-        outliers = series_no_outliers.outliers(threshold=2.0)  # Higher threshold
+        outliers = series_no_outliers.outliers(threshold=2.0)
         msg = "Series with no outliers should return empty Series"
         if not isinstance(outliers, Series) or len(outliers) != 0:
             raise OpenFrameTestError(msg)
 
-        # Test with very high threshold
         outliers_high_threshold = series_no_outliers.outliers(threshold=10.0)
         msg = "Very high threshold should return empty Series"
         if (
@@ -315,7 +303,6 @@ class TestOpenFrame(CommonTestCase):
         ):
             raise OpenFrameTestError(msg)
 
-        # Test with single data point
         series_single = OpenTimeSeries.from_arrays(
             dates=["2023-01-01"], values=[100.0], name="Single Point"
         )
@@ -325,7 +312,6 @@ class TestOpenFrame(CommonTestCase):
         if not isinstance(outliers_single, Series) or len(outliers_single) != 0:
             raise OpenFrameTestError(msg)
 
-        # Test with NaN values
         values_with_nan = [100.0, np.nan, 150.0, 99.0]
         series_with_nan = OpenTimeSeries.from_arrays(
             dates=dates, values=values_with_nan, name="With NaN"
