@@ -9,15 +9,39 @@
 
 import sys
 from pathlib import Path
+import re
 
 # Add the project root to the path
 sys.path.insert(0, str(Path("../../").resolve()))
 
+
+# Read version from pyproject.toml
+def get_version_from_pyproject():
+    """Extract version from pyproject.toml using regex (Python 3.10+ compatible)."""
+    # Get the absolute path to pyproject.toml
+    current_dir = Path(__file__).parent
+    pyproject_path = current_dir.parent.parent / "pyproject.toml"
+
+    with pyproject_path.open(mode="r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Look for version = "x.y.z" pattern
+    match = re.search(r'version\s*=\s*"([^"]+)"', content)
+    if match:
+        return match.group(1)
+
+    # Fail explicitly if version cannot be parsed
+    raise RuntimeError(
+        f"Could not parse version from {pyproject_path}. "
+        "Expected pattern: version = 'x.y.z'"
+    )
+
+
 project = "openseries"
-copyright = "2025, Captor Fund Management AB"  # noqa: A001
+copyright = "Captor Fund Management AB"
 author = "Martin Karrin"
-release = "2.0.0"
-version = "2.0.0"
+release = get_version_from_pyproject()
+version = get_version_from_pyproject()
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -143,3 +167,6 @@ myst_enable_extensions = [
     "substitution",
     "tasklist",
 ]
+
+# Custom substitutions for dynamic content
+# Using GitHub API approach instead of Sphinx substitutions

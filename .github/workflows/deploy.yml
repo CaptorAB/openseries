@@ -224,3 +224,23 @@ jobs:
           poetry build
           poetry check
           poetry publish
+
+  trigger_docs_update:
+    needs: publish_pypi
+    if: ${{ needs.publish_pypi.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Trigger documentation update
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            // Trigger the docs workflow after successful release
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'docs.yml',
+              ref: 'master'
+            });
+            console.log('Documentation update workflow triggered');

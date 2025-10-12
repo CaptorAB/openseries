@@ -1,5 +1,7 @@
 """openseries.openseries.__init__.py."""
 
+__version__ = "2.0.1"
+
 from .datefixer import (
     date_fix,
     date_offset_foll,
