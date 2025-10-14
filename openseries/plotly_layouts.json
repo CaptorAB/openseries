@@ -23,23 +23,19 @@
   "layout": {
     "autosize": true,
     "colorway": [
-      "#2186c5",
-      "#43a04c",
-      "#f44336",
-      "#f8a031",
-      "#ba46b8",
-      "#009688",
-      "#ff5722",
-      "#ec407a",
-      "#c0ca33",
-      "#795548",
-      "#e5878a",
-      "#9e9e9e"
+      "#66725B",
+      "#D0C0B1",
+      "#253551",
+      "#8D929D",
+      "#611A51",
+      "#402D16",
+      "#5D6C85",
+      "#404752"
     ],
     "dragmode": false,
     "font": {
-      "color": "#01579B",
-      "family": "Open Sans",
+      "color": "#253551",
+      "family": "Poppins",
       "size": 14
     },
     "legend": {
