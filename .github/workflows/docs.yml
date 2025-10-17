@@ -71,7 +71,6 @@ jobs:
           . venv/bin/activate
           cd docs
           # This will automatically update the changelog with the latest GitHub release
-          # The update_changelog_github.py script fetches the latest release info
           make builddocs
 
       - name: Check for documentation warnings
@@ -141,8 +140,6 @@ jobs:
         run: |
           . venv/bin/activate
           cd docs
-          # This will automatically update the changelog with the latest GitHub release
-          # The update_changelog_github.py script fetches the latest release info
           make builddocs
           echo "Documentation built successfully"
 

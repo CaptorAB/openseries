@@ -186,15 +186,18 @@ When contributing to documentation:
 ### Common Build Issues
 
 **Import errors during build:**
+
 - Ensure all dependencies are installed
 - Check that the openseries package is importable
 - Verify Python path configuration in `conf.py`
 
 **Missing modules:**
+
 - Install missing dependencies: `pip install -r requirements.txt`
 - For ReadTheDocs builds, check `.readthedocs.yaml` configuration
 
 **Broken links:**
+
 - Run `make linkcheck` to identify broken links
 - Update or remove broken external links
 - Fix internal cross-references

@@ -24,7 +24,6 @@ clean-build:
 	rm -rf $(BUILDDIR)/*
 
 builddocs html:
-	@python update_changelog_github.py
 	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" $(SPHINXOPTS) $(O)
 
 livehtml servedocs:
