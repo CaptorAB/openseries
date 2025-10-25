@@ -1300,8 +1300,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         if fitted_series:
             self.tsdf[y_label, x_label] = model.predict(x_value)
         return {
-            "coefficient": model.coef_[0],
-            "intercept": model.intercept_,
+            "coefficient": float(model.coef_[0]),
+            "intercept": float(model.intercept_),
             "rsquared": model.score(x_value, y_value),
         }
 

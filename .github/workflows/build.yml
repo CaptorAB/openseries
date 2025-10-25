@@ -170,14 +170,7 @@ jobs:
         continue-on-error: true
         run: |
           . venv/bin/activate
-          PYTHONPATH=${PWD} poetry run pytest \
-            -n auto \
-            --dist loadscope \
-            --cov=openseries \
-            --cov-report=term \
-            --cov-report=term-missing \
-            --cov-report=xml \
-            --junitxml=junit.xml
+          PYTHONPATH=${PWD} poetry run pytest
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}
@@ -271,7 +264,7 @@ jobs:
         continue-on-error: true
         run: |
           . venv/bin/activate
-          PYTHONPATH=${PWD} poetry run pytest --cov=openseries --dist loadscope -n auto
+          PYTHONPATH=${PWD} poetry run pytest
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}

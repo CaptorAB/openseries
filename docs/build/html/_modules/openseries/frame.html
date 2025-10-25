@@ -1468,8 +1468,8 @@
         <span class="k">if</span> <span class="n">fitted_series</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="p">[</span><span class="n">y_label</span><span class="p">,</span> <span class="n">x_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;coefficient&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="s2">&quot;intercept&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">,</span>
+            <span class="s2">&quot;coefficient&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="s2">&quot;intercept&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">),</span>
             <span class="s2">&quot;rsquared&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">x_value</span><span class="p">,</span> <span class="n">y_value</span><span class="p">),</span>
         <span class="p">}</span></div>
 

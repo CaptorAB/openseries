@@ -76,7 +76,6 @@ docs/
 │   ├── _static/                  # Static files (CSS, images)
 │   └── _templates/               # Custom templates
 ├── build/                        # Built documentation (generated)
-├── requirements.txt              # Documentation dependencies
 ├── Makefile                      # Build commands (Unix)
 └── make.bat                      # Build commands (Windows)
 ```
@@ -193,8 +192,8 @@ When contributing to documentation:
 
 **Missing modules:**
 
-- Install missing dependencies: `pip install -r requirements.txt`
-- For ReadTheDocs builds, check `.readthedocs.yaml` configuration
+- Install missing dependencies: `poetry install --with docs`
+- For ReadTheDocs builds, dependencies are managed through Poetry in `pyproject.toml`
 
 **Broken links:**
 

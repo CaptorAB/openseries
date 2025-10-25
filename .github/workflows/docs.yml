@@ -70,7 +70,6 @@ jobs:
         run: |
           . venv/bin/activate
           cd docs
-          # This will automatically update the changelog with the latest GitHub release
           make builddocs
 
       - name: Check for documentation warnings
