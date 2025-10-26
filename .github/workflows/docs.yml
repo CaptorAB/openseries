@@ -14,19 +14,11 @@ on:
       - '.readthedocs.yaml'
   # Manual trigger for immediate updates (e.g., after releases)
   workflow_dispatch: {}
-  # Always run on PRs to check documentation changes
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'docs/**'
-      - 'openseries/**'
-      - 'pyproject.toml'
-      - '.readthedocs.yaml'
 
 jobs:
   docs:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
     defaults:
       run:
         shell: bash
@@ -86,7 +78,6 @@ jobs:
   docs_site:
     runs-on: ubuntu-latest
     needs: docs
-    if: github.ref == 'refs/heads/master'
     permissions:
       contents: read
       pages: write
