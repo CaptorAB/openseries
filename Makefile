@@ -29,11 +29,13 @@ clean:
 
 builddocs:
 	@echo "📚 Building documentation..."
+	@. venv/bin/activate && \
 	cd docs && poetry run sphinx-build -b html source build/html
 	@echo "✅ Documentation built in docs/build/html/"
 
 servedocs:
 	@echo "📚 Starting live documentation server..."
+	@. venv/bin/activate && \
 	cd docs && poetry run sphinx-autobuild source build/html --host 127.0.0.1 --port 8000 --re-ignore ".*\..*"
 	@echo "🌐 Documentation server running at http://127.0.0.1:8000"
 
