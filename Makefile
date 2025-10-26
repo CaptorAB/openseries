@@ -1,6 +1,6 @@
 .ONESHELL:
 
-.PHONY: all install test lint clean builddocs servedocs cleandocs
+.PHONY: all install test lint clean builddocs servedocs cleandocs deploy_docs
 
 all: install
 
@@ -41,3 +41,16 @@ cleandocs:
 	@echo "🧹 Cleaning documentation artifacts..."
 	rm -rf docs/build/ docs/source/api/generated/
 	@echo "✅ Documentation artifacts cleaned"
+
+deploy_docs: builddocs
+	@echo "🚀 Deploying documentation to gh-pages branch..."
+	@git checkout gh-pages 2>/dev/null || git checkout -b gh-pages
+	@rm -rf *
+	@cp -r docs/build/html/* .
+	@git add .
+	@git commit -m "Update docs from $$(git log -1 --format='%h %s' --abbrev=10)" || echo "No changes to commit"
+	@git push origin gh-pages
+	@echo "✅ Documentation deployed to gh-pages"
+	@echo "Switching back to previous branch..."
+	@git checkout -
+	@echo "Done! Your docs should be live at: https://captorab.github.io/openseries/"
