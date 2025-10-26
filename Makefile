@@ -29,13 +29,11 @@ clean:
 
 builddocs:
 	@echo "📚 Building documentation..."
-	@. venv/bin/activate && \
 	cd docs && poetry run sphinx-build -b html source build/html
 	@echo "✅ Documentation built in docs/build/html/"
 
 servedocs:
 	@echo "📚 Starting live documentation server..."
-	@. venv/bin/activate && \
 	cd docs && poetry run sphinx-autobuild source build/html --host 127.0.0.1 --port 8000 --re-ignore ".*\..*"
 	@echo "🌐 Documentation server running at http://127.0.0.1:8000"
 
@@ -43,19 +41,3 @@ cleandocs:
 	@echo "🧹 Cleaning documentation artifacts..."
 	rm -rf docs/build/ docs/source/api/generated/
 	@echo "✅ Documentation artifacts cleaned"
-
-deploy_docs: builddocs
-	@echo "🚀 Deploying documentation to gh-pages branch..."
-	@mkdir -p /tmp/openseries_docs
-	@cp -r docs/build/html/* /tmp/openseries_docs/
-	@git checkout gh-pages 2>/dev/null || git checkout -b gh-pages
-	@rm -rf *
-	@cp -r /tmp/openseries_docs/* .
-	@git add .
-	@git commit -m "Update docs from $$(git log -1 --format='%h %s' --abbrev=10)" || echo "No changes to commit"
-	@git push origin gh-pages
-	@echo "✅ Documentation deployed to gh-pages"
-	@echo "Switching back to previous branch..."
-	@git checkout -
-	@rm -rf /tmp/openseries_docs
-	@echo "Done! Your docs should be live at: https://captorab.github.io/openseries/"
