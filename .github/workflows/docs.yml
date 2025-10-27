@@ -17,20 +17,17 @@ on:
 
 jobs:
   build-and-deploy:
+    defaults:
+      run:
+        shell: bash
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/master'
     permissions:
       contents: read
       pages: write
       id-token: write
-
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    defaults:
-      run:
-        shell: bash
 
     steps:
       - name: Check out GitHub repository
