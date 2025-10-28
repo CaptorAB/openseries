@@ -530,7 +530,7 @@ class OpenTimeSeries(_CommonModel[float]):
         ----------
         days_in_year: int, default 365
             Calendar days per year used as divisor
-        divider: float, default 100.0
+        divider: float, default 1.0
             Convenience divider for when the 1-day rate is not scaled correctly
 
         Returns:

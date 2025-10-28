@@ -1,4 +1,4 @@
-"""openseries.openseries.__init__.py."""
+"""openseries package initialization."""
 
 __version__ = "2.0.2"
 

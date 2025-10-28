@@ -1,4 +1,4 @@
-"""Functions caclculating risk measures."""
+"""Functions calculating risk measures."""
 
 from __future__ import annotations
 
