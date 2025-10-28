@@ -184,7 +184,7 @@ class OpenTimeSeries(_CommonModel[float]):
         *,
         local_ccy: bool = True,
     ) -> Self:
-        """Create series from a Pandas DataFrame or Series.
+        """Create series from a list of dates and a list of values.
 
         Parameters
         ----------
