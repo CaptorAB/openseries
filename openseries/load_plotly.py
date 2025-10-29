@@ -21,16 +21,11 @@ __all__ = ["load_plotly_dict"]
 def _check_remote_file_existence(url: str) -> bool:
     """Check if remote file exists.
 
-    Parameters
-    ----------
-    url: str
-        Path to remote file
+    Args:
+        url: Path to remote file.
 
     Returns:
-    --------
-    bool
-        True if url is valid and False otherwise
-
+        True if url is valid and False otherwise.
     """
     ok_code = 200
 
@@ -49,16 +44,11 @@ def load_plotly_dict(
 ) -> tuple[PlotlyLayoutType, CaptorLogoType]:
     """Load Plotly defaults.
 
-    Parameters
-    ----------
-    responsive: bool
-        Flag whether to load as responsive
+    Args:
+        responsive: Flag whether to load as responsive. Defaults to True.
 
     Returns:
-    --------
-    tuple[PlotlyLayoutType, CaptorLogoType]
-        A dictionary with the Plotly config and layout template
-
+        A dictionary with the Plotly config and layout template.
     """
     project_root = Path(__file__).parent.parent
     layoutfile = project_root.joinpath("openseries").joinpath("plotly_layouts.json")
