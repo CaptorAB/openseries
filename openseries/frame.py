@@ -774,14 +774,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 f"not truncated to same start dates.\n"
                 f"{self.tsdf.head()}"
             )
-            logger.warning(msg=msg)
+            logger.warning(msg)
         if len(set(self.last_indices)) != 1:
             msg = (
                 f"One or more constituents still "
                 f"not truncated to same end dates.\n"
                 f"{self.tsdf.tail()}"
             )
-            logger.warning(msg=msg)
+            logger.warning(msg)
         return self
 
     def relative(

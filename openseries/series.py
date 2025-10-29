@@ -95,7 +95,7 @@ class OpenTimeSeries(_CommonModel[float]):
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
+        (List of) markets code(s) supported by exchange_calendars
     isin: str, optional
         ISO 6166 identifier code of the associated instrument
     label: str, optional
@@ -279,7 +279,7 @@ class OpenTimeSeries(_CommonModel[float]):
                 ):
                     label = "Series"
                     msg = f"Label missing. Adding: {label}"
-                    logger.warning(msg=msg)
+                    logger.warning(msg)
                 else:
                     label = dframe.columns.get_level_values(0).to_numpy()[column_nmbr]
                 if _check_if_none(
@@ -287,7 +287,7 @@ class OpenTimeSeries(_CommonModel[float]):
                 ):
                     valuetype = ValueType.PRICE
                     msg = f"valuetype missing. Adding: {valuetype.value}"
-                    logger.warning(msg=msg)
+                    logger.warning(msg)
                 else:
                     valuetype = dframe.columns.get_level_values(1).to_numpy()[
                         column_nmbr

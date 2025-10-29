@@ -315,7 +315,7 @@ def report_html(
                 cru: Series[float] | Series[str] = crm.capture_ratio_func(ratio="both")
             except ZeroDivisionError as exc:  # pragma: no cover
                 msg = f"Capture ratio calculation error: {exc!s}"  # pragma: no cover
-                logger.warning(msg=msg)  # pragma: no cover
+                logger.warning(msg)  # pragma: no cover
                 cru = cru_save  # pragma: no cover
         if cru.hasnans:
             cru = cru_save
@@ -461,7 +461,7 @@ def report_html(
             auto_open=auto_open,
             auto_play=False,
             link_text="",
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             config=fig["config"],
         )
@@ -473,7 +473,7 @@ def report_html(
             div_id=div_id,
             auto_play=False,
             full_html=False,
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             config=fig["config"],
         )
 

@@ -60,7 +60,7 @@ def market_holidays(
     endyear: int
         Last year (inclusive) to consider.
     markets: str | list[str]
-        String or list of market codes supported by pandas_market_calendars.
+        String or list of market codes supported by exchange_calendars.
 
     Returns:
     --------
@@ -74,7 +74,7 @@ def market_holidays(
     if not all(m in supported for m in market_list):
         msg = (
             "Argument markets must be a string market code or a list of market "
-            "codes supported by pandas_market_calendars."
+            "codes supported by exchange_calendars."
         )
         raise MarketsNotStringNorListStrError(msg)
 
@@ -110,7 +110,7 @@ def holiday_calendar(
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
+        (List of) markets code(s) supported by exchange_calendars
     custom_holidays: list[str] | str, optional
         Argument where missing holidays can be added
 
@@ -216,7 +216,7 @@ def date_offset_foll(
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
+        (List of) markets code(s) supported by exchange_calendars
     custom_holidays: list[str] | str, optional
         Argument where missing holidays can be added
     adjust: bool, default: False
@@ -268,7 +268,7 @@ def get_previous_business_day_before_today(
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
+        (List of) markets code(s) supported by exchange_calendars
     custom_holidays: list[str] | str, optional
         Argument where missing holidays can be added
 
@@ -314,7 +314,7 @@ def offset_business_days(
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
+        (List of) markets code(s) supported by exchange_calendars
     custom_holidays: list[str] | str, optional
         Argument where missing holidays can be added
 
@@ -453,7 +453,7 @@ def generate_calendar_date_range(
         ]
 
     msg = (
-        "Provide one of start or end date, but not both. "
+        "Provide exactly one of start or end date. "
         "Date range is inferred from number of trading days."
     )
     raise BothStartAndEndError(msg)

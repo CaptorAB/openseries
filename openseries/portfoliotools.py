@@ -591,7 +591,7 @@ def sharpeplot(
             auto_open=auto_open,
             auto_play=False,
             link_text="",
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             config=fig["config"],
             output_type=output_type,
         )
@@ -602,7 +602,7 @@ def sharpeplot(
             fig=figure,
             config=fig["config"],
             auto_play=False,
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             full_html=False,
             div_id=div_id,
         )

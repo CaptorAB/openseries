@@ -501,7 +501,7 @@ class ReturnSimulation(BaseModel):
         countries: CountriesType, default: "SE"
             (List of) country code(s) according to ISO 3166-1 alpha-2
         markets: list[str] | str, optional
-            (List of) markets code(s) according to pandas-market-calendars
+            (List of) markets code(s) supported by exchange_calendars
 
         Returns:
         --------

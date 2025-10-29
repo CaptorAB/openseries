@@ -764,7 +764,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         countries: CountriesType, optional
             (List of) country code(s) according to ISO 3166-1 alpha-2
         markets: list[str] | str, optional
-            (List of) markets code(s) according to pandas-market-calendars
+            (List of) markets code(s) supported by exchange_calendars
         custom_holidays: list[str] | str, optional
             Argument where missing holidays can be added
         method: LiteralPandasReindexMethod, default: "nearest"
@@ -1082,7 +1082,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         plotfile: Path,
         filename: str,
         *,
-        include_plotlyjs_bool: bool,
+        include_plotlyjs_bool: LiteralPlotlyJSlib,
         auto_open: bool,
     ) -> str:
         """Write a file or return inline HTML string from a Plotly Figure."""
@@ -1197,7 +1197,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         string_output = self._emit_output(
             figure=figure,
             fig_config=fig["config"],
-            include_plotlyjs_bool=cast("bool", include_plotlyjs),
+            include_plotlyjs_bool=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
@@ -1309,7 +1309,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         string_output = self._emit_output(
             figure=figure,
             fig_config=fig["config"],
-            include_plotlyjs_bool=cast("bool", include_plotlyjs),
+            include_plotlyjs_bool=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
@@ -1455,7 +1455,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         string_output = self._emit_output(
             figure=figure,
             fig_config=fig_dict["config"],
-            include_plotlyjs_bool=cast("bool", include_plotlyjs),
+            include_plotlyjs_bool=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
