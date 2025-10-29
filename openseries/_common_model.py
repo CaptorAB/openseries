@@ -94,14 +94,14 @@ def _get_date_range_and_factor(
 
     Parameters
     ----------
-    months_from_last : int, optional
+    months_from_last: int, optional
         Number of months offset as positive integer. Overrides use of from_date
         and to_date
-    from_date : datetime.date, optional
+    from_date: datetime.date, optional
         Specific from date
-    to_date : datetime.date, optional
+    to_date: datetime.date, optional
         Specific to date
-    periods_in_a_year_fixed : DaysInYearType, optional
+    periods_in_a_year_fixed: DaysInYearType, optional
         Allows locking the periods-in-a-year to simplify test cases and
         comparisons
 
@@ -141,11 +141,11 @@ def _get_base_column_data(
 
     Parameters
     ----------
-    base_column : tuple[str, ValueType] | int
+    base_column: tuple[str, ValueType] | int
         Column reference
-    earlier : dt.date
+    earlier: dt.date
         Start date
-    later : dt.date
+    later: dt.date
         End date
 
     Returns:
@@ -182,13 +182,13 @@ def _calculate_time_factor(
 
     Parameters
     ----------
-    data : Series[float]
+    data: Series[float]
         Data series for counting observations
-    earlier : dt.date
+    earlier: dt.date
         Start date
-    later : dt.date
+    later: dt.date
         End date
-    periods_in_a_year_fixed : DaysInYearType, optional
+    periods_in_a_year_fixed: DaysInYearType, optional
         Fixed periods in year
 
     Returns:
@@ -1475,14 +1475,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1520,14 +1520,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns:
@@ -1569,16 +1569,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         ----------
         level: float, default: 0.95
             The sought VaR level
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -1631,16 +1631,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             A minimum adjustment factor
         max_leverage_local: float, default: 99999.0
             A maximum adjustment factor
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -1698,16 +1698,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             A minimum adjustment factor
         max_leverage_local: float, default: 99999.0
             A maximum adjustment factor
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         drift_adjust: bool, default: False
@@ -1793,12 +1793,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         ----------
         level: float, default: 0.95
             The sought CVaR level
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -1846,18 +1846,18 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        min_accepted_return : float, optional
+        min_accepted_return: float, optional
             The annualized Minimum Accepted Return (MAR)
         order: int, default: 2
             Order of partial moment
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1927,12 +1927,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -1977,12 +1977,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -2021,12 +2021,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -2070,12 +2070,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
         min_periods: int, default: 1
             Smallest number of observations to use to find the maximum drawdown
@@ -2111,12 +2111,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -2171,16 +2171,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        riskfree_rate : float
+        riskfree_rate: float
             The return of the zero volatility asset used to calculate Sharpe ratio
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -2232,20 +2232,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        riskfree_rate : float
+        riskfree_rate: float
             The return of the zero volatility asset
-        min_accepted_return : float, optional
+        min_accepted_return: float, optional
             The annualized Minimum Accepted Return (MAR)
         order: int, default: 2
             Order of partial moment
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -2295,14 +2295,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        min_accepted_return : float, optional
+        min_accepted_return: float, optional
             The annualized Minimum Accepted Return (MAR)
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -2338,12 +2338,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -2382,9 +2382,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        year : int
+        year: int
             Calendar year of the period to calculate.
-        month : int, optional
+        month: int, optional
             Calendar month of the period to calculate.
 
         Returns:
@@ -2423,12 +2423,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         ----------
         level: float, default: 0.95
             The sought VaR level
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
         interpolation: LiteralQuantileInterp, default: "lower"
             Type of interpolation in Pandas.DataFrame.quantile() function.
@@ -2467,12 +2467,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         ----------
         observations: int, default: 1
             Number of observations over which to measure the worst outcome
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -2511,12 +2511,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Parameters
         ----------
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:
@@ -2661,7 +2661,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             Position as integer of column to calculate
         observations: int, default: 21
             Number of observations in the overlapping window.
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
         dlta_degr_freedms: int, default: 1
@@ -2715,12 +2715,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         threshold: float, default: 3.0
             Z-score threshold for outlier detection. Values with absolute
             z-score > threshold are considered outliers.
-        months_from_last : int, optional
+        months_from_last: int, optional
             Number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
 
         Returns:

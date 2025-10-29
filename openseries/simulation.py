@@ -124,15 +124,15 @@ class ReturnSimulation(BaseModel):
 
     Parameters
     ----------
-    number_of_sims : PositiveInt
+    number_of_sims: PositiveInt
         Number of simulations to generate
     trading_days: PositiveInt
         Total number of days to simulate
-    trading_days_in_year : DaysInYearType
+    trading_days_in_year: DaysInYearType
         Number of trading days used to annualize
-    mean_annual_return : float
+    mean_annual_return: float
         Mean annual return of the distribution
-    mean_annual_vol : PositiveFloat
+    mean_annual_vol: PositiveFloat
         Mean annual standard deviation of the distribution
     dframe: pandas.DataFrame
         Pandas DataFrame object holding the resulting values

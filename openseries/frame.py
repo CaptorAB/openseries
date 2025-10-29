@@ -551,14 +551,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Column of second timeseries.
         corr_scale: float, default: 2.0
             Correlation scale factor.
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -839,14 +839,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         ----------
         base_column: tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -914,14 +914,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         ----------
         base_column: tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -997,14 +997,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The ratio to calculate
         base_column: tuple[str, ValueType] | int, default: -1
             Column of timeseries that is the denominator in the ratio.
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and
             comparisons
 
@@ -1327,7 +1327,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             The column of the asset
         market: tuple[str, ValueType] | int
             The column of the market against which Jensen's alpha is measured
-        riskfree_rate : float, default: 0.0
+        riskfree_rate: float, default: 0.0
             The return of the zero volatility riskfree asset
         dlta_degr_freedms: int, default: 1
             Variance bias factor taking the value 0 or 1.
@@ -1520,7 +1520,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Column of timeseries that is the denominator in the ratio.
         observations: int, default: 21
             The length of the rolling window to use is set as number of observations.
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns:

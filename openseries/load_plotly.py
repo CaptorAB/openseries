@@ -51,7 +51,7 @@ def load_plotly_dict(
 
     Parameters
     ----------
-    responsive : bool
+    responsive: bool
         Flag whether to load as responsive
 
     Returns:

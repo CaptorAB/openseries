@@ -70,35 +70,35 @@ class OpenTimeSeries(_CommonModel[float]):
 
     Parameters
     ----------
-    timeseries_id : str
+    timeseries_id: str
         Database identifier of the timeseries
     instrument_id: str
         Database identifier of the instrument associated with the timeseries
-    name : str
+    name: str
         string identifier of the timeseries and/or instrument
-    valuetype : ValueType
+    valuetype: ValueType
         Identifies if the series is a series of values or returns
-    dates : DateListType
+    dates: DateListType
         Dates of the individual timeseries items
         These dates will not be altered by methods
-    values : ValueListType
+    values: ValueListType
         The value or return values of the timeseries items
         These values will not be altered by methods
     local_ccy: bool
         Boolean flag indicating if timeseries is in local currency
     tsdf: pandas.DataFrame
         Pandas object holding dates and values that can be altered via methods
-    currency : CurrencyStringType
+    currency: CurrencyStringType
         ISO 4217 currency code of the timeseries
-    domestic : CurrencyStringType, default: "SEK"
+    domestic: CurrencyStringType, default: "SEK"
         ISO 4217 currency code of the user's home currency
     countries: CountriesType, default: "SE"
         (List of) country code(s) according to ISO 3166-1 alpha-2
     markets: list[str] | str, optional
         (List of) markets code(s) according to pandas-market-calendars
-    isin : str, optional
+    isin: str, optional
         ISO 6166 identifier code of the associated instrument
-    label : str, optional
+    label: str, optional
         Placeholder for a name of the timeseries
 
     """
@@ -122,14 +122,14 @@ class OpenTimeSeries(_CommonModel[float]):
     @classmethod
     def _validate_domestic(cls, value: CurrencyStringType) -> CurrencyStringType:
         """Pydantic validator to ensure domestic field is validated."""
-        _ = Currency(ccy=value)
+        Currency(ccy=value)
         return value
 
     @field_validator("countries", mode="before")
     @classmethod
     def _validate_countries(cls, value: CountriesType) -> CountriesType:
         """Pydantic validator to ensure countries field is validated."""
-        _ = Countries(countryinput=value)
+        Countries(countryinput=value)
         return value
 
     @field_validator("markets", mode="before")
@@ -194,15 +194,15 @@ class OpenTimeSeries(_CommonModel[float]):
             List of date strings as ISO 8601 YYYY-MM-DD
         values: ValueListType
             Array of float values
-        valuetype : ValueType, default: ValueType.PRICE
+        valuetype: ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        timeseries_id : str, optional
+        timeseries_id: str, optional
             Database identifier of the timeseries
         instrument_id: str, optional
             Database identifier of the instrument associated with the timeseries
-        isin : str, optional
+        isin: str, optional
             ISO 6166 identifier code of the associated instrument
-        baseccy : CurrencyStringType, default: "SEK"
+        baseccy: CurrencyStringType, default: "SEK"
             ISO 4217 currency code of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
@@ -248,11 +248,11 @@ class OpenTimeSeries(_CommonModel[float]):
         ----------
         dframe: DataFrame | Series[float]
             Pandas DataFrame or Series
-        column_nmbr : int, default: 0
+        column_nmbr: int, default: 0
             Using iloc[:, column_nmbr] to pick column
-        valuetype : ValueType, default: ValueType.PRICE
+        valuetype: ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        baseccy : CurrencyStringType, default: "SEK"
+        baseccy: CurrencyStringType, default: "SEK"
             ISO 4217 currency code of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
@@ -347,11 +347,11 @@ class OpenTimeSeries(_CommonModel[float]):
         end_dt: datetime.date, optional
             End date of date range to generate when date_range not provided. Must be
             combined with days
-        label : str
+        label: str
             Placeholder for a name of the timeseries
-        valuetype : ValueType, default: ValueType.PRICE
+        valuetype: ValueType, default: ValueType.PRICE
             Identifies if the series is a series of values or returns
-        baseccy : CurrencyStringType, default: "SEK"
+        baseccy: CurrencyStringType, default: "SEK"
             The currency of the timeseries
         local_ccy: bool, default: True
             Boolean flag indicating if timeseries is in local currency
@@ -649,14 +649,14 @@ class OpenTimeSeries(_CommonModel[float]):
             Sampling the data which is assumed to be daily.
         dlta_degr_freedms: int, default: 0
             Variance bias factor taking the value 0 or 1.
-        months_from_last : int, optional
+        months_from_last: int, optional
             number of months offset as positive integer. Overrides use of from_date
             and to_date
-        from_date : datetime.date, optional
+        from_date: datetime.date, optional
             Specific from date
-        to_date : datetime.date, optional
+        to_date: datetime.date, optional
             Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
+        periods_in_a_year_fixed: DaysInYearType, optional
             Allows locking the periods-in-a-year to simplify test cases and comparisons
 
         Returns:
@@ -885,7 +885,7 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
 
     Parameters
     ----------
-    item : Any
+    item: Any
         variable to be checked
 
     Returns:
