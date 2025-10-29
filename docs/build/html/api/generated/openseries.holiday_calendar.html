@@ -134,40 +134,22 @@
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">holiday_calendar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">startyear</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endyear</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">countries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_holidays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/datefixer.html#holiday_calendar"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Generate a business calendar.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>startyear: int</dt><dd><p>First year in date range generated</p>
-</dd>
-<dt>endyear: int</dt><dd><p>Last year in date range generated</p>
-</dd>
-<dt>countries: CountriesType, default: “SE”</dt><dd><p>(List of) country code(s) according to ISO 3166-1 alpha-2</p>
-</dd>
-<dt>markets: list[str] | str, optional</dt><dd><p>(List of) markets code(s) according to pandas-market-calendars</p>
-</dd>
-<dt>custom_holidays: list[str] | str, optional</dt><dd><p>Argument where missing holidays can be added</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>numpy.busdaycalendar</dt><dd><p>Generate a business calendar</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>startyear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>endyear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>countries</strong> (<em>CountriesType</em>)</p></li>
-<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>custom_holidays</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>startyear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – First year in date range generated.</p></li>
+<li><p><strong>endyear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Last year in date range generated.</p></li>
+<li><p><strong>countries</strong> (<em>CountriesType</em>) – (List of) country code(s) according to ISO 3166-1 alpha-2.
+Defaults to “SE”.</p></li>
+<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – (List of) markets code(s) supported by exchange_calendars.</p></li>
+<li><p><strong>custom_holidays</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Argument where missing holidays can be added.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>busdaycalendar</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generate a business calendar.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>busdaycalendar</p>
 </dd>
 </dl>
 </dd></dl>

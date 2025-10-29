@@ -692,14 +692,14 @@
 <span class="sd">            Column of second timeseries.</span>
 <span class="sd">        corr_scale: float, default: 2.0</span>
 <span class="sd">            Correlation scale factor.</span>
-<span class="sd">        months_from_last : int, optional</span>
+<span class="sd">        months_from_last: int, optional</span>
 <span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
 <span class="sd">            and to_date</span>
-<span class="sd">        from_date : datetime.date, optional</span>
+<span class="sd">        from_date: datetime.date, optional</span>
 <span class="sd">            Specific from date</span>
-<span class="sd">        to_date : datetime.date, optional</span>
+<span class="sd">        to_date: datetime.date, optional</span>
 <span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed : DaysInYearType, optional</span>
+<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
 <span class="sd">            comparisons</span>
 
@@ -924,14 +924,14 @@
                 <span class="sa">f</span><span class="s2">&quot;not truncated to same start dates.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_indices</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;One or more constituents still &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;not truncated to same end dates.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
@@ -995,14 +995,14 @@
 <span class="sd">        ----------</span>
 <span class="sd">        base_column: tuple[str, ValueType] | int, default: -1</span>
 <span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
-<span class="sd">        months_from_last : int, optional</span>
+<span class="sd">        months_from_last: int, optional</span>
 <span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
 <span class="sd">            and to_date</span>
-<span class="sd">        from_date : datetime.date, optional</span>
+<span class="sd">        from_date: datetime.date, optional</span>
 <span class="sd">            Specific from date</span>
-<span class="sd">        to_date : datetime.date, optional</span>
+<span class="sd">        to_date: datetime.date, optional</span>
 <span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed : DaysInYearType, optional</span>
+<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
 <span class="sd">            comparisons</span>
 
@@ -1073,14 +1073,14 @@
 <span class="sd">        ----------</span>
 <span class="sd">        base_column: tuple[str, ValueType] | int, default: -1</span>
 <span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
-<span class="sd">        months_from_last : int, optional</span>
+<span class="sd">        months_from_last: int, optional</span>
 <span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
 <span class="sd">            and to_date</span>
-<span class="sd">        from_date : datetime.date, optional</span>
+<span class="sd">        from_date: datetime.date, optional</span>
 <span class="sd">            Specific from date</span>
-<span class="sd">        to_date : datetime.date, optional</span>
+<span class="sd">        to_date: datetime.date, optional</span>
 <span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed : DaysInYearType, optional</span>
+<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
 <span class="sd">            comparisons</span>
 
@@ -1159,14 +1159,14 @@
 <span class="sd">            The ratio to calculate</span>
 <span class="sd">        base_column: tuple[str, ValueType] | int, default: -1</span>
 <span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
-<span class="sd">        months_from_last : int, optional</span>
+<span class="sd">        months_from_last: int, optional</span>
 <span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
 <span class="sd">            and to_date</span>
-<span class="sd">        from_date : datetime.date, optional</span>
+<span class="sd">        from_date: datetime.date, optional</span>
 <span class="sd">            Specific from date</span>
-<span class="sd">        to_date : datetime.date, optional</span>
+<span class="sd">        to_date: datetime.date, optional</span>
 <span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed : DaysInYearType, optional</span>
+<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
 <span class="sd">            comparisons</span>
 
@@ -1498,7 +1498,7 @@
 <span class="sd">            The column of the asset</span>
 <span class="sd">        market: tuple[str, ValueType] | int</span>
 <span class="sd">            The column of the market against which Jensen&#39;s alpha is measured</span>
-<span class="sd">        riskfree_rate : float, default: 0.0</span>
+<span class="sd">        riskfree_rate: float, default: 0.0</span>
 <span class="sd">            The return of the zero volatility riskfree asset</span>
 <span class="sd">        dlta_degr_freedms: int, default: 1</span>
 <span class="sd">            Variance bias factor taking the value 0 or 1.</span>
@@ -1697,7 +1697,7 @@
 <span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
 <span class="sd">        observations: int, default: 21</span>
 <span class="sd">            The length of the rolling window to use is set as number of observations.</span>
-<span class="sd">        periods_in_a_year_fixed : DaysInYearType, optional</span>
+<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and comparisons</span>
 
 <span class="sd">        Returns:</span>

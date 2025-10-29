@@ -5,12 +5,6 @@ Portfolio Tools
 
 The portfoliotools module provides functions for portfolio optimization, simulation, and analysis.
 
-.. automodule:: openseries.portfoliotools
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
-
 Portfolio Optimization
 -----------------------
 

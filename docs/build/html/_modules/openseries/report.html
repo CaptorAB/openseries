@@ -154,19 +154,13 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a table of returns with appropriate table labels.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data: OpenFrame</span>
-<span class="sd">        The timeseries data</span>
-<span class="sd">    freq: LiteralBizDayFreq</span>
-<span class="sd">        The date offset string that sets the resampled frequency</span>
-<span class="sd">    relabel: bool, default: True</span>
-<span class="sd">        Whether to set new appropriate labels</span>
+<span class="sd">    Args:</span>
+<span class="sd">        data: The timeseries data.</span>
+<span class="sd">        freq: The date offset string that sets the resampled frequency.</span>
+<span class="sd">        relabel: Whether to set new appropriate labels. Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    pandas.DataFrame</span>
-<span class="sd">        The resulting data</span>
+<span class="sd">        The resulting data.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">copied</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
@@ -203,33 +197,24 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a HTML report page with line and bar plots and a table.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data: OpenFrame</span>
-<span class="sd">        The timeseries data</span>
-<span class="sd">    bar_freq: LiteralBizDayFreq</span>
-<span class="sd">        The date offset string that sets the bar plot frequency</span>
-<span class="sd">    filename: str, optional</span>
-<span class="sd">        Name of the Plotly html file</span>
-<span class="sd">    title: str, optional</span>
-<span class="sd">        The report page title</span>
-<span class="sd">    directory: DirectoryPath, optional</span>
-<span class="sd">        Directory where Plotly html file is saved</span>
-<span class="sd">    output_type: LiteralPlotlyOutput, default: &quot;file&quot;</span>
-<span class="sd">        Determines output type</span>
-<span class="sd">    include_plotlyjs: LiteralPlotlyJSlib, default: &quot;cdn&quot;</span>
-<span class="sd">        Determines how the plotly.js library is included in the output</span>
-<span class="sd">    auto_open: bool, default: True</span>
-<span class="sd">        Determines whether to open a browser window with the plot</span>
-<span class="sd">    add_logo: bool, default: True</span>
-<span class="sd">        If True a Captor logo is added to the plot</span>
-<span class="sd">    vertical_legend: bool, default: True</span>
-<span class="sd">        Determines whether to vertically align the legend&#39;s labels</span>
+<span class="sd">    Args:</span>
+<span class="sd">        data: The timeseries data.</span>
+<span class="sd">        bar_freq: The date offset string that sets the bar plot frequency.</span>
+<span class="sd">        filename: Name of the Plotly html file.</span>
+<span class="sd">        title: The report page title.</span>
+<span class="sd">        directory: Directory where Plotly html file is saved.</span>
+<span class="sd">        output_type: Determines output type. Defaults to &quot;file&quot;.</span>
+<span class="sd">        include_plotlyjs: Determines how the plotly.js library is included in</span>
+<span class="sd">            the output.</span>
+<span class="sd">            Defaults to &quot;cdn&quot;.</span>
+<span class="sd">        auto_open: Determines whether to open a browser window with the plot.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        add_logo: If True a Captor logo is added to the plot. Defaults to True.</span>
+<span class="sd">        vertical_legend: Determines whether to vertically align the legend&#39;s</span>
+<span class="sd">            labels. Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    tuple[plotly.go.Figure, str]</span>
-<span class="sd">        Plotly Figure and a div section or a html filename with location</span>
+<span class="sd">        Plotly Figure and a div section or a html filename with location.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">copied</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
@@ -427,7 +412,7 @@
                 <span class="n">cru</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">crm</span><span class="o">.</span><span class="n">capture_ratio_func</span><span class="p">(</span><span class="n">ratio</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Capture ratio calculation error: </span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span>  <span class="c1"># pragma: no cover</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">if</span> <span class="n">cru</span><span class="o">.</span><span class="n">hasnans</span><span class="p">:</span>
             <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>
@@ -573,7 +558,7 @@
             <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">link_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">include_plotlyjs</span><span class="p">),</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
         <span class="p">)</span>
@@ -585,7 +570,7 @@
             <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">include_plotlyjs</span><span class="p">),</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 

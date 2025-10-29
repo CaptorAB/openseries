@@ -131,16 +131,11 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_remote_file_existence</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if remote file exists.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    url: str</span>
-<span class="sd">        Path to remote file</span>
+<span class="sd">    Args:</span>
+<span class="sd">        url: Path to remote file.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    bool</span>
-<span class="sd">        True if url is valid and False otherwise</span>
-
+<span class="sd">        True if url is valid and False otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ok_code</span> <span class="o">=</span> <span class="mi">200</span>
 
@@ -161,16 +156,11 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">PlotlyLayoutType</span><span class="p">,</span> <span class="n">CaptorLogoType</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Plotly defaults.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    responsive : bool</span>
-<span class="sd">        Flag whether to load as responsive</span>
+<span class="sd">    Args:</span>
+<span class="sd">        responsive: Flag whether to load as responsive. Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    tuple[PlotlyLayoutType, CaptorLogoType]</span>
-<span class="sd">        A dictionary with the Plotly config and layout template</span>
-
+<span class="sd">        A dictionary with the Plotly config and layout template.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">project_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
     <span class="n">layoutfile</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;openseries&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;plotly_layouts.json&quot;</span><span class="p">)</span>

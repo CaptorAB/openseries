@@ -3,12 +3,6 @@ Date Utilities
 
 .. currentmodule:: openseries.datefixer
 
-.. automodule:: openseries.datefixer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
-
 Date Handling Functions
 -----------------------
 

@@ -161,21 +161,15 @@
     <span class="n">endyear</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">markets</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a dict of holiday dates mapping to list of markets closed.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of holiday dates mapping to list of markets closed.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    startyear: int</span>
-<span class="sd">        First year (inclusive) to consider.</span>
-<span class="sd">    endyear: int</span>
-<span class="sd">        Last year (inclusive) to consider.</span>
-<span class="sd">    markets: str | list[str]</span>
-<span class="sd">        String or list of market codes supported by pandas_market_calendars.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        startyear: First year (inclusive) to consider.</span>
+<span class="sd">        endyear: Last year (inclusive) to consider.</span>
+<span class="sd">        markets: String or list of market codes supported by exchange_calendars.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    list[str]</span>
-<span class="sd">        list of holiday dates.</span>
+<span class="sd">        List of holiday dates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">market_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">markets</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">markets</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">markets</span><span class="p">)</span>
 
@@ -184,7 +178,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">m</span> <span class="ow">in</span> <span class="n">supported</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">market_list</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;Argument markets must be a string market code or a list of market &quot;</span>
-            <span class="s2">&quot;codes supported by pandas_market_calendars.&quot;</span>
+            <span class="s2">&quot;codes supported by exchange_calendars.&quot;</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="n">MarketsNotStringNorListStrError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -213,24 +207,16 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">busdaycalendar</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a business calendar.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    startyear: int</span>
-<span class="sd">        First year in date range generated</span>
-<span class="sd">    endyear: int</span>
-<span class="sd">        Last year in date range generated</span>
-<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
-<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
-<span class="sd">    markets: list[str] | str, optional</span>
-<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
-<span class="sd">    custom_holidays: list[str] | str, optional</span>
-<span class="sd">        Argument where missing holidays can be added</span>
+<span class="sd">    Args:</span>
+<span class="sd">        startyear: First year in date range generated.</span>
+<span class="sd">        endyear: Last year in date range generated.</span>
+<span class="sd">        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
+<span class="sd">            Defaults to &quot;SE&quot;.</span>
+<span class="sd">        markets: (List of) markets code(s) supported by exchange_calendars.</span>
+<span class="sd">        custom_holidays: Argument where missing holidays can be added.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    numpy.busdaycalendar</span>
-<span class="sd">        Generate a business calendar</span>
-
+<span class="sd">        Generate a business calendar.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">startyear</span> <span class="o">-=</span> <span class="mi">1</span>
     <span class="n">endyear</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -285,16 +271,11 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse different date formats into datetime.date.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    fixerdate: DateType</span>
-<span class="sd">        The data item to parse</span>
+<span class="sd">    Args:</span>
+<span class="sd">        fixerdate: The data item to parse.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    datetime.date</span>
-<span class="sd">        Parsed date</span>
-
+<span class="sd">        Parsed date.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown date format </span><span class="si">{</span><span class="n">fixerdate</span><span class="si">!s}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">)</span><span class="si">!s}</span><span class="s2"> encountered&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixerdate</span><span class="p">,</span> <span class="n">Timestamp</span> <span class="o">|</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
@@ -325,28 +306,20 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Offset dates according to a given calendar.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    raw_date: DateType</span>
-<span class="sd">        The date to offset from</span>
-<span class="sd">    months_offset: int, default: 12</span>
-<span class="sd">        Number of months as integer</span>
-<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
-<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
-<span class="sd">    markets: list[str] | str, optional</span>
-<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
-<span class="sd">    custom_holidays: list[str] | str, optional</span>
-<span class="sd">        Argument where missing holidays can be added</span>
-<span class="sd">    adjust: bool, default: False</span>
-<span class="sd">        Determines if offset should adjust for business days</span>
-<span class="sd">    following: bool, default: True</span>
-<span class="sd">        Determines if days should be offset forward (following) or backward</span>
+<span class="sd">    Args:</span>
+<span class="sd">        raw_date: The date to offset from.</span>
+<span class="sd">        months_offset: Number of months as integer. Defaults to 12.</span>
+<span class="sd">        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
+<span class="sd">            Defaults to &quot;SE&quot;.</span>
+<span class="sd">        markets: (List of) markets code(s) supported by exchange_calendars.</span>
+<span class="sd">        custom_holidays: Argument where missing holidays can be added.</span>
+<span class="sd">        adjust: Determines if offset should adjust for business days.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        following: Determines if days should be offset forward (following) or backward.</span>
+<span class="sd">            Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    datetime.date</span>
-<span class="sd">        Off-set date</span>
-
+<span class="sd">        Off-set date.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_date</span> <span class="o">=</span> <span class="n">date_fix</span><span class="p">(</span><span class="n">raw_date</span><span class="p">)</span>
     <span class="n">month_delta</span> <span class="o">=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="n">months_offset</span><span class="p">)</span>
@@ -382,22 +355,15 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Bump date backwards to find the previous business day.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    today: datetime.date, optional</span>
-<span class="sd">        Manual input of the day from where the previous business day is found</span>
-<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
-<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
-<span class="sd">    markets: list[str] | str, optional</span>
-<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
-<span class="sd">    custom_holidays: list[str] | str, optional</span>
-<span class="sd">        Argument where missing holidays can be added</span>
+<span class="sd">    Args:</span>
+<span class="sd">        today: Manual input of the day from where the previous business day is found.</span>
+<span class="sd">        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
+<span class="sd">            Defaults to &quot;SE&quot;.</span>
+<span class="sd">        markets: (List of) markets code(s) supported by exchange_calendars.</span>
+<span class="sd">        custom_holidays: Argument where missing holidays can be added.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    datetime.date</span>
-<span class="sd">        The previous business day</span>
-
+<span class="sd">        The previous business day.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">today</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">today</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">astimezone</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
@@ -428,25 +394,18 @@
 <span class="sd">    It first adjusts to a valid business day and then bumps with given</span>
 <span class="sd">    number of business days from there.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    ddate: datetime.date</span>
-<span class="sd">        A starting date that does not have to be a business day</span>
-<span class="sd">    days: int</span>
-<span class="sd">        The number of business days to offset from the business day that is given</span>
-<span class="sd">        If days is set as anything other than an integer its value is set to zero</span>
-<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
-<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
-<span class="sd">    markets: list[str] | str, optional</span>
-<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
-<span class="sd">    custom_holidays: list[str] | str, optional</span>
-<span class="sd">        Argument where missing holidays can be added</span>
+<span class="sd">    Args:</span>
+<span class="sd">        ddate: A starting date that does not have to be a business day.</span>
+<span class="sd">        days: The number of business days to offset from the business day</span>
+<span class="sd">            that is given.</span>
+<span class="sd">            If days is set as anything other than an integer its value is set to zero.</span>
+<span class="sd">        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
+<span class="sd">            Defaults to &quot;SE&quot;.</span>
+<span class="sd">        markets: (List of) markets code(s) supported by exchange_calendars.</span>
+<span class="sd">        custom_holidays: Argument where missing holidays can be added.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    datetime.date</span>
-<span class="sd">        The new offset business day</span>
-
+<span class="sd">        The new offset business day.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">days</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">days</span><span class="p">)</span>
@@ -514,26 +473,17 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a list of business day calendar dates.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    trading_days: int</span>
-<span class="sd">        Number of days to generate. Must be greater than zero</span>
-<span class="sd">    start: datetime.date, optional</span>
-<span class="sd">        Date when the range starts</span>
-<span class="sd">    end: datetime.date, optional</span>
-<span class="sd">        Date when the range ends</span>
-<span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
-<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
-<span class="sd">    markets: list[str] | str, optional</span>
-<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
-<span class="sd">    custom_holidays: list[str] | str, optional</span>
-<span class="sd">        Argument where missing holidays can be added</span>
+<span class="sd">    Args:</span>
+<span class="sd">        trading_days: Number of days to generate. Must be greater than zero.</span>
+<span class="sd">        start: Date when the range starts.</span>
+<span class="sd">        end: Date when the range ends.</span>
+<span class="sd">        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
+<span class="sd">            Defaults to &quot;SE&quot;.</span>
+<span class="sd">        markets: (List of) markets code(s) supported by exchange_calendars.</span>
+<span class="sd">        custom_holidays: Argument where missing holidays can be added.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    list[dt.date]</span>
-<span class="sd">        List of business day calendar dates</span>
-
+<span class="sd">        List of business day calendar dates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">trading_days</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Argument trading_days must be greater than zero.&quot;</span>
@@ -580,7 +530,7 @@
         <span class="p">]</span>
 
     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Provide one of start or end date, but not both. &quot;</span>
+        <span class="s2">&quot;Provide exactly one of start or end date. &quot;</span>
         <span class="s2">&quot;Date range is inferred from number of trading days.&quot;</span>
     <span class="p">)</span>
     <span class="k">raise</span> <span class="n">BothStartAndEndError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
@@ -598,23 +548,15 @@
 
 <span class="sd">    Stubs left in place. Stubs will be aligned to the shortest stub.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data: pandas.DataFrame</span>
-<span class="sd">        The timeseries data</span>
-<span class="sd">    freq: LiteralBizDayFreq</span>
-<span class="sd">        The date offset string that sets the resampled frequency</span>
-<span class="sd">    countries: CountriesType</span>
-<span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
-<span class="sd">    markets: list[str] | str, optional</span>
-<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
-<span class="sd">    custom_holidays: list[str] | str, optional</span>
-<span class="sd">        Argument where missing holidays can be added</span>
+<span class="sd">    Args:</span>
+<span class="sd">        data: The timeseries data.</span>
+<span class="sd">        freq: The date offset string that sets the resampled frequency.</span>
+<span class="sd">        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
+<span class="sd">        markets: (List of) markets code(s) supported by exchange_calendars.</span>
+<span class="sd">        custom_holidays: Argument where missing holidays can be added.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    Pandas.DatetimeIndex</span>
-<span class="sd">        A date range aligned to business period ends</span>
+<span class="sd">        A date range aligned to business period ends.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">copydata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>

@@ -130,28 +130,21 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">ReturnSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days_in_year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_return</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_vol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jumps_lamda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jumps_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jumps_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/simulation.html#ReturnSimulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>The class ReturnSimulation allows for simulating financial timeseries.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>number_of_sims<span class="classifier">PositiveInt</span></dt><dd><p>Number of simulations to generate</p>
-</dd>
-<dt>trading_days: PositiveInt</dt><dd><p>Total number of days to simulate</p>
-</dd>
-<dt>trading_days_in_year<span class="classifier">DaysInYearType</span></dt><dd><p>Number of trading days used to annualize</p>
-</dd>
-<dt>mean_annual_return<span class="classifier">float</span></dt><dd><p>Mean annual return of the distribution</p>
-</dd>
-<dt>mean_annual_vol<span class="classifier">PositiveFloat</span></dt><dd><p>Mean annual standard deviation of the distribution</p>
-</dd>
-<dt>dframe: pandas.DataFrame</dt><dd><p>Pandas DataFrame object holding the resulting values</p>
-</dd>
-<dt>jumps_lamda: NonNegativeFloat, default: 0.0</dt><dd><p>This is the probability of a jump happening at each point in time</p>
-</dd>
-<dt>jumps_sigma: NonNegativeFloat, default: 0.0</dt><dd><p>This is the volatility of the jump size</p>
-</dd>
-<dt>jumps_mu: float, default: 0.0</dt><dd><p>This is the average jump size</p>
-</dd>
-<dt>seed: int, optional</dt><dd><p>Seed for random process initiation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of simulations to generate.</p></li>
+<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Total number of days to simulate.</p></li>
+<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>) – Number of trading days used to annualize.</p></li>
+<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean annual return of the distribution.</p></li>
+<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Mean annual standard deviation of the distribution.</p></li>
+<li><p><strong>dframe</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>) – Pandas DataFrame object holding the resulting values.</p></li>
+<li><p><strong>jumps_lamda</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>) – This is the probability of a jump happening at each point in time.
+Defaults to 0.0.</p></li>
+<li><p><strong>jumps_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>) – This is the volatility of the jump size. Defaults to 0.0.</p></li>
+<li><p><strong>jumps_mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – This is the average jump size. Defaults to 0.0.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed for random process initiation.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
@@ -382,85 +375,57 @@ validated to form a valid model.</p>
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><span class="pre">DataFrame</span></a></em><a class="reference internal" href="../../_modules/openseries/simulation.html#ReturnSimulation.results"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Simulation data.</p>
-<section id="returns">
-<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>pandas.DataFrame</dt><dd><p>Simulation data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Simulation data.</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">realized_mean_return</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em></dt>
 <dd><p>Annualized arithmetic mean of returns.</p>
-<section id="id1">
-<h3>Returns:<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Annualized arithmetic mean of returns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Annualized arithmetic mean of returns.</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">realized_vol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em></dt>
 <dd><p>Annualized volatility.</p>
-<section id="id2">
-<h3>Returns:<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Annualized volatility</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Annualized volatility.</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_return</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_vol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days_in_year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/simulation.html#ReturnSimulation.from_normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create a Normal distribution simulation.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>number_of_sims: PositiveInt</dt><dd><p>Number of simulations to generate</p>
-</dd>
-<dt>trading_days: PositiveInt</dt><dd><p>Number of trading days to simulate</p>
-</dd>
-<dt>mean_annual_return: float</dt><dd><p>Mean return</p>
-</dd>
-<dt>mean_annual_vol: PositiveFloat</dt><dd><p>Mean standard deviation</p>
-</dd>
-<dt>trading_days_in_year: DaysInYearType, default: 252</dt><dd><p>Number of trading days used to annualize</p>
-</dd>
-<dt>seed: int, optional</dt><dd><p>Seed for random process initiation</p>
-</dd>
-<dt>randomizer: numpy.random.Generator, optional</dt><dd><p>Random process generator</p>
-</dd>
-</dl>
-</section>
-<section id="id4">
-<h3>Returns:<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ReturnSimulation</dt><dd><p>Normal distribution simulation</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of simulations to generate.</p></li>
+<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of trading days to simulate.</p></li>
+<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean return.</p></li>
+<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Mean standard deviation.</p></li>
+<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>) – Number of trading days used to annualize.
+Defaults to 252.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed for random process initiation.</p></li>
+<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>) – Random process generator.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>ReturnSimulation</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normal distribution simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ReturnSimulation</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -469,46 +434,24 @@ validated to form a valid model.</p>
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_lognormal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_return</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_vol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days_in_year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/simulation.html#ReturnSimulation.from_lognormal"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create a Lognormal distribution simulation.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>number_of_sims: PositiveInt</dt><dd><p>Number of simulations to generate</p>
-</dd>
-<dt>trading_days: PositiveInt</dt><dd><p>Number of trading days to simulate</p>
-</dd>
-<dt>mean_annual_return: float</dt><dd><p>Mean return</p>
-</dd>
-<dt>mean_annual_vol: PositiveFloat</dt><dd><p>Mean standard deviation</p>
-</dd>
-<dt>trading_days_in_year: DaysInYearType, default: 252</dt><dd><p>Number of trading days used to annualize</p>
-</dd>
-<dt>seed: int, optional</dt><dd><p>Seed for random process initiation</p>
-</dd>
-<dt>randomizer: numpy.random.Generator, optional</dt><dd><p>Random process generator</p>
-</dd>
-</dl>
-</section>
-<section id="id6">
-<h3>Returns:<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ReturnSimulation</dt><dd><p>Lognormal distribution simulation</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of simulations to generate.</p></li>
+<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of trading days to simulate.</p></li>
+<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean return.</p></li>
+<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Mean standard deviation.</p></li>
+<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>) – Number of trading days used to annualize.
+Defaults to 252.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed for random process initiation.</p></li>
+<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>) – Random process generator.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>ReturnSimulation</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lognormal distribution simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ReturnSimulation</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -517,46 +460,24 @@ validated to form a valid model.</p>
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_gbm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_return</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_vol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days_in_year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/simulation.html#ReturnSimulation.from_gbm"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create a Geometric Brownian Motion simulation.</p>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>number_of_sims: PositiveInt</dt><dd><p>Number of simulations to generate</p>
-</dd>
-<dt>trading_days: PositiveInt</dt><dd><p>Number of trading days to simulate</p>
-</dd>
-<dt>mean_annual_return: float</dt><dd><p>Mean return</p>
-</dd>
-<dt>mean_annual_vol: PositiveFloat</dt><dd><p>Mean standard deviation</p>
-</dd>
-<dt>trading_days_in_year: DaysInYearType, default: 252</dt><dd><p>Number of trading days used to annualize</p>
-</dd>
-<dt>seed: int, optional</dt><dd><p>Seed for random process initiation</p>
-</dd>
-<dt>randomizer: numpy.random.Generator, optional</dt><dd><p>Random process generator</p>
-</dd>
-</dl>
-</section>
-<section id="id8">
-<h3>Returns:<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ReturnSimulation</dt><dd><p>Geometric Brownian Motion simulation</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of simulations to generate.</p></li>
+<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of trading days to simulate.</p></li>
+<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean return.</p></li>
+<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Mean standard deviation.</p></li>
+<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>) – Number of trading days used to annualize.
+Defaults to 252.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed for random process initiation.</p></li>
+<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>) – Random process generator.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>ReturnSimulation</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Geometric Brownian Motion simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ReturnSimulation</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -565,55 +486,28 @@ validated to form a valid model.</p>
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_merton_jump_gbm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_sims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_return</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_annual_vol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jumps_lamda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jumps_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jumps_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trading_days_in_year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">252</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/simulation.html#ReturnSimulation.from_merton_jump_gbm"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create a Merton Jump-Diffusion model simulation.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>number_of_sims: PositiveInt</dt><dd><p>Number of simulations to generate</p>
-</dd>
-<dt>trading_days: PositiveInt</dt><dd><p>Number of trading days to simulate</p>
-</dd>
-<dt>mean_annual_return: float</dt><dd><p>Mean return</p>
-</dd>
-<dt>mean_annual_vol: PositiveFloat</dt><dd><p>Mean standard deviation</p>
-</dd>
-<dt>jumps_lamda: NonNegativeFloat</dt><dd><p>This is the probability of a jump happening at each point in time</p>
-</dd>
-<dt>jumps_sigma: NonNegativeFloat, default: 0.0</dt><dd><p>This is the volatility of the jump size</p>
-</dd>
-<dt>jumps_mu: float, default: 0.0</dt><dd><p>This is the average jump size</p>
-</dd>
-<dt>trading_days_in_year: DaysInYearType, default: 252</dt><dd><p>Number of trading days used to annualize</p>
-</dd>
-<dt>seed: int, optional</dt><dd><p>Seed for random process initiation</p>
-</dd>
-<dt>randomizer: numpy.random.Generator, optional</dt><dd><p>Random process generator</p>
-</dd>
-</dl>
-</section>
-<section id="id10">
-<h3>Returns:<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ReturnSimulation</dt><dd><p>Merton Jump-Diffusion model simulation</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>jumps_lamda</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>jumps_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>jumps_mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of simulations to generate.</p></li>
+<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Number of trading days to simulate.</p></li>
+<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean return.</p></li>
+<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>) – Mean standard deviation.</p></li>
+<li><p><strong>jumps_lamda</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>) – This is the probability of a jump happening at each point
+in time.</p></li>
+<li><p><strong>jumps_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>) – This is the volatility of the jump size. Defaults to 0.0.</p></li>
+<li><p><strong>jumps_mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – This is the average jump size. Defaults to 0.0.</p></li>
+<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>) – Number of trading days used to annualize.
+Defaults to 252.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed for random process initiation.</p></li>
+<li><p><strong>randomizer</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.3)"><em>Generator</em></a><em> | </em><em>None</em>) – Random process generator.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>ReturnSimulation</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Merton Jump-Diffusion model simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ReturnSimulation</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -622,62 +516,27 @@ validated to form a valid model.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">to_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">countries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/simulation.html#ReturnSimulation.to_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create a pandas.DataFrame from simulation(s).</p>
-<section id="id11">
-<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>name: str</dt><dd><p>Name label of the serie(s)</p>
-</dd>
-<dt>start: datetime.date, optional</dt><dd><p>Date when the simulation starts</p>
-</dd>
-<dt>end: datetime.date, optional</dt><dd><p>Date when the simulation ends</p>
-</dd>
-<dt>countries: CountriesType, default: “SE”</dt><dd><p>(List of) country code(s) according to ISO 3166-1 alpha-2</p>
-</dd>
-<dt>markets: list[str] | str, optional</dt><dd><p>(List of) markets code(s) according to pandas-market-calendars</p>
-</dd>
-</dl>
-</section>
-<section id="id12">
-<h3>Returns:<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>pandas.DataFrame</dt><dd><p>The simulation(s) data</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name label of the serie(s).</p></li>
+<li><p><strong>start</strong> (<em>dt.date</em><em> | </em><em>None</em>) – Date when the simulation starts.</p></li>
+<li><p><strong>end</strong> (<em>dt.date</em><em> | </em><em>None</em>) – Date when the simulation ends.</p></li>
+<li><p><strong>countries</strong> (<em>CountriesType</em>) – (List of) country code(s) according to ISO 3166-1 alpha-2.
+Defaults to “SE”.</p></li>
+<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – (List of) markets code(s) supported by exchange_calendars.</p></li>
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>start</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>end</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>countries</strong> (<em>CountriesType</em>)</p></li>
-<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>DataFrame</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The simulation(s) data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>number_of_sims</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>trading_days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>FieldInfo</em><em>(</em><em>annotation=NoneType</em><em>, </em><em>required=True</em><em>, </em><em>metadata=</em><em>[</em><em>Strict</em><em>(</em><em>strict=True</em><em>)</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=366</em><em>)</em><em>]</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>mean_annual_return</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>mean_annual_vol</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>dframe</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>)</p></li>
-<li><p><strong>jumps_lamda</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>jumps_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>jumps_mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 </section>

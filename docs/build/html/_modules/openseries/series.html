@@ -182,35 +182,35 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    timeseries_id : str</span>
+<span class="sd">    timeseries_id: str</span>
 <span class="sd">        Database identifier of the timeseries</span>
 <span class="sd">    instrument_id: str</span>
 <span class="sd">        Database identifier of the instrument associated with the timeseries</span>
-<span class="sd">    name : str</span>
+<span class="sd">    name: str</span>
 <span class="sd">        string identifier of the timeseries and/or instrument</span>
-<span class="sd">    valuetype : ValueType</span>
+<span class="sd">    valuetype: ValueType</span>
 <span class="sd">        Identifies if the series is a series of values or returns</span>
-<span class="sd">    dates : DateListType</span>
+<span class="sd">    dates: DateListType</span>
 <span class="sd">        Dates of the individual timeseries items</span>
 <span class="sd">        These dates will not be altered by methods</span>
-<span class="sd">    values : ValueListType</span>
+<span class="sd">    values: ValueListType</span>
 <span class="sd">        The value or return values of the timeseries items</span>
 <span class="sd">        These values will not be altered by methods</span>
 <span class="sd">    local_ccy: bool</span>
 <span class="sd">        Boolean flag indicating if timeseries is in local currency</span>
 <span class="sd">    tsdf: pandas.DataFrame</span>
 <span class="sd">        Pandas object holding dates and values that can be altered via methods</span>
-<span class="sd">    currency : CurrencyStringType</span>
+<span class="sd">    currency: CurrencyStringType</span>
 <span class="sd">        ISO 4217 currency code of the timeseries</span>
-<span class="sd">    domestic : CurrencyStringType, default: &quot;SEK&quot;</span>
+<span class="sd">    domestic: CurrencyStringType, default: &quot;SEK&quot;</span>
 <span class="sd">        ISO 4217 currency code of the user&#39;s home currency</span>
 <span class="sd">    countries: CountriesType, default: &quot;SE&quot;</span>
 <span class="sd">        (List of) country code(s) according to ISO 3166-1 alpha-2</span>
 <span class="sd">    markets: list[str] | str, optional</span>
-<span class="sd">        (List of) markets code(s) according to pandas-market-calendars</span>
-<span class="sd">    isin : str, optional</span>
+<span class="sd">        (List of) markets code(s) supported by exchange_calendars</span>
+<span class="sd">    isin: str, optional</span>
 <span class="sd">        ISO 6166 identifier code of the associated instrument</span>
-<span class="sd">    label : str, optional</span>
+<span class="sd">    label: str, optional</span>
 <span class="sd">        Placeholder for a name of the timeseries</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -234,14 +234,14 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_domestic</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">CurrencyStringType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CurrencyStringType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure domestic field is validated.&quot;&quot;&quot;</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="n">Currency</span><span class="p">(</span><span class="n">ccy</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">Currency</span><span class="p">(</span><span class="n">ccy</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;countries&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_countries</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">CountriesType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CountriesType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure countries field is validated.&quot;&quot;&quot;</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="n">Countries</span><span class="p">(</span><span class="n">countryinput</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">Countries</span><span class="p">(</span><span class="n">countryinput</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;markets&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
@@ -298,7 +298,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">local_ccy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create series from a Pandas DataFrame or Series.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create series from a list of dates and a list of values.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -308,15 +308,15 @@
 <span class="sd">            List of date strings as ISO 8601 YYYY-MM-DD</span>
 <span class="sd">        values: ValueListType</span>
 <span class="sd">            Array of float values</span>
-<span class="sd">        valuetype : ValueType, default: ValueType.PRICE</span>
+<span class="sd">        valuetype: ValueType, default: ValueType.PRICE</span>
 <span class="sd">            Identifies if the series is a series of values or returns</span>
-<span class="sd">        timeseries_id : str, optional</span>
+<span class="sd">        timeseries_id: str, optional</span>
 <span class="sd">            Database identifier of the timeseries</span>
 <span class="sd">        instrument_id: str, optional</span>
 <span class="sd">            Database identifier of the instrument associated with the timeseries</span>
-<span class="sd">        isin : str, optional</span>
+<span class="sd">        isin: str, optional</span>
 <span class="sd">            ISO 6166 identifier code of the associated instrument</span>
-<span class="sd">        baseccy : CurrencyStringType, default: &quot;SEK&quot;</span>
+<span class="sd">        baseccy: CurrencyStringType, default: &quot;SEK&quot;</span>
 <span class="sd">            ISO 4217 currency code of the timeseries</span>
 <span class="sd">        local_ccy: bool, default: True</span>
 <span class="sd">            Boolean flag indicating if timeseries is in local currency</span>
@@ -365,11 +365,11 @@
 <span class="sd">        ----------</span>
 <span class="sd">        dframe: DataFrame | Series[float]</span>
 <span class="sd">            Pandas DataFrame or Series</span>
-<span class="sd">        column_nmbr : int, default: 0</span>
+<span class="sd">        column_nmbr: int, default: 0</span>
 <span class="sd">            Using iloc[:, column_nmbr] to pick column</span>
-<span class="sd">        valuetype : ValueType, default: ValueType.PRICE</span>
+<span class="sd">        valuetype: ValueType, default: ValueType.PRICE</span>
 <span class="sd">            Identifies if the series is a series of values or returns</span>
-<span class="sd">        baseccy : CurrencyStringType, default: &quot;SEK&quot;</span>
+<span class="sd">        baseccy: CurrencyStringType, default: &quot;SEK&quot;</span>
 <span class="sd">            ISO 4217 currency code of the timeseries</span>
 <span class="sd">        local_ccy: bool, default: True</span>
 <span class="sd">            Boolean flag indicating if timeseries is in local currency</span>
@@ -396,7 +396,7 @@
                 <span class="p">):</span>
                     <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Series&quot;</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Label missing. Adding: </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">label</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">column_nmbr</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">_check_if_none</span><span class="p">(</span>
@@ -404,7 +404,7 @@
                 <span class="p">):</span>
                     <span class="n">valuetype</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;valuetype missing. Adding: </span><span class="si">{</span><span class="n">valuetype</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">valuetype</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span>
                         <span class="n">column_nmbr</span>
@@ -467,11 +467,11 @@
 <span class="sd">        end_dt: datetime.date, optional</span>
 <span class="sd">            End date of date range to generate when date_range not provided. Must be</span>
 <span class="sd">            combined with days</span>
-<span class="sd">        label : str</span>
+<span class="sd">        label: str</span>
 <span class="sd">            Placeholder for a name of the timeseries</span>
-<span class="sd">        valuetype : ValueType, default: ValueType.PRICE</span>
+<span class="sd">        valuetype: ValueType, default: ValueType.PRICE</span>
 <span class="sd">            Identifies if the series is a series of values or returns</span>
-<span class="sd">        baseccy : CurrencyStringType, default: &quot;SEK&quot;</span>
+<span class="sd">        baseccy: CurrencyStringType, default: &quot;SEK&quot;</span>
 <span class="sd">            The currency of the timeseries</span>
 <span class="sd">        local_ccy: bool, default: True</span>
 <span class="sd">            Boolean flag indicating if timeseries is in local currency</span>
@@ -671,7 +671,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        days_in_year: int, default 365</span>
 <span class="sd">            Calendar days per year used as divisor</span>
-<span class="sd">        divider: float, default 100.0</span>
+<span class="sd">        divider: float, default 1.0</span>
 <span class="sd">            Convenience divider for when the 1-day rate is not scaled correctly</span>
 
 <span class="sd">        Returns:</span>
@@ -799,14 +799,14 @@
 <span class="sd">            Sampling the data which is assumed to be daily.</span>
 <span class="sd">        dlta_degr_freedms: int, default: 0</span>
 <span class="sd">            Variance bias factor taking the value 0 or 1.</span>
-<span class="sd">        months_from_last : int, optional</span>
+<span class="sd">        months_from_last: int, optional</span>
 <span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
 <span class="sd">            and to_date</span>
-<span class="sd">        from_date : datetime.date, optional</span>
+<span class="sd">        from_date: datetime.date, optional</span>
 <span class="sd">            Specific from date</span>
-<span class="sd">        to_date : datetime.date, optional</span>
+<span class="sd">        to_date: datetime.date, optional</span>
 <span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed : DaysInYearType, optional</span>
+<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
 <span class="sd">            Allows locking the periods-in-a-year to simplify test cases and comparisons</span>
 
 <span class="sd">        Returns:</span>
@@ -1046,7 +1046,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    item : Any</span>
+<span class="sd">    item: Any</span>
 <span class="sd">        variable to be checked</span>
 
 <span class="sd">    Returns:</span>

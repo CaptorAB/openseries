@@ -133,46 +133,26 @@
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">efficient_frontier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ports</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">71</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontier_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SLSQP'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tweak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/portfoliotools.html#efficient_frontier"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Identify an efficient frontier.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>eframe: OpenFrame</dt><dd><p>Portfolio data</p>
-</dd>
-<dt>num_ports: int, default: 5000</dt><dd><p>Number of possible portfolios to simulate</p>
-</dd>
-<dt>seed: int, default: 71</dt><dd><p>The seed for the random process</p>
-</dd>
-<dt>bounds: tuple[tuple[float, float], …], optional</dt><dd><p>The range of minumum and maximum allowed allocations for each asset</p>
-</dd>
-<dt>frontier_points: int, default: 200</dt><dd><p>number of points along frontier to optimize</p>
-</dd>
-<dt>minimize_method: LiteralMinimizeMethods, default: SLSQP</dt><dd><p>The method passed into the scipy.minimize function</p>
-</dd>
-<dt>tweak: bool, default: True</dt><dd><p>cutting the frontier to exclude multiple points with almost the same risk</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>tuple[DataFrame, DataFrame, NDArray[float]]</dt><dd><p>The efficient frontier data, simulation data and optimal portfolio</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>eframe</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>frontier_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>)</p></li>
-<li><p><strong>tweak</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>eframe</strong> (<em>OpenFrame</em>) – Portfolio data.</p></li>
+<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of possible portfolios to simulate. Defaults to 5000.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The seed for the random process. Defaults to 71.</p></li>
+<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>) – The range of minimum and maximum allowed allocations for each asset.</p></li>
+<li><p><strong>frontier_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of points along frontier to optimize. Defaults to 200.</p></li>
+<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>) – The method passed into the scipy.minimize function.
+Defaults to SLSQP.</p></li>
+<li><p><strong>tweak</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Cutting the frontier to exclude multiple points with almost the
+same risk.
+Defaults to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[DataFrame, DataFrame, NDArray[float64]]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The efficient frontier data, simulation data and optimal portfolio.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[DataFrame, DataFrame, NDArray[float64]]</p>
 </dd>
 </dl>
 </dd></dl>

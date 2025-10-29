@@ -959,14 +959,14 @@ Correlation. <a class="reference external" href="https://www.investopedia.com/ar
 </dd>
 <dt>corr_scale: float, default: 2.0</dt><dd><p>Correlation scale factor.</p>
 </dd>
-<dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
+<dt>months_from_last: int, optional</dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
 </dd>
-<dt>from_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific from date</p>
+<dt>from_date: datetime.date, optional</dt><dd><p>Specific from date</p>
 </dd>
-<dt>to_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific to date</p>
+<dt>to_date: datetime.date, optional</dt><dd><p>Specific to date</p>
 </dd>
-<dt>periods_in_a_year_fixed<span class="classifier">DaysInYearType, optional</span></dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
+<dt>periods_in_a_year_fixed: DaysInYearType, optional</dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
 comparisons</p>
 </dd>
 </dl>
@@ -1158,14 +1158,14 @@ difference between the fund and its index returns.
 <dl class="simple">
 <dt>base_column: tuple[str, ValueType] | int, default: -1</dt><dd><p>Column of timeseries that is the denominator in the ratio.</p>
 </dd>
-<dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
+<dt>months_from_last: int, optional</dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
 </dd>
-<dt>from_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific from date</p>
+<dt>from_date: datetime.date, optional</dt><dd><p>Specific from date</p>
 </dd>
-<dt>to_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific to date</p>
+<dt>to_date: datetime.date, optional</dt><dd><p>Specific to date</p>
 </dd>
-<dt>periods_in_a_year_fixed<span class="classifier">DaysInYearType, optional</span></dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
+<dt>periods_in_a_year_fixed: DaysInYearType, optional</dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
 comparisons</p>
 </dd>
 </dl>
@@ -1207,14 +1207,14 @@ The ratio is calculated using the annualized arithmetic mean of returns.</p>
 <dl class="simple">
 <dt>base_column: tuple[str, ValueType] | int, default: -1</dt><dd><p>Column of timeseries that is the denominator in the ratio.</p>
 </dd>
-<dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
+<dt>months_from_last: int, optional</dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
 </dd>
-<dt>from_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific from date</p>
+<dt>from_date: datetime.date, optional</dt><dd><p>Specific from date</p>
 </dd>
-<dt>to_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific to date</p>
+<dt>to_date: datetime.date, optional</dt><dd><p>Specific to date</p>
 </dd>
-<dt>periods_in_a_year_fixed<span class="classifier">DaysInYearType, optional</span></dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
+<dt>periods_in_a_year_fixed: DaysInYearType, optional</dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
 comparisons</p>
 </dd>
 </dl>
@@ -1262,14 +1262,14 @@ Finance Education (Vol 2 Winter 2013).
 </dd>
 <dt>base_column: tuple[str, ValueType] | int, default: -1</dt><dd><p>Column of timeseries that is the denominator in the ratio.</p>
 </dd>
-<dt>months_from_last<span class="classifier">int, optional</span></dt><dd><p>number of months offset as positive integer. Overrides use of from_date
+<dt>months_from_last: int, optional</dt><dd><p>number of months offset as positive integer. Overrides use of from_date
 and to_date</p>
 </dd>
-<dt>from_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific from date</p>
+<dt>from_date: datetime.date, optional</dt><dd><p>Specific from date</p>
 </dd>
-<dt>to_date<span class="classifier">datetime.date, optional</span></dt><dd><p>Specific to date</p>
+<dt>to_date: datetime.date, optional</dt><dd><p>Specific to date</p>
 </dd>
-<dt>periods_in_a_year_fixed<span class="classifier">DaysInYearType, optional</span></dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
+<dt>periods_in_a_year_fixed: DaysInYearType, optional</dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and
 comparisons</p>
 </dd>
 </dl>
@@ -1394,7 +1394,7 @@ This metric is also commonly referred to as simply alpha.
 </dd>
 <dt>market: tuple[str, ValueType] | int</dt><dd><p>The column of the market against which Jensen’s alpha is measured</p>
 </dd>
-<dt>riskfree_rate<span class="classifier">float, default: 0.0</span></dt><dd><p>The return of the zero volatility riskfree asset</p>
+<dt>riskfree_rate: float, default: 0.0</dt><dd><p>The return of the zero volatility riskfree asset</p>
 </dd>
 <dt>dlta_degr_freedms: int, default: 1</dt><dd><p>Variance bias factor taking the value 0 or 1.</p>
 </dd>
@@ -1473,7 +1473,7 @@ difference between the fund and its index returns.</p>
 </dd>
 <dt>observations: int, default: 21</dt><dd><p>The length of the rolling window to use is set as number of observations.</p>
 </dd>
-<dt>periods_in_a_year_fixed<span class="classifier">DaysInYearType, optional</span></dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and comparisons</p>
+<dt>periods_in_a_year_fixed: DaysInYearType, optional</dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and comparisons</p>
 </dd>
 </dl>
 </section>

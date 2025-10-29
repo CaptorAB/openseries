@@ -134,43 +134,23 @@
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">generate_calendar_date_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trading_days</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">countries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_holidays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/datefixer.html#generate_calendar_date_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Generate a list of business day calendar dates.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>trading_days: int</dt><dd><p>Number of days to generate. Must be greater than zero</p>
-</dd>
-<dt>start: datetime.date, optional</dt><dd><p>Date when the range starts</p>
-</dd>
-<dt>end: datetime.date, optional</dt><dd><p>Date when the range ends</p>
-</dd>
-<dt>countries: CountriesType, default: “SE”</dt><dd><p>(List of) country code(s) according to ISO 3166-1 alpha-2</p>
-</dd>
-<dt>markets: list[str] | str, optional</dt><dd><p>(List of) markets code(s) according to pandas-market-calendars</p>
-</dd>
-<dt>custom_holidays: list[str] | str, optional</dt><dd><p>Argument where missing holidays can be added</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>list[dt.date]</dt><dd><p>List of business day calendar dates</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>start</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>end</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>countries</strong> (<em>CountriesType</em>)</p></li>
-<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>custom_holidays</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>trading_days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of days to generate. Must be greater than zero.</p></li>
+<li><p><strong>start</strong> (<em>dt.date</em><em> | </em><em>None</em>) – Date when the range starts.</p></li>
+<li><p><strong>end</strong> (<em>dt.date</em><em> | </em><em>None</em>) – Date when the range ends.</p></li>
+<li><p><strong>countries</strong> (<em>CountriesType</em>) – (List of) country code(s) according to ISO 3166-1 alpha-2.
+Defaults to “SE”.</p></li>
+<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – (List of) markets code(s) supported by exchange_calendars.</p></li>
+<li><p><strong>custom_holidays</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Argument where missing holidays can be added.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[dt.date]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of business day calendar dates.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[dt.date]</p>
 </dd>
 </dl>
 </dd></dl>

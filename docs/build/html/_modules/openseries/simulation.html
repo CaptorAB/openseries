@@ -161,16 +161,11 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a Numpy Random Generator object.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    seed: int, optional</span>
-<span class="sd">        Random seed</span>
+<span class="sd">    Args:</span>
+<span class="sd">        seed: Random seed.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    numpy.random.Generator</span>
-<span class="sd">        Numpy random process generator</span>
-
+<span class="sd">        Numpy random process generator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ss</span> <span class="o">=</span> <span class="n">SeedSequence</span><span class="p">(</span><span class="n">entropy</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">bg</span> <span class="o">=</span> <span class="n">PCG64</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;int | None&quot;</span><span class="p">,</span> <span class="n">ss</span><span class="p">))</span>
@@ -190,32 +185,19 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Common logic for creating simulations.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    cls: type[ReturnSimulation]</span>
-<span class="sd">        The ReturnSimulation class</span>
-<span class="sd">    returns: pandas.DataFrame</span>
-<span class="sd">        The calculated returns data</span>
-<span class="sd">    number_of_sims: PositiveInt</span>
-<span class="sd">        Number of simulations to generate</span>
-<span class="sd">    trading_days: PositiveInt</span>
-<span class="sd">        Number of trading days to simulate</span>
-<span class="sd">    trading_days_in_year: DaysInYearType</span>
-<span class="sd">        Number of trading days used to annualize</span>
-<span class="sd">    mean_annual_return: float</span>
-<span class="sd">        Mean annual return</span>
-<span class="sd">    mean_annual_vol: PositiveFloat</span>
-<span class="sd">        Mean annual volatility</span>
-<span class="sd">    seed: int, optional</span>
-<span class="sd">        Seed for random process initiation</span>
-<span class="sd">    **kwargs</span>
-<span class="sd">        Additional keyword arguments for jump parameters</span>
+<span class="sd">    Args:</span>
+<span class="sd">        cls: The ReturnSimulation class.</span>
+<span class="sd">        returns: The calculated returns data.</span>
+<span class="sd">        number_of_sims: Number of simulations to generate.</span>
+<span class="sd">        trading_days: Number of trading days to simulate.</span>
+<span class="sd">        trading_days_in_year: Number of trading days used to annualize.</span>
+<span class="sd">        mean_annual_return: Mean annual return.</span>
+<span class="sd">        mean_annual_vol: Mean annual volatility.</span>
+<span class="sd">        seed: Seed for random process initiation.</span>
+<span class="sd">        **kwargs: Additional keyword arguments for jump parameters.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    ReturnSimulation</span>
-<span class="sd">        A ReturnSimulation instance</span>
-
+<span class="sd">        A ReturnSimulation instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
         <span class="n">number_of_sims</span><span class="o">=</span><span class="n">number_of_sims</span><span class="p">,</span>
@@ -234,28 +216,18 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">ReturnSimulation</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The class ReturnSimulation allows for simulating financial timeseries.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    number_of_sims : PositiveInt</span>
-<span class="sd">        Number of simulations to generate</span>
-<span class="sd">    trading_days: PositiveInt</span>
-<span class="sd">        Total number of days to simulate</span>
-<span class="sd">    trading_days_in_year : DaysInYearType</span>
-<span class="sd">        Number of trading days used to annualize</span>
-<span class="sd">    mean_annual_return : float</span>
-<span class="sd">        Mean annual return of the distribution</span>
-<span class="sd">    mean_annual_vol : PositiveFloat</span>
-<span class="sd">        Mean annual standard deviation of the distribution</span>
-<span class="sd">    dframe: pandas.DataFrame</span>
-<span class="sd">        Pandas DataFrame object holding the resulting values</span>
-<span class="sd">    jumps_lamda: NonNegativeFloat, default: 0.0</span>
-<span class="sd">        This is the probability of a jump happening at each point in time</span>
-<span class="sd">    jumps_sigma: NonNegativeFloat, default: 0.0</span>
-<span class="sd">        This is the volatility of the jump size</span>
-<span class="sd">    jumps_mu: float, default: 0.0</span>
-<span class="sd">        This is the average jump size</span>
-<span class="sd">    seed: int, optional</span>
-<span class="sd">        Seed for random process initiation</span>
+<span class="sd">    Args:</span>
+<span class="sd">        number_of_sims: Number of simulations to generate.</span>
+<span class="sd">        trading_days: Total number of days to simulate.</span>
+<span class="sd">        trading_days_in_year: Number of trading days used to annualize.</span>
+<span class="sd">        mean_annual_return: Mean annual return of the distribution.</span>
+<span class="sd">        mean_annual_vol: Mean annual standard deviation of the distribution.</span>
+<span class="sd">        dframe: Pandas DataFrame object holding the resulting values.</span>
+<span class="sd">        jumps_lamda: This is the probability of a jump happening at each point in time.</span>
+<span class="sd">            Defaults to 0.0.</span>
+<span class="sd">        jumps_sigma: This is the volatility of the jump size. Defaults to 0.0.</span>
+<span class="sd">        jumps_mu: This is the average jump size. Defaults to 0.0.</span>
+<span class="sd">        seed: Seed for random process initiation.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -283,10 +255,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulation data.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        pandas.DataFrame</span>
-<span class="sd">            Simulation data</span>
-
+<span class="sd">            Simulation data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dframe</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
 
@@ -296,10 +265,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Annualized arithmetic mean of returns.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        float</span>
-<span class="sd">            Annualized arithmetic mean of returns</span>
-
+<span class="sd">            Annualized arithmetic mean of returns.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
             <span class="s2">&quot;float&quot;</span><span class="p">,</span>
@@ -313,10 +279,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Annualized volatility.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        float</span>
-<span class="sd">            Annualized volatility</span>
-
+<span class="sd">            Annualized volatility.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
             <span class="s2">&quot;float&quot;</span><span class="p">,</span>
@@ -341,28 +304,18 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Normal distribution simulation.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        number_of_sims: PositiveInt</span>
-<span class="sd">            Number of simulations to generate</span>
-<span class="sd">        trading_days: PositiveInt</span>
-<span class="sd">            Number of trading days to simulate</span>
-<span class="sd">        mean_annual_return: float</span>
-<span class="sd">            Mean return</span>
-<span class="sd">        mean_annual_vol: PositiveFloat</span>
-<span class="sd">            Mean standard deviation</span>
-<span class="sd">        trading_days_in_year: DaysInYearType, default: 252</span>
-<span class="sd">            Number of trading days used to annualize</span>
-<span class="sd">        seed: int, optional</span>
-<span class="sd">            Seed for random process initiation</span>
-<span class="sd">        randomizer: numpy.random.Generator, optional</span>
-<span class="sd">            Random process generator</span>
+<span class="sd">        Args:</span>
+<span class="sd">            number_of_sims: Number of simulations to generate.</span>
+<span class="sd">            trading_days: Number of trading days to simulate.</span>
+<span class="sd">            mean_annual_return: Mean return.</span>
+<span class="sd">            mean_annual_vol: Mean standard deviation.</span>
+<span class="sd">            trading_days_in_year: Number of trading days used to annualize.</span>
+<span class="sd">                Defaults to 252.</span>
+<span class="sd">            seed: Seed for random process initiation.</span>
+<span class="sd">            randomizer: Random process generator.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        ReturnSimulation</span>
-<span class="sd">            Normal distribution simulation</span>
-
+<span class="sd">            Normal distribution simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
@@ -400,28 +353,18 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Lognormal distribution simulation.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        number_of_sims: PositiveInt</span>
-<span class="sd">            Number of simulations to generate</span>
-<span class="sd">        trading_days: PositiveInt</span>
-<span class="sd">            Number of trading days to simulate</span>
-<span class="sd">        mean_annual_return: float</span>
-<span class="sd">            Mean return</span>
-<span class="sd">        mean_annual_vol: PositiveFloat</span>
-<span class="sd">            Mean standard deviation</span>
-<span class="sd">        trading_days_in_year: DaysInYearType, default: 252</span>
-<span class="sd">            Number of trading days used to annualize</span>
-<span class="sd">        seed: int, optional</span>
-<span class="sd">            Seed for random process initiation</span>
-<span class="sd">        randomizer: numpy.random.Generator, optional</span>
-<span class="sd">            Random process generator</span>
+<span class="sd">        Args:</span>
+<span class="sd">            number_of_sims: Number of simulations to generate.</span>
+<span class="sd">            trading_days: Number of trading days to simulate.</span>
+<span class="sd">            mean_annual_return: Mean return.</span>
+<span class="sd">            mean_annual_vol: Mean standard deviation.</span>
+<span class="sd">            trading_days_in_year: Number of trading days used to annualize.</span>
+<span class="sd">                Defaults to 252.</span>
+<span class="sd">            seed: Seed for random process initiation.</span>
+<span class="sd">            randomizer: Random process generator.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        ReturnSimulation</span>
-<span class="sd">            Lognormal distribution simulation</span>
-
+<span class="sd">            Lognormal distribution simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
@@ -462,28 +405,18 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Geometric Brownian Motion simulation.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        number_of_sims: PositiveInt</span>
-<span class="sd">            Number of simulations to generate</span>
-<span class="sd">        trading_days: PositiveInt</span>
-<span class="sd">            Number of trading days to simulate</span>
-<span class="sd">        mean_annual_return: float</span>
-<span class="sd">            Mean return</span>
-<span class="sd">        mean_annual_vol: PositiveFloat</span>
-<span class="sd">            Mean standard deviation</span>
-<span class="sd">        trading_days_in_year: DaysInYearType, default: 252</span>
-<span class="sd">            Number of trading days used to annualize</span>
-<span class="sd">        seed: int, optional</span>
-<span class="sd">            Seed for random process initiation</span>
-<span class="sd">        randomizer: numpy.random.Generator, optional</span>
-<span class="sd">            Random process generator</span>
+<span class="sd">        Args:</span>
+<span class="sd">            number_of_sims: Number of simulations to generate.</span>
+<span class="sd">            trading_days: Number of trading days to simulate.</span>
+<span class="sd">            mean_annual_return: Mean return.</span>
+<span class="sd">            mean_annual_vol: Mean standard deviation.</span>
+<span class="sd">            trading_days_in_year: Number of trading days used to annualize.</span>
+<span class="sd">                Defaults to 252.</span>
+<span class="sd">            seed: Seed for random process initiation.</span>
+<span class="sd">            randomizer: Random process generator.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        ReturnSimulation</span>
-<span class="sd">            Geometric Brownian Motion simulation</span>
-
+<span class="sd">            Geometric Brownian Motion simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
@@ -531,34 +464,22 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Merton Jump-Diffusion model simulation.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        number_of_sims: PositiveInt</span>
-<span class="sd">            Number of simulations to generate</span>
-<span class="sd">        trading_days: PositiveInt</span>
-<span class="sd">            Number of trading days to simulate</span>
-<span class="sd">        mean_annual_return: float</span>
-<span class="sd">            Mean return</span>
-<span class="sd">        mean_annual_vol: PositiveFloat</span>
-<span class="sd">            Mean standard deviation</span>
-<span class="sd">        jumps_lamda: NonNegativeFloat</span>
-<span class="sd">            This is the probability of a jump happening at each point in time</span>
-<span class="sd">        jumps_sigma: NonNegativeFloat, default: 0.0</span>
-<span class="sd">            This is the volatility of the jump size</span>
-<span class="sd">        jumps_mu: float, default: 0.0</span>
-<span class="sd">            This is the average jump size</span>
-<span class="sd">        trading_days_in_year: DaysInYearType, default: 252</span>
-<span class="sd">            Number of trading days used to annualize</span>
-<span class="sd">        seed: int, optional</span>
-<span class="sd">            Seed for random process initiation</span>
-<span class="sd">        randomizer: numpy.random.Generator, optional</span>
-<span class="sd">            Random process generator</span>
+<span class="sd">        Args:</span>
+<span class="sd">            number_of_sims: Number of simulations to generate.</span>
+<span class="sd">            trading_days: Number of trading days to simulate.</span>
+<span class="sd">            mean_annual_return: Mean return.</span>
+<span class="sd">            mean_annual_vol: Mean standard deviation.</span>
+<span class="sd">            jumps_lamda: This is the probability of a jump happening at each point</span>
+<span class="sd">                in time.</span>
+<span class="sd">            jumps_sigma: This is the volatility of the jump size. Defaults to 0.0.</span>
+<span class="sd">            jumps_mu: This is the average jump size. Defaults to 0.0.</span>
+<span class="sd">            trading_days_in_year: Number of trading days used to annualize.</span>
+<span class="sd">                Defaults to 252.</span>
+<span class="sd">            seed: Seed for random process initiation.</span>
+<span class="sd">            randomizer: Random process generator.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        ReturnSimulation</span>
-<span class="sd">            Merton Jump-Diffusion model simulation</span>
-
+<span class="sd">            Merton Jump-Diffusion model simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
@@ -619,24 +540,16 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a pandas.DataFrame from simulation(s).</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        name: str</span>
-<span class="sd">            Name label of the serie(s)</span>
-<span class="sd">        start: datetime.date, optional</span>
-<span class="sd">            Date when the simulation starts</span>
-<span class="sd">        end: datetime.date, optional</span>
-<span class="sd">            Date when the simulation ends</span>
-<span class="sd">        countries: CountriesType, default: &quot;SE&quot;</span>
-<span class="sd">            (List of) country code(s) according to ISO 3166-1 alpha-2</span>
-<span class="sd">        markets: list[str] | str, optional</span>
-<span class="sd">            (List of) markets code(s) according to pandas-market-calendars</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name label of the serie(s).</span>
+<span class="sd">            start: Date when the simulation starts.</span>
+<span class="sd">            end: Date when the simulation ends.</span>
+<span class="sd">            countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
+<span class="sd">                Defaults to &quot;SE&quot;.</span>
+<span class="sd">            markets: (List of) markets code(s) supported by exchange_calendars.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        pandas.DataFrame</span>
-<span class="sd">            The simulation(s) data</span>
-
+<span class="sd">            The simulation(s) data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">d_range</span> <span class="o">=</span> <span class="n">generate_calendar_date_range</span><span class="p">(</span>
             <span class="n">trading_days</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trading_days</span><span class="p">,</span>

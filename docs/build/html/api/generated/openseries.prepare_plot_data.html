@@ -132,35 +132,20 @@
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">prepare_plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimized</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/portfoliotools.html#prepare_plot_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Prepare date to be used as point_frame in the sharpeplot function.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>assets: OpenFrame</dt><dd><p>Portfolio data with individual assets and a weighted portfolio</p>
-</dd>
-<dt>current: OpenTimeSeries</dt><dd><p>The current or initial portfolio based on given weights</p>
-</dd>
-<dt>optimized: DataFrame</dt><dd><p>Data optimized with the efficient_frontier method</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>DataFrame</dt><dd><p>The data prepared with mean returns, volatility and weights</p>
-</dd>
-</dl>
-</section>
+<dd><p>Prepare data to be used as point_frame in the sharpeplot function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>assets</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>current</strong> (<em>OpenTimeSeries</em>)</p></li>
-<li><p><strong>optimized</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>assets</strong> (<em>OpenFrame</em>) – Portfolio data with individual assets and a weighted portfolio.</p></li>
+<li><p><strong>current</strong> (<em>OpenTimeSeries</em>) – The current or initial portfolio based on given weights.</p></li>
+<li><p><strong>optimized</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Data optimized with the efficient_frontier method.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>DataFrame</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The data prepared with mean returns, volatility and weights.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
 </dd>
 </dl>
 </dd></dl>

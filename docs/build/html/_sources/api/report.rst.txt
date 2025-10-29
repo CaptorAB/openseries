@@ -3,12 +3,6 @@ Report Generation
 
 .. currentmodule:: openseries.report
 
-.. automodule:: openseries.report
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
-
 HTML Report Function
 --------------------
 
