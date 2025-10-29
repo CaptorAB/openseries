@@ -68,39 +68,28 @@ class OpenTimeSeries(_CommonModel[float]):
     The intended use is to allow analyses of financial timeseries.
     It is only intended for daily or less frequent data samples.
 
-    Parameters
-    ----------
-    timeseries_id: str
-        Database identifier of the timeseries
-    instrument_id: str
-        Database identifier of the instrument associated with the timeseries
-    name: str
-        string identifier of the timeseries and/or instrument
-    valuetype: ValueType
-        Identifies if the series is a series of values or returns
-    dates: DateListType
-        Dates of the individual timeseries items
-        These dates will not be altered by methods
-    values: ValueListType
-        The value or return values of the timeseries items
-        These values will not be altered by methods
-    local_ccy: bool
-        Boolean flag indicating if timeseries is in local currency
-    tsdf: pandas.DataFrame
-        Pandas object holding dates and values that can be altered via methods
-    currency: CurrencyStringType
-        ISO 4217 currency code of the timeseries
-    domestic: CurrencyStringType, default: "SEK"
-        ISO 4217 currency code of the user's home currency
-    countries: CountriesType, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    markets: list[str] | str, optional
-        (List of) markets code(s) supported by exchange_calendars
-    isin: str, optional
-        ISO 6166 identifier code of the associated instrument
-    label: str, optional
-        Placeholder for a name of the timeseries
-
+    Args:
+        timeseries_id: Database identifier of the timeseries.
+        instrument_id: Database identifier of the instrument associated with
+            the timeseries.
+        name: String identifier of the timeseries and/or instrument.
+        valuetype: Identifies if the series is a series of values or returns.
+        dates: Dates of the individual timeseries items.
+            These dates will not be altered by methods.
+        values: The value or return values of the timeseries items.
+            These values will not be altered by methods.
+        local_ccy: Boolean flag indicating if timeseries is in local currency.
+        tsdf: Pandas object holding dates and values that can be altered via
+            methods.
+        currency: ISO 4217 currency code of the timeseries.
+        domestic: ISO 4217 currency code of the user's home currency.
+            Defaults to "SEK".
+        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+            Defaults to "SE".
+        markets: (List of) markets code(s) supported by exchange_calendars.
+            Optional.
+        isin: ISO 6166 identifier code of the associated instrument. Optional.
+        label: Placeholder for a name of the timeseries. Optional.
     """
 
     timeseries_id: str
@@ -186,32 +175,22 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> Self:
         """Create series from a list of dates and a list of values.
 
-        Parameters
-        ----------
-        name: str
-            string identifier of the timeseries and/or instrument
-        dates: DateListType
-            List of date strings as ISO 8601 YYYY-MM-DD
-        values: ValueListType
-            Array of float values
-        valuetype: ValueType, default: ValueType.PRICE
-            Identifies if the series is a series of values or returns
-        timeseries_id: str, optional
-            Database identifier of the timeseries
-        instrument_id: str, optional
-            Database identifier of the instrument associated with the timeseries
-        isin: str, optional
-            ISO 6166 identifier code of the associated instrument
-        baseccy: CurrencyStringType, default: "SEK"
-            ISO 4217 currency code of the timeseries
-        local_ccy: bool, default: True
-            Boolean flag indicating if timeseries is in local currency
+        Args:
+            name: String identifier of the timeseries and/or instrument.
+            dates: List of date strings as ISO 8601 YYYY-MM-DD.
+            values: Array of float values.
+            valuetype: Identifies if the series is a series of values or returns.
+                Defaults to ValueType.PRICE.
+            timeseries_id: Database identifier of the timeseries. Optional.
+            instrument_id: Database identifier of the instrument associated
+                with the timeseries. Optional.
+            isin: ISO 6166 identifier code of the associated instrument. Optional.
+            baseccy: ISO 4217 currency code of the timeseries. Defaults to "SEK".
+            local_ccy: Boolean flag indicating if timeseries is in local currency.
+                Defaults to True.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         return cls(
             name=name,
@@ -244,24 +223,17 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> Self:
         """Create series from a Pandas DataFrame or Series.
 
-        Parameters
-        ----------
-        dframe: DataFrame | Series[float]
-            Pandas DataFrame or Series
-        column_nmbr: int, default: 0
-            Using iloc[:, column_nmbr] to pick column
-        valuetype: ValueType, default: ValueType.PRICE
-            Identifies if the series is a series of values or returns
-        baseccy: CurrencyStringType, default: "SEK"
-            ISO 4217 currency code of the timeseries
-        local_ccy: bool, default: True
-            Boolean flag indicating if timeseries is in local currency
+        Args:
+            dframe: Pandas DataFrame or Series.
+            column_nmbr: Using iloc[:, column_nmbr] to pick column. Defaults to 0.
+            valuetype: Identifies if the series is a series of values or returns.
+                Defaults to ValueType.PRICE.
+            baseccy: ISO 4217 currency code of the timeseries. Defaults to "SEK".
+            local_ccy: Boolean flag indicating if timeseries is in local currency.
+                Defaults to True.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         msg = "Argument dframe must be pandas Series or DataFrame."
         values: list[float]
@@ -335,32 +307,22 @@ class OpenTimeSeries(_CommonModel[float]):
         Providing a date_range of type Pandas DatetimeIndex takes priority over
         providing a combination of days and an end date.
 
-        Parameters
-        ----------
-        rate: float
-            The accrual rate
-        d_range: DatetimeIndex, optional
-            A given range of dates
-        days: int, optional
-            Number of days to generate when date_range not provided. Must be combined
-            with end_dt
-        end_dt: datetime.date, optional
-            End date of date range to generate when date_range not provided. Must be
-            combined with days
-        label: str
-            Placeholder for a name of the timeseries
-        valuetype: ValueType, default: ValueType.PRICE
-            Identifies if the series is a series of values or returns
-        baseccy: CurrencyStringType, default: "SEK"
-            The currency of the timeseries
-        local_ccy: bool, default: True
-            Boolean flag indicating if timeseries is in local currency
+        Args:
+            rate: The accrual rate.
+            d_range: A given range of dates. Optional.
+            days: Number of days to generate when date_range not provided. Must be
+                combined with end_dt. Optional.
+            end_dt: End date of date range to generate when date_range not provided.
+                Must be combined with days. Optional.
+            label: Placeholder for a name of the timeseries.
+            valuetype: Identifies if the series is a series of values or returns.
+                Defaults to ValueType.PRICE.
+            baseccy: The currency of the timeseries. Defaults to "SEK".
+            local_ccy: Boolean flag indicating if timeseries is in local currency.
+                Defaults to True.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         if d_range is None:
             if days is not None and end_dt is not None:
@@ -396,10 +358,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Create copy of OpenTimeSeries object.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         return deepcopy(self)
 
@@ -407,10 +366,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Populate .tsdf Pandas DataFrame from the .dates and .values lists.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         dframe = DataFrame(
             data=self.values,
@@ -428,16 +384,12 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> DataFrame:
         """Calculate chosen properties.
 
-        Parameters
-        ----------
-        properties: list[LiteralSeriesProps], optional
-            The properties to calculate. Defaults to calculating all available.
+        Args:
+            properties: The properties to calculate. Defaults to calculating all
+                available. Optional.
 
         Returns:
-        --------
-        pandas.DataFrame
-            Properties of the OpenTimeSeries
-
+            Properties of the OpenTimeSeries.
         """
         if not properties:
             properties = cast(
@@ -454,10 +406,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Convert series of values into series of returns.
 
         Returns:
-        --------
-        OpenTimeSeries
-            The returns of the values in the series
-
+            The returns of the values in the series.
         """
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
@@ -472,17 +421,12 @@ class OpenTimeSeries(_CommonModel[float]):
     def value_to_diff(self: Self, periods: int = 1) -> Self:
         """Convert series of values to series of their period differences.
 
-        Parameters
-        ----------
-        periods: int, default: 1
-            The number of periods between observations over which difference
-            is calculated
+        Args:
+            periods: The number of periods between observations over which difference
+                is calculated. Defaults to 1.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
@@ -499,10 +443,7 @@ class OpenTimeSeries(_CommonModel[float]):
         """Convert series of returns into cumulative series of values.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         if self.valuetype == ValueType.PRICE:
             self.value_to_ret()
@@ -526,18 +467,13 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> Self:
         """Convert series of 1-day rates into series of cumulative values.
 
-        Parameters
-        ----------
-        days_in_year: int, default 365
-            Calendar days per year used as divisor
-        divider: float, default 1.0
-            Convenience divider for when the 1-day rate is not scaled correctly
+        Args:
+            days_in_year: Calendar days per year used as divisor. Defaults to 365.
+            divider: Convenience divider for when the 1-day rate is not scaled
+                correctly. Defaults to 1.0.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         arr: NDArray[float64] = array(self.values) / divider
 
@@ -569,16 +505,12 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> Self:
         """Resamples the timeseries frequency.
 
-        Parameters
-        ----------
-        freq: LiteralBizDayFreq | str, default "BME"
-            The date offset string that sets the resampled frequency
+        Args:
+            freq: The date offset string that sets the resampled frequency.
+                Defaults to "BME".
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         self.tsdf.index = DatetimeIndex(self.tsdf.index)
         if self.valuetype == ValueType.RTRN:
@@ -597,18 +529,14 @@ class OpenTimeSeries(_CommonModel[float]):
 
         Stubs left in place. Stubs will be aligned to the shortest stub.
 
-        Parameters
-        ----------
-        freq: LiteralBizDayFreq, default BME
-            The date offset string that sets the resampled frequency
-        method: LiteralPandasReindexMethod, default: nearest
-            Controls the method used to align values across columns
+        Args:
+            freq: The date offset string that sets the resampled frequency.
+                Defaults to BME.
+            method: Controls the method used to align values across columns.
+                Defaults to nearest.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         if self.valuetype == ValueType.RTRN:
             msg = (
@@ -641,29 +569,21 @@ class OpenTimeSeries(_CommonModel[float]):
 
         https://www.investopedia.com/articles/07/ewma.asp.
 
-        Parameters
-        ----------
-        lmbda: float, default: 0.94
-            Scaling factor to determine weighting.
-        day_chunk: int, default: 0
-            Sampling the data which is assumed to be daily.
-        dlta_degr_freedms: int, default: 0
-            Variance bias factor taking the value 0 or 1.
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+        Args:
+            lmbda: Scaling factor to determine weighting. Defaults to 0.94.
+            day_chunk: Sampling the data which is assumed to be daily.
+                Defaults to 0.
+            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.
+                Defaults to 0.
+            months_from_last: Number of months offset as positive integer.
+                Overrides use of from_date and to_date. Optional.
+            from_date: Specific from date. Optional.
+            to_date: Specific to date. Optional.
+            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+                test cases and comparisons. Optional.
 
         Returns:
-        --------
-        Pandas.Series[float]
-            Series EWMA volatility
-
+            Series EWMA volatility.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -716,19 +636,13 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> Self:
         """Add or subtract a fee from the timeseries return.
 
-        Parameters
-        ----------
-        adjustment: float
-            Fee to add or subtract
-        days_in_year: int, default: 365
-            The calculation divisor and
-            assumed number of days in a calendar year
+        Args:
+            adjustment: Fee to add or subtract.
+            days_in_year: The calculation divisor and assumed number of days in a
+                calendar year. Defaults to 365.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         if self.valuetype == ValueType.RTRN:
             ra_df = self.tsdf.copy()
@@ -776,20 +690,13 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> Self:
         """Set the column labels of the .tsdf Pandas Dataframe.
 
-        Parameters
-        ----------
-        lvl_zero: str, optional
-            New level zero label
-        lvl_one: ValueType, optional
-            New level one label
-        delete_lvl_one: bool, default: False
-            If True the level one label is deleted
+        Args:
+            lvl_zero: New level zero label. Optional.
+            lvl_one: New level one label. Optional.
+            delete_lvl_one: If True the level one label is deleted. Defaults to False.
 
         Returns:
-        --------
-        OpenTimeSeries
-            An OpenTimeSeries object
-
+            An OpenTimeSeries object.
         """
         if lvl_zero is None and lvl_one is None:
             self.tsdf.columns = MultiIndex.from_arrays(
@@ -818,20 +725,13 @@ def timeseries_chain(
 
     The function assumes that the two series have at least one date in common.
 
-    Parameters
-    ----------
-    front: TypeOpenTimeSeries
-        Earlier series to chain with
-    back: TypeOpenTimeSeries
-        Later series to chain with
-    old_fee: float, default: 0.0
-        Fee to apply to earlier series
+    Args:
+        front: Earlier series to chain with.
+        back: Later series to chain with.
+        old_fee: Fee to apply to earlier series. Defaults to 0.0.
 
     Returns:
-    --------
-    TypeOpenTimeSeries
-        An OpenTimeSeries object or a subclass thereof
-
+        An OpenTimeSeries object or a subclass thereof.
     """
     old = front.from_deepcopy()
     old.running_adjustment(old_fee)
@@ -883,16 +783,11 @@ def timeseries_chain(
 def _check_if_none(item: Any) -> bool:  # noqa: ANN401
     """Check if a variable is None or equivalent.
 
-    Parameters
-    ----------
-    item: Any
-        variable to be checked
+    Args:
+        item: Variable to be checked.
 
     Returns:
-    --------
-    bool
-        Answer to whether the variable is None or equivalent
-
+        Answer to whether the variable is None or equivalent.
     """
     try:
         return cast("bool", isnan(item))
