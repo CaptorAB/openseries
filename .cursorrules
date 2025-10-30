@@ -1,0 +1,15 @@
+Before any terminal command for Python tasks in this workspace, run:
+
+- `source source_me` from the project root to set PYTHONPATH and activate the local environment.
+
+Guidelines:
+
+- Assume `source_me` exists in the repo root; if missing, proceed normally.
+- Prefer absolute project paths when invoking tools.
+- Do not modify `Makefile` to achieve environment activation.
+
+Assistant behavior:
+
+- For linting, testing, docs, or Python scripts, first run `source source_me`.
+- On a new terminal session, re-run `source source_me` before env-dependent commands.
+- After code changes run `make lint` to check that the code adhers to ruff and mypy rules and run `make test` to check that all tests pass and that coverage is 100%.
