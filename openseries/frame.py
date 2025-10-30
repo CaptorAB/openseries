@@ -126,9 +126,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             constituents=copied_constituents,
             weights=weights,
         )
-
-        self.constituents = copied_constituents
-        self.weights = weights
         self._set_tsdf()
 
     def _set_tsdf(self: Self) -> None:
