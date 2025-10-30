@@ -175,19 +175,19 @@
 <td><p>To add an OpenTimeSeries object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">align_index_to_local_cdays</span></code>([countries, ...])</p></td>
-<td><p>Align the index of .tsdf with local calendar business days.</p></td>
+<td><p>Align the index of <code class="docutils literal notranslate"><span class="pre">.tsdf</span></code> with local calendar business days.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_properties</span></code>([properties])</p></td>
 <td><p>Calculate chosen timeseries properties.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">arithmetic_ret_func</span></code>([months_from_last, ...])</p></td>
-<td><p><a class="reference external" href="https://www.investopedia.com/terms/a/arithmeticmean.asp">https://www.investopedia.com/terms/a/arithmeticmean.asp</a>.</p></td>
+<td><p>Annualized arithmetic mean of returns.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code>(asset, market[, dlta_degr_freedms])</p></td>
 <td><p>Market Beta.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_range</span></code>([months_offset, from_dt, to_dt])</p></td>
-<td><p>Create user defined date range.</p></td>
+<td><p>Create a user-defined date range aligned to index.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">capture_ratio_func</span></code>(ratio[, base_column, ...])</p></td>
 <td><p>Capture Ratio.</p></td>
@@ -199,7 +199,7 @@
 <td><p>Returns a copy of the model.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cvar_down_func</span></code>([level, months_from_last, ...])</p></td>
-<td><p>Downside Conditional Value At Risk &quot;CVaR&quot;.</p></td>
+<td><p>Downside Conditional Value At Risk (CVaR).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete_timeseries</span></code>(lvl_zero_item)</p></td>
 <td><p>To delete an OpenTimeSeries object.</p></td>
@@ -232,7 +232,7 @@
 <td><p>Kurtosis of the return distribution.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_partial_moment_func</span></code>([...])</p></td>
-<td><p>Downside Deviation if order set to 2.</p></td>
+<td><p>Lower partial moment and downside deviation (order=2).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_portfolio</span></code>(name[, weight_strat])</p></td>
 <td><p>Calculate a basket timeseries based on the supplied weights.</p></td>
@@ -307,7 +307,7 @@
 <td><p>Create a Plotly Scatter Figure.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">positive_share_func</span></code>([months_from_last, ...])</p></td>
-<td><p>Calculate share of percentage changes that are greater than zero.</p></td>
+<td><p>Share of percentage changes greater than zero.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rebalanced_portfolio</span></code>(name[, items, ...])</p></td>
 <td><p>Create a rebalanced portfolio from the OpenFrame constituents.</p></td>
@@ -325,7 +325,7 @@
 <td><p>Ratio between arithmetic mean of returns and annualized volatility.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">return_nan_handle</span></code>([method])</p></td>
-<td><p>Handle missing values in a returnseries.</p></td>
+<td><p>Handle missing values in a return series.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_beta</span></code>([asset_column, market_column, ...])</p></td>
 <td><p>Calculate rolling Market Beta.</p></td>
@@ -343,10 +343,10 @@
 <td><p>Calculate rolling returns.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_var_down</span></code>([column, level, ...])</p></td>
-<td><p>Calculate rolling annualized downside Value At Risk &quot;VaR&quot;.</p></td>
+<td><p>Calculate rolling annualized downside Value At Risk (VaR).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_vol</span></code>([column, observations, ...])</p></td>
-<td><p>Calculate rolling annualised volatilities.</p></td>
+<td><p>Calculate rolling annualized volatilities.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code>([by_alias, ref_template])</p></td>
 <td><p></p></td>
@@ -358,7 +358,7 @@
 <td><p>Skew of the return distribution.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sortino_ratio_func</span></code>([riskfree_rate, ...])</p></td>
-<td><p>Sortino Ratio or Kappa3 Ratio.</p></td>
+<td><p>Sortino ratio or Kappa-3 ratio.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_weight_from_var</span></code>([target_vol, level, ...])</p></td>
 <td><p>Target weight from VaR.</p></td>
@@ -370,10 +370,10 @@
 <td><p>Convert timeseries into a drawdown series.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>(what_output, filename[, directory])</p></td>
-<td><p>Dump timeseries data into a json file.</p></td>
+<td><p>Dump timeseries data into a JSON file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xlsx</span></code>(filename[, sheet_title, directory, ...])</p></td>
-<td><p>Save .tsdf DataFrame to an Excel spreadsheet file.</p></td>
+<td><p>Save <code class="docutils literal notranslate"><span class="pre">.tsdf</span></code> DataFrame to an Excel spreadsheet file.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracking_error_func</span></code>([base_column, ...])</p></td>
 <td><p>Tracking Error.</p></td>
@@ -388,7 +388,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_nan_handle</span></code>([method])</p></td>
-<td><p>Handle missing values in a valueseries.</p></td>
+<td><p>Handle missing values in a value series.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_ret_calendar_period</span></code>(year[, month])</p></td>
 <td><p>Calculate simple return for a specific calendar period.</p></td>
@@ -400,25 +400,25 @@
 <td><p>Convert series of values to series of their period differences.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_log</span></code>()</p></td>
-<td><p>Series of values converted into logarithmic weighted series.</p></td>
+<td><p>Convert value series to log-weighted series.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_ret</span></code>()</p></td>
 <td><p>Convert series of values into series of returns.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var_down_func</span></code>([level, months_from_last, ...])</p></td>
-<td><p>Downside Value At Risk, &quot;VaR&quot;.</p></td>
+<td><p>Downside Value At Risk (VaR).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vol_from_var_func</span></code>([level, months_from_last, ...])</p></td>
-<td><p>Implied annualized volatility.</p></td>
+<td><p>Implied annualized volatility from downside VaR.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vol_func</span></code>([months_from_last, from_date, ...])</p></td>
 <td><p>Annualized volatility.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">worst_func</span></code>([observations, months_from_last, ...])</p></td>
-<td><p>Most negative percentage change over a rolling number of observations.</p></td>
+<td><p>Most negative percentage change over a rolling window.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">z_score_func</span></code>([months_from_last, from_date, ...])</p></td>
-<td><p>Z-score as (last return - mean return) / standard deviation of returns.</p></td>
+<td><p>Z-score of the last return.</p></td>
 </tr>
 </tbody>
 </table>
@@ -540,7 +540,7 @@
 <td><p>Most negative month.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">yearfrac</span></code></p></td>
-<td><p>Length of series expressed in years assuming all years have 365.25 days.</p></td>
+<td><p>Length of series in years assuming 365.25 days per year.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">z_score</span></code></p></td>
 <td><p>//www.investopedia.com/terms/z/zscore.asp.</p></td>

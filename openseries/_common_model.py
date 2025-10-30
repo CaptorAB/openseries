@@ -92,23 +92,19 @@ def _get_date_range_and_factor(
 ) -> tuple[dt.date, dt.date, float, DataFrame]:
     """Common logic for date range and time factor calculation.
 
-    Parameters
-    ----------
-    months_from_last: int, optional
-        Number of months offset as positive integer. Overrides use of from_date
-        and to_date
-    from_date: datetime.date, optional
-        Specific from date
-    to_date: datetime.date, optional
-        Specific to date
-    periods_in_a_year_fixed: DaysInYearType, optional
-        Allows locking the periods-in-a-year to simplify test cases and
-        comparisons
+    Args:
+        self: The instance.
+        months_from_last: Number of months offset as a positive integer. Overrides
+            use of ``from_date`` and ``to_date``.
+        from_date: Specific from date.
+        to_date: Specific to date.
+        periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+            test cases and comparisons.
 
     Returns:
-    --------
-    tuple[dt.date, dt.date, float, DataFrame]
-        earlier, later, time_factor, data
+        A tuple of ``(earlier, later, time_factor, data)`` where ``earlier`` and
+        ``later`` are the selected dates, ``time_factor`` is the inferred periods
+        per year, and ``data`` is the sliced ``DataFrame``.
     """
     earlier, later = self.calc_range(
         months_offset=months_from_last,
@@ -139,19 +135,16 @@ def _get_base_column_data(
 ) -> tuple[Series[float], tuple[str, ValueType], str]:
     """Common logic for base column data extraction.
 
-    Parameters
-    ----------
-    base_column: tuple[str, ValueType] | int
-        Column reference
-    earlier: dt.date
-        Start date
-    later: dt.date
-        End date
+    Args:
+        self: The instance.
+        base_column: Column reference as a ``(label, ValueType)`` tuple or
+            integer position.
+        earlier: Start date.
+        later: End date.
 
     Returns:
-    --------
-    tuple[Series[float], tuple[str, ValueType], str]
-        data, item, label
+        A tuple ``(data, item, label)`` where ``data`` is the selected series,
+        ``item`` is the resolved column key and ``label`` its first-level label.
     """
     if isinstance(base_column, tuple):
         data = self.tsdf.loc[cast("Timestamp", earlier) : cast("Timestamp", later)][
@@ -180,21 +173,14 @@ def _calculate_time_factor(
 ) -> float:
     """Calculate time factor for annualization.
 
-    Parameters
-    ----------
-    data: Series[float]
-        Data series for counting observations
-    earlier: dt.date
-        Start date
-    later: dt.date
-        End date
-    periods_in_a_year_fixed: DaysInYearType, optional
-        Fixed periods in year
+    Args:
+        data: Data series for counting observations.
+        earlier: Start date.
+        later: End date.
+        periods_in_a_year_fixed: Fixed periods in year.
 
     Returns:
-    --------
-    float
-        Time factor
+        Time factor expressed as observations per year.
     """
     if periods_in_a_year_fixed:
         return float(periods_in_a_year_fixed)
@@ -235,10 +221,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Number of observations.
 
         Returns:
-        --------
-        int
-            Number of observations
-
+            Number of observations.
         """
         return len(self.tsdf.index)
 
@@ -247,10 +230,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """The first date in the timeseries.
 
         Returns:
-        --------
-        datetime.date
-            The first date in the timeseries
-
+            The first date in the timeseries.
         """
         return cast("dt.date", self.tsdf.index[0])
 
@@ -259,10 +239,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """The last date in the timeseries.
 
         Returns:
-        --------
-        datetime.date
-            The last date in the timeseries
-
+            The last date in the timeseries.
         """
         return cast("dt.date", self.tsdf.index[-1])
 
@@ -271,23 +248,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Number of days from the first date to the last.
 
         Returns:
-        --------
-        int
-            Number of days from the first date to the last
-
+            Number of days from the first date to the last.
         """
         return (self.last_idx - self.first_idx).days
 
     @property
     def yearfrac(self: Self) -> float:
-        """Length of series expressed in years assuming all years have 365.25 days.
+        """Length of series in years assuming 365.25 days per year.
 
         Returns:
-        --------
-        float
-            Length of the timeseries expressed in years assuming all years
-            have 365.25 days
-
+            Length of the timeseries in years assuming 365.25 days per year.
         """
         return self.span_of_days / 365.25
 
@@ -296,10 +266,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """The average number of observations per year.
 
         Returns:
-        --------
-        float
-            The average number of observations per year
-
+            The average number of observations per year.
         """
         return self.length / self.yearfrac
 
@@ -698,23 +665,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         from_dt: dt.date | None = None,
         to_dt: dt.date | None = None,
     ) -> tuple[dt.date, dt.date]:
-        """Create user defined date range.
+        """Create a user-defined date range aligned to index.
 
-        Parameters
-        ----------
-        months_offset: int, optional
-            Number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_dt: datetime.date, optional
-            Specific from date
-        to_dt: datetime.date, optional
-            Specific from date
+        Args:
+            months_offset: Number of months offset as a positive integer. Overrides
+                use of ``from_dt`` and ``to_dt``.
+            from_dt: Specific from date.
+            to_dt: Specific to date.
 
         Returns:
-        --------
-        tuple[datetime.date, datetime.date]
-            Start and end date of the chosen date range
+            A tuple ``(earlier, later)`` representing the start and end date of the
+            chosen date range aligned to existing index values.
 
+        Raises:
+            DateAlignmentError: If the implied range is outside series bounds.
         """
         earlier, later = self.first_idx, self.last_idx
         if months_offset is not None:
@@ -756,25 +720,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         custom_holidays: list[str] | str | None = None,
         method: LiteralPandasReindexMethod = "nearest",
     ) -> Self:
-        """Align the index of .tsdf with local calendar business days.
+        """Align the index of ``.tsdf`` with local calendar business days.
 
-        Parameters
-        ----------
-
-        countries: CountriesType, optional
-            (List of) country code(s) according to ISO 3166-1 alpha-2
-        markets: list[str] | str, optional
-            (List of) markets code(s) supported by exchange_calendars
-        custom_holidays: list[str] | str, optional
-            Argument where missing holidays can be added
-        method: LiteralPandasReindexMethod, default: "nearest"
-            Method for reindexing when aligning to business days
+        Args:
+            countries: Country code(s) (ISO 3166-1 alpha-2).
+            markets: Market code(s) supported by ``exchange_calendars``.
+            custom_holidays: Missing holidays that should be added.
+            method: Method for reindexing when aligning to business days.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            The modified object.
         """
         startyear = cast("int", to_datetime(self.tsdf.index[0]).year)
         endyear = cast("int", to_datetime(self.tsdf.index[-1]).year)
@@ -826,15 +781,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         return self
 
     def value_to_log(self: Self) -> Self:
-        """Series of values converted into logarithmic weighted series.
+        """Convert value series to log-weighted series.
 
-        Equivalent to LN(value[t] / value[t=0]) in Excel.
+        Equivalent to ``LN(value[t] / value[t=0])`` in Excel.
 
         Returns:
-        --------
-        self
-            An object of the same class
-
+            The modified object.
         """
         self.tsdf = DataFrame(
             data=log(self.tsdf / self.tsdf.iloc[0]),
@@ -844,18 +796,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         return self
 
     def value_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
-        """Handle missing values in a valueseries.
+        """Handle missing values in a value series.
 
-        Parameters
-        ----------
-        method: LiteralNanMethod, default: "fill"
-            Method used to handle NaN. Either fill with last known or drop
+        Args:
+            method: Method used to handle NaN. Either ``"fill"`` (last known) or
+                ``"drop"``.
 
         Returns:
-        --------
-        self
-            An object of the same class
-
+            The modified object.
         """
         if method == "fill":
             self.tsdf = self.tsdf.ffill()
@@ -864,18 +812,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         return self
 
     def return_nan_handle(self: Self, method: LiteralNanMethod = "fill") -> Self:
-        """Handle missing values in a returnseries.
+        """Handle missing values in a return series.
 
-        Parameters
-        ----------
-        method: LiteralNanMethod, default: "fill"
-            Method used to handle NaN. Either fill with zero or drop
+        Args:
+            method: Method used to handle NaN. Either ``"fill"`` (zero) or
+                ``"drop"``.
 
         Returns:
-        --------
-        self
-            An object of the same class
-
+            The modified object.
         """
         if method == "fill":
             self.tsdf = self.tsdf.fillna(value=0.0)
@@ -887,10 +831,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Convert timeseries into a drawdown series.
 
         Returns:
-        --------
-        self
-            An object of the same class
-
+            The modified object.
         """
         drawdown = self.tsdf.copy()
         drawdown[isnan(drawdown)] = -inf
@@ -904,23 +845,15 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         filename: str,
         directory: DirectoryPath | None = None,
     ) -> list[dict[str, str | bool | ValueType | list[str] | list[float]]]:
-        """Dump timeseries data into a json file.
+        """Dump timeseries data into a JSON file.
 
-        Parameters
-        ----------
-        what_output: LiteralJsonOutput
-            Choice on whether the raw values or the tsdf Dataframe values are
-            returned as json and exported as json file.
-        filename: str
-            Filename including filetype
-        directory: DirectoryPath, optional
-            File folder location
+        Args:
+            what_output: Whether to export raw values or ``tsdf`` values.
+            filename: Filename including extension.
+            directory: Folder where the file will be written.
 
         Returns:
-        --------
-        list[dict[str, str | bool | ValueType | list[str] | list[float]]]
-            A list of dictionaries with the data of the series
-
+            A list of dictionaries with the data of the series.
         """
         if directory:
             dirpath = Path(directory).resolve()
@@ -970,24 +903,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         *,
         overwrite: bool = True,
     ) -> str:
-        """Save .tsdf DataFrame to an Excel spreadsheet file.
+        """Save ``.tsdf`` DataFrame to an Excel spreadsheet file.
 
-        Parameters
-        ----------
-        filename: str
-            Filename that should include .xlsx
-        sheet_title: str, optional
-            Name of the sheet in the Excel file
-        directory: DirectoryPath, optional
-            The file directory where the Excel file is saved.
-        overwrite: bool, default: True
-            Flag whether to overwrite an existing file
+        Args:
+            filename: Filename that should include ``.xlsx``.
+            sheet_title: Name of the sheet in the Excel file.
+            directory: Directory where the Excel file is saved.
+            overwrite: Whether to overwrite an existing file.
 
         Returns:
-        --------
-        str
-            The Excel file path
+            The Excel file path.
 
+        Raises:
+            NameError: If ``filename`` does not end with ``.xlsx``.
+            FileExistsError: If the file exists and ``overwrite`` is False.
         """
         if filename[-5:].lower() != ".xlsx":
             msg = "Filename must end with .xlsx"
@@ -1025,7 +954,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         labels: list[str] | None,
         default_labels: list[str],
     ) -> list[str]:
-        """Validate or infer labels for plotting."""
+        """Validate or infer labels for plotting.
+
+        Args:
+            ncols: Number of columns expected.
+            labels: Provided labels, if any.
+            default_labels: Labels to use if ``labels`` is ``None``.
+
+        Returns:
+            A list of labels with length ``ncols``.
+
+        Raises:
+            NumberOfItemsAndLabelsNotSameError: If ``labels`` length does not match
+                ``ncols``.
+        """
         if labels:
             if len(labels) != ncols:
                 msg = "Must provide same number of labels as items in frame."
@@ -1035,7 +977,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @staticmethod
     def _resolve_dir(directory: DirectoryPath | None) -> Path:
-        """Resolve output directory for plot files."""
+        """Resolve output directory for plot files.
+
+        Args:
+            directory: Optional directory override.
+
+        Returns:
+            Resolved directory path.
+        """
         if directory:
             return Path(directory).resolve()
         if (Path.home() / "Documents").exists():
@@ -1044,7 +993,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @staticmethod
     def _hover_xy(tick_fmt: str | None) -> str:
-        """Create hovertemplate for y-value and date x-axis."""
+        """Create hovertemplate for y-value and date x-axis.
+
+        Args:
+            tick_fmt: Plotly tick format string for the y-axis.
+
+        Returns:
+            Plotly hovertemplate string.
+        """
         return (
             f"%{{y:{tick_fmt}}}<br>%{{x|{'%Y-%m-%d'}}}"
             if tick_fmt
@@ -1053,7 +1009,15 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @staticmethod
     def _hover_hist(x_fmt: str | None, y_fmt: str | None) -> str:
-        """Create hovertemplate for histogram plots."""
+        """Create hovertemplate for histogram plots.
+
+        Args:
+            x_fmt: Plotly tick format string for the x-axis.
+            y_fmt: Plotly tick format string for the y-axis.
+
+        Returns:
+            Plotly hovertemplate string.
+        """
         y = f"%{{y:{y_fmt}}}" if y_fmt else "%{y}"
         x = f"%{{x:{x_fmt}}}" if x_fmt else "%{x}"
         return f"Count: {y}<br>{x}"
@@ -1066,7 +1030,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         *,
         add_logo: bool,
     ) -> None:
-        """Apply optional title and logo to a Plotly Figure."""
+        """Apply optional title and logo to a Plotly Figure.
+
+        Args:
+            figure: Plotly figure to update.
+            logo: Plotly layout image dict.
+            title: Optional plot title.
+            add_logo: Whether to add the logo to the figure.
+        """
         if add_logo:
             figure.add_layout_image(logo)
         if title:
@@ -1085,7 +1056,21 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         include_plotlyjs_bool: LiteralPlotlyJSlib,
         auto_open: bool,
     ) -> str:
-        """Write a file or return inline HTML string from a Plotly Figure."""
+        """Write a file or return inline HTML string from a Plotly Figure.
+
+        Args:
+            figure: Plotly figure to render.
+            fig_config: Plotly config dict.
+            output_type: Output type: ``"file"`` or ``"div"``.
+            plotfile: Full path to the output html file.
+            filename: Output filename used for the ``div_id`` when inline.
+            include_plotlyjs_bool: How plotly.js is included.
+            auto_open: Whether to auto-open the file in a browser.
+
+        Returns:
+            If ``output_type`` is ``"file"``, the path to the file; otherwise an
+            inline HTML string (div).
+        """
         if output_type == "file":
             plot(
                 figure_or_data=figure,
@@ -1128,37 +1113,21 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> tuple[Figure, str]:
         """Create a Plotly Bar Figure.
 
-        Parameters
-        ----------
-        self.tsdf: pandas.DataFrame
-            The timeseries self.tsdf
-        mode: LiteralBarPlotMode
-            The type of bar to use
-        title: str, optional
-            A title above the plot
-        tick_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show
-        filename: str, optional
-            Name of the Plotly html file
-        directory: DirectoryPath, optional
-            Directory where Plotly html file is saved
-        labels: list[str], optional
-            A list of labels to manually override using the names of
-            the input self.tsdf
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
-        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
-            Determines how the plotly.js library is included in the output
-        auto_open: bool, default: True
-            Determines whether to open a browser window with the plot
-        add_logo: bool, default: True
-            If True a Captor logo is added to the plot
+        Args:
+            mode: The type of bar to use.
+            title: A title above the plot.
+            tick_fmt: Tick format for the y-axis, e.g. ``'%'`` or ``'.1%'``.
+            filename: Name of the Plotly HTML file.
+            directory: Directory where the Plotly HTML file is saved.
+            labels: Labels to override the column names of ``self.tsdf``.
+            output_type: Determines output type.
+            include_plotlyjs: How the plotly.js library is included.
+            auto_open: Whether to open a browser window with the plot.
+            add_logo: If True, a Captor logo is added to the plot.
 
         Returns:
-        --------
-        tuple[plotly.go.Figure, str]
-            Plotly Figure and a div section or a html filename with location
-
+            A tuple ``(figure, output)`` where ``output`` is either a div string or
+            a file path.
         """
         labels = self._ensure_labels(
             ncols=self.tsdf.shape[1],
@@ -1223,39 +1192,22 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> tuple[Figure, str]:
         """Create a Plotly Scatter Figure.
 
-        Parameters
-        ----------
-        self.tsdf: pandas.DataFrame
-            The timeseries self.tsdf
-        mode: LiteralLinePlotMode, default: "lines"
-            The type of scatter to use
-        title: str, optional
-            A title above the plot
-        tick_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show
-        filename: str, optional
-            Name of the Plotly html file
-        directory: DirectoryPath, optional
-            Directory where Plotly html file is saved
-        labels: list[str], optional
-            A list of labels to manually override using the names of
-            the input self.tsdf
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
-        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
-            Determines how the plotly.js library is included in the output
-        auto_open: bool, default: True
-            Determines whether to open a browser window with the plot
-        add_logo: bool, default: True
-            If True a Captor logo is added to the plot
-        show_last: bool, default: False
-            If True the last self.tsdf point is highlighted as red dot with a label
+        Args:
+            mode: The type of scatter to use.
+            title: A title above the plot.
+            tick_fmt: Tick format for the y-axis, e.g. ``'%'`` or ``'.1%'``.
+            filename: Name of the Plotly HTML file.
+            directory: Directory where the Plotly HTML file is saved.
+            labels: Labels to override the column names of ``self.tsdf``.
+            output_type: Determines output type.
+            include_plotlyjs: How the plotly.js library is included.
+            auto_open: Whether to open a browser window with the plot.
+            add_logo: If True, a Captor logo is added to the plot.
+            show_last: If True, highlight the last point in red with a label.
 
         Returns:
-        --------
-        tuple[plotly.go.Figure, str]
-            Plotly Figure and a div section or a html filename with location
-
+            A tuple ``(figure, output)`` where ``output`` is either a div string or
+            a file path.
         """
         labels = self._ensure_labels(
             ncols=self.tsdf.shape[1],
@@ -1344,55 +1296,31 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> tuple[Figure, str]:
         """Create a Plotly Histogram Figure.
 
-        Parameters
-        ----------
-        plot_type: LiteralPlotlyHistogramPlotType, default: bars
-            Type of plot
-        histnorm: LiteralPlotlyHistogramHistNorm, default: percent
-            Sets the normalization mode
-        barmode: LiteralPlotlyHistogramBarMode, default: overlay
-            Specifies how bar traces are displayed relative to one another
-        xbins_size: float, optional
-            Explicitly sets the width of each bin along the x-axis in data units
-        opacity: float, default: 0.75
-            Sets the trace opacity, must be between 0 (fully transparent) and 1
-        bargap: float, default: 0.0
-            Sets the gap between bars of adjacent location coordinates
-        bargroupgap: float, default: 0.0
-            Sets the gap between bar “groups” at the same location coordinate
-        curve_type: LiteralPlotlyHistogramCurveType, default: kde
-            Specifies the type of distribution curve to overlay on the histogram
-        title: str, optional
-            A title above the plot
-        y_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show on the y-axis
-        x_fmt: str, optional
-            None, '%', '.1%' depending on number of decimals to show on the x-axis
-        filename: str, optional
-            Name of the Plotly html file
-        directory: DirectoryPath, optional
-            Directory where Plotly html file is saved
-        labels: list[str], optional
-            A list of labels to manually override using the names of
-            the input self.tsdf
-        output_type: LiteralPlotlyOutput, default: "file"
-            Determines output type
-        include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
-            Determines how the plotly.js library is included in the output
-        cumulative: bool, default: False
-            Determines whether to compute a cumulative histogram
-        show_rug: bool, default: False
-            Determines whether to draw a rug plot alongside the distribution
-        auto_open: bool, default: True
-            Determines whether to open a browser window with the plot
-        add_logo: bool, default: True
-            If True a Captor logo is added to the plot
+        Args:
+            plot_type: Type of plot, ``"bars"`` or ``"lines"``.
+            histnorm: Normalization mode.
+            barmode: How bar traces are displayed relative to one another.
+            xbins_size: Width of each bin along the x-axis in data units.
+            opacity: Trace opacity between 0 and 1.
+            bargap: Gap between bars of adjacent location coordinates.
+            bargroupgap: Gap between bar groups at the same location coordinate.
+            curve_type: Type of distribution curve to overlay on the histogram.
+            title: A title above the plot.
+            x_fmt: Tick format for the x-axis.
+            y_fmt: Tick format for the y-axis.
+            filename: Name of the Plotly HTML file.
+            directory: Directory where the Plotly HTML file is saved.
+            labels: Labels to override the column names of ``self.tsdf``.
+            output_type: Determines output type.
+            include_plotlyjs: How the plotly.js library is included.
+            cumulative: Whether to compute a cumulative histogram.
+            show_rug: Whether to draw a rug plot alongside the distribution.
+            auto_open: Whether to open a browser window with the plot.
+            add_logo: If True, a Captor logo is added to the plot.
 
         Returns:
-        --------
-        tuple[plotly.go.Figure, str]
-            Plotly Figure and a div section or a html filename with location
-
+            A tuple ``(figure, output)`` where ``output`` is either a div string or
+            a file path.
         """
         labels = self._ensure_labels(
             ncols=self.tsdf.shape[1],
@@ -1471,28 +1399,21 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/a/arithmeticmean.asp.
+        """Annualized arithmetic mean of returns.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Reference: ``https://www.investopedia.com/terms/a/arithmeticmean.asp``.
+
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Annualized arithmetic mean of returns.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
-
+            Annualized arithmetic mean of returns. Float for OpenTimeSeries,
+            ``Series[float]`` for OpenFrame.
         """
         _earlier, _later, time_factor, data = _get_date_range_and_factor(
             self=self,
@@ -1515,27 +1436,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Annualized volatility.
 
-        Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
-        https://www.investopedia.com/terms/v/volatility.asp.
+        Based on ``pandas.Series.std()`` (Excel ``STDEV.S`` equivalent).
+        Reference: ``https://www.investopedia.com/terms/v/volatility.asp``.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Annualized volatility.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Annualized volatility. Float for OpenTimeSeries, ``Series[float]`` for
+            OpenFrame.
         """
         _earlier, _later, time_factor, data = _get_date_range_and_factor(
             self=self,
@@ -1560,37 +1474,25 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         *,
         drift_adjust: bool = False,
     ) -> SeriesOrFloat_co:
-        """Implied annualized volatility.
+        """Implied annualized volatility from downside VaR.
 
-        Implied annualized volatility from the Downside VaR using the assumption
-        that returns are normally distributed.
+        Assumes normally distributed returns.
 
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought VaR level
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
+        Args:
+            level: The sought VaR level.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            interpolation: Interpolation type used by ``DataFrame.quantile``.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
+            drift_adjust: Adjustment to remove the bias implied by the average
+                return.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Implied annualized volatility from the Downside VaR using the
-            assumption that returns are normally distributed.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Implied annualized volatility. Float for OpenTimeSeries,
+            ``Series[float]`` for OpenFrame.
         """
         return self._var_implied_vol_and_target_func(
             level=level,
@@ -1618,41 +1520,27 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Target weight from VaR.
 
-        A position weight multiplier from the ratio between a VaR implied
-        volatility and a given target volatility. Multiplier = 1.0 -> target met.
+        Computes a position weight multiplier from the ratio between a VaR implied
+        volatility and a given target volatility. Multiplier = 1.0 → target met.
 
-        Parameters
-        ----------
-        target_vol: float, default: 0.175
-            Target Volatility
-        level: float, default: 0.95
-            The sought VaR level
-        min_leverage_local: float, default: 0.0
-            A minimum adjustment factor
-        max_leverage_local: float, default: 99999.0
-            A maximum adjustment factor
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
+        Args:
+            target_vol: Target volatility.
+            level: The sought VaR level.
+            min_leverage_local: Minimum adjustment factor.
+            max_leverage_local: Maximum adjustment factor.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            interpolation: Interpolation type used by ``DataFrame.quantile``.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
+            drift_adjust: Adjustment to remove the bias implied by the average
+                return.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            A position weight multiplier from the ratio between a VaR implied
-            volatility and a given target volatility. Multiplier = 1.0 -> target met.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Weight multiplier (or implied volatility if used downstream). Float for
+            OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         return self._var_implied_vol_and_target_func(
             target_vol=target_vol,
@@ -1683,43 +1571,29 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Volatility implied from VaR or Target Weight.
 
-        The function returns a position weight multiplier from the ratio between
-        a VaR implied volatility and a given target volatility if the argument
-        target_vol is provided. Otherwise the function returns the VaR implied
-        volatility. Multiplier = 1.0 -> target met.
+        If ``target_vol`` is provided, returns a weight multiplier from the ratio
+        between a VaR implied volatility and ``target_vol``; otherwise returns the
+        VaR-implied volatility. Multiplier = 1.0 → target met.
 
-        Parameters
-        ----------
-        level: float
-            The sought VaR level
-        target_vol: float | None
-            Target Volatility
-        min_leverage_local: float, default: 0.0
-            A minimum adjustment factor
-        max_leverage_local: float, default: 99999.0
-            A maximum adjustment factor
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        interpolation: LiteralQuantileInterp, default: "lower"
-            type of interpolation in Pandas.DataFrame.quantile() function.
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-        drift_adjust: bool, default: False
-            An adjustment to remove the bias implied by the average return
+        Args:
+            level: The sought VaR level.
+            target_vol: Target volatility.
+            min_leverage_local: Minimum adjustment factor.
+            max_leverage_local: Maximum adjustment factor.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            interpolation: Interpolation type used by ``DataFrame.quantile``.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
+            drift_adjust: Adjustment to remove the bias implied by the average
+                return.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Target volatility if target_vol is provided otherwise the VaR
-            implied volatility.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Target weight multiplier if ``target_vol`` is provided; otherwise the
+            VaR-implied volatility. Float for OpenTimeSeries, ``Series[float]`` for
+            OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -1785,28 +1659,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
     ) -> SeriesOrFloat_co:
-        """Downside Conditional Value At Risk "CVaR".
+        """Downside Conditional Value At Risk (CVaR).
 
-        https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
+        Reference: ``https://www.investopedia.com/terms/c/conditional_value_at_risk.asp``.
 
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought CVaR level
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            level: The sought CVaR level.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Downside Conditional Value At Risk "CVaR".
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Downside CVaR. Float for OpenTimeSeries, ``Series[float]`` for
+            OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -1837,36 +1703,27 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> SeriesOrFloat_co:
-        """Downside Deviation if order set to 2.
+        """Lower partial moment and downside deviation (order=2).
 
-        If order is set to 2 the function calculates the standard
-        deviation of returns that are below a Minimum Accepted
-        Return of zero. For general order p, it returns LPM_p^(1/p),
-        i.e., the rooted lower partial moment of order p.
+        If ``order`` is 2 calculates standard deviation of returns below MAR=0.
+        For general order ``p``, returns ``(LPM_p)^(1/p)``.
 
-        Parameters
-        ----------
-        min_accepted_return: float, optional
-            The annualized Minimum Accepted Return (MAR)
-        order: int, default: 2
-            Order of partial moment
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Args:
+            min_accepted_return: Annualized Minimum Accepted Return (MAR).
+            order: Order of partial moment (2 or 3).
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Downside deviation if order set to 2.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+            Downside deviation if ``order`` is 2; otherwise rooted lower partial
+            moment. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
 
+        Raises:
+            ValueError: If ``order`` is not 2 or 3.
         """
         msg = f"'order' must be 2 or 3, got {order!r}."
         if order not in (2, 3):
@@ -1923,24 +1780,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Compounded Annual Growth Rate (CAGR).
 
-        https://www.investopedia.com/terms/c/cagr.asp.
+        Reference: ``https://www.investopedia.com/terms/c/cagr.asp``.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Compounded Annual Growth Rate (CAGR).
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+            CAGR. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
 
+        Raises:
+            InitialValueZeroError: If initial value is zero or there are negative
+                values.
         """
         zero = 0.0
         earlier, later = self.calc_range(
@@ -1973,24 +1826,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Skew of the return distribution.
 
-        https://www.investopedia.com/terms/s/skewness.asp.
+        Reference: ``https://www.investopedia.com/terms/s/skewness.asp``.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Skew of the return distribution.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Skewness. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -2017,24 +1862,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Kurtosis of the return distribution.
 
-        https://www.investopedia.com/terms/k/kurtosis.asp.
+        Reference: ``https://www.investopedia.com/terms/k/kurtosis.asp``.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Kurtosis of the return distribution.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Kurtosis. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -2066,26 +1903,18 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Maximum drawdown without any limit on date range.
 
-        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+        Reference: ``https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp``.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        min_periods: int, default: 1
-            Smallest number of observations to use to find the maximum drawdown
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            min_periods: Smallest number of observations for rolling max.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Maximum drawdown without any limit on date range.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Maximum drawdown. Float for OpenTimeSeries, ``Series[float]`` for
+            OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -2107,24 +1936,17 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
     ) -> SeriesOrFloat_co:
-        """Calculate share of percentage changes that are greater than zero.
+        """Share of percentage changes greater than zero.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Calculate share of percentage changes that are greater than zero.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Share of positive returns. Float for OpenTimeSeries, ``Series[float]``
+            for OpenFrame.
         """
         zero: float = 0.0
         earlier, later = self.calc_range(
@@ -2163,34 +1985,22 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Ratio between arithmetic mean of returns and annualized volatility.
 
-        The ratio of annualized arithmetic mean of returns and annualized
-        volatility or, if riskfree return provided, Sharpe ratio calculated
-        as ( geometric return - risk-free return ) / volatility. The latter ratio
-        implies that the riskfree asset has zero volatility.
-        https://www.investopedia.com/terms/s/sharperatio.asp.
+        If ``riskfree_rate`` provided, computes the Sharpe ratio as
+        ``(arithmetic return - risk-free) / volatility``. Assumes zero volatility
+        for the risk-free asset. Reference:
+        ``https://www.investopedia.com/terms/s/sharperatio.asp``.
 
-        Parameters
-        ----------
-        riskfree_rate: float
-            The return of the zero volatility asset used to calculate Sharpe ratio
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Args:
+            riskfree_rate: Return of the zero volatility asset.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Ratio of the annualized arithmetic mean of returns and annualized
-            volatility or, if risk-free return provided, Sharpe ratio.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Ratio value. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         result = Series(
             self.arithmetic_ret_func(
@@ -2219,43 +2029,25 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         to_date: dt.date | None = None,
         periods_in_a_year_fixed: DaysInYearType | None = None,
     ) -> SeriesOrFloat_co:
-        """Sortino Ratio or Kappa3 Ratio.
+        """Sortino ratio or Kappa-3 ratio.
 
-        The Sortino ratio calculated as ( return - risk free return )
-        / downside deviation. The ratio implies that the riskfree asset has zero
-        volatility, and a minimum acceptable return of zero. The ratio is
-        calculated using the annualized arithmetic mean of returns.
-        https://www.investopedia.com/terms/s/sortinoratio.asp.
-        If order is set to 3 the ratio calculated becomes Kappa3 which
-        penalizes larger downside outcomes more heavily than the Sortino
-        ratio (which uses order 2).
+        Sortino: ``(return - riskfree_rate) / downside deviation`` using arithmetic
+        mean of returns. Kappa-3 when ``order=3`` penalizes larger downside more
+        than Sortino.
 
-        Parameters
-        ----------
-        riskfree_rate: float
-            The return of the zero volatility asset
-        min_accepted_return: float, optional
-            The annualized Minimum Accepted Return (MAR)
-        order: int, default: 2
-            Order of partial moment
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Args:
+            riskfree_rate: Return of the zero volatility asset.
+            min_accepted_return: Annualized Minimum Accepted Return (MAR).
+            order: Order of partial moment (2 for Sortino, 3 for Kappa-3).
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Sortino ratio calculated as ( return - riskfree return ) /
-            downside deviation (std dev of returns below MAR).
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Ratio value. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         result = Series(
             self.arithmetic_ret_func(
@@ -2288,29 +2080,18 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Omega Ratio.
 
-        The Omega Ratio compares returns above a certain target level
-        (often referred to as the “minimum acceptable return” or “MAR”)
-        to the total downside risk below that same threshold.
-        https://en.wikipedia.org/wiki/Omega_ratio.
+        Compares returns above MAR to the total downside risk below MAR.
+        Reference: ``https://en.wikipedia.org/wiki/Omega_ratio``.
 
-        Parameters
-        ----------
-        min_accepted_return: float, optional
-            The annualized Minimum Accepted Return (MAR)
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            min_accepted_return: Annualized Minimum Accepted Return (MAR).
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Omega ratio calculation.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Omega ratio. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -2336,22 +2117,18 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Calculate simple return.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Calculate simple return.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+            Simple return. Float for OpenTimeSeries, ``Series[float]`` for
+            OpenFrame.
 
+        Raises:
+            InitialValueZeroError: If initial value is zero.
         """
         zero: float = 0.0
         earlier, later = self.calc_range(
@@ -2380,19 +2157,13 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> SeriesOrFloat_co:
         """Calculate simple return for a specific calendar period.
 
-        Parameters
-        ----------
-        year: int
-            Calendar year of the period to calculate.
-        month: int, optional
-            Calendar month of the period to calculate.
+        Args:
+            year: Calendar year of the period to calculate.
+            month: Calendar month of the period to calculate.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Calculate simple return for a specific calendar period.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Simple return for the period. Float for OpenTimeSeries,
+            ``Series[float]`` for OpenFrame.
         """
         if month is None:
             period = str(year)
@@ -2414,31 +2185,21 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         to_date: dt.date | None = None,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> SeriesOrFloat_co:
-        """Downside Value At Risk, "VaR".
+        """Downside Value At Risk (VaR).
 
-        The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
-        https://www.investopedia.com/terms/v/var.asp.
+        Equivalent to ``PERCENTILE.INC(returns, 1-level)`` in Excel. Reference:
+        ``https://www.investopedia.com/terms/v/var.asp``.
 
-        Parameters
-        ----------
-        level: float, default: 0.95
-            The sought VaR level
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
-        interpolation: LiteralQuantileInterp, default: "lower"
-            Type of interpolation in Pandas.DataFrame.quantile() function.
+        Args:
+            level: The sought VaR level.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
+            interpolation: Interpolation used by ``DataFrame.quantile``.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Downside Value At Risk.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Downside VaR. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -2461,27 +2222,18 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
     ) -> SeriesOrFloat_co:
-        """Most negative percentage change over a rolling number of observations.
+        """Most negative percentage change over a rolling window.
 
-        Parameters
-        ----------
-        observations: int, default: 1
-            Number of observations over which to measure the worst outcome
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            observations: Number of observations for the rolling window.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Most negative percentage change over a rolling number of observations
-            within a chosen date range.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Most negative percentage change. Float for OpenTimeSeries,
+            ``Series[float]`` for OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -2505,26 +2257,19 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         from_date: dt.date | None = None,
         to_date: dt.date | None = None,
     ) -> SeriesOrFloat_co:
-        """Z-score as (last return - mean return) / standard deviation of returns.
+        """Z-score of the last return.
 
-        https://www.investopedia.com/terms/z/zscore.asp.
+        Computed as ``(last return - mean return) / std dev of returns``.
+        Reference: ``https://www.investopedia.com/terms/z/zscore.asp``.
 
-        Parameters
-        ----------
-        months_from_last: int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        SeriesOrFloat_co
-            Z-score as (last return - mean return) / standard deviation of returns.
-            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
-
+            Z-score. Float for OpenTimeSeries, ``Series[float]`` for OpenFrame.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -2548,20 +2293,13 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> DataFrame:
         """Calculate rolling annualized downside CVaR.
 
-        Parameters
-        ----------
-        column: int, default: 0
-            Position as integer of column to calculate
-        level: float, default: 0.95
-            The sought Conditional Value At Risk level
-        observations: int, default: 252
-            Number of observations in the overlapping window.
+        Args:
+            column: Column position to calculate.
+            level: Conditional Value At Risk level.
+            observations: Number of observations in the overlapping window.
 
         Returns:
-        --------
-        Pandas.DataFrame
-            Calculate rolling annualized downside CVaR
-
+            DataFrame with rolling annualized downside CVaR.
         """
         cvar_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         cvarseries = (
@@ -2581,18 +2319,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     ) -> DataFrame:
         """Calculate rolling returns.
 
-        Parameters
-        ----------
-        column: int, default: 0
-            Position as integer of column to calculate
-        observations: int, default: 21
-            Number of observations in the overlapping window.
+        Args:
+            column: Column position to calculate.
+            observations: Number of observations in the overlapping window.
 
         Returns:
-        --------
-        Pandas.DataFrame
-            Calculate rolling returns
-
+            DataFrame with rolling returns.
         """
         ret_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         retseries = (
@@ -2614,24 +2346,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         observations: int = 252,
         interpolation: LiteralQuantileInterp = "lower",
     ) -> DataFrame:
-        """Calculate rolling annualized downside Value At Risk "VaR".
+        """Calculate rolling annualized downside Value At Risk (VaR).
 
-        Parameters
-        ----------
-        column: int, default: 0
-            Position as integer of column to calculate
-        level: float, default: 0.95
-            The sought Value At Risk level
-        observations: int, default: 252
-            Number of observations in the overlapping window.
-        interpolation: LiteralQuantileInterp, default: "lower"
-            Type of interpolation in Pandas.DataFrame.quantile() function.
+        Args:
+            column: Column position to calculate.
+            level: Value At Risk level.
+            observations: Number of observations in the overlapping window.
+            interpolation: Interpolation used by ``DataFrame.quantile``.
 
         Returns:
-        --------
-        Pandas.DataFrame
-           Calculate rolling annualized downside Value At Risk "VaR"
-
+            DataFrame with rolling annualized downside VaR.
         """
         var_label = cast("tuple[str]", self.tsdf.iloc[:, column].name)[0]
         varseries = (
@@ -2653,25 +2377,17 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         periods_in_a_year_fixed: DaysInYearType | None = None,
         dlta_degr_freedms: int = 1,
     ) -> DataFrame:
-        """Calculate rolling annualised volatilities.
+        """Calculate rolling annualized volatilities.
 
-        Parameters
-        ----------
-        column: int, default: 0
-            Position as integer of column to calculate
-        observations: int, default: 21
-            Number of observations in the overlapping window.
-        periods_in_a_year_fixed: DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
-        dlta_degr_freedms: int, default: 1
-            Variance bias factor taking the value 0 or 1.
+        Args:
+            column: Column position to calculate.
+            observations: Number of observations in the overlapping window.
+            periods_in_a_year_fixed: Lock periods-in-a-year to simplify tests and
+                comparisons.
+            dlta_degr_freedms: Variance bias factor (0 or 1).
 
         Returns:
-        --------
-        Pandas.DataFrame
-            Calculate rolling annualised volatilities
-
+            DataFrame with rolling annualized volatilities.
         """
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -2706,31 +2422,21 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Detect outliers using z-score analysis.
 
         Identifies data points where the absolute z-score exceeds the threshold.
-        For OpenTimeSeries, returns a pandas Series with dates and outlier values.
-        For OpenFrame, returns a pandas DataFrame with dates and outlier values
-        for each column.
+        For OpenTimeSeries, returns a Series with dates and outlier values. For
+        OpenFrame, returns a DataFrame with dates and outlier values for each
+        column.
 
-        Parameters
-        ----------
-        threshold: float, default: 3.0
-            Z-score threshold for outlier detection. Values with absolute
-            z-score > threshold are considered outliers.
-        months_from_last: int, optional
-            Number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date: datetime.date, optional
-            Specific from date
-        to_date: datetime.date, optional
-            Specific to date
+        Args:
+            threshold: Z-score threshold; values with ``|z| > threshold`` are
+                outliers.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of ``from_date`` and ``to_date``.
+            from_date: Specific from date.
+            to_date: Specific to date.
 
         Returns:
-        --------
-        pandas.Series | pandas.DataFrame
-            For OpenTimeSeries: Series with dates as index and outlier values.
-            For OpenFrame: DataFrame with dates as index and outlier values for
-            each column.
-            Returns empty Series/DataFrame if no outliers found.
-
+            For OpenTimeSeries: Series of outliers. For OpenFrame: DataFrame of
+            outliers. Empty if none found.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
