@@ -391,7 +391,7 @@ class TestDateFixer:
             expected_exception=MarketsNotStringNorListStrError,
             match=(
                 r"Argument markets must be a string market code or a list "
-                r"of market codes supported by pandas_market_calendars."
+                r"of market codes supported by exchange_calendars."
             ),
         ):
             _ = market_holidays(startyear=start, endyear=end, markets=xmarkets)
@@ -481,7 +481,7 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=BothStartAndEndError,
             match=(
-                r"Provide one of start or end date, but not both. "
+                r"Provide exactly one of start or end date. "
                 r"Date range is inferred from number of trading days."
             ),
         ):
@@ -494,7 +494,7 @@ class TestDateFixer:
         with pytest.raises(
             expected_exception=BothStartAndEndError,
             match=(
-                r"Provide one of start or end date, but not both. "
+                r"Provide exactly one of start or end date. "
                 r"Date range is inferred from number of trading days."
             ),
         ):

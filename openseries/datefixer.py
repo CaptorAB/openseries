@@ -51,21 +51,19 @@ def market_holidays(
     endyear: int,
     markets: str | list[str],
 ) -> list[str]:
-    """Return a dict of holiday dates mapping to list of markets closed.
+    """Return a list of holiday dates mapping to list of markets closed.
 
-    Parameters
-    ----------
-    startyear: int
-        First year (inclusive) to consider.
-    endyear: int
-        Last year (inclusive) to consider.
-    markets: str | list[str]
-        String or list of market codes supported by pandas_market_calendars.
+    Args:
+        startyear: First year (inclusive) to consider.
+        endyear: Last year (inclusive) to consider.
+        markets: String or list of market codes supported by exchange_calendars.
 
     Returns:
-    --------
-    list[str]
-        list of holiday dates.
+        List of holiday dates.
+
+    Raises:
+        MarketsNotStringNorListStrError: If any market code is not supported by
+            ``exchange_calendars`` or the input is not a string or list of strings.
     """
     market_list = [markets] if isinstance(markets, str) else list(markets)
 
@@ -74,7 +72,7 @@ def market_holidays(
     if not all(m in supported for m in market_list):
         msg = (
             "Argument markets must be a string market code or a list of market "
-            "codes supported by pandas_market_calendars."
+            "codes supported by exchange_calendars."
         )
         raise MarketsNotStringNorListStrError(msg)
 
@@ -101,24 +99,20 @@ def holiday_calendar(
 ) -> busdaycalendar:
     """Generate a business calendar.
 
-    Parameters
-    ----------
-    startyear: int
-        First year in date range generated
-    endyear: int
-        Last year in date range generated
-    countries: CountriesType, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
-    custom_holidays: list[str] | str, optional
-        Argument where missing holidays can be added
+    Args:
+        startyear: First year in date range generated.
+        endyear: Last year in date range generated.
+        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+            Defaults to "SE".
+        markets: (List of) markets code(s) supported by exchange_calendars.
+        custom_holidays: Argument where missing holidays can be added.
 
     Returns:
-    --------
-    numpy.busdaycalendar
-        Generate a business calendar
+        Generate a business calendar.
 
+    Raises:
+        CountriesNotStringNorListStrError: If ``countries`` is not a supported
+            ISO 3166-1 alpha-2 string or a list of such strings.
     """
     startyear -= 1
     endyear += 1
@@ -170,16 +164,14 @@ def date_fix(
 ) -> dt.date:
     """Parse different date formats into datetime.date.
 
-    Parameters
-    ----------
-    fixerdate: DateType
-        The data item to parse
+    Args:
+        fixerdate: The data item to parse.
 
     Returns:
-    --------
-    datetime.date
-        Parsed date
+        Parsed date.
 
+    Raises:
+        TypeError: If the provided ``fixerdate`` type is not supported.
     """
     msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
     if isinstance(fixerdate, Timestamp | dt.datetime):
@@ -207,28 +199,20 @@ def date_offset_foll(
 ) -> dt.date:
     """Offset dates according to a given calendar.
 
-    Parameters
-    ----------
-    raw_date: DateType
-        The date to offset from
-    months_offset: int, default: 12
-        Number of months as integer
-    countries: CountriesType, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
-    custom_holidays: list[str] | str, optional
-        Argument where missing holidays can be added
-    adjust: bool, default: False
-        Determines if offset should adjust for business days
-    following: bool, default: True
-        Determines if days should be offset forward (following) or backward
+    Args:
+        raw_date: The date to offset from.
+        months_offset: Number of months as integer. Defaults to 12.
+        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+            Defaults to "SE".
+        markets: (List of) markets code(s) supported by exchange_calendars.
+        custom_holidays: Argument where missing holidays can be added.
+        adjust: Determines if offset should adjust for business days.
+            Defaults to False.
+        following: Determines if days should be offset forward (following) or backward.
+            Defaults to True.
 
     Returns:
-    --------
-    datetime.date
-        Off-set date
-
+        Offset date.
     """
     raw_date = date_fix(raw_date)
     month_delta = relativedelta(months=months_offset)
@@ -261,22 +245,15 @@ def get_previous_business_day_before_today(
 ) -> dt.date:
     """Bump date backwards to find the previous business day.
 
-    Parameters
-    ----------
-    today: datetime.date, optional
-        Manual input of the day from where the previous business day is found
-    countries: CountriesType, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
-    custom_holidays: list[str] | str, optional
-        Argument where missing holidays can be added
+    Args:
+        today: Manual input of the day from where the previous business day is found.
+        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+            Defaults to "SE".
+        markets: (List of) markets code(s) supported by exchange_calendars.
+        custom_holidays: Argument where missing holidays can be added.
 
     Returns:
-    --------
-    datetime.date
-        The previous business day
-
+        The previous business day.
     """
     if today is None:
         today = dt.datetime.now().astimezone().date()
@@ -304,25 +281,18 @@ def offset_business_days(
     It first adjusts to a valid business day and then bumps with given
     number of business days from there.
 
-    Parameters
-    ----------
-    ddate: datetime.date
-        A starting date that does not have to be a business day
-    days: int
-        The number of business days to offset from the business day that is given
-        If days is set as anything other than an integer its value is set to zero
-    countries: CountriesType, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
-    custom_holidays: list[str] | str, optional
-        Argument where missing holidays can be added
+    Args:
+        ddate: A starting date that does not have to be a business day.
+        days: The number of business days to offset from the business day
+            that is given.
+            If days is set as anything other than an integer its value is set to zero.
+        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+            Defaults to "SE".
+        markets: (List of) markets code(s) supported by exchange_calendars.
+        custom_holidays: Argument where missing holidays can be added.
 
     Returns:
-    --------
-    datetime.date
-        The new offset business day
-
+        The new offset business day.
     """
     try:
         days = int(days)
@@ -387,26 +357,17 @@ def generate_calendar_date_range(
 ) -> list[dt.date]:
     """Generate a list of business day calendar dates.
 
-    Parameters
-    ----------
-    trading_days: int
-        Number of days to generate. Must be greater than zero
-    start: datetime.date, optional
-        Date when the range starts
-    end: datetime.date, optional
-        Date when the range ends
-    countries: CountriesType, default: "SE"
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
-    custom_holidays: list[str] | str, optional
-        Argument where missing holidays can be added
+    Args:
+        trading_days: Number of days to generate. Must be greater than zero.
+        start: Date when the range starts.
+        end: Date when the range ends.
+        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+            Defaults to "SE".
+        markets: (List of) markets code(s) supported by exchange_calendars.
+        custom_holidays: Argument where missing holidays can be added.
 
     Returns:
-    --------
-    list[dt.date]
-        List of business day calendar dates
-
+        List of business day calendar dates.
     """
     if trading_days < 1:
         msg = "Argument trading_days must be greater than zero."
@@ -453,7 +414,7 @@ def generate_calendar_date_range(
         ]
 
     msg = (
-        "Provide one of start or end date, but not both. "
+        "Provide exactly one of start or end date. "
         "Date range is inferred from number of trading days."
     )
     raise BothStartAndEndError(msg)
@@ -470,23 +431,15 @@ def _do_resample_to_business_period_ends(
 
     Stubs left in place. Stubs will be aligned to the shortest stub.
 
-    Parameters
-    ----------
-    data: pandas.DataFrame
-        The timeseries data
-    freq: LiteralBizDayFreq
-        The date offset string that sets the resampled frequency
-    countries: CountriesType
-        (List of) country code(s) according to ISO 3166-1 alpha-2
-    markets: list[str] | str, optional
-        (List of) markets code(s) according to pandas-market-calendars
-    custom_holidays: list[str] | str, optional
-        Argument where missing holidays can be added
+    Args:
+        data: The timeseries data.
+        freq: The date offset string that sets the resampled frequency.
+        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+        markets: (List of) markets code(s) supported by exchange_calendars.
+        custom_holidays: Argument where missing holidays can be added.
 
     Returns:
-    --------
-    Pandas.DatetimeIndex
-        A date range aligned to business period ends
+        A date range aligned to business period ends.
 
     """
     copydata = data.copy()

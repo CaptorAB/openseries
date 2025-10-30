@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>openseries.portfoliotools &mdash; openseries 2.0.2 documentation</title>
+  <title>openseries.portfoliotools &mdash; openseries 2.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c2377ec0"></script>
+      <script src="../../_static/documentation_options.js?v=664ffad9"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -179,20 +179,13 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate random weights for simulated portfolios.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    simframe: OpenFrame</span>
-<span class="sd">        Return data for portfolio constituents</span>
-<span class="sd">    num_ports: int</span>
-<span class="sd">        Number of possible portfolios to simulate</span>
-<span class="sd">    seed: int</span>
-<span class="sd">        The seed for the random process</span>
+<span class="sd">    Args:</span>
+<span class="sd">        simframe: Return data for portfolio constituents.</span>
+<span class="sd">        num_ports: Number of possible portfolios to simulate.</span>
+<span class="sd">        seed: The seed for the random process.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    pandas.DataFrame</span>
-<span class="sd">        The resulting data</span>
-
+<span class="sd">        The resulting data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">copi</span> <span class="o">=</span> <span class="n">simframe</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
 
@@ -245,28 +238,20 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Identify an efficient frontier.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    eframe: OpenFrame</span>
-<span class="sd">        Portfolio data</span>
-<span class="sd">    num_ports: int, default: 5000</span>
-<span class="sd">        Number of possible portfolios to simulate</span>
-<span class="sd">    seed: int, default: 71</span>
-<span class="sd">        The seed for the random process</span>
-<span class="sd">    bounds: tuple[tuple[float, float], ...], optional</span>
-<span class="sd">        The range of minumum and maximum allowed allocations for each asset</span>
-<span class="sd">    frontier_points: int, default: 200</span>
-<span class="sd">        number of points along frontier to optimize</span>
-<span class="sd">    minimize_method: LiteralMinimizeMethods, default: SLSQP</span>
-<span class="sd">        The method passed into the scipy.minimize function</span>
-<span class="sd">    tweak: bool, default: True</span>
-<span class="sd">        cutting the frontier to exclude multiple points with almost the same risk</span>
+<span class="sd">    Args:</span>
+<span class="sd">        eframe: Portfolio data.</span>
+<span class="sd">        num_ports: Number of possible portfolios to simulate. Defaults to 5000.</span>
+<span class="sd">        seed: The seed for the random process. Defaults to 71.</span>
+<span class="sd">        bounds: The range of minimum and maximum allowed allocations for each asset.</span>
+<span class="sd">        frontier_points: Number of points along frontier to optimize. Defaults to 200.</span>
+<span class="sd">        minimize_method: The method passed into the scipy.minimize function.</span>
+<span class="sd">            Defaults to SLSQP.</span>
+<span class="sd">        tweak: Cutting the frontier to exclude multiple points with almost the</span>
+<span class="sd">            same risk.</span>
+<span class="sd">            Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    tuple[DataFrame, DataFrame, NDArray[float]]</span>
-<span class="sd">        The efficient frontier data, simulation data and optimal portfolio</span>
-
+<span class="sd">        The efficient frontier data, simulation data and optimal portfolio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">eframe</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">eframe</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">eframe</span><span class="o">.</span><span class="n">item_count</span><span class="p">]</span> <span class="o">*</span> <span class="n">eframe</span><span class="o">.</span><span class="n">item_count</span>
@@ -435,27 +420,19 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">OpenFrame</span><span class="p">,</span> <span class="n">OpenTimeSeries</span><span class="p">,</span> <span class="n">OpenFrame</span><span class="p">,</span> <span class="n">OpenTimeSeries</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Constrain optimized portfolios to those that improve on the current one.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data: OpenFrame</span>
-<span class="sd">        Portfolio data</span>
-<span class="sd">    serie: OpenTimeSeries</span>
-<span class="sd">        A</span>
-<span class="sd">    portfolioname: str, default: &quot;Current Portfolio&quot;</span>
-<span class="sd">        Name of the portfolio</span>
-<span class="sd">    simulations: int, default: 10000</span>
-<span class="sd">        Number of possible portfolios to simulate</span>
-<span class="sd">    curve_points: int, default: 200</span>
-<span class="sd">        Number of optimal portfolios on the efficient frontier</span>
-<span class="sd">    bounds: tuple[tuple[float, float], ...], optional</span>
-<span class="sd">        The range of minumum and maximum allowed allocations for each asset</span>
-<span class="sd">    minimize_method: LiteralMinimizeMethods, default: SLSQP</span>
-<span class="sd">        The method passed into the scipy.minimize function</span>
+<span class="sd">    Args:</span>
+<span class="sd">        data: Portfolio data.</span>
+<span class="sd">        serie: A timeseries representing the current portfolio.</span>
+<span class="sd">        portfolioname: Name of the portfolio. Defaults to &quot;Current Portfolio&quot;.</span>
+<span class="sd">        simulations: Number of possible portfolios to simulate. Defaults to 10000.</span>
+<span class="sd">        curve_points: Number of optimal portfolios on the efficient frontier.</span>
+<span class="sd">            Defaults to 200.</span>
+<span class="sd">        bounds: The range of minimum and maximum allowed allocations for each asset.</span>
+<span class="sd">        minimize_method: The method passed into the scipy.minimize function.</span>
+<span class="sd">            Defaults to SLSQP.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</span>
-<span class="sd">        The constrained optimal portfolio data</span>
+<span class="sd">        The constrained optimal portfolio data.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lr_frame</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
@@ -506,22 +483,15 @@
     <span class="n">current</span><span class="p">:</span> <span class="n">OpenTimeSeries</span><span class="p">,</span>
     <span class="n">optimized</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare date to be used as point_frame in the sharpeplot function.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare data to be used as point_frame in the sharpeplot function.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    assets: OpenFrame</span>
-<span class="sd">        Portfolio data with individual assets and a weighted portfolio</span>
-<span class="sd">    current: OpenTimeSeries</span>
-<span class="sd">        The current or initial portfolio based on given weights</span>
-<span class="sd">    optimized: DataFrame</span>
-<span class="sd">        Data optimized with the efficient_frontier method</span>
+<span class="sd">    Args:</span>
+<span class="sd">        assets: Portfolio data with individual assets and a weighted portfolio.</span>
+<span class="sd">        current: The current or initial portfolio based on given weights.</span>
+<span class="sd">        optimized: Data optimized with the efficient_frontier method.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    DataFrame</span>
-<span class="sd">        The data prepared with mean returns, volatility and weights</span>
-
+<span class="sd">        The data prepared with mean returns, volatility and weights.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">txt</span> <span class="o">=</span> <span class="s2">&quot;&lt;br&gt;&lt;br&gt;Weights:&lt;br&gt;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&lt;br&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
         <span class="p">[</span>
@@ -577,38 +547,25 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create scatter plot coloured by Sharpe Ratio.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    sim_frame: DataFrame, optional</span>
-<span class="sd">        Data from the simulate_portfolios method.</span>
-<span class="sd">    line_frame: DataFrame, optional</span>
-<span class="sd">        Data from the efficient_frontier method.</span>
-<span class="sd">    point_frame: DataFrame, optional</span>
-<span class="sd">        Data to highlight current and efficient portfolios.</span>
-<span class="sd">    point_frame_mode: LiteralLinePlotMode, default: markers</span>
-<span class="sd">        Which type of scatter to use.</span>
-<span class="sd">    filename: str, optional</span>
-<span class="sd">        Name of the Plotly html file</span>
-<span class="sd">    directory: DirectoryPath, optional</span>
-<span class="sd">        Directory where Plotly html file is saved</span>
-<span class="sd">    titletext: str, optional</span>
-<span class="sd">        Text for the plot title</span>
-<span class="sd">    output_type: LiteralPlotlyOutput, default: &quot;file&quot;</span>
-<span class="sd">        Determines output type</span>
-<span class="sd">    include_plotlyjs: LiteralPlotlyJSlib, default: &quot;cdn&quot;</span>
-<span class="sd">        Determines how the plotly.js library is included in the output</span>
-<span class="sd">    title: bool, default: True</span>
-<span class="sd">        Whether to add standard plot title</span>
-<span class="sd">    add_logo: bool, default: True</span>
-<span class="sd">        Whether to add Captor logo</span>
-<span class="sd">    auto_open: bool, default: True</span>
-<span class="sd">        Determines whether to open a browser window with the plot</span>
+<span class="sd">    Args:</span>
+<span class="sd">        sim_frame: Data from the simulate_portfolios method.</span>
+<span class="sd">        line_frame: Data from the efficient_frontier method.</span>
+<span class="sd">        point_frame: Data to highlight current and efficient portfolios.</span>
+<span class="sd">        point_frame_mode: Which type of scatter to use. Defaults to markers.</span>
+<span class="sd">        filename: Name of the Plotly html file.</span>
+<span class="sd">        directory: Directory where Plotly html file is saved.</span>
+<span class="sd">        titletext: Text for the plot title.</span>
+<span class="sd">        output_type: Determines output type. Defaults to &quot;file&quot;.</span>
+<span class="sd">        include_plotlyjs: Determines how the plotly.js library is included</span>
+<span class="sd">            in the output.</span>
+<span class="sd">            Defaults to &quot;cdn&quot;.</span>
+<span class="sd">        title: Whether to add standard plot title. Defaults to True.</span>
+<span class="sd">        add_logo: Whether to add Captor logo. Defaults to True.</span>
+<span class="sd">        auto_open: Determines whether to open a browser window with the plot.</span>
+<span class="sd">            Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    Figure</span>
-<span class="sd">        The scatter plot with simulated and optimized results</span>
-
+<span class="sd">        The scatter plot with simulated and optimized results.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">returns</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">risk</span> <span class="o">=</span> <span class="p">[]</span>
@@ -715,7 +672,7 @@
             <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">link_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">include_plotlyjs</span><span class="p">),</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
         <span class="p">)</span>
@@ -726,7 +683,7 @@
             <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">include_plotlyjs</span><span class="p">),</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
             <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
         <span class="p">)</span>

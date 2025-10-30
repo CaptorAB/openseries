@@ -51,16 +51,11 @@ class _JumpParams(TypedDict, total=False):
 def _random_generator(seed: int | None) -> Generator:
     """Make a Numpy Random Generator object.
 
-    Parameters
-    ----------
-    seed: int, optional
-        Random seed
+    Args:
+        seed: Random seed.
 
     Returns:
-    --------
-    numpy.random.Generator
-        Numpy random process generator
-
+        Numpy random process generator.
     """
     ss = SeedSequence(entropy=seed)
     bg = PCG64(seed=cast("int | None", ss))
@@ -80,32 +75,19 @@ def _create_base_simulation(
 ) -> ReturnSimulation:
     """Common logic for creating simulations.
 
-    Parameters
-    ----------
-    cls: type[ReturnSimulation]
-        The ReturnSimulation class
-    returns: pandas.DataFrame
-        The calculated returns data
-    number_of_sims: PositiveInt
-        Number of simulations to generate
-    trading_days: PositiveInt
-        Number of trading days to simulate
-    trading_days_in_year: DaysInYearType
-        Number of trading days used to annualize
-    mean_annual_return: float
-        Mean annual return
-    mean_annual_vol: PositiveFloat
-        Mean annual volatility
-    seed: int, optional
-        Seed for random process initiation
-    **kwargs
-        Additional keyword arguments for jump parameters
+    Args:
+        cls: The ReturnSimulation class.
+        returns: The calculated returns data.
+        number_of_sims: Number of simulations to generate.
+        trading_days: Number of trading days to simulate.
+        trading_days_in_year: Number of trading days used to annualize.
+        mean_annual_return: Mean annual return.
+        mean_annual_vol: Mean annual volatility.
+        seed: Seed for random process initiation.
+        **kwargs: Additional keyword arguments for jump parameters.
 
     Returns:
-    --------
-    ReturnSimulation
-        A ReturnSimulation instance
-
+        A ReturnSimulation instance.
     """
     return cls(
         number_of_sims=number_of_sims,
@@ -122,28 +104,18 @@ def _create_base_simulation(
 class ReturnSimulation(BaseModel):
     """The class ReturnSimulation allows for simulating financial timeseries.
 
-    Parameters
-    ----------
-    number_of_sims : PositiveInt
-        Number of simulations to generate
-    trading_days: PositiveInt
-        Total number of days to simulate
-    trading_days_in_year : DaysInYearType
-        Number of trading days used to annualize
-    mean_annual_return : float
-        Mean annual return of the distribution
-    mean_annual_vol : PositiveFloat
-        Mean annual standard deviation of the distribution
-    dframe: pandas.DataFrame
-        Pandas DataFrame object holding the resulting values
-    jumps_lamda: NonNegativeFloat, default: 0.0
-        This is the probability of a jump happening at each point in time
-    jumps_sigma: NonNegativeFloat, default: 0.0
-        This is the volatility of the jump size
-    jumps_mu: float, default: 0.0
-        This is the average jump size
-    seed: int, optional
-        Seed for random process initiation
+    Args:
+        number_of_sims: Number of simulations to generate.
+        trading_days: Total number of days to simulate.
+        trading_days_in_year: Number of trading days used to annualize.
+        mean_annual_return: Mean annual return of the distribution.
+        mean_annual_vol: Mean annual standard deviation of the distribution.
+        dframe: Pandas DataFrame object holding the resulting values.
+        jumps_lamda: This is the probability of a jump happening at each point in time.
+            Defaults to 0.0.
+        jumps_sigma: This is the volatility of the jump size. Defaults to 0.0.
+        jumps_mu: This is the average jump size. Defaults to 0.0.
+        seed: Seed for random process initiation.
 
     """
 
@@ -169,10 +141,7 @@ class ReturnSimulation(BaseModel):
         """Simulation data.
 
         Returns:
-        --------
-        pandas.DataFrame
-            Simulation data
-
+            Simulation data.
         """
         return self.dframe.add(1.0).cumprod(axis="columns").T
 
@@ -181,10 +150,7 @@ class ReturnSimulation(BaseModel):
         """Annualized arithmetic mean of returns.
 
         Returns:
-        --------
-        float
-            Annualized arithmetic mean of returns
-
+            Annualized arithmetic mean of returns.
         """
         return cast(
             "float",
@@ -198,10 +164,7 @@ class ReturnSimulation(BaseModel):
         """Annualized volatility.
 
         Returns:
-        --------
-        float
-            Annualized volatility
-
+            Annualized volatility.
         """
         return cast(
             "float",
@@ -224,28 +187,18 @@ class ReturnSimulation(BaseModel):
     ) -> ReturnSimulation:
         """Create a Normal distribution simulation.
 
-        Parameters
-        ----------
-        number_of_sims: PositiveInt
-            Number of simulations to generate
-        trading_days: PositiveInt
-            Number of trading days to simulate
-        mean_annual_return: float
-            Mean return
-        mean_annual_vol: PositiveFloat
-            Mean standard deviation
-        trading_days_in_year: DaysInYearType, default: 252
-            Number of trading days used to annualize
-        seed: int, optional
-            Seed for random process initiation
-        randomizer: numpy.random.Generator, optional
-            Random process generator
+        Args:
+            number_of_sims: Number of simulations to generate.
+            trading_days: Number of trading days to simulate.
+            mean_annual_return: Mean return.
+            mean_annual_vol: Mean standard deviation.
+            trading_days_in_year: Number of trading days used to annualize.
+                Defaults to 252.
+            seed: Seed for random process initiation.
+            randomizer: Random process generator.
 
         Returns:
-        --------
-        ReturnSimulation
-            Normal distribution simulation
-
+            Normal distribution simulation.
         """
         if not randomizer:
             randomizer = _random_generator(seed=seed)
@@ -280,28 +233,18 @@ class ReturnSimulation(BaseModel):
     ) -> ReturnSimulation:
         """Create a Lognormal distribution simulation.
 
-        Parameters
-        ----------
-        number_of_sims: PositiveInt
-            Number of simulations to generate
-        trading_days: PositiveInt
-            Number of trading days to simulate
-        mean_annual_return: float
-            Mean return
-        mean_annual_vol: PositiveFloat
-            Mean standard deviation
-        trading_days_in_year: DaysInYearType, default: 252
-            Number of trading days used to annualize
-        seed: int, optional
-            Seed for random process initiation
-        randomizer: numpy.random.Generator, optional
-            Random process generator
+        Args:
+            number_of_sims: Number of simulations to generate.
+            trading_days: Number of trading days to simulate.
+            mean_annual_return: Mean return.
+            mean_annual_vol: Mean standard deviation.
+            trading_days_in_year: Number of trading days used to annualize.
+                Defaults to 252.
+            seed: Seed for random process initiation.
+            randomizer: Random process generator.
 
         Returns:
-        --------
-        ReturnSimulation
-            Lognormal distribution simulation
-
+            Lognormal distribution simulation.
         """
         if not randomizer:
             randomizer = _random_generator(seed=seed)
@@ -339,28 +282,18 @@ class ReturnSimulation(BaseModel):
     ) -> ReturnSimulation:
         """Create a Geometric Brownian Motion simulation.
 
-        Parameters
-        ----------
-        number_of_sims: PositiveInt
-            Number of simulations to generate
-        trading_days: PositiveInt
-            Number of trading days to simulate
-        mean_annual_return: float
-            Mean return
-        mean_annual_vol: PositiveFloat
-            Mean standard deviation
-        trading_days_in_year: DaysInYearType, default: 252
-            Number of trading days used to annualize
-        seed: int, optional
-            Seed for random process initiation
-        randomizer: numpy.random.Generator, optional
-            Random process generator
+        Args:
+            number_of_sims: Number of simulations to generate.
+            trading_days: Number of trading days to simulate.
+            mean_annual_return: Mean return.
+            mean_annual_vol: Mean standard deviation.
+            trading_days_in_year: Number of trading days used to annualize.
+                Defaults to 252.
+            seed: Seed for random process initiation.
+            randomizer: Random process generator.
 
         Returns:
-        --------
-        ReturnSimulation
-            Geometric Brownian Motion simulation
-
+            Geometric Brownian Motion simulation.
         """
         if not randomizer:
             randomizer = _random_generator(seed=seed)
@@ -405,34 +338,22 @@ class ReturnSimulation(BaseModel):
     ) -> ReturnSimulation:
         """Create a Merton Jump-Diffusion model simulation.
 
-        Parameters
-        ----------
-        number_of_sims: PositiveInt
-            Number of simulations to generate
-        trading_days: PositiveInt
-            Number of trading days to simulate
-        mean_annual_return: float
-            Mean return
-        mean_annual_vol: PositiveFloat
-            Mean standard deviation
-        jumps_lamda: NonNegativeFloat
-            This is the probability of a jump happening at each point in time
-        jumps_sigma: NonNegativeFloat, default: 0.0
-            This is the volatility of the jump size
-        jumps_mu: float, default: 0.0
-            This is the average jump size
-        trading_days_in_year: DaysInYearType, default: 252
-            Number of trading days used to annualize
-        seed: int, optional
-            Seed for random process initiation
-        randomizer: numpy.random.Generator, optional
-            Random process generator
+        Args:
+            number_of_sims: Number of simulations to generate.
+            trading_days: Number of trading days to simulate.
+            mean_annual_return: Mean return.
+            mean_annual_vol: Mean standard deviation.
+            jumps_lamda: This is the probability of a jump happening at each point
+                in time.
+            jumps_sigma: This is the volatility of the jump size. Defaults to 0.0.
+            jumps_mu: This is the average jump size. Defaults to 0.0.
+            trading_days_in_year: Number of trading days used to annualize.
+                Defaults to 252.
+            seed: Seed for random process initiation.
+            randomizer: Random process generator.
 
         Returns:
-        --------
-        ReturnSimulation
-            Merton Jump-Diffusion model simulation
-
+            Merton Jump-Diffusion model simulation.
         """
         if not randomizer:
             randomizer = _random_generator(seed=seed)
@@ -490,24 +411,16 @@ class ReturnSimulation(BaseModel):
     ) -> DataFrame:
         """Create a pandas.DataFrame from simulation(s).
 
-        Parameters
-        ----------
-        name: str
-            Name label of the serie(s)
-        start: datetime.date, optional
-            Date when the simulation starts
-        end: datetime.date, optional
-            Date when the simulation ends
-        countries: CountriesType, default: "SE"
-            (List of) country code(s) according to ISO 3166-1 alpha-2
-        markets: list[str] | str, optional
-            (List of) markets code(s) according to pandas-market-calendars
+        Args:
+            name: Name label of the serie(s).
+            start: Date when the simulation starts.
+            end: Date when the simulation ends.
+            countries: (List of) country code(s) according to ISO 3166-1 alpha-2.
+                Defaults to "SE".
+            markets: (List of) markets code(s) supported by exchange_calendars.
 
         Returns:
-        --------
-        pandas.DataFrame
-            The simulation(s) data
-
+            The simulation(s) data.
         """
         d_range = generate_calendar_date_range(
             trading_days=self.trading_days,

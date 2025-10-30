@@ -86,18 +86,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
     The intended use is to allow comparisons across these timeseries.
 
-    Parameters
-    ----------
-    constituents: list[OpenTimeSeries]
-        List of objects of Class OpenTimeSeries
-    weights: list[float], optional
-        List of weights in float format.
-
-    Returns:
-    --------
-    OpenFrame
-        Object of the class OpenFrame
-
+    Args:
+        constituents: List of objects of Class OpenTimeSeries.
+        weights: List of weights in float format. Optional.
     """
 
     constituents: list[OpenTimeSeries]
@@ -125,18 +116,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         The intended use is to allow comparisons across these timeseries.
 
-        Parameters
-        ----------
-        constituents: list[OpenTimeSeries]
-            List of objects of Class OpenTimeSeries
-        weights: list[float], optional
-            List of weights in float format.
-
-        Returns:
-        --------
-        OpenFrame
-            Object of the class OpenFrame
-
+        Args:
+            constituents: List of objects of Class OpenTimeSeries.
+            weights: List of weights in float format. Optional.
         """
         copied_constituents = [ts.from_deepcopy() for ts in constituents]
 
@@ -144,9 +126,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             constituents=copied_constituents,
             weights=weights,
         )
-
-        self.constituents = copied_constituents
-        self.weights = weights
         self._set_tsdf()
 
     def _set_tsdf(self: Self) -> None:
@@ -165,10 +144,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Create copy of the OpenFrame object.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         return deepcopy(self)
 
@@ -178,16 +154,11 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> Self:
         """Merge index of Pandas Dataframes of the constituent OpenTimeSeries.
 
-        Parameters
-        ----------
-        how: LiteralHowMerge, default: "outer"
-            The Pandas merge method.
+        Args:
+            how: The Pandas merge method. Defaults to "outer".
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         lvl_zero = list(self.columns_lvl_zero)
         self.tsdf = reduce(
@@ -222,16 +193,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> DataFrame:
         """Calculate chosen timeseries properties.
 
-        Parameters
-        ----------
-        properties: list[LiteralFrameProps], optional
-            The properties to calculate. Defaults to calculating all available.
+        Args:
+            properties: The properties to calculate. Defaults to calculating all
+                available. Optional.
 
         Returns:
-        --------
-        pandas.DataFrame
-            Properties of the contituent OpenTimeSeries
-
+            Properties of the constituent OpenTimeSeries.
         """
         if properties:
             props = OpenFramePropertiesList(*properties)
@@ -247,10 +214,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Number of observations of all constituents.
 
         Returns:
-        --------
-        Pandas.Series[int]
-            Number of observations of all constituents
-
+            Number of observations of all constituents.
         """
         return Series(
             data=[self.tsdf[col].count() for col in self.tsdf.columns],
@@ -263,10 +227,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Number of constituents.
 
         Returns:
-        --------
-        int
-            Number of constituents
-
+            Number of constituents.
         """
         return len(self.constituents)
 
@@ -275,10 +236,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns:
-        --------
-        list[str]
-            Level 0 values of the MultiIndex columns in the .tsdf DataFrame
-
+            Level 0 values of the MultiIndex columns in the .tsdf DataFrame.
         """
         return list(self.tsdf.columns.get_level_values(0))
 
@@ -287,10 +245,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
 
         Returns:
-        --------
-        list[ValueType]
-            Level 1 values of the MultiIndex columns in the .tsdf DataFrame
-
+            Level 1 values of the MultiIndex columns in the .tsdf DataFrame.
         """
         return list(self.tsdf.columns.get_level_values(1))
 
@@ -299,10 +254,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """The first dates in the timeseries of all constituents.
 
         Returns:
-        --------
-        Pandas.Series[dt.date]
-            The first dates in the timeseries of all constituents
-
+            The first dates in the timeseries of all constituents.
         """
         return Series(
             data=[i.first_idx for i in self.constituents],
@@ -316,10 +268,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """The last dates in the timeseries of all constituents.
 
         Returns:
-        --------
-        Pandas.Series[dt.date]
-            The last dates in the timeseries of all constituents
-
+            The last dates in the timeseries of all constituents.
         """
         return Series(
             data=[i.last_idx for i in self.constituents],
@@ -333,11 +282,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Number of days from the first date to the last for all items in the frame.
 
         Returns:
-        --------
-        Pandas.Series[int]
             Number of days from the first date to the last for all
             items in the frame.
-
         """
         return Series(
             data=[c.span_of_days for c in self.constituents],
@@ -349,10 +295,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Convert series of values into series of returns.
 
         Returns:
-        --------
-        OpenFrame
-            The returns of the values in the series
-
+            The returns of the values in the series.
         """
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
@@ -368,17 +311,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     def value_to_diff(self: Self, periods: int = 1) -> Self:
         """Convert series of values to series of their period differences.
 
-        Parameters
-        ----------
-        periods: int, default: 1
-            The number of periods between observations over which difference
-            is calculated
+        Args:
+            periods: The number of periods between observations over which
+                difference is calculated. Defaults to 1.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
@@ -394,10 +332,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Convert series of returns into cumulative series of values.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
@@ -427,16 +362,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> Self:
         """Resample the timeseries frequency.
 
-        Parameters
-        ----------
-        freq: LiteralBizDayFreq | str, default "BME"
-            The date offset string that sets the resampled frequency
+        Args:
+            freq: The date offset string that sets the resampled frequency.
+                Defaults to "BME".
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
@@ -474,18 +405,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         Stubs left in place. Stubs will be aligned to the shortest stub.
 
-        Parameters
-        ----------
-        freq: LiteralBizDayFreq, default "BME"
-            The date offset string that sets the resampled frequency
-        method: LiteralPandasReindexMethod, default: nearest
-            Controls the method used to align values across columns
+        Args:
+            freq: The date offset string that sets the resampled frequency.
+                Defaults to "BME".
+            method: Controls the method used to align values across columns.
+                Defaults to nearest.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if any(vtypes):
@@ -537,36 +464,23 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Exponentially Weighted Moving Average (EWMA) for Volatilities and
         Correlation. https://www.investopedia.com/articles/07/ewma.asp.
 
-        Parameters
-        ----------
-        lmbda: float, default: 0.94
-            Scaling factor to determine weighting.
-        day_chunk: int, default: 11
-            Sampling the data which is assumed to be daily.
-        dlta_degr_freedms: int, default: 0
-            Variance bias factor taking the value 0 or 1.
-        first_column: int, default: 0
-            Column of first timeseries.
-        second_column: int, default: 1
-            Column of second timeseries.
-        corr_scale: float, default: 2.0
-            Correlation scale factor.
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Args:
+            lmbda: Scaling factor to determine weighting. Defaults to 0.94.
+            day_chunk: Sampling the data which is assumed to be daily. Defaults to 11.
+            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.
+                Defaults to 0.
+            first_column: Column of first timeseries. Defaults to 0.
+            second_column: Column of second timeseries. Defaults to 1.
+            corr_scale: Correlation scale factor. Defaults to 2.0.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of from_date and to_date. Optional.
+            from_date: Specific from date. Optional.
+            to_date: Specific to date. Optional.
+            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+                test cases and comparisons. Optional.
 
         Returns:
-        --------
-        Pandas.DataFrame
-            Series volatilities and correlation
-
+            Series volatilities and correlation.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -663,10 +577,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         in the frame.
 
         Returns:
-        --------
-        pandas.DataFrame
             Correlation matrix of the time series in the frame.
-
         """
         corr_matrix = (
             self.tsdf.ffill()
@@ -687,16 +598,11 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> Self:
         """To add an OpenTimeSeries object.
 
-        Parameters
-        ----------
-        new_series: OpenTimeSeries
-            The timeseries to add
+        Args:
+            new_series: The timeseries to add.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         self.constituents += [new_series]
         self.tsdf = concat([self.tsdf, new_series.tsdf], axis="columns", sort=True)
@@ -705,16 +611,11 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     def delete_timeseries(self: Self, lvl_zero_item: str) -> Self:
         """To delete an OpenTimeSeries object.
 
-        Parameters
-        ----------
-        lvl_zero_item: str
-            The .tsdf column level 0 value of the timeseries to delete
+        Args:
+            lvl_zero_item: The .tsdf column level 0 value of the timeseries to delete.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         if self.weights:
             new_c, new_w = [], []
@@ -739,21 +640,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> Self:
         """Truncate DataFrame such that all timeseries have the same time span.
 
-        Parameters
-        ----------
-        start_cut: datetime.date, optional
-            New first date
-        end_cut: datetime.date, optional
-            New last date
-        where: LiteralTrunc, default: both
-            Determines where dataframe is truncated also when start_cut
-            or end_cut is None.
+        Args:
+            start_cut: New first date. Optional.
+            end_cut: New last date. Optional.
+            where: Determines where dataframe is truncated also when start_cut
+                or end_cut is None. Defaults to both.
 
         Returns:
-        --------
-        OpenFrame
-            An OpenFrame object
-
+            An OpenFrame object.
         """
         if not start_cut and where in ["before", "both"]:
             start_cut = self.first_indices.max()
@@ -774,14 +668,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 f"not truncated to same start dates.\n"
                 f"{self.tsdf.head()}"
             )
-            logger.warning(msg=msg)
+            logger.warning(msg)
         if len(set(self.last_indices)) != 1:
             msg = (
                 f"One or more constituents still "
                 f"not truncated to same end dates.\n"
                 f"{self.tsdf.tail()}"
             )
-            logger.warning(msg=msg)
+            logger.warning(msg)
         return self
 
     def relative(
@@ -793,16 +687,11 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> None:
         """Calculate cumulative relative return between two series.
 
-        Parameters
-        ----------
-        long_column: int, default: 0
-            Column number of timeseries bought
-        short_column: int, default: 1
-            Column number of timeseries sold
-        base_zero: bool, default: True
-            If set to False 1.0 is added to allow for a capital base and
-            to allow a volatility calculation
-
+        Args:
+            long_column: Column number of timeseries bought. Defaults to 0.
+            short_column: Column number of timeseries sold. Defaults to 1.
+            base_zero: If set to False 1.0 is added to allow for a capital base and
+                to allow a volatility calculation. Defaults to True.
         """
         rel_label = (
             cast("tuple[str, str]", self.tsdf.iloc[:, long_column].name)[0]
@@ -835,26 +724,18 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         difference between the fund and its index returns.
         https://www.investopedia.com/terms/t/trackingerror.asp.
 
-        Parameters
-        ----------
-        base_column: tuple[str, ValueType] | int, default: -1
-            Column of timeseries that is the denominator in the ratio.
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Args:
+            base_column: Column of timeseries that is the denominator in the ratio.
+                Defaults to -1.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of from_date and to_date. Optional.
+            from_date: Specific from date. Optional.
+            to_date: Specific to date. Optional.
+            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+                test cases and comparisons. Optional.
 
         Returns:
-        --------
-        Pandas.Series[float]
-            Tracking Errors
-
+            Tracking Errors.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -910,26 +791,18 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         the difference between the fund and its index returns.
         The ratio is calculated using the annualized arithmetic mean of returns.
 
-        Parameters
-        ----------
-        base_column: tuple[str, ValueType] | int, default: -1
-            Column of timeseries that is the denominator in the ratio.
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Args:
+            base_column: Column of timeseries that is the denominator in the ratio.
+                Defaults to -1.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of from_date and to_date. Optional.
+            from_date: Specific from date. Optional.
+            to_date: Specific to date. Optional.
+            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+                test cases and comparisons. Optional.
 
         Returns:
-        --------
-        Pandas.Series[float]
-            Information Ratios
-
+            Information Ratios.
         """
         earlier, later = self.calc_range(
             months_offset=months_from_last,
@@ -991,28 +864,19 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Finance Education (Vol 2 Winter 2013).
         https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf.
 
-        Parameters
-        ----------
-        ratio: LiteralCaptureRatio
-            The ratio to calculate
-        base_column: tuple[str, ValueType] | int, default: -1
-            Column of timeseries that is the denominator in the ratio.
-        months_from_last : int, optional
-            number of months offset as positive integer. Overrides use of from_date
-            and to_date
-        from_date : datetime.date, optional
-            Specific from date
-        to_date : datetime.date, optional
-            Specific to date
-        periods_in_a_year_fixed : DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and
-            comparisons
+        Args:
+            ratio: The ratio to calculate.
+            base_column: Column of timeseries that is the denominator in the ratio.
+                Defaults to -1.
+            months_from_last: Number of months offset as positive integer. Overrides
+                use of from_date and to_date. Optional.
+            from_date: Specific from date. Optional.
+            to_date: Specific to date. Optional.
+            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+                test cases and comparisons. Optional.
 
         Returns:
-        --------
-        Pandas.Series[float]
-            Capture Ratios
-
+            Capture Ratios.
         """
         loss_limit: float = 0.0
         earlier, later = self.calc_range(
@@ -1185,20 +1049,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Calculates Beta as Co-variance of asset & market divided by Variance
         of the market. https://www.investopedia.com/terms/b/beta.asp.
 
-        Parameters
-        ----------
-        asset: tuple[str, ValueType] | int
-            The column of the asset
-        market: tuple[str, ValueType] | int
-            The column of the market against which Beta is measured
-        dlta_degr_freedms: int, default: 1
-            Variance bias factor taking the value 0 or 1.
+        Args:
+            asset: The column of the asset.
+            market: The column of the market against which Beta is measured.
+            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.
+                Defaults to 1.
 
         Returns:
-        --------
-        float
-            Beta as Co-variance of x & y divided by Variance of x
-
+            Beta as Co-variance of x & y divided by Variance of x.
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if all(vtypes):
@@ -1252,22 +1110,16 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Ordinary Least Squares fit.
 
         Performs a linear regression and adds a new column with a fitted line
-        using Ordinary Least Squares fit
+        using Ordinary Least Squares fit.
 
-        Parameters
-        ----------
-        y_column: tuple[str, ValueType] | int
-            The column level values of the dependent variable y
-        x_column: tuple[str, ValueType] | int
-            The column level values of the exogenous variable x
-        fitted_series: bool, default: True
-            If True the fit is added as a new column in the .tsdf Pandas.DataFrame
+        Args:
+            y_column: The column level values of the dependent variable y.
+            x_column: The column level values of the exogenous variable x.
+            fitted_series: If True the fit is added as a new column in the .tsdf
+                Pandas.DataFrame. Defaults to True.
 
         Returns:
-        --------
-        dict[str, float]
             A dictionary with the coefficient, intercept and rsquared outputs.
-
         """
         msg = "y_column should be a tuple[str, ValueType] or an integer."
         if isinstance(y_column, tuple):
@@ -1300,8 +1152,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         if fitted_series:
             self.tsdf[y_label, x_label] = model.predict(x_value)
         return {
-            "coefficient": model.coef_[0],
-            "intercept": model.intercept_,
+            "coefficient": float(model.coef_[0]),
+            "intercept": float(model.intercept_),
             "rsquared": model.score(x_value, y_value),
         }
 
@@ -1321,22 +1173,16 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         This metric is also commonly referred to as simply alpha.
         https://www.investopedia.com/terms/j/jensensmeasure.asp.
 
-        Parameters
-        ----------
-        asset: tuple[str, ValueType] | int
-            The column of the asset
-        market: tuple[str, ValueType] | int
-            The column of the market against which Jensen's alpha is measured
-        riskfree_rate : float, default: 0.0
-            The return of the zero volatility riskfree asset
-        dlta_degr_freedms: int, default: 1
-            Variance bias factor taking the value 0 or 1.
+        Args:
+            asset: The column of the asset.
+            market: The column of the market against which Jensen's alpha is measured.
+            riskfree_rate: The return of the zero volatility riskfree asset.
+                Defaults to 0.0.
+            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.
+                Defaults to 1.
 
         Returns:
-        --------
-        float
-            Jensen's alpha
-
+            Jensen's alpha.
         """
         vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
         if not any(vtypes):
@@ -1397,18 +1243,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> DataFrame:
         """Calculate a basket timeseries based on the supplied weights.
 
-        Parameters
-        ----------
-        name: str
-            Name of the basket timeseries
-        weight_strat: LiteralPortfolioWeightings, optional
-            weight calculation strategies
+        Args:
+            name: Name of the basket timeseries.
+            weight_strat: Weight calculation strategies. Optional.
 
         Returns:
-        --------
-        Pandas.DataFrame
-            A basket timeseries
-
+            A basket timeseries.
         """
         if self.weights is None and weight_strat is None:
             msg = (
@@ -1512,22 +1352,18 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         the Tracking Error. And the Tracking Error is the standard deviation of the
         difference between the fund and its index returns.
 
-        Parameters
-        ----------
-        long_column: int, default: 0
-            Column of timeseries that is the numerator in the ratio.
-        short_column: int, default: 1
-            Column of timeseries that is the denominator in the ratio.
-        observations: int, default: 21
-            The length of the rolling window to use is set as number of observations.
-        periods_in_a_year_fixed : DaysInYearType, optional
-            Allows locking the periods-in-a-year to simplify test cases and comparisons
+        Args:
+            long_column: Column of timeseries that is the numerator in the ratio.
+                Defaults to 0.
+            short_column: Column of timeseries that is the denominator in the ratio.
+                Defaults to 1.
+            observations: The length of the rolling window to use is set as number of
+                observations. Defaults to 21.
+            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+                test cases and comparisons. Optional.
 
         Returns:
-        --------
-        Pandas.DataFrame
-            Rolling Information Ratios
-
+            Rolling Information Ratios.
         """
         long_label = cast(
             "tuple[str, str]",
@@ -1578,22 +1414,16 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Calculates Beta as Co-variance of asset & market divided by Variance
         of the market. https://www.investopedia.com/terms/b/beta.asp.
 
-        Parameters
-        ----------
-        asset_column: int, default: 0
-            Column of timeseries that is the asset.
-        market_column: int, default: 1
-            Column of timeseries that is the market.
-        observations: int, default: 21
-            The length of the rolling window to use is set as number of observations.
-        dlta_degr_freedms: int, default: 1
-            Variance bias factor taking the value 0 or 1.
+        Args:
+            asset_column: Column of timeseries that is the asset. Defaults to 0.
+            market_column: Column of timeseries that is the market. Defaults to 1.
+            observations: The length of the rolling window to use is set as number of
+                observations. Defaults to 21.
+            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.
+                Defaults to 1.
 
         Returns:
-        --------
-        Pandas.DataFrame
-            Rolling Betas
-
+            Rolling Betas.
         """
         market_label = cast("tuple[str, str]", self.tsdf.iloc[:, market_column].name)[
             0
@@ -1640,20 +1470,16 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Calculates correlation between two series. The period with
         at least the given number of observations is the first period calculated.
 
-        Parameters
-        ----------
-        first_column: int, default: 0
-            The position as integer of the first timeseries to compare
-        second_column: int, default: 1
-            The position as integer of the second timeseries to compare
-        observations: int, default: 21
-            The length of the rolling window to use is set as number of observations
+        Args:
+            first_column: The position as integer of the first timeseries to compare.
+                Defaults to 0.
+            second_column: The position as integer of the second timeseries to compare.
+                Defaults to 1.
+            observations: The length of the rolling window to use is set as number of
+                observations. Defaults to 21.
 
         Returns:
-        --------
-        Pandas.DataFrame
-            Rolling Correlations
-
+            Rolling Correlations.
         """
         corr_label = (
             cast("tuple[str, str]", self.tsdf.iloc[:, first_column].name)[0]
@@ -1688,22 +1514,19 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         It utilizes a scikit-learn LinearRegression model and returns a DataFrame
         with summary output and an OpenTimeSeries of predicted values.
 
-        Parameters
-        ----------
-        dependent_column: tuple[str, ValueType]
-            A tuple key to select the column in the OpenFrame.tsdf.columns
-            to use as the dependent variable
+        Args:
+            dependent_column: A tuple key to select the column in the
+                OpenFrame.tsdf.columns to use as the dependent variable.
 
         Returns:
-        --------
-        tuple[pandas.DataFrame, OpenTimeSeries]
-            - A DataFrame with the R-squared, the intercept
-              and the regression coefficients
+            A tuple containing:
+            - A DataFrame with the R-squared, the intercept and the regression
+              coefficients
             - An OpenTimeSeries of predicted values
 
         Raises:
-            KeyError: If the column tuple is not found in the OpenFrame.tsdf.columns
-            ValueError: If not all series are returnseries (ValueType.RTRN)
+            KeyError: If the column tuple is not found in the OpenFrame.tsdf.columns.
+            ValueError: If not all series are returnseries (ValueType.RTRN).
         """
         key_msg = (
             f"Tuple ({dependent_column[0]}, "
@@ -1749,28 +1572,20 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     ) -> OpenFrame:
         """Create a rebalanced portfolio from the OpenFrame constituents.
 
-        Parameters
-        ----------
-        name: str
-            Name of the portfolio
-        items: list[str], optional
-            List of items to include in the portfolio. If None, uses all items.
-        bal_weights: list[float], optional
-            List of weights for rebalancing. If None, uses frame weights.
-        frequency: int, default: 1
-            Rebalancing frequency
-        cash_index: OpenTimeSeries, optional
-            Cash index series for cash component
-        equal_weights: bool, default: False
-            If True, use equal weights for all items
-        drop_extras: bool, default: True
-            If True, only return TWR series; if False, return all details
+        Args:
+            name: Name of the portfolio.
+            items: List of items to include in the portfolio. If None, uses all items.
+                Optional.
+            bal_weights: List of weights for rebalancing. If None, uses frame weights.
+                Optional.
+            frequency: Rebalancing frequency. Defaults to 1.
+            cash_index: Cash index series for cash component. Optional.
+            equal_weights: If True, use equal weights for all items. Defaults to False.
+            drop_extras: If True, only return TWR series; if False, return all details.
+                Defaults to True.
 
         Returns:
-        --------
-        OpenFrame
-            OpenFrame containing the rebalanced portfolio
-
+            OpenFrame containing the rebalanced portfolio.
         """
         if bal_weights is None and not equal_weights:
             if self.weights is None:

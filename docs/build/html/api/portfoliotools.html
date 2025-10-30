@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio Tools &mdash; openseries 2.0.2 documentation</title>
+  <title>Portfolio Tools &mdash; openseries 2.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c2377ec0"></script>
+      <script src="../_static/documentation_options.js?v=664ffad9"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -119,284 +119,32 @@
   <section id="portfolio-tools">
 <h1>Portfolio Tools<a class="headerlink" href="#portfolio-tools" title="Link to this heading"></a></h1>
 <p>The portfoliotools module provides functions for portfolio optimization, simulation, and analysis.</p>
-<p>Defining the portfolio tools for the OpenFrame class.</p>
-<dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">constrain_optimized_portfolios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">portfolioname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Current</span> <span class="pre">Portfolio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SLSQP'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#constrain_optimized_portfolios"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Constrain optimized portfolios to those that improve on the current one.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>data: OpenFrame</dt><dd><p>Portfolio data</p>
-</dd>
-<dt>serie: OpenTimeSeries</dt><dd><p>A</p>
-</dd>
-<dt>portfolioname: str, default: “Current Portfolio”</dt><dd><p>Name of the portfolio</p>
-</dd>
-<dt>simulations: int, default: 10000</dt><dd><p>Number of possible portfolios to simulate</p>
-</dd>
-<dt>curve_points: int, default: 200</dt><dd><p>Number of optimal portfolios on the efficient frontier</p>
-</dd>
-<dt>bounds: tuple[tuple[float, float], …], optional</dt><dd><p>The range of minumum and maximum allowed allocations for each asset</p>
-</dd>
-<dt>minimize_method: LiteralMinimizeMethods, default: SLSQP</dt><dd><p>The method passed into the scipy.minimize function</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</dt><dd><p>The constrained optimal portfolio data</p>
-</dd>
-</dl>
-</section>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>serie</strong> (<em>OpenTimeSeries</em>)</p></li>
-<li><p><strong>portfolioname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>simulations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>curve_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">efficient_frontier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ports</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">71</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontier_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SLSQP'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tweak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#efficient_frontier"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Identify an efficient frontier.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>eframe: OpenFrame</dt><dd><p>Portfolio data</p>
-</dd>
-<dt>num_ports: int, default: 5000</dt><dd><p>Number of possible portfolios to simulate</p>
-</dd>
-<dt>seed: int, default: 71</dt><dd><p>The seed for the random process</p>
-</dd>
-<dt>bounds: tuple[tuple[float, float], …], optional</dt><dd><p>The range of minumum and maximum allowed allocations for each asset</p>
-</dd>
-<dt>frontier_points: int, default: 200</dt><dd><p>number of points along frontier to optimize</p>
-</dd>
-<dt>minimize_method: LiteralMinimizeMethods, default: SLSQP</dt><dd><p>The method passed into the scipy.minimize function</p>
-</dd>
-<dt>tweak: bool, default: True</dt><dd><p>cutting the frontier to exclude multiple points with almost the same risk</p>
-</dd>
-</dl>
-</section>
-<section id="id2">
-<h2>Returns:<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>tuple[DataFrame, DataFrame, NDArray[float]]</dt><dd><p>The efficient frontier data, simulation data and optimal portfolio</p>
-</dd>
-</dl>
-</section>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>eframe</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>frontier_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>)</p></li>
-<li><p><strong>tweak</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[DataFrame, DataFrame, NDArray[float64]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">prepare_plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimized</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#prepare_plot_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Prepare date to be used as point_frame in the sharpeplot function.</p>
-<section id="id3">
-<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>assets: OpenFrame</dt><dd><p>Portfolio data with individual assets and a weighted portfolio</p>
-</dd>
-<dt>current: OpenTimeSeries</dt><dd><p>The current or initial portfolio based on given weights</p>
-</dd>
-<dt>optimized: DataFrame</dt><dd><p>Data optimized with the efficient_frontier method</p>
-</dd>
-</dl>
-</section>
-<section id="id4">
-<h2>Returns:<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>DataFrame</dt><dd><p>The data prepared with mean returns, volatility and weights</p>
-</dd>
-</dl>
-</section>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>assets</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>current</strong> (<em>OpenTimeSeries</em>)</p></li>
-<li><p><strong>optimized</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">sharpeplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_frame_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'markers'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titletext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_plotlyjs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cdn'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_logo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#sharpeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Create scatter plot coloured by Sharpe Ratio.</p>
-<section id="id5">
-<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>sim_frame: DataFrame, optional</dt><dd><p>Data from the simulate_portfolios method.</p>
-</dd>
-<dt>line_frame: DataFrame, optional</dt><dd><p>Data from the efficient_frontier method.</p>
-</dd>
-<dt>point_frame: DataFrame, optional</dt><dd><p>Data to highlight current and efficient portfolios.</p>
-</dd>
-<dt>point_frame_mode: LiteralLinePlotMode, default: markers</dt><dd><p>Which type of scatter to use.</p>
-</dd>
-<dt>filename: str, optional</dt><dd><p>Name of the Plotly html file</p>
-</dd>
-<dt>directory: DirectoryPath, optional</dt><dd><p>Directory where Plotly html file is saved</p>
-</dd>
-<dt>titletext: str, optional</dt><dd><p>Text for the plot title</p>
-</dd>
-<dt>output_type: LiteralPlotlyOutput, default: “file”</dt><dd><p>Determines output type</p>
-</dd>
-<dt>include_plotlyjs: LiteralPlotlyJSlib, default: “cdn”</dt><dd><p>Determines how the plotly.js library is included in the output</p>
-</dd>
-<dt>title: bool, default: True</dt><dd><p>Whether to add standard plot title</p>
-</dd>
-<dt>add_logo: bool, default: True</dt><dd><p>Whether to add Captor logo</p>
-</dd>
-<dt>auto_open: bool, default: True</dt><dd><p>Determines whether to open a browser window with the plot</p>
-</dd>
-</dl>
-</section>
-<section id="id6">
-<h2>Returns:<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>Figure</dt><dd><p>The scatter plot with simulated and optimized results</p>
-</dd>
-</dl>
-</section>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sim_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>line_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>point_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>point_frame_mode</strong> (<em>LiteralLinePlotMode</em>)</p></li>
-<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>directory</strong> (<em>DirectoryPath</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>titletext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>output_type</strong> (<em>LiteralPlotlyOutput</em>)</p></li>
-<li><p><strong>include_plotlyjs</strong> (<em>LiteralPlotlyJSlib</em>)</p></li>
-<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>add_logo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>auto_open</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Figure, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">simulate_portfolios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ports</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#simulate_portfolios"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Generate random weights for simulated portfolios.</p>
-<section id="id7">
-<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>simframe: OpenFrame</dt><dd><p>Return data for portfolio constituents</p>
-</dd>
-<dt>num_ports: int</dt><dd><p>Number of possible portfolios to simulate</p>
-</dd>
-<dt>seed: int</dt><dd><p>The seed for the random process</p>
-</dd>
-</dl>
-</section>
-<section id="id8">
-<h2>Returns:<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>pandas.DataFrame</dt><dd><p>The resulting data</p>
-</dd>
-</dl>
-</section>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>simframe</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
 <section id="portfolio-optimization">
 <h2>Portfolio Optimization<a class="headerlink" href="#portfolio-optimization" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">efficient_frontier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ports</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">71</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontier_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SLSQP'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tweak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#efficient_frontier"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Identify an efficient frontier.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>eframe: OpenFrame</dt><dd><p>Portfolio data</p>
-</dd>
-<dt>num_ports: int, default: 5000</dt><dd><p>Number of possible portfolios to simulate</p>
-</dd>
-<dt>seed: int, default: 71</dt><dd><p>The seed for the random process</p>
-</dd>
-<dt>bounds: tuple[tuple[float, float], …], optional</dt><dd><p>The range of minumum and maximum allowed allocations for each asset</p>
-</dd>
-<dt>frontier_points: int, default: 200</dt><dd><p>number of points along frontier to optimize</p>
-</dd>
-<dt>minimize_method: LiteralMinimizeMethods, default: SLSQP</dt><dd><p>The method passed into the scipy.minimize function</p>
-</dd>
-<dt>tweak: bool, default: True</dt><dd><p>cutting the frontier to exclude multiple points with almost the same risk</p>
-</dd>
-</dl>
-</section>
-<section id="id10">
-<h3>Returns:<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>tuple[DataFrame, DataFrame, NDArray[float]]</dt><dd><p>The efficient frontier data, simulation data and optimal portfolio</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>eframe</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>frontier_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>)</p></li>
-<li><p><strong>tweak</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>eframe</strong> (<em>OpenFrame</em>) – Portfolio data.</p></li>
+<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of possible portfolios to simulate. Defaults to 5000.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The seed for the random process. Defaults to 71.</p></li>
+<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>) – The range of minimum and maximum allowed allocations for each asset.</p></li>
+<li><p><strong>frontier_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of points along frontier to optimize. Defaults to 200.</p></li>
+<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>) – The method passed into the scipy.minimize function.
+Defaults to SLSQP.</p></li>
+<li><p><strong>tweak</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Cutting the frontier to exclude multiple points with almost the
+same risk.
+Defaults to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[DataFrame, DataFrame, NDArray[float64]]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The efficient frontier data, simulation data and optimal portfolio.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[DataFrame, DataFrame, NDArray[float64]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -408,34 +156,19 @@
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">simulate_portfolios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ports</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#simulate_portfolios"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Generate random weights for simulated portfolios.</p>
-<section id="id11">
-<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>simframe: OpenFrame</dt><dd><p>Return data for portfolio constituents</p>
-</dd>
-<dt>num_ports: int</dt><dd><p>Number of possible portfolios to simulate</p>
-</dd>
-<dt>seed: int</dt><dd><p>The seed for the random process</p>
-</dd>
-</dl>
-</section>
-<section id="id12">
-<h3>Returns:<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>pandas.DataFrame</dt><dd><p>The resulting data</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>simframe</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>simframe</strong> (<em>OpenFrame</em>) – Return data for portfolio constituents.</p></li>
+<li><p><strong>num_ports</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of possible portfolios to simulate.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The seed for the random process.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>DataFrame</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -447,46 +180,25 @@
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">constrain_optimized_portfolios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">portfolioname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Current</span> <span class="pre">Portfolio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SLSQP'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#constrain_optimized_portfolios"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Constrain optimized portfolios to those that improve on the current one.</p>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>data: OpenFrame</dt><dd><p>Portfolio data</p>
-</dd>
-<dt>serie: OpenTimeSeries</dt><dd><p>A</p>
-</dd>
-<dt>portfolioname: str, default: “Current Portfolio”</dt><dd><p>Name of the portfolio</p>
-</dd>
-<dt>simulations: int, default: 10000</dt><dd><p>Number of possible portfolios to simulate</p>
-</dd>
-<dt>curve_points: int, default: 200</dt><dd><p>Number of optimal portfolios on the efficient frontier</p>
-</dd>
-<dt>bounds: tuple[tuple[float, float], …], optional</dt><dd><p>The range of minumum and maximum allowed allocations for each asset</p>
-</dd>
-<dt>minimize_method: LiteralMinimizeMethods, default: SLSQP</dt><dd><p>The method passed into the scipy.minimize function</p>
-</dd>
-</dl>
-</section>
-<section id="id14">
-<h3>Returns:<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</dt><dd><p>The constrained optimal portfolio data</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>serie</strong> (<em>OpenTimeSeries</em>)</p></li>
-<li><p><strong>portfolioname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>simulations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>curve_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>)</p></li>
+<li><p><strong>data</strong> (<em>OpenFrame</em>) – Portfolio data.</p></li>
+<li><p><strong>serie</strong> (<em>OpenTimeSeries</em>) – A timeseries representing the current portfolio.</p></li>
+<li><p><strong>portfolioname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of the portfolio. Defaults to “Current Portfolio”.</p></li>
+<li><p><strong>simulations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of possible portfolios to simulate. Defaults to 10000.</p></li>
+<li><p><strong>curve_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of optimal portfolios on the efficient frontier.
+Defaults to 200.</p></li>
+<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>) – The range of minimum and maximum allowed allocations for each asset.</p></li>
+<li><p><strong>minimize_method</strong> (<em>LiteralMinimizeMethods</em>) – The method passed into the scipy.minimize function.
+Defaults to SLSQP.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The constrained optimal portfolio data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -497,35 +209,20 @@
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">prepare_plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimized</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#prepare_plot_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Prepare date to be used as point_frame in the sharpeplot function.</p>
-<section id="id15">
-<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>assets: OpenFrame</dt><dd><p>Portfolio data with individual assets and a weighted portfolio</p>
-</dd>
-<dt>current: OpenTimeSeries</dt><dd><p>The current or initial portfolio based on given weights</p>
-</dd>
-<dt>optimized: DataFrame</dt><dd><p>Data optimized with the efficient_frontier method</p>
-</dd>
-</dl>
-</section>
-<section id="id16">
-<h3>Returns:<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>DataFrame</dt><dd><p>The data prepared with mean returns, volatility and weights</p>
-</dd>
-</dl>
-</section>
+<dd><p>Prepare data to be used as point_frame in the sharpeplot function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>assets</strong> (<em>OpenFrame</em>)</p></li>
-<li><p><strong>current</strong> (<em>OpenTimeSeries</em>)</p></li>
-<li><p><strong>optimized</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>assets</strong> (<em>OpenFrame</em>) – Portfolio data with individual assets and a weighted portfolio.</p></li>
+<li><p><strong>current</strong> (<em>OpenTimeSeries</em>) – The current or initial portfolio based on given weights.</p></li>
+<li><p><strong>optimized</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>) – Data optimized with the efficient_frontier method.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>DataFrame</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The data prepared with mean returns, volatility and weights.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -534,61 +231,31 @@
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.portfoliotools.</span></span><span class="sig-name descname"><span class="pre">sharpeplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_frame_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'markers'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titletext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_plotlyjs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cdn'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_logo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/portfoliotools.html#sharpeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create scatter plot coloured by Sharpe Ratio.</p>
-<section id="id17">
-<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>sim_frame: DataFrame, optional</dt><dd><p>Data from the simulate_portfolios method.</p>
-</dd>
-<dt>line_frame: DataFrame, optional</dt><dd><p>Data from the efficient_frontier method.</p>
-</dd>
-<dt>point_frame: DataFrame, optional</dt><dd><p>Data to highlight current and efficient portfolios.</p>
-</dd>
-<dt>point_frame_mode: LiteralLinePlotMode, default: markers</dt><dd><p>Which type of scatter to use.</p>
-</dd>
-<dt>filename: str, optional</dt><dd><p>Name of the Plotly html file</p>
-</dd>
-<dt>directory: DirectoryPath, optional</dt><dd><p>Directory where Plotly html file is saved</p>
-</dd>
-<dt>titletext: str, optional</dt><dd><p>Text for the plot title</p>
-</dd>
-<dt>output_type: LiteralPlotlyOutput, default: “file”</dt><dd><p>Determines output type</p>
-</dd>
-<dt>include_plotlyjs: LiteralPlotlyJSlib, default: “cdn”</dt><dd><p>Determines how the plotly.js library is included in the output</p>
-</dd>
-<dt>title: bool, default: True</dt><dd><p>Whether to add standard plot title</p>
-</dd>
-<dt>add_logo: bool, default: True</dt><dd><p>Whether to add Captor logo</p>
-</dd>
-<dt>auto_open: bool, default: True</dt><dd><p>Determines whether to open a browser window with the plot</p>
-</dd>
-</dl>
-</section>
-<section id="id18">
-<h3>Returns:<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>Figure</dt><dd><p>The scatter plot with simulated and optimized results</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sim_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>line_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>point_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>point_frame_mode</strong> (<em>LiteralLinePlotMode</em>)</p></li>
-<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>directory</strong> (<em>DirectoryPath</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>titletext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>output_type</strong> (<em>LiteralPlotlyOutput</em>)</p></li>
-<li><p><strong>include_plotlyjs</strong> (<em>LiteralPlotlyJSlib</em>)</p></li>
-<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>add_logo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>auto_open</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>sim_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>) – Data from the simulate_portfolios method.</p></li>
+<li><p><strong>line_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>) – Data from the efficient_frontier method.</p></li>
+<li><p><strong>point_frame</strong> (<em>DataFrame</em><em> | </em><em>None</em>) – Data to highlight current and efficient portfolios.</p></li>
+<li><p><strong>point_frame_mode</strong> (<em>LiteralLinePlotMode</em>) – Which type of scatter to use. Defaults to markers.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Name of the Plotly html file.</p></li>
+<li><p><strong>directory</strong> (<em>DirectoryPath</em><em> | </em><em>None</em>) – Directory where Plotly html file is saved.</p></li>
+<li><p><strong>titletext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Text for the plot title.</p></li>
+<li><p><strong>output_type</strong> (<em>LiteralPlotlyOutput</em>) – Determines output type. Defaults to “file”.</p></li>
+<li><p><strong>include_plotlyjs</strong> (<em>LiteralPlotlyJSlib</em>) – Determines how the plotly.js library is included
+in the output.
+Defaults to “cdn”.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to add standard plot title. Defaults to True.</p></li>
+<li><p><strong>add_logo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to add Captor logo. Defaults to True.</p></li>
+<li><p><strong>auto_open</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Determines whether to open a browser window with the plot.
+Defaults to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Figure, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The scatter plot with simulated and optimized results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Figure, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
 </dd>
 </dl>
 </dd></dl>

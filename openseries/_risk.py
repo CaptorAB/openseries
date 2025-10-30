@@ -1,4 +1,4 @@
-"""Functions caclculating risk measures."""
+"""Functions calculating risk measures."""
 
 from __future__ import annotations
 
@@ -25,18 +25,12 @@ def _cvar_down_calc(
 
     https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
-    Parameters
-    ----------
-    data: DataFrame | Series[float] | list[float]
-        The data to perform the calculation over
-    level: float, default: 0.95
-        The sought CVaR level
+    Args:
+        data: The data to perform the calculation over.
+        level: The sought CVaR level. Defaults to 0.95.
 
     Returns:
-    --------
-    float
-        Downside Conditional Value At Risk "CVaR"
-
+        Downside Conditional Value At Risk "CVaR".
     """
     if isinstance(data, DataFrame):
         clean = nan_to_num(data.iloc[:, 0])
@@ -57,20 +51,14 @@ def _var_down_calc(
     The equivalent of percentile.inc([...], 1-level) over returns in MS Excel
     https://www.investopedia.com/terms/v/var.asp.
 
-    Parameters
-    ----------
-    data: DataFrame | Series[float] | list[float]
-        The data to perform the calculation over
-    level: float, default: 0.95
-        The sought VaR level
-    interpolation: LiteralQuantileInterp, default: "lower"
-        type of interpolation in Pandas.DataFrame.quantile() function.
+    Args:
+        data: The data to perform the calculation over.
+        level: The sought VaR level. Defaults to 0.95.
+        interpolation: Type of interpolation in Pandas.DataFrame.quantile() function.
+            Defaults to "lower".
 
     Returns:
-    --------
-    float
-        Downside Value At Risk
-
+        Downside Value At Risk.
     """
     if isinstance(data, DataFrame):
         clean = nan_to_num(data.iloc[:, 0])

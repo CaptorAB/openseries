@@ -44,19 +44,13 @@ def calendar_period_returns(
 ) -> DataFrame:
     """Generate a table of returns with appropriate table labels.
 
-    Parameters
-    ----------
-    data: OpenFrame
-        The timeseries data
-    freq: LiteralBizDayFreq
-        The date offset string that sets the resampled frequency
-    relabel: bool, default: True
-        Whether to set new appropriate labels
+    Args:
+        data: The timeseries data.
+        freq: The date offset string that sets the resampled frequency.
+        relabel: Whether to set new appropriate labels. Defaults to True.
 
     Returns:
-    --------
-    pandas.DataFrame
-        The resulting data
+        The resulting data.
 
     """
     copied = data.from_deepcopy()
@@ -91,33 +85,24 @@ def report_html(
 ) -> tuple[Figure, str]:
     """Generate a HTML report page with line and bar plots and a table.
 
-    Parameters
-    ----------
-    data: OpenFrame
-        The timeseries data
-    bar_freq: LiteralBizDayFreq
-        The date offset string that sets the bar plot frequency
-    filename: str, optional
-        Name of the Plotly html file
-    title: str, optional
-        The report page title
-    directory: DirectoryPath, optional
-        Directory where Plotly html file is saved
-    output_type: LiteralPlotlyOutput, default: "file"
-        Determines output type
-    include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
-        Determines how the plotly.js library is included in the output
-    auto_open: bool, default: True
-        Determines whether to open a browser window with the plot
-    add_logo: bool, default: True
-        If True a Captor logo is added to the plot
-    vertical_legend: bool, default: True
-        Determines whether to vertically align the legend's labels
+    Args:
+        data: The timeseries data.
+        bar_freq: The date offset string that sets the bar plot frequency.
+        filename: Name of the Plotly HTML file.
+        title: The report page title.
+        directory: Directory where Plotly HTML file is saved.
+        output_type: Determines output type. Defaults to "file".
+        include_plotlyjs: Determines how the plotly.js library is included in
+            the output.
+            Defaults to "cdn".
+        auto_open: Determines whether to open a browser window with the plot.
+            Defaults to False.
+        add_logo: If True a Captor logo is added to the plot. Defaults to True.
+        vertical_legend: Determines whether to vertically align the legend's
+            labels. Defaults to True.
 
     Returns:
-    --------
-    tuple[plotly.go.Figure, str]
-        Plotly Figure and a div section or a html filename with location
+        Plotly Figure and a div section or a HTML filename with location.
 
     """
     copied = data.from_deepcopy()
@@ -315,7 +300,7 @@ def report_html(
                 cru: Series[float] | Series[str] = crm.capture_ratio_func(ratio="both")
             except ZeroDivisionError as exc:  # pragma: no cover
                 msg = f"Capture ratio calculation error: {exc!s}"  # pragma: no cover
-                logger.warning(msg=msg)  # pragma: no cover
+                logger.warning(msg)  # pragma: no cover
                 cru = cru_save  # pragma: no cover
         if cru.hasnans:
             cru = cru_save
@@ -461,7 +446,7 @@ def report_html(
             auto_open=auto_open,
             auto_play=False,
             link_text="",
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             config=fig["config"],
         )
@@ -473,7 +458,7 @@ def report_html(
             div_id=div_id,
             auto_play=False,
             full_html=False,
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             config=fig["config"],
         )
 

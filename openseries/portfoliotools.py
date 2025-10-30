@@ -67,20 +67,13 @@ def simulate_portfolios(
 ) -> DataFrame:
     """Generate random weights for simulated portfolios.
 
-    Parameters
-    ----------
-    simframe: OpenFrame
-        Return data for portfolio constituents
-    num_ports: int
-        Number of possible portfolios to simulate
-    seed: int
-        The seed for the random process
+    Args:
+        simframe: Return data for portfolio constituents.
+        num_ports: Number of possible portfolios to simulate.
+        seed: The seed for the random process.
 
     Returns:
-    --------
-    pandas.DataFrame
-        The resulting data
-
+        The resulting data.
     """
     copi = simframe.from_deepcopy()
 
@@ -130,28 +123,20 @@ def efficient_frontier(
 ) -> tuple[DataFrame, DataFrame, NDArray[float64]]:
     """Identify an efficient frontier.
 
-    Parameters
-    ----------
-    eframe: OpenFrame
-        Portfolio data
-    num_ports: int, default: 5000
-        Number of possible portfolios to simulate
-    seed: int, default: 71
-        The seed for the random process
-    bounds: tuple[tuple[float, float], ...], optional
-        The range of minumum and maximum allowed allocations for each asset
-    frontier_points: int, default: 200
-        number of points along frontier to optimize
-    minimize_method: LiteralMinimizeMethods, default: SLSQP
-        The method passed into the scipy.minimize function
-    tweak: bool, default: True
-        cutting the frontier to exclude multiple points with almost the same risk
+    Args:
+        eframe: Portfolio data.
+        num_ports: Number of possible portfolios to simulate. Defaults to 5000.
+        seed: The seed for the random process. Defaults to 71.
+        bounds: The range of minimum and maximum allowed allocations for each asset.
+        frontier_points: Number of points along frontier to optimize. Defaults to 200.
+        minimize_method: The method passed into the scipy.minimize function.
+            Defaults to SLSQP.
+        tweak: Cutting the frontier to exclude multiple points with almost the
+            same risk.
+            Defaults to True.
 
     Returns:
-    --------
-    tuple[DataFrame, DataFrame, NDArray[float]]
-        The efficient frontier data, simulation data and optimal portfolio
-
+        The efficient frontier data, simulation data and optimal portfolio.
     """
     if eframe.weights is None:
         eframe.weights = [1.0 / eframe.item_count] * eframe.item_count
@@ -317,27 +302,19 @@ def constrain_optimized_portfolios(
 ) -> tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]:
     """Constrain optimized portfolios to those that improve on the current one.
 
-    Parameters
-    ----------
-    data: OpenFrame
-        Portfolio data
-    serie: OpenTimeSeries
-        A
-    portfolioname: str, default: "Current Portfolio"
-        Name of the portfolio
-    simulations: int, default: 10000
-        Number of possible portfolios to simulate
-    curve_points: int, default: 200
-        Number of optimal portfolios on the efficient frontier
-    bounds: tuple[tuple[float, float], ...], optional
-        The range of minumum and maximum allowed allocations for each asset
-    minimize_method: LiteralMinimizeMethods, default: SLSQP
-        The method passed into the scipy.minimize function
+    Args:
+        data: Portfolio data.
+        serie: A timeseries representing the current portfolio.
+        portfolioname: Name of the portfolio. Defaults to "Current Portfolio".
+        simulations: Number of possible portfolios to simulate. Defaults to 10000.
+        curve_points: Number of optimal portfolios on the efficient frontier.
+            Defaults to 200.
+        bounds: The range of minimum and maximum allowed allocations for each asset.
+        minimize_method: The method passed into the scipy.minimize function.
+            Defaults to SLSQP.
 
     Returns:
-    --------
-    tuple[OpenFrame, OpenTimeSeries, OpenFrame, OpenTimeSeries]
-        The constrained optimal portfolio data
+        The constrained optimal portfolio data.
 
     """
     lr_frame = data.from_deepcopy()
@@ -385,22 +362,15 @@ def prepare_plot_data(
     current: OpenTimeSeries,
     optimized: NDArray[float64],
 ) -> DataFrame:
-    """Prepare date to be used as point_frame in the sharpeplot function.
+    """Prepare data to be used as point_frame in the sharpeplot function.
 
-    Parameters
-    ----------
-    assets: OpenFrame
-        Portfolio data with individual assets and a weighted portfolio
-    current: OpenTimeSeries
-        The current or initial portfolio based on given weights
-    optimized: DataFrame
-        Data optimized with the efficient_frontier method
+    Args:
+        assets: Portfolio data with individual assets and a weighted portfolio.
+        current: The current or initial portfolio based on given weights.
+        optimized: Data optimized with the efficient_frontier method.
 
     Returns:
-    --------
-    DataFrame
-        The data prepared with mean returns, volatility and weights
-
+        The data prepared with mean returns, volatility and weights.
     """
     txt = "<br><br>Weights:<br>" + "<br>".join(
         [
@@ -453,38 +423,25 @@ def sharpeplot(
 ) -> tuple[Figure, str]:
     """Create scatter plot coloured by Sharpe Ratio.
 
-    Parameters
-    ----------
-    sim_frame: DataFrame, optional
-        Data from the simulate_portfolios method.
-    line_frame: DataFrame, optional
-        Data from the efficient_frontier method.
-    point_frame: DataFrame, optional
-        Data to highlight current and efficient portfolios.
-    point_frame_mode: LiteralLinePlotMode, default: markers
-        Which type of scatter to use.
-    filename: str, optional
-        Name of the Plotly html file
-    directory: DirectoryPath, optional
-        Directory where Plotly html file is saved
-    titletext: str, optional
-        Text for the plot title
-    output_type: LiteralPlotlyOutput, default: "file"
-        Determines output type
-    include_plotlyjs: LiteralPlotlyJSlib, default: "cdn"
-        Determines how the plotly.js library is included in the output
-    title: bool, default: True
-        Whether to add standard plot title
-    add_logo: bool, default: True
-        Whether to add Captor logo
-    auto_open: bool, default: True
-        Determines whether to open a browser window with the plot
+    Args:
+        sim_frame: Data from the simulate_portfolios method.
+        line_frame: Data from the efficient_frontier method.
+        point_frame: Data to highlight current and efficient portfolios.
+        point_frame_mode: Which type of scatter to use. Defaults to markers.
+        filename: Name of the Plotly html file.
+        directory: Directory where Plotly html file is saved.
+        titletext: Text for the plot title.
+        output_type: Determines output type. Defaults to "file".
+        include_plotlyjs: Determines how the plotly.js library is included
+            in the output.
+            Defaults to "cdn".
+        title: Whether to add standard plot title. Defaults to True.
+        add_logo: Whether to add Captor logo. Defaults to True.
+        auto_open: Determines whether to open a browser window with the plot.
+            Defaults to True.
 
     Returns:
-    --------
-    Figure
-        The scatter plot with simulated and optimized results
-
+        The scatter plot with simulated and optimized results.
     """
     returns = []
     risk = []
@@ -591,7 +548,7 @@ def sharpeplot(
             auto_open=auto_open,
             auto_play=False,
             link_text="",
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             config=fig["config"],
             output_type=output_type,
         )
@@ -602,7 +559,7 @@ def sharpeplot(
             fig=figure,
             config=fig["config"],
             auto_play=False,
-            include_plotlyjs=cast("bool", include_plotlyjs),
+            include_plotlyjs=include_plotlyjs,
             full_html=False,
             div_id=div_id,
         )

@@ -121,6 +121,12 @@ Documentation Contents
 
    api_consistency
 
+Python Version Support
+----------------------
+
+.. warning::
+   **Python 3.10 Deprecation Notice**: Python 3.10 support is deprecated and will be removed, no earlier than 2025-12-01. Please upgrade to Python ≥3.11. See `GitHub Issue #340 <https://github.com/CaptorAB/openseries/issues/340>`_ (pinned) for details.
+
 .. toctree::
    :maxdepth: 2
    :caption: API Reference

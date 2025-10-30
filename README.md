@@ -18,6 +18,8 @@
 
 Tools for analyzing financial timeseries of a single asset or a group of assets. Designed for daily or less frequent data.
 
+> **⚠️ Python Version Notice**: Python 3.10 support is deprecated and will be removed, no earlier than 2025-12-01. Please upgrade to Python ≥3.11. See [#340](https://github.com/CaptorAB/openseries/issues/340) (pinned) for details.
+
 ## Documentation
 
 Complete documentation is available at: [https://openseries.readthedocs.io](https://openseries.readthedocs.io/)
