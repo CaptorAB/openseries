@@ -127,7 +127,12 @@ class OpenTimeSeries(_CommonModel[float]):
         cls,
         value: list[str] | str | None,
     ) -> list[str] | str | None:
-        """Pydantic validator to ensure markets field is validated."""
+        """Pydantic validator to ensure markets field is validated.
+
+        Raises:
+            MarketsNotStringNorListStrError: If ``markets`` is neither a string
+                nor a non-empty list of strings.
+        """
         msg = (
             "'markets' must be a string or list of strings, "
             f"got {type(value).__name__!r}"
@@ -143,7 +148,12 @@ class OpenTimeSeries(_CommonModel[float]):
 
     @model_validator(mode="after")
     def _dates_and_values_validate(self: Self) -> Self:
-        """Pydantic validator to ensure dates and values are validated."""
+        """Pydantic validator to ensure dates and values are validated.
+
+        Raises:
+            ValueError: If dates are not unique or if numbers of dates and values
+                do not match the shape of ``tsdf``.
+        """
         values_list_length = len(self.values)
         dates_list_length = len(self.dates)
         dates_set_length = len(set(self.dates))
@@ -234,6 +244,10 @@ class OpenTimeSeries(_CommonModel[float]):
 
         Returns:
             An OpenTimeSeries object.
+
+        Raises:
+            TypeError: If ``dframe`` is not a ``pandas.Series`` or a
+                ``pandas.DataFrame``.
         """
         msg = "Argument dframe must be pandas Series or DataFrame."
         values: list[float]
@@ -323,6 +337,10 @@ class OpenTimeSeries(_CommonModel[float]):
 
         Returns:
             An OpenTimeSeries object.
+
+        Raises:
+            IncorrectArgumentComboError: If ``d_range`` is not provided and the
+                combination of ``days`` and ``end_dt`` is incomplete.
         """
         if d_range is None:
             if days is not None and end_dt is not None:
@@ -537,6 +555,11 @@ class OpenTimeSeries(_CommonModel[float]):
 
         Returns:
             An OpenTimeSeries object.
+
+        Raises:
+            ResampleDataLossError: If called on a return series (``valuetype`` is
+                ``ValueType.RTRN``), since summation across sparser frequency would
+                be required to avoid data loss.
         """
         if self.valuetype == ValueType.RTRN:
             msg = (

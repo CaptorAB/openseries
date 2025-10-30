@@ -60,6 +60,10 @@ def market_holidays(
 
     Returns:
         List of holiday dates.
+
+    Raises:
+        MarketsNotStringNorListStrError: If any market code is not supported by
+            ``exchange_calendars`` or the input is not a string or list of strings.
     """
     market_list = [markets] if isinstance(markets, str) else list(markets)
 
@@ -105,6 +109,10 @@ def holiday_calendar(
 
     Returns:
         Generate a business calendar.
+
+    Raises:
+        CountriesNotStringNorListStrError: If ``countries`` is not a supported
+            ISO 3166-1 alpha-2 string or a list of such strings.
     """
     startyear -= 1
     endyear += 1
@@ -161,6 +169,9 @@ def date_fix(
 
     Returns:
         Parsed date.
+
+    Raises:
+        TypeError: If the provided ``fixerdate`` type is not supported.
     """
     msg = f"Unknown date format {fixerdate!s} of type {type(fixerdate)!s} encountered"
     if isinstance(fixerdate, Timestamp | dt.datetime):
