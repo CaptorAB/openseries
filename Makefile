@@ -1,6 +1,6 @@
 .ONESHELL:
 
-.PHONY: all install test lint clean builddocs servedocs cleandocs deploy_docs
+.PHONY: all install test lint clean builddocs servedocs cleandocs
 
 all: install
 
