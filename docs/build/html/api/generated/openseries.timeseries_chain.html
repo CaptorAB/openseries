@@ -131,34 +131,19 @@
 <span class="sig-prename descclassname"><span class="pre">openseries.</span></span><span class="sig-name descname"><span class="pre">timeseries_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">front</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_fee</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#timeseries_chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Chain two timeseries together.</p>
 <p>The function assumes that the two series have at least one date in common.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>front: TypeOpenTimeSeries</dt><dd><p>Earlier series to chain with</p>
-</dd>
-<dt>back: TypeOpenTimeSeries</dt><dd><p>Later series to chain with</p>
-</dd>
-<dt>old_fee: float, default: 0.0</dt><dd><p>Fee to apply to earlier series</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>TypeOpenTimeSeries</dt><dd><p>An OpenTimeSeries object or a subclass thereof</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>front</strong> (<em>TypeOpenTimeSeries</em>)</p></li>
-<li><p><strong>back</strong> (<em>TypeOpenTimeSeries</em>)</p></li>
-<li><p><strong>old_fee</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>front</strong> (<em>TypeOpenTimeSeries</em>) – Earlier series to chain with.</p></li>
+<li><p><strong>back</strong> (<em>TypeOpenTimeSeries</em>) – Later series to chain with.</p></li>
+<li><p><strong>old_fee</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Fee to apply to earlier series. Defaults to 0.0.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>TypeOpenTimeSeries</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object or a subclass thereof.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>TypeOpenTimeSeries</em></p>
 </dd>
 </dl>
 </dd></dl>

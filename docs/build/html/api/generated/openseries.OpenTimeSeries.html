@@ -133,38 +133,31 @@
 <p>OpenTimeSeries objects are at the core of the openseries package.</p>
 <p>The intended use is to allow analyses of financial timeseries.
 It is only intended for daily or less frequent data samples.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>timeseries_id: str</dt><dd><p>Database identifier of the timeseries</p>
-</dd>
-<dt>instrument_id: str</dt><dd><p>Database identifier of the instrument associated with the timeseries</p>
-</dd>
-<dt>name: str</dt><dd><p>string identifier of the timeseries and/or instrument</p>
-</dd>
-<dt>valuetype: ValueType</dt><dd><p>Identifies if the series is a series of values or returns</p>
-</dd>
-<dt>dates: DateListType</dt><dd><p>Dates of the individual timeseries items
-These dates will not be altered by methods</p>
-</dd>
-<dt>values: ValueListType</dt><dd><p>The value or return values of the timeseries items
-These values will not be altered by methods</p>
-</dd>
-<dt>local_ccy: bool</dt><dd><p>Boolean flag indicating if timeseries is in local currency</p>
-</dd>
-<dt>tsdf: pandas.DataFrame</dt><dd><p>Pandas object holding dates and values that can be altered via methods</p>
-</dd>
-<dt>currency: CurrencyStringType</dt><dd><p>ISO 4217 currency code of the timeseries</p>
-</dd>
-<dt>domestic: CurrencyStringType, default: “SEK”</dt><dd><p>ISO 4217 currency code of the user’s home currency</p>
-</dd>
-<dt>countries: CountriesType, default: “SE”</dt><dd><p>(List of) country code(s) according to ISO 3166-1 alpha-2</p>
-</dd>
-<dt>markets: list[str] | str, optional</dt><dd><p>(List of) markets code(s) supported by exchange_calendars</p>
-</dd>
-<dt>isin: str, optional</dt><dd><p>ISO 6166 identifier code of the associated instrument</p>
-</dd>
-<dt>label: str, optional</dt><dd><p>Placeholder for a name of the timeseries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeseries_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Database identifier of the timeseries.</p></li>
+<li><p><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Database identifier of the instrument associated with
+the timeseries.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – String identifier of the timeseries and/or instrument.</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>) – Identifies if the series is a series of values or returns.</p></li>
+<li><p><strong>dates</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=None</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=10</em><em>, </em><em>max_length=10</em><em>, </em><em>pattern=^\d{4}-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>1</em><em>[</em><em>0-2</em><em>]</em><em>)</em><em>-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>[</em><em>12</em><em>]</em><em>\d</em><em>|</em><em>3</em><em>[</em><em>01</em><em>]</em><em>)</em><em>$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>) – Dates of the individual timeseries items.
+These dates will not be altered by methods.</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>) – The value or return values of the timeseries items.
+These values will not be altered by methods.</p></li>
+<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Boolean flag indicating if timeseries is in local currency.</p></li>
+<li><p><strong>tsdf</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>) – Pandas object holding dates and values that can be altered via
+methods.</p></li>
+<li><p><strong>currency</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>) – ISO 4217 currency code of the timeseries.</p></li>
+<li><p><strong>domestic</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>) – ISO 4217 currency code of the user’s home currency.
+Defaults to “SEK”.</p></li>
+<li><p><strong>countries</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em>) – (List of) country code(s) according to ISO 3166-1 alpha-2.
+Defaults to “SE”.</p></li>
+<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – (List of) markets code(s) supported by exchange_calendars.
+Optional.</p></li>
+<li><p><strong>isin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – ISO 6166 identifier code of the associated instrument. Optional.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Placeholder for a name of the timeseries. Optional.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
@@ -628,52 +621,28 @@ validated to form a valid model.</p>
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuetype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ValueType.PRICE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseccy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SEK'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_ccy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.from_arrays"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create series from a list of dates and a list of values.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>name: str</dt><dd><p>string identifier of the timeseries and/or instrument</p>
-</dd>
-<dt>dates: DateListType</dt><dd><p>List of date strings as ISO 8601 YYYY-MM-DD</p>
-</dd>
-<dt>values: ValueListType</dt><dd><p>Array of float values</p>
-</dd>
-<dt>valuetype: ValueType, default: ValueType.PRICE</dt><dd><p>Identifies if the series is a series of values or returns</p>
-</dd>
-<dt>timeseries_id: str, optional</dt><dd><p>Database identifier of the timeseries</p>
-</dd>
-<dt>instrument_id: str, optional</dt><dd><p>Database identifier of the instrument associated with the timeseries</p>
-</dd>
-<dt>isin: str, optional</dt><dd><p>ISO 6166 identifier code of the associated instrument</p>
-</dd>
-<dt>baseccy: CurrencyStringType, default: “SEK”</dt><dd><p>ISO 4217 currency code of the timeseries</p>
-</dd>
-<dt>local_ccy: bool, default: True</dt><dd><p>Boolean flag indicating if timeseries is in local currency</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>dates</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=None</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=10</em><em>, </em><em>max_length=10</em><em>, </em><em>pattern=^\d{4}-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>1</em><em>[</em><em>0-2</em><em>]</em><em>)</em><em>-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>[</em><em>12</em><em>]</em><em>\d</em><em>|</em><em>3</em><em>[</em><em>01</em><em>]</em><em>)</em><em>$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
-<li><p><strong>timeseries_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>isin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>baseccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – String identifier of the timeseries and/or instrument.</p></li>
+<li><p><strong>dates</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=None</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=10</em><em>, </em><em>max_length=10</em><em>, </em><em>pattern=^\d{4}-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>1</em><em>[</em><em>0-2</em><em>]</em><em>)</em><em>-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>[</em><em>12</em><em>]</em><em>\d</em><em>|</em><em>3</em><em>[</em><em>01</em><em>]</em><em>)</em><em>$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>) – List of date strings as ISO 8601 YYYY-MM-DD.</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>) – Array of float values.</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>) – Identifies if the series is a series of values or returns.
+Defaults to ValueType.PRICE.</p></li>
+<li><p><strong>timeseries_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Database identifier of the timeseries. Optional.</p></li>
+<li><p><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Database identifier of the instrument associated
+with the timeseries. Optional.</p></li>
+<li><p><strong>isin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – ISO 6166 identifier code of the associated instrument. Optional.</p></li>
+<li><p><strong>baseccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>) – ISO 4217 currency code of the timeseries. Defaults to “SEK”.</p></li>
+<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Boolean flag indicating if timeseries is in local currency.
+Defaults to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -682,40 +651,23 @@ validated to form a valid model.</p>
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_nmbr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuetype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ValueType.PRICE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseccy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SEK'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_ccy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.from_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create series from a Pandas DataFrame or Series.</p>
-<section id="id2">
-<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>dframe: DataFrame | Series[float]</dt><dd><p>Pandas DataFrame or Series</p>
-</dd>
-<dt>column_nmbr: int, default: 0</dt><dd><p>Using iloc[:, column_nmbr] to pick column</p>
-</dd>
-<dt>valuetype: ValueType, default: ValueType.PRICE</dt><dd><p>Identifies if the series is a series of values or returns</p>
-</dd>
-<dt>baseccy: CurrencyStringType, default: “SEK”</dt><dd><p>ISO 4217 currency code of the timeseries</p>
-</dd>
-<dt>local_ccy: bool, default: True</dt><dd><p>Boolean flag indicating if timeseries is in local currency</p>
-</dd>
-</dl>
-</section>
-<section id="id3">
-<h3>Returns:<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dframe</strong> (<em>Series</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>DataFrame</em>)</p></li>
-<li><p><strong>column_nmbr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
-<li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>)</p></li>
-<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>dframe</strong> (<em>Series</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>DataFrame</em>) – Pandas DataFrame or Series.</p></li>
+<li><p><strong>column_nmbr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Using iloc[:, column_nmbr] to pick column. Defaults to 0.</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>) – Identifies if the series is a series of values or returns.
+Defaults to ValueType.PRICE.</p></li>
+<li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>) – ISO 4217 currency code of the timeseries. Defaults to “SEK”.</p></li>
+<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Boolean flag indicating if timeseries is in local currency.
+Defaults to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Self</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self</p>
 </dd>
 </dl>
 </dd></dl>
@@ -726,51 +678,28 @@ validated to form a valid model.</p>
 <dd><p>Create series from values accruing with a given fixed rate return.</p>
 <p>Providing a date_range of type Pandas DatetimeIndex takes priority over
 providing a combination of days and an end date.</p>
-<section id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>rate: float</dt><dd><p>The accrual rate</p>
-</dd>
-<dt>d_range: DatetimeIndex, optional</dt><dd><p>A given range of dates</p>
-</dd>
-<dt>days: int, optional</dt><dd><p>Number of days to generate when date_range not provided. Must be combined
-with end_dt</p>
-</dd>
-<dt>end_dt: datetime.date, optional</dt><dd><p>End date of date range to generate when date_range not provided. Must be
-combined with days</p>
-</dd>
-<dt>label: str</dt><dd><p>Placeholder for a name of the timeseries</p>
-</dd>
-<dt>valuetype: ValueType, default: ValueType.PRICE</dt><dd><p>Identifies if the series is a series of values or returns</p>
-</dd>
-<dt>baseccy: CurrencyStringType, default: “SEK”</dt><dd><p>The currency of the timeseries</p>
-</dd>
-<dt>local_ccy: bool, default: True</dt><dd><p>Boolean flag indicating if timeseries is in local currency</p>
-</dd>
-</dl>
-</section>
-<section id="id5">
-<h3>Returns:<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>d_range</strong> (<em>DatetimeIndex</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>end_dt</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
-<li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>)</p></li>
-<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The accrual rate.</p></li>
+<li><p><strong>d_range</strong> (<em>DatetimeIndex</em><em> | </em><em>None</em>) – A given range of dates. Optional.</p></li>
+<li><p><strong>days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Number of days to generate when date_range not provided. Must be
+combined with end_dt. Optional.</p></li>
+<li><p><strong>end_dt</strong> (<em>dt.date</em><em> | </em><em>None</em>) – End date of date range to generate when date_range not provided.
+Must be combined with days. Optional.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Placeholder for a name of the timeseries.</p></li>
+<li><p><strong>valuetype</strong> (<em>ValueType</em>) – Identifies if the series is a series of values or returns.
+Defaults to ValueType.PRICE.</p></li>
+<li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>) – The currency of the timeseries. Defaults to “SEK”.</p></li>
+<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Boolean flag indicating if timeseries is in local currency.
+Defaults to True.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Self</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self</p>
 </dd>
 </dl>
 </dd></dl>
@@ -779,19 +708,15 @@ combined with days</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">from_deepcopy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.from_deepcopy"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create copy of OpenTimeSeries object.</p>
-<section id="id6">
-<h3>Returns:<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An OpenTimeSeries object.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -800,19 +725,15 @@ combined with days</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">pandas_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.pandas_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Populate .tsdf Pandas DataFrame from the .dates and .values lists.</p>
-<section id="id7">
-<h3>Returns:<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An OpenTimeSeries object.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -821,29 +742,19 @@ combined with days</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">all_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.all_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate chosen properties.</p>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>properties: list[LiteralSeriesProps], optional</dt><dd><p>The properties to calculate. Defaults to calculating all available.</p>
-</dd>
-</dl>
-</section>
-<section id="id9">
-<h3>Returns:<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>pandas.DataFrame</dt><dd><p>Properties of the OpenTimeSeries</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The properties to calculate. Defaults to calculating all
+available. Optional.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Properties of the OpenTimeSeries.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -852,19 +763,15 @@ combined with days</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">value_to_ret</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.value_to_ret"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Convert series of values into series of returns.</p>
-<section id="id10">
-<h3>Returns:<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>The returns of the values in the series</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The returns of the values in the series.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -873,30 +780,19 @@ combined with days</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">value_to_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.value_to_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Convert series of values to series of their period differences.</p>
-<section id="id11">
-<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>periods: int, default: 1</dt><dd><p>The number of periods between observations over which difference
-is calculated</p>
-</dd>
-</dl>
-</section>
-<section id="id12">
-<h3>Returns:<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>periods</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The number of periods between observations over which difference
+is calculated. Defaults to 1.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>periods</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -905,19 +801,15 @@ is calculated</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">to_cumret</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.to_cumret"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Convert series of returns into cumulative series of values.</p>
-<section id="id13">
-<h3>Returns:<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An OpenTimeSeries object.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -926,32 +818,20 @@ is calculated</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">from_1d_rate_to_cumret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days_in_year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">365</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.from_1d_rate_to_cumret"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Convert series of 1-day rates into series of cumulative values.</p>
-<section id="id14">
-<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>days_in_year: int, default 365</dt><dd><p>Calendar days per year used as divisor</p>
-</dd>
-<dt>divider: float, default 1.0</dt><dd><p>Convenience divider for when the 1-day rate is not scaled correctly</p>
-</dd>
-</dl>
-</section>
-<section id="id15">
-<h3>Returns:<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Calendar days per year used as divisor. Defaults to 365.</p></li>
+<li><p><strong>divider</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Convenience divider for when the 1-day rate is not scaled
+correctly. Defaults to 1.0.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>divider</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -960,29 +840,19 @@ is calculated</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BME'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Resamples the timeseries frequency.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>freq: LiteralBizDayFreq | str, default “BME”</dt><dd><p>The date offset string that sets the resampled frequency</p>
-</dd>
-</dl>
-</section>
-<section id="id17">
-<h3>Returns:<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'B'</em><em>, </em><em>'BME'</em><em>, </em><em>'BQE'</em><em>, </em><em>'BYE'</em><em>] </em><em>| </em><em>str</em>) – The date offset string that sets the resampled frequency.
+Defaults to “BME”.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'B'</em><em>, </em><em>'BME'</em><em>, </em><em>'BQE'</em><em>, </em><em>'BYE'</em><em>] </em><em>| </em><em>str</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -992,32 +862,21 @@ is calculated</p>
 <span class="sig-name descname"><span class="pre">resample_to_business_period_ends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BME'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.resample_to_business_period_ends"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Resamples timeseries frequency to the business calendar month end dates.</p>
 <p>Stubs left in place. Stubs will be aligned to the shortest stub.</p>
-<section id="id18">
-<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>freq: LiteralBizDayFreq, default BME</dt><dd><p>The date offset string that sets the resampled frequency</p>
-</dd>
-<dt>method: LiteralPandasReindexMethod, default: nearest</dt><dd><p>Controls the method used to align values across columns</p>
-</dd>
-</dl>
-</section>
-<section id="id19">
-<h3>Returns:<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'B'</em><em>, </em><em>'BME'</em><em>, </em><em>'BQE'</em><em>, </em><em>'BYE'</em><em>]</em>) – The date offset string that sets the resampled frequency.
+Defaults to BME.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'pad'</em><em>, </em><em>'ffill'</em><em>, </em><em>'backfill'</em><em>, </em><em>'bfill'</em><em>, </em><em>'nearest'</em><em>] </em><em>| </em><em>None</em>) – Controls the method used to align values across columns.
+Defaults to nearest.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'B'</em><em>, </em><em>'BME'</em><em>, </em><em>'BQE'</em><em>, </em><em>'BYE'</em><em>]</em>)</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'pad'</em><em>, </em><em>'ffill'</em><em>, </em><em>'backfill'</em><em>, </em><em>'bfill'</em><em>, </em><em>'nearest'</em><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1027,48 +886,28 @@ is calculated</p>
 <span class="sig-name descname"><span class="pre">ewma_vol_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.94</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.ewma_vol_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Exponentially Weighted Moving Average Model for Volatility.</p>
 <p><a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
-<section id="id20">
-<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>lmbda: float, default: 0.94</dt><dd><p>Scaling factor to determine weighting.</p>
-</dd>
-<dt>day_chunk: int, default: 0</dt><dd><p>Sampling the data which is assumed to be daily.</p>
-</dd>
-<dt>dlta_degr_freedms: int, default: 0</dt><dd><p>Variance bias factor taking the value 0 or 1.</p>
-</dd>
-<dt>months_from_last: int, optional</dt><dd><p>number of months offset as positive integer. Overrides use of from_date
-and to_date</p>
-</dd>
-<dt>from_date: datetime.date, optional</dt><dd><p>Specific from date</p>
-</dd>
-<dt>to_date: datetime.date, optional</dt><dd><p>Specific to date</p>
-</dd>
-<dt>periods_in_a_year_fixed: DaysInYearType, optional</dt><dd><p>Allows locking the periods-in-a-year to simplify test cases and comparisons</p>
-</dd>
-</dl>
-</section>
-<section id="id21">
-<h3>Returns:<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>Pandas.Series[float]</dt><dd><p>Series EWMA volatility</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>lmbda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Scaling factor to determine weighting. Defaults to 0.94.</p></li>
+<li><p><strong>day_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Sampling the data which is assumed to be daily.
+Defaults to 0.</p></li>
+<li><p><strong>dlta_degr_freedms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Variance bias factor taking the value 0 or 1.
+Defaults to 0.</p></li>
+<li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Number of months offset as positive integer.
+Overrides use of from_date and to_date. Optional.</p></li>
+<li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>) – Specific from date. Optional.</p></li>
+<li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>) – Specific to date. Optional.</p></li>
+<li><p><strong>periods_in_a_year_fixed</strong> (<em>DaysInYearType</em><em> | </em><em>None</em>) – Allows locking the periods-in-a-year to simplify
+test cases and comparisons. Optional.</p></li>
 <li><p><strong>self</strong> (<em>Self</em>)</p></li>
-<li><p><strong>lmbda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>day_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>dlta_degr_freedms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>months_from_last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>from_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>to_date</strong> (<em>dt.date</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>periods_in_a_year_fixed</strong> (<em>DaysInYearType</em><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series EWMA volatility.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1077,33 +916,20 @@ and to_date</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">running_adjustment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjustment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">365</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.running_adjustment"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Add or subtract a fee from the timeseries return.</p>
-<section id="id22">
-<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>adjustment: float</dt><dd><p>Fee to add or subtract</p>
-</dd>
-<dt>days_in_year: int, default: 365</dt><dd><p>The calculation divisor and
-assumed number of days in a calendar year</p>
-</dd>
-</dl>
-</section>
-<section id="id23">
-<h3>Returns:<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>adjustment</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Fee to add or subtract.</p></li>
+<li><p><strong>days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The calculation divisor and assumed number of days in a
+calendar year. Defaults to 365.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>adjustment</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>days_in_year</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1112,35 +938,20 @@ assumed number of days in a calendar year</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">set_new_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lvl_zero</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lvl_one</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_lvl_one</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.set_new_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Set the column labels of the .tsdf Pandas Dataframe.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>lvl_zero: str, optional</dt><dd><p>New level zero label</p>
-</dd>
-<dt>lvl_one: ValueType, optional</dt><dd><p>New level one label</p>
-</dd>
-<dt>delete_lvl_one: bool, default: False</dt><dd><p>If True the level one label is deleted</p>
-</dd>
-</dl>
-</section>
-<section id="id25">
-<h3>Returns:<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>OpenTimeSeries</dt><dd><p>An OpenTimeSeries object</p>
-</dd>
-</dl>
-</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>lvl_zero</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – New level zero label. Optional.</p></li>
+<li><p><strong>lvl_one</strong> (<em>ValueType</em><em> | </em><em>None</em>) – New level one label. Optional.</p></li>
+<li><p><strong>delete_lvl_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True the level one label is deleted. Defaults to False.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>lvl_zero</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>lvl_one</strong> (<em>ValueType</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>delete_lvl_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenTimeSeries object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1151,27 +962,6 @@ assumed number of days in a calendar year</p>
 <dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 
-</section>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tsdf</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.3)"><em>DataFrame</em></a>)</p></li>
-<li><p><strong>timeseries_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>valuetype</strong> (<em>ValueType</em>)</p></li>
-<li><p><strong>dates</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=None</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=10</em><em>, </em><em>max_length=10</em><em>, </em><em>pattern=^\d{4}-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>1</em><em>[</em><em>0-2</em><em>]</em><em>)</em><em>-</em><em>(</em><em>0</em><em>[</em><em>1-9</em><em>]</em><em>|</em><em>[</em><em>12</em><em>]</em><em>\d</em><em>|</em><em>3</em><em>[</em><em>01</em><em>]</em><em>)</em><em>$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>currency</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>domestic</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>countries</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em><em>]</em><em>, </em><em>MinLen</em><em>(</em><em>min_length=1</em><em>)</em><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=2</em><em>, </em><em>max_length=2</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{2}$</em><em>)</em><em>]</em>)</p></li>
-<li><p><strong>markets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>isin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 </section>

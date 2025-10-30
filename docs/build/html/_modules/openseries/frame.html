@@ -198,18 +198,12 @@
 
 <span class="sd">    The intended use is to allow comparisons across these timeseries.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    constituents: list[OpenTimeSeries]</span>
-<span class="sd">        List of objects of Class OpenTimeSeries</span>
-<span class="sd">    weights: list[float], optional</span>
-<span class="sd">        List of weights in float format.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        constituents: List of objects of Class OpenTimeSeries.</span>
+<span class="sd">        weights: List of weights in float format. Optional.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    OpenFrame</span>
-<span class="sd">        Object of the class OpenFrame</span>
-
+<span class="sd">        Object of the class OpenFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">constituents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">OpenTimeSeries</span><span class="p">]</span>
@@ -239,18 +233,12 @@
 
 <span class="sd">        The intended use is to allow comparisons across these timeseries.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        constituents: list[OpenTimeSeries]</span>
-<span class="sd">            List of objects of Class OpenTimeSeries</span>
-<span class="sd">        weights: list[float], optional</span>
-<span class="sd">            List of weights in float format.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            constituents: List of objects of Class OpenTimeSeries.</span>
+<span class="sd">            weights: List of weights in float format. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            Object of the class OpenFrame</span>
-
+<span class="sd">            Object of the class OpenFrame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">copied_constituents</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span> <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">constituents</span><span class="p">]</span>
 
@@ -282,10 +270,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create copy of the OpenFrame object.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
@@ -298,16 +283,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge index of Pandas Dataframes of the constituent OpenTimeSeries.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        how: LiteralHowMerge, default: &quot;outer&quot;</span>
-<span class="sd">            The Pandas merge method.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            how: The Pandas merge method. Defaults to &quot;outer&quot;.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lvl_zero</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
@@ -345,16 +325,12 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate chosen timeseries properties.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        properties: list[LiteralFrameProps], optional</span>
-<span class="sd">            The properties to calculate. Defaults to calculating all available.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            properties: The properties to calculate. Defaults to calculating all</span>
+<span class="sd">                available. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        pandas.DataFrame</span>
-<span class="sd">            Properties of the contituent OpenTimeSeries</span>
-
+<span class="sd">            Properties of the contituent OpenTimeSeries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">properties</span><span class="p">:</span>
             <span class="n">props</span> <span class="o">=</span> <span class="n">OpenFramePropertiesList</span><span class="p">(</span><span class="o">*</span><span class="n">properties</span><span class="p">)</span>
@@ -371,10 +347,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of observations of all constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.Series[int]</span>
-<span class="sd">            Number of observations of all constituents</span>
-
+<span class="sd">            Number of observations of all constituents.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">],</span>
@@ -387,10 +360,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        int</span>
-<span class="sd">            Number of constituents</span>
-
+<span class="sd">            Number of constituents.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constituents</span><span class="p">)</span>
 
@@ -399,10 +369,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Level 0 values of the MultiIndex columns in the .tsdf DataFrame.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        list[str]</span>
-<span class="sd">            Level 0 values of the MultiIndex columns in the .tsdf DataFrame</span>
-
+<span class="sd">            Level 0 values of the MultiIndex columns in the .tsdf DataFrame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
@@ -411,10 +378,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Level 1 values of the MultiIndex columns in the .tsdf DataFrame.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        list[ValueType]</span>
-<span class="sd">            Level 1 values of the MultiIndex columns in the .tsdf DataFrame</span>
-
+<span class="sd">            Level 1 values of the MultiIndex columns in the .tsdf DataFrame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 
@@ -423,10 +387,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The first dates in the timeseries of all constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.Series[dt.date]</span>
-<span class="sd">            The first dates in the timeseries of all constituents</span>
-
+<span class="sd">            The first dates in the timeseries of all constituents.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">first_idx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constituents</span><span class="p">],</span>
@@ -440,10 +401,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The last dates in the timeseries of all constituents.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.Series[dt.date]</span>
-<span class="sd">            The last dates in the timeseries of all constituents</span>
-
+<span class="sd">            The last dates in the timeseries of all constituents.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">last_idx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constituents</span><span class="p">],</span>
@@ -457,11 +415,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of days from the first date to the last for all items in the frame.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.Series[int]</span>
 <span class="sd">            Number of days from the first date to the last for all</span>
 <span class="sd">            items in the frame.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">span_of_days</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constituents</span><span class="p">],</span>
@@ -475,10 +430,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values into series of returns.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            The returns of the values in the series</span>
-
+<span class="sd">            The returns of the values in the series.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">returns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
         <span class="n">returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -497,17 +449,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">value_to_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">periods</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values to series of their period differences.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        periods: int, default: 1</span>
-<span class="sd">            The number of periods between observations over which difference</span>
-<span class="sd">            is calculated</span>
+<span class="sd">        Args:</span>
+<span class="sd">            periods: The number of periods between observations over which</span>
+<span class="sd">                difference is calculated. Defaults to 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">periods</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -526,10 +473,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of returns into cumulative series of values.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">vtypes</span><span class="p">):</span>
@@ -562,16 +506,12 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resample the timeseries frequency.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        freq: LiteralBizDayFreq | str, default &quot;BME&quot;</span>
-<span class="sd">            The date offset string that sets the resampled frequency</span>
+<span class="sd">        Args:</span>
+<span class="sd">            freq: The date offset string that sets the resampled frequency.</span>
+<span class="sd">                Defaults to &quot;BME&quot;.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">vtypes</span><span class="p">):</span>
@@ -612,18 +552,14 @@
 
 <span class="sd">        Stubs left in place. Stubs will be aligned to the shortest stub.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        freq: LiteralBizDayFreq, default &quot;BME&quot;</span>
-<span class="sd">            The date offset string that sets the resampled frequency</span>
-<span class="sd">        method: LiteralPandasReindexMethod, default: nearest</span>
-<span class="sd">            Controls the method used to align values across columns</span>
+<span class="sd">        Args:</span>
+<span class="sd">            freq: The date offset string that sets the resampled frequency.</span>
+<span class="sd">                Defaults to &quot;BME&quot;.</span>
+<span class="sd">            method: Controls the method used to align values across columns.</span>
+<span class="sd">                Defaults to nearest.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">vtypes</span><span class="p">):</span>
@@ -678,36 +614,23 @@
 <span class="sd">        Exponentially Weighted Moving Average (EWMA) for Volatilities and</span>
 <span class="sd">        Correlation. https://www.investopedia.com/articles/07/ewma.asp.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        lmbda: float, default: 0.94</span>
-<span class="sd">            Scaling factor to determine weighting.</span>
-<span class="sd">        day_chunk: int, default: 11</span>
-<span class="sd">            Sampling the data which is assumed to be daily.</span>
-<span class="sd">        dlta_degr_freedms: int, default: 0</span>
-<span class="sd">            Variance bias factor taking the value 0 or 1.</span>
-<span class="sd">        first_column: int, default: 0</span>
-<span class="sd">            Column of first timeseries.</span>
-<span class="sd">        second_column: int, default: 1</span>
-<span class="sd">            Column of second timeseries.</span>
-<span class="sd">        corr_scale: float, default: 2.0</span>
-<span class="sd">            Correlation scale factor.</span>
-<span class="sd">        months_from_last: int, optional</span>
-<span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
-<span class="sd">            and to_date</span>
-<span class="sd">        from_date: datetime.date, optional</span>
-<span class="sd">            Specific from date</span>
-<span class="sd">        to_date: datetime.date, optional</span>
-<span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
-<span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
-<span class="sd">            comparisons</span>
+<span class="sd">        Args:</span>
+<span class="sd">            lmbda: Scaling factor to determine weighting. Defaults to 0.94.</span>
+<span class="sd">            day_chunk: Sampling the data which is assumed to be daily. Defaults to 11.</span>
+<span class="sd">            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.</span>
+<span class="sd">                Defaults to 0.</span>
+<span class="sd">            first_column: Column of first timeseries. Defaults to 0.</span>
+<span class="sd">            second_column: Column of second timeseries. Defaults to 1.</span>
+<span class="sd">            corr_scale: Correlation scale factor. Defaults to 2.0.</span>
+<span class="sd">            months_from_last: Number of months offset as positive integer. Overrides</span>
+<span class="sd">                use of from_date and to_date. Optional.</span>
+<span class="sd">            from_date: Specific from date. Optional.</span>
+<span class="sd">            to_date: Specific to date. Optional.</span>
+<span class="sd">            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify</span>
+<span class="sd">                test cases and comparisons. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.DataFrame</span>
-<span class="sd">            Series volatilities and correlation</span>
-
+<span class="sd">            Series volatilities and correlation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">earlier</span><span class="p">,</span> <span class="n">later</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_range</span><span class="p">(</span>
             <span class="n">months_offset</span><span class="o">=</span><span class="n">months_from_last</span><span class="p">,</span>
@@ -805,10 +728,7 @@
 <span class="sd">        in the frame.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        pandas.DataFrame</span>
 <span class="sd">            Correlation matrix of the time series in the frame.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">corr_matrix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
@@ -831,16 +751,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;To add an OpenTimeSeries object.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        new_series: OpenTimeSeries</span>
-<span class="sd">            The timeseries to add</span>
+<span class="sd">        Args:</span>
+<span class="sd">            new_series: The timeseries to add.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">constituents</span> <span class="o">+=</span> <span class="p">[</span><span class="n">new_series</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="p">,</span> <span class="n">new_series</span><span class="o">.</span><span class="n">tsdf</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -852,16 +767,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">delete_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">lvl_zero_item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;To delete an OpenTimeSeries object.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        lvl_zero_item: str</span>
-<span class="sd">            The .tsdf column level 0 value of the timeseries to delete</span>
+<span class="sd">        Args:</span>
+<span class="sd">            lvl_zero_item: The .tsdf column level 0 value of the timeseries to delete.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">:</span>
             <span class="n">new_c</span><span class="p">,</span> <span class="n">new_w</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
@@ -889,21 +799,14 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Truncate DataFrame such that all timeseries have the same time span.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        start_cut: datetime.date, optional</span>
-<span class="sd">            New first date</span>
-<span class="sd">        end_cut: datetime.date, optional</span>
-<span class="sd">            New last date</span>
-<span class="sd">        where: LiteralTrunc, default: both</span>
-<span class="sd">            Determines where dataframe is truncated also when start_cut</span>
-<span class="sd">            or end_cut is None.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            start_cut: New first date. Optional.</span>
+<span class="sd">            end_cut: New last date. Optional.</span>
+<span class="sd">            where: Determines where dataframe is truncated also when start_cut</span>
+<span class="sd">                or end_cut is None. Defaults to both.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            An OpenFrame object</span>
-
+<span class="sd">            An OpenFrame object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">start_cut</span> <span class="ow">and</span> <span class="n">where</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;before&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">]:</span>
             <span class="n">start_cut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_indices</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
@@ -946,16 +849,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate cumulative relative return between two series.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        long_column: int, default: 0</span>
-<span class="sd">            Column number of timeseries bought</span>
-<span class="sd">        short_column: int, default: 1</span>
-<span class="sd">            Column number of timeseries sold</span>
-<span class="sd">        base_zero: bool, default: True</span>
-<span class="sd">            If set to False 1.0 is added to allow for a capital base and</span>
-<span class="sd">            to allow a volatility calculation</span>
-
+<span class="sd">        Args:</span>
+<span class="sd">            long_column: Column number of timeseries bought. Defaults to 0.</span>
+<span class="sd">            short_column: Column number of timeseries sold. Defaults to 1.</span>
+<span class="sd">            base_zero: If set to False 1.0 is added to allow for a capital base and</span>
+<span class="sd">                to allow a volatility calculation. Defaults to True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rel_label</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, str]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">long_column</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -991,26 +889,18 @@
 <span class="sd">        difference between the fund and its index returns.</span>
 <span class="sd">        https://www.investopedia.com/terms/t/trackingerror.asp.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        base_column: tuple[str, ValueType] | int, default: -1</span>
-<span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
-<span class="sd">        months_from_last: int, optional</span>
-<span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
-<span class="sd">            and to_date</span>
-<span class="sd">        from_date: datetime.date, optional</span>
-<span class="sd">            Specific from date</span>
-<span class="sd">        to_date: datetime.date, optional</span>
-<span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
-<span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
-<span class="sd">            comparisons</span>
+<span class="sd">        Args:</span>
+<span class="sd">            base_column: Column of timeseries that is the denominator in the ratio.</span>
+<span class="sd">                Defaults to -1.</span>
+<span class="sd">            months_from_last: Number of months offset as positive integer. Overrides</span>
+<span class="sd">                use of from_date and to_date. Optional.</span>
+<span class="sd">            from_date: Specific from date. Optional.</span>
+<span class="sd">            to_date: Specific to date. Optional.</span>
+<span class="sd">            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify</span>
+<span class="sd">                test cases and comparisons. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.Series[float]</span>
-<span class="sd">            Tracking Errors</span>
-
+<span class="sd">            Tracking Errors.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">earlier</span><span class="p">,</span> <span class="n">later</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_range</span><span class="p">(</span>
             <span class="n">months_offset</span><span class="o">=</span><span class="n">months_from_last</span><span class="p">,</span>
@@ -1069,26 +959,18 @@
 <span class="sd">        the difference between the fund and its index returns.</span>
 <span class="sd">        The ratio is calculated using the annualized arithmetic mean of returns.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        base_column: tuple[str, ValueType] | int, default: -1</span>
-<span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
-<span class="sd">        months_from_last: int, optional</span>
-<span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
-<span class="sd">            and to_date</span>
-<span class="sd">        from_date: datetime.date, optional</span>
-<span class="sd">            Specific from date</span>
-<span class="sd">        to_date: datetime.date, optional</span>
-<span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
-<span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
-<span class="sd">            comparisons</span>
+<span class="sd">        Args:</span>
+<span class="sd">            base_column: Column of timeseries that is the denominator in the ratio.</span>
+<span class="sd">                Defaults to -1.</span>
+<span class="sd">            months_from_last: Number of months offset as positive integer. Overrides</span>
+<span class="sd">                use of from_date and to_date. Optional.</span>
+<span class="sd">            from_date: Specific from date. Optional.</span>
+<span class="sd">            to_date: Specific to date. Optional.</span>
+<span class="sd">            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify</span>
+<span class="sd">                test cases and comparisons. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.Series[float]</span>
-<span class="sd">            Information Ratios</span>
-
+<span class="sd">            Information Ratios.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">earlier</span><span class="p">,</span> <span class="n">later</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_range</span><span class="p">(</span>
             <span class="n">months_offset</span><span class="o">=</span><span class="n">months_from_last</span><span class="p">,</span>
@@ -1153,28 +1035,19 @@
 <span class="sd">        Finance Education (Vol 2 Winter 2013).</span>
 <span class="sd">        https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        ratio: LiteralCaptureRatio</span>
-<span class="sd">            The ratio to calculate</span>
-<span class="sd">        base_column: tuple[str, ValueType] | int, default: -1</span>
-<span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
-<span class="sd">        months_from_last: int, optional</span>
-<span class="sd">            number of months offset as positive integer. Overrides use of from_date</span>
-<span class="sd">            and to_date</span>
-<span class="sd">        from_date: datetime.date, optional</span>
-<span class="sd">            Specific from date</span>
-<span class="sd">        to_date: datetime.date, optional</span>
-<span class="sd">            Specific to date</span>
-<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
-<span class="sd">            Allows locking the periods-in-a-year to simplify test cases and</span>
-<span class="sd">            comparisons</span>
+<span class="sd">        Args:</span>
+<span class="sd">            ratio: The ratio to calculate.</span>
+<span class="sd">            base_column: Column of timeseries that is the denominator in the ratio.</span>
+<span class="sd">                Defaults to -1.</span>
+<span class="sd">            months_from_last: Number of months offset as positive integer. Overrides</span>
+<span class="sd">                use of from_date and to_date. Optional.</span>
+<span class="sd">            from_date: Specific from date. Optional.</span>
+<span class="sd">            to_date: Specific to date. Optional.</span>
+<span class="sd">            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify</span>
+<span class="sd">                test cases and comparisons. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.Series[float]</span>
-<span class="sd">            Capture Ratios</span>
-
+<span class="sd">            Capture Ratios.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">loss_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">earlier</span><span class="p">,</span> <span class="n">later</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_range</span><span class="p">(</span>
@@ -1350,20 +1223,14 @@
 <span class="sd">        Calculates Beta as Co-variance of asset &amp; market divided by Variance</span>
 <span class="sd">        of the market. https://www.investopedia.com/terms/b/beta.asp.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        asset: tuple[str, ValueType] | int</span>
-<span class="sd">            The column of the asset</span>
-<span class="sd">        market: tuple[str, ValueType] | int</span>
-<span class="sd">            The column of the market against which Beta is measured</span>
-<span class="sd">        dlta_degr_freedms: int, default: 1</span>
-<span class="sd">            Variance bias factor taking the value 0 or 1.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            asset: The column of the asset.</span>
+<span class="sd">            market: The column of the market against which Beta is measured.</span>
+<span class="sd">            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.</span>
+<span class="sd">                Defaults to 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        float</span>
-<span class="sd">            Beta as Co-variance of x &amp; y divided by Variance of x</span>
-
+<span class="sd">            Beta as Co-variance of x &amp; y divided by Variance of x.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
         <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">vtypes</span><span class="p">):</span>
@@ -1420,22 +1287,16 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ordinary Least Squares fit.</span>
 
 <span class="sd">        Performs a linear regression and adds a new column with a fitted line</span>
-<span class="sd">        using Ordinary Least Squares fit</span>
+<span class="sd">        using Ordinary Least Squares fit.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        y_column: tuple[str, ValueType] | int</span>
-<span class="sd">            The column level values of the dependent variable y</span>
-<span class="sd">        x_column: tuple[str, ValueType] | int</span>
-<span class="sd">            The column level values of the exogenous variable x</span>
-<span class="sd">        fitted_series: bool, default: True</span>
-<span class="sd">            If True the fit is added as a new column in the .tsdf Pandas.DataFrame</span>
+<span class="sd">        Args:</span>
+<span class="sd">            y_column: The column level values of the dependent variable y.</span>
+<span class="sd">            x_column: The column level values of the exogenous variable x.</span>
+<span class="sd">            fitted_series: If True the fit is added as a new column in the .tsdf</span>
+<span class="sd">                Pandas.DataFrame. Defaults to True.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        dict[str, float]</span>
 <span class="sd">            A dictionary with the coefficient, intercept and rsquared outputs.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;y_column should be a tuple[str, ValueType] or an integer.&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_column</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
@@ -1492,22 +1353,16 @@
 <span class="sd">        This metric is also commonly referred to as simply alpha.</span>
 <span class="sd">        https://www.investopedia.com/terms/j/jensensmeasure.asp.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        asset: tuple[str, ValueType] | int</span>
-<span class="sd">            The column of the asset</span>
-<span class="sd">        market: tuple[str, ValueType] | int</span>
-<span class="sd">            The column of the market against which Jensen&#39;s alpha is measured</span>
-<span class="sd">        riskfree_rate: float, default: 0.0</span>
-<span class="sd">            The return of the zero volatility riskfree asset</span>
-<span class="sd">        dlta_degr_freedms: int, default: 1</span>
-<span class="sd">            Variance bias factor taking the value 0 or 1.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            asset: The column of the asset.</span>
+<span class="sd">            market: The column of the market against which Jensen&#39;s alpha is measured.</span>
+<span class="sd">            riskfree_rate: The return of the zero volatility riskfree asset.</span>
+<span class="sd">                Defaults to 0.0.</span>
+<span class="sd">            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.</span>
+<span class="sd">                Defaults to 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        float</span>
-<span class="sd">            Jensen&#39;s alpha</span>
-
+<span class="sd">            Jensen&#39;s alpha.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">vtypes</span><span class="p">):</span>
@@ -1571,18 +1426,12 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate a basket timeseries based on the supplied weights.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        name: str</span>
-<span class="sd">            Name of the basket timeseries</span>
-<span class="sd">        weight_strat: LiteralPortfolioWeightings, optional</span>
-<span class="sd">            weight calculation strategies</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the basket timeseries.</span>
+<span class="sd">            weight_strat: Weight calculation strategies. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.DataFrame</span>
-<span class="sd">            A basket timeseries</span>
-
+<span class="sd">            A basket timeseries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">weight_strat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -1689,22 +1538,18 @@
 <span class="sd">        the Tracking Error. And the Tracking Error is the standard deviation of the</span>
 <span class="sd">        difference between the fund and its index returns.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        long_column: int, default: 0</span>
-<span class="sd">            Column of timeseries that is the numerator in the ratio.</span>
-<span class="sd">        short_column: int, default: 1</span>
-<span class="sd">            Column of timeseries that is the denominator in the ratio.</span>
-<span class="sd">        observations: int, default: 21</span>
-<span class="sd">            The length of the rolling window to use is set as number of observations.</span>
-<span class="sd">        periods_in_a_year_fixed: DaysInYearType, optional</span>
-<span class="sd">            Allows locking the periods-in-a-year to simplify test cases and comparisons</span>
+<span class="sd">        Args:</span>
+<span class="sd">            long_column: Column of timeseries that is the numerator in the ratio.</span>
+<span class="sd">                Defaults to 0.</span>
+<span class="sd">            short_column: Column of timeseries that is the denominator in the ratio.</span>
+<span class="sd">                Defaults to 1.</span>
+<span class="sd">            observations: The length of the rolling window to use is set as number of</span>
+<span class="sd">                observations. Defaults to 21.</span>
+<span class="sd">            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify</span>
+<span class="sd">                test cases and comparisons. Optional.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.DataFrame</span>
-<span class="sd">            Rolling Information Ratios</span>
-
+<span class="sd">            Rolling Information Ratios.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">long_label</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
             <span class="s2">&quot;tuple[str, str]&quot;</span><span class="p">,</span>
@@ -1758,22 +1603,16 @@
 <span class="sd">        Calculates Beta as Co-variance of asset &amp; market divided by Variance</span>
 <span class="sd">        of the market. https://www.investopedia.com/terms/b/beta.asp.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        asset_column: int, default: 0</span>
-<span class="sd">            Column of timeseries that is the asset.</span>
-<span class="sd">        market_column: int, default: 1</span>
-<span class="sd">            Column of timeseries that is the market.</span>
-<span class="sd">        observations: int, default: 21</span>
-<span class="sd">            The length of the rolling window to use is set as number of observations.</span>
-<span class="sd">        dlta_degr_freedms: int, default: 1</span>
-<span class="sd">            Variance bias factor taking the value 0 or 1.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            asset_column: Column of timeseries that is the asset. Defaults to 0.</span>
+<span class="sd">            market_column: Column of timeseries that is the market. Defaults to 1.</span>
+<span class="sd">            observations: The length of the rolling window to use is set as number of</span>
+<span class="sd">                observations. Defaults to 21.</span>
+<span class="sd">            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.</span>
+<span class="sd">                Defaults to 1.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.DataFrame</span>
-<span class="sd">            Rolling Betas</span>
-
+<span class="sd">            Rolling Betas.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">market_label</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, str]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">market_column</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span>
             <span class="mi">0</span>
@@ -1823,20 +1662,16 @@
 <span class="sd">        Calculates correlation between two series. The period with</span>
 <span class="sd">        at least the given number of observations is the first period calculated.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        first_column: int, default: 0</span>
-<span class="sd">            The position as integer of the first timeseries to compare</span>
-<span class="sd">        second_column: int, default: 1</span>
-<span class="sd">            The position as integer of the second timeseries to compare</span>
-<span class="sd">        observations: int, default: 21</span>
-<span class="sd">            The length of the rolling window to use is set as number of observations</span>
+<span class="sd">        Args:</span>
+<span class="sd">            first_column: The position as integer of the first timeseries to compare.</span>
+<span class="sd">                Defaults to 0.</span>
+<span class="sd">            second_column: The position as integer of the second timeseries to compare.</span>
+<span class="sd">                Defaults to 1.</span>
+<span class="sd">            observations: The length of the rolling window to use is set as number of</span>
+<span class="sd">                observations. Defaults to 21.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        Pandas.DataFrame</span>
-<span class="sd">            Rolling Correlations</span>
-
+<span class="sd">            Rolling Correlations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">corr_label</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, str]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">first_column</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1874,22 +1709,19 @@
 <span class="sd">        It utilizes a scikit-learn LinearRegression model and returns a DataFrame</span>
 <span class="sd">        with summary output and an OpenTimeSeries of predicted values.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        dependent_column: tuple[str, ValueType]</span>
-<span class="sd">            A tuple key to select the column in the OpenFrame.tsdf.columns</span>
-<span class="sd">            to use as the dependent variable</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dependent_column: A tuple key to select the column in the</span>
+<span class="sd">                OpenFrame.tsdf.columns to use as the dependent variable.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        tuple[pandas.DataFrame, OpenTimeSeries]</span>
-<span class="sd">            - A DataFrame with the R-squared, the intercept</span>
-<span class="sd">              and the regression coefficients</span>
+<span class="sd">            A tuple containing:</span>
+<span class="sd">            - A DataFrame with the R-squared, the intercept and the regression</span>
+<span class="sd">              coefficients</span>
 <span class="sd">            - An OpenTimeSeries of predicted values</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            KeyError: If the column tuple is not found in the OpenFrame.tsdf.columns</span>
-<span class="sd">            ValueError: If not all series are returnseries (ValueType.RTRN)</span>
+<span class="sd">            KeyError: If the column tuple is not found in the OpenFrame.tsdf.columns.</span>
+<span class="sd">            ValueError: If not all series are returnseries (ValueType.RTRN).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">key_msg</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Tuple (</span><span class="si">{</span><span class="n">dependent_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
@@ -1938,28 +1770,20 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a rebalanced portfolio from the OpenFrame constituents.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        name: str</span>
-<span class="sd">            Name of the portfolio</span>
-<span class="sd">        items: list[str], optional</span>
-<span class="sd">            List of items to include in the portfolio. If None, uses all items.</span>
-<span class="sd">        bal_weights: list[float], optional</span>
-<span class="sd">            List of weights for rebalancing. If None, uses frame weights.</span>
-<span class="sd">        frequency: int, default: 1</span>
-<span class="sd">            Rebalancing frequency</span>
-<span class="sd">        cash_index: OpenTimeSeries, optional</span>
-<span class="sd">            Cash index series for cash component</span>
-<span class="sd">        equal_weights: bool, default: False</span>
-<span class="sd">            If True, use equal weights for all items</span>
-<span class="sd">        drop_extras: bool, default: True</span>
-<span class="sd">            If True, only return TWR series; if False, return all details</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the portfolio.</span>
+<span class="sd">            items: List of items to include in the portfolio. If None, uses all items.</span>
+<span class="sd">                Optional.</span>
+<span class="sd">            bal_weights: List of weights for rebalancing. If None, uses frame weights.</span>
+<span class="sd">                Optional.</span>
+<span class="sd">            frequency: Rebalancing frequency. Defaults to 1.</span>
+<span class="sd">            cash_index: Cash index series for cash component. Optional.</span>
+<span class="sd">            equal_weights: If True, use equal weights for all items. Defaults to False.</span>
+<span class="sd">            drop_extras: If True, only return TWR series; if False, return all details.</span>
+<span class="sd">                Defaults to True.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        --------</span>
-<span class="sd">        OpenFrame</span>
-<span class="sd">            OpenFrame containing the rebalanced portfolio</span>
-
+<span class="sd">            OpenFrame containing the rebalanced portfolio.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">bal_weights</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">equal_weights</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
