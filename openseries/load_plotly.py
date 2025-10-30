@@ -48,7 +48,10 @@ def load_plotly_dict(
         responsive: Flag whether to load as responsive. Defaults to True.
 
     Returns:
-        A dictionary with the Plotly config and layout template.
+        tuple[PlotlyLayoutType, CaptorLogoType]: A tuple (config_and_layout, logo)
+        where config_and_layout is the Plotly config and layout template dict,
+        and logo is the Captor logo dict (may be empty if the remote logo is
+        unavailable).
     """
     project_root = Path(__file__).parent.parent
     layoutfile = project_root.joinpath("openseries").joinpath("plotly_layouts.json")

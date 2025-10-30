@@ -160,7 +160,10 @@
 <span class="sd">        responsive: Flag whether to load as responsive. Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A dictionary with the Plotly config and layout template.</span>
+<span class="sd">        tuple[PlotlyLayoutType, CaptorLogoType]: A tuple (config_and_layout, logo)</span>
+<span class="sd">        where config_and_layout is the Plotly config and layout template dict,</span>
+<span class="sd">        and logo is the Captor logo dict (may be empty if the remote logo is</span>
+<span class="sd">        unavailable).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">project_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
     <span class="n">layoutfile</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;openseries&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;plotly_layouts.json&quot;</span><span class="p">)</span>

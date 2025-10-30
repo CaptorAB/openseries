@@ -89,9 +89,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
     Args:
         constituents: List of objects of Class OpenTimeSeries.
         weights: List of weights in float format. Optional.
-
-    Returns:
-        Object of the class OpenFrame.
     """
 
     constituents: list[OpenTimeSeries]
@@ -122,9 +119,6 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Args:
             constituents: List of objects of Class OpenTimeSeries.
             weights: List of weights in float format. Optional.
-
-        Returns:
-            Object of the class OpenFrame.
         """
         copied_constituents = [ts.from_deepcopy() for ts in constituents]
 
@@ -207,7 +201,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 available. Optional.
 
         Returns:
-            Properties of the contituent OpenTimeSeries.
+            Properties of the constituent OpenTimeSeries.
         """
         if properties:
             props = OpenFramePropertiesList(*properties)

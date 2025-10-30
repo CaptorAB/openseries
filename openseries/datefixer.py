@@ -212,7 +212,7 @@ def date_offset_foll(
             Defaults to True.
 
     Returns:
-        Off-set date.
+        Offset date.
     """
     raw_date = date_fix(raw_date)
     month_delta = relativedelta(months=months_offset)

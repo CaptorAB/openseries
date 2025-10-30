@@ -595,7 +595,7 @@ class OpenTimeSeries(_CommonModel[float]):
         Args:
             lmbda: Scaling factor to determine weighting. Defaults to 0.94.
             day_chunk: Sampling the data which is assumed to be daily.
-                Defaults to 0.
+                Defaults to 11.
             dlta_degr_freedms: Variance bias factor taking the value 0 or 1.
                 Defaults to 0.
             months_from_last: Number of months offset as positive integer.

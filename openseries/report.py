@@ -88,9 +88,9 @@ def report_html(
     Args:
         data: The timeseries data.
         bar_freq: The date offset string that sets the bar plot frequency.
-        filename: Name of the Plotly html file.
+        filename: Name of the Plotly HTML file.
         title: The report page title.
-        directory: Directory where Plotly html file is saved.
+        directory: Directory where Plotly HTML file is saved.
         output_type: Determines output type. Defaults to "file".
         include_plotlyjs: Determines how the plotly.js library is included in
             the output.
@@ -102,7 +102,7 @@ def report_html(
             labels. Defaults to True.
 
     Returns:
-        Plotly Figure and a div section or a html filename with location.
+        Plotly Figure and a div section or a HTML filename with location.
 
     """
     copied = data.from_deepcopy()
