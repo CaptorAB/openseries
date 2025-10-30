@@ -239,7 +239,12 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure markets field is validated.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure markets field is validated.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MarketsNotStringNorListStrError: If ``markets`` is neither a string</span>
+<span class="sd">                nor a non-empty list of strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;&#39;markets&#39; must be a string or list of strings, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">&quot;</span>
@@ -255,7 +260,12 @@
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_dates_and_values_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure dates and values are validated.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure dates and values are validated.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If dates are not unique or if numbers of dates and values</span>
+<span class="sd">                do not match the shape of ``tsdf``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">values_list_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="n">dates_list_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">)</span>
         <span class="n">dates_set_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">))</span>
@@ -351,6 +361,10 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If ``dframe`` is not a ``pandas.Series`` or a</span>
+<span class="sd">                ``pandas.DataFrame``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Argument dframe must be pandas Series or DataFrame.&quot;</span>
         <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
@@ -443,6 +457,10 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            IncorrectArgumentComboError: If ``d_range`` is not provided and the</span>
+<span class="sd">                combination of ``days`` and ``end_dt`` is incomplete.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">d_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">days</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -684,6 +702,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ResampleDataLossError: If called on a return series (``valuetype`` is</span>
+<span class="sd">                ``ValueType.RTRN``), since summation across sparser frequency would</span>
+<span class="sd">                be required to avoid data loss.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>

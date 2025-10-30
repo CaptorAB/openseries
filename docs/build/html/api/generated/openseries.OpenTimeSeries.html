@@ -666,8 +666,12 @@ Defaults to True.</p></li>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An OpenTimeSeries object.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Self</p>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.14)"><strong>TypeError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">dframe</span></code> is not a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> or a
+    <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self</p>
 </dd>
 </dl>
 </dd></dl>
@@ -698,8 +702,12 @@ Defaults to True.</p></li>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An OpenTimeSeries object.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Self</p>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>IncorrectArgumentComboError</strong> – If <code class="docutils literal notranslate"><span class="pre">d_range</span></code> is not provided and the
+    combination of <code class="docutils literal notranslate"><span class="pre">days</span></code> and <code class="docutils literal notranslate"><span class="pre">end_dt</span></code> is incomplete.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self</p>
 </dd>
 </dl>
 </dd></dl>
@@ -875,8 +883,13 @@ Defaults to nearest.</p></li>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An OpenTimeSeries object.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ResampleDataLossError</strong> – If called on a return series (<code class="docutils literal notranslate"><span class="pre">valuetype</span></code> is
+    <code class="docutils literal notranslate"><span class="pre">ValueType.RTRN</span></code>), since summation across sparser frequency would
+    be required to avoid data loss.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
