@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from functools import reduce
 from logging import getLogger
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Self, cast
 
 from numpy import (
     array,
@@ -70,7 +70,6 @@ from .owntypes import (
     PortfolioItemsNotWithinFrameError,
     RatioInputError,
     ResampleDataLossError,
-    Self,
     ValueType,
     WeightsNotProvidedError,
 )

@@ -39,7 +39,7 @@ class TestPackage:
             f"^({toml_version})$",
             "^(Tools for analyzing financial timeseries.)$",
             "^(Martin Karrin)$",
-            "^(>=3.10,<3.15)$",
+            "^(>=3.11,<3.15)$",
             "^(Documentation, https://openseries.readthedocs.io/)$",
         ]
 

@@ -7,13 +7,12 @@ from decimal import Decimal
 from json import load
 from pathlib import Path
 from pprint import pformat
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 import pytest
 from numpy import array
 from pandas import DataFrame, DatetimeIndex, Series, date_range
 from pydantic import ValidationError
-from typing_extensions import TypedDict
 
 if TYPE_CHECKING:  # pragma: no cover
     from pandas import Timestamp

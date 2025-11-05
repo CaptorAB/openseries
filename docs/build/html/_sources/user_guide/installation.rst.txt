@@ -4,13 +4,10 @@ Installation
 System Requirements
 -------------------
 
-openseries requires Python 3.10 or higher and is compatible with:
+openseries requires Python 3.11 or higher and is compatible with:
 
 - **Operating Systems**: Windows, macOS, Linux
-- **Python versions**: 3.10, 3.11, 3.12, 3.13, 3.14
-
-.. warning::
-   **Python 3.10 Deprecation Notice**: Python 3.10 support is deprecated and will be removed, no earlier than 2025-12-01. Please upgrade to Python ≥3.11. See `GitHub Issue #340 <https://github.com/CaptorAB/openseries/issues/340>`_ (pinned) for details.
+- **Python versions**: 3.11, 3.12, 3.13, 3.14
 
 Installing openseries
 ---------------------

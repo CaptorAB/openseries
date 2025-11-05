@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from logging import getLogger
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Self, TypeVar, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
@@ -50,7 +50,6 @@ from .owntypes import (
     MarketsNotStringNorListStrError,
     OpenTimeSeriesPropertiesList,
     ResampleDataLossError,
-    Self,
     ValueListType,
     ValueType,
 )

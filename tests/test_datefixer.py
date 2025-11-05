@@ -71,7 +71,7 @@ def test_offset_business_days(
     [
         "2022-07-15",
         dt.date(year=2022, month=7, day=15),
-        dt.datetime(year=2022, month=7, day=15, tzinfo=dt.timezone.utc),
+        dt.datetime(year=2022, month=7, day=15, tzinfo=dt.UTC),
         Timestamp(year=2022, month=7, day=15),
         datetime64("2022-07-15"),
     ],

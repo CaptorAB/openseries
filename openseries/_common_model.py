@@ -12,7 +12,7 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, Generic, Literal, cast
+from typing import TYPE_CHECKING, Any, Generic, Literal, Self, cast
 
 from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
@@ -23,7 +23,6 @@ from .owntypes import (
     NumberOfItemsAndLabelsNotSameError,
     PlotlyConfigType,
     ResampleDataLossError,
-    Self,
     SeriesOrFloat_co,
     ValueType,
 )
