@@ -211,7 +211,7 @@
 
 <span class="c1"># Minimum volatility portfolio</span>
 <span class="n">min_vol_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">volatilities</span><span class="p">)</span>
-<span class="n">min_vol_weights</span> <span class="o">=</span> <span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">][</span><span class="n">min_vol_idx</span><span class="p">]</span>
+<span class="n">min_vol_weights</span> <span class="o">=</span> <span class="n">frontier_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">min_vol_idx</span><span class="p">][</span><span class="n">investment_universe</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MINIMUM VOLATILITY PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Return: </span><span class="si">{</span><span class="n">returns</span><span class="p">[</span><span class="n">min_vol_idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -259,7 +259,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">sim_volatilities</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe: </span><span class="si">{</span><span class="n">sim_sharpe_ratios</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="n">weights</span> <span class="o">=</span> <span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">simulation_results</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">investment_universe</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Weights:&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">weight</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">:</span>  <span class="c1"># Only show weights &gt; 5%</span>
@@ -344,7 +344,7 @@
     <span class="n">equal_weight_portfolio</span><span class="p">,</span>
     <span class="n">inv_vol_portfolio</span><span class="p">,</span>
     <span class="n">max_div_portfolio</span><span class="p">,</span>
-    <span class="n">target_vol_portfolio</span>
+    <span class="n">min_vol_portfolio</span>
 <span class="p">]</span>
 
 <span class="c1"># Add optimized portfolios if available</span>
@@ -407,7 +407,10 @@
 </ul>
 </dd>
 <dt><strong>Exception Handling</strong></dt><dd><p>When using the maximum diversification strategy, it’s recommended to handle potential exceptions:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openseries.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaxDiversificationNaNError</span><span class="p">,</span> <span class="n">MaxDiversificationNegativeWeightsError</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openseries.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MaxDiversificationNaNError</span><span class="p">,</span>
+    <span class="n">MaxDiversificationNegativeWeightsError</span>
+<span class="p">)</span>
 
 <span class="c1"># This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError</span>
 <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Max Div&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;max_div&quot;</span><span class="p">)</span>
@@ -478,13 +481,13 @@
     <span class="n">backtest_results</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Backtest Results&#39;</span><span class="p">)</span>
 
     <span class="c1"># Efficient frontier data (if available)</span>
-    <span class="k">if</span> <span class="s1">&#39;frontier_results&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-        <span class="n">frontier_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-            <span class="s1">&#39;Return&#39;</span><span class="p">:</span> <span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;Volatility&#39;</span><span class="p">:</span> <span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;volatilities&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;Sharpe&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frontier_results</span><span class="p">[</span><span class="s1">&#39;volatilities&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s1">&#39;frontier_df&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+        <span class="n">frontier_export_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">&#39;Return&#39;</span><span class="p">:</span> <span class="n">frontier_df</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="s1">&#39;Volatility&#39;</span><span class="p">:</span> <span class="n">frontier_df</span><span class="p">[</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="s1">&#39;Sharpe&#39;</span><span class="p">:</span> <span class="n">frontier_df</span><span class="p">[</span><span class="s1">&#39;sharpe&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="p">})</span>
-        <span class="n">frontier_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Efficient Frontier&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">frontier_export_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Efficient Frontier&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Optimization results exported to &#39;portfolio_optimization_results.xlsx&#39;&quot;</span><span class="p">)</span>
 </pre></div>
@@ -606,7 +609,7 @@
 
 <span class="c1"># Optimal portfolio from efficient frontier</span>
 <span class="n">optimal_portfolio_df</span> <span class="o">=</span> <span class="n">fund_universe</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="n">optimal_portfolio</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Optimal Portfolio&quot;</span>
+    <span class="n">weights</span><span class="o">=</span><span class="n">optimal_portfolio</span><span class="p">[</span><span class="o">-</span><span class="n">fund_universe</span><span class="o">.</span><span class="n">item_count</span><span class="p">:]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Optimal Portfolio&quot;</span>
 <span class="p">)</span>
 <span class="n">optimal_portfolio_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">optimal_portfolio_df</span><span class="p">)</span>
 <span class="n">strategies</span><span class="p">[</span><span class="s1">&#39;Optimal Portfolio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimal_portfolio_series</span>

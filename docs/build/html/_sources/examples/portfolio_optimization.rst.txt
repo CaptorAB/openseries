@@ -80,7 +80,7 @@ Mean-Variance Optimization
 
    # Minimum volatility portfolio
    min_vol_idx = np.argmin(volatilities)
-   min_vol_weights = frontier_results['weights'][min_vol_idx]
+   min_vol_weights = frontier_df.iloc[min_vol_idx][investment_universe.columns_lvl_zero].values
 
    print(f"\n=== MINIMUM VOLATILITY PORTFOLIO ===")
    print(f"Expected Return: {returns[min_vol_idx]:.2%}")
@@ -129,7 +129,7 @@ Monte Carlo Portfolio Simulation
        print(f"  Volatility: {sim_volatilities[idx]:.2%}")
        print(f"  Sharpe: {sim_sharpe_ratios[idx]:.2f}")
 
-       weights = simulation_results['weights'][idx]
+       weights = simulation_results.iloc[idx][investment_universe.columns_lvl_zero].values
        print("  Weights:")
        for j, weight in enumerate(weights):
            if weight > 0.05:  # Only show weights > 5%
@@ -221,7 +221,7 @@ Portfolio Comparison
        equal_weight_portfolio,
        inv_vol_portfolio,
        max_div_portfolio,
-       target_vol_portfolio
+       min_vol_portfolio
    ]
 
    # Add optimized portfolios if available
@@ -284,7 +284,10 @@ The openseries library provides several built-in weight strategies for portfolio
 
    .. code-block:: python
 
-      from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
+      from openseries.owntypes import (
+          MaxDiversificationNaNError,
+          MaxDiversificationNegativeWeightsError
+      )
 
       # This may fail with MaxDiversificationNaNError or MaxDiversificationNegativeWeightsError
       portfolio_df = frame.make_portfolio(name="Max Div", weight_strat="max_div")
@@ -354,13 +357,13 @@ Export Optimization Results
        backtest_results.to_excel(writer, sheet_name='Backtest Results')
 
        # Efficient frontier data (if available)
-       if 'frontier_results' in locals():
-           frontier_df = pd.DataFrame({
-               'Return': frontier_results['returns'],
-               'Volatility': frontier_results['volatilities'],
-               'Sharpe': np.array(frontier_results['returns']) / np.array(frontier_results['volatilities'])
+       if 'frontier_df' in locals():
+           frontier_export_df = pd.DataFrame({
+               'Return': frontier_df['ret'].values,
+               'Volatility': frontier_df['stdev'].values,
+               'Sharpe': frontier_df['sharpe'].values
            })
-           frontier_df.to_excel(writer, sheet_name='Efficient Frontier', index=False)
+           frontier_export_df.to_excel(writer, sheet_name='Efficient Frontier', index=False)
 
    print("\nOptimization results exported to 'portfolio_optimization_results.xlsx'")
 
@@ -488,7 +491,7 @@ Performance Comparison Analysis
 
    # Optimal portfolio from efficient frontier
    optimal_portfolio_df = fund_universe.make_portfolio(
-       weights=optimal_portfolio.weights, name="Optimal Portfolio"
+       weights=optimal_portfolio[-fund_universe.item_count:].tolist(), name="Optimal Portfolio"
    )
    optimal_portfolio_series = OpenTimeSeries.from_df(dframe=optimal_portfolio_df)
    strategies['Optimal Portfolio'] = optimal_portfolio_series
