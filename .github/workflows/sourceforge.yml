@@ -5,7 +5,6 @@ on:
   push:
     branches: ["master"]
 
-
 permissions:
   contents: read
 
@@ -37,7 +36,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          ssh-keyscan -t ed25519 git.code.sf.net >> ~/.ssh/known_hosts
+          ssh-keyscan -t rsa,ecdsa,ed25519 git.code.sf.net >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
       - name: Add SourceForge remote
@@ -49,3 +48,13 @@ jobs:
         shell: bash -euo pipefail
         run: |
           git push --mirror sourceforge
+          if ! git ls-remote sourceforge --heads > /dev/null 2>&1; then
+            echo "❌ Failed to connect to SourceForge remote"
+            exit 1
+          fi
+          branches=$(git ls-remote sourceforge --heads | wc -l)
+          if [ "$branches" -eq 0 ]; then
+            echo "❌ No branches found on SourceForge remote"
+            exit 1
+          fi
+          echo "✓ SourceForge remote is accessible (found $branches branch(es))"
