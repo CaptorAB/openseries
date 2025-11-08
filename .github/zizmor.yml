@@ -24,3 +24,4 @@ rules:
         - actions/configure-pages
         - actions/upload-pages-artifact
         - actions/deploy-pages
+        - webfactory/ssh-agent
