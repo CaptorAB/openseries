@@ -274,12 +274,13 @@ def efficient_frontier(
 
     limit_small = 0.0001
     line_df = line_df.mask(line_df.abs() < limit_small, 0.0)
-    line_df["text"] = line_df.apply(
-        lambda c: "<br><br>Weights:<br>"
-        + "<br>".join(
-            [f"{c[nm]:.1%}  {nm}" for nm in eframe.columns_lvl_zero],
-        ),
-        axis="columns",
+
+    weight_cols = eframe.columns_lvl_zero
+    weight_header = "<br><br>Weights:<br>"
+    line_df["text"] = line_df[weight_cols].apply(
+        lambda row: weight_header
+        + "<br>".join([f"{row[col]:.1%}  {col}" for col in weight_cols]),
+        axis=1,
     )
 
     if tweak:

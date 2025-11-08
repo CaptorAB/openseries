@@ -7,6 +7,7 @@ Guidelines:
 - Assume `source_me` exists in the repo root; if missing, proceed normally.
 - Prefer absolute project paths when invoking tools.
 - Do not modify `Makefile` to achieve environment activation.
+- Do not add any commentary when implementing code changes.
 
 Assistant behavior:
 

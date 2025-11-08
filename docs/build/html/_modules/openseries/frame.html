@@ -1090,6 +1090,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">time_factor</span> <span class="o">=</span> <span class="n">shortdf</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">/</span> <span class="n">fraction</span>
 
+        <span class="n">shortdf_returns</span> <span class="o">=</span> <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+        <span class="n">shortdf_returns_np</span> <span class="o">=</span> <span class="n">shortdf_returns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">up_mask</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span> <span class="o">&gt;</span> <span class="n">loss_limit</span>
+        <span class="n">down_mask</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span> <span class="o">&lt;</span> <span class="n">loss_limit</span>
+
         <span class="n">ratios</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="n">short_item</span><span class="p">:</span>
@@ -1098,94 +1103,40 @@
                 <span class="n">longdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
                     <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
                 <span class="p">][</span><span class="n">item</span><span class="p">]</span>
+                <span class="n">longdf_returns</span> <span class="o">=</span> <span class="n">longdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+                <span class="n">longdf_returns_np</span> <span class="o">=</span> <span class="n">longdf_returns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;ratio must be one of &#39;up&#39;, &#39;down&#39; or &#39;both&#39;.&quot;</span>
                 <span class="k">if</span> <span class="n">ratio</span> <span class="o">==</span> <span class="s2">&quot;up&quot;</span><span class="p">:</span>
-                    <span class="n">uparray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">longdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">uparray</span> <span class="o">=</span> <span class="n">longdf_returns_np</span><span class="p">[</span><span class="n">up_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">up_rtrn</span> <span class="o">=</span> <span class="n">uparray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uparray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
-                    <span class="n">upidxarray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">upidxarray</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span><span class="p">[</span><span class="n">up_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">up_idx_return</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">upidxarray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">upidxarray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
                     <span class="p">)</span>
                     <span class="n">ratios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">up_rtrn</span> <span class="o">/</span> <span class="n">up_idx_return</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">ratio</span> <span class="o">==</span> <span class="s2">&quot;down&quot;</span><span class="p">:</span>
-                    <span class="n">downarray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">longdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">downarray</span> <span class="o">=</span> <span class="n">longdf_returns_np</span><span class="p">[</span><span class="n">down_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">down_return</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">downarray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">downarray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
                     <span class="p">)</span>
-                    <span class="n">downidxarray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">downidxarray</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span><span class="p">[</span><span class="n">down_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">down_idx_return</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">downidxarray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">downidxarray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span>
                         <span class="o">-</span> <span class="mi">1</span>
                     <span class="p">)</span>
                     <span class="n">ratios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">down_return</span> <span class="o">/</span> <span class="n">down_idx_return</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">ratio</span> <span class="o">==</span> <span class="s2">&quot;both&quot;</span><span class="p">:</span>
-                    <span class="n">uparray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">longdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">uparray</span> <span class="o">=</span> <span class="n">longdf_returns_np</span><span class="p">[</span><span class="n">up_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">up_rtrn</span> <span class="o">=</span> <span class="n">uparray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uparray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
-                    <span class="n">upidxarray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">upidxarray</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span><span class="p">[</span><span class="n">up_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">up_idx_return</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">upidxarray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">upidxarray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
                     <span class="p">)</span>
-                    <span class="n">downarray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">longdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">downarray</span> <span class="o">=</span> <span class="n">longdf_returns_np</span><span class="p">[</span><span class="n">down_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">down_return</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">downarray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">downarray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
                     <span class="p">)</span>
-                    <span class="n">downidxarray</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
-                        <span class="o">.</span><span class="n">pct_change</span><span class="p">()[</span>
-                            <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">loss_limit</span>
-                        <span class="p">]</span>
-                        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-                    <span class="p">)</span>
+                    <span class="n">downidxarray</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span><span class="p">[</span><span class="n">down_mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span>
                     <span class="n">down_idx_return</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">downidxarray</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">downidxarray</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_factor</span><span class="p">))</span>
                         <span class="o">-</span> <span class="mi">1</span>

@@ -928,6 +928,11 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         else:
             time_factor = shortdf.count() / fraction
 
+        shortdf_returns = shortdf.ffill().pct_change()
+        shortdf_returns_np = shortdf_returns.to_numpy()
+        up_mask = shortdf_returns_np > loss_limit
+        down_mask = shortdf_returns_np < loss_limit
+
         ratios = []
         for item in self.tsdf:
             if item == short_item:
@@ -936,94 +941,40 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 longdf = self.tsdf.loc[
                     cast("Timestamp", earlier) : cast("Timestamp", later)
                 ][item]
+                longdf_returns = longdf.ffill().pct_change()
+                longdf_returns_np = longdf_returns.to_numpy()
                 msg = "ratio must be one of 'up', 'down' or 'both'."
                 if ratio == "up":
-                    uparray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    uparray = longdf_returns_np[up_mask] + 1.0
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
-                    upidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    upidxarray = shortdf_returns_np[up_mask] + 1.0
                     up_idx_return = (
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
                     ratios.append(up_rtrn / up_idx_return)
                 elif ratio == "down":
-                    downarray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    downarray = longdf_returns_np[down_mask] + 1.0
                     down_return = (
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
-                    downidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    downidxarray = shortdf_returns_np[down_mask] + 1.0
                     down_idx_return = (
                         downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
                         - 1
                     )
                     ratios.append(down_return / down_idx_return)
                 elif ratio == "both":
-                    uparray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    uparray = longdf_returns_np[up_mask] + 1.0
                     up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
-                    upidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() > loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    upidxarray = shortdf_returns_np[up_mask] + 1.0
                     up_idx_return = (
                         upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
                     )
-                    downarray = (
-                        longdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    downarray = longdf_returns_np[down_mask] + 1.0
                     down_return = (
                         downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
                     )
-                    downidxarray = (
-                        shortdf.ffill()
-                        .pct_change()[
-                            shortdf.ffill().pct_change().to_numpy() < loss_limit
-                        ]
-                        .add(1)
-                        .to_numpy()
-                    )
+                    downidxarray = shortdf_returns_np[down_mask] + 1.0
                     down_idx_return = (
                         downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
                         - 1
