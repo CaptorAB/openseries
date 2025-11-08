@@ -249,6 +249,15 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         return list(self.tsdf.columns.get_level_values(1))
 
     @property
+    def _value_types(self: Self) -> list[bool]:
+        """Cached value type checks for efficiency.
+
+        Returns:
+            List of booleans indicating if each column is ValueType.RTRN.
+        """
+        return [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+
+    @property
     def first_indices(self: Self) -> Series[dt.date]:
         """The first dates in the timeseries of all constituents.
 
@@ -333,7 +342,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Returns:
             An OpenFrame object.
         """
-        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        vtypes = self._value_types
         if not any(vtypes):
             returns = self.tsdf.ffill().pct_change()
             returns.iloc[0] = 0
@@ -368,7 +377,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Returns:
             An OpenFrame object.
         """
-        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        vtypes = self._value_types
         if not any(vtypes):
             value_type = ValueType.PRICE
         elif all(vtypes):
@@ -382,16 +391,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             self.tsdf = self.tsdf.resample(freq).last()
         else:
             self.tsdf = self.tsdf.resample(freq).sum()
-        self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
+        self.tsdf.index = Index(DatetimeIndex(self.tsdf.index).date)
         for xerie in self.constituents:
             xerie.tsdf.index = DatetimeIndex(xerie.tsdf.index)
             if value_type == ValueType.PRICE:
                 xerie.tsdf = xerie.tsdf.resample(freq).last()
             else:
                 xerie.tsdf = xerie.tsdf.resample(freq).sum()
-            xerie.tsdf.index = Index(
-                dejt.date() for dejt in DatetimeIndex(xerie.tsdf.index)
-            )
+            xerie.tsdf.index = Index(DatetimeIndex(xerie.tsdf.index).date)
 
         return self
 
@@ -413,7 +420,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Returns:
             An OpenFrame object.
         """
-        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        vtypes = self._value_types
         if any(vtypes):
             msg = (
                 "Do not run resample_to_business_period_ends on return series. "
@@ -539,9 +546,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         alpha = 1.0 - lmbda
 
-        s1 = (r1.pow(2) * time_factor).copy()
-        s2 = (r2.pow(2) * time_factor).copy()
-        sc = (r1 * r2 * time_factor).copy()
+        s1 = r1.pow(2) * time_factor
+        s2 = r2.pow(2) * time_factor
+        sc = r1 * r2 * time_factor
 
         s1.iloc[0] = float(raw_one[0] ** 2)
         s2.iloc[0] = float(raw_two[0] ** 2)
@@ -756,6 +763,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
+        shortdf_returns = shortdf.ffill().pct_change()
+
         terrors = []
         for item in self.tsdf:
             if item == short_item:
@@ -764,7 +773,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 longdf = self.tsdf.loc[
                     cast("Timestamp", earlier) : cast("Timestamp", later)
                 ][item]
-                relative = longdf.ffill().pct_change() - shortdf.ffill().pct_change()
+                relative = longdf.ffill().pct_change() - shortdf_returns
                 vol = float(relative.std() * sqrt(time_factor))
                 terrors.append(vol)
 
@@ -823,6 +832,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             periods_in_a_year_fixed=periods_in_a_year_fixed,
         )
 
+        shortdf_returns = shortdf.ffill().pct_change()
+
         ratios = []
         for item in self.tsdf:
             if item == short_item:
@@ -831,7 +842,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 longdf = self.tsdf.loc[
                     cast("Timestamp", earlier) : cast("Timestamp", later)
                 ][item]
-                relative = longdf.ffill().pct_change() - shortdf.ffill().pct_change()
+                relative = longdf.ffill().pct_change() - shortdf_returns
                 ret = float(relative.mean() * time_factor)
                 vol = float(relative.std() * sqrt(time_factor))
                 ratios.append(ret / vol)
@@ -1057,7 +1068,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Returns:
             Beta as Co-variance of x & y divided by Variance of x.
         """
-        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        vtypes = self._value_types
         if all(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
@@ -1183,7 +1194,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Returns:
             Jensen's alpha.
         """
-        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        vtypes = self._value_types
         if not any(vtypes):
             msg = "asset should be a tuple[str, ValueType] or an integer."
             if isinstance(asset, tuple):
@@ -1256,7 +1267,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             )
             raise NoWeightsError(msg)
 
-        vtypes = [x == ValueType.RTRN for x in self.tsdf.columns.get_level_values(1)]
+        vtypes = self._value_types
         if not any(vtypes):
             returns = self.tsdf.ffill().pct_change()
             returns.iloc[0] = 0

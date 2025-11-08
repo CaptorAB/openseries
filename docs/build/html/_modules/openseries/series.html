@@ -112,13 +112,12 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
-
     <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timestamp</span>
 
@@ -126,6 +125,7 @@
     <span class="n">append</span><span class="p">,</span>
     <span class="n">array</span><span class="p">,</span>
     <span class="n">cumprod</span><span class="p">,</span>
+    <span class="n">diff</span><span class="p">,</span>
     <span class="n">float64</span><span class="p">,</span>
     <span class="n">insert</span><span class="p">,</span>
     <span class="n">isnan</span><span class="p">,</span>
@@ -678,7 +678,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
@@ -821,29 +821,39 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">:</span>
             <span class="n">ra_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+            <span class="n">initial_value</span> <span class="o">=</span> <span class="mf">1.0</span>
             <span class="n">returns_input</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])]</span>
+            <span class="n">initial_value</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
             <span class="n">ra_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
             <span class="n">returns_input</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">ra_df</span> <span class="o">=</span> <span class="n">ra_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 
-        <span class="n">prev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_idx</span>
-        <span class="n">dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">prev</span><span class="p">]</span>
+        <span class="n">dates_index</span> <span class="o">=</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">ra_df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">dates_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">first_idx</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates_index</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ra_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dt.date&quot;</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="o">*</span> <span class="p">(</span>
-                    <span class="mi">1</span>
-                    <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="o">+</span> <span class="n">adjustment</span> <span class="o">*</span> <span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dt.date&quot;</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="o">-</span> <span class="n">prev</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">/</span> <span class="n">days_in_year</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
-            <span class="n">prev</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dt.date&quot;</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">dates</span><span class="p">)</span>
+        <span class="n">dates_np</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates_list</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;datetime64[D]&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">date_diffs</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span>
+            <span class="n">diff</span><span class="p">(</span><span class="n">dates_np</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;timedelta64[D]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">returns_array</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span>
+            <span class="n">ra_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="n">adjustment_factors</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">1.0</span> <span class="o">+</span> <span class="n">returns_array</span> <span class="o">+</span> <span class="n">adjustment</span> <span class="o">*</span> <span class="n">date_diffs</span> <span class="o">/</span> <span class="n">days_in_year</span>
+        <span class="p">)</span>
+
+        <span class="n">values_array</span> <span class="o">=</span> <span class="n">cumprod</span><span class="p">(</span><span class="n">insert</span><span class="p">(</span><span class="n">adjustment_factors</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">))</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">values_array</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">dates_list</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
             <span class="p">[</span>
@@ -851,7 +861,7 @@
                 <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">],</span>
             <span class="p">],</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">returns_input</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span></div>

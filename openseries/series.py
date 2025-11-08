@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
+import datetime as dt
 from copy import deepcopy
 from logging import getLogger
 from typing import TYPE_CHECKING, Any, Self, TypeVar, cast
 
 if TYPE_CHECKING:  # pragma: no cover
-    import datetime as dt
-
     from numpy.typing import NDArray
     from pandas import Timestamp
 
@@ -16,6 +15,7 @@ from numpy import (
     append,
     array,
     cumprod,
+    diff,
     float64,
     insert,
     isnan,
@@ -534,7 +534,7 @@ class OpenTimeSeries(_CommonModel[float]):
             self.tsdf = self.tsdf.resample(freq).sum()
         else:
             self.tsdf = self.tsdf.resample(freq).last()
-        self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
+        self.tsdf.index = Index(DatetimeIndex(self.tsdf.index).date)
         return self
 
     def resample_to_business_period_ends(
@@ -668,29 +668,39 @@ class OpenTimeSeries(_CommonModel[float]):
         """
         if self.valuetype == ValueType.RTRN:
             ra_df = self.tsdf.copy()
-            values = [1.0]
+            initial_value = 1.0
             returns_input = True
         else:
-            values = [cast("float", self.tsdf.iloc[0, 0])]
+            initial_value = cast("float", self.tsdf.iloc[0, 0])
             ra_df = self.tsdf.ffill().pct_change()
             returns_input = False
         ra_df = ra_df.dropna()
 
-        prev = self.first_idx
-        dates: list[dt.date] = [prev]
+        dates_index = DatetimeIndex(ra_df.index)
+        dates_list = [self.first_idx] + [d.date() for d in dates_index]
 
-        for idx, row in ra_df.iterrows():
-            dates.append(cast("dt.date", idx))
-            values.append(
-                values[-1]
-                * (
-                    1
-                    + row.iloc[0]
-                    + adjustment * (cast("dt.date", idx) - prev).days / days_in_year
-                ),
-            )
-            prev = cast("dt.date", idx)
-        self.tsdf = DataFrame(data=values, index=dates)
+        dates_np = array(
+            [dt.datetime.combine(d, dt.time()) for d in dates_list],
+            dtype="datetime64[D]",
+        )
+        date_diffs = cast(
+            "NDArray[float64]",
+            diff(dates_np).astype("timedelta64[D]").astype(float64),
+        )
+
+        returns_array = cast(
+            "NDArray[float64]",
+            ra_df.iloc[:, 0].to_numpy(),
+        )
+
+        adjustment_factors = (
+            1.0 + returns_array + adjustment * date_diffs / days_in_year
+        )
+
+        values_array = cumprod(insert(adjustment_factors, 0, initial_value))
+        values = list(values_array)
+
+        self.tsdf = DataFrame(data=values, index=dates_list)
         self.valuetype = ValueType.PRICE
         self.tsdf.columns = MultiIndex.from_arrays(
             [
@@ -698,7 +708,7 @@ class OpenTimeSeries(_CommonModel[float]):
                 [self.valuetype],
             ],
         )
-        self.tsdf.index = Index(d.date() for d in DatetimeIndex(self.tsdf.index))
+        self.tsdf.index = Index(DatetimeIndex(self.tsdf.index).date)
         if returns_input:
             self.value_to_ret()
         return self
