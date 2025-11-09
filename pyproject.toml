@@ -54,7 +54,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/CaptorAB/openseries"
+"Homepage" = "https://captorab.github.io/openseries/"
 "Documentation" = "https://openseries.readthedocs.io/"
 "Source" = "https://github.com/CaptorAB/openseries"
 "Issue Tracker" = "https://github.com/CaptorAB/openseries/issues"
