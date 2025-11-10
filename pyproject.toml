@@ -94,26 +94,17 @@ packages = [
 include = [{ path = "openseries/py.typed", format = ["sdist", "wheel"] }]
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.11"
 mypy_path = ["."]
 cache_dir = ".mypy_cache"
 exclude = ["venv/*", "docs/*"]
+strict = true
+pretty = true
+incremental = true
 follow_imports = "normal"
+warn_unused_configs = true
 plugins = ["pydantic.mypy"]
 cache_fine_grained = true
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-ignore_missing_imports = false
-incremental = true
-no_implicit_reexport = true
-pretty = true
-strict = true
-warn_redundant_casts = true
-warn_unreachable = true
-warn_unused_configs = true
-warn_unused_ignores = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
