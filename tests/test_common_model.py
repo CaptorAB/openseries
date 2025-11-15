@@ -17,12 +17,12 @@ if TYPE_CHECKING:  # pragma: no cover
     from openseries.simulation import ReturnSimulation
 
 
-class OpenFrameTestError(Exception):
+class CommonModelTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestOpenFrame:
-    """class to run tests on the module frame.py."""
+class TestCommonModel:
+    """class to run tests on the module _common_model.py."""
 
     seed: int
     seriesim: ReturnSimulation
@@ -30,7 +30,7 @@ class TestOpenFrame:
     randomseries: OpenTimeSeries
     random_properties: dict[str, dt.date | int | float]
 
-    def test_get_base_column_data(self: TestOpenFrame) -> None:
+    def test_get_base_column_data(self: TestCommonModel) -> None:
         """Test _get_base_column_data function."""
         frame = self.randomframe.from_deepcopy()
         earlier = dt.date(2010, 1, 1)
@@ -46,28 +46,28 @@ class TestOpenFrame:
 
         msg = "_get_base_column_data did not return Series for tuple column reference"
         if not isinstance(data_tuple, Series):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         if cast("str", item_tuple) != first_column:
             msg = (
                 "_get_base_column_data item mismatch: "
                 f"expected {first_column}, got {item_tuple}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         msg = (
             "_get_base_column_data did not return "
             "string label for tuple column reference"
         )
         if not isinstance(label_tuple, str):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         if label_tuple != first_column[0]:
             msg = (
                 "_get_base_column_data label mismatch: "
                 f"expected {first_column[0]}, got {label_tuple}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         # Test with different date ranges
         earlier_narrow = dt.date(2015, 6, 1)
@@ -92,7 +92,7 @@ class TestOpenFrame:
                 "Narrower date range returned more "
                 f"data: {len(data_narrow)} > {len(data_full)}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         # Test with last column
         last_col_idx = len(frame.tsdf.columns) - 1
@@ -105,23 +105,23 @@ class TestOpenFrame:
 
         msg = "_get_base_column_data did not return Series for last column reference"
         if not isinstance(data_last, Series):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         if cast("str", item_last) != frame.tsdf.columns[last_col_idx]:
             msg = (
                 "_get_base_column_data last column item mismatch: "
                 f"expected {frame.tsdf.columns[last_col_idx]}, got {item_last}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         if label_last != frame.tsdf.columns[last_col_idx][0]:
             msg = (
                 "_get_base_column_data last column label mismatch: "
                 f"expected {frame.tsdf.columns[last_col_idx][0]}, got {label_last}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
-    def test_get_base_column_data_int(self: TestOpenFrame) -> None:
+    def test_get_base_column_data_int(self: TestCommonModel) -> None:
         """Test _get_base_column_data function with integer column reference."""
         frame = self.randomframe.from_deepcopy()
         earlier = dt.date(2010, 1, 1)
@@ -138,14 +138,14 @@ class TestOpenFrame:
             "_get_base_column_data did not return Series for integer column reference"
         )
         if not isinstance(data_int, Series):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         msg = (
             "_get_base_column_data did not return "
             "tuple item for integer column reference"
         )
         if not isinstance(item_int, tuple):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         two = 2
         if len(item_int) != two:
@@ -153,21 +153,21 @@ class TestOpenFrame:
                 "_get_base_column_data item tuple "
                 f"length mismatch: expected {two}, got {len(item_int)}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         msg = (
             "_get_base_column_data did not return "
             "string label for integer column reference"
         )
         if not isinstance(label_int, str):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         if label_int != frame.tsdf.columns[0][0]:
             msg = (
                 "_get_base_column_data label mismatch: "
                 f"expected {frame.tsdf.columns[0][0]}, got {label_int}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         with pytest.raises(
             expected_exception=TypeError,
@@ -180,7 +180,7 @@ class TestOpenFrame:
                 later=later,
             )
 
-    def test_calculate_time_factor(self: TestOpenFrame) -> None:
+    def test_calculate_time_factor(self: TestCommonModel) -> None:
         """Test _calculate_time_factor function."""
         frame = self.randomframe
         earlier = frame.first_idx
@@ -198,7 +198,7 @@ class TestOpenFrame:
                 f"Fixed periods should return the fixed value: "
                 f"expected {expected_fixed_periods}, got {time_factor_fixed}"
             )
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         time_factor_calc = _calculate_time_factor(
             data=frame.tsdf.iloc[:, 0],
@@ -209,10 +209,10 @@ class TestOpenFrame:
 
         msg = f"Time factor should be a float, got {type(time_factor_calc)}"
         if not isinstance(time_factor_calc, float):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
         if time_factor_calc <= 0:
             msg = f"Time factor should be positive, got {time_factor_calc}"
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         mid_date = frame.tsdf.index[len(frame.tsdf.index) // 2]
         time_factor_half = _calculate_time_factor(
@@ -223,12 +223,12 @@ class TestOpenFrame:
         )
         msg = f"Time factor should be a float, got {type(time_factor_half)}"
         if not isinstance(time_factor_half, float):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
         if time_factor_half <= 0:
             msg = f"Time factor should be positive, got {time_factor_half}"
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
-    def test_outliers_opentimeseries(self: TestOpenFrame) -> None:
+    def test_outliers_opentimeseries(self: TestCommonModel) -> None:
         """Test outliers method with OpenTimeSeries."""
         dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"]
         values = [100.0, 101.0, 150.0, 99.0, 50.0]
@@ -240,12 +240,12 @@ class TestOpenFrame:
         outliers = series.outliers()
         msg = "outliers() should return a Series for OpenTimeSeries"
         if not isinstance(outliers, Series):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         outliers_low_threshold = series.outliers(threshold=1.0)
         msg = "Lower threshold should catch more outliers"
         if len(outliers_low_threshold) <= len(outliers):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         outliers_subset = series.outliers(
             threshold=1.0, from_date=dt.date(2023, 1, 1), to_date=dt.date(2023, 1, 3)
@@ -253,7 +253,7 @@ class TestOpenFrame:
         msg = "Date range should limit outliers to specified period"
         max_expected_outliers = 3
         if len(outliers_subset) > max_expected_outliers:
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         outliers_recent = series.outliers(
             threshold=1.0,
@@ -261,35 +261,35 @@ class TestOpenFrame:
         )
         msg = "months_from_last should limit outliers to recent period"
         if not isinstance(outliers_recent, Series):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
-    def test_outliers_openframe(self: TestOpenFrame) -> None:
+    def test_outliers_openframe(self: TestCommonModel) -> None:
         """Test outliers method with OpenFrame."""
         frame = self.randomframe.from_deepcopy()
 
         outliers = frame.outliers()
         msg = "outliers() should return a DataFrame for OpenFrame"
         if not isinstance(outliers, DataFrame):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         outliers_low_threshold = frame.outliers(threshold=1.0)
         msg = "Lower threshold should potentially catch more outliers"
         if not isinstance(outliers_low_threshold, DataFrame):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         outliers_subset = frame.outliers(
             threshold=1.0, from_date=dt.date(2015, 1, 1), to_date=dt.date(2015, 12, 31)
         )
         msg = "Date range should limit outliers to specified period"
         if not isinstance(outliers_subset, DataFrame):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         outliers_recent = frame.outliers(threshold=1.0, months_from_last=12)
         msg = "months_from_last should limit outliers to recent period"
         if not isinstance(outliers_recent, DataFrame):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
-    def test_outliers_edge_cases(self: TestOpenFrame) -> None:
+    def test_outliers_edge_cases(self: TestCommonModel) -> None:
         """Test outliers method edge cases."""
         dates = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04"]
         values = [100.0, 100.1, 99.9, 100.05]
@@ -301,7 +301,7 @@ class TestOpenFrame:
         outliers = series_no_outliers.outliers(threshold=2.0)
         msg = "Series with no outliers should return empty Series"
         if not isinstance(outliers, Series) or len(outliers) != 0:
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         outliers_high_threshold = series_no_outliers.outliers(threshold=10.0)
         msg = "Very high threshold should return empty Series"
@@ -309,7 +309,7 @@ class TestOpenFrame:
             not isinstance(outliers_high_threshold, Series)
             or len(outliers_high_threshold) != 0
         ):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         series_single = OpenTimeSeries.from_arrays(
             dates=["2023-01-01"], values=[100.0], name="Single Point"
@@ -318,7 +318,7 @@ class TestOpenFrame:
         outliers_single = series_single.outliers()
         msg = "Single data point should return empty Series"
         if not isinstance(outliers_single, Series) or len(outliers_single) != 0:
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
 
         values_with_nan = [100.0, np.nan, 150.0, 99.0]
         series_with_nan = OpenTimeSeries.from_arrays(
@@ -328,4 +328,4 @@ class TestOpenFrame:
         outliers_with_nan = series_with_nan.outliers(threshold=1.0)
         msg = "Series with NaN should handle outliers correctly"
         if not isinstance(outliers_with_nan, Series):
-            raise OpenFrameTestError(msg)
+            raise CommonModelTestError(msg)
