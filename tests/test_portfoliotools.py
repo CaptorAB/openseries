@@ -8,8 +8,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime as dt
+    from collections.abc import Iterable
+
+    from openseries.simulation import ReturnSimulation
 
 import pytest
 
@@ -28,15 +31,19 @@ from openseries.portfoliotools import (
 )
 from openseries.series import OpenTimeSeries
 
-from .test_common_sim import CommonTestCase
-
 
 class PortfoliotoolsTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestPortfoliotools(CommonTestCase):
+class TestPortfoliotools:
     """class to run tests on the module portfoliotools.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def test_simulate_portfolios(self: TestPortfoliotools) -> None:
         """Test function simulate_portfolios."""

@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from json import loads
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
 import pytest
@@ -16,15 +16,22 @@ from openseries.load_plotly import load_plotly_dict
 from openseries.report import calendar_period_returns, report_html
 from openseries.series import OpenTimeSeries
 
-from .test_common_sim import CommonTestCase
+if TYPE_CHECKING:  # pragma: no cover
+    from openseries.simulation import ReturnSimulation
 
 
 class ReportTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestReport(CommonTestCase):
+class TestReport:
     """class to run tests on the module report.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def test_calendar_period_returns(self: TestReport) -> None:
         """Test calendar_period_returns function."""

@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from decimal import Decimal
 from json import load
+from logging import WARNING
 from pathlib import Path
 from pprint import pformat
 from typing import TYPE_CHECKING, TypedDict, cast
@@ -16,6 +17,9 @@ from pydantic import ValidationError
 
 if TYPE_CHECKING:  # pragma: no cover
     from pandas import Timestamp
+
+    from openseries.frame import OpenFrame
+    from openseries.simulation import ReturnSimulation
 
 from openseries.owntypes import (
     CountriesType,
@@ -31,8 +35,6 @@ from openseries.series import (
     _check_if_none,
     timeseries_chain,
 )
-
-from .test_common_sim import CommonTestCase
 
 
 class OpenTimeSeriesInput(TypedDict, total=False):
@@ -192,8 +194,14 @@ def test_opentimeseries_invalid_markets(markets: list[str] | str | None) -> None
         serie.markets = markets
 
 
-class TestOpenTimeSeries(CommonTestCase):
+class TestOpenTimeSeries:
     """class to run tests on the module series.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def test_invalid_dates(self: TestOpenTimeSeries) -> None:
         """Test invalid dates as input."""
@@ -465,7 +473,9 @@ class TestOpenTimeSeries(CommonTestCase):
         if not isinstance(arrseries, OpenTimeSeries):
             raise TypeError(msg)
 
-    def test_create_from_pd_dataframe(self: TestOpenTimeSeries) -> None:
+    def test_create_from_pd_dataframe(
+        self: TestOpenTimeSeries, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test construct from pandas.DataFrame."""
         df1 = DataFrame(
             data=[
@@ -533,18 +543,27 @@ class TestOpenTimeSeries(CommonTestCase):
         if not isinstance(df2series, OpenTimeSeries):
             raise TypeError(msg)
 
-        with self.assertLogs() as contextmgr:
+        with caplog.at_level(WARNING):
             _ = OpenTimeSeries.from_df(dframe=df3, column_nmbr=0)
 
-        if contextmgr.output != [
+        log_output = [
+            f"{record.levelname}:{record.name}:{record.message}"
+            for record in caplog.records
+        ]
+        if log_output != [
             "WARNING:openseries.series:Label missing. Adding: Series",
         ]:
             msgl = "OpenTimeSeries failed to log warning about label missing."
             raise OpenTimeSeriesTestError(msgl)
 
-        with self.assertLogs() as contextmgr:
+        caplog.clear()
+        with caplog.at_level(WARNING):
             _ = OpenTimeSeries.from_df(dframe=df4, column_nmbr=0)
-        if contextmgr.output != [
+        log_output = [
+            f"{record.levelname}:{record.name}:{record.message}"
+            for record in caplog.records
+        ]
+        if log_output != [
             "WARNING:openseries.series:valuetype missing. Adding: Price(Close)",
         ]:
             msgv = "OpenTimeSeries failed to log warning about valuetype missing."

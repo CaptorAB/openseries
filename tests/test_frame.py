@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import datetime as dt
-import warnings
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from inspect import getmembers, isfunction
 from itertools import product as iter_product
 from json import load, loads
+from logging import WARNING
 from pathlib import Path
 from pprint import pformat
 from re import escape
 from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, patch
+from warnings import catch_warnings, filterwarnings
 
 from numpy import array, nan
 from pydantic import BaseModel
@@ -22,6 +23,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import Literal
 
     from pandas import Timestamp
+
+    from openseries.simulation import ReturnSimulation
 
 import pytest
 from pandas import DataFrame, Series, date_range, read_excel
@@ -50,15 +53,19 @@ from openseries.owntypes import (
 )
 from openseries.series import OpenTimeSeries
 
-from .test_common_sim import CommonTestCase
-
 
 class OpenFrameTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestOpenFrame(CommonTestCase):
+class TestOpenFrame:
     """class to run tests on the module frame.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def make_mixed_type_openframe(self: TestOpenFrame) -> OpenFrame:
         """Makes an OpenFrame with both PRICE and RTRN type series."""
@@ -792,8 +799,8 @@ class TestOpenFrame(CommonTestCase):
         nan_frame = OpenFrame(constituents=[ts1, ts2])
         nan_frame.to_cumret()
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", "invalid value encountered in divide")
+        with catch_warnings():
+            filterwarnings("ignore", "invalid value encountered in divide")
             with pytest.raises(MaxDiversificationNaNError):
                 _ = nan_frame.make_portfolio(name="NaN Test", weight_strat="max_div")
 
@@ -855,8 +862,8 @@ class TestOpenFrame(CommonTestCase):
         frame = OpenFrame(constituents=[ts1, ts2, ts3])
         frame.to_cumret()
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", "invalid value encountered in divide")
+        with catch_warnings():
+            filterwarnings("ignore", "invalid value encountered in divide")
             with pytest.raises(MaxDiversificationNaNError):
                 _ = frame.make_portfolio(
                     name="Inverse NaN Test", weight_strat="max_div"
@@ -1981,7 +1988,9 @@ class TestOpenFrame(CommonTestCase):
             raise OpenFrameTestError(msg)
         mockpath.unlink()
 
-    def test_plot_methods_mock_logo_url_fail(self: TestOpenFrame) -> None:
+    def test_plot_methods_mock_logo_url_fail(
+        self: TestOpenFrame, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test plot_series and plot_bars methods with mock logo file URL fail."""
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
@@ -2009,24 +2018,34 @@ class TestOpenFrame(CommonTestCase):
                 msg = "plot_bars add_logo argument not setup correctly"
                 raise OpenFrameTestError(msg)
 
-            with self.assertLogs() as plotseries_context:
+            caplog.clear()
+            with caplog.at_level(WARNING):
                 _, _ = plotframe.plot_series(auto_open=False, output_type="div")
-            if (
+            log_output = [
+                f"{record.levelname}:{record.name}:{record.message}"
+                for record in caplog.records
+            ]
+            if log_output and (
                 "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in plotseries_context.output[0]
+                not in log_output[0]
             ):
                 msg = (
                     "plot_series() method did not warn as "
                     "expected when logo URL not working: "
-                    f"{pformat(plotseries_context.output[0])}"
+                    f"{pformat(log_output[0] if log_output else 'No logs')}"
                 )
                 raise OpenFrameTestError(msg)
 
-            with self.assertLogs() as plotbars_context:
+            caplog.clear()
+            with caplog.at_level(WARNING):
                 _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
-            if (
+            log_output = [
+                f"{record.levelname}:{record.name}:{record.message}"
+                for record in caplog.records
+            ]
+            if log_output and (
                 "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in plotbars_context.output[0]
+                not in log_output[0]
             ):
                 msg = (
                     "plot_bars() method did not warn as "
@@ -2037,11 +2056,16 @@ class TestOpenFrame(CommonTestCase):
         with patch("requests.head") as mock_statuscode:
             mock_statuscode.return_value.status_code = 400
 
-            with self.assertLogs() as plotseries_context:
+            caplog.clear()
+            with caplog.at_level(WARNING):
                 _, _ = plotframe.plot_series(auto_open=False, output_type="div")
-            if (
+            log_output = [
+                f"{record.levelname}:{record.name}:{record.message}"
+                for record in caplog.records
+            ]
+            if log_output and (
                 "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in plotseries_context.output[0]
+                not in log_output[0]
             ):
                 msg = (
                     "plot_series() method did not warn as "
@@ -2049,11 +2073,16 @@ class TestOpenFrame(CommonTestCase):
                 )
                 raise OpenFrameTestError(msg)
 
-            with self.assertLogs() as plotbars_context:
+            caplog.clear()
+            with caplog.at_level(WARNING):
                 _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
-            if (
+            log_output = [
+                f"{record.levelname}:{record.name}:{record.message}"
+                for record in caplog.records
+            ]
+            if log_output and (
                 "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in plotbars_context.output[0]
+                not in log_output[0]
             ):
                 msg = (
                     "plot_bars() method did not warn as "
@@ -2072,16 +2101,22 @@ class TestOpenFrame(CommonTestCase):
                 msg = "Unaligned data between original and data in Figure."
                 raise OpenFrameTestError(msg)
 
-    def test_passed_empty_list(self: TestOpenFrame) -> None:
+    def test_passed_empty_list(
+        self: TestOpenFrame, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test warning on object construct with empty list."""
-        with self.assertLogs() as contextmgr:
+        with caplog.at_level(WARNING):
             OpenFrame(constituents=[])
-        if contextmgr.output != [
+        log_output = [
+            f"{record.levelname}:{record.name}:{record.message}"
+            for record in caplog.records
+        ]
+        if log_output != [
             "WARNING:openseries.frame:OpenFrame() was passed an empty list.",
         ]:
             msg = (
                 "OpenFrame failed to log warning about "
-                f"empty input list: {pformat(contextmgr.output)}"
+                f"empty input list: {pformat(log_output)}"
             )
             raise OpenFrameTestError(msg)
 
@@ -2197,7 +2232,9 @@ class TestOpenFrame(CommonTestCase):
             msg = "Method trunc_frame() did not work as intended."
             raise OpenFrameTestError(msg)
 
-    def test_trunc_frame_start_fail(self: TestOpenFrame) -> None:
+    def test_trunc_frame_start_fail(
+        self: TestOpenFrame, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test trunc_frame method start fail scenario."""
         frame = OpenFrame(
             constituents=[
@@ -2255,16 +2292,26 @@ class TestOpenFrame(CommonTestCase):
                 ),
             ],
         )
-        with self.assertLogs("root", level="WARNING") as logs:
+        with caplog.at_level(WARNING, logger="root"):
             frame.trunc_frame()
+        log_output = [
+            f"{record.levelname}:{record.name}:{record.message}"
+            for record in caplog.records
+        ]
         if (
-            "WARNING:openseries.frame:One or more constituents "
-            "still not truncated to same start dates."
-        ) not in logs.output[0]:
+            log_output
+            and (
+                "WARNING:openseries.frame:One or more constituents "
+                "still not truncated to same start dates."
+            )
+            not in log_output[0]
+        ):
             msg = "Method trunc_frame() did not work as intended."
             raise OpenFrameTestError(msg)
 
-    def test_trunc_frame_end_fail(self: TestOpenFrame) -> None:
+    def test_trunc_frame_end_fail(
+        self: TestOpenFrame, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test trunc_frame method end fail scenario."""
         frame = OpenFrame(
             constituents=[
@@ -2321,12 +2368,20 @@ class TestOpenFrame(CommonTestCase):
                 ),
             ],
         )
-        with self.assertLogs("root", level="WARNING") as logs:
+        with caplog.at_level(WARNING, logger="root"):
             frame.trunc_frame()
+        log_output = [
+            f"{record.levelname}:{record.name}:{record.message}"
+            for record in caplog.records
+        ]
         if (
-            "WARNING:openseries.frame:One or more constituents "
-            "still not truncated to same end dates."
-        ) not in logs.output[0]:
+            log_output
+            and (
+                "WARNING:openseries.frame:One or more constituents "
+                "still not truncated to same end dates."
+            )
+            not in log_output[0]
+        ):
             msg = "Method trunc_frame() did not work as intended."
             raise OpenFrameTestError(msg)
 

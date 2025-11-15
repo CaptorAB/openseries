@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pytest
@@ -12,15 +12,23 @@ from pandas import DataFrame, Series
 from openseries import OpenTimeSeries
 from openseries._common_model import _calculate_time_factor, _get_base_column_data
 
-from .test_common_sim import CommonTestCase
+if TYPE_CHECKING:  # pragma: no cover
+    from openseries.frame import OpenFrame
+    from openseries.simulation import ReturnSimulation
 
 
 class OpenFrameTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestOpenFrame(CommonTestCase):
+class TestOpenFrame:
     """class to run tests on the module frame.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def test_get_base_column_data(self: TestOpenFrame) -> None:
         """Test _get_base_column_data function."""
