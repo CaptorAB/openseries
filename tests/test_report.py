@@ -257,11 +257,13 @@ class TestReport:
             )
             mockfilepath = Path(mockfile).resolve()
 
-        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
-            msg = "report_html method not working as intended"
-            raise ReportTestError(msg)
-
-        mockfilepath.unlink()
+        try:
+            if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+                msg = "report_html method not working as intended"
+                raise ReportTestError(msg)
+        finally:
+            if mockfilepath.exists():
+                mockfilepath.unlink()
 
     def test_report_html_shortdata(self: TestReport) -> None:
         """Test report_html function with short data."""

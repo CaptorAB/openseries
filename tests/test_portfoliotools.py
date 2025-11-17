@@ -613,11 +613,13 @@ class TestPortfoliotools:
             )
             mockfilepath = Path(mockfile).resolve()
 
-        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
-
-        mockfilepath.unlink()
+        try:
+            if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+                msg = "sharpeplot method not working as intended"
+                raise PortfoliotoolsTestError(msg)
+        finally:
+            if mockfilepath.exists():
+                mockfilepath.unlink()
 
     def test_sharpeplot_frame_input(self: TestPortfoliotools) -> None:
         """Test function sharpeplot with more or less input data."""

@@ -1727,11 +1727,13 @@ class TestOpenFrame:
             )
             mockfilepath = Path(mockfile).resolve()
 
-        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
-            msg = "plot_series method not working as intended"
-            raise OpenFrameTestError(msg)
-
-        mockfilepath.unlink()
+        try:
+            if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+                msg = "plot_series method not working as intended"
+                raise OpenFrameTestError(msg)
+        finally:
+            if mockfilepath.exists():
+                mockfilepath.unlink()
 
     def test_plot_bars(self: TestOpenFrame) -> None:
         """Test plot_bars method."""
