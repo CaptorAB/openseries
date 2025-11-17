@@ -5,9 +5,10 @@ from __future__ import annotations
 import datetime as dt
 from json import loads
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
 
+import numpy as np
 import pytest
 from pandas import Series
 
@@ -73,6 +74,65 @@ class TestReport:
             msg = f"calendar_period_returns not working as intended:\n{last_quarter}"
             raise ReportTestError(msg)
 
+    def _verify_report_data_alignment(
+        self: TestReport,
+        plotframe: OpenFrame,
+        fig_json: dict[str, Any],
+    ) -> None:
+        """Verify report data alignment.
+
+        Args:
+            plotframe: Frame to check.
+            fig_json: Figure JSON data.
+
+        Raises:
+            ReportTestError: If data is not aligned.
+        """
+        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
+        if rawdata != fig_json["data"][0]["x"][1:5]:
+            msg = "Unaligned data between original and data in Figure."
+            raise ReportTestError(msg)
+
+    def _verify_report_bar_freq(
+        self: TestReport,
+        fig_json: dict[str, Any],
+        expected_item: str,
+    ) -> None:
+        """Verify report bar frequency.
+
+        Args:
+            fig_json: Figure JSON data.
+            expected_item: Expected string in figure.
+
+        Raises:
+            ReportTestError: If bar frequency is not correct.
+        """
+        if expected_item not in str(fig_json):
+            msg = "report_html bar_freq argument not setup correctly."
+            raise ReportTestError(msg)
+
+    def _verify_report_logo(
+        self: TestReport,
+        fig_json: dict[str, Any],
+        logo: dict[str, Any],
+    ) -> None:
+        """Verify report logo.
+
+        Args:
+            fig_json: Figure JSON data.
+            logo: Logo dictionary.
+
+        Raises:
+            ReportTestError: If logo is not correct.
+        """
+        if logo == {}:
+            if fig_json["layout"]["images"][0] != logo:
+                msg = "report_html add_logo argument not setup correctly"
+                raise ReportTestError(msg)
+        elif fig_json["layout"]["images"][0]["source"] != logo["source"]:
+            msg = "report_html add_logo argument not setup correctly"
+            raise ReportTestError(msg)
+
     def test_report_html(self: TestReport) -> None:
         """Test report_html function."""
         plotframe = self.randomframe.from_deepcopy()
@@ -85,16 +145,8 @@ class TestReport:
             vertical_legend=True,
         )
         fig_json = loads(cast("str", figure.to_json()))
-        bar_x_axis_item = "'dtype': 'i2'"
-
-        if bar_x_axis_item not in str(fig_json):
-            msg = "report_html bar_freq argument not setup correctly."
-            raise ReportTestError(msg)
-
-        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise ReportTestError(msg)
+        self._verify_report_bar_freq(fig_json, "'dtype': 'i2'")
+        self._verify_report_data_alignment(plotframe, fig_json)
 
         figure, _ = report_html(
             data=plotframe,
@@ -103,11 +155,7 @@ class TestReport:
             vertical_legend=False,
         )
         fig_json = loads(cast("str", figure.to_json()))
-
-        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise ReportTestError(msg)
+        self._verify_report_data_alignment(plotframe, fig_json)
 
         figure, _ = report_html(
             data=plotframe,
@@ -130,11 +178,7 @@ class TestReport:
             bar_freq="BQE",
         )
         fig_bqe_json = loads(cast("str", figure_bqe.to_json()))
-
-        bar_x_axis_item_bqe = "'x': ['Q3 2009'"
-        if bar_x_axis_item_bqe not in str(fig_bqe_json):
-            msg = "report_html bar_freq argument not setup correctly."
-            raise ReportTestError(msg)
+        self._verify_report_bar_freq(fig_bqe_json, "'x': ['Q3 2009'")
 
         figure_bme, _ = report_html(
             data=plotframe,
@@ -143,11 +187,7 @@ class TestReport:
             bar_freq="BME",
         )
         fig_bme_json = loads(cast("str", figure_bme.to_json()))
-
-        bar_x_axis_item_bme = "'x': ['Jul 09'"
-        if bar_x_axis_item_bme not in str(fig_bme_json):
-            msg = "report_html bar_freq argument not setup correctly."
-            raise ReportTestError(msg)
+        self._verify_report_bar_freq(fig_bme_json, "'x': ['Jul 09'")
 
         fig_logo, _ = report_html(
             data=plotframe,
@@ -156,14 +196,7 @@ class TestReport:
             output_type="div",
         )
         fig_logo_json = loads(cast("str", fig_logo.to_json()))
-
-        if logo == {}:
-            if fig_logo_json["layout"]["images"][0] != logo:
-                msg = "report_html add_logo argument not setup correctly"
-                raise ReportTestError(msg)
-        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
-            msg = "report_html add_logo argument not setup correctly"
-            raise ReportTestError(msg)
+        self._verify_report_logo(fig_logo_json, logo)
 
         fig_nologo, _ = report_html(
             data=plotframe,
@@ -341,3 +374,45 @@ class TestReport:
             match=r"division by zero",
         ):
             _, _ = report_html(data=frame, auto_open=False, output_type="div")
+
+    def test_tracking_error_hasnans(self: TestReport) -> None:
+        """Test report_html function with tracking_error_func returning NaN values."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        mocked_te = Series(
+            data=[np.nan, np.nan, np.nan, np.nan, np.nan],
+            index=frame.tsdf.columns,
+            name="Tracking Errors vs Asset_4",
+            dtype="float64",
+        )
+
+        with patch.object(OpenFrame, "tracking_error_func", return_value=mocked_te):
+            figure, _ = report_html(data=frame, auto_open=False, output_type="div")
+            fig_json = loads(cast("str", figure.to_json()))
+
+            rawdata = [x.strftime("%Y-%m-%d") for x in frame.tsdf.index[1:5]]
+            if rawdata != fig_json["data"][0]["x"][1:5]:
+                msg = "Tracking error with NaN values test not working as intended."
+                raise ReportTestError(msg)
+
+    def test_capture_ratio_hasnans(self: TestReport) -> None:
+        """Test report_html function with capture_ratio_func returning NaN values."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        mocked_cr = Series(
+            data=[np.nan, np.nan, np.nan, np.nan, np.nan],
+            index=frame.tsdf.columns,
+            name="Up-Down Capture Ratios vs Asset_4",
+            dtype="float64",
+        )
+
+        with patch.object(OpenFrame, "capture_ratio_func", return_value=mocked_cr):
+            figure, _ = report_html(data=frame, auto_open=False, output_type="div")
+            fig_json = loads(cast("str", figure.to_json()))
+
+            rawdata = [x.strftime("%Y-%m-%d") for x in frame.tsdf.index[1:5]]
+            if rawdata != fig_json["data"][0]["x"][1:5]:
+                msg = "Capture ratio with NaN values test not working as intended."
+                raise ReportTestError(msg)

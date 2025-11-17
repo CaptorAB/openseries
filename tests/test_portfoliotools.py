@@ -5,7 +5,7 @@ from __future__ import annotations
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -346,11 +346,70 @@ class TestPortfoliotools:
 
             raise PortfoliotoolsTestError(msg)
 
-    def test_sharpeplot(self: TestPortfoliotools) -> None:
-        """Test function sharpeplot."""
-        simulations = 100
-        points = 20
+    def _verify_sharpeplot_title(
+        self: TestPortfoliotools,
+        fig_json: dict[str, Any],
+        expected_text: str | None,
+    ) -> None:
+        """Verify sharpeplot title.
 
+        Args:
+            fig_json: Figure JSON data.
+            expected_text: Expected title text or None.
+
+        Raises:
+            PortfoliotoolsTestError: If title is not correct.
+        """
+        if expected_text is None:
+            if "text" in fig_json["layout"]["title"]:
+                msg = "sharpeplot method not working as intended"
+                raise PortfoliotoolsTestError(msg)
+        elif expected_text not in fig_json["layout"]["title"]["text"]:
+            msg = "sharpeplot method not working as intended"
+            raise PortfoliotoolsTestError(msg)
+
+    def _verify_sharpeplot_names(
+        self: TestPortfoliotools,
+        fig_json: dict[str, Any],
+    ) -> None:
+        """Verify sharpeplot trace names.
+
+        Args:
+            fig_json: Figure JSON data.
+
+        Raises:
+            PortfoliotoolsTestError: If names don't match.
+        """
+        names = [item["name"] for item in fig_json["data"]]
+        expected_names = [
+            "simulated portfolios",
+            "Efficient frontier",
+            "Asset_0",
+            "Asset_1",
+            "Asset_2",
+            "Asset_3",
+            "Asset_4",
+            "Max Sharpe Portfolio",
+            "Current Portfolio",
+        ]
+        if names != expected_names:
+            msg = f"Function sharpeplot not working as intended\n{names}"
+            raise PortfoliotoolsTestError(msg)
+
+    def _setup_sharpeplot_test_data(
+        self: TestPortfoliotools,
+        simulations: int = 100,
+        points: int = 20,
+    ) -> tuple[OpenFrame, Any, Any, Any, Any, Any]:
+        """Setup test data for sharpeplot tests.
+
+        Args:
+            simulations: Number of simulations.
+            points: Number of frontier points.
+
+        Returns:
+            Tuple of (spframe, current, frontier, simulated, optimum, plotframe).
+        """
         spframe = self.randomframe.from_deepcopy()
         spframe.to_cumret()
         current = OpenTimeSeries.from_df(
@@ -374,82 +433,51 @@ class TestPortfoliotools:
             optimized=optimum,
         )
 
-        figure_title_no_text, _ = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=True,
-            auto_open=False,
-            output_type="div",
-        )
+        return spframe, current, frontier, simulated, optimum, plotframe
 
-        fig_json_title_no_text = loads(cast("str", figure_title_no_text.to_json()))
+    def _create_sharpeplot_and_get_json(
+        self: TestPortfoliotools,
+        simulated: Any,  # noqa: ANN401
+        frontier: Any,  # noqa: ANN401
+        plotframe: Any,  # noqa: ANN401
+        **kwargs: Any,  # noqa: ANN401
+    ) -> dict[str, Any]:
+        """Create sharpeplot and return JSON.
 
-        if "Risk and Return" not in fig_json_title_no_text["layout"]["title"]["text"]:
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
+        Args:
+            simulated: Simulated frame.
+            frontier: Frontier frame.
+            plotframe: Plot frame.
+            **kwargs: Additional arguments for sharpeplot.
 
-        figure_title_text, _ = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=True,
-            titletext="Awesome title",
-            auto_open=False,
-            output_type="div",
-        )
-
-        fig_json_title_text = loads(cast("str", figure_title_text.to_json()))
-        if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
-
+        Returns:
+            Figure JSON data.
+        """
         figure, _ = sharpeplot(
             sim_frame=simulated,
             line_frame=frontier,
             point_frame=plotframe,
             point_frame_mode="markers+text",
-            title=False,
             auto_open=False,
             output_type="div",
+            **kwargs,
         )
+        return cast("dict[str, Any]", loads(cast("str", figure.to_json())))
 
-        fig_json = loads(cast("str", figure.to_json()))
+    def _verify_file_output(
+        self: TestPortfoliotools,
+        figfile: str,
+    ) -> None:
+        """Verify file output creation and cleanup.
 
-        if "text" in fig_json["layout"]["title"]:
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
+        Args:
+            figfile: File path string.
 
-        names = [item["name"] for item in fig_json["data"]]
-
-        if names != [
-            "simulated portfolios",
-            "Efficient frontier",
-            "Asset_0",
-            "Asset_1",
-            "Asset_2",
-            "Asset_3",
-            "Asset_4",
-            "Max Sharpe Portfolio",
-            "Current Portfolio",
-        ]:
-            msg = f"Function sharpeplot not working as intended\n{names}"
-            raise PortfoliotoolsTestError(msg)
-
-        directory = Path(__file__).parent
-        _, figfile = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=False,
-            auto_open=False,
-            output_type="file",
-            directory=directory,
-        )
-
+        Raises:
+            FileNotFoundError: If file doesn't exist.
+            FileExistsError: If file still exists after unlink.
+            PortfoliotoolsTestError: If file format is incorrect.
+        """
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
             msg = "html file not created"
@@ -464,21 +492,40 @@ class TestPortfoliotools:
             msg = "sharpeplot method not working as intended"
             raise PortfoliotoolsTestError(msg)
 
-        _, divstring = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=False,
-            auto_open=False,
-            output_type="div",
-        )
+    def _verify_div_output(self: TestPortfoliotools, divstring: str) -> None:
+        """Verify div output format.
+
+        Args:
+            divstring: Div string to verify.
+
+        Raises:
+            PortfoliotoolsTestError: If div format is incorrect.
+        """
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
             raise PortfoliotoolsTestError(msg)
 
+    def _verify_mock_path_exists(
+        self: TestPortfoliotools,
+        simulated: Any,  # noqa: ANN401
+        frontier: Any,  # noqa: ANN401
+        plotframe: Any,  # noqa: ANN401
+        *,
+        return_value: bool,
+    ) -> dict[str, Any]:
+        """Verify sharpeplot with mocked path exists.
+
+        Args:
+            simulated: Simulated frame.
+            frontier: Frontier frame.
+            plotframe: Plot frame.
+            return_value: Return value for mock.
+
+        Returns:
+            Figure JSON data.
+        """
         with patch("pathlib.Path.exists") as mock_userfolderexists:
-            mock_userfolderexists.return_value = True
+            mock_userfolderexists.return_value = return_value
             mockhomefig, _ = sharpeplot(
                 sim_frame=simulated,
                 line_frame=frontier,
@@ -488,8 +535,66 @@ class TestPortfoliotools:
                 auto_open=False,
                 output_type="div",
             )
-            mockhomefig_json = loads(cast("str", mockhomefig.to_json()))
+            return cast("dict[str, Any]", loads(cast("str", mockhomefig.to_json())))
 
+    def test_sharpeplot(self: TestPortfoliotools) -> None:
+        """Test function sharpeplot."""
+        simulations = 100
+        points = 20
+
+        _, _, frontier, simulated, _optimum, plotframe = (
+            self._setup_sharpeplot_test_data(simulations, points)
+        )
+
+        fig_json_title_no_text = self._create_sharpeplot_and_get_json(
+            simulated, frontier, plotframe, title=True
+        )
+        self._verify_sharpeplot_title(fig_json_title_no_text, "Risk and Return")
+
+        fig_json_title_text = self._create_sharpeplot_and_get_json(
+            simulated,
+            frontier,
+            plotframe,
+            title=True,
+            titletext="Awesome title",
+        )
+        if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
+            msg = "sharpeplot method not working as intended"
+            raise PortfoliotoolsTestError(msg)
+
+        fig_json = self._create_sharpeplot_and_get_json(
+            simulated, frontier, plotframe, title=False
+        )
+        self._verify_sharpeplot_title(fig_json, None)
+        self._verify_sharpeplot_names(fig_json)
+
+        directory = Path(__file__).parent
+        _, figfile = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=False,
+            auto_open=False,
+            output_type="file",
+            directory=directory,
+        )
+        self._verify_file_output(figfile)
+
+        _, divstring = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=False,
+            auto_open=False,
+            output_type="div",
+        )
+        self._verify_div_output(divstring)
+
+        mockhomefig_json = self._verify_mock_path_exists(
+            simulated, frontier, plotframe, return_value=True
+        )
         if mockhomefig_json["data"][0]["name"] != "simulated portfolios":
             msg = "sharpeplot method not working as intended"
             raise PortfoliotoolsTestError(msg)

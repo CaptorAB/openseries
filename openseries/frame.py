@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any, Self, cast
 from numpy import (
     array,
     asarray,
+    bool_,
     concatenate,
     corrcoef,
     cov,
@@ -854,6 +855,95 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             dtype="float64",
         )
 
+    def _calculate_cagr_from_returns(
+        self: Self,
+        returns_array: NDArray[float64],
+        mask: NDArray[bool_],
+        time_factor: float,
+    ) -> float:
+        """Calculate CAGR from returns array with mask.
+
+        Args:
+            returns_array: Returns array.
+            mask: Boolean mask.
+            time_factor: Time factor for annualization.
+
+        Returns:
+            CAGR value.
+        """
+        masked_array = returns_array[mask] + 1.0
+        if len(masked_array) == 0:
+            return 0.0
+        exponent = 1 / (len(masked_array) / time_factor)
+        return float(masked_array.prod() ** exponent - 1)
+
+    def _calculate_capture_ratio_for_item(
+        self: Self,
+        ratio: LiteralCaptureRatio,
+        longdf_returns_np: NDArray[float64],
+        shortdf_returns_np: NDArray[float64],
+        up_mask: NDArray[bool_],
+        down_mask: NDArray[bool_],
+        time_factor: float,
+    ) -> float:
+        """Calculate capture ratio for a single item.
+
+        Args:
+            ratio: Ratio type to calculate.
+            longdf_returns_np: Long returns array.
+            shortdf_returns_np: Short returns array.
+            up_mask: Up mask.
+            down_mask: Down mask.
+            time_factor: Time factor.
+
+        Returns:
+            Capture ratio value.
+
+        Raises:
+            RatioInputError: If ratio is invalid.
+        """
+        if ratio == "up":
+            up_rtrn = self._calculate_cagr_from_returns(
+                longdf_returns_np, up_mask, time_factor
+            )
+            up_idx_return = self._calculate_cagr_from_returns(
+                shortdf_returns_np, up_mask, time_factor
+            )
+            if up_idx_return == 0.0:
+                return 0.0
+            return up_rtrn / up_idx_return
+
+        if ratio == "down":
+            down_return = self._calculate_cagr_from_returns(
+                longdf_returns_np, down_mask, time_factor
+            )
+            down_idx_return = self._calculate_cagr_from_returns(
+                shortdf_returns_np, down_mask, time_factor
+            )
+            if down_idx_return == 0.0:
+                return 0.0
+            return down_return / down_idx_return
+
+        if ratio == "both":
+            up_rtrn = self._calculate_cagr_from_returns(
+                longdf_returns_np, up_mask, time_factor
+            )
+            up_idx_return = self._calculate_cagr_from_returns(
+                shortdf_returns_np, up_mask, time_factor
+            )
+            down_return = self._calculate_cagr_from_returns(
+                longdf_returns_np, down_mask, time_factor
+            )
+            down_idx_return = self._calculate_cagr_from_returns(
+                shortdf_returns_np, down_mask, time_factor
+            )
+            if up_idx_return == 0.0 or down_idx_return == 0.0:
+                return 0.0
+            return (up_rtrn / up_idx_return) / (down_return / down_idx_return)
+
+        msg = "ratio must be one of 'up', 'down' or 'both'."
+        raise RatioInputError(msg)
+
     def capture_ratio_func(
         self: Self,
         ratio: LiteralCaptureRatio,
@@ -896,32 +986,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         )
         fraction: float = (later - earlier).days / 365.25
 
-        msg = "base_column should be a tuple[str, ValueType] or an integer."
-        if isinstance(base_column, tuple):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ][base_column]
-            short_item = base_column
-            short_label = cast(
-                "tuple[str, str]",
-                self.tsdf[base_column].name,
-            )[0]
-        elif isinstance(base_column, int):
-            shortdf = self.tsdf.loc[
-                cast("Timestamp", earlier) : cast("Timestamp", later)
-            ].iloc[:, base_column]
-            short_item = cast(
-                "tuple[str, ValueType]",
-                self.tsdf.iloc[
-                    :,
-                    base_column,
-                ].name,
-            )
-            short_label = cast("tuple[str, str]", self.tsdf.iloc[:, base_column].name)[
-                0
-            ]
-        else:
-            raise TypeError(msg)
+        shortdf, short_item, short_label = _get_base_column_data(
+            self=self,
+            base_column=base_column,
+            earlier=earlier,
+            later=later,
+        )
 
         if periods_in_a_year_fixed:
             time_factor = float(periods_in_a_year_fixed)
@@ -943,54 +1013,22 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 ][item]
                 longdf_returns = longdf.ffill().pct_change()
                 longdf_returns_np = longdf_returns.to_numpy()
-                msg = "ratio must be one of 'up', 'down' or 'both'."
-                if ratio == "up":
-                    uparray = longdf_returns_np[up_mask] + 1.0
-                    up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
-                    upidxarray = shortdf_returns_np[up_mask] + 1.0
-                    up_idx_return = (
-                        upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
-                    )
-                    ratios.append(up_rtrn / up_idx_return)
-                elif ratio == "down":
-                    downarray = longdf_returns_np[down_mask] + 1.0
-                    down_return = (
-                        downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
-                    )
-                    downidxarray = shortdf_returns_np[down_mask] + 1.0
-                    down_idx_return = (
-                        downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
-                        - 1
-                    )
-                    ratios.append(down_return / down_idx_return)
-                elif ratio == "both":
-                    uparray = longdf_returns_np[up_mask] + 1.0
-                    up_rtrn = uparray.prod() ** (1 / (len(uparray) / time_factor)) - 1
-                    upidxarray = shortdf_returns_np[up_mask] + 1.0
-                    up_idx_return = (
-                        upidxarray.prod() ** (1 / (len(upidxarray) / time_factor)) - 1
-                    )
-                    downarray = longdf_returns_np[down_mask] + 1.0
-                    down_return = (
-                        downarray.prod() ** (1 / (len(downarray) / time_factor)) - 1
-                    )
-                    downidxarray = shortdf_returns_np[down_mask] + 1.0
-                    down_idx_return = (
-                        downidxarray.prod() ** (1 / (len(downidxarray) / time_factor))
-                        - 1
-                    )
-                    ratios.append(
-                        (up_rtrn / up_idx_return) / (down_return / down_idx_return),
-                    )
-                else:
-                    raise RatioInputError(msg)
+                ratio_value = self._calculate_capture_ratio_for_item(
+                    ratio=ratio,
+                    longdf_returns_np=longdf_returns_np,
+                    shortdf_returns_np=shortdf_returns_np,
+                    up_mask=up_mask,
+                    down_mask=down_mask,
+                    time_factor=time_factor,
+                )
+                ratios.append(ratio_value)
 
-        if ratio == "up":
-            resultname = f"Up Capture Ratios vs {short_label}"
-        elif ratio == "down":
-            resultname = f"Down Capture Ratios vs {short_label}"
-        else:
-            resultname = f"Up-Down Capture Ratios vs {short_label}"
+        ratio_names = {
+            "up": f"Up Capture Ratios vs {short_label}",
+            "down": f"Down Capture Ratios vs {short_label}",
+            "both": f"Up-Down Capture Ratios vs {short_label}",
+        }
+        resultname = ratio_names[ratio]
 
         return Series(
             data=ratios,
@@ -998,6 +1036,36 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             name=resultname,
             dtype="float64",
         )
+
+    def _extract_column_value(
+        self: Self,
+        column: tuple[str, ValueType] | int,
+        vtypes: list[bool],
+        param_name: str = "column",
+    ) -> Series[float]:
+        """Extract column value based on value types.
+
+        Args:
+            column: Column reference.
+            vtypes: Value types list.
+            param_name: Parameter name for error messages.
+
+        Returns:
+            Series value.
+
+        Raises:
+            TypeError: If column type is invalid.
+        """
+        msg = f"{param_name} should be a tuple[str, ValueType] or an integer."
+        if isinstance(column, tuple):
+            if all(vtypes):
+                return self.tsdf[column]
+            return self.tsdf[column].ffill().pct_change().iloc[1:]
+        if isinstance(column, int):
+            if all(vtypes):
+                return self.tsdf.iloc[:, column]
+            return self.tsdf.iloc[:, column].ffill().pct_change().iloc[1:]
+        raise TypeError(msg)
 
     def beta(
         self: Self,
@@ -1020,41 +1088,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Beta as Co-variance of x & y divided by Variance of x.
         """
         vtypes = self._value_types
-        if all(vtypes):
-            msg = "asset should be a tuple[str, ValueType] or an integer."
-            if isinstance(asset, tuple):
-                y_value = self.tsdf[asset]
-            elif isinstance(asset, int):
-                y_value = self.tsdf.iloc[:, asset]
-            else:
-                raise TypeError(msg)
-
-            msg = "market should be a tuple[str, ValueType] or an integer."
-            if isinstance(market, tuple):
-                x_value = self.tsdf[market]
-            elif isinstance(market, int):
-                x_value = self.tsdf.iloc[:, market]
-            else:
-                raise TypeError(msg)
-        elif not any(vtypes):
-            msg = "asset should be a tuple[str, ValueType] or an integer."
-            if isinstance(asset, tuple):
-                y_value = self.tsdf[asset].ffill().pct_change().iloc[1:]
-            elif isinstance(asset, int):
-                y_value = self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
-            else:
-                raise TypeError(msg)
-            msg = "market should be a tuple[str, ValueType] or an integer."
-
-            if isinstance(market, tuple):
-                x_value = self.tsdf[market].ffill().pct_change().iloc[1:]
-            elif isinstance(market, int):
-                x_value = self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:]
-            else:
-                raise TypeError(msg)
-        else:
+        if not (all(vtypes) or not any(vtypes)):
             msg = "Mix of series types will give inconsistent results"
             raise MixedValuetypesError(msg)
+
+        y_value = self._extract_column_value(asset, vtypes, param_name="asset")
+        x_value = self._extract_column_value(market, vtypes, param_name="market")
 
         covariance = cov(m=y_value, y=x_value, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -1146,49 +1185,15 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             Jensen's alpha.
         """
         vtypes = self._value_types
-        if not any(vtypes):
-            msg = "asset should be a tuple[str, ValueType] or an integer."
-            if isinstance(asset, tuple):
-                asset_rtn = self.tsdf[asset].ffill().pct_change().iloc[1:]
-                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
-            elif isinstance(asset, int):
-                asset_rtn = self.tsdf.iloc[:, asset].ffill().pct_change().iloc[1:]
-                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
-            else:
-                raise TypeError(msg)
-
-            msg = "market should be a tuple[str, ValueType] or an integer."
-            if isinstance(market, tuple):
-                market_rtn = self.tsdf[market].ffill().pct_change().iloc[1:]
-                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
-            elif isinstance(market, int):
-                market_rtn = self.tsdf.iloc[:, market].ffill().pct_change().iloc[1:]
-                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
-            else:
-                raise TypeError(msg)
-        elif all(vtypes):
-            msg = "asset should be a tuple[str, ValueType] or an integer."
-            if isinstance(asset, tuple):
-                asset_rtn = self.tsdf[asset]
-                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
-            elif isinstance(asset, int):
-                asset_rtn = self.tsdf.iloc[:, asset]
-                asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
-            else:
-                raise TypeError(msg)
-
-            msg = "market should be a tuple[str, ValueType] or an integer."
-            if isinstance(market, tuple):
-                market_rtn = self.tsdf[market]
-                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
-            elif isinstance(market, int):
-                market_rtn = self.tsdf.iloc[:, market]
-                market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
-            else:
-                raise TypeError(msg)
-        else:
+        if not (all(vtypes) or not any(vtypes)):
             msg = "Mix of series types will give inconsistent results"
             raise MixedValuetypesError(msg)
+
+        asset_rtn = self._extract_column_value(asset, vtypes, param_name="asset")
+        market_rtn = self._extract_column_value(market, vtypes, param_name="market")
+
+        asset_rtn_mean = float(asset_rtn.mean() * self.periods_in_a_year)
+        market_rtn_mean = float(market_rtn.mean() * self.periods_in_a_year)
 
         covariance = cov(m=asset_rtn, y=market_rtn, ddof=dlta_degr_freedms)
         beta = covariance[0, 1] / covariance[1, 1]
@@ -1196,6 +1201,148 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         return float(
             asset_rtn_mean - riskfree_rate - beta * (market_rtn_mean - riskfree_rate),
         )
+
+    def _prepare_returns_for_portfolio(self: Self) -> DataFrame:
+        """Prepare returns DataFrame for portfolio calculation.
+
+        Returns:
+            Returns DataFrame.
+
+        Raises:
+            MixedValuetypesError: If series types are mixed.
+        """
+        vtypes = self._value_types
+        if not any(vtypes):
+            returns = self.tsdf.ffill().pct_change()
+            returns.iloc[0] = 0
+            return returns
+        if all(vtypes):
+            return self.tsdf
+        msg = "Mix of series types will give inconsistent results"
+        raise MixedValuetypesError(msg)
+
+    def _calculate_eq_weights(self: Self) -> list[float]:
+        """Calculate equal weights.
+
+        Returns:
+            List of equal weights.
+        """
+        return [1.0 / self.item_count] * self.item_count
+
+    def _calculate_inv_vol_weights(self: Self, returns: DataFrame) -> list[float]:
+        """Calculate inverse volatility weights.
+
+        Args:
+            returns: Returns DataFrame.
+
+        Returns:
+            List of inverse volatility weights.
+        """
+        vol = divide(1.0, std(returns, axis=0, ddof=1))
+        vol[isinf(vol)] = nan
+        return list(divide(vol, vol.sum()))
+
+    def _calculate_max_div_weights(self: Self, returns: DataFrame) -> list[float]:
+        """Calculate maximum diversification weights.
+
+        Args:
+            returns: Returns DataFrame.
+
+        Returns:
+            List of maximum diversification weights.
+
+        Raises:
+            MaxDiversificationNaNError: If correlation matrix has NaN values.
+            MaxDiversificationNegativeWeightsError: If weights are negative.
+        """
+        corr_matrix = corrcoef(returns.T)
+        corr_matrix[isinf(corr_matrix)] = nan
+        corr_matrix[isnan(corr_matrix)] = nan
+
+        msga = "max_div weight strategy failed: correlation matrix contains NaN values"
+        if isnan(corr_matrix).any():
+            raise MaxDiversificationNaNError(msga)
+
+        try:
+            inv_corr_sum = linalg.inv(corr_matrix).sum(axis=1)
+
+            msgb = (
+                "max_div weight strategy failed: "
+                "inverse correlation matrix sum contains NaN values"
+            )
+            if isnan(inv_corr_sum).any():
+                raise MaxDiversificationNaNError(msgb)
+
+            weights = list(divide(inv_corr_sum, inv_corr_sum.sum()))
+
+            msgc = "max_div weight strategy failed: final weights contain NaN values"
+            if any(isnan(weight) for weight in weights):  # pragma: no cover
+                raise MaxDiversificationNaNError(msgc)
+
+            msgd = (
+                "max_div weight strategy failed: negative weights detected"
+                f" - weights: {[round(w, 6) for w in weights]}"
+            )
+            if any(weight < 0 for weight in weights):
+                raise MaxDiversificationNegativeWeightsError(msgd)
+
+        except linalg.LinAlgError as e:
+            msge = (
+                "max_div weight strategy failed: "
+                f"correlation matrix is singular - {e!s}"
+            )
+            raise MaxDiversificationNaNError(msge) from e
+        else:
+            return weights
+
+    def _calculate_min_vol_overweight_weights(
+        self: Self,
+        returns: DataFrame,
+    ) -> list[float]:
+        """Calculate minimum volatility overweight weights.
+
+        Args:
+            returns: Returns DataFrame.
+
+        Returns:
+            List of minimum volatility overweight weights.
+        """
+        vols = std(returns, axis=0, ddof=1)
+        min_vol_idx = vols.argmin()
+        min_vol_weight = 0.6
+        remaining_weight = 0.4
+        weights = [remaining_weight / (self.item_count - 1)] * self.item_count
+        weights[min_vol_idx] = min_vol_weight
+        return weights
+
+    def _calculate_weights_from_strategy(
+        self: Self,
+        weight_strat: LiteralPortfolioWeightings,
+        returns: DataFrame,
+    ) -> list[float]:
+        """Calculate weights based on strategy.
+
+        Args:
+            weight_strat: Weight calculation strategy.
+            returns: Returns DataFrame.
+
+        Returns:
+            List of weights.
+
+        Raises:
+            NotImplementedError: If strategy is not implemented.
+        """
+        if weight_strat == "eq_weights":
+            return self._calculate_eq_weights()
+        if weight_strat == "inv_vol":
+            return self._calculate_inv_vol_weights(returns)
+        if weight_strat == "max_div":
+            return self._calculate_max_div_weights(returns)
+        if weight_strat == "min_vol_overweight":
+            return self._calculate_min_vol_overweight_weights(returns)
+
+        msg = "Weight strategy not implemented"
+        raise NotImplementedError(msg)
 
     def make_portfolio(
         self: Self,
@@ -1218,80 +1365,13 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             )
             raise NoWeightsError(msg)
 
-        vtypes = self._value_types
-        if not any(vtypes):
-            returns = self.tsdf.ffill().pct_change()
-            returns.iloc[0] = 0
-        elif all(vtypes):
-            returns = self.tsdf
-        else:
-            msg = "Mix of series types will give inconsistent results"
-            raise MixedValuetypesError(msg)
+        returns = self._prepare_returns_for_portfolio()
 
-        msg = "Weight strategy not implemented"
         if weight_strat:
-            if weight_strat == "eq_weights":
-                self.weights = [1.0 / self.item_count] * self.item_count
-            elif weight_strat == "inv_vol":
-                vol = divide(1.0, std(returns, axis=0, ddof=1))
-                vol[isinf(vol)] = nan
-                self.weights = list(divide(vol, vol.sum()))
-            elif weight_strat == "max_div":
-                corr_matrix = corrcoef(returns.T)
-                corr_matrix[isinf(corr_matrix)] = nan
-                corr_matrix[isnan(corr_matrix)] = nan
-
-                msga = (
-                    "max_div weight strategy failed: "
-                    "correlation matrix contains NaN values"
-                )
-                if isnan(corr_matrix).any():
-                    raise MaxDiversificationNaNError(msga)
-
-                try:
-                    inv_corr_sum = linalg.inv(corr_matrix).sum(axis=1)
-
-                    msgb = (
-                        "max_div weight strategy failed: "
-                        "inverse correlation matrix sum contains NaN values"
-                    )
-                    if isnan(inv_corr_sum).any():
-                        raise MaxDiversificationNaNError(msgb)
-
-                    self.weights = list(divide(inv_corr_sum, inv_corr_sum.sum()))
-
-                    msgc = (
-                        "max_div weight strategy failed: "
-                        "final weights contain NaN values"
-                    )
-                    if any(  # pragma: no cover
-                        isnan(weight) for weight in self.weights
-                    ):
-                        raise MaxDiversificationNaNError(msgc)
-
-                    msgd = (
-                        "max_div weight strategy failed: negative weights detected"
-                        f" - weights: {[round(w, 6) for w in self.weights]}"
-                    )
-                    if any(weight < 0 for weight in self.weights):
-                        raise MaxDiversificationNegativeWeightsError(msgd)
-
-                except linalg.LinAlgError as e:
-                    msge = (
-                        "max_div weight strategy failed: "
-                        f"correlation matrix is singular - {e!s}"
-                    )
-                    raise MaxDiversificationNaNError(msge) from e
-            elif weight_strat == "min_vol_overweight":
-                vols = std(returns, axis=0, ddof=1)
-                min_vol_idx = vols.argmin()
-                min_vol_weight = 0.6
-                remaining_weight = 0.4
-                weights = [remaining_weight / (self.item_count - 1)] * self.item_count
-                weights[min_vol_idx] = min_vol_weight
-                self.weights = weights
-            else:
-                raise NotImplementedError(msg)
+            self.weights = self._calculate_weights_from_strategy(
+                weight_strat=weight_strat,
+                returns=returns,
+            )
 
         return DataFrame(
             data=(returns @ array(self.weights)).add(1.0).cumprod(),
@@ -1520,33 +1600,27 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         return result, predictions.to_cumret()
 
-    def rebalanced_portfolio(
+    def _validate_and_prepare_rebalance_inputs(
         self: Self,
-        name: str,
-        items: list[str] | None = None,
-        bal_weights: list[float] | None = None,
-        frequency: int = 1,
-        cash_index: OpenTimeSeries | None = None,
+        items: list[str] | None,
+        bal_weights: list[float] | None,
         *,
-        equal_weights: bool = False,
-        drop_extras: bool = True,
-    ) -> OpenFrame:
-        """Create a rebalanced portfolio from the OpenFrame constituents.
+        equal_weights: bool,
+    ) -> tuple[list[str], list[float]]:
+        """Validate and prepare inputs for rebalanced portfolio.
 
         Args:
-            name: Name of the portfolio.
-            items: List of items to include in the portfolio. If None, uses all items.
-                Optional.
-            bal_weights: List of weights for rebalancing. If None, uses frame weights.
-                Optional.
-            frequency: Rebalancing frequency. Defaults to 1.
-            cash_index: Cash index series for cash component. Optional.
-            equal_weights: If True, use equal weights for all items. Defaults to False.
-            drop_extras: If True, only return TWR series; if False, return all details.
-                Defaults to True.
+            items: List of items to include. If None, uses all items.
+            bal_weights: List of weights. If None, uses frame weights.
+            equal_weights: If True, use equal weights.
 
         Returns:
-            OpenFrame containing the rebalanced portfolio.
+            Tuple of (validated items, validated weights).
+
+        Raises:
+            WeightsNotProvidedError: If weights are required but not provided.
+            TypeError: If items is not a list.
+            PortfolioItemsNotWithinFrameError: If items are invalid.
         """
         if bal_weights is None and not equal_weights:
             if self.weights is None:
@@ -1570,35 +1644,24 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         if equal_weights:
             bal_weights = [1 / len(items)] * len(items)
 
-        if cash_index:
-            cash_index.tsdf = cash_index.tsdf.reindex(self.tsdf.index)
-            cash_values: list[float] = cast(
-                "list[float]", cash_index.tsdf.iloc[:, 0].to_numpy().tolist()
-            )
-        else:
-            cash_values = [1.0] * self.length
+        return items, cast("list[float]", bal_weights)
 
-        if self.tsdf.isna().to_numpy().any():
-            self.value_nan_handle()
+    def _initialize_rebalance_output(
+        self: Self,
+        items: list[str],
+        name: str,
+        cash_values: list[float],
+    ) -> dict[str, dict[str, list[float]]]:
+        """Initialize output structure for rebalanced portfolio.
 
-        ccies = list({serie.currency for serie in self.constituents})
+        Args:
+            items: List of items in portfolio.
+            name: Name of the portfolio.
+            cash_values: Cash index values.
 
-        if len(ccies) != 1:
-            msg = "Items for portfolio must be denominated in same currency."
-            raise MultipleCurrenciesError(msg)
-
-        currency = ccies[0]
-
-        instruments = [*items, "cash", name]
-        subheaders = [
-            ValueType.PRICE,
-            "buysell_qty",
-            "position",
-            "value",
-            "twr",
-            "settle",
-        ]
-
+        Returns:
+            Initialized output dictionary.
+        """
         output = {
             item: {
                 ValueType.PRICE: [],
@@ -1630,10 +1693,27 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 },
             },
         )
+        return output
 
-        for item, weight in zip(items, cast("list[float]", bal_weights), strict=False):
+    def _initialize_first_day_positions(
+        self: Self,
+        items: list[str],
+        bal_weights: list[float],
+        output: dict[str, dict[str, list[float]]],
+        name: str,
+    ) -> None:
+        """Initialize positions for the first day.
+
+        Args:
+            items: List of items in portfolio.
+            bal_weights: Weights for each item.
+            output: Output dictionary to update.
+            name: Name of the portfolio.
+        """
+        for item, weight in zip(items, bal_weights, strict=False):
             output[item][ValueType.PRICE] = cast(
-                "list[float]", self.tsdf[(item, ValueType.PRICE)].to_numpy().tolist()
+                "list[float]",
+                self.tsdf[(item, ValueType.PRICE)].to_numpy().tolist(),
             )
             output[item]["buysell_qty"][0] = (
                 weight / self.tsdf[(item, ValueType.PRICE)].iloc[0]
@@ -1655,83 +1735,140 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         )
         output["cash"]["settle"][0] = -output["cash"]["position"][0]
 
-        counter = 1
-        for day in range(1, self.length):
-            portfolio_value = 0.0
-            settle_value = 0.0
-            if day == frequency * counter:
-                for item, weight in zip(
-                    items, cast("list[float]", bal_weights), strict=False
-                ):
-                    output[item]["buysell_qty"][day] = (
-                        weight
-                        - output[item]["value"][day - 1]
-                        / -output[name]["value"][day - 1]
-                    ) / output[item][ValueType.PRICE][day]
-                    output[item]["position"][day] = (
-                        output[item]["position"][day - 1]
-                        + output[item]["buysell_qty"][day]
-                    )
-                    output[item]["value"][day] = (
-                        output[item]["position"][day]
-                        * output[item][ValueType.PRICE][day]
-                    )
-                    portfolio_value += output[item]["value"][day]
-                    output[item]["twr"][day] = (
-                        output[item]["value"][day]
-                        / (
-                            output[item]["value"][day - 1]
-                            - output[item]["settle"][day]
-                        )
-                        * output[item]["twr"][day - 1]
-                    )
-                    output[item]["settle"][day] = (
-                        -output[item]["buysell_qty"][day]
-                        * output[item][ValueType.PRICE][day]
-                    )
-                    settle_value += output[item]["settle"][day]
-                counter += 1
-            else:
-                for item in items:
-                    output[item]["position"][day] = output[item]["position"][day - 1]
-                    output[item]["value"][day] = (
-                        output[item]["position"][day]
-                        * output[item][ValueType.PRICE][day]
-                    )
-                    portfolio_value += output[item]["value"][day]
-                    output[item]["twr"][day] = (
-                        output[item]["value"][day]
-                        / (
-                            output[item]["value"][day - 1]
-                            - output[item]["settle"][day]
-                        )
-                        * output[item]["twr"][day - 1]
-                    )
-            output["cash"]["buysell_qty"][day] = settle_value
-            output["cash"]["position"][day] = (
-                output["cash"]["position"][day - 1]
-                * output["cash"][ValueType.PRICE][day]
-                / output["cash"][ValueType.PRICE][day - 1]
-                + output["cash"]["buysell_qty"][day]
-            )
-            output["cash"]["value"][day] = output["cash"]["position"][day]
-            portfolio_value += output["cash"]["value"][day]
-            output[name]["position"][day] = output[name]["position"][day - 1]
-            output[name]["value"][day] = -portfolio_value
-            output[name]["twr"][day] = (
-                output[name]["value"][day] / output[name]["position"][day]
-            )
-            output[name][ValueType.PRICE][day] = output[name]["twr"][day]
+    def _process_rebalancing_day(
+        self: Self,
+        day: int,
+        items: list[str],
+        bal_weights: list[float],
+        output: dict[str, dict[str, list[float]]],
+        name: str,
+    ) -> tuple[float, float]:
+        """Process a rebalancing day.
 
+        Args:
+            day: Current day index.
+            items: List of items in portfolio.
+            bal_weights: Target weights for rebalancing.
+            output: Output dictionary to update.
+            name: Name of the portfolio.
+
+        Returns:
+            Tuple of (portfolio_value, settle_value).
+        """
+        portfolio_value = 0.0
+        settle_value = 0.0
+
+        for item, weight in zip(items, bal_weights, strict=False):
+            output[item]["buysell_qty"][day] = (
+                weight
+                - output[item]["value"][day - 1] / -output[name]["value"][day - 1]
+            ) / output[item][ValueType.PRICE][day]
+            output[item]["position"][day] = (
+                output[item]["position"][day - 1] + output[item]["buysell_qty"][day]
+            )
+            output[item]["value"][day] = (
+                output[item]["position"][day] * output[item][ValueType.PRICE][day]
+            )
+            portfolio_value += output[item]["value"][day]
+            output[item]["twr"][day] = (
+                output[item]["value"][day]
+                / (output[item]["value"][day - 1] - output[item]["settle"][day])
+                * output[item]["twr"][day - 1]
+            )
+            output[item]["settle"][day] = (
+                -output[item]["buysell_qty"][day] * output[item][ValueType.PRICE][day]
+            )
+            settle_value += output[item]["settle"][day]
+
+        return portfolio_value, settle_value
+
+    def _process_non_rebalancing_day(
+        self: Self,
+        day: int,
+        items: list[str],
+        output: dict[str, dict[str, list[float]]],
+    ) -> float:
+        """Process a non-rebalancing day.
+
+        Args:
+            day: Current day index.
+            items: List of items in portfolio.
+            output: Output dictionary to update.
+
+        Returns:
+            Portfolio value.
+        """
+        portfolio_value = 0.0
+
+        for item in items:
+            output[item]["position"][day] = output[item]["position"][day - 1]
+            output[item]["value"][day] = (
+                output[item]["position"][day] * output[item][ValueType.PRICE][day]
+            )
+            portfolio_value += output[item]["value"][day]
+            output[item]["twr"][day] = (
+                output[item]["value"][day]
+                / (output[item]["value"][day - 1] - output[item]["settle"][day])
+                * output[item]["twr"][day - 1]
+            )
+
+        return portfolio_value
+
+    def _update_cash_and_portfolio(
+        self: Self,
+        day: int,
+        portfolio_value: float,
+        settle_value: float,
+        output: dict[str, dict[str, list[float]]],
+        name: str,
+    ) -> None:
+        """Update cash and portfolio values for a day.
+
+        Args:
+            day: Current day index.
+            portfolio_value: Total portfolio value (before cash).
+            settle_value: Total settle value.
+            output: Output dictionary to update.
+            name: Name of the portfolio.
+        """
+        output["cash"]["buysell_qty"][day] = settle_value
+        output["cash"]["position"][day] = (
+            output["cash"]["position"][day - 1]
+            * output["cash"][ValueType.PRICE][day]
+            / output["cash"][ValueType.PRICE][day - 1]
+            + output["cash"]["buysell_qty"][day]
+        )
+        output["cash"]["value"][day] = output["cash"]["position"][day]
+        total_portfolio_value = portfolio_value + output["cash"]["value"][day]
+        output[name]["position"][day] = output[name]["position"][day - 1]
+        output[name]["value"][day] = -total_portfolio_value
+        output[name]["twr"][day] = (
+            output[name]["value"][day] / output[name]["position"][day]
+        )
+        output[name][ValueType.PRICE][day] = output[name]["twr"][day]
+
+    def _build_rebalance_result(
+        self: Self,
+        output: dict[str, dict[str, list[float]]],
+        instruments: list[str],
+        subheaders: list[str | ValueType],
+    ) -> DataFrame:
+        """Build result DataFrame from output dictionary.
+
+        Args:
+            output: Output dictionary with all calculated values.
+            instruments: List of instrument names.
+            subheaders: List of subheader names.
+
+        Returns:
+            DataFrame with MultiIndex columns.
+        """
         result = DataFrame()
         for outvalue in output.values():
             result = concat(
                 [
                     result,
-                    DataFrame(
-                        data=outvalue,
-                        index=self.tsdf.index,
-                    ),
+                    DataFrame(data=outvalue, index=self.tsdf.index),
                 ],
                 axis="columns",
             )
@@ -1740,6 +1877,114 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             lvlone.extend([instr] * 6)
             lvltwo.extend(subheaders)
         result.columns = MultiIndex.from_arrays([lvlone, lvltwo])
+        return result
+
+    def rebalanced_portfolio(
+        self: Self,
+        name: str,
+        items: list[str] | None = None,
+        bal_weights: list[float] | None = None,
+        frequency: int = 1,
+        cash_index: OpenTimeSeries | None = None,
+        *,
+        equal_weights: bool = False,
+        drop_extras: bool = True,
+    ) -> OpenFrame:
+        """Create a rebalanced portfolio from the OpenFrame constituents.
+
+        Args:
+            name: Name of the portfolio.
+            items: List of items to include in the portfolio. If None, uses all items.
+                Optional.
+            bal_weights: List of weights for rebalancing. If None, uses frame weights.
+                Optional.
+            frequency: Rebalancing frequency. Defaults to 1.
+            cash_index: Cash index series for cash component. Optional.
+            equal_weights: If True, use equal weights for all items. Defaults to False.
+            drop_extras: If True, only return TWR series; if False, return all details.
+                Defaults to True.
+
+        Returns:
+            OpenFrame containing the rebalanced portfolio.
+        """
+        items, bal_weights = self._validate_and_prepare_rebalance_inputs(
+            items,
+            bal_weights,
+            equal_weights=equal_weights,
+        )
+
+        if cash_index:
+            cash_index.tsdf = cash_index.tsdf.reindex(self.tsdf.index)
+            cash_values: list[float] = cast(
+                "list[float]", cash_index.tsdf.iloc[:, 0].to_numpy().tolist()
+            )
+        else:
+            cash_values = [1.0] * self.length
+
+        if self.tsdf.isna().to_numpy().any():
+            self.value_nan_handle()
+
+        ccies = list({serie.currency for serie in self.constituents})
+        if len(ccies) != 1:
+            msg = "Items for portfolio must be denominated in same currency."
+            raise MultipleCurrenciesError(msg)
+        currency = ccies[0]
+
+        instruments = [*items, "cash", name]
+        subheaders = [
+            ValueType.PRICE,
+            "buysell_qty",
+            "position",
+            "value",
+            "twr",
+            "settle",
+        ]
+
+        output = self._initialize_rebalance_output(
+            items=items,
+            name=name,
+            cash_values=cash_values,
+        )
+
+        self._initialize_first_day_positions(
+            items=items,
+            bal_weights=bal_weights,
+            output=output,
+            name=name,
+        )
+
+        counter = 1
+        for day in range(1, self.length):
+            if day == frequency * counter:
+                portfolio_value, settle_value = self._process_rebalancing_day(
+                    day=day,
+                    items=items,
+                    bal_weights=bal_weights,
+                    output=output,
+                    name=name,
+                )
+                counter += 1
+            else:
+                portfolio_value = self._process_non_rebalancing_day(
+                    day=day,
+                    items=items,
+                    output=output,
+                )
+                settle_value = 0.0
+
+            self._update_cash_and_portfolio(
+                day=day,
+                portfolio_value=portfolio_value,
+                settle_value=settle_value,
+                output=output,
+                name=name,
+            )
+
+        result = self._build_rebalance_result(
+            output=output,
+            instruments=instruments,
+            subheaders=subheaders,
+        )
 
         series = []
         if drop_extras:

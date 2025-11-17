@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, patch
 from warnings import catch_warnings, filterwarnings
 
-from numpy import array, nan
+from numpy import array, bool_, float64, nan
 from pydantic import BaseModel
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -38,6 +38,7 @@ from openseries.owntypes import (
     DateAlignmentError,
     InitialValueZeroError,
     LabelsNotUniqueError,
+    LiteralCaptureRatio,
     LiteralPortfolioWeightings,
     MaxDiversificationNaNError,
     MaxDiversificationNegativeWeightsError,
@@ -301,13 +302,23 @@ class TestOpenFrame:
             msg = "json file not deleted as intended"
             raise FileExistsError(msg)
 
-    def test_to_xlsx(self: TestOpenFrame) -> None:
-        """Test to_xlsx method."""
-        filename = "trial.xlsx"
+    def _get_xlsx_basefile(self: TestOpenFrame, filename: str) -> Path:
+        """Get base file path for xlsx tests.
+
+        Args:
+            filename: Filename to use.
+
+        Returns:
+            Base file path.
+        """
         if Path.home().joinpath("Documents").exists():
-            basefile = Path.home().joinpath("Documents").joinpath(filename)
-        else:
-            basefile = Path(__file__).parent.joinpath(filename)
+            return Path.home().joinpath("Documents").joinpath(filename)
+        return Path(__file__).parent.joinpath(filename)
+
+    def test_to_xlsx_basic(self: TestOpenFrame) -> None:
+        """Test to_xlsx method basic functionality."""
+        filename = "trial.xlsx"
+        basefile = self._get_xlsx_basefile(filename)
 
         if Path(basefile).exists():
             msg = "test_save_to_xlsx test case setup failed."
@@ -327,6 +338,8 @@ class TestOpenFrame:
 
         seriesfile.unlink()
 
+    def test_to_xlsx_with_directory(self: TestOpenFrame) -> None:
+        """Test to_xlsx method with directory parameter."""
         directory = Path(__file__).parent
         seriesfile = Path(
             self.randomframe.to_xlsx(filename="trial.xlsx", directory=directory),
@@ -341,6 +354,11 @@ class TestOpenFrame:
         if Path(seriesfile).exists():
             msg = "xlsx file not deleted as intended"
             raise FileExistsError(msg)
+
+    def test_to_xlsx_errors(self: TestOpenFrame) -> None:
+        """Test to_xlsx method error cases."""
+        filename = "trial.xlsx"
+        basefile = self._get_xlsx_basefile(filename)
 
         with pytest.raises(
             expected_exception=NameError,
@@ -359,6 +377,9 @@ class TestOpenFrame:
 
         basefile.unlink()
 
+    def test_to_xlsx_read_back(self: TestOpenFrame) -> None:
+        """Test to_xlsx method reading back the file."""
+        filename = "trial.xlsx"
         localfile = Path(__file__).parent.joinpath(filename)
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
@@ -390,6 +411,9 @@ class TestOpenFrame:
 
         seriesfile.unlink()
 
+    def test_to_xlsx_mocked(self: TestOpenFrame) -> None:
+        """Test to_xlsx method with mocked paths."""
+        filename = "trial.xlsx"
         with (
             patch("pathlib.Path.exists") as mock_doesnotexist,
             patch(
@@ -1485,6 +1509,92 @@ class TestOpenFrame:
             msg = f"Unexpected result(s) from method correl_matrix()\n{pformat(dict1)}"
             raise OpenFrameTestError(msg)
 
+    def _verify_plot_data_alignment(
+        self: TestOpenFrame,
+        plotframe: OpenFrame,
+        fig_json: dict[str, Any],
+    ) -> None:
+        """Verify plot data alignment.
+
+        Args:
+            plotframe: Frame to check.
+            fig_json: Figure JSON data.
+
+        Raises:
+            OpenFrameTestError: If data is not aligned.
+        """
+        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
+        if rawdata != fig_json["data"][0]["x"][1:5]:
+            msg = "Unaligned data between original and data in Figure."
+            raise OpenFrameTestError(msg)
+
+    def _verify_plot_labels(
+        self: TestOpenFrame,
+        fig_json: dict[str, Any],
+        intended_labels: list[str],
+    ) -> None:
+        """Verify plot labels.
+
+        Args:
+            fig_json: Figure JSON data.
+            intended_labels: Expected labels.
+
+        Raises:
+            OpenFrameTestError: If labels don't match.
+        """
+        labels = [item["name"] for item in fig_json["data"]]
+        if labels != intended_labels:
+            msg = f"Manual setting of labels not working: {labels}"
+            raise OpenFrameTestError(msg)
+
+    def _verify_plot_logo(
+        self: TestOpenFrame,
+        fig_json: dict[str, Any],
+        logo: dict[str, Any],
+        method_name: str,
+    ) -> None:
+        """Verify plot logo.
+
+        Args:
+            fig_json: Figure JSON data.
+            logo: Logo dictionary.
+            method_name: Method name for error messages.
+
+        Raises:
+            OpenFrameTestError: If logo is not correct.
+        """
+        if logo == {}:
+            if fig_json["layout"]["images"][0] != logo:
+                msg = f"{method_name} add_logo argument not setup correctly"
+                raise OpenFrameTestError(msg)
+        elif fig_json["layout"]["images"][0]["source"] != logo["source"]:
+            msg = f"{method_name} add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+    def _verify_plot_title(
+        self: TestOpenFrame,
+        fig_json: dict[str, Any],
+        title: str | None,
+        method_name: str,
+    ) -> None:
+        """Verify plot title.
+
+        Args:
+            fig_json: Figure JSON data.
+            title: Expected title or None.
+            method_name: Method name for error messages.
+
+        Raises:
+            OpenFrameTestError: If title is not correct.
+        """
+        if title is None:
+            if fig_json["layout"]["title"].get("text", None):
+                msg = f"{method_name} title argument not setup correctly"
+                raise OpenFrameTestError(msg)
+        elif title not in fig_json["layout"]["title"]["text"]:
+            msg = f"{method_name} title argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
     def test_plot_series(self: TestOpenFrame) -> None:
         """Test plot_series method."""
         plotframe = self.randomframe.from_deepcopy()
@@ -1492,11 +1602,7 @@ class TestOpenFrame:
 
         fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
         fig_json = loads(cast("str", fig.to_json()))
-
-        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise OpenFrameTestError(msg)
+        self._verify_plot_data_alignment(plotframe, fig_json)
 
         fig_last, _ = plotframe.plot_series(
             auto_open=False,
@@ -1530,11 +1636,7 @@ class TestOpenFrame:
             labels=intended_labels,
         )
         fig_labels_json = loads(cast("str", fig_labels.to_json()))
-
-        labels = [item["name"] for item in fig_labels_json["data"]]
-        if labels != intended_labels:
-            msg = f"Manual setting of labels not working: {labels}"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_labels(fig_labels_json, intended_labels)
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
@@ -1550,14 +1652,7 @@ class TestOpenFrame:
             output_type="div",
         )
         fig_logo_json = loads(cast("str", fig_logo.to_json()))
-
-        if logo == {}:
-            if fig_logo_json["layout"]["images"][0] != logo:
-                msg = "plot_series add_logo argument not setup correctly"
-                raise OpenFrameTestError(msg)
-        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
-            msg = "plot_series add_logo argument not setup correctly"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_logo(fig_logo_json, logo, "plot_series")
 
         fig_nologo, _ = plotframe.plot_series(
             auto_open=False,
@@ -1576,10 +1671,7 @@ class TestOpenFrame:
             output_type="div",
         )
         fig_title_json = loads(cast("str", fig_title.to_json()))
-
-        if title not in fig_title_json["layout"]["title"]["text"]:
-            msg = "plot_series title argument not setup correctly"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_title(fig_title_json, title, "plot_series")
 
         fig_no_title, _ = plotframe.plot_series(
             auto_open=False,
@@ -1587,10 +1679,7 @@ class TestOpenFrame:
             output_type="div",
         )
         fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
-
-        if fig_no_title_json["layout"]["title"].get("text", None):
-            msg = "plot_series title argument not setup correctly"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_title(fig_no_title_json, None, "plot_series")
 
     def test_plot_series_filefolders(self: TestOpenFrame) -> None:
         """Test plot_series method with different file folder options."""
@@ -1657,10 +1746,7 @@ class TestOpenFrame:
             msg = "Data in Figure not as intended."
             raise OpenFrameTestError(msg)
 
-        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise OpenFrameTestError(msg)
+        self._verify_plot_data_alignment(plotframe, fig_json)
 
         intended_labels = ["a", "b", "c", "d", "e"]
         fig_labels, _ = plotframe.plot_bars(
@@ -1669,11 +1755,7 @@ class TestOpenFrame:
             labels=intended_labels,
         )
         fig_labels_json = loads(cast("str", fig_labels.to_json()))
-
-        labels = [item["name"] for item in fig_labels_json["data"]]
-        if labels != intended_labels:
-            msg = f"Manual setting of labels not working: {labels}"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_labels(fig_labels_json, intended_labels)
 
         with pytest.raises(
             expected_exception=NumberOfItemsAndLabelsNotSameError,
@@ -1701,14 +1783,7 @@ class TestOpenFrame:
             output_type="div",
         )
         fig_logo_json = loads(cast("str", fig_logo.to_json()))
-
-        if logo == {}:
-            if fig_logo_json["layout"]["images"][0] != logo:
-                msg = "plot_bars add_logo argument not setup correctly"
-                raise OpenFrameTestError(msg)
-        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
-            msg = "plot_bars add_logo argument not setup correctly"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_logo(fig_logo_json, logo, "plot_bars")
 
         fig_nologo, _ = plotframe.plot_bars(
             auto_open=False,
@@ -1727,10 +1802,7 @@ class TestOpenFrame:
             output_type="div",
         )
         fig_title_json = loads(cast("str", fig_title.to_json()))
-
-        if title not in fig_title_json["layout"]["title"]["text"]:
-            msg = "plot_bars title argument not setup correctly"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_title(fig_title_json, title, "plot_bars")
 
         fig_no_title, _ = plotframe.plot_bars(
             auto_open=False,
@@ -1738,10 +1810,7 @@ class TestOpenFrame:
             output_type="div",
         )
         fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
-
-        if fig_no_title_json["layout"]["title"].get("text", None):
-            msg = "plot_bars title argument not setup correctly"
-            raise OpenFrameTestError(msg)
+        self._verify_plot_title(fig_no_title_json, None, "plot_bars")
 
     def test_plot_bars_filefolders(self: TestOpenFrame) -> None:
         """Test plot_bars method with different file folder options."""
@@ -1794,8 +1863,8 @@ class TestOpenFrame:
 
         mockfilepath.unlink()
 
-    def test_plot_histogram_bars(self: TestOpenFrame) -> None:
-        """Test plot_histogram method with plot_type bars."""
+    def test_plot_histogram_bars_basic(self: TestOpenFrame) -> None:
+        """Test plot_histogram method basic structure."""
         plotframe = self.randomframe.from_deepcopy()
 
         fig_keys = [
@@ -1816,6 +1885,10 @@ class TestOpenFrame:
             msg = f"Data in Figure not as intended:\n{made_fig_keys}"
             raise OpenFrameTestError(msg)
 
+    def test_plot_histogram_bars_formatting(self: TestOpenFrame) -> None:
+        """Test plot_histogram method formatting."""
+        plotframe = self.randomframe.from_deepcopy()
+
         fig_fmt, _ = plotframe.plot_histogram(
             auto_open=False,
             output_type="div",
@@ -1826,6 +1899,10 @@ class TestOpenFrame:
         if x_tickfmt != ".2%":
             msg = f"X axis tick format not working: '{x_tickfmt}'"
             raise OpenFrameTestError(msg)
+
+    def test_plot_histogram_bars_labels(self: TestOpenFrame) -> None:
+        """Test plot_histogram method labels."""
+        plotframe = self.randomframe.from_deepcopy()
 
         intended_labels = ["a", "b", "c", "d", "e"]
         fig_labels, _ = plotframe.plot_histogram(
@@ -1845,7 +1922,11 @@ class TestOpenFrame:
         ):
             _, _ = plotframe.plot_histogram(auto_open=False, labels=["a", "b"])
 
+    def test_plot_histogram_bars_logo(self: TestOpenFrame) -> None:
+        """Test plot_histogram method logo."""
+        plotframe = self.randomframe.from_deepcopy()
         _, logo = load_plotly_dict()
+
         fig_logo, _ = plotframe.plot_histogram(
             auto_open=False,
             add_logo=True,
@@ -1869,6 +1950,10 @@ class TestOpenFrame:
         if fig_nologo_json["layout"].get("images", None):
             msg = "plot_histogram add_logo argument not setup correctly"
             raise OpenFrameTestError(msg)
+
+    def test_plot_histogram_bars_title(self: TestOpenFrame) -> None:
+        """Test plot_histogram method title."""
+        plotframe = self.randomframe.from_deepcopy()
 
         title = "My Plot"
         fig_title, _ = plotframe.plot_histogram(
@@ -1988,6 +2073,91 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
         mockpath.unlink()
 
+    def _verify_no_logo_source(
+        self: TestOpenFrame,
+        fig_json: dict[str, Any],
+        method_name: str,
+    ) -> None:
+        """Verify logo source is not present in figure.
+
+        Args:
+            fig_json: Figure JSON data.
+            method_name: Method name for error messages.
+
+        Raises:
+            OpenFrameTestError: If logo source is present.
+        """
+        if fig_json["layout"]["images"][0].get("source", None):
+            msg = f"{method_name} add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+    def _verify_logo_warning(
+        self: TestOpenFrame,
+        caplog: pytest.LogCaptureFixture,
+        method_name: str,
+        *,
+        include_pformat: bool = False,
+    ) -> None:
+        """Verify logo warning is logged.
+
+        Args:
+            caplog: Pytest log capture fixture.
+            method_name: Method name for error messages.
+            include_pformat: Whether to include pformat in error message.
+
+        Raises:
+            OpenFrameTestError: If warning is not logged correctly.
+        """
+        log_output = [
+            f"{record.levelname}:{record.name}:{record.message}"
+            for record in caplog.records
+        ]
+        if log_output and (
+            "WARNING:openseries.load_plotly:Failed to add logo image from URL"
+            not in log_output[0]
+        ):
+            if include_pformat:
+                msg = (
+                    f"{method_name}() method did not warn as "
+                    "expected when logo URL not working: "
+                    f"{pformat(log_output[0] if log_output else 'No logs')}"
+                )
+            else:
+                msg = (
+                    f"{method_name}() method did not warn as "
+                    "expected when logo URL not working"
+                )
+            raise OpenFrameTestError(msg)
+
+    def _check_logo_warning_for_plot(
+        self: TestOpenFrame,
+        plotframe: OpenFrame,
+        caplog: pytest.LogCaptureFixture,
+        method_name: str,
+        plot_method: str,
+        *,
+        include_pformat: bool = False,
+    ) -> None:
+        """Check logo warning for a plot method.
+
+        Args:
+            plotframe: Frame to plot.
+            caplog: Pytest log capture fixture.
+            method_name: Method name for error messages.
+            plot_method: Either 'series' or 'bars'.
+            include_pformat: Whether to include pformat in error message.
+
+        Raises:
+            OpenFrameTestError: If warning is not logged correctly.
+        """
+        caplog.clear()
+        with caplog.at_level(WARNING):
+            if plot_method == "series":
+                _, _ = plotframe.plot_series(auto_open=False, output_type="div")
+            else:
+                _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
+        self._verify_logo_warning(caplog, method_name, include_pformat=include_pformat)
+
     def test_plot_methods_mock_logo_url_fail(
         self: TestOpenFrame, caplog: pytest.LogCaptureFixture
     ) -> None:
@@ -2004,9 +2174,7 @@ class TestOpenFrame:
                 output_type="div",
             )
             seriesfig_json = loads(cast("str", seriesfig.to_json()))
-            if seriesfig_json["layout"]["images"][0].get("source", None):
-                msg = "plot_series add_logo argument not setup correctly"
-                raise OpenFrameTestError(msg)
+            self._verify_no_logo_source(seriesfig_json, "plot_series")
 
             barfig, _ = plotframe.plot_bars(
                 auto_open=False,
@@ -2014,81 +2182,24 @@ class TestOpenFrame:
                 output_type="div",
             )
             barfig_json = loads(cast("str", barfig.to_json()))
-            if barfig_json["layout"]["images"][0].get("source", None):
-                msg = "plot_bars add_logo argument not setup correctly"
-                raise OpenFrameTestError(msg)
+            self._verify_no_logo_source(barfig_json, "plot_bars")
 
-            caplog.clear()
-            with caplog.at_level(WARNING):
-                _, _ = plotframe.plot_series(auto_open=False, output_type="div")
-            log_output = [
-                f"{record.levelname}:{record.name}:{record.message}"
-                for record in caplog.records
-            ]
-            if log_output and (
-                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in log_output[0]
-            ):
-                msg = (
-                    "plot_series() method did not warn as "
-                    "expected when logo URL not working: "
-                    f"{pformat(log_output[0] if log_output else 'No logs')}"
-                )
-                raise OpenFrameTestError(msg)
-
-            caplog.clear()
-            with caplog.at_level(WARNING):
-                _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
-            log_output = [
-                f"{record.levelname}:{record.name}:{record.message}"
-                for record in caplog.records
-            ]
-            if log_output and (
-                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in log_output[0]
-            ):
-                msg = (
-                    "plot_bars() method did not warn as "
-                    "expected when logo URL not working"
-                )
-                raise OpenFrameTestError(msg)
+            self._check_logo_warning_for_plot(
+                plotframe, caplog, "plot_series", "series", include_pformat=True
+            )
+            self._check_logo_warning_for_plot(
+                plotframe, caplog, "plot_bars", "bars", include_pformat=False
+            )
 
         with patch("requests.head") as mock_statuscode:
             mock_statuscode.return_value.status_code = 400
 
-            caplog.clear()
-            with caplog.at_level(WARNING):
-                _, _ = plotframe.plot_series(auto_open=False, output_type="div")
-            log_output = [
-                f"{record.levelname}:{record.name}:{record.message}"
-                for record in caplog.records
-            ]
-            if log_output and (
-                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in log_output[0]
-            ):
-                msg = (
-                    "plot_series() method did not warn as "
-                    "expected when logo URL not working"
-                )
-                raise OpenFrameTestError(msg)
-
-            caplog.clear()
-            with caplog.at_level(WARNING):
-                _, _ = plotframe.plot_bars(auto_open=False, output_type="div")
-            log_output = [
-                f"{record.levelname}:{record.name}:{record.message}"
-                for record in caplog.records
-            ]
-            if log_output and (
-                "WARNING:openseries.load_plotly:Failed to add logo image from URL"
-                not in log_output[0]
-            ):
-                msg = (
-                    "plot_bars() method did not warn as "
-                    "expected when logo URL not working"
-                )
-                raise OpenFrameTestError(msg)
+            self._check_logo_warning_for_plot(
+                plotframe, caplog, "plot_series", "series", include_pformat=False
+            )
+            self._check_logo_warning_for_plot(
+                plotframe, caplog, "plot_bars", "bars", include_pformat=False
+            )
 
         with patch("requests.head") as mock_statuscode:
             mock_statuscode.return_value.status_code = 200
@@ -3074,44 +3185,151 @@ class TestOpenFrame:
             msg = "Result from capture_ratio_func() not as expected."
             raise OpenFrameTestError(msg)
 
-        upfixed = cframe.capture_ratio_func(ratio="up", periods_in_a_year_fixed=12)
+    def test_capture_ratio_edge_cases(self: TestOpenFrame) -> None:
+        """Test capture_ratio_func edge cases for coverage."""
+        dates: list[str] = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04"]
 
-        if f"{upfixed.iloc[0]:.12f}" != "1.063217236138":
-            msg = "Result from capture_ratio_func() not as expected."
-            raise OpenFrameTestError(msg)
-
-        if f"{upp.iloc[0]:.2f}" != f"{upfixed.iloc[0]:.2f}":
-            msg = "Result from capture_ratio_func() not as expected."
-            raise OpenFrameTestError(msg)
-
-        uptuple = cframe.capture_ratio_func(
-            ratio="up",
-            base_column=("indxx", ValueType.PRICE),
+        asset_all_negative = OpenTimeSeries.from_arrays(
+            name="asset_neg",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, -0.01, -0.02, -0.01],
         )
 
-        if f"{uptuple.iloc[0]:.12f}" != "1.063842457805":
-            msg = "Result from capture_ratio_func() not as expected."
+        benchmark_all_negative = OpenTimeSeries.from_arrays(
+            name="bench_neg",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, -0.01, -0.02, -0.01],
+        )
+
+        frame_all_negative = OpenFrame(
+            constituents=[asset_all_negative, benchmark_all_negative]
+        ).to_cumret()
+
+        up_ratio = frame_all_negative.capture_ratio_func(ratio="up")
+        if up_ratio.iloc[0] != 0.0:
+            msg = "Up ratio with all negative returns should return 0.0"
             raise OpenFrameTestError(msg)
 
-        if f"{upp.iloc[0]:.12f}" != f"{uptuple.iloc[0]:.12f}":
-            msg = "Result from capture_ratio_func() not as expected."
+        asset_all_positive = OpenTimeSeries.from_arrays(
+            name="asset_pos",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, 0.01, 0.02, 0.01],
+        )
+
+        benchmark_zero_up = OpenTimeSeries.from_arrays(
+            name="bench_zero",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, 0.0, 0.0, 0.0],
+        )
+
+        frame_zero_up = OpenFrame(
+            constituents=[asset_all_positive, benchmark_zero_up]
+        ).to_cumret()
+
+        up_ratio_zero = frame_zero_up.capture_ratio_func(ratio="up")
+        if up_ratio_zero.iloc[0] != 0.0:
+            msg = "Up ratio with zero benchmark up return should return 0.0"
             raise OpenFrameTestError(msg)
 
-        with pytest.raises(
-            expected_exception=TypeError,
-            match=r"base_column should be a tuple",
-        ):
-            _ = cframe.capture_ratio_func(
-                ratio="up",
-                base_column=cast("tuple[str, ValueType] | int", "string"),
-            )
+        asset_all_negative2 = OpenTimeSeries.from_arrays(
+            name="asset_neg2",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, -0.01, -0.02, -0.01],
+        )
 
+        benchmark_zero_down = OpenTimeSeries.from_arrays(
+            name="bench_zero2",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, 0.0, 0.0, 0.0],
+        )
+
+        frame_zero_down = OpenFrame(
+            constituents=[asset_all_negative2, benchmark_zero_down]
+        ).to_cumret()
+
+        down_ratio_zero = frame_zero_down.capture_ratio_func(ratio="down")
+        if down_ratio_zero.iloc[0] != 0.0:
+            msg = "Down ratio with zero benchmark down return should return 0.0"
+            raise OpenFrameTestError(msg)
+
+        asset_mixed = OpenTimeSeries.from_arrays(
+            name="asset_mixed",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, 0.01, -0.01, 0.01],
+        )
+
+        benchmark_zero_both = OpenTimeSeries.from_arrays(
+            name="bench_zero3",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=dates,
+            values=[0.0, 0.0, 0.0, 0.0],
+        )
+
+        frame_zero_both = OpenFrame(
+            constituents=[asset_mixed, benchmark_zero_both]
+        ).to_cumret()
+
+        both_ratio_zero = frame_zero_both.capture_ratio_func(ratio="both")
+        if both_ratio_zero.iloc[0] != 0.0:
+            msg = "Both ratio with zero benchmark returns should return 0.0"
+            raise OpenFrameTestError(msg)
+
+        asset_fixed = OpenTimeSeries.from_arrays(
+            name="asset_fixed",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=["2023-01-01", "2023-01-02", "2023-01-03"],
+            values=[0.0, 0.01, -0.01],
+        )
+        benchmark_fixed = OpenTimeSeries.from_arrays(
+            name="bench_fixed",
+            baseccy="USD",
+            valuetype=ValueType.RTRN,
+            dates=["2023-01-01", "2023-01-02", "2023-01-03"],
+            values=[0.0, 0.02, -0.02],
+        )
+        frame_fixed = OpenFrame(
+            constituents=[asset_fixed, benchmark_fixed]
+        ).to_cumret()
+
+        result_fixed = frame_fixed.capture_ratio_func(
+            ratio="up", periods_in_a_year_fixed=252
+        )
+        if result_fixed.iloc[0] == 0.0:
+            msg = "Capture ratio with fixed periods should not be zero"
+            raise OpenFrameTestError(msg)
+
+        invalid_frame = OpenFrame(
+            constituents=[asset_mixed, benchmark_zero_both]
+        ).to_cumret()
+
+        invalid_ratio = cast("LiteralCaptureRatio", "invalid")
         with pytest.raises(
             expected_exception=RatioInputError,
             match=r"ratio must be one of 'up', 'down' or 'both'.",
         ):
-            _ = cframe.capture_ratio_func(
-                ratio=cast("Literal['up', 'down', 'both']", "boo"),
+            invalid_frame._calculate_capture_ratio_for_item(  # noqa: SLF001
+                ratio=invalid_ratio,
+                longdf_returns_np=array([0.01, -0.01, 0.01], dtype=float64),
+                shortdf_returns_np=array([0.0, 0.0, 0.0], dtype=float64),
+                up_mask=array([True, False, True], dtype=bool_),
+                down_mask=array([False, True, False], dtype=bool_),
+                time_factor=252.0,
             )
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
@@ -3418,10 +3636,9 @@ class TestOpenFrame:
             msg = "Method to_cumret() not working as intended"
             raise OpenFrameTestError(msg)
 
-    def test_miscellaneous(self: TestOpenFrame) -> None:
-        """Test miscellaneous methods."""
+    def test_miscellaneous_fixed_periods(self: TestOpenFrame) -> None:
+        """Test miscellaneous methods with fixed periods."""
         zero_str: str = "0"
-        zero_float: float = 0.0
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
 
@@ -3441,6 +3658,19 @@ class TestOpenFrame:
                         "Difference with or without fixed periods in year is too great"
                     )
                     raise OpenFrameTestError(msg)
+
+    def test_miscellaneous_date_arguments(self: TestOpenFrame) -> None:
+        """Test miscellaneous methods with date arguments."""
+        mframe = self.randomframe.from_deepcopy()
+        mframe.to_cumret()
+
+        methods = [
+            mframe.arithmetic_ret_func,
+            mframe.vol_func,
+            mframe.vol_from_var_func,
+            mframe.lower_partial_moment_func,
+            mframe.target_weight_from_var,
+        ]
         for methd in methods:
             dated = methd(  # type: ignore[operator]
                 from_date=mframe.first_idx,
@@ -3455,6 +3685,11 @@ class TestOpenFrame:
                     )
                     raise OpenFrameTestError(msg)
 
+    def test_miscellaneous_value_ret(self: TestOpenFrame) -> None:
+        """Test value_ret_func method."""
+        mframe = self.randomframe.from_deepcopy()
+        mframe.to_cumret()
+
         ret = [f"{rr:.9f}" for rr in cast("Series", mframe.value_ret_func())]
         if ret != [
             "0.640115926",
@@ -3465,6 +3700,11 @@ class TestOpenFrame:
         ]:
             msg = f"Results from value_ret_func() not as expected\n{ret}"
             raise OpenFrameTestError(msg)
+
+    def test_miscellaneous_vol_from_var(self: TestOpenFrame) -> None:
+        """Test vol_from_var_func method."""
+        mframe = self.randomframe.from_deepcopy()
+        mframe.to_cumret()
 
         impvol = [
             f"{iv:.11f}"
@@ -3494,6 +3734,12 @@ class TestOpenFrame:
         ]:
             msg = f"Results from vol_from_var_func() not as expected\n{impvoldrifted}"
             raise OpenFrameTestError(msg)
+
+    def test_miscellaneous_zero_value_error(self: TestOpenFrame) -> None:
+        """Test miscellaneous methods with zero value error."""
+        zero_float: float = 0.0
+        mframe = self.randomframe.from_deepcopy()
+        mframe.to_cumret()
 
         mframe.tsdf.iloc[0, 2] = zero_float
 

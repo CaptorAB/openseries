@@ -70,45 +70,18 @@ def calendar_period_returns(
     return cldr
 
 
-def report_html(
-    data: OpenFrame,
-    bar_freq: LiteralBizDayFreq = "BYE",
-    filename: str | None = None,
-    title: str | None = None,
-    directory: Path | None = None,
-    output_type: LiteralPlotlyOutput = "file",
-    include_plotlyjs: LiteralPlotlyJSlib = "cdn",
-    *,
-    auto_open: bool = False,
-    add_logo: bool = True,
-    vertical_legend: bool = True,
-) -> tuple[Figure, str]:
-    """Generate a HTML report page with line and bar plots and a table.
+def _get_report_properties_and_labels(
+    yearfrac: float,
+) -> tuple[list[str], list[str], list[str]]:
+    """Get properties and labels based on year fraction.
 
     Args:
-        data: The timeseries data.
-        bar_freq: The date offset string that sets the bar plot frequency.
-        filename: Name of the Plotly HTML file.
-        title: The report page title.
-        directory: Directory where Plotly HTML file is saved.
-        output_type: Determines output type. Defaults to "file".
-        include_plotlyjs: Determines how the plotly.js library is included in
-            the output.
-            Defaults to "cdn".
-        auto_open: Determines whether to open a browser window with the plot.
-            Defaults to False.
-        add_logo: If True a Captor logo is added to the plot. Defaults to True.
-        vertical_legend: Determines whether to vertically align the legend's
-            labels. Defaults to True.
+        yearfrac: Year fraction to determine report type.
 
     Returns:
-        Plotly Figure and a div section or a HTML filename with location.
-
+        Tuple of (properties, labels_init, labels_final).
     """
-    copied = data.from_deepcopy()
-    copied.trunc_frame().value_nan_handle().to_cumret()
-
-    if copied.yearfrac > 1.0:
+    if yearfrac > 1.0:
         properties = [
             "geo_ret",
             "vol",
@@ -187,6 +160,414 @@ def report_html(
             "Comparison End",
         ]
 
+    return properties, labels_init, labels_final
+
+
+def _add_jensen_alpha_to_report(
+    copied: OpenFrame,
+    rpt_df: DataFrame,
+) -> DataFrame:
+    """Add Jensen's Alpha to report DataFrame.
+
+    Args:
+        copied: Copied OpenFrame data.
+        rpt_df: Report DataFrame to update.
+
+    Returns:
+        Updated report DataFrame.
+    """
+    alpha_frame = copied.from_deepcopy()
+    alpha_frame.to_cumret()
+    with catch_warnings():
+        simplefilter("ignore")
+        alphas: list[str | float] = [
+            alpha_frame.jensen_alpha(
+                asset=(aname, ValueType.PRICE),
+                market=(alpha_frame.columns_lvl_zero[-1], ValueType.PRICE),
+                riskfree_rate=0.0,
+            )
+            for aname in alpha_frame.columns_lvl_zero[:-1]
+        ]
+    alphas.append("")
+    ar = DataFrame(
+        data=alphas,
+        index=copied.tsdf.columns,
+        columns=["Jensen's Alpha"],
+    ).T
+    return concat([rpt_df, ar])
+
+
+def _add_tracking_error_to_report(
+    copied: OpenFrame,
+    rpt_df: DataFrame,
+) -> DataFrame:
+    """Add Tracking Error to report DataFrame.
+
+    Args:
+        copied: Copied OpenFrame data.
+        rpt_df: Report DataFrame to update.
+
+    Returns:
+        Updated report DataFrame.
+    """
+    te_frame = copied.from_deepcopy()
+    te_frame.resample("7D")
+    with catch_warnings():
+        simplefilter("ignore")
+        te: Series[float] | Series[str] = te_frame.tracking_error_func()
+    if te.hasnans:
+        te = Series(
+            data=[""] * te_frame.item_count,
+            index=te_frame.tsdf.columns,
+            name="Tracking Error (weekly)",
+        )
+    else:
+        te.iloc[-1] = None
+        te.name = "Tracking Error (weekly)"
+    te_df = te.to_frame().T
+    return concat([rpt_df, te_df])
+
+
+def _add_capture_ratio_to_report(
+    copied: OpenFrame,
+    rpt_df: DataFrame,
+    formats: list[str],
+) -> tuple[DataFrame, list[str]]:
+    """Add Capture Ratio to report DataFrame.
+
+    Args:
+        copied: Copied OpenFrame data.
+        rpt_df: Report DataFrame to update.
+        formats: Format strings list to update.
+
+    Returns:
+        Tuple of (updated report DataFrame, updated formats).
+    """
+    crm = copied.from_deepcopy()
+    crm.resample("ME")
+    cru_save = Series(
+        data=[""] * crm.item_count,
+        index=crm.tsdf.columns,
+        name="Capture Ratio (monthly)",
+    )
+    with catch_warnings():
+        simplefilter("ignore")
+        try:
+            cru: Series[float] | Series[str] = crm.capture_ratio_func(ratio="both")
+        except ZeroDivisionError as exc:  # pragma: no cover
+            msg = f"Capture ratio calculation error: {exc!s}"  # pragma: no cover
+            logger.warning(msg)  # pragma: no cover
+            cru = cru_save  # pragma: no cover
+    if cru.hasnans:
+        cru = cru_save
+    else:
+        cru.iloc[-1] = None
+        cru.name = "Capture Ratio (monthly)"
+    cru_df = cru.to_frame().T
+    rpt_df = concat([rpt_df, cru_df])
+    formats.append("{:.2f}")
+    return rpt_df, formats
+
+
+def _add_beta_to_report(
+    copied: OpenFrame,
+    rpt_df: DataFrame,
+) -> DataFrame:
+    """Add Index Beta to report DataFrame.
+
+    Args:
+        copied: Copied OpenFrame data.
+        rpt_df: Report DataFrame to update.
+
+    Returns:
+        Updated report DataFrame.
+    """
+    beta_frame = copied.from_deepcopy()
+    beta_frame.resample("7D").value_nan_handle("drop")
+    beta_frame.to_cumret()
+    betas: list[str | float] = [
+        beta_frame.beta(
+            asset=(bname, ValueType.PRICE),
+            market=(beta_frame.columns_lvl_zero[-1], ValueType.PRICE),
+        )
+        for bname in beta_frame.columns_lvl_zero[:-1]
+    ]
+    betas.append("")
+    br = DataFrame(
+        data=betas,
+        index=copied.tsdf.columns,
+        columns=["Index Beta (weekly)"],
+    ).T
+    return concat([rpt_df, br])
+
+
+def _build_report_dataframe(
+    copied: OpenFrame,
+    properties: list[str],
+    formats: list[str],
+    yearfrac: float,
+) -> tuple[DataFrame, list[str]]:
+    """Build the complete report DataFrame.
+
+    Args:
+        copied: Copied OpenFrame data.
+        properties: List of properties to include.
+        formats: Format strings for values.
+        yearfrac: Year fraction to determine if capture ratio is included.
+
+    Returns:
+        Tuple of (report DataFrame, updated formats).
+    """
+    rpt_df = copied.all_properties(
+        properties=cast("list[LiteralFrameProps]", properties),
+    )
+
+    rpt_df = _add_jensen_alpha_to_report(copied, rpt_df)
+
+    ir = copied.info_ratio_func()
+    ir.name = "Information Ratio"
+    ir.iloc[-1] = None
+    ir_df = ir.to_frame().T
+    rpt_df = concat([rpt_df, ir_df])
+
+    rpt_df = _add_tracking_error_to_report(copied, rpt_df)
+
+    if yearfrac > 1.0:
+        rpt_df, formats = _add_capture_ratio_to_report(copied, rpt_df, formats)
+
+    rpt_df = _add_beta_to_report(copied, rpt_df)
+
+    return rpt_df, formats
+
+
+def _format_report_dataframe(
+    rpt_df: DataFrame,
+    formats: list[str],
+    labels_init: list[str],
+    labels_final: list[str],
+    copied: OpenFrame,
+) -> DataFrame:
+    """Format the report DataFrame with labels and calendar period returns.
+
+    Args:
+        rpt_df: Report DataFrame to format.
+        formats: Format strings for values.
+        labels_init: Initial labels for rows.
+        labels_final: Final labels for rows.
+        copied: Copied OpenFrame data.
+
+    Returns:
+        Formatted report DataFrame.
+    """
+    for item, f in zip(rpt_df.index, formats, strict=False):
+        rpt_df.loc[item] = rpt_df.loc[item].apply(
+            lambda x, fmt=f: str(x)
+            if (isinstance(x, str) or x is None)
+            else fmt.format(x),
+        )
+
+    rpt_df.index = Index(labels_init)
+
+    this_year = copied.last_idx.year
+    this_month = copied.last_idx.month
+    ytd = copied.value_ret_calendar_period(year=this_year).map("{:.2%}".format)
+    ytd.name = "Year-to-Date"
+    mtd = copied.value_ret_calendar_period(year=this_year, month=this_month).map(
+        "{:.2%}".format,
+    )
+    mtd.name = "Month-to-Date"
+    ytd_df = ytd.to_frame().T
+    mtd_df = mtd.to_frame().T
+    rpt_df = concat([rpt_df, ytd_df])
+    rpt_df = concat([rpt_df, mtd_df])
+    rpt_df = rpt_df.reindex(labels_final)
+
+    rpt_df.index = Index([f"<b>{x}</b>" for x in rpt_df.index])
+    return rpt_df.reset_index()
+
+
+def _prepare_table_data(
+    rpt_df: DataFrame,
+    copied: OpenFrame,
+) -> tuple[list[list[str]], list[str], list[str], list[str]]:
+    """Prepare table data for Plotly table.
+
+    Args:
+        rpt_df: Formatted report DataFrame.
+        copied: Copied OpenFrame data.
+
+    Returns:
+        Tuple of (cleaned table values, columns, aligning, color_lst).
+    """
+    colmns = ["", *copied.columns_lvl_zero]
+    columns = [f"<b>{x}</b>" for x in colmns]
+    aligning = ["left"] + ["center"] * (len(columns) - 1)
+
+    col_even_color = "lightgrey"
+    col_odd_color = "white"
+    color_lst = ["grey"] + [col_odd_color] * (copied.item_count - 1) + [col_even_color]
+
+    tablevalues = rpt_df.transpose().to_numpy().tolist()
+    cleanedtablevalues = list(tablevalues)[:-1]
+    cleanedcol = [
+        valu if valu not in ["nan", "nan%"] else "" for valu in tablevalues[-1]
+    ]
+    cleanedtablevalues.append(cleanedcol)
+
+    return cleanedtablevalues, columns, aligning, color_lst
+
+
+def _configure_figure_layout(
+    figure: Figure,
+    copied: OpenFrame,
+    *,
+    add_logo: bool,
+    vertical_legend: bool,
+    title: str | None,
+) -> None:
+    """Configure figure layout with logo, legend, and title.
+
+    Args:
+        figure: Plotly figure to configure.
+        copied: Copied OpenFrame data.
+        add_logo: Whether to add logo.
+        vertical_legend: Whether to use vertical legend.
+        title: Optional title for the figure.
+    """
+    fig, logo = load_plotly_dict()
+
+    if add_logo:
+        figure.add_layout_image(logo)
+
+    figure.update_layout(fig.get("layout"))
+    colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
+        "colorway",
+        [],
+    )
+
+    if vertical_legend:
+        legend = {
+            "yanchor": "bottom",
+            "y": -0.04,
+            "xanchor": "right",
+            "x": 0.98,
+            "orientation": "v",
+        }
+    else:
+        legend = {
+            "yanchor": "bottom",
+            "y": -0.2,
+            "xanchor": "right",
+            "x": 0.98,
+            "orientation": "h",
+        }
+
+    figure.update_layout(
+        legend=legend,
+        colorway=colorway[: copied.item_count],
+    )
+    figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
+    figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
+
+    if title:
+        figure.update_layout(
+            {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
+        )
+
+
+def _generate_output(
+    figure: Figure,
+    filename: str,
+    output_type: LiteralPlotlyOutput,
+    *,
+    auto_open: bool,
+    include_plotlyjs: LiteralPlotlyJSlib,
+    plotfile: Path,
+) -> str:
+    """Generate output string based on output type.
+
+    Args:
+        figure: Plotly figure.
+        filename: Output filename.
+        output_type: Type of output to generate.
+        auto_open: Whether to auto-open file.
+        include_plotlyjs: How to include plotly.js.
+        plotfile: Path to plot file.
+
+    Returns:
+        Output string (filename or HTML div).
+    """
+    fig, _ = load_plotly_dict()
+
+    if output_type == "file":
+        plot(
+            figure_or_data=figure,
+            filename=str(plotfile),
+            auto_open=auto_open,
+            auto_play=False,
+            link_text="",
+            include_plotlyjs=include_plotlyjs,
+            output_type=output_type,
+            config=fig["config"],
+        )
+        return str(plotfile)
+
+    div_id = filename.split(sep=".")[0]
+    return cast(
+        "str",
+        to_html(
+            fig=figure,
+            div_id=div_id,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=include_plotlyjs,
+            config=fig["config"],
+        ),
+    )
+
+
+def report_html(
+    data: OpenFrame,
+    bar_freq: LiteralBizDayFreq = "BYE",
+    filename: str | None = None,
+    title: str | None = None,
+    directory: Path | None = None,
+    output_type: LiteralPlotlyOutput = "file",
+    include_plotlyjs: LiteralPlotlyJSlib = "cdn",
+    *,
+    auto_open: bool = False,
+    add_logo: bool = True,
+    vertical_legend: bool = True,
+) -> tuple[Figure, str]:
+    """Generate a HTML report page with line and bar plots and a table.
+
+    Args:
+        data: The timeseries data.
+        bar_freq: The date offset string that sets the bar plot frequency.
+        filename: Name of the Plotly HTML file.
+        title: The report page title.
+        directory: Directory where Plotly HTML file is saved.
+        output_type: Determines output type. Defaults to "file".
+        include_plotlyjs: Determines how the plotly.js library is included in
+            the output.
+            Defaults to "cdn".
+        auto_open: Determines whether to open a browser window with the plot.
+            Defaults to False.
+        add_logo: If True a Captor logo is added to the plot. Defaults to True.
+        vertical_legend: Determines whether to vertically align the legend's
+            labels. Defaults to True.
+
+    Returns:
+        Plotly Figure and a div section or a HTML filename with location.
+
+    """
+    copied = data.from_deepcopy()
+    copied.trunc_frame().value_nan_handle().to_cumret()
+
+    properties, labels_init, labels_final = _get_report_properties_and_labels(
+        copied.yearfrac
+    )
+
     figure = make_subplots(
         rows=2,
         cols=2,
@@ -242,132 +623,25 @@ def report_html(
         "{:.2f}",
     ]
 
-    rpt_df = copied.all_properties(
-        properties=cast("list[LiteralFrameProps]", properties),
+    rpt_df, formats = _build_report_dataframe(
+        copied=copied,
+        properties=properties,
+        formats=formats,
+        yearfrac=copied.yearfrac,
     )
-    alpha_frame = copied.from_deepcopy()
-    alpha_frame.to_cumret()
-    with catch_warnings():
-        simplefilter("ignore")
-        alphas: list[str | float] = [
-            alpha_frame.jensen_alpha(
-                asset=(aname, ValueType.PRICE),
-                market=(alpha_frame.columns_lvl_zero[-1], ValueType.PRICE),
-                riskfree_rate=0.0,
-            )
-            for aname in alpha_frame.columns_lvl_zero[:-1]
-        ]
-    alphas.append("")
-    ar = DataFrame(
-        data=alphas,
-        index=copied.tsdf.columns,
-        columns=["Jensen's Alpha"],
-    ).T
-    rpt_df = concat([rpt_df, ar])
-    ir = copied.info_ratio_func()
-    ir.name = "Information Ratio"
-    ir.iloc[-1] = None
-    ir_df = ir.to_frame().T
-    rpt_df = concat([rpt_df, ir_df])
-    te_frame = copied.from_deepcopy()
-    te_frame.resample("7D")
-    with catch_warnings():
-        simplefilter("ignore")
-        te: Series[float] | Series[str] = te_frame.tracking_error_func()
-    if te.hasnans:
-        te = Series(
-            data=[""] * te_frame.item_count,
-            index=te_frame.tsdf.columns,
-            name="Tracking Error (weekly)",
-        )
-    else:
-        te.iloc[-1] = None
-        te.name = "Tracking Error (weekly)"
-    te_df = te.to_frame().T
-    rpt_df = concat([rpt_df, te_df])
 
-    if copied.yearfrac > 1.0:
-        crm = copied.from_deepcopy()
-        crm.resample("ME")
-        cru_save = Series(
-            data=[""] * crm.item_count,
-            index=crm.tsdf.columns,
-            name="Capture Ratio (monthly)",
-        )
-        with catch_warnings():
-            simplefilter("ignore")
-            try:
-                cru: Series[float] | Series[str] = crm.capture_ratio_func(ratio="both")
-            except ZeroDivisionError as exc:  # pragma: no cover
-                msg = f"Capture ratio calculation error: {exc!s}"  # pragma: no cover
-                logger.warning(msg)  # pragma: no cover
-                cru = cru_save  # pragma: no cover
-        if cru.hasnans:
-            cru = cru_save
-        else:
-            cru.iloc[-1] = None
-            cru.name = "Capture Ratio (monthly)"
-        cru_df = cru.to_frame().T
-        rpt_df = concat([rpt_df, cru_df])
-        formats.append("{:.2f}")
-    beta_frame = copied.from_deepcopy()
-    beta_frame.resample("7D").value_nan_handle("drop")
-    beta_frame.to_cumret()
-    betas: list[str | float] = [
-        beta_frame.beta(
-            asset=(bname, ValueType.PRICE),
-            market=(beta_frame.columns_lvl_zero[-1], ValueType.PRICE),
-        )
-        for bname in beta_frame.columns_lvl_zero[:-1]
-    ]
-    betas.append("")
-    br = DataFrame(
-        data=betas,
-        index=copied.tsdf.columns,
-        columns=["Index Beta (weekly)"],
-    ).T
-    rpt_df = concat([rpt_df, br])
-
-    for item, f in zip(rpt_df.index, formats, strict=False):
-        rpt_df.loc[item] = rpt_df.loc[item].apply(
-            lambda x, fmt=f: str(x)
-            if (isinstance(x, str) or x is None)
-            else fmt.format(x),
-        )
-
-    rpt_df.index = Index(labels_init)
-
-    this_year = copied.last_idx.year
-    this_month = copied.last_idx.month
-    ytd = copied.value_ret_calendar_period(year=this_year).map("{:.2%}".format)
-    ytd.name = "Year-to-Date"
-    mtd = copied.value_ret_calendar_period(year=this_year, month=this_month).map(
-        "{:.2%}".format,
+    rpt_df = _format_report_dataframe(
+        rpt_df=rpt_df,
+        formats=formats,
+        labels_init=labels_init,
+        labels_final=labels_final,
+        copied=copied,
     )
-    mtd.name = "Month-to-Date"
-    ytd_df = ytd.to_frame().T
-    mtd_df = mtd.to_frame().T
-    rpt_df = concat([rpt_df, ytd_df])
-    rpt_df = concat([rpt_df, mtd_df])
-    rpt_df = rpt_df.reindex(labels_final)
 
-    rpt_df.index = Index([f"<b>{x}</b>" for x in rpt_df.index])
-    rpt_df = rpt_df.reset_index()
-
-    colmns = ["", *copied.columns_lvl_zero]
-    columns = [f"<b>{x}</b>" for x in colmns]
-    aligning = ["left"] + ["center"] * (len(columns) - 1)
-
-    col_even_color = "lightgrey"
-    col_odd_color = "white"
-    color_lst = ["grey"] + [col_odd_color] * (copied.item_count - 1) + [col_even_color]
-
-    tablevalues = rpt_df.transpose().to_numpy().tolist()
-    cleanedtablevalues = list(tablevalues)[:-1]
-    cleanedcol = [
-        valu if valu not in ["nan", "nan%"] else "" for valu in tablevalues[-1]
-    ]
-    cleanedtablevalues.append(cleanedcol)
+    cleanedtablevalues, columns, aligning, color_lst = _prepare_table_data(
+        rpt_df=rpt_df,
+        copied=copied,
+    )
 
     figure.add_table(
         header={
@@ -399,67 +673,21 @@ def report_html(
 
     plotfile = dirpath / filename
 
-    fig, logo = load_plotly_dict()
-
-    if add_logo:
-        figure.add_layout_image(logo)
-
-    figure.update_layout(fig.get("layout"))
-    colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
-        "colorway",
-        [],
+    _configure_figure_layout(
+        figure,
+        copied,
+        add_logo=add_logo,
+        vertical_legend=vertical_legend,
+        title=title,
     )
 
-    if vertical_legend:
-        legend = {
-            "yanchor": "bottom",
-            "y": -0.04,
-            "xanchor": "right",
-            "x": 0.98,
-            "orientation": "v",
-        }
-    else:
-        legend = {
-            "yanchor": "bottom",
-            "y": -0.2,
-            "xanchor": "right",
-            "x": 0.98,
-            "orientation": "h",
-        }
-
-    figure.update_layout(
-        legend=legend,
-        colorway=colorway[: copied.item_count],
+    string_output = _generate_output(
+        figure,
+        filename,
+        output_type,
+        auto_open=auto_open,
+        include_plotlyjs=include_plotlyjs,
+        plotfile=plotfile,
     )
-    figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
-    figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
-
-    if title:
-        figure.update_layout(
-            {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
-        )
-
-    if output_type == "file":
-        plot(
-            figure_or_data=figure,
-            filename=str(plotfile),
-            auto_open=auto_open,
-            auto_play=False,
-            link_text="",
-            include_plotlyjs=include_plotlyjs,
-            output_type=output_type,
-            config=fig["config"],
-        )
-        string_output = str(plotfile)
-    else:
-        div_id = filename.split(sep=".")[0]
-        string_output = to_html(
-            fig=figure,
-            div_id=div_id,
-            auto_play=False,
-            full_html=False,
-            include_plotlyjs=include_plotlyjs,
-            config=fig["config"],
-        )
 
     return figure, string_output

@@ -120,9 +120,8 @@ exclude = ["docs"]
 select = ["ALL"]
 ignore = ["COM812"]
 fixable = ["ALL"]
-mccabe = { max-complexity = 19 }
 pydocstyle = { convention = "google" }
-pylint = { max-args = 20, max-branches = 23, max-statements = 130 }
+pylint = { max-args = 20, max-branches = 12, max-statements = 48 }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
