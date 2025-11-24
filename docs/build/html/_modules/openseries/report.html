@@ -180,47 +180,18 @@
     <span class="k">return</span> <span class="n">cldr</span>
 
 
-<div class="viewcode-block" id="report_html">
-<a class="viewcode-back" href="../../api/report.html#openseries.report_html">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">report_html</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
-    <span class="n">bar_freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">&quot;BYE&quot;</span><span class="p">,</span>
-    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
-    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">vertical_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a HTML report page with line and bar plots and a table.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_report_properties_and_labels</span><span class="p">(</span>
+    <span class="n">yearfrac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get properties and labels based on year fraction.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        data: The timeseries data.</span>
-<span class="sd">        bar_freq: The date offset string that sets the bar plot frequency.</span>
-<span class="sd">        filename: Name of the Plotly HTML file.</span>
-<span class="sd">        title: The report page title.</span>
-<span class="sd">        directory: Directory where Plotly HTML file is saved.</span>
-<span class="sd">        output_type: Determines output type. Defaults to &quot;file&quot;.</span>
-<span class="sd">        include_plotlyjs: Determines how the plotly.js library is included in</span>
-<span class="sd">            the output.</span>
-<span class="sd">            Defaults to &quot;cdn&quot;.</span>
-<span class="sd">        auto_open: Determines whether to open a browser window with the plot.</span>
-<span class="sd">            Defaults to False.</span>
-<span class="sd">        add_logo: If True a Captor logo is added to the plot. Defaults to True.</span>
-<span class="sd">        vertical_legend: Determines whether to vertically align the legend&#39;s</span>
-<span class="sd">            labels. Defaults to True.</span>
+<span class="sd">        yearfrac: Year fraction to determine report type.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Plotly Figure and a div section or a HTML filename with location.</span>
-
+<span class="sd">        Tuple of (properties, labels_init, labels_final).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">copied</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-    <span class="n">copied</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">copied</span><span class="o">.</span><span class="n">yearfrac</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">yearfrac</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="n">properties</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s2">&quot;geo_ret&quot;</span><span class="p">,</span>
             <span class="s2">&quot;vol&quot;</span><span class="p">,</span>
@@ -299,6 +270,416 @@
             <span class="s2">&quot;Comparison End&quot;</span><span class="p">,</span>
         <span class="p">]</span>
 
+    <span class="k">return</span> <span class="n">properties</span><span class="p">,</span> <span class="n">labels_init</span><span class="p">,</span> <span class="n">labels_final</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_jensen_alpha_to_report</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Jensen&#39;s Alpha to report DataFrame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        rpt_df: Report DataFrame to update.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Updated report DataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">alpha_frame</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
+    <span class="n">alpha_frame</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">alphas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">alpha_frame</span><span class="o">.</span><span class="n">jensen_alpha</span><span class="p">(</span>
+                <span class="n">asset</span><span class="o">=</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
+                <span class="n">market</span><span class="o">=</span><span class="p">(</span><span class="n">alpha_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
+                <span class="n">riskfree_rate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">aname</span> <span class="ow">in</span> <span class="n">alpha_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">]</span>
+    <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">ar</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">],</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ar</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_tracking_error_to_report</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Tracking Error to report DataFrame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        rpt_df: Report DataFrame to update.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Updated report DataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">te_frame</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
+    <span class="n">te_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;7D&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">te</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">te_frame</span><span class="o">.</span><span class="n">tracking_error_func</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">te</span><span class="o">.</span><span class="n">hasnans</span><span class="p">:</span>
+        <span class="n">te</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">te_frame</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">te_frame</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">te</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">te</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Tracking Error (weekly)&quot;</span>
+    <span class="n">te_df</span> <span class="o">=</span> <span class="n">te</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">te_df</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_capture_ratio_to_report</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">formats</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Capture Ratio to report DataFrame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        rpt_df: Report DataFrame to update.</span>
+<span class="sd">        formats: Format strings list to update.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of (updated report DataFrame, updated formats).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">crm</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
+    <span class="n">crm</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;ME&quot;</span><span class="p">)</span>
+    <span class="n">cru_save</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">crm</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">crm</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Capture Ratio (monthly)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cru</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">crm</span><span class="o">.</span><span class="n">capture_ratio_func</span><span class="p">(</span><span class="n">ratio</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Capture ratio calculation error: </span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">if</span> <span class="n">cru</span><span class="o">.</span><span class="n">hasnans</span><span class="p">:</span>
+        <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cru</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cru</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Capture Ratio (monthly)&quot;</span>
+    <span class="n">cru_df</span> <span class="o">=</span> <span class="n">cru</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">cru_df</span><span class="p">])</span>
+    <span class="n">formats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rpt_df</span><span class="p">,</span> <span class="n">formats</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_beta_to_report</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Index Beta to report DataFrame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        rpt_df: Report DataFrame to update.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Updated report DataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">beta_frame</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
+    <span class="n">beta_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;7D&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+    <span class="n">beta_frame</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
+    <span class="n">betas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">beta_frame</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span>
+            <span class="n">asset</span><span class="o">=</span><span class="p">(</span><span class="n">bname</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
+            <span class="n">market</span><span class="o">=</span><span class="p">(</span><span class="n">beta_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">bname</span> <span class="ow">in</span> <span class="n">beta_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="n">betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">br</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">],</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">br</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_report_dataframe</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">properties</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">formats</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">yearfrac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the complete report DataFrame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        properties: List of properties to include.</span>
+<span class="sd">        formats: Format strings for values.</span>
+<span class="sd">        yearfrac: Year fraction to determine if capture ratio is included.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of (report DataFrame, updated formats).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">all_properties</span><span class="p">(</span>
+        <span class="n">properties</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[LiteralFrameProps]&quot;</span><span class="p">,</span> <span class="n">properties</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">_add_jensen_alpha_to_report</span><span class="p">(</span><span class="n">copied</span><span class="p">,</span> <span class="n">rpt_df</span><span class="p">)</span>
+
+    <span class="n">ir</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">info_ratio_func</span><span class="p">()</span>
+    <span class="n">ir</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Information Ratio&quot;</span>
+    <span class="n">ir</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ir_df</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ir_df</span><span class="p">])</span>
+
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">_add_tracking_error_to_report</span><span class="p">(</span><span class="n">copied</span><span class="p">,</span> <span class="n">rpt_df</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">yearfrac</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">rpt_df</span><span class="p">,</span> <span class="n">formats</span> <span class="o">=</span> <span class="n">_add_capture_ratio_to_report</span><span class="p">(</span><span class="n">copied</span><span class="p">,</span> <span class="n">rpt_df</span><span class="p">,</span> <span class="n">formats</span><span class="p">)</span>
+
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">_add_beta_to_report</span><span class="p">(</span><span class="n">copied</span><span class="p">,</span> <span class="n">rpt_df</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rpt_df</span><span class="p">,</span> <span class="n">formats</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_report_dataframe</span><span class="p">(</span>
+    <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">formats</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">labels_init</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">labels_final</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the report DataFrame with labels and calendar period returns.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rpt_df: Report DataFrame to format.</span>
+<span class="sd">        formats: Format strings for values.</span>
+<span class="sd">        labels_init: Initial labels for rows.</span>
+<span class="sd">        labels_final: Final labels for rows.</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Formatted report DataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">formats</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">rpt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">f</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">labels_init</span><span class="p">)</span>
+
+    <span class="n">this_year</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">last_idx</span><span class="o">.</span><span class="n">year</span>
+    <span class="n">this_month</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">last_idx</span><span class="o">.</span><span class="n">month</span>
+    <span class="n">ytd</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">this_year</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+    <span class="n">ytd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Year-to-Date&quot;</span>
+    <span class="n">mtd</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">this_year</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">this_month</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mtd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Month-to-Date&quot;</span>
+    <span class="n">ytd_df</span> <span class="o">=</span> <span class="n">ytd</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">mtd_df</span> <span class="o">=</span> <span class="n">mtd</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ytd_df</span><span class="p">])</span>
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">mtd_df</span><span class="p">])</span>
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">labels_final</span><span class="p">)</span>
+
+    <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_table_data</span><span class="p">(</span>
+    <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare table data for Plotly table.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rpt_df: Formatted report DataFrame.</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of (cleaned table values, columns, aligning, color_lst).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">colmns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colmns</span><span class="p">]</span>
+    <span class="n">aligning</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">col_even_color</span> <span class="o">=</span> <span class="s2">&quot;lightgrey&quot;</span>
+    <span class="n">col_odd_color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+    <span class="n">color_lst</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;grey&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_odd_color</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">item_count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_even_color</span><span class="p">]</span>
+
+    <span class="n">tablevalues</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">cleanedtablevalues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tablevalues</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">cleanedcol</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">valu</span> <span class="k">if</span> <span class="n">valu</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="s2">&quot;nan%&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">valu</span> <span class="ow">in</span> <span class="n">tablevalues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="n">cleanedtablevalues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cleanedcol</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cleanedtablevalues</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">aligning</span><span class="p">,</span> <span class="n">color_lst</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_configure_figure_layout</span><span class="p">(</span>
+    <span class="n">figure</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">vertical_legend</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure figure layout with logo, legend, and title.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        figure: Plotly figure to configure.</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        add_logo: Whether to add logo.</span>
+<span class="sd">        vertical_legend: Whether to use vertical legend.</span>
+<span class="sd">        title: Optional title for the figure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">add_logo</span><span class="p">:</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">add_layout_image</span><span class="p">(</span><span class="n">logo</span><span class="p">)</span>
+
+    <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">))</span>
+    <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, list[str]]&quot;</span><span class="p">,</span> <span class="n">fig</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;colorway&quot;</span><span class="p">,</span>
+        <span class="p">[],</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">vertical_legend</span><span class="p">:</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.04</span><span class="p">,</span>
+            <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+            <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+            <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+        <span class="n">colorway</span><span class="o">=</span><span class="n">colorway</span><span class="p">[:</span> <span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span> <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;br&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">36</span><span class="p">}}},</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate_output</span><span class="p">(</span>
+    <span class="n">figure</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span><span class="p">,</span>
+    <span class="n">plotfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate output string based on output type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        figure: Plotly figure.</span>
+<span class="sd">        filename: Output filename.</span>
+<span class="sd">        output_type: Type of output to generate.</span>
+<span class="sd">        auto_open: Whether to auto-open file.</span>
+<span class="sd">        include_plotlyjs: How to include plotly.js.</span>
+<span class="sd">        plotfile: Path to plot file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Output string (filename or HTML div).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+        <span class="n">plot</span><span class="p">(</span>
+            <span class="n">figure_or_data</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">),</span>
+            <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
+            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">link_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
+            <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
+
+    <span class="n">div_id</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="s2">&quot;str&quot;</span><span class="p">,</span>
+        <span class="n">to_html</span><span class="p">(</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
+            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
+            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="report_html">
+<a class="viewcode-back" href="../../api/report.html#openseries.report_html">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">report_html</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">bar_freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">&quot;BYE&quot;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
+    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">vertical_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a HTML report page with line and bar plots and a table.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: The timeseries data.</span>
+<span class="sd">        bar_freq: The date offset string that sets the bar plot frequency.</span>
+<span class="sd">        filename: Name of the Plotly HTML file.</span>
+<span class="sd">        title: The report page title.</span>
+<span class="sd">        directory: Directory where Plotly HTML file is saved.</span>
+<span class="sd">        output_type: Determines output type. Defaults to &quot;file&quot;.</span>
+<span class="sd">        include_plotlyjs: Determines how the plotly.js library is included in</span>
+<span class="sd">            the output.</span>
+<span class="sd">            Defaults to &quot;cdn&quot;.</span>
+<span class="sd">        auto_open: Determines whether to open a browser window with the plot.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        add_logo: If True a Captor logo is added to the plot. Defaults to True.</span>
+<span class="sd">        vertical_legend: Determines whether to vertically align the legend&#39;s</span>
+<span class="sd">            labels. Defaults to True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Plotly Figure and a div section or a HTML filename with location.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">copied</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
+    <span class="n">copied</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
+
+    <span class="n">properties</span><span class="p">,</span> <span class="n">labels_init</span><span class="p">,</span> <span class="n">labels_final</span> <span class="o">=</span> <span class="n">_get_report_properties_and_labels</span><span class="p">(</span>
+        <span class="n">copied</span><span class="o">.</span><span class="n">yearfrac</span>
+    <span class="p">)</span>
+
     <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
         <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -354,132 +735,25 @@
         <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">all_properties</span><span class="p">(</span>
-        <span class="n">properties</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[LiteralFrameProps]&quot;</span><span class="p">,</span> <span class="n">properties</span><span class="p">),</span>
+    <span class="n">rpt_df</span><span class="p">,</span> <span class="n">formats</span> <span class="o">=</span> <span class="n">_build_report_dataframe</span><span class="p">(</span>
+        <span class="n">copied</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span>
+        <span class="n">properties</span><span class="o">=</span><span class="n">properties</span><span class="p">,</span>
+        <span class="n">formats</span><span class="o">=</span><span class="n">formats</span><span class="p">,</span>
+        <span class="n">yearfrac</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">yearfrac</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">alpha_frame</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-    <span class="n">alpha_frame</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-        <span class="n">alphas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">alpha_frame</span><span class="o">.</span><span class="n">jensen_alpha</span><span class="p">(</span>
-                <span class="n">asset</span><span class="o">=</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
-                <span class="n">market</span><span class="o">=</span><span class="p">(</span><span class="n">alpha_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
-                <span class="n">riskfree_rate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">aname</span> <span class="ow">in</span> <span class="n">alpha_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">]</span>
-    <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="n">ar</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span>
-        <span class="n">index</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">],</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ar</span><span class="p">])</span>
-    <span class="n">ir</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">info_ratio_func</span><span class="p">()</span>
-    <span class="n">ir</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Information Ratio&quot;</span>
-    <span class="n">ir</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">ir_df</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ir_df</span><span class="p">])</span>
-    <span class="n">te_frame</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-    <span class="n">te_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;7D&quot;</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-        <span class="n">te</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">te_frame</span><span class="o">.</span><span class="n">tracking_error_func</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">te</span><span class="o">.</span><span class="n">hasnans</span><span class="p">:</span>
-        <span class="n">te</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">te_frame</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
-            <span class="n">index</span><span class="o">=</span><span class="n">te_frame</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">te</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">te</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Tracking Error (weekly)&quot;</span>
-    <span class="n">te_df</span> <span class="o">=</span> <span class="n">te</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">te_df</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="n">copied</span><span class="o">.</span><span class="n">yearfrac</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
-        <span class="n">crm</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-        <span class="n">crm</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;ME&quot;</span><span class="p">)</span>
-        <span class="n">cru_save</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">crm</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
-            <span class="n">index</span><span class="o">=</span><span class="n">crm</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Capture Ratio (monthly)&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
-            <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">cru</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">crm</span><span class="o">.</span><span class="n">capture_ratio_func</span><span class="p">(</span><span class="n">ratio</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Capture ratio calculation error: </span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span>  <span class="c1"># pragma: no cover</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
-                <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">if</span> <span class="n">cru</span><span class="o">.</span><span class="n">hasnans</span><span class="p">:</span>
-            <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cru</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">cru</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Capture Ratio (monthly)&quot;</span>
-        <span class="n">cru_df</span> <span class="o">=</span> <span class="n">cru</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">cru_df</span><span class="p">])</span>
-        <span class="n">formats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">beta_frame</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-    <span class="n">beta_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;7D&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
-    <span class="n">beta_frame</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
-    <span class="n">betas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">beta_frame</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span>
-            <span class="n">asset</span><span class="o">=</span><span class="p">(</span><span class="n">bname</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
-            <span class="n">market</span><span class="o">=</span><span class="p">(</span><span class="n">beta_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">bname</span> <span class="ow">in</span> <span class="n">beta_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="p">]</span>
-    <span class="n">betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="n">br</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span>
-        <span class="n">index</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">],</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">br</span><span class="p">])</span>
-
-    <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">formats</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">rpt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">f</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">else</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
-        <span class="p">)</span>
-
-    <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">labels_init</span><span class="p">)</span>
-
-    <span class="n">this_year</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">last_idx</span><span class="o">.</span><span class="n">year</span>
-    <span class="n">this_month</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">last_idx</span><span class="o">.</span><span class="n">month</span>
-    <span class="n">ytd</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">this_year</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
-    <span class="n">ytd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Year-to-Date&quot;</span>
-    <span class="n">mtd</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">this_year</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">this_month</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-        <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">_format_report_dataframe</span><span class="p">(</span>
+        <span class="n">rpt_df</span><span class="o">=</span><span class="n">rpt_df</span><span class="p">,</span>
+        <span class="n">formats</span><span class="o">=</span><span class="n">formats</span><span class="p">,</span>
+        <span class="n">labels_init</span><span class="o">=</span><span class="n">labels_init</span><span class="p">,</span>
+        <span class="n">labels_final</span><span class="o">=</span><span class="n">labels_final</span><span class="p">,</span>
+        <span class="n">copied</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">mtd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Month-to-Date&quot;</span>
-    <span class="n">ytd_df</span> <span class="o">=</span> <span class="n">ytd</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">mtd_df</span> <span class="o">=</span> <span class="n">mtd</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ytd_df</span><span class="p">])</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">mtd_df</span><span class="p">])</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">labels_final</span><span class="p">)</span>
 
-    <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
-    <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-
-    <span class="n">colmns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">]</span>
-    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colmns</span><span class="p">]</span>
-    <span class="n">aligning</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">col_even_color</span> <span class="o">=</span> <span class="s2">&quot;lightgrey&quot;</span>
-    <span class="n">col_odd_color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
-    <span class="n">color_lst</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;grey&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_odd_color</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">item_count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_even_color</span><span class="p">]</span>
-
-    <span class="n">tablevalues</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-    <span class="n">cleanedtablevalues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tablevalues</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">cleanedcol</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">valu</span> <span class="k">if</span> <span class="n">valu</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="s2">&quot;nan%&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">valu</span> <span class="ow">in</span> <span class="n">tablevalues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="p">]</span>
-    <span class="n">cleanedtablevalues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cleanedcol</span><span class="p">)</span>
+    <span class="n">cleanedtablevalues</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">aligning</span><span class="p">,</span> <span class="n">color_lst</span> <span class="o">=</span> <span class="n">_prepare_table_data</span><span class="p">(</span>
+        <span class="n">rpt_df</span><span class="o">=</span><span class="n">rpt_df</span><span class="p">,</span>
+        <span class="n">copied</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
         <span class="n">header</span><span class="o">=</span><span class="p">{</span>
@@ -511,68 +785,22 @@
 
     <span class="n">plotfile</span> <span class="o">=</span> <span class="n">dirpath</span> <span class="o">/</span> <span class="n">filename</span>
 
-    <span class="n">fig</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">add_logo</span><span class="p">:</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">add_layout_image</span><span class="p">(</span><span class="n">logo</span><span class="p">)</span>
-
-    <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">))</span>
-    <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, list[str]]&quot;</span><span class="p">,</span> <span class="n">fig</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="s2">&quot;colorway&quot;</span><span class="p">,</span>
-        <span class="p">[],</span>
+    <span class="n">_configure_figure_layout</span><span class="p">(</span>
+        <span class="n">figure</span><span class="p">,</span>
+        <span class="n">copied</span><span class="p">,</span>
+        <span class="n">add_logo</span><span class="o">=</span><span class="n">add_logo</span><span class="p">,</span>
+        <span class="n">vertical_legend</span><span class="o">=</span><span class="n">vertical_legend</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">vertical_legend</span><span class="p">:</span>
-        <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.04</span><span class="p">,</span>
-            <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
-            <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span>
-            <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
-            <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
-
-    <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
-        <span class="n">colorway</span><span class="o">=</span><span class="n">colorway</span><span class="p">[:</span> <span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">],</span>
+    <span class="n">string_output</span> <span class="o">=</span> <span class="n">_generate_output</span><span class="p">(</span>
+        <span class="n">figure</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">output_type</span><span class="p">,</span>
+        <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
+        <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
+        <span class="n">plotfile</span><span class="o">=</span><span class="n">plotfile</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">figure</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">)</span>
-    <span class="n">figure</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span> <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-            <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;br&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">36</span><span class="p">}}},</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
-        <span class="n">plot</span><span class="p">(</span>
-            <span class="n">figure_or_data</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
-            <span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">),</span>
-            <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
-            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">link_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-            <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="n">string_output</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">div_id</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">string_output</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
-            <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
-            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
-            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">figure</span><span class="p">,</span> <span class="n">string_output</span></div>
 

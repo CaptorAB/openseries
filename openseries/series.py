@@ -589,7 +589,7 @@ class OpenTimeSeries(_CommonModel[float]):
     ) -> Series[float]:
         """Exponentially Weighted Moving Average Model for Volatility.
 
-        https://www.investopedia.com/articles/07/ewma.asp.
+        Reference: https://www.investopedia.com/articles/07/ewma.asp.
 
         Args:
             lmbda: Scaling factor to determine weighting. Defaults to 0.94.

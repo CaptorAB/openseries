@@ -408,10 +408,10 @@ validated to form a valid model.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">arithmetic_ret</span></code></p></td>
-<td><p>//www.investopedia.com/terms/a/arithmeticmean.asp.</p></td>
+<td><p>Annualized arithmetic mean of returns.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cvar_down</span></code></p></td>
-<td><p>//www.investopedia.com/terms/c/conditional_value_at_risk.asp.</p></td>
+<td><p>Downside 95% Conditional Value At Risk &quot;CVaR&quot;.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">downside_deviation</span></code></p></td>
 <td><p>Downside Deviation.</p></td>
@@ -420,13 +420,13 @@ validated to form a valid model.</p>
 <td><p>The first date in the timeseries.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">geo_ret</span></code></p></td>
-<td><p>//www.investopedia.com/terms/c/cagr.asp.</p></td>
+<td><p>Compounded Annual Growth Rate (CAGR).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kappa3_ratio</span></code></p></td>
 <td><p>Kappa-3 ratio.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kurtosis</span></code></p></td>
-<td><p>//www.investopedia.com/terms/k/kurtosis.asp.</p></td>
+<td><p>Kurtosis of the return distribution.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_idx</span></code></p></td>
 <td><p>The last date in the timeseries.</p></td>
@@ -435,10 +435,10 @@ validated to form a valid model.</p>
 <td><p>Number of observations.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_drawdown</span></code></p></td>
-<td><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p></td>
+<td><p>Maximum drawdown without any limit on date range.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_drawdown_cal_year</span></code></p></td>
-<td><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p></td>
+<td><p>Maximum drawdown in a single calendar year.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_drawdown_date</span></code></p></td>
 <td><p>Date when the maximum drawdown occurred.</p></td>
@@ -459,7 +459,7 @@ validated to form a valid model.</p>
 <td><p>Returns the set of fields that have been explicitly set on this model instance.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">omega_ratio</span></code></p></td>
-<td><p>//en.wikipedia.org/wiki/Omega_ratio.</p></td>
+<td><p>Omega ratio.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">periods_in_a_year</span></code></p></td>
 <td><p>The average number of observations per year.</p></td>
@@ -471,10 +471,10 @@ validated to form a valid model.</p>
 <td><p>Ratio of annualized arithmetic mean of returns and annualized volatility.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">skew</span></code></p></td>
-<td><p>//www.investopedia.com/terms/s/skewness.asp.</p></td>
+<td><p>Skew of the return distribution.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sortino_ratio</span></code></p></td>
-<td><p>//www.investopedia.com/terms/s/sortinoratio.asp.</p></td>
+<td><p>Sortino ratio.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">span_of_days</span></code></p></td>
 <td><p>Number of days from the first date to the last.</p></td>
@@ -501,7 +501,7 @@ validated to form a valid model.</p>
 <td><p>Length of series in years assuming 365.25 days per year.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">z_score</span></code></p></td>
-<td><p>//www.investopedia.com/terms/z/zscore.asp.</p></td>
+<td><p>Z-score.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeseries_id</span></code></p></td>
 <td><p></p></td>
@@ -898,7 +898,7 @@ Defaults to nearest.</p></li>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">ewma_vol_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.94</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.ewma_vol_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Exponentially Weighted Moving Average Model for Volatility.</p>
-<p><a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

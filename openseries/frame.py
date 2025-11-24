@@ -469,7 +469,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Exponentially Weighted Moving Average Volatilities and Correlation.
 
         Exponentially Weighted Moving Average (EWMA) for Volatilities and
-        Correlation. https://www.investopedia.com/articles/07/ewma.asp.
+        Correlation.
+
+        Reference: https://www.investopedia.com/articles/07/ewma.asp.
 
         Args:
             lmbda: Scaling factor to determine weighting. Defaults to 0.94.
@@ -729,7 +731,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         Calculates Tracking Error which is the standard deviation of the
         difference between the fund and its index returns.
-        https://www.investopedia.com/terms/t/trackingerror.asp.
+
+        Reference: https://www.investopedia.com/terms/t/trackingerror.asp.
 
         Args:
             base_column: Column of timeseries that is the denominator in the ratio.
@@ -962,7 +965,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         Source: 'Capture Ratios: A Popular Method of Measuring Portfolio Performance
         in Practice', Don R. Cox and Delbert C. Goff, Journal of Economics and
         Finance Education (Vol 2 Winter 2013).
-        https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf.
+
+        Reference: https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf.
 
         Args:
             ratio: The ratio to calculate.
@@ -1076,7 +1080,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Market Beta.
 
         Calculates Beta as Co-variance of asset & market divided by Variance
-        of the market. https://www.investopedia.com/terms/b/beta.asp.
+        of the market.
+
+        Reference: https://www.investopedia.com/terms/b/beta.asp.
 
         Args:
             asset: The column of the asset.
@@ -1171,7 +1177,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         above or below that predicted by the capital asset pricing model (CAPM),
         given the portfolio's or investment's beta and the average market return.
         This metric is also commonly referred to as simply alpha.
-        https://www.investopedia.com/terms/j/jensensmeasure.asp.
+
+        Reference: https://www.investopedia.com/terms/j/jensensmeasure.asp.
 
         Args:
             asset: The column of the asset.
@@ -1453,7 +1460,9 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """Calculate rolling Market Beta.
 
         Calculates Beta as Co-variance of asset & market divided by Variance
-        of the market. https://www.investopedia.com/terms/b/beta.asp.
+        of the market.
+
+        Reference: https://www.investopedia.com/terms/b/beta.asp.
 
         Args:
             asset_column: Column of timeseries that is the asset. Defaults to 0.
