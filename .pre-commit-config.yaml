@@ -59,7 +59,7 @@ repos:
       - id: fix-byte-order-marker
         exclude: ^docs/build/|^docs/_build/|docs/source/api/generated/
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v1.16.3
+    rev: v1.17.0
     hooks:
       - id: zizmor
   - repo: https://github.com/python-poetry/poetry
