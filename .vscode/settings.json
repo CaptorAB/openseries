@@ -8,11 +8,23 @@
     "editor.formatOnSave": true
   },
   "cSpell.enabled": false,
+  "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.detectIndentation": true,
+  "editor.quickSuggestions": {
+    "comments": false,
+    "other": false,
+    "strings": false
+  },
   "editor.rulers": [
     87
   ],
+  "editor.suggest.localityBonus": false,
+  "editor.suggest.preview": true,
+  "editor.suggest.showSnippets": false,
+  "editor.suggest.showWords": false,
+  "editor.suggestSelection": "first",
   "editor.tabSize": 4,
+  "editor.wordBasedSuggestions": "off",
   "files.associations": {
     "*.py": "python"
   },
@@ -33,6 +45,9 @@
     "MD033": false,
     "MD041": false
   },
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.stubPath": "${workspaceFolder}",
+  "python.analysis.typeCheckingMode": "basic",
   "python.defaultInterpreterPath": "${workspaceFolder}/venv",
   "python.terminal.activateEnvironment": true,
   "python.testing.cwd": "${workspaceFolder}",
