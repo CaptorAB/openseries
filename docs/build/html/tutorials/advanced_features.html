@@ -129,20 +129,20 @@
 
 <span class="c1"># Load factor data (Fama-French factors would be ideal, using proxies here)</span>
 <span class="n">factor_tickers</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;^GSPC&quot;</span><span class="p">:</span> <span class="s2">&quot;Market&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;^RUT&quot;</span><span class="p">:</span> <span class="s2">&quot;Small Cap&quot;</span><span class="p">,</span>  <span class="c1"># Size factor proxy</span>
-    <span class="s2">&quot;EFA&quot;</span><span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span>  <span class="c1"># International factor</span>
-    <span class="s2">&quot;TLT&quot;</span><span class="p">:</span> <span class="s2">&quot;Bonds&quot;</span>  <span class="c1"># Interest rate factor</span>
+     <span class="s2">&quot;^GSPC&quot;</span><span class="p">:</span> <span class="s2">&quot;Market&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;^RUT&quot;</span><span class="p">:</span> <span class="s2">&quot;Small Cap&quot;</span><span class="p">,</span>  <span class="c1"># Size factor proxy</span>
+     <span class="s2">&quot;EFA&quot;</span><span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span>  <span class="c1"># International factor</span>
+     <span class="s2">&quot;TLT&quot;</span><span class="p">:</span> <span class="s2">&quot;Bonds&quot;</span>  <span class="c1"># Interest rate factor</span>
 <span class="p">}</span>
 
 <span class="c1"># Load factor data</span>
 <span class="n">factor_series</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">factor_tickers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="c1"># This may fail if the ticker is invalid or data unavailable</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
-    <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">factor_series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+     <span class="c1"># This may fail if the ticker is invalid or data unavailable</span>
+     <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
+     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+     <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+     <span class="n">factor_series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
 <span class="c1"># Create factor frame</span>
 <span class="n">factors</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">factor_series</span><span class="p">)</span>
@@ -158,7 +158,7 @@
 <span class="c1"># Perform multi-factor regression</span>
 <span class="c1"># This may fail with various exceptions</span>
 <span class="n">regression_results</span> <span class="o">=</span> <span class="n">analysis_frame</span><span class="o">.</span><span class="n">multi_factor_linear_regression</span><span class="p">(</span>
-    <span class="n">dependent_variable_idx</span><span class="o">=-</span><span class="mi">1</span>  <span class="c1"># Apple is the last series (dependent variable)</span>
+     <span class="n">dependent_variable_idx</span><span class="o">=-</span><span class="mi">1</span>  <span class="c1"># Apple is the last series (dependent variable)</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MULTI-FACTOR REGRESSION RESULTS ===&quot;</span><span class="p">)</span>
@@ -167,8 +167,8 @@
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Factor Loadings (Betas):&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">factor_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">factor_series</span><span class="p">]):</span>
-    <span class="n">beta</span> <span class="o">=</span> <span class="n">regression_results</span><span class="p">[</span><span class="s1">&#39;coefficients&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Skip intercept</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">factor_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">beta</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+     <span class="n">beta</span> <span class="o">=</span> <span class="n">regression_results</span><span class="p">[</span><span class="s1">&#39;coefficients&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Skip intercept</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">factor_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">beta</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">R-squared: </span><span class="si">{</span><span class="n">regression_results</span><span class="p">[</span><span class="s1">&#39;r_squared&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adjusted R-squared: </span><span class="si">{</span><span class="n">regression_results</span><span class="p">[</span><span class="s1">&#39;adj_r_squared&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

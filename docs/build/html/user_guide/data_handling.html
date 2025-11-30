@@ -174,15 +174,15 @@
 
 <span class="c1"># From pandas Series with DatetimeIndex</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span>
-                <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+                     <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;Sample&quot;</span><span class="p">)</span>
 
 <span class="c1"># From pandas DataFrame column</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-    <span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
-    <span class="s1">&#39;Close&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span>
-    <span class="s1">&#39;Volume&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1100</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">1200</span><span class="p">]</span>
+     <span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+     <span class="s1">&#39;Close&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span>
+     <span class="s1">&#39;Volume&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1100</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">1200</span><span class="p">]</span>
 <span class="p">})</span>
 <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
@@ -198,9 +198,9 @@
 <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>
 
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
-    <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Data&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
+     <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Data&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -212,10 +212,10 @@
 
 <span class="c1"># Create 252 trading days at 5% annual rate</span>
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_fixed_rate</span><span class="p">(</span>
-    <span class="n">rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
-    <span class="n">days</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
-    <span class="n">end_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;5</span><span class="si">% F</span><span class="s2">ixed Rate&quot;</span>
+     <span class="n">rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+     <span class="n">days</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
+     <span class="n">end_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;5</span><span class="si">% F</span><span class="s2">ixed Rate&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -232,8 +232,8 @@
 <span class="c1"># Invalid formats will raise ValidationError</span>
 <span class="c1"># This will fail with a validation error</span>
 <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;01/01/2023&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-1-1&#39;</span><span class="p">],</span>  <span class="c1"># Wrong format</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">]</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;01/01/2023&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-1-1&#39;</span><span class="p">],</span>  <span class="c1"># Wrong format</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -249,9 +249,9 @@
 <span class="c1"># Handle NaN values appropriately</span>
 <span class="n">values_with_nan</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="n">values_with_nan</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Data with NaN&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="n">values_with_nan</span><span class="p">,</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Data with NaN&quot;</span>
 <span class="p">)</span>
 
 <span class="c1"># Clean NaN values (modifies original)</span>
@@ -265,8 +265,8 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This will raise an error</span>
 <span class="c1"># This will fail with a length mismatch error</span>
 <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>  <span class="c1"># Different length</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">101.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">]</span>  <span class="c1"># Different length</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -278,9 +278,9 @@
 <h3>Price and Return Conversions<a class="headerlink" href="#price-and-return-conversions" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assume we have a price series</span>
 <span class="n">prices</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">],</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock Price&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">],</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock Price&quot;</span>
 <span class="p">)</span>
 
 <span class="c1"># Convert to simple returns (modifies original)</span>
@@ -344,7 +344,7 @@
 <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span>
 
 <span class="n">series_with_nan</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;With NaN&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;With NaN&quot;</span>
 <span class="p">)</span>
 
 <span class="c1"># Forward fill missing values (for price series) (modifies original)</span>
@@ -372,13 +372,13 @@
 
 <span class="c1"># Create multiple series</span>
 <span class="n">series1</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset A&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset A&quot;</span>
 <span class="p">)</span>
 
 <span class="n">series2</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">49</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset B&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">49</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset B&quot;</span>
 <span class="p">)</span>
 
 <span class="c1"># Create frame</span>
@@ -391,13 +391,13 @@
 <p>OpenFrame automatically handles series with different date ranges:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Series with different start/end dates</span>
 <span class="n">early_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2022-12-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">95</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Early Start&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2022-12-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">95</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Early Start&quot;</span>
 <span class="p">)</span>
 
 <span class="n">late_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">51</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">52</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Late Start&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-04&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">51</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">52</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Late Start&quot;</span>
 <span class="p">)</span>
 
 <span class="c1"># Frame will align to common date range</span>
@@ -410,8 +410,8 @@
 <h3>Adding and Removing Series<a class="headerlink" href="#adding-and-removing-series" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a new series</span>
 <span class="n">new_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">198</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset C&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">198</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset C&quot;</span>
 <span class="p">)</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">new_series</span><span class="p">)</span>
 
@@ -433,8 +433,8 @@
 
 <span class="c1"># Export with custom sheet title</span>
 <span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span>
-    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;formatted_export.xlsx&quot;</span><span class="p">,</span>
-    <span class="n">sheet_title</span><span class="o">=</span><span class="s2">&quot;Analysis&quot;</span>
+     <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;formatted_export.xlsx&quot;</span><span class="p">,</span>
+     <span class="n">sheet_title</span><span class="o">=</span><span class="s2">&quot;Analysis&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -464,8 +464,8 @@
 <span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)</span>
 
 <span class="n">apple</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Apple Inc.&quot;</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Apple Inc.&quot;</span>
 <span class="p">)</span>
 
 <span class="c1"># Multiple assets</span>
@@ -473,13 +473,13 @@
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="n">ticker_symbol</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
-    <span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker_symbol</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;1y&quot;</span><span class="p">)</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-        <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">ticker_symbol</span>
-    <span class="p">)</span>
-    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+     <span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker_symbol</span><span class="p">)</span>
+     <span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;1y&quot;</span><span class="p">)</span>
+     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+          <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+          <span class="n">name</span><span class="o">=</span><span class="n">ticker_symbol</span>
+     <span class="p">)</span>
+     <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
 <span class="n">tech_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
 </pre></div>
@@ -491,8 +491,8 @@
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;stock_data.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock from CSV&quot;</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Stock from CSV&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -512,7 +512,7 @@
 <span class="n">actual_length</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">length</span>
 
 <span class="k">if</span> <span class="n">expected_length</span> <span class="o">!=</span> <span class="n">actual_length</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data gaps detected: expected </span><span class="si">{</span><span class="n">expected_length</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">actual_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data gaps detected: expected </span><span class="si">{</span><span class="n">expected_length</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">actual_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -531,8 +531,8 @@
 
 <span class="c1"># Customize threshold and date range</span>
 <span class="n">recent_outliers</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">outliers</span><span class="p">(</span>
-    <span class="n">threshold</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
-    <span class="n">months_from_last</span><span class="o">=</span><span class="mi">6</span>
+     <span class="n">threshold</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
+     <span class="n">months_from_last</span><span class="o">=</span><span class="mi">6</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -564,11 +564,11 @@
 <span class="c1"># Create series efficiently</span>
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-        <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">ticker</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">ticker</span>
-    <span class="p">)</span>
-    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+          <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">ticker</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span>
+          <span class="n">name</span><span class="o">=</span><span class="n">ticker</span>
+     <span class="p">)</span>
+     <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
 <span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
 </pre></div>

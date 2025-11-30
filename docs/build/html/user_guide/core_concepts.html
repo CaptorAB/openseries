@@ -182,17 +182,17 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 
 <span class="n">simulation</span> <span class="o">=</span> <span class="n">ReturnSimulation</span><span class="o">.</span><span class="n">from_lognormal</span><span class="p">(</span>
-    <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">trading_days</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-    <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>  <span class="c1"># ~0.001 daily</span>
-    <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span>     <span class="c1"># ~0.02 daily</span>
-    <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
-    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+     <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+     <span class="n">trading_days</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+     <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>  <span class="c1"># ~0.001 daily</span>
+     <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span>     <span class="c1"># ~0.02 daily</span>
+     <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
+     <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>
 
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Asset&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
-    <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Asset&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
+     <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
 <span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
 
 <span class="c1"># Core properties</span>
@@ -249,24 +249,24 @@
 
 <span class="c1"># Create multiple series using openseries simulation</span>
 <span class="n">simulation</span> <span class="o">=</span> <span class="n">ReturnSimulation</span><span class="o">.</span><span class="n">from_lognormal</span><span class="p">(</span>
-    <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">trading_days</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-    <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>  <span class="c1"># ~0.001 daily</span>
-    <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span>     <span class="c1"># ~0.02 daily</span>
-    <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
-    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+     <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+     <span class="n">trading_days</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+     <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>  <span class="c1"># ~0.001 daily</span>
+     <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span>     <span class="c1"># ~0.02 daily</span>
+     <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
+     <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>
 
 <span class="c1"># Create OpenFrame with multiple series from simulation</span>
 <span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span>
-    <span class="n">constituents</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-            <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
-            <span class="n">column_nmbr</span><span class="o">=</span><span class="n">serie</span><span class="p">,</span>
-            <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
-        <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">number_of_sims</span><span class="p">)</span>
-    <span class="p">]</span>
+     <span class="n">constituents</span><span class="o">=</span><span class="p">[</span>
+          <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
+                <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Asset&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
+                <span class="n">column_nmbr</span><span class="o">=</span><span class="n">serie</span><span class="p">,</span>
+                <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">,</span>
+          <span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
+          <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">number_of_sims</span><span class="p">)</span>
+     <span class="p">]</span>
 <span class="p">)</span>
 
 <span class="c1"># Frame properties</span>
@@ -397,15 +397,15 @@ The library provides explicit methods for alignment that require user choice:</p
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dates must be valid ISO format strings</span>
 <span class="c1"># This will fail with a validation error</span>
 <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;invalid-date&quot;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">]</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;invalid-date&quot;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="c1"># Values must be numeric</span>
 <span class="c1"># This will fail with a validation error</span>
 <span class="n">invalid_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">],</span>
-    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;not a number&quot;</span><span class="p">]</span>
+     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">],</span>
+     <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;not a number&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -541,10 +541,10 @@ The library provides explicit methods for alignment that require user choice:</p
 
 <span class="c1"># Available weight strategies</span>
 <span class="n">strategies</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;eq_weights&#39;</span><span class="p">:</span> <span class="s1">&#39;Equal weights for all assets&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;inv_vol&#39;</span><span class="p">:</span> <span class="s1">&#39;Inverse volatility weighting (risk parity)&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;max_div&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum diversification optimization&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;min_vol_overweight&#39;</span><span class="p">:</span> <span class="s1">&#39;Minimum volatility overweight strategy&#39;</span>
+     <span class="s1">&#39;eq_weights&#39;</span><span class="p">:</span> <span class="s1">&#39;Equal weights for all assets&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;inv_vol&#39;</span><span class="p">:</span> <span class="s1">&#39;Inverse volatility weighting (risk parity)&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;max_div&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum diversification optimization&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;min_vol_overweight&#39;</span><span class="p">:</span> <span class="s1">&#39;Minimum volatility overweight strategy&#39;</span>
 <span class="p">}</span>
 
 <span class="c1"># Example with error handling</span>

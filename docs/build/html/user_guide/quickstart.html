@@ -138,18 +138,18 @@
 
 <span class="c1"># Create a simulated time series using lognormal distribution</span>
 <span class="n">simulation</span> <span class="o">=</span> <span class="n">ReturnSimulation</span><span class="o">.</span><span class="n">from_lognormal</span><span class="p">(</span>
-    <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">trading_days</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span>  <span class="c1"># 8% annual return</span>
-    <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>     <span class="c1"># 15% annual volatility</span>
-    <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
-    <span class="n">seed</span><span class="o">=</span><span class="mi">71</span>
+     <span class="n">number_of_sims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+     <span class="n">trading_days</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+     <span class="n">mean_annual_return</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span>  <span class="c1"># 8% annual return</span>
+     <span class="n">mean_annual_vol</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>     <span class="c1"># 15% annual volatility</span>
+     <span class="n">trading_days_in_year</span><span class="o">=</span><span class="mi">252</span><span class="p">,</span>
+     <span class="n">seed</span><span class="o">=</span><span class="mi">71</span>
 <span class="p">)</span>
 
 <span class="c1"># Convert simulation to OpenTimeSeries</span>
 <span class="n">sp500</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
-    <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
+     <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
 <span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
 
 <span class="n">sp500</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">)</span>
@@ -207,7 +207,7 @@
 <section id="get-all-metrics-at-once">
 <h3>Get All Metrics at Once<a class="headerlink" href="#get-all-metrics-at-once" title="Link to this heading"></a></h3>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">all_properties</span></code> attribute to get a comprehensive overview:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get all metrics in a DataFrame</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get all metrics of an OpenTimeSeries or OpenFrame</span>
 <span class="n">metrics</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
 </pre></div>
@@ -217,7 +217,7 @@
 <section id="creating-visualizations">
 <h2>Creating Visualizations<a class="headerlink" href="#creating-visualizations" title="Link to this heading"></a></h2>
 <p>openseries integrates with Plotly for interactive visualizations:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the price series</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the timeseries</span>
 <span class="n">sp500</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
 <span class="c1"># This opens an interactive plot in your browser</span>
 
@@ -247,10 +247,10 @@
 
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
-    <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+     <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)</span>
+     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+     <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+     <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
 <span class="c1"># Create OpenFrame</span>
 <span class="n">frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="n">series_list</span><span class="p">)</span>
@@ -270,10 +270,7 @@
 <section id="portfolio-analysis">
 <h2>Portfolio Analysis<a class="headerlink" href="#portfolio-analysis" title="Link to this heading"></a></h2>
 <p>Create and analyze portfolios:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create portfolios using different weight strategies</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openseries.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaxDiversificationNaNError</span><span class="p">,</span> <span class="n">MaxDiversificationNegativeWeightsError</span>
-
-<span class="c1"># Equal-weighted portfolio (most reliable)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Equal-weighted portfolio</span>
 <span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">)</span>
 <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
@@ -282,13 +279,14 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Sharpe: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Create custom weighted portfolio</span>
-<span class="n">frame</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>  <span class="c1"># Custom allocation</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>  <span class="c1"># Custom allocation</span>
 <span class="n">custom_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Portfolio&quot;</span><span class="p">)</span>
 <span class="n">custom_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">custom_df</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Custom Portfolio Sharpe: </span><span class="si">{</span><span class="n">custom_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Compare with individual assets</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">portfolio</span><span class="p">)</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">custom_portfolio</span><span class="p">)</span>
 <span class="n">comparison</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">comparison</span><span class="p">)</span>
 </pre></div>
@@ -322,9 +320,6 @@
 
 <span class="c1"># Export to JSON</span>
 <span class="n">sp500</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;sp500_data.json&quot;</span><span class="p">,</span> <span class="n">what_output</span><span class="o">=</span><span class="s2">&quot;tsdf&quot;</span><span class="p">)</span>
-
-<span class="c1"># Export metrics to CSV</span>
-<span class="n">metrics</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;sp500_metrics.csv&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

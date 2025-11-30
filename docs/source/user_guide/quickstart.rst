@@ -10,32 +10,32 @@ Let's start by creating a simulated financial time series using openseries' buil
 
 .. code-block:: python
 
-   from openseries import OpenTimeSeries, ReturnSimulation, ValueType
-   import datetime as dt
+    from openseries import OpenTimeSeries, ReturnSimulation, ValueType
+    import datetime as dt
 
-   # Create a simulated time series using lognormal distribution
-   simulation = ReturnSimulation.from_lognormal(
-       number_of_sims=1,
-       trading_days=1000,
-       mean_annual_return=0.08,  # 8% annual return
-       mean_annual_vol=0.15,     # 15% annual volatility
-       trading_days_in_year=252,
-       seed=71
-   )
+    # Create a simulated time series using lognormal distribution
+    simulation = ReturnSimulation.from_lognormal(
+         number_of_sims=1,
+         trading_days=1000,
+         mean_annual_return=0.08,  # 8% annual return
+         mean_annual_vol=0.15,     # 15% annual volatility
+         trading_days_in_year=252,
+         seed=71
+    )
 
-   # Convert simulation to OpenTimeSeries
-   sp500 = OpenTimeSeries.from_df(
-       dframe=simulation.to_dataframe(name="S&P 500", end=dt.date(2023, 12, 31)),
-       valuetype=ValueType.RTRN
-   ).to_cumret()  # Convert returns to cumulative prices
+    # Convert simulation to OpenTimeSeries
+    sp500 = OpenTimeSeries.from_df(
+         dframe=simulation.to_dataframe(name="S&P 500", end=dt.date(2023, 12, 31)),
+         valuetype=ValueType.RTRN
+    ).to_cumret()  # Convert returns to cumulative prices
 
-   sp500.set_new_label(lvl_zero="S&P 500")
+    sp500.set_new_label(lvl_zero="S&P 500")
 
-   # Display basic information
-   print(f"Series: {sp500.label}")
-   print(f"Start date: {sp500.first_idx}")
-   print(f"End date: {sp500.last_idx}")
-   print(f"Number of observations: {sp500.length}")
+    # Display basic information
+    print(f"Series: {sp500.label}")
+    print(f"Start date: {sp500.first_idx}")
+    print(f"End date: {sp500.last_idx}")
+    print(f"Number of observations: {sp500.length}")
 
 Loading Data from External Sources
 -----------------------------------
@@ -44,21 +44,21 @@ Alternatively, you can load data from external sources like yfinance:
 
 .. code-block:: python
 
-   import yfinance as yf  # pip install yfinance
-   from openseries import OpenTimeSeries
+    import yfinance as yf  # pip install yfinance
+    from openseries import OpenTimeSeries
 
-   # Download S&P 500 data
-   ticker = yf.Ticker("^GSPC")
-   data = ticker.history(period="2y")
+    # Download S&P 500 data
+    ticker = yf.Ticker("^GSPC")
+    data = ticker.history(period="2y")
 
-   # Create OpenTimeSeries from the Close prices
-   sp500 = OpenTimeSeries.from_df(dframe=data['Close'])
+    # Create OpenTimeSeries from the Close prices
+    sp500 = OpenTimeSeries.from_df(dframe=data['Close'])
 
-   # Set a more descriptive label
-   sp500.set_new_label(lvl_zero="S&P 500 Index")
+    # Set a more descriptive label
+    sp500.set_new_label(lvl_zero="S&P 500 Index")
 
-   print(f"Loaded {sp500.length} observations")
-   print(f"Date range: {sp500.first_idx} to {sp500.last_idx}")
+    print(f"Loaded {sp500.length} observations")
+    print(f"Date range: {sp500.first_idx} to {sp500.last_idx}")
 
 Basic Financial Metrics
 ------------------------
@@ -67,22 +67,22 @@ openseries provides a comprehensive set of financial metrics:
 
 .. code-block:: python
 
-   # Key performance metrics
-   print(f"Total Return: {sp500.value_ret:.2%}")
-   print(f"Annualized Return (CAGR): {sp500.geo_ret:.2%}")
-   print(f"Annualized Volatility: {sp500.vol:.2%}")
-   print(f"Sharpe Ratio: {sp500.ret_vol_ratio:.2f}")
-   print(f"Maximum Drawdown: {sp500.max_drawdown:.2%}")
+    # Key performance metrics
+    print(f"Total Return: {sp500.value_ret:.2%}")
+    print(f"Annualized Return (CAGR): {sp500.geo_ret:.2%}")
+    print(f"Annualized Volatility: {sp500.vol:.2%}")
+    print(f"Sharpe Ratio: {sp500.ret_vol_ratio:.2f}")
+    print(f"Maximum Drawdown: {sp500.max_drawdown:.2%}")
 
-   # Risk metrics
-   print(f"95% VaR (daily): {sp500.var_down:.2%}")
-   print(f"95% CVaR (daily): {sp500.cvar_down:.2%}")
-   print(f"Sortino Ratio: {sp500.sortino_ratio:.2f}")
+    # Risk metrics
+    print(f"95% VaR (daily): {sp500.var_down:.2%}")
+    print(f"95% CVaR (daily): {sp500.cvar_down:.2%}")
+    print(f"Sortino Ratio: {sp500.sortino_ratio:.2f}")
 
-   # Distribution statistics
-   print(f"Skewness: {sp500.skew:.2f}")
-   print(f"Kurtosis: {sp500.kurtosis:.2f}")
-   print(f"Positive Days: {sp500.positive_share:.1%}")
+    # Distribution statistics
+    print(f"Skewness: {sp500.skew:.2f}")
+    print(f"Kurtosis: {sp500.kurtosis:.2f}")
+    print(f"Positive Days: {sp500.positive_share:.1%}")
 
 Get All Metrics at Once
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,9 +91,9 @@ Use the ``all_properties`` attribute to get a comprehensive overview:
 
 .. code-block:: python
 
-   # Get all metrics in a DataFrame
-   metrics = sp500.all_properties()
-   print(metrics)
+    # Get all metrics of an OpenTimeSeries or OpenFrame
+    metrics = sp500.all_properties()
+    print(metrics)
 
 Creating Visualizations
 -----------------------
@@ -102,21 +102,21 @@ openseries integrates with Plotly for interactive visualizations:
 
 .. code-block:: python
 
-   # Plot the price series
-   sp500.plot_series()
-   # This opens an interactive plot in your browser
+    # Plot the timeseries
+    sp500.plot_series()
+    # This opens an interactive plot in your browser
 
-   # Plot returns histogram
-   returns = sp500.from_deepcopy()
-   returns.value_to_ret()  # Convert to returns (modifies original)
-   returns.plot_histogram()
+    # Plot returns histogram
+    returns = sp500.from_deepcopy()
+    returns.value_to_ret()  # Convert to returns (modifies original)
+    returns.plot_histogram()
 
-   # Plot bar chart (useful for plotting returns)
-   returns.plot_bars()
+    # Plot bar chart (useful for plotting returns)
+    returns.plot_bars()
 
-   # Plot drawdown series
-   sp500.to_drawdown_series()  # Convert to drawdown (modifies original)
-   sp500.plot_series()
+    # Plot drawdown series
+    sp500.to_drawdown_series()  # Convert to drawdown (modifies original)
+    sp500.plot_series()
 
 
 Working with Multiple Assets (OpenFrame)
@@ -126,32 +126,32 @@ For multi-asset analysis, use the OpenFrame class:
 
 .. code-block:: python
 
-   from openseries import OpenFrame
-   import yfinance as yf
+    from openseries import OpenFrame
+    import yfinance as yf
 
-   # Download data for multiple assets
-   tickers = ["^GSPC", "^IXIC", "^RUT"]  # S&P 500, NASDAQ, Russell 2000
-   names = ["S&P 500", "NASDAQ", "Russell 2000"]
+    # Download data for multiple assets
+    tickers = ["^GSPC", "^IXIC", "^RUT"]  # S&P 500, NASDAQ, Russell 2000
+    names = ["S&P 500", "NASDAQ", "Russell 2000"]
 
-   series_list = []
-   for ticker, name in zip(tickers, names):
-       data = yf.Ticker(ticker).history(period="2y")
-       series = OpenTimeSeries.from_df(dframe=data['Close'])
-       series.set_new_label(lvl_zero=name)
-       series_list.append(series)
+    series_list = []
+    for ticker, name in zip(tickers, names):
+         data = yf.Ticker(ticker).history(period="2y")
+         series = OpenTimeSeries.from_df(dframe=data['Close'])
+         series.set_new_label(lvl_zero=name)
+         series_list.append(series)
 
-   # Create OpenFrame
-   frame = OpenFrame(constituents=series_list)
-   frame.value_nan_handle().trunc_frame()
+    # Create OpenFrame
+    frame = OpenFrame(constituents=series_list)
+    frame.value_nan_handle().trunc_frame()
 
-   # Get metrics for all series
-   all_metrics = frame.all_properties()
-   print(all_metrics)
+    # Get metrics for all series
+    all_metrics = frame.all_properties()
+    print(all_metrics)
 
-   # Calculate correlations
-   correlations = frame.correl_matrix
-   print("\nCorrelation Matrix:")
-   print(correlations)
+    # Calculate correlations
+    correlations = frame.correl_matrix
+    print("\nCorrelation Matrix:")
+    print(correlations)
 
 Portfolio Analysis
 ------------------
@@ -160,27 +160,25 @@ Create and analyze portfolios:
 
 .. code-block:: python
 
-   # Create portfolios using different weight strategies
-   from openseries.owntypes import MaxDiversificationNaNError, MaxDiversificationNegativeWeightsError
+    # Equal-weighted portfolio
+    portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
+    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
 
-   # Equal-weighted portfolio (most reliable)
-   portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
-   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+    print(f"Equal Weight Portfolio Return: {portfolio.geo_ret:.2%}")
+    print(f"Equal Weight Portfolio Volatility: {portfolio.vol:.2%}")
+    print(f"Equal Weight Portfolio Sharpe: {portfolio.ret_vol_ratio:.2f}")
 
-   print(f"Equal Weight Portfolio Return: {portfolio.geo_ret:.2%}")
-   print(f"Equal Weight Portfolio Volatility: {portfolio.vol:.2%}")
-   print(f"Equal Weight Portfolio Sharpe: {portfolio.ret_vol_ratio:.2f}")
+    # Create custom weighted portfolio
+    frame.weights = [0.8, 0.2]  # Custom allocation
+    custom_df = frame.make_portfolio(name="Custom Portfolio")
+    custom_portfolio = OpenTimeSeries.from_df(dframe=custom_df)
+    print(f"Custom Portfolio Sharpe: {custom_portfolio.ret_vol_ratio:.2f}")
 
-   # Create custom weighted portfolio
-   frame.weights = [0.5, 0.3, 0.2]  # Custom allocation
-   custom_df = frame.make_portfolio(name="Custom Portfolio")
-   custom_portfolio = OpenTimeSeries.from_df(dframe=custom_df)
-   print(f"Custom Portfolio Sharpe: {custom_portfolio.ret_vol_ratio:.2f}")
-
-   # Compare with individual assets
-   frame.add_timeseries(portfolio)
-   comparison = frame.all_properties()
-   print(comparison)
+    # Compare with individual assets
+    frame.add_timeseries(portfolio)
+    frame.add_timeseries(custom_portfolio)
+    comparison = frame.all_properties()
+    print(comparison)
 
 Data Transformations
 --------------------
@@ -189,20 +187,20 @@ openseries provides various data transformation methods:
 
 .. code-block:: python
 
-   # Convert prices to returns (modifies original)
-   sp500.value_to_ret()
-   print(f"Returns series length: {sp500.length}")
+    # Convert prices to returns (modifies original)
+    sp500.value_to_ret()
+    print(f"Returns series length: {sp500.length}")
 
-   # Convert to log returns (modifies original)
-   sp500.value_to_log()
+    # Convert to log returns (modifies original)
+    sp500.value_to_log()
 
-   # Calculate rolling statistics
-   rolling_vol = sp500.rolling_vol(observations=30)  # 30-day rolling volatility
-   rolling_ret = sp500.rolling_return(observations=30)  # 30-day rolling returns
+    # Calculate rolling statistics
+    rolling_vol = sp500.rolling_vol(observations=30)  # 30-day rolling volatility
+    rolling_ret = sp500.rolling_return(observations=30)  # 30-day rolling returns
 
-   # Resample to monthly data (modifies original)
-   sp500.resample_to_business_period_ends(freq="BME")
-   print(f"Monthly data points: {sp500.length}")
+    # Resample to monthly data (modifies original)
+    sp500.resample_to_business_period_ends(freq="BME")
+    print(f"Monthly data points: {sp500.length}")
 
 Exporting Results
 -----------------
@@ -211,14 +209,11 @@ Save your analysis results:
 
 .. code-block:: python
 
-   # Export to Excel
-   sp500.to_xlsx(filename="sp500_analysis.xlsx")
+    # Export to Excel
+    sp500.to_xlsx(filename="sp500_analysis.xlsx")
 
-   # Export to JSON
-   sp500.to_json(filename="sp500_data.json", what_output="tsdf")
-
-   # Export metrics to CSV
-   metrics.to_csv("sp500_metrics.csv")
+    # Export to JSON
+    sp500.to_json(filename="sp500_data.json", what_output="tsdf")
 
 Working with Business Days
 --------------------------
@@ -227,14 +222,14 @@ openseries handles business day calendars automatically:
 
 .. code-block:: python
 
-   # Align to Swedish business days (modifies original)
-   sp500.align_index_to_local_cdays(countries="SE")
+    # Align to Swedish business days (modifies original)
+    sp500.align_index_to_local_cdays(countries="SE")
 
-   # Use multiple countries (modifies original)
-   sp500.align_index_to_local_cdays(countries=["US", "GB"])
+    # Use multiple countries (modifies original)
+    sp500.align_index_to_local_cdays(countries=["US", "GB"])
 
-   # Handle missing values (modifies original)
-   sp500.value_nan_handle()  # Forward fill NaN values
+    # Handle missing values (modifies original)
+    sp500.value_nan_handle()  # Forward fill NaN values
 
 Next Steps
 ----------
@@ -262,35 +257,35 @@ Here are some common usage patterns:
 
 .. code-block:: python
 
-   # Pattern 1: Load, analyze, visualize
-   series = OpenTimeSeries.from_df(dframe=data['Close'])
-   series.set_new_label(lvl_zero="Asset")
-   metrics = series.all_properties()
-   series.plot_series()
+    # Pattern 1: Load, analyze, visualize
+    series = OpenTimeSeries.from_df(dframe=data['Close'])
+    series.set_new_label(lvl_zero="Asset")
+    metrics = series.all_properties()
+    series.plot_series()
 
-   # Pattern 2: Multi-asset comparison
-   frame = OpenFrame(constituents=[series1, series2, series3])
-   comparison = frame.all_properties()
-   correlations = frame.correl_matrix
+    # Pattern 2: Multi-asset comparison
+    frame = OpenFrame(constituents=[series1, series2, series3])
+    comparison = frame.all_properties()
+    correlations = frame.correl_matrix
 
-   # Pattern 3: Portfolio construction (built-in strategies)
-   portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
-   portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
-   frame.add_timeseries(portfolio)
+    # Pattern 3: Portfolio construction (built-in strategies)
+    portfolio_df = frame.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
+    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+    frame.add_timeseries(portfolio)
 
-   # Pattern 3b: Custom portfolio construction (create fresh frame)
-   custom_frame = OpenFrame(constituents=[series1, series2, series3])
-   custom_frame.weights = [0.4, 0.3, 0.3]
-   custom_df = custom_frame.make_portfolio(name="Custom Portfolio")
-   custom_portfolio = OpenTimeSeries.from_df(dframe=custom_df)
+    # Pattern 3b: Custom portfolio construction (create fresh frame)
+    custom_frame = OpenFrame(constituents=[series1, series2, series3])
+    custom_frame.weights = [0.4, 0.3, 0.3]
+    custom_df = custom_frame.make_portfolio(name="Custom Portfolio")
+    custom_portfolio = OpenTimeSeries.from_df(dframe=custom_df)
 
-   # Pattern 4: Risk analysis
-   risk_series = series.from_deepcopy()  # Create copy for risk analysis
-   var_95 = risk_series.var_down  # VaR on returns
-   max_dd = series.max_drawdown
-   rolling_risk = risk_series.rolling_vol(observations=252)
+    # Pattern 4: Risk analysis
+    risk_series = series.from_deepcopy()  # Create copy for risk analysis
+    var_95 = risk_series.var_down  # VaR on returns
+    max_dd = series.max_drawdown
+    rolling_risk = risk_series.rolling_vol(observations=252)
 
-   # Drawdown analysis (on original series)
-   series.to_drawdown_series()  # Convert to drawdown (modifies original)
+    # Drawdown analysis (on original series)
+    series.to_drawdown_series()  # Convert to drawdown (modifies original)
 
 This should give you a solid foundation to start using openseries for your financial analysis needs!

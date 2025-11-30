@@ -146,7 +146,7 @@
 
 <span class="c1"># Create OpenTimeSeries</span>
 <span class="n">sp500</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="c1"># Set a descriptive label</span>
@@ -262,15 +262,15 @@
 <span class="n">skewness</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">skew</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skewness: </span><span class="si">{</span><span class="n">skewness</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">skewness</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Negative skew: more extreme negative returns&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Negative skew: more extreme negative returns&quot;</span><span class="p">)</span>
 <span class="k">elif</span> <span class="n">skewness</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Positive skew: more extreme positive returns&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Positive skew: more extreme positive returns&quot;</span><span class="p">)</span>
 
 <span class="c1"># Kurtosis (tail heaviness)</span>
 <span class="n">kurtosis</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">kurtosis</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Kurtosis: </span><span class="si">{</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">kurtosis</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Fat tails: more extreme returns than normal distribution&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Fat tails: more extreme returns than normal distribution&quot;</span><span class="p">)</span>
 
 <span class="c1"># Percentage of positive days</span>
 <span class="n">positive_share</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">positive_share</span>
@@ -310,9 +310,9 @@
 <span class="n">years</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">2025</span><span class="p">)</span>  <span class="c1"># Adjust based on your data range</span>
 
 <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
-    <span class="c1"># This may fail if no data exists for the year</span>
-    <span class="n">year_return</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+     <span class="c1"># This may fail if no data exists for the year</span>
+     <span class="n">year_return</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -333,9 +333,9 @@
 <span class="n">vol_values</span> <span class="o">=</span> <span class="n">rolling_vol</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
 <span class="n">vol_series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-    <span class="n">dates</span><span class="o">=</span><span class="n">vol_dates</span><span class="p">,</span>
-    <span class="n">values</span><span class="o">=</span><span class="n">vol_values</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Rolling Volatility&quot;</span>
+     <span class="n">dates</span><span class="o">=</span><span class="n">vol_dates</span><span class="p">,</span>
+     <span class="n">values</span><span class="o">=</span><span class="n">vol_values</span><span class="p">,</span>
+     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Rolling Volatility&quot;</span>
 <span class="p">)</span>
 
 <span class="n">vol_series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
@@ -383,7 +383,7 @@
 
 <span class="c1"># Create bond series (using yield data)</span>
 <span class="n">bonds</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-    <span class="n">dframe</span><span class="o">=</span><span class="n">bond_data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">bond_data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="n">bonds</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;10Y Treasury Yield&quot;</span><span class="p">)</span>
 
@@ -444,14 +444,14 @@
 
 <span class="c1"># Risk assessment</span>
 <span class="k">if</span> <span class="n">sp500</span><span class="o">.</span><span class="n">ret_vol_ratio</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Good risk-adjusted returns (Sharpe &gt; 1.0)&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Good risk-adjusted returns (Sharpe &gt; 1.0)&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;⚠ Moderate risk-adjusted returns (Sharpe &lt; 1.0)&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;⚠ Moderate risk-adjusted returns (Sharpe &lt; 1.0)&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">sp500</span><span class="o">.</span><span class="n">max_drawdown</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.20</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Moderate maximum drawdown (&lt; 20%)&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Moderate maximum drawdown (&lt; 20%)&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;⚠ Significant maximum drawdown (&gt; 20%)&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;⚠ Significant maximum drawdown (&gt; 20%)&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This tutorial provides a comprehensive foundation for financial analysis using openseries. You can adapt these techniques for any financial time series data.</p>

@@ -13,13 +13,13 @@ When creating `OpenTimeSeries` objects from price data, `ValueType.PRICE` is the
 
 .. code-block:: python
 
-   # Correct way (ValueType.PRICE is default)
-   series = OpenTimeSeries.from_df(dframe=data['Close'])
-   series.set_new_label(lvl_zero="Asset Name")
+    # Correct way (ValueType.PRICE is default)
+    series = OpenTimeSeries.from_df(dframe=data['Close'])
+    series.set_new_label(lvl_zero="Asset Name")
 
-   # This also works but is unnecessary
-   series = OpenTimeSeries.from_df(dframe=data['Close'], valuetype=ValueType.PRICE)
-   series.set_new_label(lvl_zero="Asset Name")
+    # This also works but is unnecessary
+    series = OpenTimeSeries.from_df(dframe=data['Close'], valuetype=ValueType.PRICE)
+    series.set_new_label(lvl_zero="Asset Name")
 
 Method Chaining vs Object Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,19 +28,19 @@ Methods that return `self` are designed for method chaining and modify the origi
 
 .. code-block:: python
 
-   # CORRECT: Method chaining (modifies original)
-   series.value_to_ret().plot_histogram()
+    # CORRECT: Method chaining (modifies original)
+    series.value_to_ret().plot_histogram()
 
-   # CORRECT: Sequential operations (modifies original)
-   series.value_to_ret()  # Convert to returns
-   series.plot_histogram()  # Plot the returns
+    # CORRECT: Sequential operations (modifies original)
+    series.value_to_ret()  # Convert to returns
+    series.plot_histogram()  # Plot the returns
 
-   # INCORRECT: This doesn't create a new object
-   # returns_series = series.value_to_ret()  # Wrong pattern!
+    # INCORRECT: This doesn't create a new object
+    # returns_series = series.value_to_ret()  # Wrong pattern!
 
-   # To create a new object, use from_deepcopy()
-   returns_series = series.from_deepcopy()
-   returns_series.value_to_ret()  # Now you have both original and returns
+    # To create a new object, use from_deepcopy()
+    returns_series = series.from_deepcopy()
+    returns_series.value_to_ret()  # Now you have both original and returns
 
 Method Parameter Names
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -75,12 +75,12 @@ When creating portfolios, the weight_strat parameter can be used for built-in st
 
 .. code-block:: python
 
-   # Using the weight_strat parameter
-   portfolio_df = frame.make_portfolio(name="My Portfolio", weight_strat="eq_weights")
+    # Using the weight_strat parameter
+    portfolio_df = frame.make_portfolio(name="My Portfolio", weight_strat="eq_weights")
 
-   # Or set custom weights
-   weights = [0.5, 0.3, 0.2]
-   portfolio_df = frame.make_portfolio(name="Custom Portfolio", weights=weights)
+    # Or set custom weights
+    weights = [0.5, 0.3, 0.2]
+    portfolio_df = frame.make_portfolio(name="Custom Portfolio", weights=weights)
 
 Metric Names in DataFrames
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,14 +92,14 @@ The `all_properties()` method has two modes:
 
 .. code-block:: python
 
-   # Get all properties with display names
-   all_metrics = frame.all_properties()
-   # Access using display names
-   key_metrics = all_metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
+    # Get all properties with display names
+    all_metrics = frame.all_properties()
+    # Access using display names
+    key_metrics = all_metrics.loc[['Geometric return', 'Volatility', 'Return vol ratio', 'Max drawdown']]
 
-   # Get only specific properties using internal names
-   specific_metrics = frame.all_properties(properties=['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown'])
-   # No need to filter - only requested properties are returned
+    # Get only specific properties using internal names
+    specific_metrics = frame.all_properties(properties=['geo_ret', 'vol', 'ret_vol_ratio', 'max_drawdown'])
+    # No need to filter - only requested properties are returned
 
 Function Return Values
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -108,11 +108,11 @@ Some functions return tuples that need to be unpacked:
 
 .. code-block:: python
 
-   # efficient_frontier returns a tuple
-   frontier_df, simulated_df, optimal_portfolio = efficient_frontier(eframe=frame, ...)
+    # efficient_frontier returns a tuple
+    frontier_df, simulated_df, optimal_portfolio = efficient_frontier(eframe=frame, ...)
 
-   # simulate_portfolios returns a DataFrame
-   simulation_results = simulate_portfolios(simframe=frame, ...)
+    # simulate_portfolios returns a DataFrame
+    simulation_results = simulate_portfolios(simframe=frame, ...)
 
 Common Issues and Solutions
 ---------------------------
@@ -134,11 +134,11 @@ Issue: "TypeError: unsupported format string passed to Series.__format__"
 
 .. code-block:: python
 
-   # Correct
-   print(f"VaR: {var_series.iloc[0]:.2%}")
+    # Correct
+    print(f"VaR: {var_series.iloc[0]:.2%}")
 
-   # Incorrect
-   print(f"VaR: {var_series:.2%}")
+    # Incorrect
+    print(f"VaR: {var_series:.2%}")
 
 Best Practices
 --------------
