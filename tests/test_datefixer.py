@@ -287,7 +287,6 @@ class TestDateFixer:
             datetime64("2023-05-01"),
             datetime64("2023-05-18"),
             datetime64("2023-06-06"),
-            datetime64("2023-06-23"),
             datetime64("2023-12-25"),
             datetime64("2023-12-26"),
         ]
@@ -316,9 +315,6 @@ class TestDateFixer:
             dt.date(year, 4, 2),
             dt.date(year, 4, 5),
             dt.date(year, 5, 13),
-            dt.date(year, 6, 25),
-            dt.date(year, 12, 24),
-            dt.date(year, 12, 31),
         ]
         cdr_without = holiday_calendar(startyear=year, endyear=year, countries="SE")
         hols_without = [
@@ -423,9 +419,9 @@ class TestDateFixer:
         """Test offset_business_days function with many days."""
         startdate = dt.date(2023, 4, 13)
         forward = 2421
-        forwarddate = dt.date(2033, 4, 13)
+        forwarddate = dt.date(2033, 3, 15)
         backward = -forward
-        backwarddate = dt.date(2013, 4, 23)
+        backwarddate = dt.date(2013, 5, 28)
 
         offsetdate_forward = offset_business_days(
             ddate=startdate,

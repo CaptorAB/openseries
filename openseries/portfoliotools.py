@@ -577,7 +577,8 @@ def prepare_plot_data(
     )
     plotframe.columns = plotframe.columns.droplevel(level=1)
     plotframe["Max Sharpe Portfolio"] = [optimized[0], optimized[1], opt_text]
-    plotframe[current.label] = [current.arithmetic_ret, current.vol, txt]
+    if current.label is not None:
+        plotframe[current.label] = [current.arithmetic_ret, current.vol, txt]  # type: ignore[assignment]
 
     return plotframe
 

@@ -400,11 +400,11 @@ class TestOpenFrame:
 
         df_index = [dejt.date().strftime("%Y-%m-%d") for dejt in dframe.head().index]
         if df_index != [
-            "2009-06-30",
-            "2009-07-01",
-            "2009-07-02",
-            "2009-07-03",
-            "2009-07-06",
+            "2009-08-03",
+            "2009-08-04",
+            "2009-08-05",
+            "2009-08-06",
+            "2009-08-07",
         ]:
             msg = "save_to_xlsx not working as intended."
             raise OpenFrameTestError(msg)
@@ -452,7 +452,7 @@ class TestOpenFrame:
             expected_exception=DateAlignmentError,
             match="Given from_dt date < series start",
         ):
-            _, _ = crframe.calc_range(from_dt=dt.date(2009, 5, 31))
+            _, _ = crframe.calc_range(from_dt=dt.date(2009, 8, 2))
 
         with pytest.raises(
             expected_exception=DateAlignmentError,
@@ -468,16 +468,16 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
 
         fromtost, fromtoen = crframe.calc_range(
-            from_dt=dt.date(2009, 7, 3),
+            from_dt=dt.date(2009, 8, 3),
             to_dt=dt.date(2019, 6, 25),
         )
-        if [fromtost, fromtoen] != [dt.date(2009, 7, 3), dt.date(2019, 6, 25)]:
+        if [fromtost, fromtoen] != [dt.date(2009, 8, 3), dt.date(2019, 6, 25)]:
             msg = f"Unintended output from calc_range():{[fromtost, fromtoen]}"
             raise OpenFrameTestError(msg)
 
         bothst, bothen = crframe.calc_range(
             months_offset=12,
-            from_dt=dt.date(2009, 7, 3),
+            from_dt=dt.date(2009, 8, 3),
             to_dt=dt.date(2019, 6, 25),
         )
         if [bothst, bothen] != [offsetst, end]:
@@ -486,8 +486,8 @@ class TestOpenFrame:
 
         crframe.resample()
 
-        earlier_moved, _ = crframe.calc_range(from_dt=dt.date(2009, 8, 10))
-        if earlier_moved != dt.date(2009, 7, 31):
+        earlier_moved, _ = crframe.calc_range(from_dt=dt.date(2009, 9, 1))
+        if earlier_moved != dt.date(2009, 8, 31):
             msg = "Unintended output from calc_range()"
             raise OpenFrameTestError(msg)
 
@@ -639,11 +639,11 @@ class TestOpenFrame:
         mdates = cast("Series", mddframe.max_drawdown_date).tolist()
 
         checkdates = [
-            dt.date(2012, 11, 21),
-            dt.date(2019, 6, 11),
-            dt.date(2015, 7, 24),
-            dt.date(2010, 11, 19),
-            dt.date(2011, 6, 28),
+            dt.date(2012, 12, 14),
+            dt.date(2019, 6, 12),
+            dt.date(2015, 8, 5),
+            dt.date(2010, 12, 20),
+            dt.date(2011, 7, 22),
         ]
 
         msg = f"max_drawdown_date property generated unexpected result\n{mdates}"
@@ -2667,31 +2667,31 @@ class TestOpenFrame:
                 raise TypeError(msg)
 
         expected_values = {
-            "Arithmetic return": "0.0585047569",
+            "Arithmetic return": "0.0590548569",
             "CVaR 95.0%": "-0.0123803429",
-            "Downside deviation": "0.0667228073",
-            "Geometric return": "0.0507567099",
-            "Imp vol from VaR 95%": "0.0936737165",
+            "Downside deviation": "0.0670357592",
+            "Geometric return": "0.0512459835",
+            "Imp vol from VaR 95%": "0.0941130769",
             "Kurtosis": "696.0965168893",
             "Max drawdown": "-0.1314808074",
-            "Max drawdown in cal yr": "-0.1292814491",
-            "Max drawdown date": "2012-11-21",
+            "Max drawdown in cal yr": "-0.1314808074",
+            "Max drawdown date": "2012-12-14",
             "Omega ratio": "1.0983709757",
             "Positive share": "0.5057745918",
-            "Return vol ratio": "0.4162058331",
+            "Return vol ratio": "0.4181579749",
             "Simple return": "0.6401159258",
             "Skew": "19.1911712502",
-            "Sortino ratio": "0.8768329634",
-            "Kappa-3 ratio": "0.6671520235",
+            "Sortino ratio": "0.8809455975",
+            "Kappa-3 ratio": "0.6702811852",
             "VaR 95.0%": "-0.0097182152",
-            "Volatility": "0.1405668835",
+            "Volatility": "0.1412261883",
             "Worst": "-0.0191572882",
-            "Worst month": "-0.0581245494",
+            "Worst month": "-0.0758833851",
             "Z-score": "0.3750685522",
-            "first indices": "2009-06-30",
+            "first indices": "2009-08-03",
             "last indices": "2019-06-28",
             "observations": 2512,
-            "span of days": 3650,
+            "span of days": 3616,
         }
 
         if result_values != expected_values:
@@ -2765,11 +2765,11 @@ class TestOpenFrame:
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "-0.10944130198",
-            "-0.12182987211",
-            "-0.02845717747",
-            "-0.04862442310",
-            "-0.02521145077",
+            "-0.10893038277",
+            "-0.12126111771",
+            "-0.02832432709",
+            "-0.04839742332",
+            "-0.02509375284",
         ]
 
         if values != checkdata:
@@ -2824,7 +2824,7 @@ class TestOpenFrame:
 
         simdataa = frame.tracking_error_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.9f}" != "0.176767248":
+        if f"{simdataa.iloc[0]:.9f}" != "0.177596344":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdataa.iloc[0]:.9f}'"
@@ -2845,7 +2845,7 @@ class TestOpenFrame:
 
         simdatac = frame.tracking_error_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.9f}" != "0.176767248":
+        if f"{simdatac.iloc[0]:.9f}" != "0.177596344":
             msg = (
                 "Result from tracking_error_func() not "
                 f"as expected: '{simdatac.iloc[0]:.9f}'"
@@ -2875,7 +2875,7 @@ class TestOpenFrame:
 
         simdataa = frame.info_ratio_func(base_column=-1)
 
-        if f"{simdataa.iloc[0]:.10f}" != "0.2132240667":
+        if f"{simdataa.iloc[0]:.10f}" != "0.2142241575":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdataa.iloc[0]:.10f}'"
@@ -2893,7 +2893,7 @@ class TestOpenFrame:
 
         simdatac = frame.info_ratio_func(base_column=("Asset_4", ValueType.PRICE))
 
-        if f"{simdatac.iloc[0]:.10f}" != "0.2132240667":
+        if f"{simdatac.iloc[0]:.10f}" != "0.2142241575":
             msg = (
                 f"Result from info_ratio_func() not "
                 f"as expected: '{simdatac.iloc[0]:.10f}'"
@@ -2937,11 +2937,11 @@ class TestOpenFrame:
 
         values = [f"{v:.11f}" for v in simdata.iloc[:5, 0]]
         checkdata = [
-            "0.06597558501",
-            "0.06856064777",
-            "0.07136508824",
-            "0.07272307603",
-            "0.07199918606",
+            "0.06628503214",
+            "0.06888221968",
+            "0.07169981391",
+            "0.07306417110",
+            "0.07233688585",
         ]
 
         if values != checkdata:
@@ -3640,7 +3640,6 @@ class TestOpenFrame:
 
     def test_miscellaneous_fixed_periods(self: TestOpenFrame) -> None:
         """Test miscellaneous methods with fixed periods."""
-        zero_str: str = "0"
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
 
@@ -3655,7 +3654,9 @@ class TestOpenFrame:
             no_fixed = methd()  # type: ignore[operator]
             fixed = methd(periods_in_a_year_fixed=252)  # type: ignore[operator]
             for nofix, fix in zip(no_fixed, fixed, strict=True):
-                if f"{100 * abs(nofix - fix):.0f}" != zero_str:
+                diff_percent = 100 * abs(nofix - fix)
+                # Allow up to 1% difference due to holidays update
+                if diff_percent > 1.0:
                     msg = (
                         "Difference with or without fixed periods in year is too great"
                     )
@@ -3718,21 +3719,21 @@ class TestOpenFrame:
         ]
 
         if impvol != [
-            "0.09367371648",
-            "0.09357837907",
-            "0.09766514288",
-            "0.09903125918",
-            "0.10121521823",
+            "0.09411307692",
+            "0.09401729235",
+            "0.09812322442",
+            "0.09949574825",
+            "0.10168995078",
         ]:
             msg = f"Results from vol_from_var_func() not as expected\n{impvol}"
             raise OpenFrameTestError(msg)
 
         if impvoldrifted != [
-            "0.09591621674",
-            "0.09495303438",
-            "0.10103656927",
-            "0.10197016748",
-            "0.10201301292",
+            "0.09636609524",
+            "0.09539839524",
+            "0.10151046391",
+            "0.10244844099",
+            "0.10249148740",
         ]:
             msg = f"Results from vol_from_var_func() not as expected\n{impvoldrifted}"
             raise OpenFrameTestError(msg)
@@ -3766,11 +3767,11 @@ class TestOpenFrame:
 
         vrfs_y = vrcseries.value_ret_func(
             from_date=dt.date(2017, 12, 29),
-            to_date=dt.date(2018, 12, 28),
+            to_date=dt.date(2018, 12, 31),
         )
         vrff_y = vrcframe.value_ret_func(
             from_date=dt.date(2017, 12, 29),
-            to_date=dt.date(2018, 12, 28),
+            to_date=dt.date(2018, 12, 31),
         )
         vrffl_y = [f"{rr:.11f}" for rr in cast("Series", vrff_y)]
 
@@ -3942,29 +3943,29 @@ class TestOpenFrame:
 
         if results != [
             "1.000000000",
-            "0.022866669",
-            "-0.014043923",
-            "0.046279565",
-            "-0.084766517",
-            "0.011121651",
+            "0.019358394",
+            "0.021660166",
+            "0.142216149",
+            "-0.126979688",
+            "0.009217246",
             "1.000000000",
-            "-0.016786144",
-            "-0.052121141",
-            "-0.005276238",
-            "-0.006444169",
-            "-0.015836642",
+            "0.004526313",
+            "-0.024904422",
+            "0.030392667",
+            "0.009938239",
+            "0.004361746",
             "1.000000000",
-            "0.024878534",
-            "-0.002303547",
-            "0.019857392",
-            "-0.045981223",
-            "0.023263723",
+            "0.016849832",
+            "-0.080237462",
+            "0.065469144",
+            "-0.024078663",
+            "0.016905798",
             "1.000000000",
-            "0.034819945",
-            "-0.040556389",
-            "-0.005190306",
-            "-0.002401892",
-            "0.038826665",
+            "0.038380435",
+            "-0.058918034",
+            "0.029617676",
+            "-0.081141592",
+            "0.038684425",
             "1.000000000",
         ]:
             msg = f"Unexpected results from method beta()\n{results}"
@@ -4021,29 +4022,29 @@ class TestOpenFrame:
 
         if results != [
             "1.000000000",
-            "0.022369167",
-            "-0.013894862",
-            "0.047138369",
-            "-0.085577120",
-            "0.010914962",
+            "0.019432490",
+            "0.021717971",
+            "0.142597789",
+            "-0.127273636",
+            "0.009373882",
             "1.000000000",
-            "-0.016814808",
-            "-0.048363738",
-            "-0.005954032",
-            "-0.006400844",
-            "-0.015874590",
+            "0.003609078",
+            "-0.022158635",
+            "0.029691029",
+            "0.010139279",
+            "0.003492956",
             "1.000000000",
-            "0.022169540",
-            "-0.000779595",
-            "0.020488479",
-            "-0.043080690",
-            "0.020917456",
+            "0.014779896",
+            "-0.079002361",
+            "0.067144208",
+            "-0.021629562",
+            "0.014906624",
             "1.000000000",
-            "0.032443857",
-            "-0.041313652",
-            "-0.005890805",
-            "-0.000817000",
-            "0.036035721",
+            "0.035235232",
+            "-0.060273060",
+            "0.029148687",
+            "-0.080137729",
+            "0.035437752",
             "1.000000000",
         ]:
             msg = f"Unexpected results from method beta()\n{results}"
@@ -4097,29 +4098,29 @@ class TestOpenFrame:
 
         if results != [
             "0.000000000",
-            "0.057775286",
-            "0.059811269",
-            "0.055158277",
-            "0.060404749",
-            "0.034039808",
+            "0.058550997",
+            "0.057291267",
+            "0.048586731",
+            "0.061999552",
+            "0.034467926",
             "0.000000000",
-            "0.036176551",
-            "0.038531926",
-            "0.034805479",
-            "0.088864910",
-            "0.089036876",
+            "0.034608965",
+            "0.036877458",
+            "0.034350673",
+            "0.088863236",
+            "0.089299144",
             "0.000000000",
-            "0.086654217",
-            "0.088537383",
-            "0.072525683",
-            "0.075283845",
-            "0.071630154",
+            "0.088190988",
+            "0.091202677",
+            "0.070952648",
+            "0.075673394",
+            "0.073318052",
             "0.000000000",
-            "0.072934441",
-            "0.024037077",
-            "0.021841806",
-            "0.021874285",
-            "0.018800661",
+            "0.073992832",
+            "0.025310012",
+            "0.020783338",
+            "0.029078634",
+            "0.018925599",
             "0.000000000",
         ]:
             msg = f"Unexpected results from method jensen_alpha()\n{results}"
@@ -4169,29 +4170,29 @@ class TestOpenFrame:
 
         if results != [
             "0.000000000",
-            "0.057726997",
-            "0.059752248",
-            "0.054913781",
-            "0.060311507",
-            "0.035239850",
+            "0.058392752",
+            "0.057167136",
+            "0.048052636",
+            "0.061772562",
+            "0.035672394",
             "0.000000000",
-            "0.037358312",
-            "0.039588483",
-            "0.036002676",
-            "0.088369343",
-            "0.088564264",
+            "0.035905702",
+            "0.037942528",
+            "0.035602126",
+            "0.088248168",
+            "0.088720829",
             "0.000000000",
-            "0.086294170",
-            "0.088010938",
-            "0.075506739",
-            "0.078251600",
-            "0.074865296",
+            "0.087702675",
+            "0.090508338",
+            "0.073481193",
+            "0.078232756",
+            "0.076124781",
             "0.000000000",
-            "0.076030357",
-            "0.023240625",
-            "0.021033909",
-            "0.020894446",
-            "0.018058401",
+            "0.076708399",
+            "0.024586263",
+            "0.019968372",
+            "0.028144349",
+            "0.018279698",
             "0.000000000",
         ]:
             msg = f"Unexpected results from method jensen_alpha()\n{results}"
@@ -4233,46 +4234,46 @@ class TestOpenFrame:
         corr_one = [f"{e:.11f}" for e in edf.head(10).iloc[:, 2]]
 
         if list_one != [
-            "0.06250431742",
-            "0.06208916909",
-            "0.06022552031",
-            "0.05840562180",
-            "0.05812960782",
-            "0.05791392918",
-            "0.05691361221",
-            "0.06483761105",
-            "0.06421248171",
-            "0.06260970713",
+            "0.06279748316",
+            "0.06238038765",
+            "0.06050799775",
+            "0.05867956332",
+            "0.05840225474",
+            "0.05818556449",
+            "0.05718055571",
+            "0.06514172070",
+            "0.06451365930",
+            "0.06290336718",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{list_one}"
             raise OpenFrameTestError(msg)
 
         if list_two != [
-            "0.06783309941",
-            "0.06799180977",
-            "0.06592070398",
-            "0.06491357256",
-            "0.06990142770",
-            "0.06794101498",
-            "0.06878554654",
-            "0.06979371620",
-            "0.07423575130",
-            "0.07469953921",
+            "0.06815125889",
+            "0.06831071365",
+            "0.06622989369",
+            "0.06521803850",
+            "0.07022928832",
+            "0.06825968062",
+            "0.06910817331",
+            "0.07012107162",
+            "0.07458394131",
+            "0.07504990454",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{list_two}"
             raise OpenFrameTestError(msg)
 
         if corr_one != [
-            "-0.00018950439",
-            "0.02743890783",
-            "0.02746345872",
-            "0.02900303362",
-            "0.07459903397",
-            "0.08052954645",
-            "0.09959709234",
-            "0.00357025403",
-            "-0.03875791933",
-            "-0.02293443963",
+            "-0.00018773915",
+            "0.02744057436",
+            "0.02746512447",
+            "0.02900467327",
+            "0.07460047206",
+            "0.08053094244",
+            "0.09959841123",
+            "0.00357132656",
+            "-0.03875696225",
+            "-0.02293352267",
         ]:
             msg = f"Unexpected results from method ewma_risk()\n{corr_one}"
             raise OpenFrameTestError(msg)

@@ -864,7 +864,7 @@ class TestOpenTimeSeries:
         if calc != self.randomseries.periods_in_a_year:
             msg = "Property periods_in_a_year returned unexpected result"
             raise OpenTimeSeriesTestError(msg)
-        if f"{251.3720547945:.10f}" != f"{self.randomseries.periods_in_a_year:.10f}":
+        if f"{253.7356194690:.10f}" != f"{self.randomseries.periods_in_a_year:.10f}":
             msg = "Property periods_in_a_year returned unexpected result"
             raise OpenTimeSeriesTestError(msg)
 
@@ -875,7 +875,7 @@ class TestOpenTimeSeries:
 
     def test_yearfrac(self: TestOpenTimeSeries) -> None:
         """Test yearfrac property."""
-        if f"{9.99315537303:.11f}" != f"{self.randomseries.yearfrac:.11f}":
+        if f"{9.90006844627:.11f}" != f"{self.randomseries.yearfrac:.11f}":
             msg = "Property periods_in_a_year returned unexpected result"
             raise OpenTimeSeriesTestError(msg)
 
@@ -905,7 +905,7 @@ class TestOpenTimeSeries:
         ret = array(before)[1:] / array(before)[:-1] - 1
         before_ret = [f"{item:.6f}" for item in ret]
 
-        expected_but_not_same = ["0.016315", "0.023237", "-0.024421", "-0.030321"]
+        expected_but_not_same = ["0.012903", "0.029975", "-0.026213", "-0.037612"]
         before_rr_ret = [
             f"{item:.6f}" for item in rr_series.tsdf.loc[dates].iloc[1:, 0]
         ]
@@ -1047,8 +1047,8 @@ class TestOpenTimeSeries:
         gr_0 = cseries.vol_func(months_from_last=48)
 
         cseries.model_config.update({"validate_assignment": False})
-        cseries.dates = cseries.dates[-1008:]
-        cseries.values = list(cseries.values)[-1008:]
+        cseries.dates = cseries.dates[-1016:]
+        cseries.values = list(cseries.values)[-1016:]
         cseries.model_config.update({"validate_assignment": True})
         cseries.pandas_df()
         cseries.set_new_label(lvl_one=ValueType.RTRN)
@@ -1187,32 +1187,32 @@ class TestOpenTimeSeries:
                 raise TypeError(msg)
 
         expected_values = {
-            "arithmetic_ret": "0.0585047569",
+            "arithmetic_ret": "0.0590548569",
             "cvar_down": "-0.0123803429",
-            "downside_deviation": "0.0667228073",
-            "first_idx": "2009-06-30",
-            "geo_ret": "0.0507567099",
+            "downside_deviation": "0.0670357592",
+            "first_idx": "2009-08-03",
+            "geo_ret": "0.0512459835",
             "kurtosis": "696.0965168893",
             "last_idx": "2019-06-28",
             "length": 2512,
             "max_drawdown": "-0.1314808074",
-            "max_drawdown_cal_year": "-0.1292814491",
-            "max_drawdown_date": "2012-11-21",
+            "max_drawdown_cal_year": "-0.1314808074",
+            "max_drawdown_date": "2012-12-14",
             "omega_ratio": "1.0983709757",
-            "periods_in_a_year": "251.3720547945",
+            "periods_in_a_year": "253.7356194690",
             "positive_share": "0.5057745918",
-            "ret_vol_ratio": "0.4162058331",
+            "ret_vol_ratio": "0.4181579749",
             "skew": "19.1911712502",
-            "sortino_ratio": "0.8768329634",
-            "kappa3_ratio": "0.6671520235",
-            "span_of_days": 3650,
+            "sortino_ratio": "0.8809455975",
+            "kappa3_ratio": "0.6702811852",
+            "span_of_days": 3616,
             "value_ret": "0.6401159258",
             "var_down": "-0.0097182152",
-            "vol": "0.1405668835",
-            "vol_from_var": "0.0936737165",
+            "vol": "0.1412261883",
+            "vol_from_var": "0.0941130769",
             "worst": "-0.0191572882",
-            "worst_month": "-0.0581245494",
-            "yearfrac": "9.9931553730",
+            "worst_month": "-0.0758833851",
+            "yearfrac": "9.9000684463",
             "z_score": "0.3750685522",
         }
 
@@ -1232,22 +1232,22 @@ class TestOpenTimeSeries:
         """Test all calculated properties."""
         checks = {
             "cvar_down": "-0.0123803429",
-            "downside_deviation": "0.0667228073",
-            "geo_ret": "0.0507567099",
+            "downside_deviation": "0.0670357592",
+            "geo_ret": "0.0512459835",
             "kurtosis": "696.0965168893",
             "max_drawdown": "-0.1314808074",
-            "max_drawdown_cal_year": "-0.1292814491",
+            "max_drawdown_cal_year": "-0.1314808074",
             "positive_share": "0.5057745918",
-            "ret_vol_ratio": "0.4162058331",
+            "ret_vol_ratio": "0.4181579749",
             "skew": "19.1911712502",
-            "sortino_ratio": "0.8768329634",
-            "kappa3_ratio": "0.6671520235",
+            "sortino_ratio": "0.8809455975",
+            "kappa3_ratio": "0.6702811852",
             "value_ret": "0.6401159258",
             "var_down": "-0.0097182152",
-            "vol": "0.1405668835",
-            "vol_from_var": "0.0936737165",
+            "vol": "0.1412261883",
+            "vol_from_var": "0.0941130769",
             "worst": "-0.0191572882",
-            "worst_month": "-0.0581245494",
+            "worst_month": "-0.0758833851",
             "z_score": "0.3750685522",
         }
         audit = {}
@@ -1279,26 +1279,26 @@ class TestOpenTimeSeries:
 
     def test_all_calc_functions(self: TestOpenTimeSeries) -> None:
         """Test all calculation methods."""
-        excel_geo_ret = (1.640115925775493 / 1.4387489280838568) ** (
+        excel_geo_ret = (1.640115925775493 / 1.4386043392392553) ** (
             1 / ((dt.date(2019, 6, 28) - dt.date(2015, 6, 26)).days / 365.25)
         ) - 1
         checks = {
-            "arithmetic_ret_func": "0.03770656022",
+            "arithmetic_ret_func": "0.03774005386",
             "cvar_down_func": "-0.01265870645",
-            "lower_partial_moment_func": "0.06871856382",
+            "lower_partial_moment_func": "0.06877091485",
             "geo_ret_func": f"{excel_geo_ret:.11f}",
-            "kurtosis_func": "-0.07991363073",
+            "kurtosis_func": "-0.06622801241",
             "max_drawdown_func": "-0.12512526696",
-            "positive_share_func": "0.50744786495",
-            "ret_vol_ratio_func": "0.37802191976",
-            "skew_func": "0.03894541564",
-            "sortino_ratio_func": "0.54870995728",
-            "value_ret_func": "0.13995978990",
+            "positive_share_func": "0.50738916256",
+            "ret_vol_ratio_func": "0.37802994872",
+            "skew_func": "0.03982615963",
+            "sortino_ratio_func": "0.54877929050",
+            "value_ret_func": "0.14007436308",
             "var_down_func": "-0.01032629793",
-            "vol_func": "0.09974702060",
-            "vol_from_var_func": "0.09959111838",
+            "vol_func": "0.09983350258",
+            "vol_from_var_func": "0.09998554019",
             "worst_func": "-0.01915728825",
-            "z_score_func": "0.54204277867",
+            "z_score_func": "0.54388522850",
         }
         audit = {}
         msg = ""
@@ -1318,7 +1318,7 @@ class TestOpenTimeSeries:
             raise OpenTimeSeriesTestError(msg)
 
         func = "value_ret_calendar_period"
-        if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.039890004088":
+        if f"{getattr(self.randomseries, func)(year=2019):.12f}" != "0.044265375294":
             msg = (
                 f"Unexpected result from method {func}(): "
                 f"'{getattr(self.randomseries, func)(year=2019):.12f}'"
@@ -1329,8 +1329,8 @@ class TestOpenTimeSeries:
         """Test max_drawdown_date property."""
         if cast("dt.date", self.randomseries.max_drawdown_date) != dt.date(
             2012,
-            11,
-            21,
+            12,
+            14,
         ):
             msg = (
                 "Unexpected max_drawdown_date: "
@@ -1351,7 +1351,7 @@ class TestOpenTimeSeries:
         adjustedseries = self.randomseries.from_deepcopy()
         adjustedseries.running_adjustment(0.05)
 
-        if f"{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "2.7036984198":
+        if f"{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}" != "2.6909938693":
             msg = (
                 "Unexpected result from running_adjustment(): "
                 f"'{cast('float', adjustedseries.tsdf.iloc[-1, 0]):.10f}'"
@@ -1430,7 +1430,7 @@ class TestOpenTimeSeries:
             raise TypeError(msg)
 
         front_series_three = OpenTimeSeries.from_df(full_series.tsdf.iloc[:136])
-        front_series_three.resample(freq="10D")
+        front_series_three.resample(freq="15D")
 
         if back_series.first_idx in front_series_three.tsdf.index:
             msg = "Function timeseries_chain() not working as intended"
@@ -1438,7 +1438,10 @@ class TestOpenTimeSeries:
 
         with pytest.raises(
             expected_exception=DateAlignmentError,
-            match="Failed to find a matching date between series",
+            match=(
+                r"(Timeseries dates must overlap to allow them to be chained|"
+                r"Failed to find a matching date between series)"
+            ),
         ):
             _ = timeseries_chain(front_series_three, back_series)
 
@@ -1536,7 +1539,7 @@ class TestOpenTimeSeries:
         self: TestOpenTimeSeries,
     ) -> None:
         """Test align_index_to_local_cdays method."""
-        d_range = [d.date() for d in date_range(start="2020-06-15", end="2020-06-25")]
+        d_range = [d.date() for d in date_range(start="2020-04-28", end="2020-05-05")]
         asim = [1.0] * len(d_range)
         adf = DataFrame(
             data=asim,
@@ -1551,23 +1554,23 @@ class TestOpenTimeSeries:
             msg = "Base case test_align_index_to_local_cdays not set up as intended"
             raise OpenTimeSeriesTestError(msg)
 
-        midsummer = dt.date(2020, 6, 19)
-        if midsummer not in d_range:
+        first_may = dt.date(2020, 5, 1)
+        if first_may not in d_range:
             msg = "Date range generation not run as intended"
             raise OpenTimeSeriesTestError(msg)
 
         aseries.align_index_to_local_cdays(countries="SE")
-        if midsummer in aseries.tsdf.index:
+        if first_may in aseries.tsdf.index:
             msg = "Method align_index_to_local_cdays() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
         anotherseries.align_index_to_local_cdays(countries="US", markets="XSTO")
-        if midsummer in anotherseries.tsdf.index:
+        if first_may in anotherseries.tsdf.index:
             msg = "Method align_index_to_local_cdays() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
         yetoneseries.align_index_to_local_cdays(countries="US")
-        if midsummer not in yetoneseries.tsdf.index:
+        if first_may not in yetoneseries.tsdf.index:
             msg = "Method align_index_to_local_cdays() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
@@ -1576,11 +1579,11 @@ class TestOpenTimeSeries:
         simdata = self.randomseries.ewma_vol_func()
         values = [f"{v:.11f}" for v in simdata.iloc[:5]]
         checkdata = [
-            "0.06250431742",
-            "0.06208916909",
-            "0.06022552031",
-            "0.05840562180",
-            "0.05812960782",
+            "0.06279748316",
+            "0.06238038765",
+            "0.06050799775",
+            "0.05867956332",
+            "0.05840225474",
         ]
 
         if values != checkdata:
@@ -1719,12 +1722,12 @@ class TestOpenTimeSeries:
         """Test sortino_ratio_func() setting order to 3 to get kappa3 ratio."""
         sortino = self.randomseries.sortino_ratio_func(order=2)
         msg = f"Unexpected result from sortino_ratio_func(): {sortino:.10f}"
-        if f"{sortino:.10f}" != "0.8768329634":
+        if f"{sortino:.10f}" != "0.8809455975":
             raise OpenTimeSeriesTestError(msg)
 
         kappa3 = self.randomseries.sortino_ratio_func(order=3)
         msg = f"Unexpected result from sortino_ratio_func(): {kappa3:.10f}"
-        if f"{kappa3:.10f}" != "0.6671520235":
+        if f"{kappa3:.10f}" != "0.6702811852":
             raise OpenTimeSeriesTestError(msg)
 
         with pytest.raises(
@@ -1933,7 +1936,6 @@ class TestOpenTimeSeries:
     def test_miscellaneous(self: TestOpenTimeSeries) -> None:
         """Test miscellaneous methods."""
         mseries = self.randomseries.from_deepcopy()
-        zero_str: str = "0"
 
         methods = [
             "arithmetic_ret_func",
@@ -1945,17 +1947,19 @@ class TestOpenTimeSeries:
         for methd in methods:
             no_fixed = getattr(mseries, methd)()
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
-            if f"{100 * abs(no_fixed - fixed):.0f}" != zero_str:
+            diff_percent = 100 * abs(no_fixed - fixed)
+            # Allow up to 1% difference due to holidays update
+            if diff_percent > 1.0:
                 msg = "Difference with or without fixed periods in year is too great"
                 raise OpenTimeSeriesTestError(msg)
 
         impvol = mseries.vol_from_var_func(drift_adjust=False)
-        if f"{impvol:.12f}" != "0.093673716476":
+        if f"{impvol:.12f}" != "0.094113076917":
             msg = "Unexpected result from method vol_from_var_func(): '{impvol:.12f}'"
             raise OpenTimeSeriesTestError(msg)
 
         impvoldrifted = mseries.vol_from_var_func(drift_adjust=True)
-        if f"{impvoldrifted:.12f}" != "0.095916216736":
+        if f"{impvoldrifted:.12f}" != "0.096366095239":
             msg = (
                 "Unexpected result from method vol_from_var_func(): "
                 f"'{impvoldrifted:.12f}'"
@@ -1970,7 +1974,7 @@ class TestOpenTimeSeries:
 
         vrfs_y = vrcseries.value_ret_func(
             from_date=dt.date(2017, 12, 29),
-            to_date=dt.date(2018, 12, 28),
+            to_date=dt.date(2018, 12, 31),
         )
         vrvrcs_y = vrcseries.value_ret_calendar_period(year=2018)
         if f"{vrfs_y:.11f}" != f"{vrvrcs_y:.11f}":

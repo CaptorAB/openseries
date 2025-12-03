@@ -1003,7 +1003,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             time_factor = shortdf.count() / fraction
 
         shortdf_returns = shortdf.ffill().pct_change()
-        shortdf_returns_np = shortdf_returns.to_numpy()
+        shortdf_returns_np = cast("NDArray[float64]", shortdf_returns.to_numpy())
         up_mask = shortdf_returns_np > loss_limit
         down_mask = shortdf_returns_np < loss_limit
 
@@ -1016,7 +1016,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                     cast("Timestamp", earlier) : cast("Timestamp", later)
                 ][item]
                 longdf_returns = longdf.ffill().pct_change()
-                longdf_returns_np = longdf_returns.to_numpy()
+                longdf_returns_np = cast("NDArray[float64]", longdf_returns.to_numpy())
                 ratio_value = self._calculate_capture_ratio_for_item(
                     ratio=ratio,
                     longdf_returns_np=longdf_returns_np,

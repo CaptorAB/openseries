@@ -66,7 +66,7 @@ class TestPortfoliotools:
             f"{result_returns.loc[result_returns['stdev'].idxmin()]['ret']:.7f}"
         )
 
-        if (return_least_vol, return_where_least_vol) != ("0.0476781", "0.0558805"):
+        if (return_least_vol, return_where_least_vol) != ("0.0479017", "0.0564059"):
             msg = (
                 "Function simulate_portfolios not working as intended"
                 f"\n{(return_least_vol, return_where_least_vol)}"
@@ -89,7 +89,7 @@ class TestPortfoliotools:
             f"{result_values.loc[result_values['stdev'].idxmin()]['ret']:.7f}"
         )
 
-        if (value_least_vol, value_where_least_vol) != ("0.0476875", "0.0559028"):
+        if (value_least_vol, value_where_least_vol) != ("0.0479112", "0.0564284"):
             msg = (
                 "Function simulate_portfolios not working as intended"
                 f"\n{(value_least_vol, value_where_least_vol)}"
@@ -157,8 +157,8 @@ class TestPortfoliotools:
             )
 
             if (frt_most_sharpe, frt_return_where_most_sharpe) != (
-                Decimal("1.302126"),
-                Decimal("0.067698"),
+                Decimal("1.308234"),
+                Decimal("0.068335"),
             ):
                 msg = (
                     "Function efficient_frontier not working as intended"
@@ -176,8 +176,8 @@ class TestPortfoliotools:
             )
 
             if (sim_least_vol, sim_return_where_least_vol) != (
-                Decimal("0.047678"),
-                Decimal("0.055881"),
+                Decimal("0.047902"),
+                Decimal("0.056406"),
             ):
                 msg = (
                     "Function efficient_frontier not working as intended"
@@ -193,13 +193,13 @@ class TestPortfoliotools:
                 raise PortfoliotoolsTestError(msg)
 
             if optlist != [
-                Decimal("0.068444"),
-                Decimal("0.052547"),
-                Decimal("1.302525"),
-                Decimal("0.116616"),
+                Decimal("0.069088"),
+                Decimal("0.052794"),
+                Decimal("1.308634"),
+                Decimal("0.116617"),
                 Decimal("0.140094"),
-                Decimal("0.352682"),
-                Decimal("0.312324"),
+                Decimal("0.352684"),
+                Decimal("0.312323"),
                 Decimal("0.078283"),
             ]:
                 msg = f"Function efficient_frontier not working as intended\n{optlist}"
@@ -268,11 +268,11 @@ class TestPortfoliotools:
             f"{minw:.7f}" for minw in list(cast("Iterable[float]", minframe.weights))
         ]
         if minframe_weights != [
-            "0.1150512",
-            "0.2045890",
-            "0.2412361",
-            "0.2352707",
-            "0.2038530",
+            "0.1150596",
+            "0.2045882",
+            "0.2412307",
+            "0.2352717",
+            "0.2038498",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -292,11 +292,11 @@ class TestPortfoliotools:
             for minw in list(cast("Iterable[float]", minframe_nb.weights))
         ]
         if minframe_nb_weights != [
-            "0.1150512",
-            "0.2045890",
-            "0.2412361",
-            "0.2352707",
-            "0.2038530",
+            "0.1150596",
+            "0.2045882",
+            "0.2412307",
+            "0.2352717",
+            "0.2038498",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -306,7 +306,7 @@ class TestPortfoliotools:
 
         if (
             f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
-            != "0.0016062"
+            != "0.0016213"
         ):
             msg = (
                 "Optimization did not find better return with similar vol\n"
@@ -326,11 +326,11 @@ class TestPortfoliotools:
             f"{maxw:.7f}" for maxw in list(cast("Iterable[float]", maxframe.weights))
         ]
         if maxframe_weights != [
-            "0.1151792",
-            "0.1738639",
-            "0.2942018",
-            "0.2704667",
-            "0.1462884",
+            "0.1151897",
+            "0.1738640",
+            "0.2941952",
+            "0.2704676",
+            "0.1462836",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -338,7 +338,7 @@ class TestPortfoliotools:
             )
             raise PortfoliotoolsTestError(msg)
 
-        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0001994":
+        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0002004":
             msg = (
                 "Optimization did not find better return with similar vol\n"
                 f"{assets_std.vol - maxseries.vol:.7f}"
@@ -755,4 +755,46 @@ class TestPortfoliotools:
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "sharpeplot add_logo argument not setup correctly"
+            raise PortfoliotoolsTestError(msg)
+
+    def test_prepare_plot_data_with_none_label(self: TestPortfoliotools) -> None:
+        """Test prepare_plot_data when current.label is None."""
+        simulations = 100
+        points = 20
+
+        spframe = self.randomframe.from_deepcopy()
+        spframe.to_cumret()
+        current = OpenTimeSeries.from_df(
+            spframe.make_portfolio(
+                name="Current Portfolio",
+                weight_strat="eq_weights",
+            ),
+        )
+        current.label = None
+
+        _frontier, _simulated, optimum = efficient_frontier(
+            eframe=spframe,
+            num_ports=simulations,
+            seed=self.seed,
+            frontier_points=points,
+            tweak=False,
+        )
+
+        plotframe = prepare_plot_data(
+            assets=spframe,
+            current=current,
+            optimized=optimum,
+        )
+
+        if current.label in plotframe.columns:
+            msg = "prepare_plot_data should not add current series when label is None"
+            raise PortfoliotoolsTestError(msg)
+
+        if "Max Sharpe Portfolio" not in plotframe.columns:
+            msg = "prepare_plot_data should still add Max Sharpe Portfolio"
+            raise PortfoliotoolsTestError(msg)
+
+        expected_rows = 3
+        if plotframe.shape[0] != expected_rows:
+            msg = f"plotframe should have {expected_rows} rows (ret, stdev, text)"
             raise PortfoliotoolsTestError(msg)

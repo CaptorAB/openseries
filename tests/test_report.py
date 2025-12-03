@@ -40,11 +40,11 @@ class TestReport:
         frame.to_cumret()
 
         expected_one = [
-            "-0.15435597",
-            "-0.26899063",
-            "-2.15829921",
-            "-2.06087664",
-            "-1.63741658",
+            "0.62145461",
+            "4.75300303",
+            "-0.38834851",
+            "1.23234213",
+            "-0.95914766",
         ]
 
         returns = calendar_period_returns(data=frame, relabel=True)
@@ -63,11 +63,11 @@ class TestReport:
         last_quarter = [f"{nbr:.8f}" for nbr in returns.loc["Q2 2019"]]
 
         expected_two = [
-            "-2.51705728",
-            "-0.94753886",
-            "2.51347355",
-            "0.13058329",
-            "-0.91336477",
+            "-0.13684769",
+            "-1.71819468",
+            "-2.47673386",
+            "-235.56746401",
+            "-1.07977144",
         ]
 
         if last_quarter != expected_two:
@@ -187,7 +187,7 @@ class TestReport:
             bar_freq="BME",
         )
         fig_bme_json = loads(cast("str", figure_bme.to_json()))
-        self._verify_report_bar_freq(fig_bme_json, "'x': ['Jul 09'")
+        self._verify_report_bar_freq(fig_bme_json, "'x': ['Aug 09'")
 
         fig_logo, _ = report_html(
             data=plotframe,
@@ -294,7 +294,7 @@ class TestReport:
 
         frame.trunc_frame(start_cut=dt.date(2019, 4, 30))
 
-        new_length = 40
+        new_length = 41
         if new_length != frame.length:
             msg = f"report_html shortdata test not working:{frame.length}"
             raise ReportTestError(msg)

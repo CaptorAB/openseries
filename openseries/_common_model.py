@@ -205,15 +205,13 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         if self.tsdf.shape[1] == 1:
             arr = float(asarray(a=result, dtype=float64).squeeze())
             return cast("SeriesOrFloat_co", arr)  # type: ignore[redundant-cast]
-        return cast(
-            "SeriesOrFloat_co",
-            Series(
-                data=result,
-                index=self.tsdf.columns,
-                name=name,
-                dtype="float64",
-            ),
+        series_result: SeriesOrFloat_co = Series(  # type: ignore[assignment]
+            data=result,
+            index=self.tsdf.columns,
+            name=name,
+            dtype="float64",
         )
+        return series_result
 
     @property
     def length(self: Self) -> int:
@@ -508,16 +506,17 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         mdddf = self.tsdf.copy()
         mdddf.index = DatetimeIndex(mdddf.index)
-        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date
+        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date  # type: ignore[attr-defined,arg-type]
 
         if self.tsdf.shape[1] == 1:
-            return result.iloc[0]
-        return Series(
+            return cast("dt.date", result.iloc[0])
+        date_series = Series(
             data=result,
             index=self.tsdf.columns,
             name="Max drawdown date",
             dtype="datetime64[ns]",
-        ).dt.date
+        ).dt.date  # type: ignore[attr-defined]
+        return cast("Series[dt.date]", date_series)
 
     @property
     def worst(self: Self) -> SeriesOrFloat_co:
