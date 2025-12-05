@@ -128,7 +128,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = [
   "-n", "auto",
-  "--dist=loadscope",
+  "--dist=worksteal",
   "--cov=openseries",
   "--strict-markers",
   "--cov-fail-under=99",
