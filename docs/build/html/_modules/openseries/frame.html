@@ -1165,7 +1165,7 @@
             <span class="n">time_factor</span> <span class="o">=</span> <span class="n">shortdf</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">/</span> <span class="n">fraction</span>
 
         <span class="n">shortdf_returns</span> <span class="o">=</span> <span class="n">shortdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
-        <span class="n">shortdf_returns_np</span> <span class="o">=</span> <span class="n">shortdf_returns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">shortdf_returns_np</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span> <span class="n">shortdf_returns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
         <span class="n">up_mask</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span> <span class="o">&gt;</span> <span class="n">loss_limit</span>
         <span class="n">down_mask</span> <span class="o">=</span> <span class="n">shortdf_returns_np</span> <span class="o">&lt;</span> <span class="n">loss_limit</span>
 
@@ -1178,7 +1178,7 @@
                     <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
                 <span class="p">][</span><span class="n">item</span><span class="p">]</span>
                 <span class="n">longdf_returns</span> <span class="o">=</span> <span class="n">longdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
-                <span class="n">longdf_returns_np</span> <span class="o">=</span> <span class="n">longdf_returns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+                <span class="n">longdf_returns_np</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span> <span class="n">longdf_returns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
                 <span class="n">ratio_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_capture_ratio_for_item</span><span class="p">(</span>
                     <span class="n">ratio</span><span class="o">=</span><span class="n">ratio</span><span class="p">,</span>
                     <span class="n">longdf_returns_np</span><span class="o">=</span><span class="n">longdf_returns_np</span><span class="p">,</span>
