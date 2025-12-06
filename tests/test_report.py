@@ -11,10 +11,17 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 from pandas import Series
+from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
-from openseries.report import calendar_period_returns, report_html
+from openseries.report import (
+    _configure_figure_layout,
+    _generate_output,
+    _generate_responsive_html,
+    calendar_period_returns,
+    report_html,
+)
 from openseries.series import OpenTimeSeries
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -231,7 +238,7 @@ class TestReport:
             raise ReportTestError(msg)
 
         _, divstring = report_html(data=plotframe, auto_open=False, output_type="div")
-        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+        if not divstring.startswith("<div") or not divstring.endswith("</script>"):
             msg = "Html div section not created"
             raise ReportTestError(msg)
 
@@ -418,3 +425,165 @@ class TestReport:
             if rawdata != fig_json["data"][0]["x"][1:5]:
                 msg = "Capture ratio with NaN values test not working as intended."
                 raise ReportTestError(msg)
+
+    def test_configure_figure_layout_with_table_min_height(self: TestReport) -> None:
+        """Test _configure_figure_layout with table_min_height and total_min_height."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        figure = make_subplots(
+            rows=2,
+            cols=1,
+            specs=[
+                [{"type": "xy"}],
+                [{"type": "xy"}],
+            ],
+        )
+
+        _configure_figure_layout(
+            figure=figure,
+            copied=frame,
+            add_logo=False,
+            vertical_legend=False,
+            title=None,
+            mobile=True,
+            total_min_height=950,
+            table_min_height=200,
+        )
+
+        fig_json = loads(cast("str", figure.to_json()))
+        layout = fig_json["layout"]
+
+        if "yaxis" not in layout or "domain" not in layout["yaxis"]:
+            msg = (
+                "_configure_figure_layout with table_min_height "
+                "not working as intended."
+            )
+            raise ReportTestError(msg)
+
+    def test_generate_responsive_html_with_table_html(self: TestReport) -> None:
+        """Test _generate_responsive_html with table_html parameter."""
+        html_desktop = "<div>Desktop HTML</div>"
+        html_mobile = "<div>Mobile HTML</div>"
+        div_id_desktop = "test_desktop"
+        div_id_mobile = "test_mobile"
+        table_html = "<table><tr><td>Test</td></tr></table>"
+
+        result = _generate_responsive_html(
+            html_desktop=html_desktop,
+            html_mobile=html_mobile,
+            div_id_desktop=div_id_desktop,
+            div_id_mobile=div_id_mobile,
+            table_html=table_html,
+        )
+
+        if table_html not in result:
+            msg = "_generate_responsive_html with table_html not working as intended."
+            raise ReportTestError(msg)
+
+        result_no_table = _generate_responsive_html(
+            html_desktop=html_desktop,
+            html_mobile=html_mobile,
+            div_id_desktop=div_id_desktop,
+            div_id_mobile=div_id_mobile,
+            table_html=None,
+        )
+
+        if table_html in result_no_table:
+            msg = (
+                "_generate_responsive_html with table_html=None "
+                "not working as intended."
+            )
+            raise ReportTestError(msg)
+
+    def test_report_html_auto_open_file(self: TestReport) -> None:
+        """Test report_html with auto_open=True and output_type='file'."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        directory = Path(__file__).parent
+        with patch("webbrowser.open") as mock_open:
+            _, figfile = report_html(
+                data=frame,
+                auto_open=True,
+                output_type="file",
+                directory=directory,
+            )
+            plotfile = Path(figfile).resolve()
+
+            if not plotfile.exists():
+                msg = "html file not created"
+                raise FileNotFoundError(msg)
+
+            mock_open.assert_called_once()
+            if str(plotfile.resolve()) not in str(mock_open.call_args[0][0]):
+                msg = "webbrowser.open not called with correct file path"
+                raise ReportTestError(msg)
+
+            plotfile.unlink()
+
+    def test_generate_output_file_no_mobile(self: TestReport) -> None:
+        """Test _generate_output with output_type='file' and figure_mobile=None."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        figure = make_subplots(
+            rows=2,
+            cols=2,
+            specs=[
+                [{"type": "xy"}, {"rowspan": 2, "type": "table"}],
+                [{"type": "xy"}, None],
+            ],
+        )
+
+        directory = Path(__file__).parent
+        plotfile = directory / "test_output_no_mobile.html"
+
+        with patch("openseries.report.plot") as mock_plot:
+            result = _generate_output(
+                figure=figure,
+                figure_mobile=None,
+                filename="test_output_no_mobile.html",
+                output_type="file",
+                auto_open=False,
+                include_plotlyjs="cdn",
+                plotfile=plotfile,
+            )
+
+            mock_plot.assert_called_once()
+            if result != str(plotfile):
+                msg = (
+                    "_generate_output with file and no mobile not working as intended."
+                )
+                raise ReportTestError(msg)
+
+            if plotfile.exists():
+                plotfile.unlink()
+
+    def test_generate_output_div_no_mobile(self: TestReport) -> None:
+        """Test _generate_output with output_type='div' and figure_mobile=None."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        figure = make_subplots(
+            rows=2,
+            cols=2,
+            specs=[
+                [{"type": "xy"}, {"rowspan": 2, "type": "table"}],
+                [{"type": "xy"}, None],
+            ],
+        )
+
+        result = _generate_output(
+            figure=figure,
+            figure_mobile=None,
+            filename="test_output.html",
+            output_type="div",
+            auto_open=False,
+            include_plotlyjs="cdn",
+            plotfile=Path("test_output.html"),
+        )
+
+        if not isinstance(result, str) or not result.startswith("<div"):
+            msg = "_generate_output with div and no mobile not working as intended."
+            raise ReportTestError(msg)
