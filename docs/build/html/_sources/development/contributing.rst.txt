@@ -99,13 +99,13 @@ All new code should include proper type hints:
 
 .. code-block:: python
 
-   def calculate_returns(prices: list[float]) -> list[float]:
-       """Calculate simple returns from prices."""
-       returns = []
-       for i in range(1, len(prices)):
-           ret = (prices[i] / prices[i-1]) - 1
-           returns.append(ret)
-       return returns
+    def calculate_returns(prices: list[float]) -> list[float]:
+         """Calculate simple returns from prices."""
+         returns = []
+         for i in range(1, len(prices)):
+              ret = (prices[i] / prices[i-1]) - 1
+              returns.append(ret)
+         return returns
 
 Docstrings
 ~~~~~~~~~~
@@ -114,34 +114,34 @@ Use Google-style docstrings for all public functions and classes:
 
 .. code-block:: python
 
-   def calculate_sharpe_ratio(returns: list[float], risk_free_rate: float = 0.0) -> float:
-       """Calculate the Sharpe ratio.
+    def calculate_sharpe_ratio(returns: list[float], risk_free_rate: float = 0.0) -> float:
+         """Calculate the Sharpe ratio.
 
-       Args:
-           returns: List of periodic returns.
-           risk_free_rate: Risk-free rate for the same period. Defaults to 0.0.
+         Args:
+              returns: List of periodic returns.
+              risk_free_rate: Risk-free rate for the same period. Defaults to 0.0.
 
-       Returns:
-           The Sharpe ratio.
+         Returns:
+              The Sharpe ratio.
 
-       Raises:
-           ValueError: If returns list is empty.
+         Raises:
+              ValueError: If returns list is empty.
 
-       Example:
-           >>> returns = [0.01, 0.02, -0.01, 0.03]
-           >>> sharpe = calculate_sharpe_ratio(returns)
-           >>> print(f"Sharpe ratio: {sharpe:.3f}")
-       """
-       if not returns:
-           raise ValueError("Returns list cannot be empty")
+         Example:
+              >>> returns = [0.01, 0.02, -0.01, 0.03]
+              >>> sharpe = calculate_sharpe_ratio(returns)
+              >>> print(f"Sharpe ratio: {sharpe:.3f}")
+         """
+         if not returns:
+              raise ValueError("Returns list cannot be empty")
 
-       mean_return = sum(returns) / len(returns)
-       std_dev = (sum((r - mean_return) ** 2 for r in returns) / len(returns)) ** 0.5
+         mean_return = sum(returns) / len(returns)
+         std_dev = (sum((r - mean_return) ** 2 for r in returns) / len(returns)) ** 0.5
 
-       if std_dev == 0:
-           return 0.0
+         if std_dev == 0:
+              return 0.0
 
-       return (mean_return - risk_free_rate) / std_dev
+         return (mean_return - risk_free_rate) / std_dev
 
 Testing
 -------
@@ -167,64 +167,64 @@ Write comprehensive tests for new functionality:
 
 .. code-block:: python
 
-   import pytest
-   import pandas as pd
-   from pandas.testing import assert_frame_equal
-   from openseries import OpenTimeSeries
+    import pytest
+    import pandas as pd
+    from pandas.testing import assert_frame_equal
+    from openseries import OpenTimeSeries
 
-   class TestOpenTimeSeries:
-       """Test cases for OpenTimeSeries class."""
+    class TestOpenTimeSeries:
+         """Test cases for OpenTimeSeries class."""
 
-       def test_from_arrays_basic(self):
-           """Test basic creation from arrays."""
-           dates = ['2023-01-01', '2023-01-02', '2023-01-03']
-           values = [100.0, 102.0, 99.0]
+         def test_from_arrays_basic(self):
+              """Test basic creation from arrays."""
+              dates = ['2023-01-01', '2023-01-02', '2023-01-03']
+              values = [100.0, 102.0, 99.0]
 
-           series = OpenTimeSeries.from_arrays(dates=dates, values=values, name="Test")
+              series = OpenTimeSeries.from_arrays(dates=dates, values=values, name="Test")
 
-           if series.label != "Test":
-               msg = f"Expected name 'Test', got '{series.label}'"
-               raise ValueError(msg)
-           if series.length != 3:
-               msg = f"Expected length 3, got {series.length}"
-               raise ValueError(msg)
-           if series.first_idx != pd.Timestamp('2023-01-01').date():
-               msg = f"Expected first_idx 2023-01-01, got {series.first_idx}"
-               raise ValueError(msg)
-           if series.last_idx != pd.Timestamp('2023-01-03').date():
-               msg = f"Expected last_idx 2023-01-03, got {series.last_idx}"
-               raise ValueError(msg)
+              if series.label != "Test":
+                    msg = f"Expected name 'Test', got '{series.label}'"
+                    raise ValueError(msg)
+              if series.length != 3:
+                    msg = f"Expected length 3, got {series.length}"
+                    raise ValueError(msg)
+              if series.first_idx != pd.Timestamp('2023-01-01').date():
+                    msg = f"Expected first_idx 2023-01-01, got {series.first_idx}"
+                    raise ValueError(msg)
+              if series.last_idx != pd.Timestamp('2023-01-03').date():
+                    msg = f"Expected last_idx 2023-01-03, got {series.last_idx}"
+                    raise ValueError(msg)
 
-       def test_from_arrays_invalid_dates(self):
-           """Test that invalid dates raise appropriate errors."""
-           with pytest.raises(ValueError):
-               OpenTimeSeries.from_arrays(
-                   dates=['invalid-date'],
-                   values=[100.0],
-                   name="Test"
-               )
+         def test_from_arrays_invalid_dates(self):
+              """Test that invalid dates raise appropriate errors."""
+              with pytest.raises(ValueError):
+                    OpenTimeSeries.from_arrays(
+                         dates=['invalid-date'],
+                         values=[100.0],
+                         name="Test"
+                    )
 
-       def test_calculate_returns(self):
-           """Test return calculation."""
-           dates = ['2023-01-01', '2023-01-02', '2023-01-03']
-           values = [100.0, 102.0, 99.0]
+         def test_calculate_returns(self):
+              """Test return calculation."""
+              dates = ['2023-01-01', '2023-01-02', '2023-01-03']
+              values = [100.0, 102.0, 99.0]
 
-           series = OpenTimeSeries.from_arrays(dates=dates, values=values, name="Test")
-           series.value_to_ret()  # Modifies original
+              series = OpenTimeSeries.from_arrays(dates=dates, values=values, name="Test")
+              series.value_to_ret()  # Modifies original
 
-           expected_returns = [0.02, -0.0294117647]  # Approximate
-           actual_returns = series.values
+              expected_returns = [0.02, -0.0294117647]  # Approximate
+              actual_returns = series.values
 
-           if len(actual_returns) != 2:
-               msg = f"Expected 2 returns, got {len(actual_returns)}"
-               raise ValueError(msg)
-           # Use tolerance-based comparison
-           if abs(actual_returns[0] - expected_returns[0]) >= 1e-6:
-               msg = f"First return mismatch: {actual_returns[0]} vs {expected_returns[0]}"
-               raise ValueError(msg)
-           if abs(actual_returns[1] - expected_returns[1]) >= 1e-6:
-               msg = f"Second return mismatch: {actual_returns[1]} vs {expected_returns[1]}"
-               raise ValueError(msg)
+              if len(actual_returns) != 2:
+                    msg = f"Expected 2 returns, got {len(actual_returns)}"
+                    raise ValueError(msg)
+              # Use tolerance-based comparison
+              if abs(actual_returns[0] - expected_returns[0]) >= 1e-6:
+                    msg = f"First return mismatch: {actual_returns[0]} vs {expected_returns[0]}"
+                    raise ValueError(msg)
+              if abs(actual_returns[1] - expected_returns[1]) >= 1e-6:
+                    msg = f"Second return mismatch: {actual_returns[1]} vs {expected_returns[1]}"
+                    raise ValueError(msg)
 
 Running Tests
 ~~~~~~~~~~~~~

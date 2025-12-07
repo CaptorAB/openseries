@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "2.0.3"
+version = "2.1.0"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
@@ -11,10 +11,9 @@ maintainers = [
 license = "BSD-3-Clause"
 license-files = ["LICENSE.md"]
 readme = "README.md"
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.11,<3.15"
 
 classifiers = [
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -55,20 +54,20 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/CaptorAB/openseries"
+"Homepage" = "https://captorab.github.io/openseries/"
 "Documentation" = "https://openseries.readthedocs.io/"
 "Source" = "https://github.com/CaptorAB/openseries"
 "Issue Tracker" = "https://github.com/CaptorAB/openseries/issues"
 "Release Notes" = "https://github.com/CaptorAB/openseries/releases"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "1.18.2"
+mypy = "1.19.0"
 pandas-stubs = ">=2.1.2"
-pre-commit = ">=4.3.0"
-pytest = ">=8.4.2"
+pre-commit = ">=4.4.0"
+pytest = ">=9.0.0"
 pytest-cov = ">=7.0.0"
 pytest-xdist = ">=3.8.0"
-ruff = "0.14.2"
+ruff = "0.14.8"
 types-openpyxl = ">=3.1.2"
 scipy-stubs = ">=1.14.1.0"
 types-python-dateutil = ">=2.8.2"
@@ -76,9 +75,9 @@ types-requests = ">=2.20.0"
 
 [tool.poetry.group.docs.dependencies]
 myst-parser = ">=4.0.1"
-sphinx = ">=8.1.3"
-sphinx-autobuild = ">=2024.10.3"
-sphinx-autodoc-typehints = ">=3.0.1"
+sphinx = ">=8.2.3"
+sphinx-autobuild = ">=2025.8.25"
+sphinx-autodoc-typehints = ">=3.5.2"
 sphinx-rtd-theme = ">=3.0.2"
 
 [build-system]
@@ -95,26 +94,17 @@ packages = [
 include = [{ path = "openseries/py.typed", format = ["sdist", "wheel"] }]
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.11"
 mypy_path = ["."]
 cache_dir = ".mypy_cache"
 exclude = ["venv/*", "docs/*"]
+strict = true
+pretty = true
+incremental = true
 follow_imports = "normal"
+warn_unused_configs = true
 plugins = ["pydantic.mypy"]
 cache_fine_grained = true
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-ignore_missing_imports = false
-incremental = true
-no_implicit_reexport = true
-pretty = true
-strict = true
-warn_redundant_casts = true
-warn_unreachable = true
-warn_unused_configs = true
-warn_unused_ignores = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
@@ -122,7 +112,7 @@ init_typed = true
 warn_required_dynamic_aliases = true
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 87
 exclude = ["docs"]
 
@@ -130,16 +120,15 @@ exclude = ["docs"]
 select = ["ALL"]
 ignore = ["COM812"]
 fixable = ["ALL"]
-mccabe = { max-complexity = 19 }
 pydocstyle = { convention = "google" }
-pylint = { max-args = 20, max-branches = 23, max-statements = 130 }
+pylint = { max-args = 20, max-branches = 12, max-statements = 48 }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = [
   "-n", "auto",
-  "--dist=loadscope",
+  "--dist=worksteal",
   "--cov=openseries",
   "--strict-markers",
   "--cov-fail-under=99",

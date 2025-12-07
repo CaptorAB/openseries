@@ -12,7 +12,7 @@ from math import ceil
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
-from typing import TYPE_CHECKING, Any, Generic, Literal, cast
+from typing import TYPE_CHECKING, Any, Generic, Literal, Self, cast
 
 from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
@@ -23,7 +23,6 @@ from .owntypes import (
     NumberOfItemsAndLabelsNotSameError,
     PlotlyConfigType,
     ResampleDataLossError,
-    Self,
     SeriesOrFloat_co,
     ValueType,
 )
@@ -206,15 +205,13 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         if self.tsdf.shape[1] == 1:
             arr = float(asarray(a=result, dtype=float64).squeeze())
             return cast("SeriesOrFloat_co", arr)  # type: ignore[redundant-cast]
-        return cast(
-            "SeriesOrFloat_co",
-            Series(
-                data=result,
-                index=self.tsdf.columns,
-                name=name,
-                dtype="float64",
-            ),
+        series_result: SeriesOrFloat_co = Series(  # type: ignore[assignment]
+            data=result,
+            index=self.tsdf.columns,
+            name=name,
+            dtype="float64",
         )
+        return series_result
 
     @property
     def length(self: Self) -> int:
@@ -272,7 +269,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def max_drawdown_cal_year(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+        """Maximum drawdown in a single calendar year.
+
+        Reference: https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
         --------
@@ -294,7 +293,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def geo_ret(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/c/cagr.asp.
+        """Compounded Annual Growth Rate (CAGR).
+
+        Reference: https://www.investopedia.com/terms/c/cagr.asp.
 
         Returns:
         --------
@@ -308,7 +309,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def arithmetic_ret(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/a/arithmeticmean.asp.
+        """Annualized arithmetic mean of returns.
+
+        Reference: https://www.investopedia.com/terms/a/arithmeticmean.asp.
 
         Returns:
         --------
@@ -339,7 +342,8 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """Annualized volatility.
 
         Based on Pandas .std() which is the equivalent of stdev.s([...]) in MS Excel.
-        https://www.investopedia.com/terms/v/volatility.asp.
+
+        Reference: https://www.investopedia.com/terms/v/volatility.asp.
 
         Returns:
         --------
@@ -357,7 +361,8 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         Standard deviation of returns that are below a Minimum Accepted Return
         of zero. It is used to calculate the Sortino Ratio.
-        https://www.investopedia.com/terms/d/downside-deviation.asp.
+
+        Reference: https://www.investopedia.com/terms/d/downside-deviation.asp.
 
         Returns:
         --------
@@ -391,7 +396,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def sortino_ratio(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/s/sortinoratio.asp.
+        """Sortino ratio.
+
+        Reference: https://www.investopedia.com/terms/s/sortinoratio.asp.
 
         Returns:
         --------
@@ -438,7 +445,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def omega_ratio(self: Self) -> SeriesOrFloat_co:
-        """https://en.wikipedia.org/wiki/Omega_ratio.
+        """Omega ratio.
+
+        Reference: https://en.wikipedia.org/wiki/Omega_ratio.
 
         Returns:
         --------
@@ -453,7 +462,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def z_score(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/z/zscore.asp.
+        """Z-score.
+
+        Reference: https://www.investopedia.com/terms/z/zscore.asp.
 
         Returns:
         --------
@@ -467,7 +478,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def max_drawdown(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+        """Maximum drawdown without any limit on date range.
+
+        Reference: https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
         --------
@@ -483,7 +496,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     def max_drawdown_date(self: Self) -> dt.date | Series[dt.date]:
         """Date when the maximum drawdown occurred.
 
-        https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
+        Reference: https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.
 
         Returns:
         --------
@@ -493,16 +506,17 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         mdddf = self.tsdf.copy()
         mdddf.index = DatetimeIndex(mdddf.index)
-        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date
+        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date  # type: ignore[attr-defined,arg-type]
 
         if self.tsdf.shape[1] == 1:
-            return result.iloc[0]
-        return Series(
+            return cast("dt.date", result.iloc[0])
+        date_series = Series(
             data=result,
             index=self.tsdf.columns,
             name="Max drawdown date",
             dtype="datetime64[ns]",
-        ).dt.date
+        ).dt.date  # type: ignore[attr-defined]
+        return cast("Series[dt.date]", date_series)
 
     @property
     def worst(self: Self) -> SeriesOrFloat_co:
@@ -581,7 +595,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def skew(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/s/skewness.asp.
+        """Skew of the return distribution.
+
+        Reference: https://www.investopedia.com/terms/s/skewness.asp.
 
         Returns:
         --------
@@ -595,7 +611,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def kurtosis(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/k/kurtosis.asp.
+        """Kurtosis of the return distribution.
+
+        Reference: https://www.investopedia.com/terms/k/kurtosis.asp.
 
         Returns:
         --------
@@ -609,7 +627,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
     @property
     def cvar_down(self: Self) -> SeriesOrFloat_co:
-        """https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
+        """Downside 95% Conditional Value At Risk "CVaR".
+
+        Reference: https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
         Returns:
         --------

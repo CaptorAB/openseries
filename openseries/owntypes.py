@@ -5,7 +5,15 @@ from __future__ import annotations
 import datetime as dt
 from enum import Enum
 from pprint import pformat
-from typing import TYPE_CHECKING, Annotated, ClassVar, Literal, TypeAlias, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    ClassVar,
+    Literal,
+    Self,
+    TypeAlias,
+    TypeVar,
+)
 
 from annotated_types import MinLen
 from numpy import datetime64
@@ -19,13 +27,7 @@ if TYPE_CHECKING:
 else:
     SeriesFloat = Series
 
-try:
-    from typing import Self
-except ImportError:  # pragma: no cover
-    from typing_extensions import Self
-
-
-__all__ = ["Self", "ValueType"]
+__all__ = ["ValueType"]
 
 
 SeriesOrFloat_co = TypeVar("SeriesOrFloat_co", float, SeriesFloat, covariant=True)

@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path("../../").resolve()))
 
 # Read version from pyproject.toml
 def get_version_from_pyproject():
-    """Extract version from pyproject.toml using regex (Python 3.10+ compatible)."""
+    """Extract version from pyproject.toml using regex (Python 3.11+ compatible)."""
     # Get the absolute path to pyproject.toml
     current_dir = Path(__file__).parent
     pyproject_path = current_dir.parent.parent / "pyproject.toml"

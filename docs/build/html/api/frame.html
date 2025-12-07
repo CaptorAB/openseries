@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenFrame &mdash; openseries 2.0.3 documentation</title>
+  <title>OpenFrame &mdash; openseries 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=664ffad9"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -424,7 +424,8 @@ Defaults to nearest.</p></li>
 <span class="sig-name descname"><span class="pre">ewma_risk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.94</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corr_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.ewma_risk"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Exponentially Weighted Moving Average Volatilities and Correlation.</p>
 <p>Exponentially Weighted Moving Average (EWMA) for Volatilities and
-Correlation. <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
+Correlation.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -554,8 +555,8 @@ to allow a volatility calculation. Defaults to True.</p></li>
 <span class="sig-name descname"><span class="pre">tracking_error_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.tracking_error_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Tracking Error.</p>
 <p>Calculates Tracking Error which is the standard deviation of the
-difference between the fund and its index returns.
-<a class="reference external" href="https://www.investopedia.com/terms/t/trackingerror.asp">https://www.investopedia.com/terms/t/trackingerror.asp</a>.</p>
+difference between the fund and its index returns.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/t/trackingerror.asp">https://www.investopedia.com/terms/t/trackingerror.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -620,8 +621,8 @@ by the CAGR of the benchmark during the same periods.
 CaptureRatio.BOTH is the Up ratio divided by the Down ratio.
 Source: ‘Capture Ratios: A Popular Method of Measuring Portfolio Performance
 in Practice’, Don R. Cox and Delbert C. Goff, Journal of Economics and
-Finance Education (Vol 2 Winter 2013).
-<a class="reference external" href="https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf">https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf</a>.</p>
+Finance Education (Vol 2 Winter 2013).</p>
+<p>Reference: <a class="reference external" href="https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf">https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -651,7 +652,8 @@ test cases and comparisons. Optional.</p></li>
 <span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">market</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Market Beta.</p>
 <p>Calculates Beta as Co-variance of asset &amp; market divided by Variance
-of the market. <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
+of the market.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -704,8 +706,8 @@ Pandas.DataFrame. Defaults to True.</p></li>
 measure that represents the average return on a portfolio or investment,
 above or below that predicted by the capital asset pricing model (CAPM),
 given the portfolio’s or investment’s beta and the average market return.
-This metric is also commonly referred to as simply alpha.
-<a class="reference external" href="https://www.investopedia.com/terms/j/jensensmeasure.asp">https://www.investopedia.com/terms/j/jensensmeasure.asp</a>.</p>
+This metric is also commonly referred to as simply alpha.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/j/jensensmeasure.asp">https://www.investopedia.com/terms/j/jensensmeasure.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -783,7 +785,8 @@ test cases and comparisons. Optional.</p></li>
 <span class="sig-name descname"><span class="pre">rolling_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">market_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">21</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.rolling_beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate rolling Market Beta.</p>
 <p>Calculates Beta as Co-variance of asset &amp; market divided by Variance
-of the market. <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
+of the market.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1081,7 +1084,7 @@ items in the frame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">max_drawdown_date</span></span></dt>
 <dd><p>Date when the maximum drawdown occurred.</p>
-<p><a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
 <section id="returns">
 <h4>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -1135,17 +1138,13 @@ items in the frame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">arithmetic_ret</span></span></dt>
-<dd><p>//www.investopedia.com/terms/a/arithmeticmean.asp.</p>
+<dd><p>Annualized arithmetic mean of returns.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/a/arithmeticmean.asp">https://www.investopedia.com/terms/a/arithmeticmean.asp</a>.</p>
 <section id="id1">
 <h4>Returns:<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Annualized arithmetic mean of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1154,17 +1153,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">geo_ret</span></span></dt>
-<dd><p>//www.investopedia.com/terms/c/cagr.asp.</p>
+<dd><p>Compounded Annual Growth Rate (CAGR).</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/c/cagr.asp">https://www.investopedia.com/terms/c/cagr.asp</a>.</p>
 <section id="id2">
 <h4>Returns:<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Compounded Annual Growth Rate (CAGR).
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1188,8 +1183,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">vol</span></span></dt>
 <dd><p>Annualized volatility.</p>
-<p>Based on Pandas .std() which is the equivalent of stdev.s([…]) in MS Excel.
-<a class="reference external" href="https://www.investopedia.com/terms/v/volatility.asp">https://www.investopedia.com/terms/v/volatility.asp</a>.</p>
+<p>Based on Pandas .std() which is the equivalent of stdev.s([…]) in MS Excel.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/v/volatility.asp">https://www.investopedia.com/terms/v/volatility.asp</a>.</p>
 <section id="id4">
 <h4>Returns:<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -1205,8 +1200,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">downside_deviation</span></span></dt>
 <dd><p>Downside Deviation.</p>
 <p>Standard deviation of returns that are below a Minimum Accepted Return
-of zero. It is used to calculate the Sortino Ratio.
-<a class="reference external" href="https://www.investopedia.com/terms/d/downside-deviation.asp">https://www.investopedia.com/terms/d/downside-deviation.asp</a>.</p>
+of zero. It is used to calculate the Sortino Ratio.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/d/downside-deviation.asp">https://www.investopedia.com/terms/d/downside-deviation.asp</a>.</p>
 <section id="id5">
 <h4>Returns:<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -1235,7 +1230,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">sortino_ratio</span></span></dt>
-<dd><p>//www.investopedia.com/terms/s/sortinoratio.asp.</p>
+<dd><p>Sortino ratio.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/s/sortinoratio.asp">https://www.investopedia.com/terms/s/sortinoratio.asp</a>.</p>
 <section id="id7">
 <h4>Returns:<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -1243,11 +1239,6 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 / downside deviation. The ratio implies that the riskfree asset has zero
 volatility, and a minimum acceptable return of zero.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1276,17 +1267,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">omega_ratio</span></span></dt>
-<dd><p>//en.wikipedia.org/wiki/Omega_ratio.</p>
+<dd><p>Omega ratio.</p>
+<p>Reference: <a class="reference external" href="https://en.wikipedia.org/wiki/Omega_ratio">https://en.wikipedia.org/wiki/Omega_ratio</a>.</p>
 <section id="id9">
 <h4>Returns:<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Omega ratio calculation.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1311,17 +1298,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">cvar_down</span></span></dt>
-<dd><p>//www.investopedia.com/terms/c/conditional_value_at_risk.asp.</p>
+<dd><p>Downside 95% Conditional Value At Risk “CVaR”.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/c/conditional_value_at_risk.asp">https://www.investopedia.com/terms/c/conditional_value_at_risk.asp</a>.</p>
 <section id="id11">
 <h4>Returns:<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside 95% Conditional Value At Risk “CVaR”.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1358,17 +1341,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">max_drawdown</span></span></dt>
-<dd><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p>
+<dd><p>Maximum drawdown without any limit on date range.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
 <section id="id14">
 <h4>Returns:<a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Maximum drawdown without any limit on date range.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1377,17 +1356,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">max_drawdown_cal_year</span></span></dt>
-<dd><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p>
+<dd><p>Maximum drawdown in a single calendar year.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
 <section id="id15">
 <h4>Returns:<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Maximum drawdown in a single calendar year.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1426,17 +1401,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">skew</span></span></dt>
-<dd><p>//www.investopedia.com/terms/s/skewness.asp.</p>
+<dd><p>Skew of the return distribution.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/s/skewness.asp">https://www.investopedia.com/terms/s/skewness.asp</a>.</p>
 <section id="id18">
 <h4>Returns:<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Skew of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1445,17 +1416,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">kurtosis</span></span></dt>
-<dd><p>//www.investopedia.com/terms/k/kurtosis.asp.</p>
+<dd><p>Kurtosis of the return distribution.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/k/kurtosis.asp">https://www.investopedia.com/terms/k/kurtosis.asp</a>.</p>
 <section id="id19">
 <h4>Returns:<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Kurtosis of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1464,17 +1431,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">z_score</span></span></dt>
-<dd><p>//www.investopedia.com/terms/z/zscore.asp.</p>
+<dd><p>Z-score.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/z/zscore.asp">https://www.investopedia.com/terms/z/zscore.asp</a>.</p>
 <section id="id20">
 <h4>Returns:<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Z-score as (last return - mean return) / standard deviation of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1675,7 +1638,8 @@ Pandas.DataFrame. Defaults to True.</p></li>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">market</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Market Beta.</p>
 <p>Calculates Beta as Co-variance of asset &amp; market divided by Variance
-of the market. <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
+of the market.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1703,8 +1667,8 @@ Defaults to 1.</p></li>
 measure that represents the average return on a portfolio or investment,
 above or below that predicted by the capital asset pricing model (CAPM),
 given the portfolio’s or investment’s beta and the average market return.
-This metric is also commonly referred to as simply alpha.
-<a class="reference external" href="https://www.investopedia.com/terms/j/jensensmeasure.asp">https://www.investopedia.com/terms/j/jensensmeasure.asp</a>.</p>
+This metric is also commonly referred to as simply alpha.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/j/jensensmeasure.asp">https://www.investopedia.com/terms/j/jensensmeasure.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1731,8 +1695,8 @@ Defaults to 1.</p></li>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">tracking_error_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.tracking_error_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Tracking Error.</p>
 <p>Calculates Tracking Error which is the standard deviation of the
-difference between the fund and its index returns.
-<a class="reference external" href="https://www.investopedia.com/terms/t/trackingerror.asp">https://www.investopedia.com/terms/t/trackingerror.asp</a>.</p>
+difference between the fund and its index returns.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/t/trackingerror.asp">https://www.investopedia.com/terms/t/trackingerror.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1797,8 +1761,8 @@ by the CAGR of the benchmark during the same periods.
 CaptureRatio.BOTH is the Up ratio divided by the Down ratio.
 Source: ‘Capture Ratios: A Popular Method of Measuring Portfolio Performance
 in Practice’, Don R. Cox and Delbert C. Goff, Journal of Economics and
-Finance Education (Vol 2 Winter 2013).
-<a class="reference external" href="https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf">https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf</a>.</p>
+Finance Education (Vol 2 Winter 2013).</p>
+<p>Reference: <a class="reference external" href="https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf">https://www.economics-finance.org/jefe/volume12-2/11ArticleCox.pdf</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1897,7 +1861,8 @@ test cases and comparisons. Optional.</p></li>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">rolling_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">market_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">21</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.rolling_beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate rolling Market Beta.</p>
 <p>Calculates Beta as Co-variance of asset &amp; market divided by Variance
-of the market. <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
+of the market.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/b/beta.asp">https://www.investopedia.com/terms/b/beta.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2057,7 +2022,8 @@ in the frame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">ewma_risk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.94</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corr_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/frame.html#OpenFrame.ewma_risk"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Exponentially Weighted Moving Average Volatilities and Correlation.</p>
 <p>Exponentially Weighted Moving Average (EWMA) for Volatilities and
-Correlation. <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
+Correlation.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

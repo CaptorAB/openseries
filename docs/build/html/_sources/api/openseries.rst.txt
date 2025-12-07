@@ -78,7 +78,6 @@ Types and Enums
    :nosignatures:
 
    openseries.ValueType
-   openseries.Self
 
 Other Utilities
 ---------------

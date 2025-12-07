@@ -5,11 +5,14 @@ from __future__ import annotations
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime as dt
+    from collections.abc import Iterable
+
+    from openseries.simulation import ReturnSimulation
 
 import pytest
 
@@ -28,15 +31,19 @@ from openseries.portfoliotools import (
 )
 from openseries.series import OpenTimeSeries
 
-from .test_common_sim import CommonTestCase
-
 
 class PortfoliotoolsTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestPortfoliotools(CommonTestCase):
+class TestPortfoliotools:
     """class to run tests on the module portfoliotools.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def test_simulate_portfolios(self: TestPortfoliotools) -> None:
         """Test function simulate_portfolios."""
@@ -59,7 +66,7 @@ class TestPortfoliotools(CommonTestCase):
             f"{result_returns.loc[result_returns['stdev'].idxmin()]['ret']:.7f}"
         )
 
-        if (return_least_vol, return_where_least_vol) != ("0.0476781", "0.0558805"):
+        if (return_least_vol, return_where_least_vol) != ("0.0479017", "0.0564059"):
             msg = (
                 "Function simulate_portfolios not working as intended"
                 f"\n{(return_least_vol, return_where_least_vol)}"
@@ -82,7 +89,7 @@ class TestPortfoliotools(CommonTestCase):
             f"{result_values.loc[result_values['stdev'].idxmin()]['ret']:.7f}"
         )
 
-        if (value_least_vol, value_where_least_vol) != ("0.0476875", "0.0559028"):
+        if (value_least_vol, value_where_least_vol) != ("0.0479112", "0.0564284"):
             msg = (
                 "Function simulate_portfolios not working as intended"
                 f"\n{(value_least_vol, value_where_least_vol)}"
@@ -150,8 +157,8 @@ class TestPortfoliotools(CommonTestCase):
             )
 
             if (frt_most_sharpe, frt_return_where_most_sharpe) != (
-                Decimal("1.302126"),
-                Decimal("0.067698"),
+                Decimal("1.308234"),
+                Decimal("0.068335"),
             ):
                 msg = (
                     "Function efficient_frontier not working as intended"
@@ -169,8 +176,8 @@ class TestPortfoliotools(CommonTestCase):
             )
 
             if (sim_least_vol, sim_return_where_least_vol) != (
-                Decimal("0.047678"),
-                Decimal("0.055881"),
+                Decimal("0.047902"),
+                Decimal("0.056406"),
             ):
                 msg = (
                     "Function efficient_frontier not working as intended"
@@ -186,13 +193,13 @@ class TestPortfoliotools(CommonTestCase):
                 raise PortfoliotoolsTestError(msg)
 
             if optlist != [
-                Decimal("0.068444"),
-                Decimal("0.052547"),
-                Decimal("1.302525"),
-                Decimal("0.116616"),
+                Decimal("0.069088"),
+                Decimal("0.052794"),
+                Decimal("1.308634"),
+                Decimal("0.116617"),
                 Decimal("0.140094"),
-                Decimal("0.352682"),
-                Decimal("0.312324"),
+                Decimal("0.352684"),
+                Decimal("0.312323"),
                 Decimal("0.078283"),
             ]:
                 msg = f"Function efficient_frontier not working as intended\n{optlist}"
@@ -261,11 +268,11 @@ class TestPortfoliotools(CommonTestCase):
             f"{minw:.7f}" for minw in list(cast("Iterable[float]", minframe.weights))
         ]
         if minframe_weights != [
-            "0.1150512",
-            "0.2045890",
-            "0.2412361",
-            "0.2352707",
-            "0.2038530",
+            "0.1150596",
+            "0.2045882",
+            "0.2412307",
+            "0.2352717",
+            "0.2038498",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -285,11 +292,11 @@ class TestPortfoliotools(CommonTestCase):
             for minw in list(cast("Iterable[float]", minframe_nb.weights))
         ]
         if minframe_nb_weights != [
-            "0.1150512",
-            "0.2045890",
-            "0.2412361",
-            "0.2352707",
-            "0.2038530",
+            "0.1150596",
+            "0.2045882",
+            "0.2412307",
+            "0.2352717",
+            "0.2038498",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -299,7 +306,7 @@ class TestPortfoliotools(CommonTestCase):
 
         if (
             f"{minseries.arithmetic_ret - assets_std.arithmetic_ret:.7f}"
-            != "0.0016062"
+            != "0.0016213"
         ):
             msg = (
                 "Optimization did not find better return with similar vol\n"
@@ -319,11 +326,11 @@ class TestPortfoliotools(CommonTestCase):
             f"{maxw:.7f}" for maxw in list(cast("Iterable[float]", maxframe.weights))
         ]
         if maxframe_weights != [
-            "0.1151792",
-            "0.1738639",
-            "0.2942018",
-            "0.2704667",
-            "0.1462884",
+            "0.1151897",
+            "0.1738640",
+            "0.2941952",
+            "0.2704676",
+            "0.1462836",
         ]:
             msg = (
                 "Function constrain_optimized_portfolios not "
@@ -331,7 +338,7 @@ class TestPortfoliotools(CommonTestCase):
             )
             raise PortfoliotoolsTestError(msg)
 
-        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0001994":
+        if f"{assets_std.vol - maxseries.vol:.7f}" != "0.0002004":
             msg = (
                 "Optimization did not find better return with similar vol\n"
                 f"{assets_std.vol - maxseries.vol:.7f}"
@@ -339,11 +346,70 @@ class TestPortfoliotools(CommonTestCase):
 
             raise PortfoliotoolsTestError(msg)
 
-    def test_sharpeplot(self: TestPortfoliotools) -> None:
-        """Test function sharpeplot."""
-        simulations = 100
-        points = 20
+    def _verify_sharpeplot_title(
+        self: TestPortfoliotools,
+        fig_json: dict[str, Any],
+        expected_text: str | None,
+    ) -> None:
+        """Verify sharpeplot title.
 
+        Args:
+            fig_json: Figure JSON data.
+            expected_text: Expected title text or None.
+
+        Raises:
+            PortfoliotoolsTestError: If title is not correct.
+        """
+        if expected_text is None:
+            if "text" in fig_json["layout"]["title"]:
+                msg = "sharpeplot method not working as intended"
+                raise PortfoliotoolsTestError(msg)
+        elif expected_text not in fig_json["layout"]["title"]["text"]:
+            msg = "sharpeplot method not working as intended"
+            raise PortfoliotoolsTestError(msg)
+
+    def _verify_sharpeplot_names(
+        self: TestPortfoliotools,
+        fig_json: dict[str, Any],
+    ) -> None:
+        """Verify sharpeplot trace names.
+
+        Args:
+            fig_json: Figure JSON data.
+
+        Raises:
+            PortfoliotoolsTestError: If names don't match.
+        """
+        names = [item["name"] for item in fig_json["data"]]
+        expected_names = [
+            "simulated portfolios",
+            "Efficient frontier",
+            "Asset_0",
+            "Asset_1",
+            "Asset_2",
+            "Asset_3",
+            "Asset_4",
+            "Max Sharpe Portfolio",
+            "Current Portfolio",
+        ]
+        if names != expected_names:
+            msg = f"Function sharpeplot not working as intended\n{names}"
+            raise PortfoliotoolsTestError(msg)
+
+    def _setup_sharpeplot_test_data(
+        self: TestPortfoliotools,
+        simulations: int = 100,
+        points: int = 20,
+    ) -> tuple[OpenFrame, Any, Any, Any, Any, Any]:
+        """Setup test data for sharpeplot tests.
+
+        Args:
+            simulations: Number of simulations.
+            points: Number of frontier points.
+
+        Returns:
+            Tuple of (spframe, current, frontier, simulated, optimum, plotframe).
+        """
         spframe = self.randomframe.from_deepcopy()
         spframe.to_cumret()
         current = OpenTimeSeries.from_df(
@@ -367,82 +433,51 @@ class TestPortfoliotools(CommonTestCase):
             optimized=optimum,
         )
 
-        figure_title_no_text, _ = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=True,
-            auto_open=False,
-            output_type="div",
-        )
+        return spframe, current, frontier, simulated, optimum, plotframe
 
-        fig_json_title_no_text = loads(cast("str", figure_title_no_text.to_json()))
+    def _create_sharpeplot_and_get_json(
+        self: TestPortfoliotools,
+        simulated: Any,  # noqa: ANN401
+        frontier: Any,  # noqa: ANN401
+        plotframe: Any,  # noqa: ANN401
+        **kwargs: Any,  # noqa: ANN401
+    ) -> dict[str, Any]:
+        """Create sharpeplot and return JSON.
 
-        if "Risk and Return" not in fig_json_title_no_text["layout"]["title"]["text"]:
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
+        Args:
+            simulated: Simulated frame.
+            frontier: Frontier frame.
+            plotframe: Plot frame.
+            **kwargs: Additional arguments for sharpeplot.
 
-        figure_title_text, _ = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=True,
-            titletext="Awesome title",
-            auto_open=False,
-            output_type="div",
-        )
-
-        fig_json_title_text = loads(cast("str", figure_title_text.to_json()))
-        if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
-
+        Returns:
+            Figure JSON data.
+        """
         figure, _ = sharpeplot(
             sim_frame=simulated,
             line_frame=frontier,
             point_frame=plotframe,
             point_frame_mode="markers+text",
-            title=False,
             auto_open=False,
             output_type="div",
+            **kwargs,
         )
+        return cast("dict[str, Any]", loads(cast("str", figure.to_json())))
 
-        fig_json = loads(cast("str", figure.to_json()))
+    def _verify_file_output(
+        self: TestPortfoliotools,
+        figfile: str,
+    ) -> None:
+        """Verify file output creation and cleanup.
 
-        if "text" in fig_json["layout"]["title"]:
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
+        Args:
+            figfile: File path string.
 
-        names = [item["name"] for item in fig_json["data"]]
-
-        if names != [
-            "simulated portfolios",
-            "Efficient frontier",
-            "Asset_0",
-            "Asset_1",
-            "Asset_2",
-            "Asset_3",
-            "Asset_4",
-            "Max Sharpe Portfolio",
-            "Current Portfolio",
-        ]:
-            msg = f"Function sharpeplot not working as intended\n{names}"
-            raise PortfoliotoolsTestError(msg)
-
-        directory = Path(__file__).parent
-        _, figfile = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=False,
-            auto_open=False,
-            output_type="file",
-            directory=directory,
-        )
-
+        Raises:
+            FileNotFoundError: If file doesn't exist.
+            FileExistsError: If file still exists after unlink.
+            PortfoliotoolsTestError: If file format is incorrect.
+        """
         plotfile = Path(figfile).resolve()
         if not plotfile.exists():
             msg = "html file not created"
@@ -457,21 +492,40 @@ class TestPortfoliotools(CommonTestCase):
             msg = "sharpeplot method not working as intended"
             raise PortfoliotoolsTestError(msg)
 
-        _, divstring = sharpeplot(
-            sim_frame=simulated,
-            line_frame=frontier,
-            point_frame=plotframe,
-            point_frame_mode="markers+text",
-            title=False,
-            auto_open=False,
-            output_type="div",
-        )
+    def _verify_div_output(self: TestPortfoliotools, divstring: str) -> None:
+        """Verify div output format.
+
+        Args:
+            divstring: Div string to verify.
+
+        Raises:
+            PortfoliotoolsTestError: If div format is incorrect.
+        """
         if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
             msg = "Html div section not created"
             raise PortfoliotoolsTestError(msg)
 
+    def _verify_mock_path_exists(
+        self: TestPortfoliotools,
+        simulated: Any,  # noqa: ANN401
+        frontier: Any,  # noqa: ANN401
+        plotframe: Any,  # noqa: ANN401
+        *,
+        return_value: bool,
+    ) -> dict[str, Any]:
+        """Verify sharpeplot with mocked path exists.
+
+        Args:
+            simulated: Simulated frame.
+            frontier: Frontier frame.
+            plotframe: Plot frame.
+            return_value: Return value for mock.
+
+        Returns:
+            Figure JSON data.
+        """
         with patch("pathlib.Path.exists") as mock_userfolderexists:
-            mock_userfolderexists.return_value = True
+            mock_userfolderexists.return_value = return_value
             mockhomefig, _ = sharpeplot(
                 sim_frame=simulated,
                 line_frame=frontier,
@@ -481,8 +535,66 @@ class TestPortfoliotools(CommonTestCase):
                 auto_open=False,
                 output_type="div",
             )
-            mockhomefig_json = loads(cast("str", mockhomefig.to_json()))
+            return cast("dict[str, Any]", loads(cast("str", mockhomefig.to_json())))
 
+    def test_sharpeplot(self: TestPortfoliotools) -> None:
+        """Test function sharpeplot."""
+        simulations = 100
+        points = 20
+
+        _, _, frontier, simulated, _optimum, plotframe = (
+            self._setup_sharpeplot_test_data(simulations, points)
+        )
+
+        fig_json_title_no_text = self._create_sharpeplot_and_get_json(
+            simulated, frontier, plotframe, title=True
+        )
+        self._verify_sharpeplot_title(fig_json_title_no_text, "Risk and Return")
+
+        fig_json_title_text = self._create_sharpeplot_and_get_json(
+            simulated,
+            frontier,
+            plotframe,
+            title=True,
+            titletext="Awesome title",
+        )
+        if fig_json_title_text["layout"]["title"]["text"] != "Awesome title":
+            msg = "sharpeplot method not working as intended"
+            raise PortfoliotoolsTestError(msg)
+
+        fig_json = self._create_sharpeplot_and_get_json(
+            simulated, frontier, plotframe, title=False
+        )
+        self._verify_sharpeplot_title(fig_json, None)
+        self._verify_sharpeplot_names(fig_json)
+
+        directory = Path(__file__).parent
+        _, figfile = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=False,
+            auto_open=False,
+            output_type="file",
+            directory=directory,
+        )
+        self._verify_file_output(figfile)
+
+        _, divstring = sharpeplot(
+            sim_frame=simulated,
+            line_frame=frontier,
+            point_frame=plotframe,
+            point_frame_mode="markers+text",
+            title=False,
+            auto_open=False,
+            output_type="div",
+        )
+        self._verify_div_output(divstring)
+
+        mockhomefig_json = self._verify_mock_path_exists(
+            simulated, frontier, plotframe, return_value=True
+        )
         if mockhomefig_json["data"][0]["name"] != "simulated portfolios":
             msg = "sharpeplot method not working as intended"
             raise PortfoliotoolsTestError(msg)
@@ -501,11 +613,13 @@ class TestPortfoliotools(CommonTestCase):
             )
             mockfilepath = Path(mockfile).resolve()
 
-        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
-            msg = "sharpeplot method not working as intended"
-            raise PortfoliotoolsTestError(msg)
-
-        mockfilepath.unlink()
+        try:
+            if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+                msg = "sharpeplot method not working as intended"
+                raise PortfoliotoolsTestError(msg)
+        finally:
+            if mockfilepath.exists():
+                mockfilepath.unlink()
 
     def test_sharpeplot_frame_input(self: TestPortfoliotools) -> None:
         """Test function sharpeplot with more or less input data."""
@@ -641,4 +755,46 @@ class TestPortfoliotools(CommonTestCase):
         fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
         if fig_nologo_json["layout"].get("images", None):
             msg = "sharpeplot add_logo argument not setup correctly"
+            raise PortfoliotoolsTestError(msg)
+
+    def test_prepare_plot_data_with_none_label(self: TestPortfoliotools) -> None:
+        """Test prepare_plot_data when current.label is None."""
+        simulations = 100
+        points = 20
+
+        spframe = self.randomframe.from_deepcopy()
+        spframe.to_cumret()
+        current = OpenTimeSeries.from_df(
+            spframe.make_portfolio(
+                name="Current Portfolio",
+                weight_strat="eq_weights",
+            ),
+        )
+        current.label = None
+
+        _frontier, _simulated, optimum = efficient_frontier(
+            eframe=spframe,
+            num_ports=simulations,
+            seed=self.seed,
+            frontier_points=points,
+            tweak=False,
+        )
+
+        plotframe = prepare_plot_data(
+            assets=spframe,
+            current=current,
+            optimized=optimum,
+        )
+
+        if current.label in plotframe.columns:
+            msg = "prepare_plot_data should not add current series when label is None"
+            raise PortfoliotoolsTestError(msg)
+
+        if "Max Sharpe Portfolio" not in plotframe.columns:
+            msg = "prepare_plot_data should still add Max Sharpe Portfolio"
+            raise PortfoliotoolsTestError(msg)
+
+        expected_rows = 3
+        if plotframe.shape[0] != expected_rows:
+            msg = f"plotframe should have {expected_rows} rows (ret, stdev, text)"
             raise PortfoliotoolsTestError(msg)

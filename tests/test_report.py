@@ -5,26 +5,41 @@ from __future__ import annotations
 import datetime as dt
 from json import loads
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
 
+import numpy as np
 import pytest
 from pandas import Series
+from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
-from openseries.report import calendar_period_returns, report_html
+from openseries.report import (
+    _configure_figure_layout,
+    _generate_output,
+    _generate_responsive_html,
+    calendar_period_returns,
+    report_html,
+)
 from openseries.series import OpenTimeSeries
 
-from .test_common_sim import CommonTestCase
+if TYPE_CHECKING:  # pragma: no cover
+    from openseries.simulation import ReturnSimulation
 
 
 class ReportTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestReport(CommonTestCase):
+class TestReport:
     """class to run tests on the module report.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def test_calendar_period_returns(self: TestReport) -> None:
         """Test calendar_period_returns function."""
@@ -32,11 +47,11 @@ class TestReport(CommonTestCase):
         frame.to_cumret()
 
         expected_one = [
-            "-0.15435597",
-            "-0.26899063",
-            "-2.15829921",
-            "-2.06087664",
-            "-1.63741658",
+            "0.62145461",
+            "4.75300303",
+            "-0.38834851",
+            "1.23234213",
+            "-0.95914766",
         ]
 
         returns = calendar_period_returns(data=frame, relabel=True)
@@ -55,15 +70,74 @@ class TestReport(CommonTestCase):
         last_quarter = [f"{nbr:.8f}" for nbr in returns.loc["Q2 2019"]]
 
         expected_two = [
-            "-2.51705728",
-            "-0.94753886",
-            "2.51347355",
-            "0.13058329",
-            "-0.91336477",
+            "-0.13684769",
+            "-1.71819468",
+            "-2.47673386",
+            "-235.56746401",
+            "-1.07977144",
         ]
 
         if last_quarter != expected_two:
             msg = f"calendar_period_returns not working as intended:\n{last_quarter}"
+            raise ReportTestError(msg)
+
+    def _verify_report_data_alignment(
+        self: TestReport,
+        plotframe: OpenFrame,
+        fig_json: dict[str, Any],
+    ) -> None:
+        """Verify report data alignment.
+
+        Args:
+            plotframe: Frame to check.
+            fig_json: Figure JSON data.
+
+        Raises:
+            ReportTestError: If data is not aligned.
+        """
+        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
+        if rawdata != fig_json["data"][0]["x"][1:5]:
+            msg = "Unaligned data between original and data in Figure."
+            raise ReportTestError(msg)
+
+    def _verify_report_bar_freq(
+        self: TestReport,
+        fig_json: dict[str, Any],
+        expected_item: str,
+    ) -> None:
+        """Verify report bar frequency.
+
+        Args:
+            fig_json: Figure JSON data.
+            expected_item: Expected string in figure.
+
+        Raises:
+            ReportTestError: If bar frequency is not correct.
+        """
+        if expected_item not in str(fig_json):
+            msg = "report_html bar_freq argument not setup correctly."
+            raise ReportTestError(msg)
+
+    def _verify_report_logo(
+        self: TestReport,
+        fig_json: dict[str, Any],
+        logo: dict[str, Any],
+    ) -> None:
+        """Verify report logo.
+
+        Args:
+            fig_json: Figure JSON data.
+            logo: Logo dictionary.
+
+        Raises:
+            ReportTestError: If logo is not correct.
+        """
+        if logo == {}:
+            if fig_json["layout"]["images"][0] != logo:
+                msg = "report_html add_logo argument not setup correctly"
+                raise ReportTestError(msg)
+        elif fig_json["layout"]["images"][0]["source"] != logo["source"]:
+            msg = "report_html add_logo argument not setup correctly"
             raise ReportTestError(msg)
 
     def test_report_html(self: TestReport) -> None:
@@ -78,16 +152,8 @@ class TestReport(CommonTestCase):
             vertical_legend=True,
         )
         fig_json = loads(cast("str", figure.to_json()))
-        bar_x_axis_item = "'dtype': 'i2'"
-
-        if bar_x_axis_item not in str(fig_json):
-            msg = "report_html bar_freq argument not setup correctly."
-            raise ReportTestError(msg)
-
-        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise ReportTestError(msg)
+        self._verify_report_bar_freq(fig_json, "'dtype': 'i2'")
+        self._verify_report_data_alignment(plotframe, fig_json)
 
         figure, _ = report_html(
             data=plotframe,
@@ -96,11 +162,7 @@ class TestReport(CommonTestCase):
             vertical_legend=False,
         )
         fig_json = loads(cast("str", figure.to_json()))
-
-        rawdata = [x.strftime("%Y-%m-%d") for x in plotframe.tsdf.index[1:5]]
-        if rawdata != fig_json["data"][0]["x"][1:5]:
-            msg = "Unaligned data between original and data in Figure."
-            raise ReportTestError(msg)
+        self._verify_report_data_alignment(plotframe, fig_json)
 
         figure, _ = report_html(
             data=plotframe,
@@ -123,11 +185,7 @@ class TestReport(CommonTestCase):
             bar_freq="BQE",
         )
         fig_bqe_json = loads(cast("str", figure_bqe.to_json()))
-
-        bar_x_axis_item_bqe = "'x': ['Q3 2009'"
-        if bar_x_axis_item_bqe not in str(fig_bqe_json):
-            msg = "report_html bar_freq argument not setup correctly."
-            raise ReportTestError(msg)
+        self._verify_report_bar_freq(fig_bqe_json, "'x': ['Q3 2009'")
 
         figure_bme, _ = report_html(
             data=plotframe,
@@ -136,11 +194,7 @@ class TestReport(CommonTestCase):
             bar_freq="BME",
         )
         fig_bme_json = loads(cast("str", figure_bme.to_json()))
-
-        bar_x_axis_item_bme = "'x': ['Jul 09'"
-        if bar_x_axis_item_bme not in str(fig_bme_json):
-            msg = "report_html bar_freq argument not setup correctly."
-            raise ReportTestError(msg)
+        self._verify_report_bar_freq(fig_bme_json, "'x': ['Aug 09'")
 
         fig_logo, _ = report_html(
             data=plotframe,
@@ -149,14 +203,7 @@ class TestReport(CommonTestCase):
             output_type="div",
         )
         fig_logo_json = loads(cast("str", fig_logo.to_json()))
-
-        if logo == {}:
-            if fig_logo_json["layout"]["images"][0] != logo:
-                msg = "report_html add_logo argument not setup correctly"
-                raise ReportTestError(msg)
-        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
-            msg = "report_html add_logo argument not setup correctly"
-            raise ReportTestError(msg)
+        self._verify_report_logo(fig_logo_json, logo)
 
         fig_nologo, _ = report_html(
             data=plotframe,
@@ -191,7 +238,7 @@ class TestReport(CommonTestCase):
             raise ReportTestError(msg)
 
         _, divstring = report_html(data=plotframe, auto_open=False, output_type="div")
-        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+        if not divstring.startswith("<div") or not divstring.endswith("</script>"):
             msg = "Html div section not created"
             raise ReportTestError(msg)
 
@@ -217,11 +264,13 @@ class TestReport(CommonTestCase):
             )
             mockfilepath = Path(mockfile).resolve()
 
-        if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
-            msg = "report_html method not working as intended"
-            raise ReportTestError(msg)
-
-        mockfilepath.unlink()
+        try:
+            if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+                msg = "report_html method not working as intended"
+                raise ReportTestError(msg)
+        finally:
+            if mockfilepath.exists():
+                mockfilepath.unlink()
 
     def test_report_html_shortdata(self: TestReport) -> None:
         """Test report_html function with short data."""
@@ -252,7 +301,7 @@ class TestReport(CommonTestCase):
 
         frame.trunc_frame(start_cut=dt.date(2019, 4, 30))
 
-        new_length = 40
+        new_length = 41
         if new_length != frame.length:
             msg = f"report_html shortdata test not working:{frame.length}"
             raise ReportTestError(msg)
@@ -334,3 +383,207 @@ class TestReport(CommonTestCase):
             match=r"division by zero",
         ):
             _, _ = report_html(data=frame, auto_open=False, output_type="div")
+
+    def test_tracking_error_hasnans(self: TestReport) -> None:
+        """Test report_html function with tracking_error_func returning NaN values."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        mocked_te = Series(
+            data=[np.nan, np.nan, np.nan, np.nan, np.nan],
+            index=frame.tsdf.columns,
+            name="Tracking Errors vs Asset_4",
+            dtype="float64",
+        )
+
+        with patch.object(OpenFrame, "tracking_error_func", return_value=mocked_te):
+            figure, _ = report_html(data=frame, auto_open=False, output_type="div")
+            fig_json = loads(cast("str", figure.to_json()))
+
+            rawdata = [x.strftime("%Y-%m-%d") for x in frame.tsdf.index[1:5]]
+            if rawdata != fig_json["data"][0]["x"][1:5]:
+                msg = "Tracking error with NaN values test not working as intended."
+                raise ReportTestError(msg)
+
+    def test_capture_ratio_hasnans(self: TestReport) -> None:
+        """Test report_html function with capture_ratio_func returning NaN values."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        mocked_cr = Series(
+            data=[np.nan, np.nan, np.nan, np.nan, np.nan],
+            index=frame.tsdf.columns,
+            name="Up-Down Capture Ratios vs Asset_4",
+            dtype="float64",
+        )
+
+        with patch.object(OpenFrame, "capture_ratio_func", return_value=mocked_cr):
+            figure, _ = report_html(data=frame, auto_open=False, output_type="div")
+            fig_json = loads(cast("str", figure.to_json()))
+
+            rawdata = [x.strftime("%Y-%m-%d") for x in frame.tsdf.index[1:5]]
+            if rawdata != fig_json["data"][0]["x"][1:5]:
+                msg = "Capture ratio with NaN values test not working as intended."
+                raise ReportTestError(msg)
+
+    def test_configure_figure_layout_with_table_min_height(self: TestReport) -> None:
+        """Test _configure_figure_layout with table_min_height and total_min_height."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        figure = make_subplots(
+            rows=2,
+            cols=1,
+            specs=[
+                [{"type": "xy"}],
+                [{"type": "xy"}],
+            ],
+        )
+
+        _configure_figure_layout(
+            figure=figure,
+            copied=frame,
+            add_logo=False,
+            vertical_legend=False,
+            title=None,
+            mobile=True,
+            total_min_height=950,
+            table_min_height=200,
+        )
+
+        fig_json = loads(cast("str", figure.to_json()))
+        layout = fig_json["layout"]
+
+        if "yaxis" not in layout or "domain" not in layout["yaxis"]:
+            msg = (
+                "_configure_figure_layout with table_min_height "
+                "not working as intended."
+            )
+            raise ReportTestError(msg)
+
+    def test_generate_responsive_html_with_table_html(self: TestReport) -> None:
+        """Test _generate_responsive_html with table_html parameter."""
+        html_desktop = "<div>Desktop HTML</div>"
+        html_mobile = "<div>Mobile HTML</div>"
+        div_id_desktop = "test_desktop"
+        div_id_mobile = "test_mobile"
+        table_html = "<table><tr><td>Test</td></tr></table>"
+
+        result = _generate_responsive_html(
+            html_desktop=html_desktop,
+            html_mobile=html_mobile,
+            div_id_desktop=div_id_desktop,
+            div_id_mobile=div_id_mobile,
+            table_html=table_html,
+        )
+
+        if table_html not in result:
+            msg = "_generate_responsive_html with table_html not working as intended."
+            raise ReportTestError(msg)
+
+        result_no_table = _generate_responsive_html(
+            html_desktop=html_desktop,
+            html_mobile=html_mobile,
+            div_id_desktop=div_id_desktop,
+            div_id_mobile=div_id_mobile,
+            table_html=None,
+        )
+
+        if table_html in result_no_table:
+            msg = (
+                "_generate_responsive_html with table_html=None "
+                "not working as intended."
+            )
+            raise ReportTestError(msg)
+
+    def test_report_html_auto_open_file(self: TestReport) -> None:
+        """Test report_html with auto_open=True and output_type='file'."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        directory = Path(__file__).parent
+        with patch("webbrowser.open") as mock_open:
+            _, figfile = report_html(
+                data=frame,
+                auto_open=True,
+                output_type="file",
+                directory=directory,
+            )
+            plotfile = Path(figfile).resolve()
+
+            if not plotfile.exists():
+                msg = "html file not created"
+                raise FileNotFoundError(msg)
+
+            mock_open.assert_called_once()
+            if str(plotfile.resolve()) not in str(mock_open.call_args[0][0]):
+                msg = "webbrowser.open not called with correct file path"
+                raise ReportTestError(msg)
+
+            plotfile.unlink()
+
+    def test_generate_output_file_no_mobile(self: TestReport) -> None:
+        """Test _generate_output with output_type='file' and figure_mobile=None."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        figure = make_subplots(
+            rows=2,
+            cols=2,
+            specs=[
+                [{"type": "xy"}, {"rowspan": 2, "type": "table"}],
+                [{"type": "xy"}, None],
+            ],
+        )
+
+        directory = Path(__file__).parent
+        plotfile = directory / "test_output_no_mobile.html"
+
+        with patch("openseries.report.plot") as mock_plot:
+            result = _generate_output(
+                figure=figure,
+                figure_mobile=None,
+                filename="test_output_no_mobile.html",
+                output_type="file",
+                auto_open=False,
+                include_plotlyjs="cdn",
+                plotfile=plotfile,
+            )
+
+            mock_plot.assert_called_once()
+            if result != str(plotfile):
+                msg = (
+                    "_generate_output with file and no mobile not working as intended."
+                )
+                raise ReportTestError(msg)
+
+            if plotfile.exists():
+                plotfile.unlink()
+
+    def test_generate_output_div_no_mobile(self: TestReport) -> None:
+        """Test _generate_output with output_type='div' and figure_mobile=None."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        figure = make_subplots(
+            rows=2,
+            cols=2,
+            specs=[
+                [{"type": "xy"}, {"rowspan": 2, "type": "table"}],
+                [{"type": "xy"}, None],
+            ],
+        )
+
+        result = _generate_output(
+            figure=figure,
+            figure_mobile=None,
+            filename="test_output.html",
+            output_type="div",
+            auto_open=False,
+            include_plotlyjs="cdn",
+            plotfile=Path("test_output.html"),
+        )
+
+        if not isinstance(result, str) or not result.startswith("<div"):
+            msg = "_generate_output with div and no mobile not working as intended."
+            raise ReportTestError(msg)

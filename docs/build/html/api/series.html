@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenTimeSeries &mdash; openseries 2.0.3 documentation</title>
+  <title>OpenTimeSeries &mdash; openseries 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=664ffad9"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -304,15 +304,15 @@ providing a combination of days and an end date.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The accrual rate.</p></li>
-<li><p><strong>d_range</strong> (<em>DatetimeIndex</em><em> | </em><em>None</em>) – A given range of dates. Optional.</p></li>
+<li><p><strong>d_range</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v2.3.3)"><em>DatetimeIndex</em></a><em> | </em><em>None</em>) – A given range of dates. Optional.</p></li>
 <li><p><strong>days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Number of days to generate when date_range not provided. Must be
 combined with end_dt. Optional.</p></li>
-<li><p><strong>end_dt</strong> (<em>dt.date</em><em> | </em><em>None</em>) – End date of date range to generate when date_range not provided.
+<li><p><strong>end_dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.14)"><em>date</em></a><em> | </em><em>None</em>) – End date of date range to generate when date_range not provided.
 Must be combined with days. Optional.</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Placeholder for a name of the timeseries.</p></li>
 <li><p><strong>valuetype</strong> (<em>ValueType</em>) – Identifies if the series is a series of values or returns.
 Defaults to ValueType.PRICE.</p></li>
-<li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>) – The currency of the timeseries. Defaults to “SEK”.</p></li>
+<li><p><strong>baseccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>) – The currency of the timeseries. Defaults to “SEK”.</p></li>
 <li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Boolean flag indicating if timeseries is in local currency.
 Defaults to True.</p></li>
 </ul>
@@ -325,7 +325,7 @@ Defaults to True.</p></li>
     combination of <code class="docutils literal notranslate"><span class="pre">days</span></code> and <code class="docutils literal notranslate"><span class="pre">end_dt</span></code> is incomplete.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Self</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -516,7 +516,7 @@ Defaults to nearest.</p></li>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">ewma_vol_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.94</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.ewma_vol_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Exponentially Weighted Moving Average Model for Volatility.</p>
-<p><a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -674,15 +674,15 @@ providing a combination of days and an end date.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The accrual rate.</p></li>
-<li><p><strong>d_range</strong> (<em>DatetimeIndex</em><em> | </em><em>None</em>) – A given range of dates. Optional.</p></li>
+<li><p><strong>d_range</strong> (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v2.3.3)"><em>DatetimeIndex</em></a><em> | </em><em>None</em>) – A given range of dates. Optional.</p></li>
 <li><p><strong>days</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Number of days to generate when date_range not provided. Must be
 combined with end_dt. Optional.</p></li>
-<li><p><strong>end_dt</strong> (<em>dt.date</em><em> | </em><em>None</em>) – End date of date range to generate when date_range not provided.
+<li><p><strong>end_dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.14)"><em>date</em></a><em> | </em><em>None</em>) – End date of date range to generate when date_range not provided.
 Must be combined with days. Optional.</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Placeholder for a name of the timeseries.</p></li>
 <li><p><strong>valuetype</strong> (<em>ValueType</em>) – Identifies if the series is a series of values or returns.
 Defaults to ValueType.PRICE.</p></li>
-<li><p><strong>baseccy</strong> (<em>CurrencyStringType</em>) – The currency of the timeseries. Defaults to “SEK”.</p></li>
+<li><p><strong>baseccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><em>StringConstraints</em></a><em>(</em><em>strip_whitespace=True</em><em>, </em><em>to_upper=True</em><em>, </em><em>to_lower=None</em><em>, </em><em>strict=True</em><em>, </em><em>min_length=3</em><em>, </em><em>max_length=3</em><em>, </em><em>pattern=^</em><em>[</em><em>A-Z</em><em>]</em><em>{3}$</em><em>)</em><em>]</em>) – The currency of the timeseries. Defaults to “SEK”.</p></li>
 <li><p><strong>local_ccy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Boolean flag indicating if timeseries is in local currency.
 Defaults to True.</p></li>
 </ul>
@@ -695,7 +695,7 @@ Defaults to True.</p></li>
     combination of <code class="docutils literal notranslate"><span class="pre">days</span></code> and <code class="docutils literal notranslate"><span class="pre">end_dt</span></code> is incomplete.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Self</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -843,7 +843,7 @@ Defaults to True.</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">max_drawdown_date</span></span></dt>
 <dd><p>Date when the maximum drawdown occurred.</p>
-<p><a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
 <section id="returns">
 <h4>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -897,17 +897,13 @@ Defaults to True.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">arithmetic_ret</span></span></dt>
-<dd><p>//www.investopedia.com/terms/a/arithmeticmean.asp.</p>
+<dd><p>Annualized arithmetic mean of returns.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/a/arithmeticmean.asp">https://www.investopedia.com/terms/a/arithmeticmean.asp</a>.</p>
 <section id="id1">
 <h4>Returns:<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Annualized arithmetic mean of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -916,17 +912,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">geo_ret</span></span></dt>
-<dd><p>//www.investopedia.com/terms/c/cagr.asp.</p>
+<dd><p>Compounded Annual Growth Rate (CAGR).</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/c/cagr.asp">https://www.investopedia.com/terms/c/cagr.asp</a>.</p>
 <section id="id2">
 <h4>Returns:<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Compounded Annual Growth Rate (CAGR).
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -950,8 +942,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">vol</span></span></dt>
 <dd><p>Annualized volatility.</p>
-<p>Based on Pandas .std() which is the equivalent of stdev.s([…]) in MS Excel.
-<a class="reference external" href="https://www.investopedia.com/terms/v/volatility.asp">https://www.investopedia.com/terms/v/volatility.asp</a>.</p>
+<p>Based on Pandas .std() which is the equivalent of stdev.s([…]) in MS Excel.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/v/volatility.asp">https://www.investopedia.com/terms/v/volatility.asp</a>.</p>
 <section id="id4">
 <h4>Returns:<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -967,8 +959,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">downside_deviation</span></span></dt>
 <dd><p>Downside Deviation.</p>
 <p>Standard deviation of returns that are below a Minimum Accepted Return
-of zero. It is used to calculate the Sortino Ratio.
-<a class="reference external" href="https://www.investopedia.com/terms/d/downside-deviation.asp">https://www.investopedia.com/terms/d/downside-deviation.asp</a>.</p>
+of zero. It is used to calculate the Sortino Ratio.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/d/downside-deviation.asp">https://www.investopedia.com/terms/d/downside-deviation.asp</a>.</p>
 <section id="id5">
 <h4>Returns:<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -997,7 +989,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">sortino_ratio</span></span></dt>
-<dd><p>//www.investopedia.com/terms/s/sortinoratio.asp.</p>
+<dd><p>Sortino ratio.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/s/sortinoratio.asp">https://www.investopedia.com/terms/s/sortinoratio.asp</a>.</p>
 <section id="id7">
 <h4>Returns:<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
 <dl class="simple">
@@ -1005,11 +998,6 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 / downside deviation. The ratio implies that the riskfree asset has zero
 volatility, and a minimum acceptable return of zero.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1038,17 +1026,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">omega_ratio</span></span></dt>
-<dd><p>//en.wikipedia.org/wiki/Omega_ratio.</p>
+<dd><p>Omega ratio.</p>
+<p>Reference: <a class="reference external" href="https://en.wikipedia.org/wiki/Omega_ratio">https://en.wikipedia.org/wiki/Omega_ratio</a>.</p>
 <section id="id9">
 <h4>Returns:<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Omega ratio calculation.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1073,17 +1057,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">cvar_down</span></span></dt>
-<dd><p>//www.investopedia.com/terms/c/conditional_value_at_risk.asp.</p>
+<dd><p>Downside 95% Conditional Value At Risk “CVaR”.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/c/conditional_value_at_risk.asp">https://www.investopedia.com/terms/c/conditional_value_at_risk.asp</a>.</p>
 <section id="id11">
 <h4>Returns:<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Downside 95% Conditional Value At Risk “CVaR”.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1120,17 +1100,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">max_drawdown</span></span></dt>
-<dd><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p>
+<dd><p>Maximum drawdown without any limit on date range.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
 <section id="id14">
 <h4>Returns:<a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Maximum drawdown without any limit on date range.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1139,17 +1115,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">max_drawdown_cal_year</span></span></dt>
-<dd><p>//www.investopedia.com/terms/m/maximum-drawdown-mdd.asp.</p>
+<dd><p>Maximum drawdown in a single calendar year.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp">https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp</a>.</p>
 <section id="id15">
 <h4>Returns:<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Maximum drawdown in a single calendar year.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1188,17 +1160,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">skew</span></span></dt>
-<dd><p>//www.investopedia.com/terms/s/skewness.asp.</p>
+<dd><p>Skew of the return distribution.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/s/skewness.asp">https://www.investopedia.com/terms/s/skewness.asp</a>.</p>
 <section id="id18">
 <h4>Returns:<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Skew of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1207,17 +1175,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">kurtosis</span></span></dt>
-<dd><p>//www.investopedia.com/terms/k/kurtosis.asp.</p>
+<dd><p>Kurtosis of the return distribution.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/k/kurtosis.asp">https://www.investopedia.com/terms/k/kurtosis.asp</a>.</p>
 <section id="id19">
 <h4>Returns:<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Kurtosis of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1226,17 +1190,13 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">z_score</span></span></dt>
-<dd><p>//www.investopedia.com/terms/z/zscore.asp.</p>
+<dd><p>Z-score.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/z/zscore.asp">https://www.investopedia.com/terms/z/zscore.asp</a>.</p>
 <section id="id20">
 <h4>Returns:<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Z-score as (last return - mean return) / standard deviation of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>https</p>
 </dd>
 </dl>
 </section>
@@ -1546,7 +1506,7 @@ is calculated. Defaults to 1.</p></li>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">ewma_vol_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.94</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.ewma_vol_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Exponentially Weighted Moving Average Model for Volatility.</p>
-<p><a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
+<p>Reference: <a class="reference external" href="https://www.investopedia.com/articles/07/ewma.asp">https://www.investopedia.com/articles/07/ewma.asp</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

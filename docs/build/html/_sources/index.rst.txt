@@ -64,25 +64,25 @@ Here's a simple example to get you started:
 
 .. code-block:: python
 
-   from openseries import OpenTimeSeries
-   import yfinance as yf
+    from openseries import OpenTimeSeries
+    import yfinance as yf
 
-   # Download data
-   ticker = yf.Ticker("^GSPC")
-   history = ticker.history(period="5y")
+    # Download data
+    ticker = yf.Ticker("^GSPC")
+    history = ticker.history(period="5y")
 
-   # Create OpenTimeSeries
-   series = OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
-   series.set_new_label(lvl_zero="S&P 500")
+    # Create OpenTimeSeries
+    series = OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
+    series.set_new_label(lvl_zero="S&P 500")
 
-   # Calculate key metrics
-   print(f"Annual Return: {series.geo_ret:.2%}")
-   print(f"Volatility: {series.vol:.2%}")
-   print(f"Sharpe Ratio: {series.ret_vol_ratio:.2f}")
-   print(f"Max Drawdown: {series.max_drawdown:.2%}")
+    # Calculate key metrics
+    print(f"Annual Return: {series.geo_ret:.2%}")
+    print(f"Volatility: {series.vol:.2%}")
+    print(f"Sharpe Ratio: {series.ret_vol_ratio:.2f}")
+    print(f"Max Drawdown: {series.max_drawdown:.2%}")
 
-   # Create interactive plot
-   series.plot_series()
+    # Create interactive plot
+    series.plot_series()
 
 Documentation Contents
 ----------------------
@@ -123,9 +123,6 @@ Documentation Contents
 
 Python Version Support
 ----------------------
-
-.. warning::
-   **Python 3.10 Deprecation Notice**: Python 3.10 support is deprecated and will be removed, no earlier than 2025-12-01. Please upgrade to Python ≥3.11. See `GitHub Issue #340 <https://github.com/CaptorAB/openseries/issues/340>`_ (pinned) for details.
 
 .. toctree::
    :maxdepth: 2

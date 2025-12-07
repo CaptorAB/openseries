@@ -9,18 +9,24 @@ from openseries.owntypes import ValueType
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation, _random_generator
 
-from .test_common_sim import CommonTestCase
-
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from numpy.random import Generator
+
+    from openseries.frame import OpenFrame
 
 
 class SimulationTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-class TestSimulation(CommonTestCase):
+class TestSimulation:
     """class to run tests on the module simulation.py."""
+
+    seed: int
+    seriesim: ReturnSimulation
+    randomframe: OpenFrame
+    randomseries: OpenTimeSeries
+    random_properties: dict[str, dt.date | int | float]
 
     def test_processes(self: TestSimulation) -> None:
         """Test ReturnSimulation based on different stochastic processes."""

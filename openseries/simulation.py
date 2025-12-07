@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 try:
     from typing import Unpack
@@ -33,7 +33,6 @@ from .datefixer import generate_calendar_date_range
 from .owntypes import (
     CountriesType,
     DaysInYearType,
-    Self,
     ValueType,
 )
 

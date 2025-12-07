@@ -23,7 +23,7 @@ def _cvar_down_calc(
 ) -> float:
     """Calculate downside Conditional Value at Risk (CVaR).
 
-    https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
+    Reference: https://www.investopedia.com/terms/c/conditional_value_at_risk.asp.
 
     Args:
         data: The data to perform the calculation over.
@@ -48,8 +48,9 @@ def _var_down_calc(
 ) -> float:
     """Calculate downside Value At Risk (VaR).
 
-    The equivalent of percentile.inc([...], 1-level) over returns in MS Excel
-    https://www.investopedia.com/terms/v/var.asp.
+    The equivalent of percentile.inc([...], 1-level) over returns in MS Excel.
+
+    Reference: https://www.investopedia.com/terms/v/var.asp.
 
     Args:
         data: The data to perform the calculation over.
