@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio Analysis &mdash; openseries 2.1.0 documentation</title>
+  <title>Portfolio Analysis &mdash; openseries 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../_static/documentation_options.js?v=841abef3"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -146,8 +146,6 @@
 <h2>Setting Up the Data<a class="headerlink" href="#setting-up-the-data" title="Link to this heading"></a></h2>
 <p>Let’s start by downloading data for a diversified set of assets:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span><span class="p">,</span> <span class="n">OpenFrame</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">efficient_frontier</span><span class="p">,</span> <span class="n">simulate_portfolios</span>
 
@@ -190,19 +188,18 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">asset_metrics</span><span class="p">)</span>
 
 <span class="c1"># Key metrics comparison</span>
-<span class="n">returns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Geometric return&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-<span class="n">volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Volatility&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">returns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Geometric return&#39;</span><span class="p">]</span>
+<span class="n">volatilities</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Volatility&#39;</span><span class="p">]</span>
 <span class="n">sharpe_ratios</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Return vol ratio&#39;</span><span class="p">]</span>
-<span class="n">max_drawdowns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Max drawdown&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">max_drawdowns</span> <span class="o">=</span> <span class="n">asset_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Max drawdown&#39;</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== ASSET COMPARISON ===&quot;</span><span class="p">)</span>
-<span class="n">comparison_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-     <span class="s1">&#39;Annual Return (%)&#39;</span><span class="p">:</span> <span class="n">returns</span><span class="p">,</span>
-     <span class="s1">&#39;Volatility (%)&#39;</span><span class="p">:</span> <span class="n">volatilities</span><span class="p">,</span>
-     <span class="s1">&#39;Sharpe Ratio&#39;</span><span class="p">:</span> <span class="n">sharpe_ratios</span><span class="p">,</span>
-     <span class="s1">&#39;Max Drawdown (%)&#39;</span><span class="p">:</span> <span class="n">max_drawdowns</span>
-<span class="p">})</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">comparison_df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">returns</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">asset</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Annual Return: </span><span class="si">{</span><span class="n">returns</span><span class="p">[</span><span class="n">asset</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">volatilities</span><span class="p">[</span><span class="n">asset</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe Ratio: </span><span class="si">{</span><span class="n">sharpe_ratios</span><span class="p">[</span><span class="n">asset</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Max Drawdown: </span><span class="si">{</span><span class="n">max_drawdowns</span><span class="p">[</span><span class="n">asset</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -334,9 +331,13 @@
      <span class="p">}</span>
 
 <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
-     <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== STRATEGY COMPARISON ===&quot;</span><span class="p">)</span>
-     <span class="nb">print</span><span class="p">((</span><span class="n">results_df</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+     <span class="k">for</span> <span class="n">strategy_name</span><span class="p">,</span> <span class="n">metrics</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">strategy_name</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Return: </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;return&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;volatility&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe: </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;sharpe&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Max Drawdown: </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;max_drawdown&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -361,7 +362,7 @@
 
 <span class="c1"># Find maximum Sharpe ratio portfolio</span>
 <span class="n">sharpe_ratios</span> <span class="o">=</span> <span class="n">frontier_df</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">frontier_df</span><span class="p">[</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span>
-<span class="n">max_sharpe_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sharpe_ratios</span><span class="p">)</span>
+<span class="n">max_sharpe_idx</span> <span class="o">=</span> <span class="n">sharpe_ratios</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== MAXIMUM SHARPE RATIO PORTFOLIO ===&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Return: </span><span class="si">{</span><span class="n">frontier_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">max_sharpe_idx</span><span class="p">][</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -393,11 +394,12 @@
 <span class="n">sim_sharpe_ratios</span> <span class="o">=</span> <span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">simulation_results</span><span class="p">[</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span>
 
 <span class="c1"># Top 5 Sharpe ratios</span>
-<span class="n">top_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sim_sharpe_ratios</span><span class="p">)[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span>
+<span class="n">sorted_indices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sim_sharpe_ratios</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">sim_sharpe_ratios</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">top_indices</span> <span class="o">=</span> <span class="n">sorted_indices</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== TOP 5 SIMULATED PORTFOLIOS ===&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">top_indices</span><span class="p">)):</span>
-     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Rank </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top_indices</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Rank </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Return: </span><span class="si">{</span><span class="n">simulation_results</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">simulation_results</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;stdev&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe: </span><span class="si">{</span><span class="n">sim_sharpe_ratios</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -430,61 +432,40 @@
 <section id="risk-attribution">
 <h2>Risk Attribution<a class="headerlink" href="#risk-attribution" title="Link to this heading"></a></h2>
 <p>Analyze the risk contribution of each asset:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate portfolio statistics for equal weight portfolio</span>
-<span class="n">returns_data</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-     <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
-     <span class="n">returns_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">tsdf</span><span class="p">)</span>
-
-<span class="c1"># Create returns matrix</span>
-<span class="n">returns_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">returns_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">returns_matrix</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
-
-<span class="c1"># Calculate covariance matrix (annualized)</span>
-<span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">returns_matrix</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span> <span class="o">*</span> <span class="mi">252</span>  <span class="c1"># Assuming daily data</span>
-
-<span class="c1"># Portfolio weights (equal weight)</span>
-<span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">equal_weights</span><span class="p">)</span>
-
-<span class="c1"># Portfolio variance</span>
-<span class="n">portfolio_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">,</span> <span class="n">weights</span><span class="p">))</span>
-<span class="n">portfolio_volatility</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">portfolio_variance</span><span class="p">)</span>
-
-<span class="c1"># Marginal contribution to risk</span>
-<span class="n">marginal_contrib</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="n">portfolio_volatility</span>
-
-<span class="c1"># Component contribution to risk</span>
-<span class="n">component_contrib</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">*</span> <span class="n">marginal_contrib</span>
-
-<span class="c1"># Percentage contribution</span>
-<span class="n">percent_contrib</span> <span class="o">=</span> <span class="n">component_contrib</span> <span class="o">/</span> <span class="n">portfolio_volatility</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate portfolio statistics using openseries methods</span>
+<span class="c1"># Create equal weight portfolio</span>
+<span class="n">equal_weight_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">)</span>
+<span class="n">equal_weight_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">equal_weight_portfolio_df</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== RISK ATTRIBUTION (Equal Weight Portfolio) ===&quot;</span><span class="p">)</span>
-<span class="n">risk_attribution</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-     <span class="s1">&#39;Weight&#39;</span><span class="p">:</span> <span class="n">weights</span><span class="p">,</span>
-     <span class="s1">&#39;Marginal Contrib&#39;</span><span class="p">:</span> <span class="n">marginal_contrib</span><span class="p">,</span>
-     <span class="s1">&#39;Component Contrib&#39;</span><span class="p">:</span> <span class="n">component_contrib</span><span class="p">,</span>
-     <span class="s1">&#39;Percent Contrib&#39;</span><span class="p">:</span> <span class="n">percent_contrib</span>
-<span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Volatility: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio Return: </span><span class="si">{</span><span class="n">equal_weight_portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">risk_attribution</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="c1"># Individual asset contributions can be analyzed using openseries properties</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">series</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">):</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">equal_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">asset_vol</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">vol</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Weight: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Individual Volatility: </span><span class="si">{</span><span class="n">asset_vol</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Weighted Contribution: </span><span class="si">{</span><span class="n">weight</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">asset_vol</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="performance-attribution">
 <h2>Performance Attribution<a class="headerlink" href="#performance-attribution" title="Link to this heading"></a></h2>
 <p>Analyze performance contribution over time:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate individual asset returns</span>
-<span class="n">asset_returns</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">:</span>
-     <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
-     <span class="n">asset_returns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">tsdf</span><span class="p">)</span>
-
-<span class="n">returns_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">asset_returns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">]</span>
-
-<span class="c1"># Calculate weighted returns (equal weight portfolio)</span>
-<span class="n">weighted_returns</span> <span class="o">=</span> <span class="n">returns_df</span> <span class="o">*</span> <span class="n">equal_weights</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate performance attribution using openseries</span>
+<span class="c1"># Individual asset performance is available through openseries properties</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== PERFORMANCE ATTRIBUTION ===&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">series</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">assets</span><span class="o">.</span><span class="n">constituents</span><span class="p">):</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">equal_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">asset_return</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span>
+    <span class="n">contribution</span> <span class="o">=</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">asset_return</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Weight: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Return: </span><span class="si">{</span><span class="n">asset_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Contribution: </span><span class="si">{</span><span class="n">contribution</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Cumulative contribution</span>
 <span class="n">cumulative_contrib</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">weighted_returns</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span>
@@ -540,10 +521,8 @@
      <span class="n">rebalanced_portfolios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">portfolio</span><span class="o">.</span><span class="n">constituents</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
 <span class="c1"># Compare with theoretical portfolio</span>
-<span class="n">theoretical_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span>
-     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Theoretical&quot;</span><span class="p">,</span>
-     <span class="n">weights</span><span class="o">=</span><span class="n">equal_weights</span>
-<span class="p">)</span>
+<span class="n">assets</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">equal_weights</span>
+<span class="n">theoretical_portfolio_df</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Theoretical&quot;</span><span class="p">)</span>
 <span class="n">theoretical_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">theoretical_portfolio_df</span><span class="p">)</span>
 
 <span class="c1"># Create comprehensive comparison</span>

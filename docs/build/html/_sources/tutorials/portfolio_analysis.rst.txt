@@ -11,8 +11,6 @@ Let's start by downloading data for a diversified set of assets:
 .. code-block:: python
 
     import yfinance as yf
-    import pandas as pd
-    import numpy as np
     from openseries import OpenTimeSeries, OpenFrame
     from openseries import efficient_frontier, simulate_portfolios
 
@@ -57,19 +55,18 @@ First, let's analyze the individual assets:
     print(asset_metrics)
 
     # Key metrics comparison
-    returns = asset_metrics.loc['Geometric return'] * 100
-    volatilities = asset_metrics.loc['Volatility'] * 100
+    returns = asset_metrics.loc['Geometric return']
+    volatilities = asset_metrics.loc['Volatility']
     sharpe_ratios = asset_metrics.loc['Return vol ratio']
-    max_drawdowns = asset_metrics.loc['Max drawdown'] * 100
+    max_drawdowns = asset_metrics.loc['Max drawdown']
 
     print("\n=== ASSET COMPARISON ===")
-    comparison_df = pd.DataFrame({
-         'Annual Return (%)': returns,
-         'Volatility (%)': volatilities,
-         'Sharpe Ratio': sharpe_ratios,
-         'Max Drawdown (%)': max_drawdowns
-    })
-    print(comparison_df.round(2))
+    for asset in returns.index:
+        print(f"{asset}:")
+        print(f"  Annual Return: {returns[asset]:.2%}")
+        print(f"  Volatility: {volatilities[asset]:.2%}")
+        print(f"  Sharpe Ratio: {sharpe_ratios[asset]:.2f}")
+        print(f"  Max Drawdown: {max_drawdowns[asset]:.2%}")
 
 Correlation Analysis
 --------------------
@@ -217,9 +214,13 @@ When comparing multiple strategies, it's important to handle potential failures 
          }
 
     if results:
-         results_df = pd.DataFrame(results).T
          print("\n=== STRATEGY COMPARISON ===")
-         print((results_df * 100).round(2))
+         for strategy_name, metrics in results.items():
+             print(f"\n{strategy_name}:")
+             print(f"  Return: {metrics['return']*100:.2f}%")
+             print(f"  Volatility: {metrics['volatility']*100:.2f}%")
+             print(f"  Sharpe: {metrics['sharpe']:.2f}")
+             print(f"  Max Drawdown: {metrics['max_drawdown']*100:.2f}%")
 
 Portfolio Optimization
 ----------------------
@@ -245,7 +246,7 @@ Efficient Frontier
 
     # Find maximum Sharpe ratio portfolio
     sharpe_ratios = frontier_df['ret'] / frontier_df['stdev']
-    max_sharpe_idx = np.argmax(sharpe_ratios)
+    max_sharpe_idx = sharpe_ratios.idxmax()
 
     print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
     print(f"Expected Return: {frontier_df.iloc[max_sharpe_idx]['ret']:.2%}")
@@ -278,11 +279,12 @@ Monte Carlo Portfolio Simulation
     sim_sharpe_ratios = simulation_results['ret'] / simulation_results['stdev']
 
     # Top 5 Sharpe ratios
-    top_indices = np.argsort(sim_sharpe_ratios)[-5:]
+    sorted_indices = sorted(range(len(sim_sharpe_ratios)), key=lambda i: sim_sharpe_ratios.iloc[i], reverse=True)
+    top_indices = sorted_indices[:5]
 
     print("\n=== TOP 5 SIMULATED PORTFOLIOS ===")
-    for i, idx in enumerate(reversed(top_indices)):
-         print(f"\nRank {i+1}:")
+    for i, idx in enumerate(top_indices, 1):
+         print(f"\nRank {i}:")
          print(f"  Return: {simulation_results.iloc[idx]['ret']:.2%}")
          print(f"  Volatility: {simulation_results.iloc[idx]['stdev']:.2%}")
          print(f"  Sharpe: {sim_sharpe_ratios.iloc[idx]:.2f}")
@@ -318,44 +320,23 @@ Analyze the risk contribution of each asset:
 
 .. code-block:: python
 
-    # Calculate portfolio statistics for equal weight portfolio
-    returns_data = []
-    for series in assets.constituents:
-         series.value_to_ret()  # Modifies original
-         returns_data.append(series.tsdf)
-
-    # Create returns matrix
-    returns_matrix = pd.concat(returns_data, axis=1)
-    returns_matrix.columns = [series.label for series in assets.constituents]
-
-    # Calculate covariance matrix (annualized)
-    cov_matrix = returns_matrix.cov() * 252  # Assuming daily data
-
-    # Portfolio weights (equal weight)
-    weights = np.array(equal_weights)
-
-    # Portfolio variance
-    portfolio_variance = np.dot(weights.T, np.dot(cov_matrix, weights))
-    portfolio_volatility = np.sqrt(portfolio_variance)
-
-    # Marginal contribution to risk
-    marginal_contrib = np.dot(cov_matrix, weights) / portfolio_volatility
-
-    # Component contribution to risk
-    component_contrib = weights * marginal_contrib
-
-    # Percentage contribution
-    percent_contrib = component_contrib / portfolio_volatility
+    # Calculate portfolio statistics using openseries methods
+    # Create equal weight portfolio
+    equal_weight_portfolio_df = assets.make_portfolio(name="Equal Weight", weight_strat="eq_weights")
+    equal_weight_portfolio = OpenTimeSeries.from_df(dframe=equal_weight_portfolio_df)
 
     print("\n=== RISK ATTRIBUTION (Equal Weight Portfolio) ===")
-    risk_attribution = pd.DataFrame({
-         'Weight': weights,
-         'Marginal Contrib': marginal_contrib,
-         'Component Contrib': component_contrib,
-         'Percent Contrib': percent_contrib
-    }, index=[series.label for series in assets.constituents])
+    print(f"Portfolio Volatility: {equal_weight_portfolio.vol:.4f}")
+    print(f"Portfolio Return: {equal_weight_portfolio.geo_ret:.4f}")
 
-    print(risk_attribution.round(4))
+    # Individual asset contributions can be analyzed using openseries properties
+    for i, series in enumerate(assets.constituents):
+        weight = equal_weights[i]
+        asset_vol = series.vol
+        print(f"\n{series.label}:")
+        print(f"  Weight: {weight:.4f}")
+        print(f"  Individual Volatility: {asset_vol:.4f}")
+        print(f"  Weighted Contribution: {weight * asset_vol:.4f}")
 
 Performance Attribution
 -----------------------
@@ -364,17 +345,17 @@ Analyze performance contribution over time:
 
 .. code-block:: python
 
-    # Calculate individual asset returns
-    asset_returns = []
-    for series in assets.constituents:
-         series.value_to_ret()  # Modifies original
-         asset_returns.append(series.tsdf)
-
-    returns_df = pd.concat(asset_returns, axis=1)
-    returns_df.columns = [series.label for series in assets.constituents]
-
-    # Calculate weighted returns (equal weight portfolio)
-    weighted_returns = returns_df * equal_weights
+    # Calculate performance attribution using openseries
+    # Individual asset performance is available through openseries properties
+    print("\n=== PERFORMANCE ATTRIBUTION ===")
+    for i, series in enumerate(assets.constituents):
+        weight = equal_weights[i]
+        asset_return = series.geo_ret
+        contribution = weight * asset_return
+        print(f"{series.label}:")
+        print(f"  Weight: {weight:.2%}")
+        print(f"  Return: {asset_return:.2%}")
+        print(f"  Contribution: {contribution:.2%}")
 
     # Cumulative contribution
     cumulative_contrib = (1 + weighted_returns).cumprod()
@@ -434,10 +415,8 @@ Analyze the impact of rebalancing frequency using the realistic `rebalanced_port
          rebalanced_portfolios.append(portfolio.constituents[-1])
 
     # Compare with theoretical portfolio
-    theoretical_portfolio_df = assets.make_portfolio(
-         name="Theoretical",
-         weights=equal_weights
-    )
+    assets.weights = equal_weights
+    theoretical_portfolio_df = assets.make_portfolio(name="Theoretical")
     theoretical_portfolio = OpenTimeSeries.from_df(dframe=theoretical_portfolio_df)
 
     # Create comprehensive comparison

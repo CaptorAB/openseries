@@ -342,7 +342,7 @@ Methods that return calculated values:
 
     # Rolling calculations
     rolling_vol = series.rolling_vol(observations=30)
-    rolling_corr = frame.rolling_corr(window=60)
+    rolling_corr = frame.rolling_corr(observations=60)
 
     # Statistical analysis
     beta = frame.beta()

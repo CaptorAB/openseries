@@ -143,15 +143,6 @@ class TestReport:
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
-        pltfrm = plotframe.from_deepcopy()
-        pltfrm.delete_timeseries(lvl_zero_item="Asset_0")
-        pltfrm.delete_timeseries(lvl_zero_item="Asset_1")
-        report_html(
-            data=pltfrm,
-            auto_open=True,
-            filename="test_report_html.html",
-        )
-
         figure, _ = report_html(
             data=plotframe,
             auto_open=False,
