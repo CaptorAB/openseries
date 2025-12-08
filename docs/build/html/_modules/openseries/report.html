@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>openseries.report &mdash; openseries 2.1.0 documentation</title>
+  <title>openseries.report &mdash; openseries 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../../_static/documentation_options.js?v=841abef3"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -131,7 +131,6 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">concat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_html</span>  <span class="c1"># type: ignore[import-untyped]</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">plotly.offline</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot</span>  <span class="c1"># type: ignore[import-untyped]</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>  <span class="c1"># type: ignore[import-untyped]</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.load_plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_plotly_dict</span>
@@ -528,150 +527,6 @@
     <span class="k">return</span> <span class="n">cleanedtablevalues</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">aligning</span><span class="p">,</span> <span class="n">color_lst</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_build_mobile_layout_figure</span><span class="p">(</span>
-    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
-    <span class="n">bdf</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">vertical_legend</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a mobile-optimized vertical layout figure with only charts.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        copied: Copied OpenFrame data.</span>
-<span class="sd">        bdf: Bar chart DataFrame.</span>
-<span class="sd">        add_logo: Whether to add logo.</span>
-<span class="sd">        vertical_legend: Whether to use vertical legend.</span>
-<span class="sd">        title: Optional title for the figure.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Mobile layout figure (without table).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">plot_height</span> <span class="o">=</span> <span class="mi">400</span>
-    <span class="n">bar_height</span> <span class="o">=</span> <span class="mi">350</span>
-    <span class="n">total_min_height</span> <span class="o">=</span> <span class="n">plot_height</span> <span class="o">+</span> <span class="n">bar_height</span> <span class="o">+</span> <span class="mi">200</span>
-
-    <span class="n">plot_ratio</span> <span class="o">=</span> <span class="n">plot_height</span> <span class="o">/</span> <span class="p">(</span><span class="n">plot_height</span> <span class="o">+</span> <span class="n">bar_height</span><span class="p">)</span>
-    <span class="n">bar_ratio</span> <span class="o">=</span> <span class="n">bar_height</span> <span class="o">/</span> <span class="p">(</span><span class="n">plot_height</span> <span class="o">+</span> <span class="n">bar_height</span><span class="p">)</span>
-
-    <span class="n">figure_mobile</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
-        <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">specs</span><span class="o">=</span><span class="p">[</span>
-            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">}],</span>
-            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">}],</span>
-        <span class="p">],</span>
-        <span class="n">vertical_spacing</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span>
-        <span class="n">row_heights</span><span class="o">=</span><span class="p">[</span><span class="n">plot_ratio</span><span class="p">,</span> <span class="n">bar_ratio</span><span class="p">],</span>
-        <span class="n">subplot_titles</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-    <span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">):</span>
-        <span class="n">figure_mobile</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-            <span class="n">y</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
-            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%{x|%Y-%m-</span><span class="si">%d</span><span class="s2">}&quot;</span><span class="p">,</span>
-            <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;dash&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">},</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">lbl</span><span class="p">,</span>
-            <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">):</span>
-        <span class="n">col_name</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, ValueType]&quot;</span><span class="p">,</span> <span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">figure_mobile</span><span class="o">.</span><span class="n">add_bar</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-            <span class="n">y</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
-            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%</span><span class="si">{x}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">col_name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="n">_configure_figure_layout</span><span class="p">(</span>
-        <span class="n">figure_mobile</span><span class="p">,</span>
-        <span class="n">copied</span><span class="p">,</span>
-        <span class="n">add_logo</span><span class="o">=</span><span class="n">add_logo</span><span class="p">,</span>
-        <span class="n">vertical_legend</span><span class="o">=</span><span class="n">vertical_legend</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">mobile</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">total_min_height</span><span class="o">=</span><span class="n">total_min_height</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">figure_mobile</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_generate_html_table</span><span class="p">(</span>
-    <span class="n">cleanedtablevalues</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">aligning</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">color_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate an HTML table from table data.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        cleanedtablevalues: Table cell values.</span>
-<span class="sd">        columns: Table column headers.</span>
-<span class="sd">        aligning: Table cell alignment.</span>
-<span class="sd">        color_lst: Table cell colors.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        HTML table string.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleanedtablevalues</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">cleanedtablevalues</span> <span class="k">else</span> <span class="mi">0</span>
-    <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
-
-    <span class="n">table_html</span> <span class="o">=</span> <span class="s1">&#39;&lt;table style=&quot;width:100%; border-collapse:collapse; &#39;</span>
-    <span class="n">table_html</span> <span class="o">+=</span> <span class="s1">&#39;margin-top:20px; font-family:Poppins, sans-serif;&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;thead&gt;</span><span class="se">\n</span><span class="s2">&lt;tr&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
-
-    <span class="k">for</span> <span class="n">col_idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
-        <span class="n">align</span> <span class="o">=</span> <span class="n">aligning</span><span class="p">[</span><span class="n">col_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">col_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">aligning</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;center&quot;</span>
-        <span class="n">table_html</span> <span class="o">+=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;&lt;th style=&quot;background-color:grey; color:white; &#39;</span>
-            <span class="sa">f</span><span class="s2">&quot;padding:10px; text-align:</span><span class="si">{</span><span class="n">align</span><span class="si">}</span><span class="s2">; vertical-align:middle; &quot;</span>
-            <span class="sa">f</span><span class="s1">&#39;font-size:11px; font-weight:bold;&quot;&gt;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&lt;/th&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="p">)</span>
-
-    <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/tr&gt;</span><span class="se">\n</span><span class="s2">&lt;/thead&gt;</span><span class="se">\n</span><span class="s2">&lt;tbody&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
-
-    <span class="n">col_even_color</span> <span class="o">=</span> <span class="n">color_lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_lst</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;white&quot;</span>
-    <span class="n">col_odd_color</span> <span class="o">=</span> <span class="n">color_lst</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_lst</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;white&quot;</span>
-
-    <span class="k">for</span> <span class="n">row_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
-        <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;tr&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="k">for</span> <span class="n">col_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
-            <span class="n">align</span> <span class="o">=</span> <span class="n">aligning</span><span class="p">[</span><span class="n">col_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">col_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">aligning</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;center&quot;</span>
-            <span class="n">cell_value</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">cleanedtablevalues</span><span class="p">[</span><span class="n">col_idx</span><span class="p">][</span><span class="n">row_idx</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">col_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleanedtablevalues</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">row_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleanedtablevalues</span><span class="p">[</span><span class="n">col_idx</span><span class="p">])</span>
-                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">col_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">bg_color</span> <span class="o">=</span> <span class="s2">&quot;grey&quot;</span>
-                <span class="n">text_color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
-            <span class="k">elif</span> <span class="n">col_idx</span> <span class="o">==</span> <span class="n">num_cols</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">bg_color</span> <span class="o">=</span> <span class="n">col_even_color</span>
-                <span class="n">text_color</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">bg_color</span> <span class="o">=</span> <span class="n">col_odd_color</span>
-                <span class="n">text_color</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
-            <span class="n">table_html</span> <span class="o">+=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;&lt;td style=&quot;background-color:</span><span class="si">{</span><span class="n">bg_color</span><span class="si">}</span><span class="s1">; color:</span><span class="si">{</span><span class="n">text_color</span><span class="si">}</span><span class="s1">; &#39;</span>
-                <span class="sa">f</span><span class="s2">&quot;padding:8px; text-align:</span><span class="si">{</span><span class="n">align</span><span class="si">}</span><span class="s2">; vertical-align:middle; &quot;</span>
-                <span class="sa">f</span><span class="s1">&#39;font-size:10px; height:25px;&quot;&gt;</span><span class="si">{</span><span class="n">cell_value</span><span class="si">}</span><span class="s1">&lt;/td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
-            <span class="p">)</span>
-        <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/tr&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
-
-    <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/tbody&gt;</span><span class="se">\n</span><span class="s2">&lt;/table&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="n">table_html</span>
-
-
 <span class="k">def</span><span class="w"> </span><span class="nf">_configure_figure_layout</span><span class="p">(</span>
     <span class="n">figure</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span>
     <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
@@ -808,12 +663,268 @@
         <span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_generate_responsive_html</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_bar_dataframe</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">bar_freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get bar chart DataFrame based on year fraction.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        bar_freq: The date offset string for bar plot frequency.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Bar chart DataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quarter_of_year</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="k">if</span> <span class="n">copied</span><span class="o">.</span><span class="n">yearfrac</span> <span class="o">&lt;</span> <span class="n">quarter_of_year</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">tmp</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">calendar_period_returns</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">bar_freq</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_desktop_figure</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">bdf</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">cleanedtablevalues</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">aligning</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">color_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the desktop figure with plots and table.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        bdf: Bar chart DataFrame.</span>
+<span class="sd">        cleanedtablevalues: Table cell values.</span>
+<span class="sd">        columns: Table column headers.</span>
+<span class="sd">        aligning: Table cell alignment.</span>
+<span class="sd">        color_lst: Table cell colors.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Desktop figure with plots and table.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+        <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">specs</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;rowspan&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;table&quot;</span><span class="p">}],</span>
+            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">},</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">):</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
+            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%{x|%Y-%m-</span><span class="si">%d</span><span class="s2">}&quot;</span><span class="p">,</span>
+            <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;dash&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">},</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">lbl</span><span class="p">,</span>
+            <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">):</span>
+        <span class="n">col_name</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, ValueType]&quot;</span><span class="p">,</span> <span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">add_bar</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
+            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%</span><span class="si">{x}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">col_name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">figure</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
+        <span class="n">header</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">columns</span><span class="p">,</span>
+            <span class="s2">&quot;align&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;grey&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="n">cells</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">cleanedtablevalues</span><span class="p">,</span>
+            <span class="s2">&quot;align&quot;</span><span class="p">:</span> <span class="n">aligning</span><span class="p">,</span>
+            <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+            <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="n">color_lst</span><span class="p">,</span>
+            <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)},</span>
+        <span class="p">},</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">figure</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_mobile_figure</span><span class="p">(</span>
+    <span class="n">copied</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
+    <span class="n">bdf</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">vertical_legend</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the mobile figure with charts only.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        copied: Copied OpenFrame data.</span>
+<span class="sd">        bdf: Bar chart DataFrame.</span>
+<span class="sd">        add_logo: Whether to add logo.</span>
+<span class="sd">        vertical_legend: Whether to use vertical legend.</span>
+<span class="sd">        title: Optional title for the figure.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Mobile layout figure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plot_height</span> <span class="o">=</span> <span class="mi">400</span>
+    <span class="n">bar_height</span> <span class="o">=</span> <span class="mi">350</span>
+    <span class="n">total_min_height</span> <span class="o">=</span> <span class="n">plot_height</span> <span class="o">+</span> <span class="n">bar_height</span> <span class="o">+</span> <span class="mi">200</span>
+
+    <span class="n">plot_ratio</span> <span class="o">=</span> <span class="n">plot_height</span> <span class="o">/</span> <span class="p">(</span><span class="n">plot_height</span> <span class="o">+</span> <span class="n">bar_height</span><span class="p">)</span>
+    <span class="n">bar_ratio</span> <span class="o">=</span> <span class="n">bar_height</span> <span class="o">/</span> <span class="p">(</span><span class="n">plot_height</span> <span class="o">+</span> <span class="n">bar_height</span><span class="p">)</span>
+
+    <span class="n">figure_mobile</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+        <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">specs</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">}],</span>
+            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">}],</span>
+        <span class="p">],</span>
+        <span class="n">vertical_spacing</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span>
+        <span class="n">row_heights</span><span class="o">=</span><span class="p">[</span><span class="n">plot_ratio</span><span class="p">,</span> <span class="n">bar_ratio</span><span class="p">],</span>
+        <span class="n">subplot_titles</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">):</span>
+        <span class="n">figure_mobile</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
+            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%{x|%Y-%m-</span><span class="si">%d</span><span class="s2">}&quot;</span><span class="p">,</span>
+            <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;dash&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">},</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">lbl</span><span class="p">,</span>
+            <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">):</span>
+        <span class="n">col_name</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, ValueType]&quot;</span><span class="p">,</span> <span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">figure_mobile</span><span class="o">.</span><span class="n">add_bar</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
+            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%</span><span class="si">{x}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">col_name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">_configure_figure_layout</span><span class="p">(</span>
+        <span class="n">figure_mobile</span><span class="p">,</span>
+        <span class="n">copied</span><span class="p">,</span>
+        <span class="n">add_logo</span><span class="o">=</span><span class="n">add_logo</span><span class="p">,</span>
+        <span class="n">vertical_legend</span><span class="o">=</span><span class="n">vertical_legend</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">mobile</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">total_min_height</span><span class="o">=</span><span class="n">total_min_height</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">figure_mobile</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate_html_table_string</span><span class="p">(</span>
+    <span class="n">cleanedtablevalues</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">aligning</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">color_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate HTML table string for mobile layout.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cleanedtablevalues: Table cell values.</span>
+<span class="sd">        columns: Table column headers.</span>
+<span class="sd">        aligning: Table cell alignment.</span>
+<span class="sd">        color_lst: Table cell colors.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTML table string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleanedtablevalues</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">cleanedtablevalues</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="n">table_html</span> <span class="o">=</span> <span class="s1">&#39;&lt;table style=&quot;width:100%; border-collapse:collapse; &#39;</span>
+    <span class="n">table_html</span> <span class="o">+=</span> <span class="s1">&#39;margin-top:20px; font-family:Poppins, sans-serif;&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;thead&gt;</span><span class="se">\n</span><span class="s2">&lt;tr&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="k">for</span> <span class="n">col_idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">align</span> <span class="o">=</span> <span class="n">aligning</span><span class="p">[</span><span class="n">col_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">col_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">aligning</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;center&quot;</span>
+        <span class="n">table_html</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;&lt;th style=&quot;background-color:grey; color:white; &#39;</span>
+            <span class="sa">f</span><span class="s2">&quot;padding:10px; text-align:</span><span class="si">{</span><span class="n">align</span><span class="si">}</span><span class="s2">; vertical-align:middle; &quot;</span>
+            <span class="sa">f</span><span class="s1">&#39;font-size:11px; font-weight:bold;&quot;&gt;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&lt;/th&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+
+    <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/tr&gt;</span><span class="se">\n</span><span class="s2">&lt;/thead&gt;</span><span class="se">\n</span><span class="s2">&lt;tbody&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="n">col_even_color</span> <span class="o">=</span> <span class="n">color_lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_lst</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;white&quot;</span>
+    <span class="n">col_odd_color</span> <span class="o">=</span> <span class="n">color_lst</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_lst</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;white&quot;</span>
+
+    <span class="k">for</span> <span class="n">row_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+        <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;tr&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">col_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
+            <span class="n">align</span> <span class="o">=</span> <span class="n">aligning</span><span class="p">[</span><span class="n">col_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">col_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">aligning</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;center&quot;</span>
+            <span class="n">cell_value</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">cleanedtablevalues</span><span class="p">[</span><span class="n">col_idx</span><span class="p">][</span><span class="n">row_idx</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">col_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleanedtablevalues</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">row_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleanedtablevalues</span><span class="p">[</span><span class="n">col_idx</span><span class="p">])</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">col_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">bg_color</span> <span class="o">=</span> <span class="s2">&quot;grey&quot;</span>
+                <span class="n">text_color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+            <span class="k">elif</span> <span class="n">col_idx</span> <span class="o">==</span> <span class="n">num_cols</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">bg_color</span> <span class="o">=</span> <span class="n">col_even_color</span>
+                <span class="n">text_color</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bg_color</span> <span class="o">=</span> <span class="n">col_odd_color</span>
+                <span class="n">text_color</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
+            <span class="n">table_html</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;&lt;td style=&quot;background-color:</span><span class="si">{</span><span class="n">bg_color</span><span class="si">}</span><span class="s1">; color:</span><span class="si">{</span><span class="n">text_color</span><span class="si">}</span><span class="s1">; &#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;padding:8px; text-align:</span><span class="si">{</span><span class="n">align</span><span class="si">}</span><span class="s2">; vertical-align:middle; &quot;</span>
+                <span class="sa">f</span><span class="s1">&#39;font-size:10px; height:25px;&quot;&gt;</span><span class="si">{</span><span class="n">cell_value</span><span class="si">}</span><span class="s1">&lt;/td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+        <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/tr&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="n">table_html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/tbody&gt;</span><span class="se">\n</span><span class="s2">&lt;/table&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">table_html</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_output_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the output directory path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        directory: Optional directory path.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Resolved directory path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">directory</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;Documents&quot;</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">stack</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate_responsive_html_string</span><span class="p">(</span>
     <span class="n">html_desktop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">html_mobile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">div_id_desktop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">div_id_mobile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">table_html</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">table_html</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate responsive HTML wrapper with CSS and JavaScript.</span>
 
@@ -822,7 +933,7 @@
 <span class="sd">        html_mobile: Mobile layout HTML.</span>
 <span class="sd">        div_id_desktop: Desktop container div ID.</span>
 <span class="sd">        div_id_mobile: Mobile container div ID.</span>
-<span class="sd">        table_html: Optional HTML table for mobile layout.</span>
+<span class="sd">        table_html: HTML table string for mobile layout.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Responsive HTML string.</span>
@@ -833,9 +944,7 @@
     <span class="n">desktop_get</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;document.getElementById(&quot;</span><span class="si">{</span><span class="n">div_id_desktop</span><span class="si">}</span><span class="s1">_container&quot;)&#39;</span>
     <span class="n">mobile_get</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;document.getElementById(&quot;</span><span class="si">{</span><span class="n">div_id_mobile</span><span class="si">}</span><span class="s1">_container&quot;)&#39;</span>
 
-    <span class="n">mobile_content</span> <span class="o">=</span> <span class="n">html_mobile</span>
-    <span class="k">if</span> <span class="n">table_html</span><span class="p">:</span>
-        <span class="n">mobile_content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">table_html</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">mobile_content</span> <span class="o">=</span> <span class="n">html_mobile</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">table_html</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">return</span> <span class="p">(</span>
         <span class="sa">f</span><span class="s1">&#39;&lt;div id=&quot;</span><span class="si">{</span><span class="n">div_id_desktop</span><span class="si">}</span><span class="s1">_container&quot; &#39;</span>
@@ -899,7 +1008,61 @@
         <span class="s1">&#39;desktopContainer.style.display = &quot;block&quot;;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="s2">&quot;            if (mobileContainer) &quot;</span>
         <span class="s1">&#39;mobileContainer.style.display = &quot;none&quot;;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s2">&quot;            disableTableScrolling(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(function() { &quot;</span>
+        <span class="s2">&quot;adjustTableSize(desktopContainer); }, 100);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    function adjustTableSize(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var svg = plot.querySelector(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (!svg) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var tableGroup = svg.querySelector(&#39;g[class*=</span><span class="se">\&quot;</span><span class="s2">table</span><span class="se">\&quot;</span><span class="s2">]&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (!tableGroup) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var plotRect = plot.getBoundingClientRect();</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (plotRect.height === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                try {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var bbox = tableGroup.getBBox();</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (bbox.height === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var availableHeight = plotRect.height - 60;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var currentHeight = bbox.height;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (currentHeight &gt; availableHeight &amp;&amp; &quot;</span>
+        <span class="s2">&quot;availableHeight &gt; 0) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var scaleFactor = availableHeight / &quot;</span>
+        <span class="s2">&quot;currentHeight;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var minScale = 0.4;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var maxScale = 1.0;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        scaleFactor = Math.max(minScale, &quot;</span>
+        <span class="s2">&quot;Math.min(maxScale, scaleFactor));</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var existingTransform = &quot;</span>
+        <span class="s2">&quot;tableGroup.getAttribute(&#39;transform&#39;) || &#39;&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var translateMatch = &quot;</span>
+        <span class="s2">&quot;existingTransform.match(/translate</span><span class="se">\\</span><span class="s2">(([^)]+)</span><span class="se">\\</span><span class="s2">)/);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var translate = translateMatch ? &quot;</span>
+        <span class="s2">&quot;translateMatch[0] : &#39;translate(0,0)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var scaleTransform = translate + &#39; scale(&#39; + &quot;</span>
+        <span class="s2">&quot;scaleFactor + &#39;)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        tableGroup.setAttribute(&#39;transform&#39;, &quot;</span>
+        <span class="s2">&quot;scaleTransform);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    } else if (currentHeight &lt;= availableHeight) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var existingTransform = &quot;</span>
+        <span class="s2">&quot;tableGroup.getAttribute(&#39;transform&#39;) || &#39;&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var translateMatch = &quot;</span>
+        <span class="s2">&quot;existingTransform.match(/translate</span><span class="se">\\</span><span class="s2">(([^)]+)</span><span class="se">\\</span><span class="s2">)/);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var translate = translateMatch ? &quot;</span>
+        <span class="s2">&quot;translateMatch[0] : &#39;translate(0,0)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        tableGroup.setAttribute(&#39;transform&#39;, &quot;</span>
+        <span class="s2">&quot;translate);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                } catch (e) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    console.log(&#39;Table adjustment error:&#39;, e);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }, 300);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function disableTableScrolling(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -933,7 +1096,8 @@
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var svgs = plot.querySelectorAll(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            svgs.forEach(function(svg) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                svg.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                svg.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                svg.setAttribute(&#39;overflow&#39;, &#39;visible&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -953,10 +1117,20 @@
         <span class="s2">&quot;        return observer;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    window.addEventListener(&#39;resize&#39;, updateLayout);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    window.addEventListener(&#39;resize&#39;, function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        updateLayout();</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        setTimeout(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;            var desktopContainer = </span><span class="si">{</span><span class="n">desktop_get</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (desktopContainer &amp;&amp; &quot;</span>
+        <span class="s1">&#39;desktopContainer.style.display !== &quot;none&quot;) {</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s2">&quot;                adjustTableSize(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        }, 100);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    updateLayout();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    var checkInterval = setInterval(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;        var mobileContainer = </span><span class="si">{</span><span class="n">mobile_get</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;        var desktopContainer = </span><span class="si">{</span><span class="n">desktop_get</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (mobileContainer &amp;&amp; &quot;</span>
         <span class="s1">&#39;mobileContainer.style.display !== &quot;none&quot;) {</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="s2">&quot;            disableTableScrolling(mobileContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -965,128 +1139,19 @@
         <span class="s2">&quot;setupScrollObserver(mobileContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        if (desktopContainer &amp;&amp; &quot;</span>
+        <span class="s1">&#39;desktopContainer.style.display !== &quot;none&quot;) {</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s2">&quot;            disableTableScrolling(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            adjustTableSize(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (!desktopContainer._scrollObserver) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                desktopContainer._scrollObserver = &quot;</span>
+        <span class="s2">&quot;setupScrollObserver(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }, 50);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    setTimeout(function() { clearInterval(checkInterval); }, 2000);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;})();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;&lt;/script&gt;&quot;</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_generate_output</span><span class="p">(</span>
-    <span class="n">figure</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span>
-    <span class="n">figure_mobile</span><span class="p">:</span> <span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span><span class="p">,</span>
-    <span class="n">plotfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="n">table_html</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate output string based on output type.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        figure: Plotly figure (desktop layout).</span>
-<span class="sd">        figure_mobile: Optional Plotly figure (mobile layout).</span>
-<span class="sd">        filename: Output filename.</span>
-<span class="sd">        output_type: Type of output to generate.</span>
-<span class="sd">        auto_open: Whether to auto-open file.</span>
-<span class="sd">        include_plotlyjs: How to include plotly.js.</span>
-<span class="sd">        plotfile: Path to plot file.</span>
-<span class="sd">        table_html: Optional HTML table string for mobile layout.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Output string (filename or HTML div).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">figure_mobile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">div_id_desktop</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_desktop&quot;</span>
-            <span class="n">div_id_mobile</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_mobile&quot;</span>
-
-            <span class="n">html_desktop</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
-                <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
-                <span class="n">div_id</span><span class="o">=</span><span class="n">div_id_desktop</span><span class="p">,</span>
-                <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-                <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-            <span class="p">)</span>
-
-            <span class="n">html_mobile</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
-                <span class="n">fig</span><span class="o">=</span><span class="n">figure_mobile</span><span class="p">,</span>
-                <span class="n">div_id</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
-                <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">include_plotlyjs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-            <span class="p">)</span>
-
-            <span class="n">responsive_html</span> <span class="o">=</span> <span class="n">_generate_responsive_html</span><span class="p">(</span>
-                <span class="n">html_desktop</span><span class="o">=</span><span class="n">html_desktop</span><span class="p">,</span>
-                <span class="n">html_mobile</span><span class="o">=</span><span class="n">html_mobile</span><span class="p">,</span>
-                <span class="n">div_id_desktop</span><span class="o">=</span><span class="n">div_id_desktop</span><span class="p">,</span>
-                <span class="n">div_id_mobile</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
-                <span class="n">table_html</span><span class="o">=</span><span class="n">table_html</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="k">with</span> <span class="n">plotfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">responsive_html</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">auto_open</span><span class="p">:</span>
-                <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file://</span><span class="si">{</span><span class="n">plotfile</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
-        <span class="n">plot</span><span class="p">(</span>
-            <span class="n">figure_or_data</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
-            <span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">),</span>
-            <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
-            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">link_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-            <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
-
-    <span class="n">div_id</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">figure_mobile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">div_id_mobile</span> <span class="o">=</span> <span class="n">div_id</span> <span class="o">+</span> <span class="s2">&quot;_mobile&quot;</span>
-        <span class="n">html_desktop</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
-            <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
-            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
-            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="n">html_mobile</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
-            <span class="n">fig</span><span class="o">=</span><span class="n">figure_mobile</span><span class="p">,</span>
-            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
-            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_generate_responsive_html</span><span class="p">(</span>
-            <span class="n">html_desktop</span><span class="o">=</span><span class="n">html_desktop</span><span class="p">,</span>
-            <span class="n">html_mobile</span><span class="o">=</span><span class="n">html_mobile</span><span class="p">,</span>
-            <span class="n">div_id_desktop</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
-            <span class="n">div_id_mobile</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
-            <span class="n">table_html</span><span class="o">=</span><span class="n">table_html</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-        <span class="s2">&quot;str&quot;</span><span class="p">,</span>
-        <span class="n">to_html</span><span class="p">(</span>
-            <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
-            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
-            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
-        <span class="p">),</span>
     <span class="p">)</span>
 
 
@@ -1121,7 +1186,7 @@
 <span class="sd">            Defaults to False.</span>
 <span class="sd">        add_logo: If True a Captor logo is added to the plot. Defaults to True.</span>
 <span class="sd">        vertical_legend: Determines whether to vertically align the legend&#39;s</span>
-<span class="sd">            labels. Defaults to True.</span>
+<span class="sd">            labels. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Plotly Figure and a div section or a HTML filename with location.</span>
@@ -1133,47 +1198,6 @@
     <span class="n">properties</span><span class="p">,</span> <span class="n">labels_init</span><span class="p">,</span> <span class="n">labels_final</span> <span class="o">=</span> <span class="n">_get_report_properties_and_labels</span><span class="p">(</span>
         <span class="n">copied</span><span class="o">.</span><span class="n">yearfrac</span>
     <span class="p">)</span>
-
-    <span class="n">figure</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
-        <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">specs</span><span class="o">=</span><span class="p">[</span>
-            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;rowspan&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;table&quot;</span><span class="p">}],</span>
-            <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;xy&quot;</span><span class="p">},</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="p">],</span>
-    <span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">):</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-            <span class="n">y</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
-            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%{x|%Y-%m-</span><span class="si">%d</span><span class="s2">}&quot;</span><span class="p">,</span>
-            <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;dash&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">},</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">lbl</span><span class="p">,</span>
-            <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="n">quarter_of_year</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="k">if</span> <span class="n">copied</span><span class="o">.</span><span class="n">yearfrac</span> <span class="o">&lt;</span> <span class="n">quarter_of_year</span><span class="p">:</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-        <span class="n">bdf</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">bdf</span> <span class="o">=</span> <span class="n">calendar_period_returns</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">bar_freq</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">):</span>
-        <span class="n">col_name</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, ValueType]&quot;</span><span class="p">,</span> <span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">add_bar</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-            <span class="n">y</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">],</span>
-            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{y:.2%}</span><span class="s2">&lt;br&gt;%</span><span class="si">{x}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">col_name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
 
     <span class="n">formats</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -1209,30 +1233,17 @@
         <span class="n">copied</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">figure</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
-        <span class="n">header</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">columns</span><span class="p">,</span>
-            <span class="s2">&quot;align&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;grey&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">},</span>
-        <span class="p">},</span>
-        <span class="n">cells</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">cleanedtablevalues</span><span class="p">,</span>
-            <span class="s2">&quot;align&quot;</span><span class="p">:</span> <span class="n">aligning</span><span class="p">,</span>
-            <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
-            <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="n">color_lst</span><span class="p">,</span>
-            <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)},</span>
-        <span class="p">},</span>
-        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">bdf</span> <span class="o">=</span> <span class="n">_get_bar_dataframe</span><span class="p">(</span><span class="n">copied</span><span class="p">,</span> <span class="n">bar_freq</span><span class="p">)</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">_build_desktop_figure</span><span class="p">(</span>
+        <span class="n">copied</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span>
+        <span class="n">bdf</span><span class="o">=</span><span class="n">bdf</span><span class="p">,</span>
+        <span class="n">cleanedtablevalues</span><span class="o">=</span><span class="n">cleanedtablevalues</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+        <span class="n">aligning</span><span class="o">=</span><span class="n">aligning</span><span class="p">,</span>
+        <span class="n">color_lst</span><span class="o">=</span><span class="n">color_lst</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">directory</span><span class="p">:</span>
-        <span class="n">dirpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="n">dirpath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;Documents&quot;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">dirpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">dirpath</span> <span class="o">=</span> <span class="n">_get_output_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">choice</span><span class="p">(</span><span class="n">ascii_letters</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span>
@@ -1248,7 +1259,7 @@
         <span class="n">mobile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">figure_mobile</span> <span class="o">=</span> <span class="n">_build_mobile_layout_figure</span><span class="p">(</span>
+    <span class="n">figure_mobile</span> <span class="o">=</span> <span class="n">_build_mobile_figure</span><span class="p">(</span>
         <span class="n">copied</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span>
         <span class="n">bdf</span><span class="o">=</span><span class="n">bdf</span><span class="p">,</span>
         <span class="n">add_logo</span><span class="o">=</span><span class="n">add_logo</span><span class="p">,</span>
@@ -1256,23 +1267,79 @@
         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">table_html</span> <span class="o">=</span> <span class="n">_generate_html_table</span><span class="p">(</span>
+    <span class="n">table_html</span> <span class="o">=</span> <span class="n">_generate_html_table_string</span><span class="p">(</span>
         <span class="n">cleanedtablevalues</span><span class="o">=</span><span class="n">cleanedtablevalues</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
         <span class="n">aligning</span><span class="o">=</span><span class="n">aligning</span><span class="p">,</span>
         <span class="n">color_lst</span><span class="o">=</span><span class="n">color_lst</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">string_output</span> <span class="o">=</span> <span class="n">_generate_output</span><span class="p">(</span>
-        <span class="n">figure</span><span class="p">,</span>
-        <span class="n">figure_mobile</span><span class="p">,</span>
-        <span class="n">filename</span><span class="p">,</span>
-        <span class="n">output_type</span><span class="p">,</span>
-        <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
-        <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-        <span class="n">plotfile</span><span class="o">=</span><span class="n">plotfile</span><span class="p">,</span>
-        <span class="n">table_html</span><span class="o">=</span><span class="n">table_html</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+        <span class="n">div_id_desktop</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_desktop&quot;</span>
+        <span class="n">div_id_mobile</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_mobile&quot;</span>
+
+        <span class="n">html_desktop</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
+            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id_desktop</span><span class="p">,</span>
+            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">html_mobile</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">figure_mobile</span><span class="p">,</span>
+            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
+            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">responsive_html</span> <span class="o">=</span> <span class="n">_generate_responsive_html_string</span><span class="p">(</span>
+            <span class="n">html_desktop</span><span class="o">=</span><span class="n">html_desktop</span><span class="p">,</span>
+            <span class="n">html_mobile</span><span class="o">=</span><span class="n">html_mobile</span><span class="p">,</span>
+            <span class="n">div_id_desktop</span><span class="o">=</span><span class="n">div_id_desktop</span><span class="p">,</span>
+            <span class="n">div_id_mobile</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
+            <span class="n">table_html</span><span class="o">=</span><span class="n">table_html</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">plotfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">responsive_html</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">auto_open</span><span class="p">:</span>
+            <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file://</span><span class="si">{</span><span class="n">plotfile</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">string_output</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">div_id</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">div_id_mobile</span> <span class="o">=</span> <span class="n">div_id</span> <span class="o">+</span> <span class="s2">&quot;_mobile&quot;</span>
+        <span class="n">html_desktop</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
+            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
+            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">html_mobile</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">figure_mobile</span><span class="p">,</span>
+            <span class="n">div_id</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
+            <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">string_output</span> <span class="o">=</span> <span class="n">_generate_responsive_html_string</span><span class="p">(</span>
+            <span class="n">html_desktop</span><span class="o">=</span><span class="n">html_desktop</span><span class="p">,</span>
+            <span class="n">html_mobile</span><span class="o">=</span><span class="n">html_mobile</span><span class="p">,</span>
+            <span class="n">div_id_desktop</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
+            <span class="n">div_id_mobile</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
+            <span class="n">table_html</span><span class="o">=</span><span class="n">table_html</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">figure</span><span class="p">,</span> <span class="n">string_output</span></div>
 

@@ -21,7 +21,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from pandas import DataFrame, Index, Series, Timestamp, concat
 from plotly.io import to_html  # type: ignore[import-untyped]
-from plotly.offline import plot  # type: ignore[import-untyped]
 from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 
 from .load_plotly import load_plotly_dict
@@ -418,150 +417,6 @@ def _prepare_table_data(
     return cleanedtablevalues, columns, aligning, color_lst
 
 
-def _build_mobile_layout_figure(
-    copied: OpenFrame,
-    bdf: DataFrame,
-    *,
-    add_logo: bool,
-    vertical_legend: bool,
-    title: str | None,
-) -> Figure:
-    """Build a mobile-optimized vertical layout figure with only charts.
-
-    Args:
-        copied: Copied OpenFrame data.
-        bdf: Bar chart DataFrame.
-        add_logo: Whether to add logo.
-        vertical_legend: Whether to use vertical legend.
-        title: Optional title for the figure.
-
-    Returns:
-        Mobile layout figure (without table).
-    """
-    plot_height = 400
-    bar_height = 350
-    total_min_height = plot_height + bar_height + 200
-
-    plot_ratio = plot_height / (plot_height + bar_height)
-    bar_ratio = bar_height / (plot_height + bar_height)
-
-    figure_mobile = make_subplots(
-        rows=2,
-        cols=1,
-        specs=[
-            [{"type": "xy"}],
-            [{"type": "xy"}],
-        ],
-        vertical_spacing=0.08,
-        row_heights=[plot_ratio, bar_ratio],
-        subplot_titles=("", ""),
-    )
-
-    for item, lbl in enumerate(copied.columns_lvl_zero):
-        figure_mobile.add_scatter(
-            x=copied.tsdf.index,
-            y=copied.tsdf.iloc[:, item],
-            hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
-            line={"width": 2.5, "dash": "solid"},
-            mode="lines",
-            name=lbl,
-            showlegend=True,
-            row=1,
-            col=1,
-        )
-
-    for item in range(copied.item_count):
-        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
-        figure_mobile.add_bar(
-            x=bdf.index,
-            y=bdf.iloc[:, item],
-            hovertemplate="%{y:.2%}<br>%{x}",
-            name=col_name[0],
-            showlegend=False,
-            row=2,
-            col=1,
-        )
-
-    _configure_figure_layout(
-        figure_mobile,
-        copied,
-        add_logo=add_logo,
-        vertical_legend=vertical_legend,
-        title=title,
-        mobile=True,
-        total_min_height=total_min_height,
-    )
-
-    return figure_mobile
-
-
-def _generate_html_table(
-    cleanedtablevalues: list[list[str]],
-    columns: list[str],
-    aligning: list[str],
-    color_lst: list[str],
-) -> str:
-    """Generate an HTML table from table data.
-
-    Args:
-        cleanedtablevalues: Table cell values.
-        columns: Table column headers.
-        aligning: Table cell alignment.
-        color_lst: Table cell colors.
-
-    Returns:
-        HTML table string.
-    """
-    num_rows = len(cleanedtablevalues[0]) if cleanedtablevalues else 0
-    num_cols = len(columns)
-
-    table_html = '<table style="width:100%; border-collapse:collapse; '
-    table_html += 'margin-top:20px; font-family:Poppins, sans-serif;">\n'
-    table_html += "<thead>\n<tr>\n"
-
-    for col_idx, col in enumerate(columns):
-        align = aligning[col_idx] if col_idx < len(aligning) else "center"
-        table_html += (
-            f'<th style="background-color:grey; color:white; '
-            f"padding:10px; text-align:{align}; vertical-align:middle; "
-            f'font-size:11px; font-weight:bold;">{col}</th>\n'
-        )
-
-    table_html += "</tr>\n</thead>\n<tbody>\n"
-
-    col_even_color = color_lst[-1] if len(color_lst) > 1 else "white"
-    col_odd_color = color_lst[1] if len(color_lst) > 1 else "white"
-
-    for row_idx in range(num_rows):
-        table_html += "<tr>\n"
-        for col_idx in range(num_cols):
-            align = aligning[col_idx] if col_idx < len(aligning) else "center"
-            cell_value = (
-                cleanedtablevalues[col_idx][row_idx]
-                if col_idx < len(cleanedtablevalues)
-                and row_idx < len(cleanedtablevalues[col_idx])
-                else ""
-            )
-            if col_idx == 0:
-                bg_color = "grey"
-                text_color = "white"
-            elif col_idx == num_cols - 1:
-                bg_color = col_even_color
-                text_color = "black"
-            else:
-                bg_color = col_odd_color
-                text_color = "black"
-            table_html += (
-                f'<td style="background-color:{bg_color}; color:{text_color}; '
-                f"padding:8px; text-align:{align}; vertical-align:middle; "
-                f'font-size:10px; height:25px;">{cell_value}</td>\n'
-            )
-        table_html += "</tr>\n"
-
-    table_html += "</tbody>\n</table>\n"
-    return table_html
-
-
 def _configure_figure_layout(
     figure: Figure,
     copied: OpenFrame,
@@ -698,12 +553,268 @@ def _configure_figure_layout(
         )
 
 
-def _generate_responsive_html(
+def _get_bar_dataframe(
+    copied: OpenFrame,
+    bar_freq: LiteralBizDayFreq,
+) -> DataFrame:
+    """Get bar chart DataFrame based on year fraction.
+
+    Args:
+        copied: Copied OpenFrame data.
+        bar_freq: The date offset string for bar plot frequency.
+
+    Returns:
+        Bar chart DataFrame.
+    """
+    quarter_of_year = 0.25
+    if copied.yearfrac < quarter_of_year:
+        tmp = copied.from_deepcopy()
+        return tmp.value_to_ret().tsdf.iloc[1:]
+    return calendar_period_returns(data=copied, freq=bar_freq)
+
+
+def _build_desktop_figure(
+    copied: OpenFrame,
+    bdf: DataFrame,
+    cleanedtablevalues: list[list[str]],
+    columns: list[str],
+    aligning: list[str],
+    color_lst: list[str],
+) -> Figure:
+    """Build the desktop figure with plots and table.
+
+    Args:
+        copied: Copied OpenFrame data.
+        bdf: Bar chart DataFrame.
+        cleanedtablevalues: Table cell values.
+        columns: Table column headers.
+        aligning: Table cell alignment.
+        color_lst: Table cell colors.
+
+    Returns:
+        Desktop figure with plots and table.
+    """
+    figure = make_subplots(
+        rows=2,
+        cols=2,
+        specs=[
+            [{"type": "xy"}, {"rowspan": 2, "type": "table"}],
+            [{"type": "xy"}, None],
+        ],
+    )
+
+    for item, lbl in enumerate(copied.columns_lvl_zero):
+        figure.add_scatter(
+            x=copied.tsdf.index,
+            y=copied.tsdf.iloc[:, item],
+            hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
+            line={"width": 2.5, "dash": "solid"},
+            mode="lines",
+            name=lbl,
+            showlegend=True,
+            row=1,
+            col=1,
+        )
+
+    for item in range(copied.item_count):
+        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
+        figure.add_bar(
+            x=bdf.index,
+            y=bdf.iloc[:, item],
+            hovertemplate="%{y:.2%}<br>%{x}",
+            name=col_name[0],
+            showlegend=False,
+            row=2,
+            col=1,
+        )
+
+    figure.add_table(
+        header={
+            "values": columns,
+            "align": "center",
+            "fill_color": "grey",
+            "font": {"color": "white"},
+        },
+        cells={
+            "values": cleanedtablevalues,
+            "align": aligning,
+            "height": 25,
+            "fill_color": color_lst,
+            "font": {"color": ["white"] + ["black"] * len(columns)},
+        },
+        row=1,
+        col=2,
+    )
+
+    return figure
+
+
+def _build_mobile_figure(
+    copied: OpenFrame,
+    bdf: DataFrame,
+    *,
+    add_logo: bool,
+    vertical_legend: bool,
+    title: str | None,
+) -> Figure:
+    """Build the mobile figure with charts only.
+
+    Args:
+        copied: Copied OpenFrame data.
+        bdf: Bar chart DataFrame.
+        add_logo: Whether to add logo.
+        vertical_legend: Whether to use vertical legend.
+        title: Optional title for the figure.
+
+    Returns:
+        Mobile layout figure.
+    """
+    plot_height = 400
+    bar_height = 350
+    total_min_height = plot_height + bar_height + 200
+
+    plot_ratio = plot_height / (plot_height + bar_height)
+    bar_ratio = bar_height / (plot_height + bar_height)
+
+    figure_mobile = make_subplots(
+        rows=2,
+        cols=1,
+        specs=[
+            [{"type": "xy"}],
+            [{"type": "xy"}],
+        ],
+        vertical_spacing=0.08,
+        row_heights=[plot_ratio, bar_ratio],
+        subplot_titles=("", ""),
+    )
+
+    for item, lbl in enumerate(copied.columns_lvl_zero):
+        figure_mobile.add_scatter(
+            x=copied.tsdf.index,
+            y=copied.tsdf.iloc[:, item],
+            hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
+            line={"width": 2.5, "dash": "solid"},
+            mode="lines",
+            name=lbl,
+            showlegend=True,
+            row=1,
+            col=1,
+        )
+
+    for item in range(copied.item_count):
+        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
+        figure_mobile.add_bar(
+            x=bdf.index,
+            y=bdf.iloc[:, item],
+            hovertemplate="%{y:.2%}<br>%{x}",
+            name=col_name[0],
+            showlegend=False,
+            row=2,
+            col=1,
+        )
+
+    _configure_figure_layout(
+        figure_mobile,
+        copied,
+        add_logo=add_logo,
+        vertical_legend=vertical_legend,
+        title=title,
+        mobile=True,
+        total_min_height=total_min_height,
+    )
+
+    return figure_mobile
+
+
+def _generate_html_table_string(
+    cleanedtablevalues: list[list[str]],
+    columns: list[str],
+    aligning: list[str],
+    color_lst: list[str],
+) -> str:
+    """Generate HTML table string for mobile layout.
+
+    Args:
+        cleanedtablevalues: Table cell values.
+        columns: Table column headers.
+        aligning: Table cell alignment.
+        color_lst: Table cell colors.
+
+    Returns:
+        HTML table string.
+    """
+    num_rows = len(cleanedtablevalues[0]) if cleanedtablevalues else 0
+    num_cols = len(columns)
+
+    table_html = '<table style="width:100%; border-collapse:collapse; '
+    table_html += 'margin-top:20px; font-family:Poppins, sans-serif;">\n'
+    table_html += "<thead>\n<tr>\n"
+
+    for col_idx, col in enumerate(columns):
+        align = aligning[col_idx] if col_idx < len(aligning) else "center"
+        table_html += (
+            f'<th style="background-color:grey; color:white; '
+            f"padding:10px; text-align:{align}; vertical-align:middle; "
+            f'font-size:11px; font-weight:bold;">{col}</th>\n'
+        )
+
+    table_html += "</tr>\n</thead>\n<tbody>\n"
+
+    col_even_color = color_lst[-1] if len(color_lst) > 1 else "white"
+    col_odd_color = color_lst[1] if len(color_lst) > 1 else "white"
+
+    for row_idx in range(num_rows):
+        table_html += "<tr>\n"
+        for col_idx in range(num_cols):
+            align = aligning[col_idx] if col_idx < len(aligning) else "center"
+            cell_value = (
+                cleanedtablevalues[col_idx][row_idx]
+                if col_idx < len(cleanedtablevalues)
+                and row_idx < len(cleanedtablevalues[col_idx])
+                else ""
+            )
+            if col_idx == 0:
+                bg_color = "grey"
+                text_color = "white"
+            elif col_idx == num_cols - 1:
+                bg_color = col_even_color
+                text_color = "black"
+            else:
+                bg_color = col_odd_color
+                text_color = "black"
+            table_html += (
+                f'<td style="background-color:{bg_color}; color:{text_color}; '
+                f"padding:8px; text-align:{align}; vertical-align:middle; "
+                f'font-size:10px; height:25px;">{cell_value}</td>\n'
+            )
+        table_html += "</tr>\n"
+
+    table_html += "</tbody>\n</table>\n"
+    return table_html
+
+
+def _get_output_directory(directory: Path | None) -> Path:
+    """Get the output directory path.
+
+    Args:
+        directory: Optional directory path.
+
+    Returns:
+        Resolved directory path.
+    """
+    if directory:
+        return Path(directory).resolve()
+    if Path.home().joinpath("Documents").exists():
+        return Path.home() / "Documents"
+    return Path(stack()[2].filename).parent
+
+
+def _generate_responsive_html_string(
     html_desktop: str,
     html_mobile: str,
     div_id_desktop: str,
     div_id_mobile: str,
-    table_html: str | None = None,
+    table_html: str,
 ) -> str:
     """Generate responsive HTML wrapper with CSS and JavaScript.
 
@@ -712,7 +823,7 @@ def _generate_responsive_html(
         html_mobile: Mobile layout HTML.
         div_id_desktop: Desktop container div ID.
         div_id_mobile: Mobile container div ID.
-        table_html: Optional HTML table for mobile layout.
+        table_html: HTML table string for mobile layout.
 
     Returns:
         Responsive HTML string.
@@ -723,9 +834,7 @@ def _generate_responsive_html(
     desktop_get = f'document.getElementById("{div_id_desktop}_container")'
     mobile_get = f'document.getElementById("{div_id_mobile}_container")'
 
-    mobile_content = html_mobile
-    if table_html:
-        mobile_content += f"\n{table_html}"
+    mobile_content = html_mobile + f"\n{table_html}"
 
     return (
         f'<div id="{div_id_desktop}_container" '
@@ -789,7 +898,61 @@ def _generate_responsive_html(
         'desktopContainer.style.display = "block";\n'
         "            if (mobileContainer) "
         'mobileContainer.style.display = "none";\n'
+        "            disableTableScrolling(desktopContainer);\n"
+        "            setTimeout(function() { "
+        "adjustTableSize(desktopContainer); }, 100);\n"
         "        }\n"
+        "    }\n"
+        "\n"
+        "    function adjustTableSize(container) {\n"
+        "        if (!container) return;\n"
+        "        var plots = container.querySelectorAll('.js-plotly-plot');\n"
+        "        plots.forEach(function(plot) {\n"
+        "            var svg = plot.querySelector('svg');\n"
+        "            if (!svg) return;\n"
+        "            var tableGroup = svg.querySelector('g[class*=\"table\"]');\n"
+        "            if (!tableGroup) return;\n"
+        "            var plotRect = plot.getBoundingClientRect();\n"
+        "            if (plotRect.height === 0) return;\n"
+        "            setTimeout(function() {\n"
+        "                try {\n"
+        "                    var bbox = tableGroup.getBBox();\n"
+        "                    if (bbox.height === 0) return;\n"
+        "                    var availableHeight = plotRect.height - 60;\n"
+        "                    var currentHeight = bbox.height;\n"
+        "                    if (currentHeight > availableHeight && "
+        "availableHeight > 0) {\n"
+        "                        var scaleFactor = availableHeight / "
+        "currentHeight;\n"
+        "                        var minScale = 0.4;\n"
+        "                        var maxScale = 1.0;\n"
+        "                        scaleFactor = Math.max(minScale, "
+        "Math.min(maxScale, scaleFactor));\n"
+        "                        var existingTransform = "
+        "tableGroup.getAttribute('transform') || '';\n"
+        "                        var translateMatch = "
+        "existingTransform.match(/translate\\(([^)]+)\\)/);\n"
+        "                        var translate = translateMatch ? "
+        "translateMatch[0] : 'translate(0,0)';\n"
+        "                        var scaleTransform = translate + ' scale(' + "
+        "scaleFactor + ')';\n"
+        "                        tableGroup.setAttribute('transform', "
+        "scaleTransform);\n"
+        "                    } else if (currentHeight <= availableHeight) {\n"
+        "                        var existingTransform = "
+        "tableGroup.getAttribute('transform') || '';\n"
+        "                        var translateMatch = "
+        "existingTransform.match(/translate\\(([^)]+)\\)/);\n"
+        "                        var translate = translateMatch ? "
+        "translateMatch[0] : 'translate(0,0)';\n"
+        "                        tableGroup.setAttribute('transform', "
+        "translate);\n"
+        "                    }\n"
+        "                } catch (e) {\n"
+        "                    console.log('Table adjustment error:', e);\n"
+        "                }\n"
+        "            }, 300);\n"
+        "        });\n"
         "    }\n"
         "\n"
         "    function disableTableScrolling(container) {\n"
@@ -823,7 +986,8 @@ def _generate_responsive_html(
         "            });\n"
         "            var svgs = plot.querySelectorAll('svg');\n"
         "            svgs.forEach(function(svg) {\n"
-        "                svg.style.setProperty('overflow', 'visible', 'important');\n"
+        "                svg.style.setProperty('overflow', 'visible', "
+        "'important');\n"
         "                svg.setAttribute('overflow', 'visible');\n"
         "            });\n"
         "        });\n"
@@ -843,10 +1007,20 @@ def _generate_responsive_html(
         "        return observer;\n"
         "    }\n"
         "\n"
-        "    window.addEventListener('resize', updateLayout);\n"
+        "    window.addEventListener('resize', function() {\n"
+        "        updateLayout();\n"
+        "        setTimeout(function() {\n"
+        f"            var desktopContainer = {desktop_get};\n"
+        "            if (desktopContainer && "
+        'desktopContainer.style.display !== "none") {\n'
+        "                adjustTableSize(desktopContainer);\n"
+        "            }\n"
+        "        }, 100);\n"
+        "    });\n"
         "    updateLayout();\n"
         "    var checkInterval = setInterval(function() {\n"
         f"        var mobileContainer = {mobile_get};\n"
+        f"        var desktopContainer = {desktop_get};\n"
         "        if (mobileContainer && "
         'mobileContainer.style.display !== "none") {\n'
         "            disableTableScrolling(mobileContainer);\n"
@@ -855,128 +1029,19 @@ def _generate_responsive_html(
         "setupScrollObserver(mobileContainer);\n"
         "            }\n"
         "        }\n"
+        "        if (desktopContainer && "
+        'desktopContainer.style.display !== "none") {\n'
+        "            disableTableScrolling(desktopContainer);\n"
+        "            adjustTableSize(desktopContainer);\n"
+        "            if (!desktopContainer._scrollObserver) {\n"
+        "                desktopContainer._scrollObserver = "
+        "setupScrollObserver(desktopContainer);\n"
+        "            }\n"
+        "        }\n"
         "    }, 50);\n"
         "    setTimeout(function() { clearInterval(checkInterval); }, 2000);\n"
         "})();\n"
         "</script>"
-    )
-
-
-def _generate_output(
-    figure: Figure,
-    figure_mobile: Figure | None,
-    filename: str,
-    output_type: LiteralPlotlyOutput,
-    *,
-    auto_open: bool,
-    include_plotlyjs: LiteralPlotlyJSlib,
-    plotfile: Path,
-    table_html: str | None = None,
-) -> str:
-    """Generate output string based on output type.
-
-    Args:
-        figure: Plotly figure (desktop layout).
-        figure_mobile: Optional Plotly figure (mobile layout).
-        filename: Output filename.
-        output_type: Type of output to generate.
-        auto_open: Whether to auto-open file.
-        include_plotlyjs: How to include plotly.js.
-        plotfile: Path to plot file.
-        table_html: Optional HTML table string for mobile layout.
-
-    Returns:
-        Output string (filename or HTML div).
-    """
-    fig, _ = load_plotly_dict()
-
-    if output_type == "file":
-        if figure_mobile is not None:
-            div_id_desktop = filename.split(sep=".")[0] + "_desktop"
-            div_id_mobile = filename.split(sep=".")[0] + "_mobile"
-
-            html_desktop = to_html(
-                fig=figure,
-                div_id=div_id_desktop,
-                auto_play=False,
-                full_html=False,
-                include_plotlyjs=include_plotlyjs,
-                config=fig["config"],
-            )
-
-            html_mobile = to_html(
-                fig=figure_mobile,
-                div_id=div_id_mobile,
-                auto_play=False,
-                full_html=False,
-                include_plotlyjs=False,
-                config=fig["config"],
-            )
-
-            responsive_html = _generate_responsive_html(
-                html_desktop=html_desktop,
-                html_mobile=html_mobile,
-                div_id_desktop=div_id_desktop,
-                div_id_mobile=div_id_mobile,
-                table_html=table_html,
-            )
-
-            with plotfile.open(mode="w", encoding="utf-8") as f:
-                f.write(responsive_html)
-
-            if auto_open:
-                webbrowser.open(f"file://{plotfile.resolve()}")
-
-            return str(plotfile)
-        plot(
-            figure_or_data=figure,
-            filename=str(plotfile),
-            auto_open=auto_open,
-            auto_play=False,
-            link_text="",
-            include_plotlyjs=include_plotlyjs,
-            output_type=output_type,
-            config=fig["config"],
-        )
-        return str(plotfile)
-
-    div_id = filename.split(sep=".")[0]
-    if figure_mobile is not None:
-        div_id_mobile = div_id + "_mobile"
-        html_desktop = to_html(
-            fig=figure,
-            div_id=div_id,
-            auto_play=False,
-            full_html=False,
-            include_plotlyjs=include_plotlyjs,
-            config=fig["config"],
-        )
-        html_mobile = to_html(
-            fig=figure_mobile,
-            div_id=div_id_mobile,
-            auto_play=False,
-            full_html=False,
-            include_plotlyjs=False,
-            config=fig["config"],
-        )
-        return _generate_responsive_html(
-            html_desktop=html_desktop,
-            html_mobile=html_mobile,
-            div_id_desktop=div_id,
-            div_id_mobile=div_id_mobile,
-            table_html=table_html,
-        )
-
-    return cast(
-        "str",
-        to_html(
-            fig=figure,
-            div_id=div_id,
-            auto_play=False,
-            full_html=False,
-            include_plotlyjs=include_plotlyjs,
-            config=fig["config"],
-        ),
     )
 
 
@@ -1009,7 +1074,7 @@ def report_html(
             Defaults to False.
         add_logo: If True a Captor logo is added to the plot. Defaults to True.
         vertical_legend: Determines whether to vertically align the legend's
-            labels. Defaults to True.
+            labels. Defaults to False.
 
     Returns:
         Plotly Figure and a div section or a HTML filename with location.
@@ -1021,47 +1086,6 @@ def report_html(
     properties, labels_init, labels_final = _get_report_properties_and_labels(
         copied.yearfrac
     )
-
-    figure = make_subplots(
-        rows=2,
-        cols=2,
-        specs=[
-            [{"type": "xy"}, {"rowspan": 2, "type": "table"}],
-            [{"type": "xy"}, None],
-        ],
-    )
-
-    for item, lbl in enumerate(copied.columns_lvl_zero):
-        figure.add_scatter(
-            x=copied.tsdf.index,
-            y=copied.tsdf.iloc[:, item],
-            hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
-            line={"width": 2.5, "dash": "solid"},
-            mode="lines",
-            name=lbl,
-            showlegend=True,
-            row=1,
-            col=1,
-        )
-
-    quarter_of_year = 0.25
-    if copied.yearfrac < quarter_of_year:
-        tmp = copied.from_deepcopy()
-        bdf = tmp.value_to_ret().tsdf.iloc[1:]
-    else:
-        bdf = calendar_period_returns(data=copied, freq=bar_freq)
-
-    for item in range(copied.item_count):
-        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
-        figure.add_bar(
-            x=bdf.index,
-            y=bdf.iloc[:, item],
-            hovertemplate="%{y:.2%}<br>%{x}",
-            name=col_name[0],
-            showlegend=False,
-            row=2,
-            col=1,
-        )
 
     formats = [
         "{:.2%}",
@@ -1097,30 +1121,17 @@ def report_html(
         copied=copied,
     )
 
-    figure.add_table(
-        header={
-            "values": columns,
-            "align": "center",
-            "fill_color": "grey",
-            "font": {"color": "white"},
-        },
-        cells={
-            "values": cleanedtablevalues,
-            "align": aligning,
-            "height": 25,
-            "fill_color": color_lst,
-            "font": {"color": ["white"] + ["black"] * len(columns)},
-        },
-        row=1,
-        col=2,
+    bdf = _get_bar_dataframe(copied, bar_freq)
+    figure = _build_desktop_figure(
+        copied=copied,
+        bdf=bdf,
+        cleanedtablevalues=cleanedtablevalues,
+        columns=columns,
+        aligning=aligning,
+        color_lst=color_lst,
     )
 
-    if directory:
-        dirpath = Path(directory).resolve()
-    elif Path.home().joinpath("Documents").exists():
-        dirpath = Path.home() / "Documents"
-    else:
-        dirpath = Path(stack()[1].filename).parent
+    dirpath = _get_output_directory(directory)
 
     if not filename:
         filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
@@ -1136,7 +1147,7 @@ def report_html(
         mobile=False,
     )
 
-    figure_mobile = _build_mobile_layout_figure(
+    figure_mobile = _build_mobile_figure(
         copied=copied,
         bdf=bdf,
         add_logo=add_logo,
@@ -1144,22 +1155,78 @@ def report_html(
         title=title,
     )
 
-    table_html = _generate_html_table(
+    table_html = _generate_html_table_string(
         cleanedtablevalues=cleanedtablevalues,
         columns=columns,
         aligning=aligning,
         color_lst=color_lst,
     )
 
-    string_output = _generate_output(
-        figure,
-        figure_mobile,
-        filename,
-        output_type,
-        auto_open=auto_open,
-        include_plotlyjs=include_plotlyjs,
-        plotfile=plotfile,
-        table_html=table_html,
-    )
+    fig, _ = load_plotly_dict()
+
+    if output_type == "file":
+        div_id_desktop = filename.split(sep=".")[0] + "_desktop"
+        div_id_mobile = filename.split(sep=".")[0] + "_mobile"
+
+        html_desktop = to_html(
+            fig=figure,
+            div_id=div_id_desktop,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=include_plotlyjs,
+            config=fig["config"],
+        )
+
+        html_mobile = to_html(
+            fig=figure_mobile,
+            div_id=div_id_mobile,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=False,
+            config=fig["config"],
+        )
+
+        responsive_html = _generate_responsive_html_string(
+            html_desktop=html_desktop,
+            html_mobile=html_mobile,
+            div_id_desktop=div_id_desktop,
+            div_id_mobile=div_id_mobile,
+            table_html=table_html,
+        )
+
+        with plotfile.open(mode="w", encoding="utf-8") as f:
+            f.write(responsive_html)
+
+        if auto_open:
+            webbrowser.open(f"file://{plotfile.resolve()}")
+
+        string_output = str(plotfile)
+    else:
+        div_id = filename.split(sep=".")[0]
+        div_id_mobile = div_id + "_mobile"
+        html_desktop = to_html(
+            fig=figure,
+            div_id=div_id,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=include_plotlyjs,
+            config=fig["config"],
+        )
+        html_mobile = to_html(
+            fig=figure_mobile,
+            div_id=div_id_mobile,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=False,
+            config=fig["config"],
+        )
+
+        string_output = _generate_responsive_html_string(
+            html_desktop=html_desktop,
+            html_mobile=html_mobile,
+            div_id_desktop=div_id,
+            div_id_mobile=div_id_mobile,
+            table_html=table_html,
+        )
 
     return figure, string_output

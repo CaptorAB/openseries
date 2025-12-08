@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Core Concepts &mdash; openseries 2.1.0 documentation</title>
+  <title>Core Concepts &mdash; openseries 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../_static/documentation_options.js?v=841abef3"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -462,7 +462,7 @@ The library provides explicit methods for alignment that require user choice:</p
 <p>Methods that return calculated values:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rolling calculations</span>
 <span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">rolling_corr</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">rolling_corr</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">rolling_corr</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">rolling_corr</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 
 <span class="c1"># Statistical analysis</span>
 <span class="n">beta</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">beta</span><span class="p">()</span>

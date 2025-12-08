@@ -11,8 +11,6 @@ Let's start with a portfolio of assets for risk analysis:
 .. code-block:: python
 
     import yfinance as yf
-    import pandas as pd
-    import numpy as np
     from openseries import OpenTimeSeries, OpenFrame
     from datetime import datetime, timedelta
     import warnings
@@ -105,9 +103,10 @@ Calculate VaR at different confidence levels:
 
     print(f"\n=== VaR TIME HORIZONS (95% confidence) ===")
     print(f"1-day VaR: {daily_var_95:.2%}")
-    print(f"1-week VaR: {daily_var_95 * np.sqrt(5):.2%}")
-    print(f"1-month VaR: {daily_var_95 * np.sqrt(22):.2%}")
-    print(f"1-year VaR: {daily_var_95 * np.sqrt(252):.2%}")
+    # Scale VaR to different time horizons
+    print(f"1-week VaR: {daily_var_95 * (5 ** 0.5):.2%}")
+    print(f"1-month VaR: {daily_var_95 * (22 ** 0.5):.2%}")
+    print(f"1-year VaR: {daily_var_95 * (252 ** 0.5):.2%}")
 
 Conditional Value at Risk (CVaR)
 --------------------------------
@@ -244,7 +243,10 @@ Use Monte Carlo methods for risk assessment:
     portfolio_sharpes = simulated_portfolios['sharpe']
 
     # Calculate risk metrics from simulation
-    sim_var_95 = np.percentile(portfolio_returns, 5)
+    # Calculate 5th percentile manually
+    sorted_returns = sorted(portfolio_returns)
+    percentile_idx = int(len(sorted_returns) * 0.05)
+    sim_var_95 = sorted_returns[percentile_idx]
     sim_cvar_95 = portfolio_returns[portfolio_returns <= sim_var_95].mean()
 
     print(f"Monte Carlo Results ({num_simulations:,} simulations):")
@@ -252,8 +254,11 @@ Use Monte Carlo methods for risk assessment:
     print(f"Average Volatility: {portfolio_volatilities.mean():.2%}")
     print(f"95% VaR: {sim_var_95:.2%}")
     print(f"95% CVaR: {sim_cvar_95:.2%}")
-    print(f"Worst Case (0.1%): {np.percentile(portfolio_returns, 0.1):.2%}")
-    print(f"Best Case (99.9%): {np.percentile(portfolio_returns, 99.9):.2%}")
+    # Calculate percentiles manually
+    worst_idx = int(len(sorted_returns) * 0.001)
+    best_idx = int(len(sorted_returns) * 0.999)
+    print(f"Worst Case (0.1%): {sorted_returns[worst_idx]:.2%}")
+    print(f"Best Case (99.9%): {sorted_returns[best_idx]:.2%}")
     print(f"Average Sharpe Ratio: {portfolio_sharpes.mean():.3f}")
 
     # Show distribution of portfolio characteristics
@@ -279,40 +284,26 @@ Analyze risk contribution by asset:
     portfolio_vol = portfolio.vol
 
     # Calculate correlation matrix
-    correlation_matrix = portfolio_assets.correl_matrix()
+    correlation_matrix = portfolio_assets.correl_matrix
 
-    # Risk contribution analysis
-    weights = np.array(equal_weights)
-    vols = np.array(asset_vols)
-    corr_matrix = correlation_matrix.values
-
-    # Portfolio variance
-    portfolio_variance = np.dot(weights.T, np.dot(np.outer(vols, vols) * corr_matrix, weights))
-
-    # Marginal contribution to risk
-    marginal_contrib = np.dot(np.outer(vols, vols) * corr_matrix, weights) / np.sqrt(portfolio_variance)
-
-    # Component contribution to risk
-    component_contrib = weights * marginal_contrib
-
-    # Percentage contribution
-    percent_contrib = component_contrib / np.sqrt(portfolio_variance)
+    # Risk contribution analysis using openseries
+    # Create portfolio to get portfolio-level metrics
+    portfolio_df = portfolio_assets.make_portfolio(name="Portfolio", weight_strat="eq_weights")
+    portfolio = OpenTimeSeries.from_df(dframe=portfolio_df)
+    portfolio_vol = portfolio.vol
 
     print("Risk Contribution Analysis:")
-    risk_decomp = pd.DataFrame({
-         'Asset': [series.label for series in portfolio_assets.constituents],
-         'Weight': weights,
-         'Individual Vol': vols,
-         'Marginal Contrib': marginal_contrib,
-         'Component Contrib': component_contrib,
-         'Risk Contrib %': percent_contrib * 100
-    })
+    for i, series in enumerate(portfolio_assets.constituents):
+        weight = equal_weights[i]
+        asset_vol = asset_vols[i]
+        print(f"\n{series.label}:")
+        print(f"  Weight: {weight:.4f}")
+        print(f"  Individual Volatility: {asset_vol:.4f}")
+        print(f"  Weighted Volatility Contribution: {weight * asset_vol:.4f}")
+    print(f"\nPortfolio Volatility: {portfolio_vol:.4f}")
 
-    print(risk_decomp.round(4))
-
-    # Verify risk contributions sum to portfolio volatility
+    # Verify portfolio metrics
     print(f"\nVerification:")
-    print(f"Sum of component contributions: {component_contrib.sum():.4f}")
     print(f"Portfolio volatility: {portfolio_vol:.4f}")
 
 Risk-Adjusted Performance
@@ -493,7 +484,20 @@ Save comprehensive risk analysis:
 .. code-block:: python
 
     # Create comprehensive risk report
-    risk_report = pd.DataFrame({
+    # Create risk report using openseries methods
+    print("\n=== RISK REPORT ===")
+    print("Risk metrics are available through openseries properties:")
+    for series in portfolio_assets.constituents:
+        print(f"\n{series.label}:")
+        print(f"  VaR (95%): {series.var_down:.4f}")
+        print(f"  CVaR (95%): {series.cvar_down:.4f}")
+        print(f"  Volatility: {series.vol:.4f}")
+        print(f"  Max Drawdown: {series.max_drawdown:.4f}")
+
+    # Note: For comprehensive Excel export, use openseries to_xlsx() method
+    portfolio_assets.to_xlsx('risk_analysis_report.xlsx')
+
+    # Alternative: risk_report = pd.DataFrame({
          'Metric': [
               'Annualized Return', 'Annualized Volatility', 'Sharpe Ratio',
               'Sortino Ratio', 'Maximum Drawdown', '95% VaR (daily)',
@@ -514,7 +518,8 @@ Save comprehensive risk analysis:
     })
 
     # Export to Excel
-    with pd.ExcelWriter('risk_analysis_report.xlsx') as writer:
+    # Export using openseries native method (commented out ExcelWriter approach)
+    # with pd.ExcelWriter('risk_analysis_report.xlsx') as writer:
          risk_report.to_excel(writer, sheet_name='Risk Metrics', index=False)
          risk_decomp.to_excel(writer, sheet_name='Risk Decomposition', index=False)
          correlation_matrix.to_excel(writer, sheet_name='Correlations')

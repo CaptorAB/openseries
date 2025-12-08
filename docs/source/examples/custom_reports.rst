@@ -29,7 +29,7 @@ Using the Built-in HTML Report
     # Generate HTML report
     # The last asset in the frame is used as the benchmark
     report_html(
-         frame=comparison_frame,
+         data=comparison_frame,
          output_type="file",
-         file_name="stock_comparison_report.html"
+         filename="stock_comparison_report.html"
     )

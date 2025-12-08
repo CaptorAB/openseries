@@ -9,8 +9,6 @@ Basic Portfolio Optimization Setup
 .. code-block:: python
 
     import yfinance as yf
-    import pandas as pd
-    import numpy as np
     from openseries import OpenTimeSeries, OpenFrame
     from openseries import efficient_frontier, simulate_portfolios
 
@@ -59,18 +57,18 @@ Mean-Variance Optimization
     print(f"Simulated {len(simulated_df)} random portfolios")
 
     # Find key portfolios
-    returns = frontier_df['ret'].values
-    volatilities = frontier_df['stdev'].values
+    returns = frontier_df['ret']
+    volatilities = frontier_df['stdev']
     sharpe_ratios = returns / volatilities
 
     # Maximum Sharpe ratio portfolio
-    max_sharpe_idx = np.argmax(sharpe_ratios)
+    max_sharpe_idx = sharpe_ratios.idxmax()
     max_sharpe_weights = optimal_portfolio[-len(investment_universe.constituents):]
 
     print(f"\n=== MAXIMUM SHARPE RATIO PORTFOLIO ===")
-    print(f"Expected Return: {returns[max_sharpe_idx]:.2%}")
-    print(f"Volatility: {volatilities[max_sharpe_idx]:.2%}")
-    print(f"Sharpe Ratio: {sharpe_ratios[max_sharpe_idx]:.2f}")
+    print(f"Expected Return: {frontier_df.iloc[max_sharpe_idx]['ret']:.2%}")
+    print(f"Volatility: {frontier_df.iloc[max_sharpe_idx]['stdev']:.2%}")
+    print(f"Sharpe Ratio: {sharpe_ratios.iloc[max_sharpe_idx]:.2f}")
 
     print("\nOptimal Weights:")
     for i, weight in enumerate(max_sharpe_weights):
@@ -79,19 +77,19 @@ Mean-Variance Optimization
               print(f"  {asset_name}: {weight:.1%}")
 
     # Minimum volatility portfolio
-    min_vol_idx = np.argmin(volatilities)
+    min_vol_idx = volatilities.idxmin()
     min_vol_weights = frontier_df.iloc[min_vol_idx][investment_universe.columns_lvl_zero].values
 
     print(f"\n=== MINIMUM VOLATILITY PORTFOLIO ===")
-    print(f"Expected Return: {returns[min_vol_idx]:.2%}")
-    print(f"Volatility: {volatilities[min_vol_idx]:.2%}")
-    print(f"Sharpe Ratio: {sharpe_ratios[min_vol_idx]:.2f}")
+    print(f"Expected Return: {min_vol_row['ret']:.2%}")
+    print(f"Volatility: {min_vol_row['stdev']:.2%}")
+    print(f"Sharpe Ratio: {sharpe_ratios.iloc[min_vol_idx]:.2f}")
 
     print("\nMinimum Volatility Weights:")
-    for i, weight in enumerate(min_vol_weights):
-         asset_name = investment_universe.constituents[i].label
+    for col in investment_universe.columns_lvl_zero:
+         weight = min_vol_row[col]
          if weight > 0.01:
-              print(f"  {asset_name}: {weight:.1%}")
+              print(f"  {col}: {weight:.1%}")
 
 Monte Carlo Portfolio Simulation
 --------------------------------
@@ -120,7 +118,8 @@ Monte Carlo Portfolio Simulation
     print(f"Sharpe range: {sim_sharpe_ratios.min():.2f} to {sim_sharpe_ratios.max():.2f}")
 
     # Best portfolios from simulation
-    top_sharpe_indices = np.argsort(sim_sharpe_ratios)[-5:]
+    sorted_indices = sorted(range(len(sim_sharpe_ratios)), key=lambda i: sim_sharpe_ratios.iloc[i], reverse=True)
+    top_sharpe_indices = sorted_indices[:5]
 
     print(f"\n=== TOP 5 SIMULATED PORTFOLIOS ===")
     for i, idx in enumerate(reversed(top_sharpe_indices)):
@@ -226,16 +225,16 @@ Portfolio Comparison
 
     # Add optimized portfolios if available
     if 'max_sharpe_weights' in locals():
+         investment_universe.weights = max_sharpe_weights.tolist()
          max_sharpe_portfolio_df = investment_universe.make_portfolio(
-              weights=max_sharpe_weights.tolist(),
               name="Max Sharpe (Optimized)"
          )
          max_sharpe_portfolio = OpenTimeSeries.from_df(dframe=max_sharpe_portfolio_df)
          portfolios.append(max_sharpe_portfolio)
 
     if 'min_vol_weights' in locals():
+         investment_universe.weights = min_vol_weights.tolist()
          min_vol_portfolio_df = investment_universe.make_portfolio(
-              weights=min_vol_weights.tolist(),
               name="Min Vol (Optimized)"
          )
          min_vol_portfolio = OpenTimeSeries.from_df(dframe=min_vol_portfolio_df)
@@ -319,52 +318,37 @@ Backtesting Framework
               'volatility': portfolio.vol,
               'sharpe': portfolio.ret_vol_ratio,
               'max_drawdown': portfolio.max_drawdown,
-              'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else np.nan
+              'calmar': portfolio.geo_ret / abs(portfolio.max_drawdown) if portfolio.max_drawdown != 0 else float('nan')
          }
 
-    backtest_results = pd.DataFrame(backtest_results).T
-
     print(f"\n=== BACKTEST RESULTS ===")
-    print(backtest_results.round(4))
+    for strategy_name, metrics in backtest_results.items():
+        print(f"\n{strategy_name}:")
+        print(f"  Return: {metrics['return']:.4f}")
+        print(f"  Volatility: {metrics['volatility']:.4f}")
+        print(f"  Sharpe: {metrics['sharpe']:.4f}")
+        print(f"  Max Drawdown: {metrics['max_drawdown']:.4f}")
+        print(f"  Calmar: {metrics['calmar']:.4f}")
 
     # Rank strategies
-    backtest_results['Rank'] = backtest_results['sharpe'].rank(ascending=False)
-    best_strategy = backtest_results.sort_values('Rank').index[0]
+    sorted_strategies = sorted(backtest_results.items(), key=lambda x: x[1]['sharpe'], reverse=True)
+    best_strategy = sorted_strategies[0][0]
 
     print(f"\nBest performing strategy: {best_strategy}")
-    print(f"Sharpe ratio: {backtest_results.loc[best_strategy, 'sharpe']:.3f}")
+    print(f"Sharpe ratio: {sorted_strategies[0][1]['sharpe']:.3f}")
 
 Export Optimization Results
 ---------------------------
 
 .. code-block:: python
 
-    # Export comprehensive optimization results
-    with pd.ExcelWriter('portfolio_optimization_results.xlsx') as writer:
+    # Export using openseries native methods
+    # Export frame data
+    investment_universe.to_xlsx('portfolio_optimization_results.xlsx')
 
-         # Portfolio comparison
-         comparison_metrics.to_excel(writer, sheet_name='Portfolio Comparison')
-
-         # Individual asset metrics
-         asset_metrics = investment_universe.all_properties()
-         asset_metrics.to_excel(writer, sheet_name='Asset Metrics')
-
-         # Correlation matrix
-         correlation_matrix = investment_universe.correl_matrix()
-         correlation_matrix.to_excel(writer, sheet_name='Correlations')
-
-         # Backtest results
-         backtest_results.to_excel(writer, sheet_name='Backtest Results')
-
-         # Efficient frontier data (if available)
-         if 'frontier_df' in locals():
-              frontier_export_df = pd.DataFrame({
-                    'Return': frontier_df['ret'].values,
-                    'Volatility': frontier_df['stdev'].values,
-                    'Sharpe': frontier_df['sharpe'].values
-              })
-              frontier_export_df.to_excel(writer, sheet_name='Efficient Frontier', index=False)
-
+    # Note: For comprehensive Excel export with multiple sheets,
+    # the DataFrames returned by all_properties() and correl_matrix
+    # are pandas DataFrames and support to_excel() method
     print("\nOptimization results exported to 'portfolio_optimization_results.xlsx'")
 
 Real-World Fund Portfolio Optimization
@@ -490,9 +474,8 @@ Performance Comparison Analysis
     strategies['Equal Weight'] = equal_weight_portfolio
 
     # Optimal portfolio from efficient frontier
-    optimal_portfolio_df = fund_universe.make_portfolio(
-         weights=optimal_portfolio[-fund_universe.item_count:].tolist(), name="Optimal Portfolio"
-    )
+    fund_universe.weights = optimal_portfolio[-fund_universe.item_count:].tolist()
+    optimal_portfolio_df = fund_universe.make_portfolio(name="Optimal Portfolio")
     optimal_portfolio_series = OpenTimeSeries.from_df(dframe=optimal_portfolio_df)
     strategies['Optimal Portfolio'] = optimal_portfolio_series
 
@@ -563,7 +546,10 @@ Here's how to perform portfolio optimization using openseries methods directly:
                     'Max Drawdown': portfolio.max_drawdown
               }
 
-         results_df = pd.DataFrame(results).T
-
          print("=== PORTFOLIO OPTIMIZATION RESULTS ===")
-         print((results_df * 100).round(2))
+         for name, metrics in results.items():
+             print(f"\n{name}:")
+             print(f"  Return: {metrics['Return']*100:.2f}%")
+             print(f"  Volatility: {metrics['Volatility']*100:.2f}%")
+             print(f"  Sharpe: {metrics['Sharpe']:.2f}")
+             print(f"  Max Drawdown: {metrics['Max Drawdown']*100:.2f}%")

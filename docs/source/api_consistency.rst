@@ -80,7 +80,8 @@ When creating portfolios, the weight_strat parameter can be used for built-in st
 
     # Or set custom weights
     weights = [0.5, 0.3, 0.2]
-    portfolio_df = frame.make_portfolio(name="Custom Portfolio", weights=weights)
+    frame.weights = weights
+    portfolio_df = frame.make_portfolio(name="Custom Portfolio")
 
 Metric Names in DataFrames
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -10,8 +10,6 @@ Setting Up Multi-Asset Analysis
 
     import yfinance as yf
     from openseries import OpenTimeSeries, OpenFrame
-    import pandas as pd
-    import numpy as np
 
     # Define asset universe
     assets = {
@@ -68,27 +66,29 @@ Ranking Analysis
 
 .. code-block:: python
 
-    # Rank assets by different criteria
-    rankings = pd.DataFrame(index=all_metrics.columns)
-
-    # Rank by return (higher is better)
-    rankings['Return Rank'] = all_metrics.loc['Geometric return'].rank(ascending=False)
-
-    # Rank by volatility (lower is better)
-    rankings['Volatility Rank'] = all_metrics.loc['Volatility'].rank(ascending=True)
-
-    # Rank by Sharpe ratio (higher is better)
-    rankings['Sharpe Rank'] = all_metrics.loc['Return vol ratio'].rank(ascending=False)
-
-    # Rank by max drawdown (higher/less negative is better)
-    rankings['Drawdown Rank'] = all_metrics.loc['Max drawdown'].rank(ascending=False)
-
-    # Overall rank (average of all ranks)
-    rankings['Overall Rank'] = rankings.mean(axis=1)
-    rankings = rankings.sort_values('Overall Rank')
+    # Rank assets by different criteria using openseries metrics
+    # Get key metrics for ranking
+    returns = all_metrics.loc['Geometric return']
+    volatilities = all_metrics.loc['Volatility']
+    sharpe_ratios = all_metrics.loc['Return vol ratio']
+    drawdowns = all_metrics.loc['Max drawdown']
 
     print("\n=== ASSET RANKINGS ===")
-    print(rankings.round(1))
+    print("Ranked by Return (highest first):")
+    for i, (asset, ret) in enumerate(returns.sort_values(ascending=False).items(), 1):
+        print(f"  {i}. {asset}: {ret:.2%}")
+
+    print("\nRanked by Volatility (lowest first):")
+    for i, (asset, vol) in enumerate(volatilities.sort_values(ascending=True).items(), 1):
+        print(f"  {i}. {asset}: {vol:.2%}")
+
+    print("\nRanked by Sharpe Ratio (highest first):")
+    for i, (asset, sharpe) in enumerate(sharpe_ratios.sort_values(ascending=False).items(), 1):
+        print(f"  {i}. {asset}: {sharpe:.2f}")
+
+    print("\nRanked by Max Drawdown (least negative first):")
+    for i, (asset, dd) in enumerate(drawdowns.sort_values(ascending=False).items(), 1):
+        print(f"  {i}. {asset}: {dd:.2%}")
 
 Correlation Analysis
 --------------------
@@ -96,7 +96,7 @@ Correlation Analysis
 .. code-block:: python
 
     # Calculate correlation matrix
-    correlation_matrix = tech_stocks.correl_matrix()
+    correlation_matrix = tech_stocks.correl_matrix
     print("\n=== CORRELATION MATRIX ===")
     print(correlation_matrix.round(3))
 
@@ -125,28 +125,28 @@ Risk-Return Analysis
 
 .. code-block:: python
 
-    # Create risk-return scatter data
-    returns = all_metrics.loc['Geometric return'] * 100
-    volatilities = all_metrics.loc['Volatility'] * 100
+    # Analyze risk-return using openseries metrics
+    returns = all_metrics.loc['Geometric return']
+    volatilities = all_metrics.loc['Volatility']
     sharpe_ratios = all_metrics.loc['Return vol ratio']
 
-    risk_return_df = pd.DataFrame({
-         'Asset': returns.index,
-         'Return (%)': returns.values,
-         'Volatility (%)': volatilities.values,
-         'Sharpe Ratio': sharpe_ratios.values
-    })
-
     print("\n=== RISK-RETURN ANALYSIS ===")
-    print(risk_return_df.round(2))
+    for asset in returns.index:
+        ret_pct = returns[asset] * 100
+        vol_pct = volatilities[asset] * 100
+        sharpe = sharpe_ratios[asset]
+        print(f"{asset}: Return={ret_pct:.2f}%, Volatility={vol_pct:.2f}%, Sharpe={sharpe:.2f}")
 
     # Identify efficient assets (high return per unit risk)
-    efficient_threshold = sharpe_ratios.quantile(0.75)
-    efficient_assets = sharpe_ratios[sharpe_ratios >= efficient_threshold]
+    # Calculate 75th percentile threshold manually
+    sorted_sharpes = sorted(sharpe_ratios.values, reverse=True)
+    threshold_idx = int(len(sorted_sharpes) * 0.25)
+    efficient_threshold = sorted_sharpes[threshold_idx] if threshold_idx < len(sorted_sharpes) else sorted_sharpes[-1]
 
     print(f"\n=== MOST EFFICIENT ASSETS (Sharpe >= {efficient_threshold:.2f}) ===")
-    for asset, sharpe in efficient_assets.sort_values(ascending=False).items():
-         print(f"{asset}: {sharpe:.2f}")
+    for asset, sharpe in sharpe_ratios.items():
+        if sharpe >= efficient_threshold:
+            print(f"{asset}: {sharpe:.2f}")
 
 Sector/Style Analysis
 ---------------------
@@ -189,7 +189,7 @@ Time Series Analysis
     microsoft = next(s for s in tech_stocks.constituents if "Microsoft" in s.label)
 
     pair_frame = OpenFrame(constituents=[apple, microsoft])
-    rolling_corr = pair_frame.rolling_corr(window=252)  # 1-year rolling
+    rolling_corr = pair_frame.rolling_corr(observations=252)  # 1-year rolling
 
     print(f"\n=== ROLLING CORRELATION: {apple.label} vs {microsoft.label} ===")
     print(f"Current correlation: {rolling_corr.iloc[-1, 0]:.3f}")
@@ -217,11 +217,14 @@ Performance Attribution
 
     print(f"\nDiversification benefit:")
     equal_weights = [1/tech_stocks.item_count] * tech_stocks.item_count
-    print(f"  Weighted avg return: {np.average(individual_returns, weights=equal_weights):.2%}")
+    # Calculate weighted average manually
+    weighted_avg_return = sum(ret * w for ret, w in zip(individual_returns, equal_weights))
+    weighted_avg_vol = sum(vol * w for vol, w in zip(individual_vols, equal_weights))
+    print(f"  Weighted avg return: {weighted_avg_return:.2%}")
     print(f"  Portfolio return: {portfolio.geo_ret:.2%}")
-    print(f"  Weighted avg volatility: {np.average(individual_vols, weights=equal_weights):.2%}")
+    print(f"  Weighted avg volatility: {weighted_avg_vol:.2%}")
     print(f"  Portfolio volatility: {portfolio.vol:.2%}")
-    print(f"  Volatility reduction: {(np.average(individual_vols, weights=equal_weights) - portfolio.vol):.2%}")
+    print(f"  Volatility reduction: {(weighted_avg_vol - portfolio.vol):.2%}")
 
 Stress Testing
 --------------
@@ -256,23 +259,13 @@ Export Multi-Asset Results
 
 .. code-block:: python
 
-    # Export comprehensive analysis
-    with pd.ExcelWriter('multi_asset_analysis.xlsx') as writer:
-         # All metrics
-         all_metrics.to_excel(writer, sheet_name='All Metrics')
+    # Export using openseries native methods
+    # Export frame data
+    tech_stocks.to_xlsx('multi_asset_analysis.xlsx')
 
-         # Rankings
-         rankings.to_excel(writer, sheet_name='Rankings')
-
-         # Correlations
-         correlation_matrix.to_excel(writer, sheet_name='Correlations')
-
-         # Risk-return data
-         risk_return_df.to_excel(writer, sheet_name='Risk Return', index=False)
-
-         # Individual series data
-         tech_stocks.to_xlsx(writer, sheet_name='Price Data')
-
+    # Note: For comprehensive Excel export with multiple sheets,
+    # you can use the DataFrame returned by all_properties() and correl_matrix
+    # which are pandas DataFrames and support to_excel() method
     print("\nMulti-asset analysis exported to 'multi_asset_analysis.xlsx'")
 
 Complete Multi-Asset Analysis Workflow
@@ -313,8 +306,8 @@ Here's how to perform a complete multi-asset analysis using openseries methods d
          print("\nKey Metrics:")
          print((key_metrics * 100).round(2))  # Convert to percentages
 
-         # Correlations using openseries correl_matrix method
-         correlations = frame.correl_matrix()
+         # Correlations using openseries correl_matrix property
+         correlations = frame.correl_matrix
          avg_correlation = correlations.mean().mean()
          print(f"\nAverage correlation: {avg_correlation:.3f}")
 
