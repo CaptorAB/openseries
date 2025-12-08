@@ -21,7 +21,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from pandas import DataFrame, Index, Series, Timestamp, concat
 from plotly.io import to_html  # type: ignore[import-untyped]
-from plotly.offline import plot  # type: ignore[import-untyped]
 from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 
 from .load_plotly import load_plotly_dict
@@ -418,150 +417,6 @@ def _prepare_table_data(
     return cleanedtablevalues, columns, aligning, color_lst
 
 
-def _build_mobile_layout_figure(
-    copied: OpenFrame,
-    bdf: DataFrame,
-    *,
-    add_logo: bool,
-    vertical_legend: bool,
-    title: str | None,
-) -> Figure:
-    """Build a mobile-optimized vertical layout figure with only charts.
-
-    Args:
-        copied: Copied OpenFrame data.
-        bdf: Bar chart DataFrame.
-        add_logo: Whether to add logo.
-        vertical_legend: Whether to use vertical legend.
-        title: Optional title for the figure.
-
-    Returns:
-        Mobile layout figure (without table).
-    """
-    plot_height = 400
-    bar_height = 350
-    total_min_height = plot_height + bar_height + 200
-
-    plot_ratio = plot_height / (plot_height + bar_height)
-    bar_ratio = bar_height / (plot_height + bar_height)
-
-    figure_mobile = make_subplots(
-        rows=2,
-        cols=1,
-        specs=[
-            [{"type": "xy"}],
-            [{"type": "xy"}],
-        ],
-        vertical_spacing=0.08,
-        row_heights=[plot_ratio, bar_ratio],
-        subplot_titles=("", ""),
-    )
-
-    for item, lbl in enumerate(copied.columns_lvl_zero):
-        figure_mobile.add_scatter(
-            x=copied.tsdf.index,
-            y=copied.tsdf.iloc[:, item],
-            hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
-            line={"width": 2.5, "dash": "solid"},
-            mode="lines",
-            name=lbl,
-            showlegend=True,
-            row=1,
-            col=1,
-        )
-
-    for item in range(copied.item_count):
-        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
-        figure_mobile.add_bar(
-            x=bdf.index,
-            y=bdf.iloc[:, item],
-            hovertemplate="%{y:.2%}<br>%{x}",
-            name=col_name[0],
-            showlegend=False,
-            row=2,
-            col=1,
-        )
-
-    _configure_figure_layout(
-        figure_mobile,
-        copied,
-        add_logo=add_logo,
-        vertical_legend=vertical_legend,
-        title=title,
-        mobile=True,
-        total_min_height=total_min_height,
-    )
-
-    return figure_mobile
-
-
-def _generate_html_table(
-    cleanedtablevalues: list[list[str]],
-    columns: list[str],
-    aligning: list[str],
-    color_lst: list[str],
-) -> str:
-    """Generate an HTML table from table data.
-
-    Args:
-        cleanedtablevalues: Table cell values.
-        columns: Table column headers.
-        aligning: Table cell alignment.
-        color_lst: Table cell colors.
-
-    Returns:
-        HTML table string.
-    """
-    num_rows = len(cleanedtablevalues[0]) if cleanedtablevalues else 0
-    num_cols = len(columns)
-
-    table_html = '<table style="width:100%; border-collapse:collapse; '
-    table_html += 'margin-top:20px; font-family:Poppins, sans-serif;">\n'
-    table_html += "<thead>\n<tr>\n"
-
-    for col_idx, col in enumerate(columns):
-        align = aligning[col_idx] if col_idx < len(aligning) else "center"
-        table_html += (
-            f'<th style="background-color:grey; color:white; '
-            f"padding:10px; text-align:{align}; vertical-align:middle; "
-            f'font-size:11px; font-weight:bold;">{col}</th>\n'
-        )
-
-    table_html += "</tr>\n</thead>\n<tbody>\n"
-
-    col_even_color = color_lst[-1] if len(color_lst) > 1 else "white"
-    col_odd_color = color_lst[1] if len(color_lst) > 1 else "white"
-
-    for row_idx in range(num_rows):
-        table_html += "<tr>\n"
-        for col_idx in range(num_cols):
-            align = aligning[col_idx] if col_idx < len(aligning) else "center"
-            cell_value = (
-                cleanedtablevalues[col_idx][row_idx]
-                if col_idx < len(cleanedtablevalues)
-                and row_idx < len(cleanedtablevalues[col_idx])
-                else ""
-            )
-            if col_idx == 0:
-                bg_color = "grey"
-                text_color = "white"
-            elif col_idx == num_cols - 1:
-                bg_color = col_even_color
-                text_color = "black"
-            else:
-                bg_color = col_odd_color
-                text_color = "black"
-            table_html += (
-                f'<td style="background-color:{bg_color}; color:{text_color}; '
-                f"padding:8px; text-align:{align}; vertical-align:middle; "
-                f'font-size:10px; height:25px;">{cell_value}</td>\n'
-            )
-        table_html += "</tr>\n"
-
-    table_html += "</tbody>\n</table>\n"
-    return table_html
-
-
 def _configure_figure_layout(
     figure: Figure,
     copied: OpenFrame,
@@ -698,289 +553,7 @@ def _configure_figure_layout(
         )
 
 
-def _generate_responsive_html(
-    html_desktop: str,
-    html_mobile: str,
-    div_id_desktop: str,
-    div_id_mobile: str,
-    table_html: str | None = None,
-) -> str:
-    """Generate responsive HTML wrapper with CSS and JavaScript.
-
-    Args:
-        html_desktop: Desktop layout HTML.
-        html_mobile: Mobile layout HTML.
-        div_id_desktop: Desktop container div ID.
-        div_id_mobile: Mobile container div ID.
-        table_html: Optional HTML table for mobile layout.
-
-    Returns:
-        Responsive HTML string.
-    """
-    desktop_style = "width:100%;"
-    mobile_style = "width:100%; display:none;"
-    match_media = 'window.matchMedia("(max-width: 960px)").matches'
-    desktop_get = f'document.getElementById("{div_id_desktop}_container")'
-    mobile_get = f'document.getElementById("{div_id_mobile}_container")'
-
-    mobile_content = html_mobile
-    if table_html:
-        mobile_content += f"\n{table_html}"
-
-    return (
-        f'<div id="{div_id_desktop}_container" '
-        f'class="plotly-desktop" style="{desktop_style}">\n'
-        f"{html_desktop}\n"
-        f"</div>\n"
-        f'<div id="{div_id_mobile}_container" '
-        f'class="plotly-mobile" style="{mobile_style}">\n'
-        f"{mobile_content}\n"
-        f"</div>\n"
-        "<style>\n"
-        "body { overflow-y: auto; }\n"
-        "@media (max-width: 960px) {\n"
-        "    .plotly-desktop { display: none !important; }\n"
-        "    .plotly-mobile { display: block !important; "
-        "overflow: visible !important; }\n"
-        "    .plotly-mobile .js-plotly-plot { "
-        "min-height: auto !important; overflow: visible !important; "
-        "height: auto !important; max-height: none !important; }\n"
-        "    .plotly-mobile .js-plotly-plot > div { "
-        "overflow: visible !important; overflow-y: visible !important; "
-        "overflow-x: visible !important; height: auto !important; "
-        "max-height: none !important; }\n"
-        "    .plotly-mobile .js-plotly-plot svg { "
-        "overflow: visible !important; height: auto !important; "
-        "max-height: none !important; }\n"
-        "    .plotly-mobile .js-plotly-plot g { "
-        "overflow: visible !important; }\n"
-        "    .plotly-mobile .js-plotly-plot [class*='table'] { "
-        "overflow: visible !important; }\n"
-        "    .plotly-mobile * { "
-        "overflow-y: visible !important; max-height: none !important; }\n"
-        "    .plotly-mobile .scrollbar { display: none !important; }\n"
-        "    .plotly-mobile [style*='overflow'] { "
-        "overflow: visible !important; overflow-y: visible !important; }\n"
-        "}\n"
-        "@media (min-width: 961px) {\n"
-        "    .plotly-desktop { display: block !important; }\n"
-        "    .plotly-mobile { display: none !important; }\n"
-        "}\n"
-        "</style>\n"
-        "<script>\n"
-        "(function() {\n"
-        "    function updateLayout() {\n"
-        f"        var isMobile = {match_media};\n"
-        f"        var desktopContainer = {desktop_get};\n"
-        f"        var mobileContainer = {mobile_get};\n"
-        "\n"
-        "        if (isMobile) {\n"
-        "            if (desktopContainer) "
-        'desktopContainer.style.display = "none";\n'
-        "            if (mobileContainer) "
-        'mobileContainer.style.display = "block";\n'
-        "            disableTableScrolling(mobileContainer);\n"
-        "            if (mobileContainer && !mobileContainer._scrollObserver) {\n"
-        "                mobileContainer._scrollObserver = "
-        "setupScrollObserver(mobileContainer);\n"
-        "            }\n"
-        "        } else {\n"
-        "            if (desktopContainer) "
-        'desktopContainer.style.display = "block";\n'
-        "            if (mobileContainer) "
-        'mobileContainer.style.display = "none";\n'
-        "        }\n"
-        "    }\n"
-        "\n"
-        "    function disableTableScrolling(container) {\n"
-        "        if (!container) return;\n"
-        "        var plots = container.querySelectorAll('.js-plotly-plot');\n"
-        "        plots.forEach(function(plot) {\n"
-        "            var allElements = plot.querySelectorAll('*');\n"
-        "            allElements.forEach(function(el) {\n"
-        "                var style = window.getComputedStyle(el);\n"
-        "                var overflow = style.overflow;\n"
-        "                var overflowY = style.overflowY;\n"
-        "                if (overflow === 'auto' || overflow === 'scroll' || "
-        "overflowY === 'auto' || overflowY === 'scroll') {\n"
-        "                    el.style.setProperty('overflow', 'visible', "
-        "'important');\n"
-        "                    el.style.setProperty('overflow-y', 'visible', "
-        "'important');\n"
-        "                    el.style.setProperty('overflow-x', 'visible', "
-        "'important');\n"
-        "                }\n"
-        "            });\n"
-        "            plot.style.setProperty('overflow', 'visible', 'important');\n"
-        "            plot.style.setProperty('overflow-y', 'visible', "
-        "'important');\n"
-        "            var plotDivs = plot.querySelectorAll('div');\n"
-        "            plotDivs.forEach(function(div) {\n"
-        "                div.style.setProperty('overflow', 'visible', "
-        "'important');\n"
-        "                div.style.setProperty('overflow-y', 'visible', "
-        "'important');\n"
-        "            });\n"
-        "            var svgs = plot.querySelectorAll('svg');\n"
-        "            svgs.forEach(function(svg) {\n"
-        "                svg.style.setProperty('overflow', 'visible', 'important');\n"
-        "                svg.setAttribute('overflow', 'visible');\n"
-        "            });\n"
-        "        });\n"
-        "    }\n"
-        "\n"
-        "    function setupScrollObserver(container) {\n"
-        "        if (!container) return;\n"
-        "        var observer = new MutationObserver(function(mutations) {\n"
-        "            disableTableScrolling(container);\n"
-        "        });\n"
-        "        observer.observe(container, {\n"
-        "            childList: true,\n"
-        "            subtree: true,\n"
-        "            attributes: true,\n"
-        "            attributeFilter: ['style', 'class']\n"
-        "        });\n"
-        "        return observer;\n"
-        "    }\n"
-        "\n"
-        "    window.addEventListener('resize', updateLayout);\n"
-        "    updateLayout();\n"
-        "    var checkInterval = setInterval(function() {\n"
-        f"        var mobileContainer = {mobile_get};\n"
-        "        if (mobileContainer && "
-        'mobileContainer.style.display !== "none") {\n'
-        "            disableTableScrolling(mobileContainer);\n"
-        "            if (!mobileContainer._scrollObserver) {\n"
-        "                mobileContainer._scrollObserver = "
-        "setupScrollObserver(mobileContainer);\n"
-        "            }\n"
-        "        }\n"
-        "    }, 50);\n"
-        "    setTimeout(function() { clearInterval(checkInterval); }, 2000);\n"
-        "})();\n"
-        "</script>"
-    )
-
-
-def _generate_output(
-    figure: Figure,
-    figure_mobile: Figure | None,
-    filename: str,
-    output_type: LiteralPlotlyOutput,
-    *,
-    auto_open: bool,
-    include_plotlyjs: LiteralPlotlyJSlib,
-    plotfile: Path,
-    table_html: str | None = None,
-) -> str:
-    """Generate output string based on output type.
-
-    Args:
-        figure: Plotly figure (desktop layout).
-        figure_mobile: Optional Plotly figure (mobile layout).
-        filename: Output filename.
-        output_type: Type of output to generate.
-        auto_open: Whether to auto-open file.
-        include_plotlyjs: How to include plotly.js.
-        plotfile: Path to plot file.
-        table_html: Optional HTML table string for mobile layout.
-
-    Returns:
-        Output string (filename or HTML div).
-    """
-    fig, _ = load_plotly_dict()
-
-    if output_type == "file":
-        if figure_mobile is not None:
-            div_id_desktop = filename.split(sep=".")[0] + "_desktop"
-            div_id_mobile = filename.split(sep=".")[0] + "_mobile"
-
-            html_desktop = to_html(
-                fig=figure,
-                div_id=div_id_desktop,
-                auto_play=False,
-                full_html=False,
-                include_plotlyjs=include_plotlyjs,
-                config=fig["config"],
-            )
-
-            html_mobile = to_html(
-                fig=figure_mobile,
-                div_id=div_id_mobile,
-                auto_play=False,
-                full_html=False,
-                include_plotlyjs=False,
-                config=fig["config"],
-            )
-
-            responsive_html = _generate_responsive_html(
-                html_desktop=html_desktop,
-                html_mobile=html_mobile,
-                div_id_desktop=div_id_desktop,
-                div_id_mobile=div_id_mobile,
-                table_html=table_html,
-            )
-
-            with plotfile.open(mode="w", encoding="utf-8") as f:
-                f.write(responsive_html)
-
-            if auto_open:
-                webbrowser.open(f"file://{plotfile.resolve()}")
-
-            return str(plotfile)
-        plot(
-            figure_or_data=figure,
-            filename=str(plotfile),
-            auto_open=auto_open,
-            auto_play=False,
-            link_text="",
-            include_plotlyjs=include_plotlyjs,
-            output_type=output_type,
-            config=fig["config"],
-        )
-        return str(plotfile)
-
-    div_id = filename.split(sep=".")[0]
-    if figure_mobile is not None:
-        div_id_mobile = div_id + "_mobile"
-        html_desktop = to_html(
-            fig=figure,
-            div_id=div_id,
-            auto_play=False,
-            full_html=False,
-            include_plotlyjs=include_plotlyjs,
-            config=fig["config"],
-        )
-        html_mobile = to_html(
-            fig=figure_mobile,
-            div_id=div_id_mobile,
-            auto_play=False,
-            full_html=False,
-            include_plotlyjs=False,
-            config=fig["config"],
-        )
-        return _generate_responsive_html(
-            html_desktop=html_desktop,
-            html_mobile=html_mobile,
-            div_id_desktop=div_id,
-            div_id_mobile=div_id_mobile,
-            table_html=table_html,
-        )
-
-    return cast(
-        "str",
-        to_html(
-            fig=figure,
-            div_id=div_id,
-            auto_play=False,
-            full_html=False,
-            include_plotlyjs=include_plotlyjs,
-            config=fig["config"],
-        ),
-    )
-
-
-def report_html(
+def report_html(  # noqa: C901, PLR0912, PLR0915
     data: OpenFrame,
     bar_freq: LiteralBizDayFreq = "BYE",
     filename: str | None = None,
@@ -1136,30 +709,443 @@ def report_html(
         mobile=False,
     )
 
-    figure_mobile = _build_mobile_layout_figure(
-        copied=copied,
-        bdf=bdf,
+    plot_height = 400
+    bar_height = 350
+    total_min_height = plot_height + bar_height + 200
+
+    plot_ratio = plot_height / (plot_height + bar_height)
+    bar_ratio = bar_height / (plot_height + bar_height)
+
+    figure_mobile = make_subplots(
+        rows=2,
+        cols=1,
+        specs=[
+            [{"type": "xy"}],
+            [{"type": "xy"}],
+        ],
+        vertical_spacing=0.08,
+        row_heights=[plot_ratio, bar_ratio],
+        subplot_titles=("", ""),
+    )
+
+    for item, lbl in enumerate(copied.columns_lvl_zero):
+        figure_mobile.add_scatter(
+            x=copied.tsdf.index,
+            y=copied.tsdf.iloc[:, item],
+            hovertemplate="%{y:.2%}<br>%{x|%Y-%m-%d}",
+            line={"width": 2.5, "dash": "solid"},
+            mode="lines",
+            name=lbl,
+            showlegend=True,
+            row=1,
+            col=1,
+        )
+
+    for item in range(copied.item_count):
+        col_name = cast("tuple[str, ValueType]", bdf.iloc[:, item].name)
+        figure_mobile.add_bar(
+            x=bdf.index,
+            y=bdf.iloc[:, item],
+            hovertemplate="%{y:.2%}<br>%{x}",
+            name=col_name[0],
+            showlegend=False,
+            row=2,
+            col=1,
+        )
+
+    _configure_figure_layout(
+        figure_mobile,
+        copied,
         add_logo=add_logo,
         vertical_legend=vertical_legend,
         title=title,
+        mobile=True,
+        total_min_height=total_min_height,
     )
 
-    table_html = _generate_html_table(
-        cleanedtablevalues=cleanedtablevalues,
-        columns=columns,
-        aligning=aligning,
-        color_lst=color_lst,
-    )
+    num_rows = len(cleanedtablevalues[0]) if cleanedtablevalues else 0
+    num_cols = len(columns)
 
-    string_output = _generate_output(
-        figure,
-        figure_mobile,
-        filename,
-        output_type,
-        auto_open=auto_open,
-        include_plotlyjs=include_plotlyjs,
-        plotfile=plotfile,
-        table_html=table_html,
-    )
+    table_html = '<table style="width:100%; border-collapse:collapse; '
+    table_html += 'margin-top:20px; font-family:Poppins, sans-serif;">\n'
+    table_html += "<thead>\n<tr>\n"
+
+    for col_idx, col in enumerate(columns):
+        align = aligning[col_idx] if col_idx < len(aligning) else "center"
+        table_html += (
+            f'<th style="background-color:grey; color:white; '
+            f"padding:10px; text-align:{align}; vertical-align:middle; "
+            f'font-size:11px; font-weight:bold;">{col}</th>\n'
+        )
+
+    table_html += "</tr>\n</thead>\n<tbody>\n"
+
+    col_even_color = color_lst[-1] if len(color_lst) > 1 else "white"
+    col_odd_color = color_lst[1] if len(color_lst) > 1 else "white"
+
+    for row_idx in range(num_rows):
+        table_html += "<tr>\n"
+        for col_idx in range(num_cols):
+            align = aligning[col_idx] if col_idx < len(aligning) else "center"
+            cell_value = (
+                cleanedtablevalues[col_idx][row_idx]
+                if col_idx < len(cleanedtablevalues)
+                and row_idx < len(cleanedtablevalues[col_idx])
+                else ""
+            )
+            if col_idx == 0:
+                bg_color = "grey"
+                text_color = "white"
+            elif col_idx == num_cols - 1:
+                bg_color = col_even_color
+                text_color = "black"
+            else:
+                bg_color = col_odd_color
+                text_color = "black"
+            table_html += (
+                f'<td style="background-color:{bg_color}; color:{text_color}; '
+                f"padding:8px; text-align:{align}; vertical-align:middle; "
+                f'font-size:10px; height:25px;">{cell_value}</td>\n'
+            )
+        table_html += "</tr>\n"
+
+    table_html += "</tbody>\n</table>\n"
+
+    fig, _ = load_plotly_dict()
+
+    if output_type == "file":
+        div_id_desktop = filename.split(sep=".")[0] + "_desktop"
+        div_id_mobile = filename.split(sep=".")[0] + "_mobile"
+
+        html_desktop = to_html(
+            fig=figure,
+            div_id=div_id_desktop,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=include_plotlyjs,
+            config=fig["config"],
+        )
+
+        html_mobile = to_html(
+            fig=figure_mobile,
+            div_id=div_id_mobile,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=False,
+            config=fig["config"],
+        )
+
+        mobile_content = html_mobile + f"\n{table_html}"
+
+        desktop_style = "width:100%;"
+        mobile_style = "width:100%; display:none;"
+        match_media = 'window.matchMedia("(max-width: 960px)").matches'
+        desktop_get = f'document.getElementById("{div_id_desktop}_container")'
+        mobile_get = f'document.getElementById("{div_id_mobile}_container")'
+
+        responsive_html = (
+            f'<div id="{div_id_desktop}_container" '
+            f'class="plotly-desktop" style="{desktop_style}">\n'
+            f"{html_desktop}\n"
+            f"</div>\n"
+            f'<div id="{div_id_mobile}_container" '
+            f'class="plotly-mobile" style="{mobile_style}">\n'
+            f"{mobile_content}\n"
+            f"</div>\n"
+            "<style>\n"
+            "body { overflow-y: auto; }\n"
+            "@media (max-width: 960px) {\n"
+            "    .plotly-desktop { display: none !important; }\n"
+            "    .plotly-mobile { display: block !important; "
+            "overflow: visible !important; }\n"
+            "    .plotly-mobile .js-plotly-plot { "
+            "min-height: auto !important; overflow: visible !important; "
+            "height: auto !important; max-height: none !important; }\n"
+            "    .plotly-mobile .js-plotly-plot > div { "
+            "overflow: visible !important; overflow-y: visible !important; "
+            "overflow-x: visible !important; height: auto !important; "
+            "max-height: none !important; }\n"
+            "    .plotly-mobile .js-plotly-plot svg { "
+            "overflow: visible !important; height: auto !important; "
+            "max-height: none !important; }\n"
+            "    .plotly-mobile .js-plotly-plot g { "
+            "overflow: visible !important; }\n"
+            "    .plotly-mobile .js-plotly-plot [class*='table'] { "
+            "overflow: visible !important; }\n"
+            "    .plotly-mobile * { "
+            "overflow-y: visible !important; max-height: none !important; }\n"
+            "    .plotly-mobile .scrollbar { display: none !important; }\n"
+            "    .plotly-mobile [style*='overflow'] { "
+            "overflow: visible !important; overflow-y: visible !important; }\n"
+            "}\n"
+            "@media (min-width: 961px) {\n"
+            "    .plotly-desktop { display: block !important; }\n"
+            "    .plotly-mobile { display: none !important; }\n"
+            "}\n"
+            "</style>\n"
+            "<script>\n"
+            "(function() {\n"
+            "    function updateLayout() {\n"
+            f"        var isMobile = {match_media};\n"
+            f"        var desktopContainer = {desktop_get};\n"
+            f"        var mobileContainer = {mobile_get};\n"
+            "\n"
+            "        if (isMobile) {\n"
+            "            if (desktopContainer) "
+            'desktopContainer.style.display = "none";\n'
+            "            if (mobileContainer) "
+            'mobileContainer.style.display = "block";\n'
+            "            disableTableScrolling(mobileContainer);\n"
+            "            if (mobileContainer && !mobileContainer._scrollObserver) {\n"
+            "                mobileContainer._scrollObserver = "
+            "setupScrollObserver(mobileContainer);\n"
+            "            }\n"
+            "        } else {\n"
+            "            if (desktopContainer) "
+            'desktopContainer.style.display = "block";\n'
+            "            if (mobileContainer) "
+            'mobileContainer.style.display = "none";\n'
+            "        }\n"
+            "    }\n"
+            "\n"
+            "    function disableTableScrolling(container) {\n"
+            "        if (!container) return;\n"
+            "        var plots = container.querySelectorAll('.js-plotly-plot');\n"
+            "        plots.forEach(function(plot) {\n"
+            "            var allElements = plot.querySelectorAll('*');\n"
+            "            allElements.forEach(function(el) {\n"
+            "                var style = window.getComputedStyle(el);\n"
+            "                var overflow = style.overflow;\n"
+            "                var overflowY = style.overflowY;\n"
+            "                if (overflow === 'auto' || overflow === 'scroll' || "
+            "overflowY === 'auto' || overflowY === 'scroll') {\n"
+            "                    el.style.setProperty('overflow', 'visible', "
+            "'important');\n"
+            "                    el.style.setProperty('overflow-y', 'visible', "
+            "'important');\n"
+            "                    el.style.setProperty('overflow-x', 'visible', "
+            "'important');\n"
+            "                }\n"
+            "            });\n"
+            "            plot.style.setProperty('overflow', 'visible', 'important');\n"
+            "            plot.style.setProperty('overflow-y', 'visible', "
+            "'important');\n"
+            "            var plotDivs = plot.querySelectorAll('div');\n"
+            "            plotDivs.forEach(function(div) {\n"
+            "                div.style.setProperty('overflow', 'visible', "
+            "'important');\n"
+            "                div.style.setProperty('overflow-y', 'visible', "
+            "'important');\n"
+            "            });\n"
+            "            var svgs = plot.querySelectorAll('svg');\n"
+            "            svgs.forEach(function(svg) {\n"
+            "                svg.style.setProperty('overflow', 'visible', "
+            "'important');\n"
+            "                svg.setAttribute('overflow', 'visible');\n"
+            "            });\n"
+            "        });\n"
+            "    }\n"
+            "\n"
+            "    function setupScrollObserver(container) {\n"
+            "        if (!container) return;\n"
+            "        var observer = new MutationObserver(function(mutations) {\n"
+            "            disableTableScrolling(container);\n"
+            "        });\n"
+            "        observer.observe(container, {\n"
+            "            childList: true,\n"
+            "            subtree: true,\n"
+            "            attributes: true,\n"
+            "            attributeFilter: ['style', 'class']\n"
+            "        });\n"
+            "        return observer;\n"
+            "    }\n"
+            "\n"
+            "    window.addEventListener('resize', updateLayout);\n"
+            "    updateLayout();\n"
+            "    var checkInterval = setInterval(function() {\n"
+            f"        var mobileContainer = {mobile_get};\n"
+            "        if (mobileContainer && "
+            'mobileContainer.style.display !== "none") {\n'
+            "            disableTableScrolling(mobileContainer);\n"
+            "            if (!mobileContainer._scrollObserver) {\n"
+            "                mobileContainer._scrollObserver = "
+            "setupScrollObserver(mobileContainer);\n"
+            "            }\n"
+            "        }\n"
+            "    }, 50);\n"
+            "    setTimeout(function() { clearInterval(checkInterval); }, 2000);\n"
+            "})();\n"
+            "</script>"
+        )
+
+        with plotfile.open(mode="w", encoding="utf-8") as f:
+            f.write(responsive_html)
+
+        if auto_open:
+            webbrowser.open(f"file://{plotfile.resolve()}")
+
+        string_output = str(plotfile)
+    else:
+        div_id = filename.split(sep=".")[0]
+        div_id_mobile = div_id + "_mobile"
+        html_desktop = to_html(
+            fig=figure,
+            div_id=div_id,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=include_plotlyjs,
+            config=fig["config"],
+        )
+        html_mobile = to_html(
+            fig=figure_mobile,
+            div_id=div_id_mobile,
+            auto_play=False,
+            full_html=False,
+            include_plotlyjs=False,
+            config=fig["config"],
+        )
+
+        mobile_content = html_mobile + f"\n{table_html}"
+
+        desktop_style = "width:100%;"
+        mobile_style = "width:100%; display:none;"
+        match_media = 'window.matchMedia("(max-width: 960px)").matches'
+        desktop_get = f'document.getElementById("{div_id}_container")'
+        mobile_get = f'document.getElementById("{div_id_mobile}_container")'
+
+        string_output = (
+            f'<div id="{div_id}_container" '
+            f'class="plotly-desktop" style="{desktop_style}">\n'
+            f"{html_desktop}\n"
+            f"</div>\n"
+            f'<div id="{div_id_mobile}_container" '
+            f'class="plotly-mobile" style="{mobile_style}">\n'
+            f"{mobile_content}\n"
+            f"</div>\n"
+            "<style>\n"
+            "body { overflow-y: auto; }\n"
+            "@media (max-width: 960px) {\n"
+            "    .plotly-desktop { display: none !important; }\n"
+            "    .plotly-mobile { display: block !important; "
+            "overflow: visible !important; }\n"
+            "    .plotly-mobile .js-plotly-plot { "
+            "min-height: auto !important; overflow: visible !important; "
+            "height: auto !important; max-height: none !important; }\n"
+            "    .plotly-mobile .js-plotly-plot > div { "
+            "overflow: visible !important; overflow-y: visible !important; "
+            "overflow-x: visible !important; height: auto !important; "
+            "max-height: none !important; }\n"
+            "    .plotly-mobile .js-plotly-plot svg { "
+            "overflow: visible !important; height: auto !important; "
+            "max-height: none !important; }\n"
+            "    .plotly-mobile .js-plotly-plot g { "
+            "overflow: visible !important; }\n"
+            "    .plotly-mobile .js-plotly-plot [class*='table'] { "
+            "overflow: visible !important; }\n"
+            "    .plotly-mobile * { "
+            "overflow-y: visible !important; max-height: none !important; }\n"
+            "    .plotly-mobile .scrollbar { display: none !important; }\n"
+            "    .plotly-mobile [style*='overflow'] { "
+            "overflow: visible !important; overflow-y: visible !important; }\n"
+            "}\n"
+            "@media (min-width: 961px) {\n"
+            "    .plotly-desktop { display: block !important; }\n"
+            "    .plotly-mobile { display: none !important; }\n"
+            "}\n"
+            "</style>\n"
+            "<script>\n"
+            "(function() {\n"
+            "    function updateLayout() {\n"
+            f"        var isMobile = {match_media};\n"
+            f"        var desktopContainer = {desktop_get};\n"
+            f"        var mobileContainer = {mobile_get};\n"
+            "\n"
+            "        if (isMobile) {\n"
+            "            if (desktopContainer) "
+            'desktopContainer.style.display = "none";\n'
+            "            if (mobileContainer) "
+            'mobileContainer.style.display = "block";\n'
+            "            disableTableScrolling(mobileContainer);\n"
+            "            if (mobileContainer && !mobileContainer._scrollObserver) {\n"
+            "                mobileContainer._scrollObserver = "
+            "setupScrollObserver(mobileContainer);\n"
+            "            }\n"
+            "        } else {\n"
+            "            if (desktopContainer) "
+            'desktopContainer.style.display = "block";\n'
+            "            if (mobileContainer) "
+            'mobileContainer.style.display = "none";\n'
+            "        }\n"
+            "    }\n"
+            "\n"
+            "    function disableTableScrolling(container) {\n"
+            "        if (!container) return;\n"
+            "        var plots = container.querySelectorAll('.js-plotly-plot');\n"
+            "        plots.forEach(function(plot) {\n"
+            "            var allElements = plot.querySelectorAll('*');\n"
+            "            allElements.forEach(function(el) {\n"
+            "                var style = window.getComputedStyle(el);\n"
+            "                var overflow = style.overflow;\n"
+            "                var overflowY = style.overflowY;\n"
+            "                if (overflow === 'auto' || overflow === 'scroll' || "
+            "overflowY === 'auto' || overflowY === 'scroll') {\n"
+            "                    el.style.setProperty('overflow', 'visible', "
+            "'important');\n"
+            "                    el.style.setProperty('overflow-y', 'visible', "
+            "'important');\n"
+            "                    el.style.setProperty('overflow-x', 'visible', "
+            "'important');\n"
+            "                }\n"
+            "            });\n"
+            "            plot.style.setProperty('overflow', 'visible', 'important');\n"
+            "            plot.style.setProperty('overflow-y', 'visible', "
+            "'important');\n"
+            "            var plotDivs = plot.querySelectorAll('div');\n"
+            "            plotDivs.forEach(function(div) {\n"
+            "                div.style.setProperty('overflow', 'visible', "
+            "'important');\n"
+            "                div.style.setProperty('overflow-y', 'visible', "
+            "'important');\n"
+            "            });\n"
+            "            var svgs = plot.querySelectorAll('svg');\n"
+            "            svgs.forEach(function(svg) {\n"
+            "                svg.style.setProperty('overflow', 'visible', "
+            "'important');\n"
+            "                svg.setAttribute('overflow', 'visible');\n"
+            "            });\n"
+            "        });\n"
+            "    }\n"
+            "\n"
+            "    function setupScrollObserver(container) {\n"
+            "        if (!container) return;\n"
+            "        var observer = new MutationObserver(function(mutations) {\n"
+            "            disableTableScrolling(container);\n"
+            "        });\n"
+            "        observer.observe(container, {\n"
+            "            childList: true,\n"
+            "            subtree: true,\n"
+            "            attributes: true,\n"
+            "            attributeFilter: ['style', 'class']\n"
+            "        });\n"
+            "        return observer;\n"
+            "    }\n"
+            "\n"
+            "    window.addEventListener('resize', updateLayout);\n"
+            "    updateLayout();\n"
+            "    var checkInterval = setInterval(function() {\n"
+            f"        var mobileContainer = {mobile_get};\n"
+            "        if (mobileContainer && "
+            'mobileContainer.style.display !== "none") {\n'
+            "            disableTableScrolling(mobileContainer);\n"
+            "            if (!mobileContainer._scrollObserver) {\n"
+            "                mobileContainer._scrollObserver = "
+            "setupScrollObserver(mobileContainer);\n"
+            "            }\n"
+            "        }\n"
+            "    }, 50);\n"
+            "    setTimeout(function() { clearInterval(checkInterval); }, 2000);\n"
+            "})();\n"
+            "</script>"
+        )
 
     return figure, string_output
